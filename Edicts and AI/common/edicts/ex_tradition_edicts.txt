@@ -1,0 +1,113 @@
+### ExOverhaul Costs ###
+
+@Standard_Edict_Cost = 70
+@Ethic_Edict_Cost = 120
+@Advanced_Edict_Cost = 200
+
+@Standard_Edict_Duration = 3600
+@Ethic_Edict_Duration = 7200
+@Advanced_Edict_Duration = 14400
+
+### ExOverhaul AI Weights ###
+
+#base weight multipliers - use either with weight, factor or add
+@avoid = 0
+@redundant = 0.5
+@standard = 1
+@good = 10
+@important = 25
+@strategic = 100
+@crucial_1 = 1000
+@crucial_2 = 10000
+
+#interest weight modifiers - use with factor
+@reduce_interest_1 = 0.5
+@reduce_interest_2 = 0.25
+@reduce_interest_3 = 0.1
+@increase_interest_1 = 1.25
+@increase_interest_2 = 2.5
+@increase_interest_3 = 5
+
+#use with weight only
+@upgrade_weight = 10000 
+
+planet_edict = {
+	name = "bastion_of_purity"
+	influence_cost = @Advanced_Edict_Cost
+	modifier = {
+		spaceport_ship_build_cost_mult = -0.10
+		planet_building_cost_mult = -0.10
+		pop_consumer_goods_mult = -0.10
+		pop_resource_output = 0.10
+	}
+	
+	length = @Advanced_Edict_Duration
+	
+	potential = {	
+		owner = {
+			AND = {
+				has_global_flag = "ex_traditions_active"
+				has_swapped_tradition = tr_purity_adopt
+				OR = {
+					has_valid_civic = civic_fanatic_purifiers
+					has_valid_civic = civic_hive_devouring_swarm
+					has_valid_civic = civic_inwards_perfection
+					has_valid_civic = civic_machine_terminator
+				}
+			}	
+		}
+	}	
+	
+	allow = {}
+	
+	ai_weight = {
+		weight = @important
+		modifier = {
+			weight = @avoid
+			OR = {
+				owner = { influence < 300 }
+				planet = {
+					OR = {
+						planet_size < 15
+						count_pops = {
+							count < 10
+							limit = { is_colony_pop = yes }
+						}	
+					}	
+				}	
+			}
+		}						
+		modifier = {
+			factor = @increase_interest_1
+			owner = { influence > 800 }
+		}		
+		modifier = {
+			factor = @increase_interest_2
+			owner = { has_edict_bonus_civic = yes }				
+		}				
+		modifier = {
+			factor = @increase_interest_1
+			owner = { has_technology = "tech_artificial_moral_codes" }				
+		}						
+		modifier = {
+			factor = @increase_interest_1
+			owner = { has_edict_bonus_leader = yes }
+		}										
+		modifier = {
+			factor = @increase_interest_2
+			owner = {
+				AND = {
+					has_global_flag = "ex_ethics_active"
+					OR = {
+						is_pacifist = yes
+						has_authority = auth_hive_mind
+					}
+				}
+			}		
+		}		
+		modifier = {
+			factor = @increase_interest_1
+			owner = { has_edict_bonus_tradition = yes }
+		}			
+	}	
+}
