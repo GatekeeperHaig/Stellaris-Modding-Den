@@ -1,0 +1,89 @@
+namespace = ex_terraforming
+
+planet_event = {
+	id = ex_terraforming.1
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		remove_modifier = "atmospheric_hallucinogen"
+		remove_modifier = "atmospheric_aphrodisiac"
+		remove_modifier = "bleak_planet"
+		remove_modifier = "wild_storms"
+		remove_modifier = "asteroid_impacts"
+		remove_modifier = "unstable_tectonics"
+		remove_modifier = "weak_magnetic_field"
+		remove_modifier = "hazardous_weather"
+		remove_modifier = "dangerous_wildlife"
+		remove_modifier = "irradiated_planet"		
+	}
+}
+
+planet_event = {
+	id = ex_terraforming.2
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = { 
+				NOT = { has_modifier = ex_terraformed }
+			}
+			add_modifier = { 
+				modifier = "ex_terraformed" 
+				days = -1 
+			}
+		}	
+		if = {
+			limit = { is_planet_class = pc_gaia }									
+ 			add_modifier = { 
+				modifier = "ex_gaia_world" 
+				days = -1 
+			}									
+		}					
+	}
+}
+
+planet_event = {
+	id = ex_terraforming.3
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		remove_modifier = abandoned_terraforming
+		owner = { end_event_chain = "abandoned_terraforming_chain" }
+	}
+}
+
+planet_event = {
+	id = ex_terraforming.4
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = { 
+				AND = {
+						planet_size < 23
+						NOT = { has_planet_flag = ex_size_increased }						
+				}												
+			}
+			ex_roll_size_increase_large = yes			
+		}
+		if = {
+			limit = { 
+				AND = {
+						planet_size > 22
+						planet_size < 25
+						NOT = { has_planet_flag = ex_size_increased }						
+				}												
+			}
+			ex_roll_size_increase_small = yes			
+		}		
+		set_planet_flag = ex_size_increased			
+	}
+}
