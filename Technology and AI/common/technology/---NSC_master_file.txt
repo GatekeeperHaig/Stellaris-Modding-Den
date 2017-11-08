@@ -1,0 +1,4265 @@
+##################
+### TECH COSTS ###
+##################
+
+@tier1cost1 = 250
+@tier1cost2 = 500
+@tier1cost3 = 750
+@tier1cost4 = 1000
+
+@tier2cost1 = 1500
+@tier2cost2 = 2000
+@tier2cost3 = 2500
+@tier2cost4 = 3000
+
+@tier3cost1 = 4500
+@tier3cost2 = 6000
+@tier3cost3 = 8500
+@tier3cost4 = 10000
+
+@tier4cost1 = 13000
+@tier4cost2 = 16000
+@tier4cost3 = 19000
+@tier4cost4 = 22000
+
+####################
+### TECH WEIGHTS ###
+####################
+
+@tier1weight1 = 100
+@tier1weight2 = 95
+@tier1weight3 = 90
+@tier1weight4 = 85
+
+@tier2weight1 = 70
+@tier2weight2 = 65
+@tier2weight3 = 60
+@tier2weight4 = 55
+
+@tier3weight1 = 40
+@tier3weight2 = 35
+@tier3weight3 = 30
+@tier3weight4 = 25
+
+@tier4weight1 = 20
+@tier4weight2 = 15
+@tier4weight3 = 10
+@tier4weight4 = 5
+
+####################
+### A.I. WEIGHTS ###
+####################
+
+@redundant = 1
+@important = 50
+@strategic = 100
+@crucial = 1000
+
+################
+### SCARCITY ###
+################
+
+@very_common = 1.5
+@common = 1.25
+@scarce = 0.75
+@rare = 0.5
+@very_rare = 0.25
+
+###########################
+### TECH COSTS - REPEATABLE  ###
+###########################
+
+@repeatableTechBaseCost = 5000
+@repeatableTechLevelCost = 1000
+@repeatableTechTier = 4
+
+
+###########################
+### TECH WEIGHTS - REPEATABLE  ###
+###########################
+
+@repeatableTechWeight = 25
+@repatableTechFactor = 0.5
+
+# Integrated Research Paradigm
+tech_integrated_research_paradigm = {
+	cost = @tier1cost2
+	area = society
+	tier = 2
+	category = { statecraft }	
+	weight = @tier1weight2
+	
+	# Unlocks Research Initiative Center, first in upgrade line for R&D Center buildings
+	prereqfor_desc = {
+		building = {
+			title = "TECH_UNLOCK_BUILDING_SCIENCE_CENTER_1_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_BUILDING_SCIENCE_CENTER_1_CONSTRUCTION_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		factor = @very_common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_statecraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @important
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_statecraft"
+			}
+		}
+	}
+}
+
+# Level 3 Kinetic Artillery - Kinetic Barrage
+tech_kinetic_artillery_nsc = {
+	area = physics
+	cost = @tier4cost2
+	tier = 4
+	category = { materials }
+	ai_update_type = military
+	prerequisites = { "tech_kinetic_artillery_2" }
+	is_rare = yes
+	weight = @tier4weight2
+	
+	prereqfor_desc = {
+		custom = {
+			title = "TECH_UNLOCK_KINETIC_ARTILLERY_NSC_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_KINETIC_ARTILLERY_NSC_CONSTRUCTION_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		factor = @rare
+		modifier = {
+			factor = 0			
+			OR = {
+				has_global_flag = "ex_components_active"
+				NOT = { has_global_flag = "has_nsc_active" }				
+			}	
+		}	
+		modifier = {
+			factor = @very_common
+			OR = {
+				is_preferred_weapons = weapon_type_kinetic
+				is_at_war = yes
+			}	
+		}
+		modifier = {
+			factor = @rare
+			NOT = {
+				research_leader = {
+					area = engineering
+					has_trait = "leader_trait_expertise_materials"
+				}	
+			}
+		}
+		modifier = {
+			factor = 1.15
+			OR = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+				has_civic = civic_fanatic_purifiers
+				has_civic = civic_hive_devouring_swarm
+				has_civic = civic_machine_terminator
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @very_common
+			OR = {
+				is_preferred_weapons = weapon_type_kinetic
+				is_at_war = yes
+			}	
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+		modifier = {
+			factor = 1.15
+			OR = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+				has_civic = civic_fanatic_purifiers
+				has_civic = civic_hive_devouring_swarm
+				has_civic = civic_machine_terminator
+			}
+		}
+	}
+}
+
+# Level 3 Energy Lance
+tech_energy_lance_NSC = {
+	area = physics
+	cost = @tier4cost2
+	tier = 4
+	category = { particles }
+	ai_update_type = military
+	prerequisites = { "tech_energy_lance_2" }
+	is_rare = yes
+	weight = @tier4weight2
+	
+	prereqfor_desc = {
+		custom = {
+			title = "TECH_UNLOCK_ENERGY_LANCE_NSC_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_ENERGY_LANCE_NSC_CONSTRUCTION_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		factor = @rare
+		modifier = {
+			factor = 0			
+			OR = {
+				has_global_flag = "ex_components_active"
+				NOT = { has_global_flag = "has_nsc_active" }				
+			}	
+		}			
+		modifier = {
+			factor = @very_common
+			OR = {
+				is_preferred_weapons = weapon_type_energy
+				is_at_war = yes
+			}	
+		}
+		modifier = {
+			factor = @rare
+			NOT = {
+				research_leader = {
+					area = physics
+					has_trait = "leader_trait_expertise_particles"
+				}	
+			}
+		}
+		modifier = {
+			factor = 1.15
+			OR = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+				has_civic = civic_fanatic_purifiers
+				has_civic = civic_hive_devouring_swarm
+				has_civic = civic_machine_terminator
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @very_common
+			OR = {
+				is_preferred_weapons = weapon_type_energy
+				is_at_war = yes
+			}	
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_particles"
+			}
+		}
+		modifier = {
+			factor = 1.15
+			OR = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+				has_civic = civic_fanatic_purifiers
+				has_civic = civic_hive_devouring_swarm
+				has_civic = civic_machine_terminator
+			}
+		}
+	}	
+}
+
+# Level 3 arc_emmiter
+tech_arc_emitter_NSC = {
+	area = physics
+	cost = @tier4cost2
+	tier = 4
+	category = { particles }
+	ai_update_type = military
+	prerequisites = { "tech_arc_emitter_2" }
+	is_rare = yes 
+	weight = @tier4weight2
+	
+	prereqfor_desc = {
+		custom = {
+			title = "TECH_UNLOCK_ARC_EMITTER_NSC_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_ARC_EMITTER_NSC_CONSTRUCTION_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		factor = @rare	
+		modifier = {
+			factor = 0			
+			OR = {
+				has_global_flag = "ex_components_active"
+				NOT = { has_global_flag = "has_nsc_active" }				
+			}	
+		}	
+		modifier = {
+			factor = @very_common
+			OR = {
+				is_preferred_weapons = weapon_type_energy
+				is_at_war = yes
+			}	
+		}
+		modifier = {
+			factor = @rare
+			NOT = {
+				research_leader = {
+					area = physics
+					has_trait = "leader_trait_expertise_particles"
+				}	
+			}
+		}
+		modifier = {
+			factor = 1.15
+			OR = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+				has_civic = civic_fanatic_purifiers
+				has_civic = civic_hive_devouring_swarm
+				has_civic = civic_machine_terminator
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @very_common
+			OR = {
+				is_preferred_weapons = weapon_type_energy
+				is_at_war = yes
+			}	
+		}
+		modifier = {
+			factor = @rare
+			NOT = {
+				research_leader = {
+					area = physics
+					has_trait = "leader_trait_expertise_particles"
+				}	
+			}
+		}
+		modifier = {
+			factor = 1.15
+			OR = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+				has_civic = civic_fanatic_purifiers
+				has_civic = civic_hive_devouring_swarm
+				has_civic = civic_machine_terminator
+			}
+		}
+	}
+}
+
+# Level 3 XL Kinetic
+tech_mass_accelerator_NSC = {
+	area = engineering
+	cost = @tier4cost2
+	tier = 4
+	category = { materials }
+	ai_update_type = military
+	prerequisites = { "tech_mass_accelerator_2" }
+	is_rare = yes
+	weight = @tier4weight2
+	
+	prereqfor_desc = {
+		custom = {
+			title = "TECH_UNLOCK_MASS_ACCELERATOR_NSC_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_MASS_ACCELERATOR_NSC_CONSTRUCTION_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		factor = @rare
+		modifier = {
+			factor = 0			
+			OR = {
+				has_global_flag = "ex_components_active"
+				NOT = { has_global_flag = "has_nsc_active" }				
+			}	
+		}	
+		modifier = {
+			factor = @very_common
+			OR = {
+				is_preferred_weapons = weapon_type_kinetic
+				is_at_war = yes
+			}	
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+		modifier = {
+			factor = 1.15
+			OR = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+				has_civic = civic_fanatic_purifiers
+				has_civic = civic_hive_devouring_swarm
+				has_civic = civic_machine_terminator
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @very_common
+			OR = {
+				is_preferred_weapons = weapon_type_kinetic
+				is_at_war = yes
+			}	
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+		modifier = {
+			factor = 1.15
+			OR = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+				has_civic = civic_fanatic_purifiers
+				has_civic = civic_hive_devouring_swarm
+				has_civic = civic_machine_terminator
+			}
+		}
+	}
+}
+
+#Science/Conctruction Cruiser Upgrades
+tech_civilian_cruiser_upgrades = {
+	cost = @tier2cost3
+	area = physics
+	tier = 2
+	category = { voidcraft }
+	prerequisites = { "tech_spaceport_2" }
+	weight = @tier2weight2
+		
+	## Unlocks Science/Construction Cruiser Segment, Bonuses, and Defense Aura.
+	prereqfor_desc = {
+		custom = { #Both Auras take priority, only leaving room for one descriptor.
+			title = "TECH_UNLOCK_CIVILIANCRUISER_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_CIVILIANCRUISER_CONSTRUCTION_DESC"
+		}
+	}
+	
+	# Modifiers always take priority in the description box, so NO modifiers can be attached to this tech.
+	modifier = {
+		description = civilian_cruiser_upgrades_modifier_desc
+		shipsize_colonizer_construction_speed_mult = 0.35
+		shipsize_colonizer_build_cost_mult = -0.20
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}		
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_civilian_cruiser_upgrades }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed > 26
+		}
+		modifier = {
+			factor = 1
+			years_passed > 25
+		}
+		modifier = {
+			factor = 2
+			years_passed > 30
+		}
+		modifier = {
+			factor = 3
+			years_passed > 35
+		}
+		modifier = {
+			factor = 4
+			years_passed > 40
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = { 
+		factor = 50 # Important upgrade especially for the AI to help with stupidity.
+		modifier = {
+			factor = 5
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+tech_frigate_upgrades_1 = {
+	cost = @tier2cost3
+	area = engineering
+	tier = 2
+	category = { voidcraft }
+	prerequisites = { "tech_spaceport_4" } #Available immediately after Light Carriers (if they remain unlocked at this stage).
+	weight = @tier2weight1
+	
+	prereqfor_desc = {
+		custom = {
+			title = "TECH_UNLOCK_FRIGATE_UPGRADES_TITLE"
+			desc = "TECH_UNLOCK_FRIGATE_UPGRADES_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+		modifier = {
+			factor = 0
+			NOT = {
+				OR = {
+					has_technology = tech_pd_tracking_1
+					has_technology = tech_pd_tracking_2
+					has_technology = tech_pd_tracking_3
+					has_technology = tech_flak_batteries_1
+					has_technology = tech_flak_batteries_2
+				}
+			}
+		}
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_frigate_upgrades_1 }
+		}
+		modifier = {
+			factor = 1
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+		}
+		modifier = {
+			factor = 2
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+			has_technology = tech_spaceport_4
+		}
+		modifier = {
+			factor = 3
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+			has_technology = tech_spaceport_5
+		}
+		modifier = {
+			factor = 5
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+			has_technology = tech_spaceport_6
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic #important tech - Frigate Upgrades
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+tech_corvette_upgrades_1 = {
+	cost = @tier2cost4
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_carrier_1" }
+	weight = @tier2weight2
+	
+	prereqfor_desc = {
+		custom = {
+			title = "TECH_UNLOCK_CORVETTE_UPGRADES_TITLE"
+			desc = "TECH_UNLOCK_CORVETTE_UPGRADES_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}		
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_corvette_upgrades_1 }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 51
+		}	
+		modifier = {
+			factor = 1
+			years_passed > 50
+		}
+		modifier = {
+			factor = 2
+			years_passed > 60
+		}
+		modifier = {
+			factor = 3
+			years_passed > 70
+		}
+		modifier = {
+			factor = 4
+			years_passed > 80
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic #important tech - Corvette Segments
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+tech_destroyer_upgrades_1 = {
+	cost = @tier2cost4
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_carrier_1" }
+	weight = @tier2weight2
+	
+	prereqfor_desc = {
+		custom = {
+			title = "TECH_UNLOCK_DESTROYER_UPGRADES_TITLE"
+			desc = "TECH_UNLOCK_DESTROYER_UPGRADES_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+		
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_destroyer_upgrades_1 }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 51
+		}	
+		modifier = {
+			factor = 1
+			years_passed > 50
+		}
+		modifier = {
+			factor = 2
+			years_passed > 60
+		}
+		modifier = {
+			factor = 3
+			years_passed > 70
+		}
+		modifier = {
+			factor = 4
+			years_passed > 80
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic #important tech - Destroyer Upgrades
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+tech_spitfire_battleship_upgrades = {
+	cost = @tier3cost1
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_carrier_1" }
+	weight = @tier2weight4
+	
+	prereqfor_desc = {
+		custom = {
+			title = "TECH_UNLOCK_SPITFIRE_UPGRADES_TITLE"
+			desc = "TECH_UNLOCK_SPITFIRE_UPGRADES_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+		
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_spitfire_battleship_upgrades }
+		}
+		modifier = {
+			factor = 2
+			has_technology = tech_corvette_upgrades_1
+			NOT = { has_technology = tech_destroyer_upgrades_1 }
+		}
+		modifier = {
+			factor = 2
+			has_technology = tech_destroyer_upgrades_1
+			NOT = { has_technology = tech_corvette_upgrades_1 }
+		}
+		modifier = {
+			factor = 5
+			has_technology = tech_corvette_upgrades_1
+			has_technology = tech_destroyer_upgrades_1
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 51
+		}	
+		modifier = {
+			factor = 1
+			years_passed > 50
+		}
+		modifier = {
+			factor = 2
+			years_passed > 60
+		}
+		modifier = {
+			factor = 3
+			years_passed > 70
+		}
+		modifier = {
+			factor = 4
+			years_passed > 80
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic #important tech - Ship Upgrade
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+tech_supercarrier_1 = {
+	cost = @tier4cost4
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	is_rare = yes
+	prerequisites = { "tech_dreadnought_1" }
+	weight = @tier3weight2
+	
+	gateway = ship
+	
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_SUPERCARRIER_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_SUPERCARRIER_CONSTRUCTION_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+		
+		modifier = {
+			factor = 0
+			NOT = {
+				OR = {
+					has_technology = tech_pd_tracking_1
+					has_technology = tech_pd_tracking_2
+					has_technology = tech_pd_tracking_3
+					has_technology = tech_flak_batteries_1
+					has_technology = tech_flak_batteries_2
+				}
+			}
+		}
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_supercarrier_1 }
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+		}	
+		modifier = {
+			factor = 0.1
+			years_passed > 61
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+		}
+		modifier = {
+			factor = 1
+			years_passed > 60
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+		}
+		modifier = {
+			factor = 2
+			years_passed > 70
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+		}
+		modifier = {
+			factor = 3
+			years_passed > 80
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+		}
+		modifier = {
+			factor = 4
+			years_passed > 90
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic #important tech - Supercarrier
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+# Battleship XL Upgrade
+tech_xl_upgrade_1 = {
+	cost = @tier4cost1
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	is_rare = yes
+	prerequisites = { "tech_carrier_1" }
+	weight = @tier3weight1
+	
+	gateway = ship
+	
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_XL_BATTLESHIP_UPGRADE_TITLE"
+			desc = "TECH_UNLOCK_XL_BATTLESHIP_UPGRADE_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+
+		modifier = {
+			factor = 0
+			NOT = {
+				OR = {
+					has_technology = tech_energy_lance_1
+					has_technology = tech_energy_lance_2
+					has_technology = tech_arc_emitter_1
+					has_technology = tech_arc_emitter_2
+					has_technology = tech_mass_accelerator_1
+					has_technology = tech_mass_accelerator_2
+				}
+			}
+		}
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_xl_upgrade_1 }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 51
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = 1
+			years_passed > 50
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = 2
+			years_passed > 60
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = 3
+			years_passed > 70
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = 4
+			years_passed > 80
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic #important tech - Battleship XL Upgrade
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+# Dreadnought XL Upgrade
+tech_xl_upgrade_2 = {
+	cost = @tier4cost2
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	is_rare = yes
+	prerequisites = { "tech_superdreadnought_1" }
+	weight = @tier3weight2
+	
+	gateway = ship
+	
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_XL_DREADNOUGHT_UPGRADE_TITLE"
+			desc = "TECH_UNLOCK_XL_DREADNOUGHT_UPGRADE_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 0
+			NOT = {
+				OR = {
+					has_technology = tech_energy_lance_1
+					has_technology = tech_energy_lance_2
+					has_technology = tech_arc_emitter_1
+					has_technology = tech_arc_emitter_2
+					has_technology = tech_mass_accelerator_1
+					has_technology = tech_mass_accelerator_2
+				}
+			}
+		}
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_xl_upgrade_2 }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 51
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = 1
+			years_passed > 50
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = 2
+			years_passed > 60
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = 3
+			years_passed > 70
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = 4
+			years_passed > 80
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic #important tech - Dreadnought XL Upgrade
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+# Superdreadnought XL Upgrade
+tech_xl_upgrade_3 = {
+	cost = @tier4cost3
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	is_rare = yes
+	prerequisites = { "tech_flagship_1" }
+	weight = @tier3weight3
+	
+	gateway = ship
+	
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_XL_SUPERDREADNOUGHT_UPGRADE_TITLE"
+			desc = "TECH_UNLOCK_XL_SUPERDREADNOUGHT_UPGRADE_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 0
+			NOT = {
+				OR = {
+					has_technology = tech_energy_lance_1
+					has_technology = tech_energy_lance_2
+					has_technology = tech_arc_emitter_1
+					has_technology = tech_arc_emitter_2
+					has_technology = tech_mass_accelerator_1
+					has_technology = tech_mass_accelerator_2
+				}
+			}
+		}
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_xl_upgrade_3 }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 51
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = 1
+			years_passed > 50
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = 2
+			years_passed > 60
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = 3
+			years_passed > 70
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = 4
+			years_passed > 80
+			OR = {
+				has_technology = tech_energy_lance_1
+				has_technology = tech_energy_lance_2
+				has_technology = tech_arc_emitter_1
+				has_technology = tech_arc_emitter_2
+				has_technology = tech_mass_accelerator_1
+				has_technology = tech_mass_accelerator_2
+			}
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic #important tech - Superdreadnought XL Upgrade
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+tech_repeatable_improved_orbital_station_health = {
+	area = engineering
+	cost = @repeatableTechBaseCost
+	cost_per_level = @repeatableTechLevelCost
+	tier = 1
+	category = { voidcraft }
+	levels = -1
+	prerequisites = { "tech_spaceport_1" }
+	weight = @repeatableTechWeight
+	
+	weight_modifier = { 
+		factor = @repatableTechFactor 
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}		
+	}
+	
+	ai_weight = { factor = 1.0 }
+	
+	weight_groups = { repeatable }
+	
+	mod_weight_if_group_picked = { repeatable = 0.01 }
+	
+	modifier = { shipclass_orbital_station_hit_points_mult = 0.10 }
+}
+
+#Advanced Construction Techniques (Strike Cruiser)
+tech_advanced_construction_techniques_strike_cruiser = {
+	cost = @tier2cost3
+	area = society
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_spaceport_6" }
+	weight = @tier2weight3
+		
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_advanced_construction_techniques_strike_cruiser }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 31
+		}
+		modifier = {
+			factor = 1
+			years_passed > 30
+		}
+		modifier = {
+			factor = 2
+			years_passed > 35
+		}
+		modifier = {
+			factor = 3
+			years_passed > 40
+		}
+		modifier = {
+			factor = 4
+			years_passed > 50
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	modifier = {
+		shipsize_StrikeCruiser_construction_speed_mult = 0.35
+		shipsize_StrikeCruiser_build_cost_mult = -0.20
+	}
+	
+	ai_weight = {
+		factor = @strategic #higher factor due to battleship hull
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+#Advanced Construction Techniques (Battlecruiser)
+tech_advanced_construction_techniques_battlecruiser = {
+	cost = @tier2cost2
+	area = society
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_spaceport_5" }
+	weight = @tier2weight2
+		
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_advanced_construction_techniques_battlecruiser }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 41
+		}	
+		modifier = {
+			factor = 1
+			years_passed > 40
+		}
+		modifier = {
+			factor = 2
+			years_passed > 45
+		}
+		modifier = {
+			factor = 3
+			years_passed > 50
+		}
+		modifier = {
+			factor = 4
+			years_passed > 60
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	modifier = {
+		shipsize_Battlecruiser_construction_speed_mult = 0.35
+		shipsize_Battlecruiser_build_cost_mult = -0.20
+	}
+	
+	ai_weight = {
+		factor = @strategic #higher factor due to battleship hull
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+#Advanced Construction Techniques (Light Carrier)
+tech_advanced_construction_techniques_light_carrier = {
+	cost = @tier2cost1
+	area = society
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_spaceport_4" }
+	weight = @tier2weight1
+		
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_advanced_construction_techniques_light_carrier }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 51
+		}	
+		modifier = {
+			factor = 1
+			years_passed > 50
+		}
+		modifier = {
+			factor = 2
+			years_passed > 60
+		}
+		modifier = {
+			factor = 3
+			years_passed > 70
+		}
+		modifier = {
+			factor = 4
+			years_passed > 80
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	modifier = {
+		shipsize_LightCarrier_construction_speed_mult = 0.35
+		shipsize_LightCarrier_build_cost_mult = -0.20
+	}
+	
+	ai_weight = {
+		factor = @strategic #higher factor due to battleship hull
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+#Advanced Construction Techniques (Carrier)
+tech_advanced_construction_techniques_carrier = {
+	cost = @tier3cost1
+	area = society
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_carrier_1" }
+	weight = @tier3weight1
+		
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_advanced_construction_techniques_carrier }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 61
+		}
+		modifier = {
+			factor = 1
+			years_passed > 60
+		}
+		modifier = {
+			factor = 2
+			years_passed > 70
+		}
+		modifier = {
+			factor = 3
+			years_passed > 80
+		}
+		modifier = {
+			factor = 4
+			years_passed > 90
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	modifier = {
+		shipsize_Carrier_construction_speed_mult = 0.35
+		shipsize_Carrier_build_cost_mult = -0.20
+	}
+	
+	ai_weight = {
+		factor = @strategic #higher factor due to battleship hull
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+#Advanced Construction Techniques (Dreadnought)
+tech_advanced_construction_techniques_dreadnought = {
+	cost = @tier3cost2
+	area = society
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_dreadnought_1" }
+	weight = @tier3weight2
+		
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_advanced_construction_techniques_dreadnought }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 66
+		}
+		modifier = {
+			factor = 1
+			years_passed > 65
+		}
+		modifier = {
+			factor = 2
+			years_passed > 75
+		}
+		modifier = {
+			factor = 3
+			years_passed > 85
+		}
+		modifier = {
+			factor = 4
+			years_passed > 100
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	modifier = {
+		shipsize_Dreadnought_construction_speed_mult = 0.35
+		shipsize_Dreadnought_build_cost_mult = -0.20
+	}
+	
+	ai_weight = {
+		factor = @strategic #higher factor due to battleship hull
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+#Advanced Construction Techniques (Superdreadnought)
+tech_advanced_construction_techniques_superdreadnought = {
+	cost = @tier3cost4
+	area = society
+	tier = 3
+	category = { voidcraft }
+	is_rare = yes
+	prerequisites = { "tech_superdreadnought_1" }
+	weight = @tier3weight3
+		
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_advanced_construction_techniques_superdreadnought }
+		}
+		modifier = {
+			factor = 0
+			years_passed < 41
+		}
+		modifier = {
+			factor = 0.1
+			has_technology = tech_superdreadnought_1
+			years_passed > 40
+			years_passed < 76
+		}
+		modifier = {
+			factor = 1
+			years_passed > 75
+		}
+		modifier = {
+			factor = 2
+			years_passed > 85
+		}
+		modifier = {
+			factor = 3
+			years_passed > 90
+		}
+		modifier = {
+			factor = 4
+			years_passed > 100
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	modifier = {
+		shipsize_Superdreadnought_construction_speed_mult = 0.35
+		shipsize_Superdreadnought_build_cost_mult = -0.20
+	}
+	
+	ai_weight = {
+		factor = @strategic #higher factor due to battleship hull
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+#Advanced Construction Techniques (Flagship)
+tech_advanced_construction_techniques_flagship = {
+	cost = @tier4cost1
+	area = society
+	tier = 3
+	category = { voidcraft }
+	is_rare = yes
+	prerequisites = { "tech_flagship_1" }
+	weight = @tier3weight4
+		
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_advanced_construction_techniques_flagship }
+		}
+		modifier = {
+			factor = 0
+			years_passed < 51
+		}
+		modifier = {
+			factor = 0.1
+			years_passed > 50
+			years_passed < 101
+		}
+		modifier = {
+			factor = 1
+			years_passed > 100
+		}
+		modifier = {
+			factor = 2
+			years_passed > 110
+		}
+		modifier = {
+			factor = 3
+			years_passed > 120
+		}
+		modifier = {
+			factor = 4
+			years_passed > 130
+		}
+		modifier = {
+			factor = 5
+			years_passed > 150
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	modifier = {
+		shipsize_Flagship_construction_speed_mult = 0.35
+		shipsize_Flagship_build_cost_mult = -0.20
+	}
+	
+	ai_weight = {
+		factor = @strategic #higher factor due to battleship hull
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+#Advanced Construction Techniques (Military Stations)
+tech_advanced_construction_techniques_military_stations = {
+	cost = @tier2cost1
+	area = society
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_spaceport_6" "tech_space_defense_station_3" }
+	weight = @tier1weight4
+		
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_advanced_construction_techniques_military_stations }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 31
+		}
+		modifier = {
+			factor = 1
+			years_passed > 30
+		}
+		modifier = {
+			factor = 2
+			years_passed > 40
+		}
+		modifier = {
+			factor = 3
+			years_passed > 50
+		}
+		modifier = {
+			factor = 4
+			years_passed > 60
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	modifier = {
+		shipsize_military_station_small_construction_speed_mult = 0.35
+		shipsize_military_station_small_build_cost_mult = -0.20
+		shipsize_military_station_medium_construction_speed_mult = 0.35
+		shipsize_military_station_medium_build_cost_mult = -0.20
+		shipsize_military_station_large_construction_speed_mult = 0.35
+		shipsize_military_station_large_build_cost_mult = -0.20
+	}
+	
+	ai_weight = {
+		factor = @strategic #higher factor due to battleship hull
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+#Advanced Construction Techniques (Battle Fortress)
+tech_advanced_construction_techniques_battle_fortress = {
+	cost = @tier3cost1
+	area = society
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_spaceport_6" "tech_battle_fortress_1" }
+	weight = @tier2weight4
+		
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_advanced_construction_techniques_battle_fortress }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 51
+		}
+		modifier = {
+			factor = 1
+			years_passed > 50
+		}
+		modifier = {
+			factor = 2
+			years_passed > 60
+		}
+		modifier = {
+			factor = 3
+			years_passed > 70
+		}
+		modifier = {
+			factor = 4
+			years_passed > 80
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	modifier = {
+		shipsize_military_station_xlarge_construction_speed_mult = 0.35
+		shipsize_military_station_xlarge_build_cost_mult = -0.20
+	}
+	
+	ai_weight = {
+		factor = @strategic #higher factor due to battleship hull
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+
+#Advanced Construction Techniques (HQ Station)
+tech_advanced_construction_techniques_hq_station = {
+	cost = @tier4cost2
+	area = society
+	tier = 3
+	category = { voidcraft }
+	is_rare = yes
+	prerequisites = { "tech_headquarters_1" }
+	weight = @tier3weight4
+		
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_advanced_construction_techniques_hq_station }
+		}
+		modifier = {
+			factor = 0
+			years_passed < 61
+		}
+		modifier = {
+			factor = 0.1
+			years_passed > 60
+			years_passed < 101
+		}
+		modifier = {
+			factor = 1
+			years_passed > 100
+		}
+		modifier = {
+			factor = 2
+			years_passed > 120
+		}
+		modifier = {
+			factor = 3
+			years_passed > 130
+		}
+		modifier = {
+			factor = 4
+			years_passed > 140
+		}
+		modifier = {
+			factor = 5
+			years_passed > 160
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	modifier = {
+		shipsize_Headquarters_construction_speed_mult = 0.35
+		shipsize_Headquarters_build_cost_mult = -0.20
+	}
+	
+	ai_weight = {
+		factor = @strategic #higher factor due to battleship hull
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+#Advanced Construction Techniques (Vanilla Ships)
+tech_advanced_construction_techniques_vanilla_ships = {
+	cost = @tier2cost4
+	area = society
+	tier = 2
+	category = { voidcraft }
+	prerequisites = { "tech_battleship_1" }
+	weight = @tier2weight4
+		
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_advanced_construction_techniques_vanilla_ships }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 56
+		}
+		modifier = {
+			factor = 1
+			years_passed > 55
+		}
+		modifier = {
+			factor = 2
+			years_passed > 65
+		}
+		modifier = {
+			factor = 3
+			years_passed > 75
+		}
+		modifier = {
+			factor = 4
+			years_passed > 85
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	modifier = {
+		description = act_vanilla_ships_modifier_desc
+		shipsize_corvette_construction_speed_mult = 0.02 #35 total
+		shipsize_corvette_build_cost_mult = -0.20
+		shipsize_destroyer_construction_speed_mult = 0.02 #35 total
+		shipsize_destroyer_build_cost_mult = -0.20
+		shipsize_cruiser_construction_speed_mult = 0.02 #35 total
+		shipsize_cruiser_build_cost_mult = -0.20
+		shipsize_battleship_construction_speed_mult = 0.02 #35 total
+		shipsize_battleship_build_cost_mult = -0.20
+	}
+	
+	ai_weight = {
+		factor = @strategic #higher factor due to ship class hulls
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+# Advanced Warship Components Tier 1
+tech_advanced_warship_components_1 = {
+	cost = @tier2cost3
+	area = physics
+	tier = 2
+	category = { computing }
+	prerequisites = { "tech_spaceport_4" }
+	weight = @tier2weight1
+		
+	## unlocks Special Component Slot & all Power 50 component sets	
+	prereqfor_desc = {
+		custom = {
+			title = "TECH_UNLOCK_SPECIAL_COMPONENTS_1_TITLE"
+			desc = "TECH_UNLOCK_SPECIAL_COMPONENTS_1_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_advanced_warship_components_1 }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 21
+		}	
+		modifier = {
+			factor = 1
+			years_passed > 20
+		}
+		modifier = {
+			factor = 2
+			years_passed > 30
+		}
+		modifier = {
+			factor = 3
+			years_passed > 35
+		}
+		modifier = {
+			factor = 4
+			years_passed > 40
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_computing"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_computing"
+			}
+		}
+	}
+}
+
+# Advanced Warship Components Tier 2
+tech_advanced_warship_components_2 = {
+	cost = @tier3cost1
+	area = physics
+	tier = 3
+	category = { computing }
+	prerequisites = { "tech_spaceport_6" }
+	weight = @tier2weight4
+		
+	## unlocks remaining Special Ship Components: 75, 100 power modules and both auxiliary modules
+	prereqfor_desc = {
+		custom = {
+			title = "TECH_UNLOCK_SPECIAL_COMPONENTS_2_TITLE"
+			desc = "TECH_UNLOCK_SPECIAL_COMPONENTS_2_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+		
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_advanced_warship_components_2 }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 51
+		}	
+		modifier = {
+			factor = 1
+			years_passed > 50
+		}
+		modifier = {
+			factor = 2
+			years_passed > 60
+		}
+		modifier = {
+			factor = 3
+			years_passed > 65
+		}
+		modifier = {
+			factor = 4
+			years_passed > 70
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_computing"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_computing"
+			}
+		}
+	}
+}
+
+tech_graviton_power = {
+	area = physics
+	cost = @tier4cost1
+	tier = 3
+	category = { particles }
+	ai_update_type = military
+	prerequisites = { "tech_zero_point_power" "tech_block_needed_power" } #This tech is needed if no other component mods are active, thus separate tech block.
+	weight = @tier3weight4
+	
+	modifier = { max_energy = 1000 }
+	
+	weight_modifier = {
+		factor = @very_common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}		
+		modifier = {
+			factor = 2
+			has_technology = tech_spaceport_6
+		}	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_graviton_power }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_industry"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 50 #important component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_industry"
+			}
+		}
+	}
+}
+
+tech_dark_matter_power = {
+	area = physics
+	cost = @tier4cost1
+	tier = 3
+	category = { particles }
+	ai_update_type = military
+	prerequisites = { "tech_graviton_power" "tech_block_needed_power" } #This tech is needed if no other component mods are active, thus separate tech block.
+	weight = @tier3weight4
+	
+	modifier = { max_energy = 1000 }
+	
+	weight_modifier = {
+		factor = 1.5
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}
+		modifier = {
+			factor = 3
+			has_technology = tech_spaceport_6
+		}	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_dark_matter_power }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_industry"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 50 #important component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_industry"
+			}
+		}
+	}
+}
+
+# This tech is the Singularity Reactor, name kept for save-game compatibility.
+tech_adv_zero_point_power = {
+	area = physics
+	cost = @tier4cost2
+	tier = 3
+	category = { particles }
+	ai_update_type = military	
+	prerequisites = { "tech_dark_matter_power" "tech_block_reactors" } #This one is first with "regular" tech block.
+	weight = @tier3weight4
+	
+	modifier = { max_energy = 1000 }
+	
+	weight_modifier = {
+		factor = 1.5
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_adv_zero_point_power }
+		}
+		modifier = {
+			factor = 3
+			has_technology = tech_battleship_1
+		}	
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_industry"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 50 #important component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_industry"
+			}
+		}
+	}
+}
+
+tech_multidimensional_power = {
+	area = physics
+	cost = @tier4cost2
+	tier = 3
+	category = { particles }
+	ai_update_type = military
+	prerequisites = { "tech_adv_zero_point_power" }
+	weight = @tier3weight4
+	
+	modifier = { max_energy = 1000 }
+	
+	weight_modifier = {
+		factor = 1.5
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 3
+			has_technology = tech_carrier_1
+		}	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_multidimensional_power }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_industry"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 50 #important component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_industry"
+			}
+		}
+	}
+}
+
+tech_nsc_zero_point_power = {
+	area = physics
+	cost = @tier4cost3
+	tier = 3
+	category = { particles }
+	is_rare = yes
+	ai_update_type = military
+	prerequisites = { "tech_multidimensional_power" }
+	weight = @tier3weight4
+	
+	modifier = { max_energy = 1000 }
+	
+	weight_modifier = {
+		factor = 1.5
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 3
+			has_technology = tech_dreadnought_1
+		}	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_nsc_zero_point_power }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_industry"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 50 #important component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_industry"
+			}
+		}
+	}
+}
+
+tech_optimized_enigmatic_power = {
+	area = physics
+	cost = @tier4cost4
+	tier = 3
+	category = { particles }
+	is_rare = yes
+	ai_update_type = military
+	prerequisites = { "tech_nsc_zero_point_power" "tech_enigmatic_power_core" }
+	weight = @tier3weight4
+	
+	modifier = { max_energy = 1000 }
+	
+	weight_modifier = {
+		factor = 1.5
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 5
+			has_technology = tech_enigmatic_power_core
+		}
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_optimized_enigmatic_power }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_industry"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 50 #important component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_industry"
+			}
+		}
+	}
+}
+
+tech_shields_6_NSC = {
+	area = physics
+	cost = @tier3cost3
+	tier = 3
+	category = { field_manipulation }
+	ai_update_type = all
+	prerequisites = { "tech_shields_5" "tech_block_shields" }
+	weight = @tier3weight2
+	
+	#modifier = { planet_fortification_strength = 0.2 }
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_shields_6_NSC }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 40 #good component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+}
+
+tech_shields_7_NSC = {
+	area = physics
+	cost = @tier3cost4
+	tier = 3
+	category = { field_manipulation }
+	ai_update_type = all
+	prerequisites = { "tech_shields_6_NSC" }
+	weight = @tier3weight2
+	
+	#modifier = { planet_fortification_strength = 0.2 }
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_shields_7_NSC }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 40 #good component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+}
+
+tech_shields_8_NSC = {
+	area = physics
+	cost = @tier4cost1
+	tier = 3
+	category = { field_manipulation }
+	ai_update_type = all
+	prerequisites = { "tech_shields_7_NSC" }
+	weight = @tier3weight3
+	
+	#modifier = { planet_fortification_strength = 0.2 }
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_shields_8_NSC }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 40 #good component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+}
+
+tech_shields_9_NSC = {
+	area = physics
+	cost = @tier4cost2
+	tier = 3
+	category = { field_manipulation }
+	ai_update_type = all
+	prerequisites = { "tech_shields_8_NSC" }
+	weight = @tier3weight3
+	
+	#modifier = { planet_fortification_strength = 0.2 }
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_shields_9_NSC }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 40 #good component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+}
+
+tech_shields_10_NSC = {
+	area = physics
+	cost = @tier4cost3
+	tier = 3
+	category = { field_manipulation }
+	is_rare = yes
+	ai_update_type = all
+	prerequisites = { "tech_shields_9_NSC" }
+	weight = @tier3weight4
+	
+	#modifier = { planet_fortification_strength = 0.2 }
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_shields_10_NSC }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 40 #good component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+}
+
+tech_shields_11_psionic_NSC = {
+	area = physics
+	cost = @tier4cost4
+	tier = 3
+	category = { field_manipulation }
+	is_rare = yes
+	ai_update_type = all
+	prerequisites = { "tech_shields_10_NSC" "tech_psionic_shield" }
+	weight = @tier3weight4
+	
+	#modifier = { planet_fortification_strength = 0.2 }
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_shields_11_psionic_NSC }
+		}
+		modifier = {
+			factor = 5
+			has_technology = tech_psionic_shield
+		}	
+		modifier = {
+			factor = 2
+			has_technology = tech_shields_10_NSC
+		}	
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 40 #good component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+}
+
+tech_shields_12_enigmatic_NSC = {
+	area = physics
+	cost = @tier4cost4
+	tier = 3
+	category = { field_manipulation }
+	is_rare = yes
+	ai_update_type = all
+	prerequisites = { "tech_shields_10_NSC" "tech_enigmatic_deflector" }
+	weight = @tier3weight4
+	
+	#modifier = { planet_fortification_strength = 0.2 }
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_shields_12_enigmatic_NSC }
+		}
+		modifier = {
+			factor = 5
+			has_technology = tech_enigmatic_deflector
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 40 #good component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_field_manipulation"
+			}
+		}
+	}
+}
+
+# Ablative Neutronium Armor
+tech_ship_armor_6_NSC = {
+	area = engineering
+	cost = @tier3cost3
+	tier = 3
+	category = { materials }
+	ai_update_type = all
+	prerequisites = { "tech_block_armors" "tech_ship_armor_5" }
+	weight = @tier3weight3
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_ship_armor_6_NSC }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 30
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
+}
+
+# Reactive Nanocomposite Armor
+tech_ship_armor_7_NSC = {
+	area = engineering
+	cost = @tier3cost4
+	tier = 3
+	category = { materials }
+	ai_update_type = all
+	prerequisites = { "tech_ship_armor_6_NSC" }
+	weight = @tier3weight3
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_ship_armor_7_NSC }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 30
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
+}
+
+# Neutronium Nanocomposite Armor
+tech_ship_armor_8_NSC = {
+	area = engineering
+	cost = @tier4cost1
+	tier = 3
+	category = { materials }
+	ai_update_type = all
+	prerequisites = { "tech_ship_armor_7_NSC" }
+	weight = @tier3weight3
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_ship_armor_8_NSC }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 30
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
+}
+
+# Anti-Neutronium Nanocomposite Armor
+tech_ship_armor_9_NSC = {
+	area = engineering
+	cost = @tier4cost2
+	tier = 3
+	category = { materials }
+	ai_update_type = all
+	prerequisites = { "tech_ship_armor_8_NSC" }
+	weight = @tier3weight3
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_ship_armor_9_NSC }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 30
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
+}
+
+# Gravi-Forged Nanocomposite Armor
+tech_ship_armor_10_NSC = {
+	area = engineering
+	cost = @tier4cost3
+	tier = 3
+	category = { materials }
+	is_rare = yes
+	ai_update_type = all
+	prerequisites = { "tech_ship_armor_9_NSC" }
+	weight = @tier3weight4
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_ship_armor_10_NSC }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 30
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
+}
+
+# Optimized Adaptive Dragon Armor
+tech_optimized_adaptive_dragon_armor = {
+	area = engineering
+	cost = @tier4cost4
+	tier = 3
+	category = { materials }
+	is_rare = yes
+	ai_update_type = all
+	prerequisites = { "tech_dragon_armor" "tech_ship_armor_10_NSC" }
+	weight = @tier3weight4
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = {  has_technology = tech_optimized_adaptive_dragon_armor	}
+		}
+		modifier = {
+			factor = 5
+			has_technology = tech_dragon_armor
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 30
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
+}
+
+tech_sensors_5_NSC = {
+	area = physics
+	cost = @tier3cost3
+	tier = 3
+	category = { voidcraft }
+	ai_update_type = all	
+	prerequisites = { "tech_block_components" "tech_sensors_4" }
+	weight = @tier3weight2
+		
+	modifier = { planet_sensor_range_add = 30 } #planet_sensor_range_mult = 0.5
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_sensors_5_NSC }
+		}
+		modifier = { #This modifier is to ensure the Player gets the sensor tech more readily if the player already unlocked any ship/station requiring the EWARS Array.
+			factor = 20
+			OR = {
+				#Flagship/HQ Station not included due to requiring the one of the first two respectively.
+				has_technology = tech_superdreadnought_1
+				has_technology = tech_battle_fortress_1
+				has_technology = tech_sensorstation_1
+			}
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}	
+	
+	ai_weight = {
+		factor = 15 #good component
+		modifier = {
+			factor = 10
+			any_neighbor_country = {
+				has_technology = tech_sensors_5_NSC
+			}
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+tech_sensors_6_NSC = {
+	area = physics
+	cost = @tier3cost4
+	tier = 3
+	category = { voidcraft }
+	ai_update_type = all	
+	prerequisites = { "tech_sensors_5_NSC" }
+	weight = @tier3weight3
+		
+	modifier = { planet_sensor_range_add = 30 } #planet_sensor_range_mult = 0.5
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}		
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_sensors_6_NSC }
+		}
+		modifier = { #This modifier is to ensure the Player gets the sensor tech more readily if the player already unlocked any ship/station requiring the EWARS Array.
+			factor = 20
+			OR = {
+				#Flagship/HQ Station not included due to requiring the one of the first two respectively.
+				has_technology = tech_superdreadnought_1
+				has_technology = tech_battle_fortress_1
+				has_technology = tech_sensorstation_1
+			}
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}	
+	
+	ai_weight = {
+		factor = 15 #good component
+		modifier = {
+			factor = 10
+			any_neighbor_country = {
+				has_technology = tech_sensors_6_NSC
+			}
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = physics
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+#Graviton Thrusters
+tech_thrusters_5_NSC = {
+	area = engineering
+	cost = @tier3cost4
+	tier = 3
+	category = { rocketry }
+	ai_update_type = all
+	prerequisites = { "tech_block_components" "tech_thrusters_4" }
+	weight = @tier3weight2
+	
+	weight_modifier = {
+		factor = @common
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}				
+		modifier = {
+			factor = 0			
+			has_global_flag = "ex_components_active_active"
+		}					
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_thrusters_5_NSC }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_rocketry"
+			}
+		}
+		modifier = {
+			factor = 2
+			has_technology = tech_spaceport_6
+		}
+	}
+	
+	ai_weight = {
+		factor = 3 #important component
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_rocketry"
+			}
+		}
+	}
+}
+
+tech_battleship_1 = {
+	cost = @tier3cost4
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_spaceport_6" }
+	weight = @tier2weight2
+	
+	gateway = ship
+	
+	## Unlocks Battleship
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_BATTLESHIP2_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_BATTLESHIP2_CONSTRUCTION_DESC"
+		}
+	}
+	
+	modifier = { max_minerals = 2000 }
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}			
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_battleship_1 }
+		}	
+		modifier = {
+			factor = 0.1
+			years_passed < 56
+		}
+		modifier = {
+			factor = 1
+			years_passed > 55
+		}
+		modifier = {
+			factor = 2
+			years_passed > 65
+		}
+		modifier = {
+			factor = 3
+			years_passed > 75
+		}
+		modifier = {
+			factor = 4
+			years_passed > 85
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic #important tech - Battleship
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+tech_carrier_1 = {
+	cost = @tier4cost1
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_battleship_1" }
+	weight = @tier2weight3
+	
+	gateway = ship
+	
+	## Unlocks Carrier
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_CARRIER_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_CARRIER_CONSTRUCTION_DESC"
+		}
+	}
+	
+	modifier = { max_minerals = 2000 }
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}			
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_carrier_1 }
+		}	
+		modifier = {
+			factor = 0.1
+			years_passed < 61
+		}
+		modifier = {
+			factor = 1
+			years_passed > 60
+		}
+		modifier = {
+			factor = 2
+			years_passed > 70
+		}
+		modifier = {
+			factor = 3
+			years_passed > 80
+		}
+		modifier = {
+			factor = 4
+			years_passed > 90
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic #important tech - Carrier
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+tech_dreadnought_1 = {
+	cost = @tier4cost2
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_carrier_1" }
+	weight = @tier2weight4
+	
+	gateway = ship
+	
+	## Unlocks Dreadnought
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_DREADNOUGHT_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_DREADNOUGHT_CONSTRUCTION_DESC"
+		}
+	}
+	
+	modifier = { max_minerals = 2000 }
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}			
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_dreadnought_1 }
+		}	
+		modifier = {
+			factor = 0.1
+			years_passed < 66
+		}
+		modifier = {
+			factor = 1
+			years_passed > 65
+		}
+		modifier = {
+			factor = 2
+			years_passed > 75
+		}
+		modifier = {
+			factor = 3
+			years_passed > 85
+		}
+		modifier = {
+			factor = 4
+			years_passed > 100
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic #important tech - Dreadnought
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+tech_superdreadnought_1 = {
+	cost = @tier4cost3
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	is_rare = yes
+	prerequisites = { "tech_dreadnought_1" }
+	weight = @tier3weight2
+	
+	gateway = ship
+	
+	## Unlocks Superdreadnought
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_SUPERDREADNOUGHT_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_SUPERDREADNOUGHT_CONSTRUCTION_DESC"
+		}
+	}
+	
+	modifier = { max_minerals = 2000 }
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}			
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_superdreadnought_1 }
+		}	
+		modifier = {
+			factor = 0.1
+			years_passed < 71
+		}
+		modifier = {
+			factor = 1
+			years_passed > 70
+		}
+		modifier = {
+			factor = 2
+			years_passed > 80
+		}
+		modifier = {
+			factor = 3
+			years_passed > 90
+		}
+		modifier = {
+			factor = 4
+			years_passed > 100
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic #important tech - Superdreadnought
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+tech_flagship_1 = {
+	cost = @tier4cost4
+	area = engineering
+	tier = 4
+	category = { voidcraft }
+	is_rare = yes
+	prerequisites = { "tech_superdreadnought_1" }
+	weight = @tier3weight2
+	
+	gateway = ship
+	
+	## Unlocks Flagship
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_FLAGSHIP_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_FLAGSHIP_CONSTRUCTION_DESC"
+		}
+	}
+	
+	modifier = { max_minerals = 2000 }
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}			
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_flagship_1 }
+		}
+		modifier = {
+			factor = 10
+			has_technology = tech_headquarters_1
+		}
+		modifier = {
+			factor = 0
+			NOT = { has_technology = tech_superdreadnought_1 }
+			years_passed < 46
+		}
+		modifier = {
+			factor = 0.1
+			has_technology = tech_superdreadnought_1
+			years_passed < 46
+		}
+		modifier = {
+			factor = 0.1
+			years_passed > 45
+			years_passed < 71
+		}
+		modifier = {
+			factor = 1
+			years_passed > 70
+		}
+		modifier = {
+			factor = 2
+			years_passed > 80
+		}
+		modifier = {
+			factor = 3
+			years_passed > 90
+		}
+		modifier = {
+			factor = 4
+			years_passed > 100
+		}
+		modifier = {
+			factor = 5
+			years_passed > 110
+		}
+		modifier = {
+			factor = 6
+			years_passed > 120
+		}
+		modifier = {
+			factor = 7
+			years_passed > 130
+		}
+		modifier = {
+			factor = 8
+			years_passed > 140
+		}
+		modifier = {
+			factor = 10
+			years_passed > 150
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic #important tech - Flagship
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+#Sensor Station
+tech_sensorstation_1 = {
+	cost = @tier2cost2
+	area = engineering
+	tier = 2
+	category = { voidcraft }
+	prerequisites = { "tech_spaceport_3" }
+	weight = @tier2weight2
+		
+	## Unlocks Sensor Station	
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_SENSORSTATION_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_SENSORSTATION_CONSTRUCTION_DESC"
+		}
+	}
+	
+	weight_modifier = {	
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}			
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_sensorstation_1 }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 26
+		}
+		modifier = {
+			factor = 1
+			years_passed > 25
+		}
+		modifier = {
+			factor = 2
+			years_passed > 30
+		}
+		modifier = {
+			factor = 3
+			years_passed > 35
+		}
+		modifier = {
+			factor = 4
+			years_passed > 40
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+#Mining Base
+tech_miningbase_1 = {
+	cost = @tier3cost3
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_space_defense_station_3" }
+	weight = @tier3weight1
+		
+	## Unlocks Mining Base	
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_MININGBASE_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_MININGBASE_CONSTRUCTION_DESC"
+		}
+	}
+	
+	weight_modifier = {	
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}			
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_miningbase_1 }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 41
+		}
+		modifier = {
+			factor = 1
+			years_passed > 40
+		}
+		modifier = {
+			factor = 2
+			years_passed > 50
+		}
+		modifier = {
+			factor = 3
+			years_passed > 55
+		}
+		modifier = {
+			factor = 4
+			years_passed > 60
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+
+
+
+#Power Station
+tech_powerstation_1 = {
+	cost = @tier3cost3
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_space_defense_station_3" }
+	weight = @tier3weight1
+		
+	## Unlocks Power Station
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_POWERSTATION_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_POWERSTATION_CONSTRUCTION_DESC"
+		}
+	}
+	
+	weight_modifier = {	
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}			
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_miningbase_1 }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 41
+		}
+		modifier = {
+			factor = 1
+			years_passed > 40
+		}
+		modifier = {
+			factor = 2
+			years_passed > 50
+		}
+		modifier = {
+			factor = 3
+			years_passed > 55
+		}
+		modifier = {
+			factor = 4
+			years_passed > 60
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+
+# Battle Fortress
+tech_battle_fortress_1 = {
+	cost = @tier4cost1
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_space_defense_station_3" }
+	weight = @tier3weight1
+	
+	## Unlocks Battle Fortress
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_BATTLEFORTRESS_TITLE"
+			desc = "TECH_UNLOCK_BATTLEFORTRESS_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}			
+		modifier = {
+			factor = 5
+			has_technology = tech_spaceport_6
+		}	
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_battle_fortress_1 }
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+		modifier = {
+			factor = @common
+			OR = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+			}
+		}
+	}
+	
+	ai_weight = {
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+
+#Headquarters
+tech_headquarters_1 = {
+	cost = @tier4cost4
+	area = engineering
+	tier = 4
+	category = { voidcraft }
+	is_rare = yes
+	prerequisites = { "tech_carrier_1" "tech_battle_fortress_1" }
+	weight = @tier4weight1
+		
+	## Unlocks Headquarters
+	prereqfor_desc = {
+		ship = {
+			title = "TECH_UNLOCK_HEADQUARTERS_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_HEADQUARTERS_CONSTRUCTION_DESC"
+		}
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}			
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_headquarters_1 }
+		}
+		modifier = {
+			factor = 10
+			has_technology = tech_flagship_1
+		}
+		modifier = {
+			factor = 0
+			NOR = {
+				has_technology = tech_carrier_1
+				has_technology = tech_battle_fortress_1 
+			}
+			years_passed < 46
+		}
+		modifier = {
+			factor = 0.1
+			has_technology = tech_carrier_1
+			has_technology = tech_battle_fortress_1
+			years_passed < 46
+		}
+		modifier = {
+			factor = 0.1
+			years_passed > 45
+			years_passed < 71
+		}
+		modifier = {
+			factor = 1
+			years_passed > 70
+		}
+		modifier = {
+			factor = 2
+			years_passed > 80
+		}
+		modifier = {
+			factor = 3
+			years_passed > 90
+		}
+		modifier = {
+			factor = 4
+			years_passed > 100
+		}
+		modifier = {
+			factor = 5
+			years_passed > 110
+		}
+		modifier = {
+			factor = 6
+			years_passed > 120
+		}
+		modifier = {
+			factor = 7
+			years_passed > 130
+		}
+		modifier = {
+			factor = 8
+			years_passed > 140
+		}
+		modifier = {
+			factor = 10
+			years_passed > 150
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = { factor = 0 }
+}
+
+tech_frontier_outpost_1 = {
+	cost = @tier2cost1
+	area = engineering
+	tier = 2
+	category = { voidcraft }
+	prerequisites = { "tech_space_defense_station_1" }
+	weight = @tier2weight1
+	ai_update_type = all
+		
+	## Unlocks Frontier Outpost Tier 2
+	prereqfor_desc = {
+		 custom = {
+			title = "TECH_UNLOCK_FRONTIER_OUTPOST_2_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_FRONTIER_OUTPOST_2_CONSTRUCTION_DESC"
+		}
+	}
+	
+	weight_modifier = {	
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}			
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_frontier_outpost_1 }
+		}
+		modifier = {
+			factor = 0
+			NOT = {
+				OR = {
+					has_technology = tech_pd_tracking_1
+					has_technology = tech_pd_tracking_2
+					has_technology = tech_pd_tracking_3
+					has_technology = tech_flak_batteries_1
+					has_technology = tech_flak_batteries_2
+				}
+			}
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 26
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+		}
+		modifier = {
+			factor = 1
+			years_passed > 25
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+		}
+		modifier = {
+			factor = 2
+			years_passed > 30
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+		}
+		modifier = {
+			factor = 3
+			years_passed > 40
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+		}
+		modifier = {
+			factor = 4
+			years_passed > 50
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+		}
+		modifier = {
+			factor = 5
+			years_passed > 60
+			OR = {
+				has_technology = tech_pd_tracking_1
+				has_technology = tech_pd_tracking_2
+				has_technology = tech_pd_tracking_3
+				has_technology = tech_flak_batteries_1
+				has_technology = tech_flak_batteries_2
+			}
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+tech_frontier_outpost_2 = {
+	cost = @tier3cost1
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_frontier_outpost_1" "tech_space_defense_station_2" }
+	weight = @tier3weight1
+	ai_update_type = all
+		
+	## unlock Frontier Outpost Tier 3
+	prereqfor_desc = {
+		 custom = {
+			title = "TECH_UNLOCK_FRONTIER_OUTPOST_3_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_FRONTIER_OUTPOST_3_CONSTRUCTION_DESC"
+		}
+	}
+	
+	weight_modifier = {	
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}			
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_frontier_outpost_2 }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed < 51
+		}
+		modifier = {
+			factor = 1
+			years_passed > 50
+		}
+		modifier = {
+			factor = 2
+			years_passed > 60
+		}
+		modifier = {
+			factor = 3
+			years_passed > 75
+		}
+		modifier = {
+			factor = 4
+			years_passed > 90
+		}
+		modifier = {
+			factor = 5
+			years_passed > 125
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
+
+tech_frontier_outpost_3 = {
+	cost = @tier4cost1
+	area = engineering
+	tier = 3
+	category = { voidcraft }
+	prerequisites = { "tech_frontier_outpost_2" "tech_space_defense_station_3" }
+	weight = @tier3weight4
+	ai_update_type = all
+		
+	## unlock Frontier Outpost Tier 4
+	prereqfor_desc = {
+		 custom = {
+			title = "TECH_UNLOCK_FRONTIER_OUTPOST_4_CONSTRUCTION_TITLE"
+			desc = "TECH_UNLOCK_FRONTIER_OUTPOST_4_CONSTRUCTION_DESC"
+		}
+	}
+	
+	weight_modifier = {	
+		modifier = {
+			factor = 0			
+			NOT = { has_global_flag = "has_nsc_active" }				
+		}			
+		modifier = {
+			factor = 10
+			any_neighbor_country = { has_technology = tech_frontier_outpost_3 }
+		}
+		modifier = {
+			factor = 0.1
+			years_passed > 76
+		}
+		modifier = {
+			factor = 1
+			years_passed > 75
+		}
+		modifier = {
+			factor = 2
+			years_passed > 90
+		}
+		modifier = {
+			factor = 3
+			years_passed > 110
+		}
+		modifier = {
+			factor = 4
+			years_passed > 125
+		}
+		modifier = {
+			factor = 5
+			years_passed > 150
+		}
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @common
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_voidcraft"
+			}
+		}
+	}
+}
