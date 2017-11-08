@@ -1,0 +1,415 @@
+### ExOverhaul Costs and Weights ###
+
+@cost = 60
+
+@avoid = 0
+@standard = 10
+@important = 25
+@excellent = 50
+@strategic = 100
+@crucial_1 = 250
+@crucial_2 = 1000
+
+@reduce_interest_1 = 0.5
+@reduce_interest_2 = 0.25
+@reduce_interest_3 = 0.1
+@increase_interest_1 = 2
+@increase_interest_2 = 3
+@increase_interest_3 = 5
+
+####################################
+
+tr_expansion_adopt = {
+	cost = { unity = @cost }
+
+	tradition_swap = {
+		name = tr_expansion_adopt_machine
+		inherit_effects = no
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {	has_authority = auth_machine_intelligence }
+		modifier = { shipsize_colonizer_upkeep_mult = -0.75	}
+		weight = { factor = 1 }
+	}
+
+	tradition_swap = {
+		name = tr_expansion_adopt_hive
+		inherit_effects = no
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {	has_authority = auth_hive_mind }
+		modifier = { shipsize_colonizer_upkeep_mult = -0.75	}
+		weight = { factor = 1 }
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @avoid
+			AND = {
+				years_passed < 10
+				OR = {
+					AND = {
+						is_machine_or_hive = no 
+						NOT = { has_non_swapped_tradition = tr_discovery_to_boldly_go }
+					}					
+					AND = {
+						has_non_swapped_tradition = tr_harmony_adopt
+						NOT = { has_non_swapped_tradition = tr_harmony_utopian_dream }
+					}	
+					AND = {
+						has_non_swapped_tradition = tr_prosperity_adopt
+						NOT = { has_non_swapped_tradition = tr_prosperity_pursuit_of_profit }
+					}	
+					AND = {
+						is_xenophile = yes
+						NOT = { has_non_swapped_tradition = tr_diplomacy_alien_tourism }
+					}	
+					AND = {
+						is_purifier_or_perfectionist = yes						
+						NOT = { has_swapped_tradition = tr_purity_symbol_purity }
+					}	
+					AND = {
+						has_authority = auth_machine_intelligence 
+						NOR = { 
+							has_swapped_tradition = tr_discovery_to_boldly_go_machine
+							has_swapped_tradition = tr_prosperity_pursuit_of_profit_machine
+						}
+					}
+					AND = {
+						has_swapped_tradition = tr_synchronicity_adopt_machine
+						OR = { 
+							AND = {
+								has_valid_civic = civic_machine_servitor
+								NOT = { has_swapped_tradition = tr_synchronicity_organic_paradise }
+							}		
+							AND = {
+								has_valid_civic = civic_machine_assimilator
+								NOT = { has_swapped_tradition = tr_synchronicity_cyber_comms }
+							}	
+							AND = {
+								has_authority = auth_machine_intelligence
+								NOR = {
+									has_valid_civic = civic_machine_assimilator
+									has_valid_civic = civic_machine_servitor
+									has_swapped_tradition = tr_synchronicity_machine_center
+								}
+							}	
+						}	
+					}	
+					AND = {
+						has_authority = auth_hive_mind
+						NOT = { has_swapped_tradition = tr_discovery_to_boldly_go_hive }
+					}	
+					AND = {
+						has_swapped_tradition = tr_prosperity_adopt_hive
+						NOT = { has_swapped_tradition = tr_prosperity_hive_neural_signal_boosters }
+					}	
+					AND = {
+						has_swapped_tradition = tr_synchronicity_hive_adopt
+						NOT = { has_swapped_tradition = tr_synchronicity_hive_mind_synapse }
+					}							
+				}	
+			}	
+		}				
+		modifier = {
+			factor = @reduce_interest_1
+			OR = {
+				AND = {
+					is_xenophile = no
+					is_machine_or_hive = no
+					NOT = { has_non_swapped_tradition = tr_harmony_utopian_dream }
+				}
+				AND = {
+					has_authority = auth_hive_mind
+					NOT = { has_swapped_tradition = tr_synchronicity_hive_mind_synapse }
+				}	
+				AND = {
+					has_valid_civic = civic_hive_devouring_swarm
+					NOT = { has_swapped_tradition = tr_purity_natural_order }
+				}	
+				AND = {
+					has_valid_civic = civic_machine_terminator
+					NOT = { has_swapped_tradition = tr_purity_age_machines }
+				}				
+			}	
+		}			
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				years_passed > 10
+				years_passed < 20
+			}	
+		}
+		modifier = {
+			factor = @increase_interest_2
+			AND = {
+				years_passed > 20
+				years_passed < 30
+			}	
+		}			
+		modifier = {
+			factor = @increase_interest_3
+			years_passed > 30
+		}			
+		modifier = {
+			factor = @increase_interest_1
+			num_owned_planets > 3
+		}			
+		modifier = {
+			factor = @increase_interest_3
+			OR = {
+				AND = {
+					is_machine_or_hive = no
+					OR = {
+						has_non_swapped_tradition = tr_discovery_finish
+						has_non_swapped_tradition = tr_harmony_finish
+						has_non_swapped_tradition = tr_prosperity_finish
+					}
+				}	
+				AND = {
+					is_xenophile = yes
+					has_non_swapped_tradition = tr_diplomacy_finish
+				}	
+				AND = {
+					is_purity_civics = yes
+					has_swapped_tradition = tr_purity_finish
+				}	
+				AND = {
+					has_authority = auth_machine_intelligence 
+					OR = {	
+						has_swapped_tradition = tr_discovery_finish_machine
+						has_swapped_tradition = tr_synchronicity_finish
+						has_swapped_tradition = tr_properity_finish_machine
+						has_swapped_tradition = tr_versatility_finish
+					}	
+				}
+				AND = {
+					has_authority = auth_hive_mind
+					OR = {
+						has_swapped_tradition = tr_discovery_finish_hive
+						has_swapped_tradition = tr_synchronicity_finish
+						has_swapped_tradition = tr_prosperity_finish_hive
+						has_swapped_tradition = tr_adaptability_finish
+					}	
+				}					
+			}	
+		}					
+	}
+}
+
+tr_expansion_finish = {
+	modifier = {
+		country_core_sector_system_cap = 2
+		ascension_perks_add = 1
+	}
+
+	tradition_swap = {
+		name = tr_expansion_finish_machine
+		inherit_effects = no
+		inherit_icon = yes
+		inherit_name = yes
+		trigger = {	has_authority = auth_machine_intelligence }
+
+		modifier = {
+			country_core_sector_system_cap = 2
+			ascension_perks_add = 1
+		}
+		weight = { factor = 1 }
+	}
+
+	tradition_swap = {
+		name = tr_expansion_finish_hive
+		inherit_effects = no
+		inherit_icon = yes
+		inherit_name = yes
+		trigger = { has_authority = auth_hive_mind }
+
+		modifier = {
+			country_core_sector_system_cap = 2
+			ascension_perks_add = 1
+		}
+		weight = { factor = 1 }
+	}
+}
+
+tr_expansion_colonization_fever = {
+	cost = { unity = @cost }
+
+	tradition_swap = {
+		name = tr_expansion_colonization_fever_machine
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {	has_authority = auth_machine_intelligence }
+		weight = { factor = 1 }
+	}
+
+	tradition_swap = {
+		name = tr_expansion_colonization_fever_hive
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {	has_authority = auth_hive_mind }
+		weight = { factor = 1 }
+	}
+		
+	ai_weight = { factor = @crucial_2 }
+}
+
+tr_expansion_a_new_life = {
+	cost = { unity = @cost }
+	possible = { has_tradition = tr_expansion_colonization_fever }
+	modifier = {
+		pop_migration_speed = 0.5
+		planet_colony_development_speed_mult = 0.50		
+	}
+
+	tradition_swap = {
+		name = tr_expansion_a_new_life_machine
+		inherit_effects = no
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {	has_authority = auth_machine_intelligence }		
+		modifier = { planet_colony_development_speed_mult = 0.75 }		
+		weight = { factor = 1 }
+	}
+
+	tradition_swap = {
+		name = tr_expansion_a_new_life_hive
+		inherit_effects = no
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {	has_authority = auth_hive_mind }		
+		modifier = { planet_colony_development_speed_mult = 0.75 }		
+		weight = { factor = 1 }
+	}			
+
+	ai_weight = { 
+		factor = @important
+		modifier = {
+			factor = @avoid
+			OR = {
+				AND = {
+					is_machine_or_hive = no
+					NOT = { has_non_swapped_tradition = tr_expansion_galactic_ambition }
+				}
+				AND = {
+					has_authority = auth_machine_intelligence
+					NOT = { has_swapped_tradition = tr_expansion_galactic_ambition_machine }
+				}
+				AND = {
+					has_authority = auth_hive_mind
+					NOT = { has_swapped_tradition = tr_expansion_galactic_ambition_hive }
+				}				
+			}	
+		}	
+		modifier = {
+			factor = @strategic
+			num_owned_planets > 3
+		}			
+	}
+}	
+
+tr_expansion_courier_network = {
+	cost = { unity = @cost }
+	possible = { has_tradition = tr_expansion_colonization_fever }
+	
+	modifier = { tradition_cost_num_colonies_mult = -0.20 }
+
+	tradition_swap = {
+		name = tr_expansion_courier_network_machine
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {	has_authority = auth_machine_intelligence }		
+		weight = { factor = 1 }
+	}	
+	
+	tradition_swap = {
+		name = tr_expansion_courier_network_hive
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = { has_authority = auth_hive_mind }
+		weight = { factor = 1 }
+	}
+	
+	ai_weight = { 
+		factor = @excellent
+		modifier = {
+			factor = @avoid
+			OR = {
+				AND = {
+					is_machine_or_hive = no
+					NOT = { has_non_swapped_tradition = tr_expansion_galactic_ambition }
+				}
+				AND = {
+					has_authority = auth_machine_intelligence
+					NOT = { has_swapped_tradition = tr_expansion_galactic_ambition_machine }
+				}
+				AND = {
+					has_authority = auth_hive_mind
+					NOT = { has_swapped_tradition = tr_expansion_galactic_ambition_hive }
+				}				
+			}	
+		}	
+		modifier = {
+			factor = @strategic
+			num_owned_planets > 5
+		}			
+	}
+}	
+
+tr_expansion_reach_for_the_stars = {
+	cost = { unity = @cost }
+	
+	modifier = { country_expansion_distance_mult = -0.50 }
+
+	tradition_swap = {
+		name = tr_expansion_reach_for_the_stars_machine
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {	has_authority = auth_machine_intelligence }
+		weight = { factor = 1 }
+	}
+
+	tradition_swap = {
+		name = tr_expansion_reach_for_the_stars_hive
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {	has_authority = auth_hive_mind }
+		weight = { factor = 1 }
+	}
+	
+	ai_weight = { factor = @crucial_2 }
+}
+
+tr_expansion_galactic_ambition = {
+	cost = { unity = @cost }
+	possible = { has_tradition = tr_expansion_reach_for_the_stars }
+	
+	modifier = { shipsize_outpost_station_upkeep_mult = -0.50 }
+
+	tradition_swap = {
+		name = tr_expansion_galactic_ambition_machine
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = { has_authority = auth_machine_intelligence }
+		weight = { factor = 1 }
+	}
+
+	tradition_swap = {
+		name = tr_expansion_galactic_ambition_hive
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {	has_authority = auth_hive_mind }
+		weight = { factor = 1 }
+	}
+	
+	ai_weight = { factor = @crucial_2 }
+}
