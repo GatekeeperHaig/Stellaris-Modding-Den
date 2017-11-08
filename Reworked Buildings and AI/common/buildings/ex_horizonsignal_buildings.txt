@@ -1,0 +1,545 @@
+### ExOverhaul Building Mineral Costs ###
+@basic_resource_building_cost_0 = 40
+@basic_resource_building_cost_1 = 80
+@basic_resource_building_cost_2 = 120
+@basic_resource_building_cost_3 = 160
+@basic_resource_building_cost_4 = 200
+@basic_resource_building_cost_5 = 240
+
+@special_resource_building_mineral_cost = 150
+@special_resource_building_energy_cost = 50
+
+@planet_unique_mineral_cost_upgrade = 200
+@planet_unique_mineral_cost_1 = 200
+@planet_unique_mineral_cost_2 = 225
+@planet_unique_mineral_cost_3 = 250
+
+@capital_mineral_cost_tier_1 = 200
+@capital_mineral_cost_tier_2 = 300
+@capital_mineral_cost_tier_2.5 = 400
+@capital_mineral_cost_tier_3 = 500
+
+@empire_unique_mineral_cost = 400
+
+### ExOverhaul Building Energy Costs ###
+
+@resource_building_energy_cost_tier_0 = 5
+@resource_building_energy_cost_tier_1 = 15
+@resource_building_energy_cost_tier_2 = 30
+@resource_building_energy_cost_tier_3 = 45
+@resource_building_energy_cost_tier_4 = 60
+@resource_building_energy_cost_tier_5 = 75
+@resource_building_energy_cost_hab = 80
+
+@planet_unique_energy_cost_upgrade = 50
+@planet_unique_energy_cost_1 = 50
+@planet_unique_energy_cost_2 = 75
+@planet_unique_energy_cost_3 = 100
+
+@capital_energy_cost_tier_1 = 200
+@capital_energy_cost_tier_2 = 300
+@capital_energy_cost_tier_2.5 = 400
+@capital_energy_cost_tier_3 = 500
+
+@empire_unique_energy_cost = 400
+
+@empire_unique_influence_cost = 50
+@capital_influence_cost_tier_3 = 100
+
+### ExOverhaul Build Time ###
+
+@resource_building_build_time_tier_0 = 150
+@resource_building_build_time_tier_1 = 180
+@resource_building_build_time_tier_2 = 210
+@resource_building_build_time_tier_3 = 240
+@resource_building_build_time_tier_4 = 270
+@resource_building_build_time_tier_5 = 300
+@resource_building_build_time_hab = 360
+
+@planet_unique_build_time_1 = 270
+@planet_unique_build_time_2 = 360
+@planet_unique_build_time_3 = 450
+@planet_unique_build_time_upgrade = 270
+
+@capital_build_time_tier_1 = 480
+@capital_build_time_tier_2 = 960
+@capital_build_time_tier_3 = 1440
+
+@empire_unique_build_time = 1080
+
+### Resource Output ###
+@resource_building_output_tier_0 = 1
+@resource_building_output_tier_1 = 2
+@resource_building_output_tier_2 = 3
+@resource_building_output_tier_3 = 4
+@resource_building_output_tier_4 = 5
+@resource_building_output_tier_4.5 = 6
+@resource_building_output_tier_5 = 8
+@resource_building_output_tier_hab = 6
+
+@planet_unique_output_1 = 2
+@planet_unique_output_2 = 4
+@planet_unique_output_3 = 6
+
+@empire_unique_output_1 = 8
+@empire_unique_output_2 = 12
+@empire_unique_output_3 = 16
+@empire_unique_output_4 = 20
+
+### Upkeep ###
+@resource_building_upkeep_tier_0 = 0.5
+@resource_building_upkeep_tier_1 = 1
+@resource_building_upkeep_tier_2 = 1.5
+@resource_building_upkeep_tier_3 = 2
+@resource_building_upkeep_tier_4 = 2.5
+@resource_building_upkeep_tier_5 = 3
+@resource_building_upkeep_hab = 3
+
+@planet_unique_upkeep_1 = 3
+@planet_unique_upkeep_2 = 3.5
+@planet_unique_upkeep_3 = 4
+
+@empire_unique_upkeep = 10
+
+### ExOverhaul AI Weights ###
+
+#base weight multipliers - use either with weight, factor or add
+@avoid = 0
+@redundant = 0.5
+@standard = 1
+@good = 10
+@important = 25
+@strategic = 100
+@crucial_1 = 1000
+@crucial_2 = 10000
+
+#additive weight modifiers - use either with factor
+@reduce_interest_1 = 0.5
+@reduce_interest_2 = 0.25
+@reduce_interest_3 = 0.1
+@increase_interest_1 = 1.25
+@increase_interest_2 = 2.5
+@increase_interest_3 = 5
+
+#use with weight only, since the 9001 trick requires weight
+@always_build_and_never_remove = 9001 
+
+#
+#	THE WORM-IN-WAITING
+#
+
+building_akx_worm_1 = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_2
+		energy = @planet_unique_energy_cost_2
+	}
+
+	potential = { 
+		planet = {
+			OR = {
+				has_capital_1 = yes	
+				has_capital_2 = yes
+				has_capital_3 = yes
+				has_building = "building_hab_capital"
+			}		
+			NOR = {
+				has_building = "building_power_hub_1"
+				has_building = "building_power_hub_2"
+			}		
+		}	
+	}
+	
+	allow = { }
+	
+	planet_modifier  = {
+		tile_resource_energy_mult = 0.20
+		pop_happiness = -0.05
+	}
+
+	produced_resources = { energy = @planet_unique_output_3 }
+	
+	prerequisites = { "tech_akx_worm_1"	}
+	
+	ai_allow = { 
+		tile = {
+			OR = {
+				AND = {						
+					has_energy = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no					
+				}				
+				AND = { 
+					has_vanilla_or_exoverhaul_strategic_resources = no					
+					has_energy = no
+					has_minerals = no					
+					has_research_resources = no
+				}
+			}	
+		}	
+	}
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = energy
+					amount > 2
+				}
+			}
+		}			
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				OR = {
+					has_energy = no
+					AND = {
+						owner_is_not_machine_or_is_servitor = yes
+						has_high_food = yes
+					}
+				}				
+			}	
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = {
+				has_slave_pop = yes			
+				has_prole_or_stapled_pop = yes		
+				AND = {
+					has_non_sapient_robot = yes
+					exists = owner
+					owner = { NOT = { has_global_flag = "ex_robots_active" } }					
+				}				
+			}	
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_energy_bonus_pop = yes	}
+		}		
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				owner = { has_global_flag = "ex_resources_active" }
+				tile = { any_neighboring_tile = { has_building = "building_sr_engos_2" } }
+			}	
+		}			
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_hyperstorage_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}		
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				OR = {
+					AND = {
+						has_robot_pop = yes
+						exists = owner
+						owner = { has_global_flag = "ex_robots_active" } 
+					}
+					has_free_sapient_robot = yes		
+				}	
+			}
+		}				
+		modifier = {
+			factor = @increase_interest_1
+			tile = { owner = { has_authority = auth_machine_intelligence } }
+		}		
+		modifier = {
+			factor = @increase_interest_1
+			planet = { has_modifier = "strong_magnetic_field" }					
+		}			
+		modifier = {
+			factor = @increase_interest_3
+			OR = { 
+				planet = { has_modifier = "hazardous_weather" }					
+				guilli_energy_modifiers = yes
+			}	
+		}					
+	}
+}
+
+building_akx_worm_2 = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	ai_replace = no
+
+	potential = { 
+		planet = {
+			OR = {
+				has_capital_1 = yes	
+				has_capital_2 = yes
+				has_capital_3 = yes
+				has_building = "building_hab_capital"
+			}		
+		}				
+	}
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_1
+		energy = @planet_unique_energy_cost_1
+	}
+
+	produced_resources = { society_research = @planet_unique_output_2 }
+
+	planet_modifier  = {
+		pop_government_ethic_attraction = 0.05
+		pop_happiness = 0.05
+	}
+	
+	required_resources = { energy = @planet_unique_upkeep_1	}
+	
+	prerequisites = { "tech_akx_worm_2"	}
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				AND = {
+					has_society = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = { 
+					has_vanilla_or_exoverhaul_strategic_resources = no
+					has_energy = no
+					has_minerals = no							
+					has_research_resources = no
+				}
+			}	
+		}	
+	}
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @crucial_1
+			owner = { NOT = { has_ethic = ethic_gestalt_consciousness } }				
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			owner = { has_ethic = ethic_gestalt_consciousness }				
+		}		
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				OR = {
+					has_society = no
+					AND = {
+						owner_is_not_machine_or_is_servitor = yes
+						has_high_food = yes
+					}
+				}				
+			}	
+		}		
+		modifier = {
+			factor = @avoid
+			tile = {
+				OR = {
+					has_slave_pop = yes
+					has_prole_or_stapled_pop = yes
+					has_non_sapient_robot = yes
+				}
+			}	
+		}
+		modifier = {
+			factor = @increase_interest_2
+			tile = { any_neighboring_tile = { has_polytechnic_building = yes } } 
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				OR = {
+					has_research_bonus_pop = yes
+					has_free_sapient_robot = yes					
+				}			
+			}					
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				AND = {
+					exists = pop
+					pop = {	has_trait = "trait_natural_sociologists" }
+				}			
+			}					
+		}
+		modifier = {
+			factor = @increase_interest_2
+			planet = {
+				OR = {
+					has_modifier = "dangerous_wildlife"
+					has_modifier = "titanic_life" 
+				}
+			}	
+		}
+		modifier = {
+			factor = @increase_interest_1
+			planet = {
+				OR = {
+					has_modifier = "atmospheric_hallucinogen"
+					has_modifier = "atmospheric_hallucinogen_good"
+				}
+			}	
+		}				
+		modifier = {
+			factor = @increase_interest_2
+			guilli_society_modifiers = yes
+		}		
+	}
+}
+
+building_akx_worm_3 = {
+	base_buildtime = @planet_unique_build_time_3
+	empire_unique = yes
+	ai_special_building = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	potential = {
+		planet = {
+			AND = {
+				is_capital = yes
+				OR = {
+					has_capital_3 = yes
+					has_building = "building_hab_capital"
+				}
+			}	
+		}
+	}
+
+	produced_resources = { physics_research = 10 }
+
+	required_resources = { energy = @planet_unique_upkeep_3	}
+	
+	prerequisites = { "tech_akx_worm_3"	}
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				AND = {
+					has_physics = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = { 
+					has_vanilla_or_exoverhaul_strategic_resources = no
+					has_energy = no
+					has_minerals = no							
+					has_research_resources = no
+				}
+			}	
+		}	
+	}
+	
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @important
+			tile = { has_physics = yes }
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				OR = {
+					has_physics = no
+					AND = {
+						owner_is_not_machine_or_is_servitor = yes
+						has_high_food = yes
+					}
+				}				
+			}	
+		}		
+		modifier = {
+			factor = @avoid
+			tile = {
+				OR = {
+					has_slave_pop = yes
+					has_prole_or_stapled_pop = yes
+					has_non_sapient_robot = yes
+				}
+			}	
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				OR = {
+					has_research_bonus_pop = yes
+					has_free_sapient_robot = yes					
+				}			
+			}					
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				AND = {
+					exists = pop
+					pop = {	has_trait = "trait_natural_physicists" }
+				}			
+			}					
+		}			
+		modifier = {
+			factor = @increase_interest_2
+			planet = { has_modifier = "wild_storms" }
+		}
+		modifier = {
+			factor = @increase_interest_2
+			guilli_physics_modifiers = yes				
+		}		
+	}
+}
+
+building_worm_mine = {
+	is_listed = no
+	
+	allow = { always = no }
+	
+	produced_resources = { minerals = 12 }
+	
+	required_resources = { energy = 2 }
+	
+	ai_replace = no
+	event_building = yes
+}
+
+building_worm_farm = {
+	is_listed = no
+	
+	allow = { always = no }
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	
+	produced_resources = { food = 12 }
+	
+	required_resources = { energy = 2 }
+	
+	ai_replace = no
+	event_building = yes
+}

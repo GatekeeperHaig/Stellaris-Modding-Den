@@ -1,0 +1,66 @@
+namespace = ex_buildings_reworked_events
+
+event = {
+	id = ex_buildings_reworked_events.1	
+	hide_window = yes
+	is_triggered_only = yes	
+	
+	immediate = {
+		every_country = {
+			if = {
+				limit = {
+					AND = {
+						has_country_flag = "is_food_starved" 
+						food > 2
+					}
+				}
+				remove_country_flag = "is_food_starved"
+			}
+			if = {
+				limit = { 
+					AND = {
+						energy > 2
+						has_country_flag = "is_energy_starved"						
+					}
+				}	
+				remove_country_flag = "is_energy_starved"
+			}
+			if = {
+				limit = { 
+					AND = {
+						energy > 2
+						has_country_flag = "is_minerals_starved"	
+					}
+				}
+				remove_country_flag = "is_minerals_starved"
+			}							
+			country_event = { id = ex_buildings_reworked_events.2 }	
+		}		
+	}	
+}
+
+country_event = {
+	id = ex_buildings_reworked_events.2	
+	hide_window = yes
+	is_triggered_only = yes	
+	
+	immediate = {
+		if = {
+			limit = {
+				AND = {
+					NOT = { has_authority = auth_machine_intelligence }
+					food < 1
+				}
+			}
+			set_country_flag = "is_food_starved"
+		}
+		if = {
+			limit = { energy < 1 }
+			set_country_flag = "is_energy_starved"
+		}
+		if = {
+			limit = { minerals < 1 }
+			set_country_flag = "is_minerals_starved"
+		}							
+	}			
+}	
