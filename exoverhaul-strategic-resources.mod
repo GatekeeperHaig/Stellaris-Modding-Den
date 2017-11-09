@@ -1,0 +1,15 @@
+name="(--ExOverhaul: Strategic Resources--)"
+path="mod/exoverhaul-strategic-resources"
+tags={
+	"ExOverhaul"
+	"Balance"
+	"Galaxy Generation"
+	"Overhaul"
+	"Gameplay"
+	"Buildings"
+	"Strategic Resources"
+	"Technologies"
+}
+picture="thumb_strategic_resources.png"
+remote_file_id="1193585277"
+supported_version="1.8.*"

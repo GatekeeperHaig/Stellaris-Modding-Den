@@ -1,0 +1,1091 @@
+### ExOverhaul Building Mineral Costs ###
+@resource_building_mineral_cost_tier_0 = 25
+@resource_building_mineral_cost_tier_1 = 50
+@resource_building_mineral_cost_tier_2 = 75
+@resource_building_mineral_cost_tier_3 = 100
+@resource_building_mineral_cost_tier_4 = 125
+@resource_building_mineral_cost_tier_5 = 150
+@resource_building_mineral_cost_hab = 200
+
+@special_resource_building_mineral_cost = 150
+@special_resource_building_energy_cost = 50
+
+@planet_unique_mineral_cost_upgrade = 200
+@planet_unique_mineral_cost_1 = 200
+@planet_unique_mineral_cost_2 = 225
+@planet_unique_mineral_cost_3 = 250
+
+@capital_mineral_cost_tier_1 = 200
+@capital_mineral_cost_tier_2 = 300
+@capital_mineral_cost_tier_2.5 = 400
+@capital_mineral_cost_tier_3 = 500
+
+@empire_unique_mineral_cost = 400
+
+### ExOverhaul Building Energy Costs ###
+
+@resource_building_energy_cost_tier_0 = 0
+@resource_building_energy_cost_tier_1 = 10
+@resource_building_energy_cost_tier_2 = 25
+@resource_building_energy_cost_tier_3 = 40
+@resource_building_energy_cost_tier_4 = 55
+@resource_building_energy_cost_tier_5 = 70
+@resource_building_energy_cost_hab = 100
+
+@planet_unique_energy_cost_upgrade = 50
+@planet_unique_energy_cost_1 = 50
+@planet_unique_energy_cost_2 = 75
+@planet_unique_energy_cost_3 = 100
+
+@capital_energy_cost_tier_1 = 200
+@capital_energy_cost_tier_2 = 300
+@capital_energy_cost_tier_2.5 = 400
+@capital_energy_cost_tier_3 = 500
+
+@empire_unique_energy_cost = 400
+
+@empire_unique_influence_cost = 50
+@capital_influence_cost_tier_3 = 100
+
+### ExOverhaul Build Time ###
+
+@resource_building_build_time_tier_0 = 150
+@resource_building_build_time_tier_1 = 180
+@resource_building_build_time_tier_2 = 210
+@resource_building_build_time_tier_3 = 240
+@resource_building_build_time_tier_4 = 270
+@resource_building_build_time_tier_5 = 300
+@resource_building_build_time_hab = 360
+
+@planet_unique_build_time_1 = 270
+@planet_unique_build_time_2 = 360
+@planet_unique_build_time_3 = 450
+@planet_unique_build_time_upgrade = 270
+
+@capital_build_time_tier_1 = 480
+@capital_build_time_tier_2 = 960
+@capital_build_time_tier_3 = 1440
+
+@empire_unique_build_time = 1080
+
+### Resource Output ###
+@resource_building_output_tier_0 = 1
+@resource_building_output_tier_1 = 2
+@resource_building_output_tier_2 = 3
+@resource_building_output_tier_3 = 4
+@resource_building_output_tier_4 = 5
+@resource_building_output_tier_4.5 = 6
+@resource_building_output_tier_5 = 8
+@resource_building_output_tier_hab = 6
+
+@planet_unique_output_1 = 2
+@planet_unique_output_2 = 4
+@planet_unique_output_3 = 6
+
+@empire_unique_output_1 = 8
+@empire_unique_output_2 = 12
+@empire_unique_output_3 = 16
+@empire_unique_output_4 = 20
+
+### Upkeep ###
+@resource_building_upkeep_tier_0 = 0.5
+@resource_building_upkeep_tier_1 = 1
+@resource_building_upkeep_tier_2 = 1.5
+@resource_building_upkeep_tier_3 = 2
+@resource_building_upkeep_tier_4 = 2.5
+@resource_building_upkeep_tier_5 = 3
+@resource_building_upkeep_hab = 3
+
+@planet_unique_upkeep_1 = 2
+@planet_unique_upkeep_2 = 3
+@planet_unique_upkeep_3 = 4
+
+@empire_unique_upkeep = 10
+
+#######################
+### Unity buildings ###
+#######################
+
+building_autochthon_monument = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_1
+		energy = @planet_unique_energy_cost_1
+	}
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		owner = {
+			NOR = {
+				has_ethic = ethic_spiritualist		
+				has_ethic = ethic_fanatic_spiritualist
+				has_authority = auth_machine_intelligence
+			}
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			NOR = {
+				has_building = building_temple
+				has_building = building_holotemple				
+				has_building = building_citadel_of_faith
+				has_building = building_sacred_nexus
+			}
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		OR = {
+			owner = { has_authority = auth_machine_intelligence }
+			AND = {
+				owner = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		}
+	}
+	
+	produced_resources = {
+		unity = 2
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_1
+	}
+	
+	prerequisites = {
+		"tech_cultural_heritage"
+	}	
+	
+	upgrades = {
+		building_heritage_site
+	}
+	
+	ai_allow = {
+		OR = {
+			tile = {
+				has_building = no
+			}
+			tile = {
+				has_building = building_autochthon_monument
+			}
+		}
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+	}
+
+	ai_weight = {
+		weight = 100000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = energy
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 1
+					}
+				}
+				tile = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = physics_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = society_research
+						amount > 0
+					}
+				}
+			}
+		} #Build only on empty tiles or food 1 tiles
+		modifier = {
+			weight = 0
+			AND = {
+				owner = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		} #All tradations finished time to scrap these buildings
+
+	} #This weight written so that if the tile has a resource the AI wont build on it.
+	
+	ai_replace = no
+}
+
+building_heritage_site = {
+	base_buildtime = @planet_unique_build_time_2
+	is_listed = no
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_2
+		energy = @planet_unique_energy_cost_2
+	}
+	
+	produced_resources = {
+		unity = 4
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_2
+	}
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		owner = {
+			NOR = {
+				has_ethic = ethic_spiritualist		
+				has_ethic = ethic_fanatic_spiritualist
+				has_authority = auth_machine_intelligence
+			}
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			NOR = {
+				has_building = building_temple
+				has_building = building_holotemple				
+				has_building = building_citadel_of_faith
+				has_building = building_sacred_nexus
+			}
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		OR = {
+			owner = { has_authority = auth_machine_intelligence }
+			AND = {
+				owner = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_1"
+			planet = {
+				OR = {
+					has_building = "building_capital_1"
+					has_building = "building_capital_2"
+					has_building = "building_capital_3"
+				}
+			}
+		}
+	}
+	
+	prerequisites = {
+		"tech_heritage_site"
+	}
+	
+	upgrades = {
+		building_hypercomms_forum
+	}
+	
+	ai_weight = {
+		weight = 500
+		modifier = {
+			weight = 0
+			AND = {
+				owner = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		} #All tradations finished time to scrap these buildings
+	}
+		
+	ai_replace = no
+}
+
+building_hypercomms_forum = {
+	base_buildtime = @planet_unique_build_time_3
+	is_listed = no
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	produced_resources = {
+		unity = 6
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_3
+	}
+	
+	planet_modifier = {
+		tile_resource_unity_mult = 0.10
+	}
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		owner = {
+			NOR = {
+				has_ethic = ethic_spiritualist		
+				has_ethic = ethic_fanatic_spiritualist
+				has_authority = auth_machine_intelligence
+			}
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			NOR = {
+				has_building = building_temple
+				has_building = building_holotemple				
+				has_building = building_citadel_of_faith
+				has_building = building_sacred_nexus
+			}
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		OR = {
+			owner = { has_authority = auth_machine_intelligence }
+			AND = {
+				owner = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_2"
+			planet = {
+				OR = {
+					has_building = "building_capital_2"
+					has_building = "building_capital_3"
+				}
+			}
+		}
+	}	
+	
+	prerequisites = {
+		"tech_hypercomms_forum"
+	}
+	
+	upgrades = {
+		building_autocurating_vault
+	}
+	
+	ai_weight = {
+		modifier = {
+			weight = 0
+			AND = {
+				owner = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		} #All tradations finished time to scrap these buildings
+	}
+}
+
+building_temple = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_1
+		energy = @planet_unique_energy_cost_1
+	}
+	
+	produced_resources = {
+		unity = 3
+	}
+	
+	planet_modifier = {
+		pop_ethic_spiritualist_attraction_mult = 0.2
+	}
+	
+	prerequisites = {
+		"tech_cultural_heritage"
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_1
+	}
+	
+	potential = { 	
+		owner = {
+			OR = {
+				has_ethic = ethic_spiritualist		
+				has_ethic = ethic_fanatic_spiritualist
+			}
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			NOR = {
+				has_building = building_autochthon_monument
+				has_building = building_heritage_site
+				has_building = building_hypercomms_forum
+				has_building = building_autocurating_vault
+			}
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		OR = {
+			owner = { has_authority = auth_machine_intelligence }
+			AND = {
+				owner = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		}
+	}
+	
+	upgrades = {
+		building_holotemple
+	}
+	
+	ai_allow = {
+		OR = {
+			tile = {
+				has_building = no
+			}
+			tile = {
+				has_building = building_temple
+			}
+		}
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+	}
+
+	ai_weight = {
+		weight = 10000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = energy
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 1
+					}
+				}
+				tile = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = physics_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = society_research
+						amount > 0
+					}
+				}
+			}
+		} #Build only on empty tiles or food 1
+		modifier = {
+		weight = 0
+		AND = {
+			owner = {
+			has_tradition = tr_supremacy_finish
+			has_tradition = tr_harmony_finish
+			has_tradition = tr_prosperity_finish
+			has_tradition = tr_domination_finish
+			has_tradition = tr_expansion_finish
+			has_tradition = tr_discovery_finish
+			has_tradition = tr_diplomacy_finish
+			}
+			}
+		} #All tradations finished time to scrap these buildings
+		
+	} #This weight written so that if the tile has a resource the AI wont build on it.
+
+	ai_replace = no
+}
+
+building_holotemple = {
+	base_buildtime = @planet_unique_build_time_2
+	is_listed = no
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_2
+		energy = @planet_unique_energy_cost_2
+	}
+	
+	produced_resources = {
+		unity = 6
+	}
+	
+	planet_modifier = {
+		pop_ethic_spiritualist_attraction_mult = 0.3
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_2
+	}
+	
+	potential = { 	
+		owner = {
+			OR = {
+				has_ethic = ethic_spiritualist		
+				has_ethic = ethic_fanatic_spiritualist
+			}
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			NOR = {
+				has_building = building_autochthon_monument
+				has_building = building_heritage_site
+				has_building = building_hypercomms_forum
+				has_building = building_autocurating_vault
+			}
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		OR = {
+			owner = { has_authority = auth_machine_intelligence }
+			AND = {
+				owner = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_1"
+			planet = {
+				OR = {
+					has_building = "building_capital_1"
+					has_building = "building_capital_2"
+					has_building = "building_capital_3"
+				}
+			}
+		}
+	}
+	
+	upgrades = {
+		building_sacred_nexus
+	}	
+	
+	prerequisites = {
+		"tech_holographic_rituals"
+	}
+
+	ai_weight = {
+		weight = 10000
+		modifier = {
+		weight = 0
+		AND = {
+			owner = {
+			has_tradition = tr_supremacy_finish
+			has_tradition = tr_harmony_finish
+			has_tradition = tr_prosperity_finish
+			has_tradition = tr_domination_finish
+			has_tradition = tr_expansion_finish
+			has_tradition = tr_discovery_finish
+			has_tradition = tr_diplomacy_finish
+			}
+		}
+		} #All tradations finished time to scrap these buildings
+	} #This weight written so that if the tile has a resource the AI wont build on it.
+
+	ai_replace = no
+}
+
+building_sacred_nexus = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	is_listed = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	produced_resources = {
+		unity = 9
+	}
+	
+	planet_modifier = {
+		tile_resource_unity_mult = 0.10
+		pop_ethic_spiritualist_attraction_mult = 0.3
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_3
+	}
+	
+	potential = { 	
+		owner = {
+			OR = {
+				has_ethic = ethic_spiritualist		
+				has_ethic = ethic_fanatic_spiritualist
+			}
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			NOR = {
+				has_building = building_autochthon_monument
+				has_building = building_heritage_site
+				has_building = building_hypercomms_forum
+				has_building = building_autocurating_vault
+			}
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		OR = {
+			owner = { has_authority = auth_machine_intelligence }
+			AND = {
+				owner = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_2"
+			planet = {
+				OR = {
+					has_building = "building_capital_2"
+					has_building = "building_capital_3"
+				}
+			}
+		}
+	}
+	
+	upgrades = {
+		building_citadel_of_faith
+	}	
+	
+	prerequisites = {
+		"tech_consecration_fields"
+	}
+
+	ai_weight = {
+		weight = 10000
+		modifier = {
+		weight = 0
+		AND = {
+			owner = {
+			has_tradition = tr_supremacy_finish
+			has_tradition = tr_harmony_finish
+			has_tradition = tr_prosperity_finish
+			has_tradition = tr_domination_finish
+			has_tradition = tr_expansion_finish
+			has_tradition = tr_discovery_finish
+			has_tradition = tr_diplomacy_finish
+			}
+			}
+		} #All tradations finished time to scrap these buildings
+	} #This weight written so that if the tile has a resource the AI wont build on it.
+
+	ai_replace = no
+}
+
+# Uplink Node
+building_uplink_node = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_1
+		energy = @planet_unique_energy_cost_1
+	}
+	
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+	}
+
+	destroy_if = {
+		OR = {
+			owner = {
+				NOT = { has_authority = auth_machine_intelligence }
+			}
+			owner = {
+				AND = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		}
+	}
+	
+	produced_resources = {
+		unity = 2
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_1
+	}
+	
+	prerequisites = {
+		"tech_cultural_heritage"
+	}	
+	
+	upgrades = {
+		building_network_junction
+	}
+	
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+	}
+
+	ai_weight = {
+		weight = 10000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = energy
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = physics_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = society_research
+						amount > 0
+					}
+				}
+			}
+		} #Build only on empty tiles
+			modifier = {
+		weight = 0
+		AND = {
+			owner = {
+			has_tradition = tr_supremacy_finish
+			has_tradition = tr_harmony_finish
+			has_tradition = tr_prosperity_finish
+			has_tradition = tr_domination_finish
+			has_tradition = tr_expansion_finish
+			has_tradition = tr_discovery_finish
+			has_tradition = tr_diplomacy_finish
+			}
+			}
+		} #All tradations finished time to scrap these buildings
+	} #This weight written so that if the tile has a resource the AI wont build on it.
+	
+	ai_allow = {
+		# If planet only has slaves/robots, keep it to mining and farming...
+		is_slave_tile_or_planet = no
+	}
+	
+	ai_replace = no
+	
+}
+
+# Network Junction
+building_network_junction = {
+	base_buildtime = @planet_unique_build_time_2
+	is_listed = no
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_2
+		energy = @planet_unique_energy_cost_2
+	}
+	
+	produced_resources = {
+		unity = 4
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_2
+	}
+	
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+	}
+
+	destroy_if = {
+		OR = {
+			owner = {
+				NOT = { has_authority = auth_machine_intelligence }
+			}
+			owner = {
+				AND = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_1"
+			planet = {
+				OR = {
+					has_building = "building_machine_capital_1"
+					has_building = "building_machine_capital_2"
+					has_building = "building_machine_capital_3"
+					has_building = "building_hab_capital"
+				}
+			}
+		}
+	}
+	
+	prerequisites = {
+		"tech_heritage_site"
+	}
+	
+	upgrades = {
+		building_system_conflux
+	}
+	
+	ai_allow = {
+		# If planet only has slaves/robots, keep it to mining and farming...
+		is_slave_tile_or_planet = no	
+	}
+	
+	ai_weight = {
+		weight = 10000
+	}
+	ai_replace = no
+}
+
+# System Conflux
+building_system_conflux = {
+	base_buildtime = @planet_unique_build_time_3
+	is_listed = no
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	produced_resources = {
+		unity = 6
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_3
+	}
+	
+	planet_modifier = {
+		tile_resource_unity_mult = 0.10
+	}
+	
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+	}
+
+	destroy_if = {
+		OR = {
+			owner = {
+				NOT = { has_authority = auth_machine_intelligence }
+			}
+			owner = {
+				AND = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_2"
+			planet = {
+				OR = {
+					has_building = "building_machine_capital_2"
+					has_building = "building_machine_capital_3"
+					has_building = "building_hab_capital"
+				}
+			}
+		}
+	}	
+	
+	prerequisites = {
+		"tech_hypercomms_forum"
+	}
+	
+	upgrades = {
+		building_alpha_hub
+	}
+	
+	ai_allow = {
+		# If planet only has slaves/robots, keep it to mining and farming...
+		is_slave_tile_or_planet = no	
+	}
+	
+	ai_weight = {
+		weight = 10000
+	}
+	ai_replace = no
+}

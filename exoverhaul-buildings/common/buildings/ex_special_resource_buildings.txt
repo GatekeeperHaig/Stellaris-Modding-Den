@@ -1,0 +1,380 @@
+### ExOverhaul Building Mineral Costs ###
+@resource_building_mineral_cost_tier_0 = 25
+@resource_building_mineral_cost_tier_1 = 50
+@resource_building_mineral_cost_tier_2 = 75
+@resource_building_mineral_cost_tier_3 = 100
+@resource_building_mineral_cost_tier_4 = 125
+@resource_building_mineral_cost_tier_5 = 150
+@resource_building_mineral_cost_hab = 200
+
+@special_resource_building_mineral_cost = 150
+@special_resource_building_energy_cost = 50
+
+@planet_unique_mineral_cost_upgrade = 200
+@planet_unique_mineral_cost_1 = 200
+@planet_unique_mineral_cost_2 = 225
+@planet_unique_mineral_cost_3 = 250
+
+@capital_mineral_cost_tier_1 = 200
+@capital_mineral_cost_tier_2 = 300
+@capital_mineral_cost_tier_2.5 = 400
+@capital_mineral_cost_tier_3 = 500
+
+@empire_unique_mineral_cost = 400
+
+### ExOverhaul Building Energy Costs ###
+
+@resource_building_energy_cost_tier_0 = 0
+@resource_building_energy_cost_tier_1 = 10
+@resource_building_energy_cost_tier_2 = 25
+@resource_building_energy_cost_tier_3 = 40
+@resource_building_energy_cost_tier_4 = 55
+@resource_building_energy_cost_tier_5 = 70
+@resource_building_energy_cost_hab = 100
+
+@planet_unique_energy_cost_upgrade = 50
+@planet_unique_energy_cost_1 = 50
+@planet_unique_energy_cost_2 = 75
+@planet_unique_energy_cost_3 = 100
+
+@capital_energy_cost_tier_1 = 200
+@capital_energy_cost_tier_2 = 300
+@capital_energy_cost_tier_2.5 = 400
+@capital_energy_cost_tier_3 = 500
+
+@empire_unique_energy_cost = 400
+
+@empire_unique_influence_cost = 50
+@capital_influence_cost_tier_3 = 100
+
+### ExOverhaul Build Time ###
+
+@resource_building_build_time_tier_0 = 150
+@resource_building_build_time_tier_1 = 180
+@resource_building_build_time_tier_2 = 210
+@resource_building_build_time_tier_3 = 240
+@resource_building_build_time_tier_4 = 270
+@resource_building_build_time_tier_5 = 300
+@resource_building_build_time_hab = 360
+
+@planet_unique_build_time_1 = 270
+@planet_unique_build_time_2 = 360
+@planet_unique_build_time_3 = 450
+@planet_unique_build_time_upgrade = 270
+
+@capital_build_time_tier_1 = 480
+@capital_build_time_tier_2 = 960
+@capital_build_time_tier_3 = 1440
+
+@empire_unique_build_time = 1080
+
+### Resource Output ###
+@resource_building_output_tier_0 = 1
+@resource_building_output_tier_1 = 2
+@resource_building_output_tier_2 = 3
+@resource_building_output_tier_3 = 4
+@resource_building_output_tier_4 = 5
+@resource_building_output_tier_4.5 = 6
+@resource_building_output_tier_5 = 8
+@resource_building_output_tier_hab = 6
+
+@planet_unique_output_1 = 2
+@planet_unique_output_2 = 4
+@planet_unique_output_3 = 6
+
+@empire_unique_output_1 = 8
+@empire_unique_output_2 = 12
+@empire_unique_output_3 = 16
+@empire_unique_output_4 = 20
+
+### Upkeep ###
+@resource_building_upkeep_tier_0 = 0.5
+@resource_building_upkeep_tier_1 = 1
+@resource_building_upkeep_tier_2 = 1.5
+@resource_building_upkeep_tier_3 = 2
+@resource_building_upkeep_tier_4 = 2.5
+@resource_building_upkeep_tier_5 = 3
+@resource_building_upkeep_hab = 3
+
+@planet_unique_upkeep_1 = 3
+@planet_unique_upkeep_2 = 3.5
+@planet_unique_upkeep_3 = 4
+
+@empire_unique_upkeep = 10
+
+##################################
+### Special Resource buildings ###
+##################################
+
+betharian_power_plant = {
+	base_buildtime = @planet_unique_build_time_1
+	icon = "building_betharian_power_plant_1"
+	
+	cost = {
+		minerals = @special_resource_building_mineral_cost
+		energy = @special_resource_building_energy_cost
+	}
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }	
+		}
+	}
+	
+	produced_resources = {
+		energy = 10
+	}
+	
+	prerequisites = {
+		"tech_mine_betharian"
+	}
+	
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_capital_1"
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_betharian_stone"
+					tile = {
+						has_resource = {
+							type = sr_betharian
+							amount > 0
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_machine_capital_1"
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_betharian_stone"
+					tile = {
+						has_resource = {
+							type = sr_betharian
+							amount > 0
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	ai_allow = {
+		AND = {
+			tile = {
+				has_building = no
+			}
+			tile = {
+				has_resource = {
+					type = sr_betharian
+					amount > 0
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = 2000	
+		modifier = {
+			factor = 10
+			owner = { has_authority = auth_machine_intelligence }
+			AND = {
+				running_balance < 30
+				OR = {
+					tile = {
+						has_resource = {
+							type = food
+							amount > 0
+						}
+					}
+					tile = {
+						has_resource = {
+							type = energy
+							amount > 0
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+building_xeno_zoo = {
+	base_buildtime = @planet_unique_build_time_1
+	
+	cost = {
+		minerals = @special_resource_building_mineral_cost
+		energy = @special_resource_building_energy_cost
+	}
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		NOT = { 
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}	
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	produced_resources = {
+		unity = 4
+		society_research = 4
+	}
+	
+	planet_modifier = {
+		pop_citizen_happiness = 0.05
+		planet_migration_all_pull = 0.25
+	}
+	
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_alien_pets"
+				tile = {
+					has_resource = {
+						type = sr_alien_pets
+						amount > 0
+					}
+				}
+			}
+		}
+	}
+	
+	prerequisites = {
+		"tech_alien_life_studies"
+	}
+	
+	ai_allow = {
+		AND = {
+			tile = {
+				has_building = no
+			}
+			tile = {
+				has_resource = {
+					type = sr_alien_pets
+					amount > 0
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		factor = 10
+	}
+}
+
+# Animal Evaluation Laboratory
+building_animal_evaluation_laboratory = {
+	base_buildtime = @planet_unique_build_time_1
+	
+	cost = {
+		minerals = @special_resource_building_mineral_cost
+		energy = @special_resource_building_energy_cost
+	}
+	
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+		}
+	}
+
+	destroy_if = {
+		owner = {
+			NOT = { has_authority = auth_machine_intelligence }
+		}		
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	produced_resources = {
+		unity = 4
+		society_research = 2
+	}
+	
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "requires_building_machine_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_alien_pets"
+				tile = {
+					has_resource = {
+						type = sr_alien_pets
+						amount > 0
+					}
+				}
+			}
+		}
+	}
+	
+	prerequisites = {
+		"tech_alien_life_studies"
+	}
+
+	ai_weight = {
+		factor = 10000
+	}
+	ai_replace = no
+}
+

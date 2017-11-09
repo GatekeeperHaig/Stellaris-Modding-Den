@@ -1,0 +1,16 @@
+name="(--ExOverhaul: Enhanced Tomb Worlds and Xeno-Archeology--)"
+path="mod/exoverhaul-tomb-worlds"
+tags={
+	"ExOverhaul"
+	"Balance"
+	"Galaxy Generation"
+	"Overhaul"
+	"Gameplay"
+	"Tomb"
+	"Buildings"
+	"Strategic Resources"
+	"Technologies"
+}
+picture="thumb_tomb.png"
+remote_file_id="1113662068"
+supported_version="1.8.*"

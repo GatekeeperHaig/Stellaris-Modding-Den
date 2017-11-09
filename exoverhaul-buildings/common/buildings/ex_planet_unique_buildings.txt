@@ -1,0 +1,1007 @@
+### ExOverhaul Building Mineral Costs ###
+@resource_building_mineral_cost_tier_0 = 25
+@resource_building_mineral_cost_tier_1 = 50
+@resource_building_mineral_cost_tier_2 = 75
+@resource_building_mineral_cost_tier_3 = 100
+@resource_building_mineral_cost_tier_4 = 125
+@resource_building_mineral_cost_tier_5 = 150
+@resource_building_mineral_cost_hab = 200
+
+@special_resource_building_mineral_cost = 150
+@special_resource_building_energy_cost = 50
+
+@planet_unique_mineral_cost_upgrade = 200
+@planet_unique_mineral_cost_1 = 200
+@planet_unique_mineral_cost_2 = 225
+@planet_unique_mineral_cost_3 = 250
+
+@capital_mineral_cost_tier_1 = 200
+@capital_mineral_cost_tier_2 = 300
+@capital_mineral_cost_tier_2.5 = 400
+@capital_mineral_cost_tier_3 = 500
+
+@empire_unique_mineral_cost = 400
+
+### ExOverhaul Building Energy Costs ###
+
+@resource_building_energy_cost_tier_0 = 0
+@resource_building_energy_cost_tier_1 = 10
+@resource_building_energy_cost_tier_2 = 25
+@resource_building_energy_cost_tier_3 = 40
+@resource_building_energy_cost_tier_4 = 55
+@resource_building_energy_cost_tier_5 = 70
+@resource_building_energy_cost_hab = 100
+
+@planet_unique_energy_cost_upgrade = 50
+@planet_unique_energy_cost_1 = 50
+@planet_unique_energy_cost_2 = 75
+@planet_unique_energy_cost_3 = 100
+
+@capital_energy_cost_tier_1 = 200
+@capital_energy_cost_tier_2 = 300
+@capital_energy_cost_tier_2.5 = 400
+@capital_energy_cost_tier_3 = 500
+
+@empire_unique_energy_cost = 400
+
+@empire_unique_influence_cost = 50
+@capital_influence_cost_tier_3 = 100
+
+### ExOverhaul Build Time ###
+
+@resource_building_build_time_tier_0 = 150
+@resource_building_build_time_tier_1 = 180
+@resource_building_build_time_tier_2 = 210
+@resource_building_build_time_tier_3 = 240
+@resource_building_build_time_tier_4 = 270
+@resource_building_build_time_tier_5 = 300
+@resource_building_build_time_hab = 360
+
+@planet_unique_build_time_1 = 270
+@planet_unique_build_time_2 = 360
+@planet_unique_build_time_3 = 450
+@planet_unique_build_time_upgrade = 270
+
+@capital_build_time_tier_1 = 480
+@capital_build_time_tier_2 = 960
+@capital_build_time_tier_3 = 1440
+
+@empire_unique_build_time = 1080
+
+### Resource Output ###
+@resource_building_output_tier_0 = 1
+@resource_building_output_tier_1 = 2
+@resource_building_output_tier_2 = 3
+@resource_building_output_tier_3 = 4
+@resource_building_output_tier_4 = 5
+@resource_building_output_tier_4.5 = 6
+@resource_building_output_tier_5 = 8
+@resource_building_output_tier_hab = 6
+
+@planet_unique_output_1 = 2
+@planet_unique_output_2 = 4
+@planet_unique_output_3 = 6
+
+@empire_unique_output_1 = 8
+@empire_unique_output_2 = 12
+@empire_unique_output_3 = 16
+@empire_unique_output_4 = 20
+
+### Upkeep ###
+@resource_building_upkeep_tier_0 = 0.5
+@resource_building_upkeep_tier_1 = 1
+@resource_building_upkeep_tier_2 = 1.5
+@resource_building_upkeep_tier_3 = 2
+@resource_building_upkeep_tier_4 = 2.5
+@resource_building_upkeep_tier_5 = 3
+@resource_building_upkeep_hab = 3
+
+@planet_unique_upkeep_1 = 3
+@planet_unique_upkeep_2 = 3.5
+@planet_unique_upkeep_3 = 4
+
+@empire_unique_upkeep = 10
+
+###############################
+### Planet Unique Buildings ###
+###############################
+
+# Clone Vats are required to build Clone Armies
+building_clone_vats = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_2
+		energy = @planet_unique_energy_cost_2
+	}
+	
+	produced_resources = {
+		food = @planet_unique_output_2
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_2
+	}
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }	
+		}
+	}	
+
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_2"
+			planet = {
+				OR = {
+					has_building = "building_capital_2"
+					has_building = "building_capital_3"
+				}
+			}
+		}
+	}
+	
+	prerequisites = {
+		"tech_cloning"
+	}
+	
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+		
+		NOT = {
+			planet = {
+				owner = {
+					any_owned_planet = {
+						NOT = { is_same_value = from }
+						has_building = building_clone_vats
+					}				
+				}
+			}
+		}
+		
+		# If planet only has slaves/robots, keep it to mining and farming...
+		is_slave_tile_or_planet = no	
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}
+
+# Grants additional fortification strength to planets
+building_planetary_shield_generator = {
+	icon = "building_shield_generator"
+	base_buildtime = @planet_unique_build_time_2	
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_1
+	}
+
+	produced_resources = {
+		unity = @planet_unique_output_1
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_2
+	}	
+	
+	planet_modifier = {
+		planet_fortification_strength = 4
+		pop_happiness = 0.05
+	}
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+		}
+	}
+	
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			custom_tooltip = {
+				text = "requires_building_machine_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+		}
+	}
+	
+	prerequisites = {
+		"tech_planetary_shield_generator"
+	}
+
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+		fromfrom = {
+			has_technology = tech_planetary_shield_generator
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}
+
+building_slave_processing = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_2
+		energy = @planet_unique_energy_cost_2
+	}
+	
+	produced_resources = {
+		minerals = @planet_unique_output_1
+		food = @planet_unique_output_1
+	}
+	
+	required_resources = {
+		energy = 3
+	}
+	
+	planet_modifier = {
+		slave_mineral_output = 0.10
+		slave_food_output = 0.10
+		country_unrest_unhappy_slave_effect_mult = -0.50
+	}	
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }	
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requirement_slave_facility"
+			planet = {
+				any_pop = {
+					is_enslaved = yes
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			custom_tooltip = {
+				text = "requires_building_machine_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+		}
+	}
+	
+
+	prerequisites = {
+		"tech_neural_implants"
+	}
+	
+	ai_allow = {
+		OR = {
+			tile = {
+				has_building = no
+			}
+			tile = {
+				has_building = building_slave_processing
+			}
+		}
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+		planet = {
+			OR = {
+				has_building = building_slave_processing
+				count_pops = {
+					limit = { is_enslaved = yes }
+					count > 2
+				}				
+			}
+		}	
+	}
+	
+	ai_weight = {
+		weight = 0
+		modifier = {
+			weight = 1000000
+			factor = 2
+			AND = {
+				tile = {
+				has_resource = {
+				type = food
+				amount > 0
+				}
+				has_resource = {
+				type = minerals
+				amount > 0
+				}
+				}
+			}
+		}
+		modifier = {
+			weight = 10
+			factor = 2
+			OR = {
+				tile = {
+				has_resource = {
+				type = food
+				amount > 0
+				}
+				has_resource = {
+				type = minerals
+				amount > 0
+				}
+				}
+			}
+		}
+		modifier = {
+			weight = 1
+			factor = 1
+			and = {
+				tile = {
+				has_resource = {
+					type = energy
+					amount = 0
+				}
+				has_resource = {
+					type = engineering_research
+					amount = 0
+				}
+				has_resource = {
+					type = physics_research
+					amount = 0
+				}
+				has_resource = {
+					type = society_research
+					amount = 0
+				}
+				}
+			}
+		}
+	}
+	ai_replace = no
+}
+
+building_clinic = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_1
+		energy = @planet_unique_energy_cost_1
+	}
+
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_1
+	}
+	
+	produced_resources = {
+		society_research = 1
+		unity = 1
+	}
+	
+	planet_modifier = {
+		pop_growth_speed = 0.15
+	}
+	
+	prerequisites = {
+		"tech_frontier_health"
+	}
+	
+	upgrades = {
+		building_hospital
+	}
+	
+	ai_allow = {
+		OR = {
+			tile = {
+				has_building = no
+			}
+			tile = {
+				has_building = building_clinic
+			}
+		}
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+		
+		# If planet only has slaves/robots, keep it to mining and farming...
+		is_slave_tile_or_planet = no
+		is_robot_tile_or_planet = no
+	}
+
+	ai_weight = {
+		weight = 1000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = energy
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = physics_research
+						amount > 0
+					}
+				}
+			}
+		} #Build on empty tiles or society tiles
+	}
+	
+	ai_replace = no
+}
+
+
+building_hospital = {
+	base_buildtime = @planet_unique_build_time_upgrade
+	planet_unique = yes
+	is_listed = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_2
+		energy = @planet_unique_energy_cost_2
+	}
+
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_2"
+			planet = {
+				OR = {
+					has_building = "building_capital_2"
+					has_building = "building_capital_3"
+				}
+			}
+		}
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_2
+	}
+	
+	produced_resources = {
+		society_research = 2
+		unity = 2
+	}
+	
+	planet_modifier = {
+		pop_growth_speed = 0.3
+	}
+	
+	prerequisites = {
+		"tech_frontier_hospital"
+	}
+	
+	ai_allow = {
+		OR = {
+			tile = {
+				has_building = building_hospital
+			}
+			tile = {
+				has_building = building_clinic
+			}
+		}
+		# If planet only has slaves/robots, keep it to mining and farming...
+		is_slave_tile_or_planet = no
+		is_robot_tile_or_planet = no
+	}
+
+	ai_weight = {
+		weight = 10000
+	}
+	
+	ai_replace = no
+}
+
+building_military_academy = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_2
+		energy = @planet_unique_energy_cost_2
+	}
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+	
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }	
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_1"
+			planet = {
+				OR = {
+					has_building = "building_capital_1"
+					has_building = "building_capital_2"
+					has_building = "building_capital_3"
+				}
+			}
+		}
+	}
+	
+	produced_resources = {
+		unity = @planet_unique_output_1
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_2
+	}
+
+	army_modifier = {
+		army_damage_mult = 0.20
+	}
+	
+	planet_modifier = {
+		planet_army_build_speed_mult = 0.5		
+		planet_fortification_strength = 1.0		
+		pop_ethic_militarist_attraction_mult = 0.15
+	}
+	
+	prerequisites = {
+		"tech_centralized_command"
+	}
+	
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+		NOT = {
+			planet = {
+				owner = {
+					any_owned_planet = {
+						NOT = { is_same_value = from }
+						has_building = building_military_academy
+					}				
+				}
+			}
+		}
+		
+		# If planet only has slaves/robots, keep it to mining and farming...
+		is_slave_tile_or_planet = no	
+	}
+	
+	ai_weight = {
+		weight = 5
+		modifier = {
+			weight = 1000
+			owner = {
+				OR = {
+					has_ethic = ethic_militarist
+					has_ethic = ethic_fanatic_militarist
+				}
+			}	
+		}	
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = energy
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = physics_research
+						amount > 0
+					}
+				}
+			}
+		} #Build on empty tiles or society tiles
+	}
+	ai_replace = no
+}
+
+building_spare_parts_depot = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_1
+		energy = @planet_unique_energy_cost_1
+	}
+
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+	}
+
+	destroy_if = {
+		owner = {
+			NOT = { has_authority = auth_machine_intelligence }
+		}		
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_1
+	}
+	
+	planet_modifier = {
+		pop_robot_build_speed_mult = 0.15
+		pop_robot_build_cost_mult = -0.10
+		pop_consumer_goods_mult = -0.05
+	}
+	
+	prerequisites = {
+		"tech_modular_components"
+	}
+	
+	upgrades = {
+		building_unit_assembly_plant
+	}
+	
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+	}
+
+	ai_weight = {
+		weight = 1000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = energy
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = physics_research
+						amount > 0
+					}
+				}
+			}
+		} #Build on empty tiles or society tiles
+	}
+	ai_replace = no
+}
+
+# Unit Assembly Plant
+building_unit_assembly_plant = {
+	base_buildtime = @planet_unique_build_time_upgrade
+	planet_unique = yes
+	is_listed = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_2
+		energy = @planet_unique_energy_cost_2
+	}
+
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+	}
+
+	destroy_if = {
+		owner = {
+			NOT = { has_authority = auth_machine_intelligence }
+		}		
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_machine_capital_2"
+			planet = {
+				OR = {
+					has_building = "building_machine_capital_2"
+					has_building = "building_machine_capital_3"
+					has_building = "building_hab_capital"
+				}
+			}
+		}
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_2
+	}
+	
+	planet_modifier = {
+		pop_robot_build_speed_mult = 0.3
+		pop_robot_build_cost_mult = -0.20
+		pop_consumer_goods_mult = -0.1
+		
+	}
+	
+	prerequisites = {
+		"tech_intelligent_factories"
+	}
+	
+	ai_allow = {
+	}
+
+	ai_weight = {
+		weight = 1000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = energy
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = physics_research
+						amount > 0
+					}
+				}
+			}
+		} #Build on empty tiles or society tiles
+	}
+	ai_replace = no
+}
+
+building_hab_cultural_center = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {		
+			is_planet_class = pc_habitat
+			has_building = "building_hab_capital"
+		}	
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	
+	produced_resources = {		
+		unity = 4
+	}
+	
+	planet_modifier = {
+		pop_citizen_happiness = 0.05
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_3
+	}
+	
+	ai_weight = {
+		weight = 300
+	}
+		ai_replace = no
+}

@@ -1,0 +1,759 @@
+### ExOverhaul Building Mineral Costs ###
+@basic_resource_building_cost_0 = 40
+@basic_resource_building_cost_1 = 80
+@basic_resource_building_cost_2 = 120
+@basic_resource_building_cost_3 = 160
+@basic_resource_building_cost_4 = 200
+@basic_resource_building_cost_5 = 240
+
+@special_resource_building_mineral_cost = 150
+@special_resource_building_energy_cost = 50
+
+@planet_unique_mineral_cost_upgrade = 200
+@planet_unique_mineral_cost_1 = 200
+@planet_unique_mineral_cost_2 = 225
+@planet_unique_mineral_cost_3 = 250
+
+@capital_mineral_cost_tier_1 = 200
+@capital_mineral_cost_tier_2 = 300
+@capital_mineral_cost_tier_2.5 = 400
+@capital_mineral_cost_tier_3 = 500
+
+@empire_unique_mineral_cost = 400
+
+### ExOverhaul Building Energy Costs ###
+
+@resource_building_energy_cost_tier_0 = 5
+@resource_building_energy_cost_tier_1 = 15
+@resource_building_energy_cost_tier_2 = 30
+@resource_building_energy_cost_tier_3 = 45
+@resource_building_energy_cost_tier_4 = 60
+@resource_building_energy_cost_tier_5 = 75
+@resource_building_energy_cost_hab = 80
+
+@planet_unique_energy_cost_upgrade = 50
+@planet_unique_energy_cost_1 = 50
+@planet_unique_energy_cost_2 = 75
+@planet_unique_energy_cost_3 = 100
+
+@capital_energy_cost_tier_1 = 200
+@capital_energy_cost_tier_2 = 300
+@capital_energy_cost_tier_2.5 = 400
+@capital_energy_cost_tier_3 = 500
+
+@empire_unique_energy_cost = 400
+
+@empire_unique_influence_cost = 50
+@capital_influence_cost_tier_3 = 100
+
+### ExOverhaul Build Time ###
+
+@resource_building_build_time_tier_0 = 150
+@resource_building_build_time_tier_1 = 180
+@resource_building_build_time_tier_2 = 210
+@resource_building_build_time_tier_3 = 240
+@resource_building_build_time_tier_4 = 270
+@resource_building_build_time_tier_5 = 300
+@resource_building_build_time_hab = 360
+
+@planet_unique_build_time_1 = 270
+@planet_unique_build_time_2 = 360
+@planet_unique_build_time_3 = 450
+@planet_unique_build_time_upgrade = 270
+
+@capital_build_time_tier_1 = 480
+@capital_build_time_tier_2 = 960
+@capital_build_time_tier_3 = 1440
+
+@empire_unique_build_time = 1080
+
+### Resource Output ###
+@resource_building_output_tier_0 = 1
+@resource_building_output_tier_1 = 2
+@resource_building_output_tier_2 = 3
+@resource_building_output_tier_3 = 4
+@resource_building_output_tier_4 = 5
+@resource_building_output_tier_4.5 = 6
+@resource_building_output_tier_5 = 8
+@resource_building_output_tier_hab = 6
+
+@planet_unique_output_1 = 2
+@planet_unique_output_2 = 4
+@planet_unique_output_3 = 6
+
+@empire_unique_output_1 = 8
+@empire_unique_output_2 = 12
+@empire_unique_output_3 = 16
+@empire_unique_output_4 = 20
+
+### Upkeep ###
+@resource_building_upkeep_tier_0 = 0.5
+@resource_building_upkeep_tier_1 = 1
+@resource_building_upkeep_tier_2 = 1.5
+@resource_building_upkeep_tier_3 = 2
+@resource_building_upkeep_tier_4 = 2.5
+@resource_building_upkeep_tier_5 = 3
+@resource_building_upkeep_hab = 3
+
+@planet_unique_upkeep_1 = 3
+@planet_unique_upkeep_2 = 3.5
+@planet_unique_upkeep_3 = 4
+
+@empire_unique_upkeep = 10
+
+### ExOverhaul AI Weights ###
+
+#base weight multipliers - use either with weight, factor or add
+@avoid = 0
+@redundant = 0.5
+@standard = 1
+@good = 10
+@important = 25
+@strategic = 100
+@crucial_1 = 1000
+@crucial_2 = 10000
+
+#additive weight modifiers - use either with factor
+@reduce_interest_1 = 0.5
+@reduce_interest_2 = 0.25
+@reduce_interest_3 = 0.1
+@increase_interest_1 = 1.25
+@increase_interest_2 = 2.5
+@increase_interest_3 = 5
+
+#use with weight only, since the 9001 trick requires weight
+@always_build_and_never_remove = 9001
+
+###########################
+### Tradition Buildings ###
+###########################
+
+building_paradise_dome = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	required_resources = { energy = @planet_unique_upkeep_3	}
+	
+	produced_resources = { unity = 3 }
+
+	produced_resource_trigger = {
+		modifier = {
+			NOT = { has_country_flag = synthetic_age }			
+			resources = { food = 3 }		
+		}
+		modifier = {
+			has_country_flag = synthetic_age
+			resources = { energy = 3 }
+		}		
+	}
+	
+	planet_modifier = { pop_citizen_happiness = 0.05 }
+	
+	potential = { 
+		owner = {	has_non_swapped_tradition = tr_harmony_utopian_dream }
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building = "building_capital_1"
+				has_building = "building_capital_2"
+				has_building = "building_capital_3"
+			}
+		}		
+	}
+
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_authority = auth_machine_intelligence
+				NOT = { has_non_swapped_tradition = tr_harmony_utopian_dream }
+			}
+		}
+	}
+	
+	allow = { }
+
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				has_deposit = no
+				NOR = {
+					has_vanilla_or_exoverhaul_strategic_resources = yes 
+					has_research_resources = yes
+					has_minerals = yes
+					has_energy = yes				
+				}	
+			}
+		}
+		planet = { NOT = { has_modifier = "irradiated_planet" } }
+		#owner = { NOT = { has_all_traditions = yes } } 
+	}
+	
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = food
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = food
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = food
+					amount > 2
+				}
+			}
+		}		
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_food_bonus_pop = yes }			
+		}	
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_hyperstorage_building = yes } } 	
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_capital_building = yes } } 
+		}			
+		modifier = {
+			factor = @increase_interest_2
+			OR = {
+				planet = { has_modifier = "lush_planet" }
+				guilli_positive_food_modifiers = yes
+			}	
+		}
+		modifier = {
+			factor = @increase_interest_3
+			planet = { has_modifier = "eat_the_titans" }
+		}		
+		modifier = {
+			factor = @reduce_interest_1
+			planet = { has_modifier = "bleak_planet" }
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			guilli_negative_food_modifiers = yes
+		}				
+		modifier = {
+			factor = @reduce_interest_1
+			tile = { has_food = no }
+		}
+		modifier = {
+			factor = @crucial_1
+			owner = { has_country_flag = is_food_starved }
+		}	
+		modifier = {
+			factor = @crucial_2
+			AND = {
+				owner = { has_global_flag = "legw_active" }
+				planet = { has_modifier = "food_corn" }
+			}		
+		}				
+	}
+}
+
+building_visitor_center = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	potential = {
+		owner = {
+			AND = { 
+				has_non_swapped_tradition = tr_diplomacy_alien_tourism
+				is_xenophile = no				
+			}					
+		}
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building = "building_capital_1"
+				has_building = "building_capital_2"
+				has_building = "building_capital_3"
+			}
+		}		
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_authority = auth_machine_intelligence
+				NOT = { has_non_swapped_tradition = tr_diplomacy_alien_tourism }
+				#has_all_traditions = yes
+			}
+		}
+	}
+	
+	produced_resources = {
+		energy = 3
+		unity = 3
+	}
+	
+	planet_modifier = {
+		planet_migration_xeno_pull = 0.50
+		pop_environment_tolerance = 0.05
+	}
+
+	ai_allow = { 
+		tile = {
+			OR = {
+				has_deposit = no
+				AND = {						
+					has_energy = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no					
+				}				
+				AND = { 
+					has_vanilla_or_exoverhaul_strategic_resources = no					
+					has_energy = no
+					has_minerals = no					
+					has_research_resources = no
+				}
+			}	
+		}	
+	}
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = energy
+					amount > 2
+				}
+			}
+		}			
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				OR = {
+					has_energy = no
+					has_high_food = yes
+				}				
+			}	
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = {
+				has_slave_pop = yes			
+				has_prole_or_stapled_pop = yes		
+				AND = {
+					has_non_sapient_robot = yes
+					exists = owner
+					owner = { NOT = { has_global_flag = "ex_robots_active" } }					
+				}				
+			}	
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_energy_bonus_pop = yes	}
+		}		
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				OR = {
+					AND = {
+						has_robot_pop = yes
+						exists = owner
+						owner = { has_global_flag = "ex_robots_active" } 
+					}
+					has_free_sapient_robot = yes		
+				}	
+			}
+		}				
+		modifier = {
+			factor = @increase_interest_1
+			planet = { has_modifier = "strong_magnetic_field" }					
+		}			
+		modifier = {
+			factor = @increase_interest_3
+			OR = { 
+				planet = { has_modifier = "hazardous_weather" }					
+				guilli_energy_modifiers = yes
+			}	
+		}					
+	}
+}
+
+building_hive_synapse = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	potential = { 
+		owner = { has_swapped_tradition = tr_synchronicity_hive_mind_synapse }
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building = "building_capital_1"
+				has_building = "building_capital_2"
+				has_building = "building_capital_3"
+			}
+		}				
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_swapped_tradition = tr_synchronicity_hive_mind_synapse } }
+	}
+	
+	produced_resources = { energy = @planet_unique_output_3 }
+	
+	planet_modifier = { pop_non_slave_resource_output = 0.05 }	
+
+	ai_allow = { 
+		tile = {
+			OR = {
+				has_deposit = no
+				AND = {						
+					has_energy = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no					
+				}				
+				AND = { 
+					has_vanilla_or_exoverhaul_strategic_resources = no					
+					has_energy = no
+					has_minerals = no					
+					has_research_resources = no
+				}
+			}	
+		}	
+	}
+	
+	ai_weight = {
+		weight = @crucial_1
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = energy
+					amount > 2
+				}
+			}
+		}			
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				OR = {
+					has_energy = no
+					has_high_food = yes
+				}				
+			}	
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = {
+				has_slave_pop = yes			
+				has_prole_or_stapled_pop = yes		
+			}	
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_energy_bonus_pop = yes	}
+		}					
+		modifier = {
+			factor = @increase_interest_1
+			planet = { has_modifier = "strong_magnetic_field" }					
+		}			
+		modifier = {
+			factor = @increase_interest_3
+			OR = { 
+				planet = { has_modifier = "hazardous_weather" }					
+				guilli_energy_modifiers = yes
+			}	
+		}					
+	}
+}	
+	
+
+building_symbol_purity = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	potential = { 
+		owner = { has_swapped_tradition = tr_purity_symbol_purity }
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building = "building_capital_1"
+				has_building = "building_capital_2"
+				has_building = "building_capital_3"
+			}
+		}				
+	}
+	
+	destroy_if = {
+		exists = owner
+		OR = {
+			owner = {
+				OR = {
+					NOT = { has_swapped_tradition = tr_purity_symbol_purity }
+					has_authority = auth_machine_intelligence
+					#has_all_traditions = yes
+				}
+			}
+		}
+	}
+	
+	produced_resources = { unity = 4 }
+	
+	planet_modifier = {	pop_government_ethic_attraction = 0.20 }
+	
+	allow = { }
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }		
+	}
+
+	ai_weight = { weight = @crucial_2 }	
+}
+
+building_control_center = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	potential = { 
+		owner = { has_swapped_tradition = tr_synchronicity_machine_center }
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building = "building_machine_capital_1"
+				has_building = "building_machine_capital_2"
+				has_building = "building_machine_capital_3"
+			}
+		}				
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_swapped_tradition = tr_synchronicity_machine_center } }
+	}
+	
+	produced_resources = { energy = 4 }
+	
+	planet_modifier = {	pop_robot_production_output = 0.05 }
+	
+	ai_allow = { 
+		tile = {
+			OR = {
+				has_deposit = no
+				AND = {						
+					has_energy = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no					
+				}				
+				AND = { 
+					has_vanilla_or_exoverhaul_strategic_resources = no					
+					has_energy = no
+					has_minerals = no					
+					has_research_resources = no
+				}
+			}	
+		}	
+	}
+	
+	ai_weight = {
+		weight = @crucial_1
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = energy
+					amount > 2
+				}
+			}
+		}			
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				OR = {
+					has_energy = no
+					has_high_food = yes
+				}				
+			}	
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_energy_bonus_pop = yes	}
+		}					
+		modifier = {
+			factor = @increase_interest_1
+			planet = { has_modifier = "strong_magnetic_field" }					
+		}			
+		modifier = {
+			factor = @increase_interest_3
+			OR = { 
+				planet = { has_modifier = "hazardous_weather" }					
+				guilli_energy_modifiers = yes
+			}	
+		}					
+	}
+}
+
+building_neuro_electric_amplifier = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	produced_resources = {
+		minerals = 2
+		energy = 2
+	}
+	
+	planet_modifier_with_pop_trigger = {
+		key = building_neuro_electric_amplifier
+		potential = { has_trait = trait_cybernetic }
+		modifier = {
+			tile_resource_minerals_mult = 0.15
+			tile_resource_energy_mult = 0.15
+		}
+	}
+	
+	potential = { 
+		owner = { has_swapped_tradition = tr_synchronicity_cyber_comms }
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building = "building_machine_capital_1"
+				has_building = "building_machine_capital_2"
+				has_building = "building_machine_capital_3"
+			}
+		}				
+	}
+
+	destroy_if = {
+		owner = {
+			NOT = { 
+				AND = {
+					has_authority = auth_machine_intelligence
+					has_government = gov_machine_assimilator
+					has_swapped_tradition = tr_synchronicity_cyber_comms
+				}	
+			}
+		}		
+	}
+	
+	allow = { }
+
+	
+	ai_allow = {
+		tile = { 
+			OR = {
+				has_deposit = no
+				AND = {
+					has_energy = yes 
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_minerals = yes 
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}				
+			}	
+		}
+	}
+
+	ai_weight = { weight = @crucial_2 }	
+}

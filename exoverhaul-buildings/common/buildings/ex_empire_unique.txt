@@ -1,0 +1,1163 @@
+### ExOverhaul Building Mineral Costs ###
+@resource_building_mineral_cost_tier_0 = 25
+@resource_building_mineral_cost_tier_1 = 50
+@resource_building_mineral_cost_tier_2 = 75
+@resource_building_mineral_cost_tier_3 = 100
+@resource_building_mineral_cost_tier_4 = 125
+@resource_building_mineral_cost_tier_5 = 150
+@resource_building_mineral_cost_hab = 200
+
+@special_resource_building_mineral_cost = 150
+@special_resource_building_energy_cost = 50
+
+@planet_unique_mineral_cost_upgrade = 200
+@planet_unique_mineral_cost_1 = 200
+@planet_unique_mineral_cost_2 = 225
+@planet_unique_mineral_cost_3 = 250
+
+@capital_mineral_cost_tier_1 = 200
+@capital_mineral_cost_tier_2 = 300
+@capital_mineral_cost_tier_2.5 = 400
+@capital_mineral_cost_tier_3 = 500
+
+@empire_unique_mineral_cost = 400
+
+### ExOverhaul Building Energy Costs ###
+
+@resource_building_energy_cost_tier_0 = 0
+@resource_building_energy_cost_tier_1 = 10
+@resource_building_energy_cost_tier_2 = 25
+@resource_building_energy_cost_tier_3 = 40
+@resource_building_energy_cost_tier_4 = 55
+@resource_building_energy_cost_tier_5 = 70
+@resource_building_energy_cost_hab = 100
+
+@planet_unique_energy_cost_upgrade = 50
+@planet_unique_energy_cost_1 = 50
+@planet_unique_energy_cost_2 = 75
+@planet_unique_energy_cost_3 = 100
+
+@capital_energy_cost_tier_1 = 200
+@capital_energy_cost_tier_2 = 300
+@capital_energy_cost_tier_2.5 = 400
+@capital_energy_cost_tier_3 = 500
+
+@empire_unique_energy_cost = 400
+
+@empire_unique_influence_cost = 50
+@capital_influence_cost_tier_3 = 100
+
+### ExOverhaul Build Time ###
+
+@resource_building_build_time_tier_0 = 150
+@resource_building_build_time_tier_1 = 180
+@resource_building_build_time_tier_2 = 210
+@resource_building_build_time_tier_3 = 240
+@resource_building_build_time_tier_4 = 270
+@resource_building_build_time_tier_5 = 300
+@resource_building_build_time_hab = 360
+
+@planet_unique_build_time_1 = 270
+@planet_unique_build_time_2 = 360
+@planet_unique_build_time_3 = 450
+@planet_unique_build_time_upgrade = 270
+
+@capital_build_time_tier_1 = 480
+@capital_build_time_tier_2 = 960
+@capital_build_time_tier_3 = 1440
+
+@empire_unique_build_time = 1080
+
+### Resource Output ###
+@resource_building_output_tier_0 = 1
+@resource_building_output_tier_1 = 2
+@resource_building_output_tier_2 = 3
+@resource_building_output_tier_3 = 4
+@resource_building_output_tier_4 = 5
+@resource_building_output_tier_4.5 = 6
+@resource_building_output_tier_5 = 8
+@resource_building_output_tier_hab = 6
+
+@planet_unique_output_1 = 2
+@planet_unique_output_2 = 4
+@planet_unique_output_3 = 6
+
+@empire_unique_output_1 = 8
+@empire_unique_output_2 = 12
+@empire_unique_output_3 = 16
+@empire_unique_output_4 = 20
+
+### Upkeep ###
+@resource_building_upkeep_tier_0 = 0.5
+@resource_building_upkeep_tier_1 = 1
+@resource_building_upkeep_tier_2 = 1.5
+@resource_building_upkeep_tier_3 = 2
+@resource_building_upkeep_tier_4 = 2.5
+@resource_building_upkeep_tier_5 = 3
+@resource_building_upkeep_hab = 3
+
+@planet_unique_upkeep_1 = 3
+@planet_unique_upkeep_2 = 3.5
+@planet_unique_upkeep_3 = 4
+
+@empire_unique_upkeep = 10
+
+###############################
+### Empire Unique Buildings ###
+###############################
+
+building_galactic_stock_exchange = {
+	base_buildtime = @empire_unique_build_time
+	empire_unique = yes
+	
+	cost = {
+		minerals = @empire_unique_mineral_cost
+		energy = @empire_unique_energy_cost
+		influence = @empire_unique_influence_cost		
+	}
+	
+	produced_resources = {
+		energy = @empire_unique_output_4
+	}
+	
+	country_modifier = {
+		tile_resource_energy_mult = 0.10
+		max_energy = 5000
+	}	
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			is_capital = yes
+		}
+	}
+
+	destroy_if = {
+		OR = {
+			planet = { is_capital = no }
+			AND = {
+				exists = owner
+				owner = { has_authority = auth_machine_intelligence }
+			}
+		}
+	}	
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_any_empire_capital"
+			planet = {
+				OR = {
+					has_building = "building_capital_3"
+					has_building = "building_hab_capital"
+				}		
+			}
+		}
+	}
+	
+	prerequisites = {
+		"tech_galactic_markets"
+	}
+	
+	ai_special_building = yes
+	
+	ai_allow = {
+		AND = {
+			OR = {
+				tile = {
+					has_building = no
+					has_building = building_galactic_stock_exchange
+				}
+			}
+			NOR = {
+				has_resource = {
+					type = sr_betharian
+					amount > 0
+				}	
+				has_resource = {
+					type = sr_alien_pets
+					amount > 0
+				}				
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = 100000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = physics_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = society_research
+						amount > 0
+					}
+				}
+			}
+		} #Build only on empty tiles or tiles with energy
+	} 
+	
+	ai_replace = no
+}
+
+building_ministry_benevolence = {
+	base_buildtime = @empire_unique_build_time
+	empire_unique = yes
+	
+	cost = {
+		minerals = @empire_unique_mineral_cost
+		energy = @empire_unique_energy_cost
+		influence = @empire_unique_influence_cost		
+	}
+	
+	required_resources = {
+		energy = @empire_unique_upkeep
+	}
+	
+	produced_resources = {
+		unity = @empire_unique_output_2
+	}
+	
+	country_modifier = {
+		pop_citizen_happiness = 0.05
+		pop_government_ethic_attraction	= 0.1
+	}
+
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			is_capital = yes
+		}
+	}
+
+	destroy_if = {
+		OR = {
+			planet = { is_capital = no }
+			AND = {
+				exists = owner
+				owner = { has_authority = auth_machine_intelligence }
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_any_empire_capital"
+			planet = {
+				OR = {
+					has_building = "building_capital_3"
+					has_building = "building_hab_capital"
+				}		
+			}
+		}
+	}
+	prerequisites = {
+		"tech_galactic_benevolence"
+	}
+	
+	ai_special_building = yes
+	
+	ai_allow = {
+		AND = {
+			OR = {
+				tile = {
+					has_building = no
+					has_building = building_ministry_benevolence
+				}
+			}
+			NOR = {
+				has_resource = {
+					type = sr_betharian
+					amount > 0
+				}	
+				has_resource = {
+					type = sr_alien_pets
+					amount > 0
+				}				
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = 100000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = energy
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = physics_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = society_research
+						amount > 0
+					}
+				}
+			}
+		} #Build only on empty tiles
+	} #This weight written so that if the tile has a resource the AI wont build on it.
+	
+	ai_replace = no
+}
+
+building_institute = {
+	base_buildtime = @empire_unique_build_time
+	empire_unique = yes
+	
+	cost = {
+		minerals = @empire_unique_mineral_cost
+		energy = @empire_unique_energy_cost
+		influence = @empire_unique_influence_cost		
+	}
+	
+	produced_resources = {
+		engineering_research = 8
+		physics_research = 8
+		society_research = 8		
+	}
+	
+	required_resources = {
+		energy = @empire_unique_upkeep
+	}
+	
+	country_modifier = {
+		all_technology_research_speed = 0.05
+	}
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		NOT = { 
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			is_capital = yes
+		}
+	}
+
+	destroy_if = {
+		OR = {
+			planet = { is_capital = no }
+			AND = {
+				exists = owner
+				owner = { has_authority = auth_machine_intelligence }
+			}
+		}
+	}	
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_any_empire_capital"
+			planet = {
+				OR = {
+					has_building = "building_capital_3"
+					has_building = "building_hab_capital"
+				}		
+			}
+		}
+	}
+	
+	prerequisites = {
+		"tech_global_research_initiative"
+	}
+	
+	ai_special_building = yes
+	
+	ai_weight = {
+		weight = 1000000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = energy
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 0
+					}
+				}
+			}
+		} 
+	} #Build on a research tile or nothing at all
+	
+		
+	ai_allow = {
+		AND = {
+			OR = {
+				tile = {
+					has_building = no
+					has_building = building_institute
+				}
+			}
+			NOR = {
+				has_resource = {
+					type = sr_betharian
+					amount > 0
+				}	
+				has_resource = {
+					type = sr_alien_pets
+					amount > 0
+				}				
+			}
+		}
+	}
+	
+	ai_replace = no
+}
+
+building_psi_corps = {
+	base_buildtime = @empire_unique_build_time
+	empire_unique = yes
+	
+	cost = {
+		minerals = @empire_unique_mineral_cost
+		energy = @empire_unique_energy_cost
+		influence = @empire_unique_influence_cost		
+	}
+	
+	produced_resources = {
+		unity = @empire_unique_output_2
+	}
+	
+	required_resources = {
+		energy = @empire_unique_upkeep
+	}
+	
+	country_modifier = {
+		pop_government_ethic_attraction = 0.15
+	}
+	
+	potential = {
+		owner = {
+			has_ascension_perk = ap_mind_over_matter
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}	
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_3"
+			planet = {
+				has_building = "building_capital_3"
+			}
+		}
+	}
+	
+	ai_special_building = yes
+	
+	ai_weight = {
+		weight = 10000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = energy
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = physics_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = society_research
+						amount > 0
+					}
+				}
+			}
+		} #Build only on empty tiles
+	}
+	
+	ai_allow = {
+		AND = {
+			OR = {
+				tile = {
+					has_building = no
+					has_building = building_psi_corps
+				}
+			}
+			NOR = {
+				has_resource = {
+					type = sr_betharian
+					amount > 0
+				}	
+				has_resource = {
+					type = sr_alien_pets
+					amount > 0
+				}				
+			}
+		}
+	}
+	
+	ai_replace = no
+}
+
+building_citadel_of_faith = {
+	base_buildtime = @empire_unique_build_time
+	is_listed = no
+	empire_unique = yes
+	
+	cost = {
+		minerals = @empire_unique_mineral_cost
+		energy = @empire_unique_energy_cost
+		influence = @empire_unique_influence_cost		
+	}
+	
+	produced_resources = {
+		unity = @empire_unique_output_4
+	}
+	
+	country_modifier = {
+		country_resource_unity_mult = 0.10
+		pop_ethic_spiritualist_attraction_mult = 0.1
+	}
+	
+	planet_modifier = {
+		pop_ethic_spiritualist_attraction_mult = 0.5
+	}
+	
+	required_resources = {
+		energy = @empire_unique_upkeep
+	}
+	
+	potential = { 	
+		owner = {
+			OR = {
+				has_ethic = ethic_spiritualist		
+				has_ethic = ethic_fanatic_spiritualist
+			}
+		}
+		planet = {
+			is_capital = yes
+			NOR = {
+				has_building = building_autochthon_monument
+				has_building = building_heritage_site
+				has_building = building_hypercomms_forum
+				has_building = building_autocurating_vault
+			}
+		}
+	}	
+
+	destroy_if = {
+		exists = owner
+		OR = {
+			owner = { has_authority = auth_machine_intelligence }
+			owner = {
+				AND = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_any_empire_capital"
+			planet = {
+				OR = {
+					has_building = "building_capital_3"
+					has_building = "building_hab_capital"
+				}		
+			}
+		}
+	}	
+	
+	prerequisites = {
+		"tech_transcendent_faith"
+	}
+
+	ai_weight = {
+		weight = 10000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = energy
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = physics_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = society_research
+						amount > 0
+					}
+				}
+			}
+		} #Build only on empty tiles
+			modifier = {
+		weight = 0
+		AND = {
+			owner = {
+			has_tradition = tr_supremacy_finish
+			has_tradition = tr_harmony_finish
+			has_tradition = tr_prosperity_finish
+			has_tradition = tr_domination_finish
+			has_tradition = tr_expansion_finish
+			has_tradition = tr_discovery_finish
+			has_tradition = tr_diplomacy_finish
+			}
+			}
+		} #All tradations finished time to scrap these buildings
+	} #This weight written so that if the tile has a resource the AI wont build on it.
+	
+	ai_allow = {
+		AND = {
+			OR = {
+				tile = {
+					has_building = no
+					has_building = building_citadel_of_faith
+				}
+			}
+			NOR = {
+				has_resource = {
+					type = sr_betharian
+					amount > 0
+				}	
+				has_resource = {
+					type = sr_alien_pets
+					amount > 0
+				}				
+			}
+		}
+	}
+	
+	ai_replace = no
+}
+
+building_autocurating_vault = {
+	base_buildtime = @empire_unique_build_time
+	is_listed = no
+	empire_unique = yes
+	
+	cost = {
+		minerals = @empire_unique_mineral_cost
+		energy = @empire_unique_energy_cost
+		influence = @empire_unique_influence_cost		
+	}
+	
+	produced_resources = {
+		unity = @empire_unique_output_4
+	}
+	
+	required_resources = {
+		energy = @empire_unique_upkeep
+	}
+	
+	country_modifier = {
+		country_resource_unity_mult = 0.10
+	}
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = { 	
+		owner = {
+			NOR = {
+				has_ethic = ethic_spiritualist		
+				has_ethic = ethic_fanatic_spiritualist
+				has_authority = auth_machine_intelligence
+			}
+		}
+		planet = {
+			is_capital = yes
+			NOR = {
+				has_building = building_temple
+				has_building = building_holotemple				
+				has_building = building_citadel_of_faith
+				has_building = building_sacred_nexus
+			}
+		}
+	}
+
+	destroy_if = {
+		OR = {
+			OR = {
+				planet = { is_capital = no }
+				AND = {
+					exists = owner
+					owner = { has_authority = auth_machine_intelligence }
+				}
+			}
+			owner = {
+				AND = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		}
+	}	
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_any_empire_capital"
+			planet = {
+				OR = {
+					has_building = "building_capital_3"
+					has_building = "building_hab_capital"
+				}		
+			}
+		}
+	}	
+	
+	prerequisites = {
+		"tech_autocurating_vault"
+	}
+	
+	ai_allow = {
+		AND = {
+			OR = {
+				tile = {
+					has_building = no
+					has_building = building_autocurating_vault
+				}
+			}
+			NOR = {
+				has_resource = {
+					type = sr_betharian
+					amount > 0
+				}	
+				has_resource = {
+					type = sr_alien_pets
+					amount > 0
+				}				
+			}
+		}
+	}
+	
+	
+	ai_weight = {
+		weight = 10000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = energy
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = physics_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = society_research
+						amount > 0
+					}
+				}
+			}
+		} #Build only on empty tiles
+		modifier = {
+		weight = 0
+		AND = {
+			owner = {
+			has_tradition = tr_supremacy_finish
+			has_tradition = tr_harmony_finish
+			has_tradition = tr_prosperity_finish
+			has_tradition = tr_domination_finish
+			has_tradition = tr_expansion_finish
+			has_tradition = tr_discovery_finish
+			has_tradition = tr_diplomacy_finish
+			}
+			}
+		} #All tradations finished time to scrap these buildings
+	} #This weight written so that if the tile has a resource the AI wont build on it.
+	ai_replace = no
+}
+
+# Alpha Hub
+building_alpha_hub = {
+	base_buildtime = @empire_unique_build_time
+	is_listed = no
+	empire_unique = yes
+	
+	cost = {
+		minerals = @empire_unique_mineral_cost
+		energy = @empire_unique_energy_cost
+		influence = @empire_unique_influence_cost		
+	}
+	
+	produced_resources = {
+		unity = @empire_unique_output_4
+	}
+	
+	required_resources = {
+		energy = @empire_unique_upkeep
+	}
+	
+	country_modifier = {
+		country_resource_unity_mult = 0.10
+	}
+	
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+
+	potential = { 	
+		owner = { has_authority = auth_machine_intelligence }
+		planet = {
+			is_capital = yes
+		}
+	}
+
+	destroy_if = {
+		OR = {
+			owner = {
+				NOT = { has_authority = auth_machine_intelligence }
+			}
+			owner = {
+				AND = {
+					has_tradition = tr_supremacy_finish
+					has_tradition = tr_harmony_finish
+					has_tradition = tr_prosperity_finish
+					has_tradition = tr_domination_finish
+					has_tradition = tr_expansion_finish
+					has_tradition = tr_discovery_finish
+					has_tradition = tr_diplomacy_finish
+				}
+			}
+		}
+	}
+
+	destroy_if = {
+		planet = { is_capital = no }
+	}	
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_any_empire_capital"
+			planet = {
+				OR = {
+					has_building = "building_machine_capital_3"
+					has_building = "building_hab_capital"
+				}		
+			}
+		}
+	}	
+	
+	prerequisites = {
+		"tech_autocurating_vault"
+	}
+	
+	ai_weight = {
+		weight = 10000
+	}
+	ai_replace = no
+}
+
+# Singularity Core
+building_singularity_core = {
+	base_buildtime = @empire_unique_build_time
+	empire_unique = yes
+	
+	cost = {
+		minerals = @empire_unique_mineral_cost
+		energy = @empire_unique_energy_cost
+		influence = @empire_unique_influence_cost		
+	}
+	
+	produced_resources = {
+		engineering_research = @empire_unique_output_1
+		physics_research = @empire_unique_output_1
+		society_research = @empire_unique_output_1
+	}
+	
+	required_resources = {
+		energy = @empire_unique_upkeep
+	}
+	
+	country_modifier = {
+		country_physics_tech_research_speed = 0.20
+	}
+	
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = {
+			is_capital = yes
+		}
+	}
+
+	destroy_if = {
+		planet = { is_capital = no }
+		owner = {
+			NOT = { has_authority = auth_machine_intelligence }
+		}		
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_machine_capital_3"
+			planet = { has_building = "building_machine_capital_3" }
+		}
+	}
+	
+	prerequisites = {
+		"tech_singularity_core"
+	}
+	
+	ai_weight = {
+		weight = 1000000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = energy
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 0
+					}
+				}
+			}
+		} 
+	} #Build on a research tile or nothing at all
+	ai_replace = no
+}
+
+# Probability Engine
+building_probability_engine = {
+	base_buildtime = @empire_unique_build_time
+	empire_unique = yes
+	
+	cost = {
+		minerals = @empire_unique_mineral_cost
+		energy = @empire_unique_energy_cost
+		influence = @empire_unique_influence_cost		
+	}
+	
+	produced_resources = {
+		energy = @empire_unique_output_4
+	}
+	
+	country_modifier = {
+		tile_resource_energy_mult = 0.10
+		max_energy = 5000
+	}	
+	
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = {
+			is_capital = yes
+		}
+	}
+
+	destroy_if = {
+		planet = { is_capital = no }
+		owner = {
+			NOT = { has_authority = auth_machine_intelligence }
+		}		
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_machine_capital_3"
+			planet = { has_building = "building_machine_capital_3" }
+		}
+	}
+	
+	prerequisites = {
+		"tech_probability_theory"
+	}
+	
+	ai_weight = {
+		weight = 10000
+		modifier = {
+			weight = 0
+			OR = {
+				tile = {
+					has_resource = {
+						type = minerals
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = food
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = engineering_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = physics_research
+						amount > 0
+					}
+				}
+				tile = {
+					has_resource = {
+						type = society_research
+						amount > 0
+					}
+				}
+			}
+		} #Build only on empty tiles or tiles with energy
+	}
+	ai_replace = no
+}
+

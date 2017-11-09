@@ -1,0 +1,384 @@
+############# ExOverhaul- FTL Mineral Costs
+
+@warp_tier_1_cost = 5
+@warp_tier_2_cost = 10
+@warp_tier_3_cost = 15
+
+@hyperdrive_tier_1_cost = 5
+@hyperdrive_tier_2_cost = 10
+@hyperdrive_tier_3_cost = 15
+
+@wormhole_tier_2_cost = 5
+@wormhole_tier_3_cost = 10
+
+@jumpdrive_cost = 25
+@psi_jumpdrive_cost = 30
+
+############# ExOverhaul- FTL Power Costs
+
+@warp_tier_1_power = -10
+@warp_tier_2_power = -20
+@warp_tier_3_power = -30
+
+@hyperdrive_tier_1_power = -10
+@hyperdrive_tier_2_power = -20
+@hyperdrive_tier_3_power = -30
+
+@wormhole_tier_2_power = -5
+@wormhole_tier_3_power = -10
+
+@jumpdrive_power = -40
+@psi_jumpdrive_power = -50
+
+#############
+
+@warp_tier_2_winup = -0.25
+@warp_tier_2_windown = -0.25
+@warp_tier_2_emergency_ftl = -0.15
+@warp_tier_2_ftl_range = 0.5
+@warp_tier_2_ftl_speed = 1
+
+@warp_tier_3_winup = -0.5
+@warp_tier_3_windown = -0.5
+@warp_tier_3_emergency_ftl = -0.30
+@warp_tier_3_ftl_range = 1
+@warp_tier_3_ftl_speed = 2
+
+@hyperdrive_tier_2_winup = -0.3
+@hyperdrive_tier_2_emergency_ftl = -0.15
+@hyperdrive_tier_2_ftl_speed = 0.5
+
+@hyperdrive_tier_3_winup = -0.6
+@hyperdrive_tier_3_emergency_ftl = -0.2
+@hyperdrive_tier_3_ftl_speed = 1
+
+@wormhole_tier_2_generation_speed = 0.25 
+@wormhole_tier_2_emergency_ftl = -0.25
+@wormhole_tier_2_ftl_range = 0.33 
+
+@wormhole_tier_3_generation_speed = 0.5
+@wormhole_tier_3_emergency_ftl = -0.5
+@wormhole_tier_3_ftl_range = 0.66
+
+@jumpdrive_emergency_ftl = -0.3
+@psi_jumpdrive_emergency_ftl = -0.5
+@psi_jumpdrive_windup = -0.25
+@psi_jumpdrive_range = 0.25
+
+#############
+# UTILITIES #
+#############
+
+### NON-FTL DRIVE
+utility_component_template = {
+	key = "EMPTY_DRIVE"
+	size = small
+	icon = "GFX_ship_part_empty_ftl_drive"
+	icon_frame = 1
+	power = 0
+	cost = 0
+	should_ai_use = no
+	
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+	component_set = "ftl_components"
+}
+
+### WARP DRIVES
+utility_component_template = {
+	key = "WARP_DRIVE_1"
+	size = small
+	icon = "GFX_ship_part_warp_drive_1"
+	icon_frame = 1
+	power = @warp_tier_1_power
+	cost = @warp_tier_1_cost
+	ftl = warp
+	
+	ai_weight = {
+		weight = 1
+	}
+
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+	prerequisites = { "tech_warp_drive_1" }
+	component_set = "ftl_components"
+	upgrades_to = "WARP_DRIVE_2"
+}
+
+utility_component_template = {
+	key = "WARP_DRIVE_2"
+	size = small
+	icon = "GFX_ship_part_warp_drive_2"
+	icon_frame = 1
+	power = @warp_tier_2_power
+	cost = @warp_tier_2_cost
+	ftl = warp
+	
+	ship_modifier = {
+		ship_windup_mult = @warp_tier_2_winup
+		ship_winddown_mult = @warp_tier_2_windown
+		ship_emergency_ftl_mult = @warp_tier_2_emergency_ftl
+		ship_ftl_warp_range_mult = @warp_tier_2_ftl_range
+		ship_interstellar_speed_mult = @warp_tier_2_ftl_speed		
+	}
+	
+	ai_weight = {
+		weight = 2
+	}
+
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+	prerequisites = { "tech_warp_drive_2" }
+	component_set = "ftl_components"
+	upgrades_to = "WARP_DRIVE_3"
+}
+
+utility_component_template = {
+	key = "WARP_DRIVE_3"
+	size = small
+	icon = "GFX_ship_part_warp_drive_3"
+	icon_frame = 1
+	power = @warp_tier_3_power
+	cost = @warp_tier_3_cost
+	ftl = warp
+	
+	ship_modifier = {
+		ship_windup_mult = @warp_tier_3_winup
+		ship_winddown_mult = @warp_tier_3_windown
+		ship_emergency_ftl_mult = @warp_tier_3_emergency_ftl
+		ship_ftl_warp_range_mult = @warp_tier_3_ftl_range
+		ship_interstellar_speed_mult = @warp_tier_3_ftl_speed			
+	}
+	
+	ai_weight = {
+		weight = 3
+	}
+
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+	prerequisites = { "tech_warp_drive_3" }
+	component_set = "ftl_components"
+}
+
+### HYPER DRIVES
+utility_component_template = {
+	key = "HYPER_DRIVE_1"
+	size = small
+	icon = "GFX_ship_part_hyper_drive_1"
+	icon_frame = 1
+	power = @hyperdrive_tier_1_power
+	cost = @hyperdrive_tier_1_cost
+	ftl = hyperdrive
+	
+	ai_weight = {
+		weight = 1
+	}
+	
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+	prerequisites = { "tech_hyper_drive_1" }
+	component_set = "ftl_components"
+	upgrades_to = "HYPER_DRIVE_2"
+}
+
+utility_component_template = {
+	key = "HYPER_DRIVE_2"
+	size = small
+	icon = "GFX_ship_part_hyper_drive_2"
+	icon_frame = 1
+	power = @hyperdrive_tier_2_power
+	cost = @hyperdrive_tier_2_cost
+	ftl = hyperdrive
+
+	ship_modifier = {
+		ship_windup_mult = @hyperdrive_tier_2_winup
+		ship_emergency_ftl_mult = @hyperdrive_tier_2_emergency_ftl
+		ship_interstellar_speed_mult = @hyperdrive_tier_2_ftl_speed	
+	}
+	
+	ai_weight = {
+		weight = 2
+	}
+	
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+	prerequisites = { "tech_hyper_drive_2" }
+	component_set = "ftl_components"
+	upgrades_to = "HYPER_DRIVE_3"
+}
+
+utility_component_template = {
+	key = "HYPER_DRIVE_3"
+	size = small
+	icon = "GFX_ship_part_hyper_drive_3"
+	icon_frame = 1
+	power = @hyperdrive_tier_3_power
+	cost = @hyperdrive_tier_3_cost
+	ftl = hyperdrive
+		
+	ship_modifier = {
+		ship_windup_mult = @hyperdrive_tier_3_winup
+		ship_emergency_ftl_mult = @hyperdrive_tier_3_emergency_ftl
+		ship_interstellar_speed_mult = @hyperdrive_tier_3_ftl_speed	
+	}	
+	
+	ai_weight = {
+		weight = 3
+	}
+	
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+	prerequisites = { "tech_hyper_drive_3" }
+	component_set = "ftl_components"
+}
+
+### WORM HOLE DRIVES
+utility_component_template = {
+	key = "WORMHOLE_DRIVE"
+	size = small
+	icon = "GFX_ship_part_wormhole"
+	icon_frame = 1
+	power = 0
+	cost = 0
+	ftl = wormhole
+	
+	ai_weight = {
+		weight = 1
+	}
+	
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+	prerequisites = { "tech_wormhole_generation_1" }
+	component_set = "ftl_components"
+}
+
+utility_component_template = {
+	key = "WORMHOLE_DRIVE_2"
+	size = small
+	icon = "GFX_ship_part_wormhole_2"
+	icon_frame = 1
+	power = @wormhole_tier_2_power
+	cost = @wormhole_tier_2_cost
+	ftl = wormhole
+
+	ship_modifier = {		
+		ship_emergency_ftl_mult = @wormhole_tier_2_emergency_ftl
+	}
+	
+	ai_weight = {
+		weight = 2
+	}
+	
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+	prerequisites = { "tech_wormhole_generation_2" }
+	component_set = "ftl_components"
+}
+
+utility_component_template = {
+	key = "WORMHOLE_DRIVE_3"
+	size = small
+	icon = "GFX_ship_part_wormhole_3"
+	icon_frame = 1
+	power = @wormhole_tier_3_power
+	cost = @wormhole_tier_3_cost
+	ftl = wormhole
+	
+	ship_modifier = {
+		ship_emergency_ftl_mult = @wormhole_tier_3_emergency_ftl
+	}
+	
+	ai_weight = {
+		weight = 3
+	}
+	
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+	prerequisites = { "tech_wormhole_generation_3" }
+	component_set = "ftl_components"
+}
+
+### Jump drives
+utility_component_template = {
+	key = "JUMP_DRIVE_1"
+	size = small
+	icon = "GFX_ship_part_jump_drive_1"
+	icon_frame = 1
+	power = @jumpdrive_power
+	cost = @jumpdrive_cost
+	ftl = jumpdrive
+
+	ship_modifier = {
+		ship_emergency_ftl_mult = @jumpdrive_emergency_ftl
+	}
+	
+	ai_weight = {
+		weight = 4
+	}
+
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+	prerequisites = { "tech_jump_drive_1" }
+	component_set = "ftl_components"
+	upgrades_to = "PSI_JUMP_DRIVE_1"
+}
+
+### Jump drives
+utility_component_template = {
+	key = "PSI_JUMP_DRIVE_1"
+	size = small
+	icon = "GFX_ship_part_psi_jump_drive_1"
+	icon_frame = 1
+	power = @psi_jumpdrive_power
+	cost = @psi_jumpdrive_cost
+	ftl = jumpdrive
+	
+	ai_weight = {
+		weight = 5
+	}
+	
+	ship_modifier = {
+		ship_ftl_jumpdrive_range_mult = @psi_jumpdrive_range
+		ship_windup_mult = @psi_jumpdrive_windup
+		ship_emergency_ftl_mult = @psi_jumpdrive_emergency_ftl		
+	}
+
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+	prerequisites = { "tech_psi_jump_drive_1" }
+	component_set = "ftl_components"
+}
+
+utility_component_template = {
+	key = "NOMAD_WARP_DRIVE"
+	hidden = yes
+	size = small
+	icon = "GFX_ship_part_warp_drive_3"
+	icon_frame = 1
+	power = @warp_tier_3_power
+	cost = @warp_tier_3_cost
+	ftl = warp
+	ship_modifier = {
+		ship_ftl_warp_range_mult = 1
+		ship_interstellar_speed_mult = 5
+		ship_winddown_mult = -3
+	}
+	
+	ai_weight = {
+		weight = 3
+	}
+
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+	#prerequisites = { "tech_warp_drive_3" }
+	component_set = "ftl_components"
+}
+
+utility_component_template = {
+	key = "GUARDIAN_WARP"
+	hidden = yes
+	size = small
+	icon = "GFX_ship_part_warp_drive_3"
+	icon_frame = 1
+	power = @warp_tier_3_power
+	cost = @warp_tier_3_cost
+	ftl = warp
+	ship_modifier = {
+		ship_ftl_warp_range_mult = 2.0
+		ship_interstellar_speed_mult = 8
+		ship_winddown_mult = -4
+	}
+	
+	ai_weight = {
+		weight = 3
+	}
+
+	class_restriction = { shipclass_military shipclass_constructor shipclass_colonizer shipclass_science_ship shipclass_transport }
+}
