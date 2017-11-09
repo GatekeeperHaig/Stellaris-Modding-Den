@@ -457,12 +457,14 @@ def main(argv):
     buildingNameToData.removeDuplicatesRec()
       
     #OUTPUT   
+    if args.output_folder[0]==".":
+      args.output_folder=args.output_folder[1:].lstrip(os.sep)
     modfileName=os.path.dirname(args.output_folder)
     if modfileName=='' or modfileName==".": #should only happen if args.output_folder is a pure foldername in which case 'os.path.dirname' is unessecary anyway
       modfileName=args.output_folder
     with open(modfileName+".mod",'w') as modfile:
       modfile.write('name="!{}"\n'.format(modfileName))
-      modfile.write('path="mod/{}"\n'.format(args.output_folder))
+      modfile.write('path="mod/{}"\n'.format(args.output_folder.rstrip(os.sep)))
       modfile.write('tags={\n')
       modfile.write('\t"Buildings"\n')
       modfile.write('}\n')
