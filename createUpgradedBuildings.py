@@ -202,8 +202,6 @@ def computeNewCosts(entryA, entryB, tag, discount, varsToValue):
   except ValueError:
     magnitude.append("0")
     B=0
-  print(tag)
-  print(magnitude)
   for i in range(len(magnitude)):
     if magnitude[i][0]=="@":
       magnitude[i]=varsToValue.get(magnitude[i])
@@ -320,7 +318,6 @@ def main(argv):
           
           #new building requirements to ensure that only the highest currently available is buildable. Keep the building list as short as possible. Done via "potential" to compeltely remove them from the list (not even greyed out)
           newRequirements=NamesToValue(2)
-          # print(upgrades.names)
           if len(upgrades.names)>0 and not args.keep_lower_tier and not buildingData.buildingName in args.keep_specific_lower_tier:
             buildingData.getOrCreate("potential")
             buildingData.splitToListIfString("potential").add(["NAND", newRequirements])
@@ -382,8 +379,6 @@ def main(argv):
             costsA=buildingData.splitToListIfString("cost")
             costsB=upgradeData.splitToListIfString("cost")
             allCostNames=list(set(costsA.names)|set(costsB.names)) #create a list that includes any cost name from either building exactly once
-            print(buildingData.buildingName)
-            print(upgradeData.buildingName)
             for name in allCostNames:
               computeNewCosts(costsA, costsB, name, args.cost_discount,varsToValue)
               
