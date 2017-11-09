@@ -21,7 +21,8 @@ def parse(argv):
   parser.add_argument('-f','--foreign_scripted_trigger', action="store_true", help="If you created your own scripted_triggers file including 'has_building' mentions on buildings that will be copied by this script, run this script once with all such files as input instead of the building files. In this mode the script will simply replace all 'has_building = ...' with scripted_triggers created by the script if not run with this argument. This obviously only works if you have/will run all buildings mentioned here through the main script!")
   parser.add_argument('-o','--output_folder', default="build_upgraded", help="(default: %(default)s)")
   parser.add_argument('-j','--join_files', action="store_true", help="Output from all input files goes into a single file. Has to be activated if you have upgrades distributed over different files. Will not copy comments!")
-  parser.add_argument('--gameVersion', default="1.8.*", help="Game version of the newly created .mod file to avoid launcher warning")
+  parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help="Removes all upgrades where the building can also be reached differently.")
+  parser.add_argument('-g','--gameVersion', default="1.8.*", help="Game version of the newly created .mod file to avoid launcher warning(default: %(default)s)")
 
   
   if isinstance(argv, str):
@@ -290,6 +291,39 @@ def main(argv):
         continue
       else:
         varsToValue.removeDuplicateNames()
+        
+    if args.remove_reduntant_upgrades:
+      for buildingData in buildingNameToData.vals:
+        #print(len(buildingNameToData.vals))
+        #print(buildingData.buildingName)
+        upgrades=buildingData.splitToListIfString("upgrades")
+        #print(upgrades.names)
+        upgradeIndex=-1
+        while 1:
+          upgradeIndex+=1
+          if upgradeIndex>=len(upgrades.names):
+            break
+          if len(upgrades.names[upgradeIndex])>0:
+            upgradeList=[buildingNameToData.get(upgrades.names[upgradeIndex])]
+            upgrade=upgradeList[0]
+            while len(upgradeList)>0:
+              upgradeList=upgradeList[1:]
+              for upgradeName in upgrade.splitToListIfString("upgrades").names:
+                if len(upgradeName)>0:
+                  upgradeList.append(buildingNameToData.get(upgradeName))
+              if len(upgradeList)==0:
+                break
+              upgrade=upgradeList[0]
+              # print(upgrades.names)
+              # print(upgrade.buildingName)
+              if upgrade.buildingName in upgrades.names:
+                #print(upgrades.names)
+                upgrades.names.remove(upgrade.buildingName)
+                #print(upgrades.names)
+              
+              
+            
+      
     
     if not args.foreign_scripted_trigger:  
       #COPY AND MODIFY WHERE NEEDED       
