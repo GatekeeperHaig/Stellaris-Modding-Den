@@ -70,6 +70,19 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
   def replace(self, name,val): #replace via name
     i=self.names.index(name)
     self.vals[i]=val
+  def splitToListIfString(self,name): #I do not generally split lines that open and close brackets within the line (to prevent enlarging the file). Yet sometimes it's necessary...
+    try:
+      i=self.names.index(name)
+    except ValueError:
+      return NamesToValue(0)
+    if not isinstance(self.vals[i],NamesToValue):
+      string=self.vals[i].strip()
+      if string[0]=="{":
+        string=string[1:-1].strip() #remove on bracket layer
+      self.vals[i]=NamesToValue(self.bracketLevel+1)
+      if len(string)>0:
+        self.vals[i].addString(string)
+    return self.vals[i]
   def increaseLevelRec(self): #increase the bracket level for this object and every object below. Beware that as the head name of this object is stored one level higher, the head name of the object is not shifted
     self.bracketLevel+=1
     for val in self.vals:
@@ -189,6 +202,8 @@ def computeNewCosts(entryA, entryB, tag, discount, varsToValue):
   except ValueError:
     magnitude.append("0")
     B=0
+  print(tag)
+  print(magnitude)
   for i in range(len(magnitude)):
     if magnitude[i][0]=="@":
       magnitude[i]=varsToValue.get(magnitude[i])
@@ -234,6 +249,7 @@ def main(argv):
     bracketLevel=0
     objectList=[] #objects currently open objectList[0] would be lowest bracket object (a building), etc
     with open(buildingFileName,'r') as inputFile:
+      print("Start reading "+buildingFileName)
       if args.foreign_scripted_trigger:
         outPath=args.output_folder+"/common/scripted_triggers/"
       else:
@@ -295,17 +311,19 @@ def main(argv):
           #take first element to work with and remove it from todo-list
           buildingData=buildingDataList[0]
           buildingDataList=buildingDataList[1:]
-          upgrades=buildingData.get("upgrades")
-          if not isinstance(upgrades,NamesToValue):
-            buildingData.replace("upgrades",NamesToValue(buildingData.bracketLevel+1))
-            buildingData.get("upgrades").addString(upgrades.replace("{","").replace("}","").strip())
-            upgrades=buildingData.get("upgrades")
+          upgrades=buildingData.splitToListIfString("upgrades")
+          # upgrades=buildingData.get("upgrades")
+          # if not isinstance(upgrades,NamesToValue):
+            # buildingData.replace("upgrades",NamesToValue(buildingData.bracketLevel+1))
+            # buildingData.get("upgrades").addString(upgrades.replace("{","").replace("}","").strip())
+            # upgrades=buildingData.get("upgrades")
           
           #new building requirements to ensure that only the highest currently available is buildable. Keep the building list as short as possible. Done via "potential" to compeltely remove them from the list (not even greyed out)
           newRequirements=NamesToValue(2)
           # print(upgrades.names)
           if len(upgrades.names)>0 and not args.keep_lower_tier and not buildingData.buildingName in args.keep_specific_lower_tier:
-            buildingData.getOrCreate("potential").add(["NAND", newRequirements])
+            buildingData.getOrCreate("potential")
+            buildingData.splitToListIfString("potential").add(["NAND", newRequirements])
            
           #iterate through all upgrades: Create a copy of each upgrade, compute costs. Finish requirements for current building and add the copies to the todo-list
           for upgradeName in upgrades.names:
@@ -330,7 +348,7 @@ def main(argv):
               continue #do not copy empire_unique buildings EVER. Impossible to keep them unique otherwise, for some reason even if capital only
 
             #new requirements: Only buildable if one of the conditions of the next higher tier is not satisfied.
-            poss=copy.deepcopy([attemptGet(upgradeData,"prerequisites"),attemptGet(upgradeData,"potential"),attemptGet(upgradeData,"allow")])
+            poss=copy.deepcopy([upgradeData.splitToListIfString("prerequisites"),upgradeData.splitToListIfString("potential"),upgradeData.splitToListIfString("allow")])
             for eI in range(len(poss[0].names)):
               poss[0].vals[eI]='{ has_technology ='+' {} '.format(poss[0].names[eI])+'}'
               poss[0].names[eI]='owner'
@@ -361,9 +379,11 @@ def main(argv):
             computeNewCosts(buildingData, upgradeData, "base_buildtime", args.time_discount,varsToValue)
             
             #compute costs
-            costsA=buildingData.get("cost")
-            costsB=upgradeData.get("cost")
+            costsA=buildingData.splitToListIfString("cost")
+            costsB=upgradeData.splitToListIfString("cost")
             allCostNames=list(set(costsA.names)|set(costsB.names)) #create a list that includes any cost name from either building exactly once
+            print(buildingData.buildingName)
+            print(upgradeData.buildingName)
             for name in allCostNames:
               computeNewCosts(costsA, costsB, name, args.cost_discount,varsToValue)
               
