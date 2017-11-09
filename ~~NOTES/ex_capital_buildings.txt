@@ -1,0 +1,2050 @@
+### ExOverhaul Building Mineral Costs ###
+@basic_resource_building_cost_0 = 40
+@basic_resource_building_cost_1 = 80
+@basic_resource_building_cost_2 = 120
+@basic_resource_building_cost_3 = 160
+@basic_resource_building_cost_4 = 200
+@basic_resource_building_cost_5 = 240
+
+@special_resource_building_mineral_cost = 150
+@special_resource_building_energy_cost = 50
+
+@planet_unique_mineral_cost_upgrade = 200
+@planet_unique_mineral_cost_1 = 200
+@planet_unique_mineral_cost_2 = 225
+@planet_unique_mineral_cost_3 = 250
+
+@capital_mineral_cost_tier_1 = 200
+@capital_mineral_cost_tier_2 = 300
+@capital_mineral_cost_tier_2.5 = 400
+@capital_mineral_cost_tier_3 = 500
+
+@empire_unique_mineral_cost = 400
+
+### ExOverhaul Building Energy Costs ###
+
+@resource_building_energy_cost_tier_0 = 5
+@resource_building_energy_cost_tier_1 = 15
+@resource_building_energy_cost_tier_2 = 30
+@resource_building_energy_cost_tier_3 = 45
+@resource_building_energy_cost_tier_4 = 60
+@resource_building_energy_cost_tier_5 = 75
+@resource_building_energy_cost_hab = 80
+
+@planet_unique_energy_cost_upgrade = 50
+@planet_unique_energy_cost_1 = 50
+@planet_unique_energy_cost_2 = 75
+@planet_unique_energy_cost_3 = 100
+
+@capital_energy_cost_tier_1 = 200
+@capital_energy_cost_tier_2 = 300
+@capital_energy_cost_tier_2.5 = 400
+@capital_energy_cost_tier_3 = 500
+
+@empire_unique_energy_cost = 400
+
+@empire_unique_influence_cost = 50
+@capital_influence_cost_tier_3 = 100
+
+### ExOverhaul Build Time ###
+
+@resource_building_build_time_tier_0 = 150
+@resource_building_build_time_tier_1 = 180
+@resource_building_build_time_tier_2 = 210
+@resource_building_build_time_tier_3 = 240
+@resource_building_build_time_tier_4 = 270
+@resource_building_build_time_tier_5 = 300
+@resource_building_build_time_hab = 360
+
+@planet_unique_build_time_1 = 270
+@planet_unique_build_time_2 = 360
+@planet_unique_build_time_3 = 450
+@planet_unique_build_time_upgrade = 270
+
+@capital_build_time_tier_1 = 480
+@capital_build_time_tier_2 = 960
+@capital_build_time_tier_3 = 1440
+
+@empire_unique_build_time = 1080
+
+### Resource Output ###
+@resource_building_output_tier_0 = 1
+@resource_building_output_tier_1 = 2
+@resource_building_output_tier_2 = 3
+@resource_building_output_tier_3 = 4
+@resource_building_output_tier_4 = 5
+@resource_building_output_tier_4.5 = 6
+@resource_building_output_tier_5 = 8
+@resource_building_output_tier_hab = 6
+
+@planet_unique_output_1 = 2
+@planet_unique_output_2 = 4
+@planet_unique_output_3 = 6
+
+@empire_unique_output_1 = 8
+@empire_unique_output_2 = 12
+@empire_unique_output_3 = 16
+@empire_unique_output_4 = 20
+
+### Upkeep ###
+@resource_building_upkeep_tier_0 = 0.5
+@resource_building_upkeep_tier_1 = 1
+@resource_building_upkeep_tier_2 = 1.5
+@resource_building_upkeep_tier_3 = 2
+@resource_building_upkeep_tier_4 = 2.5
+@resource_building_upkeep_tier_5 = 3
+@resource_building_upkeep_hab = 3
+
+@planet_unique_upkeep_1 = 3
+@planet_unique_upkeep_2 = 3.5
+@planet_unique_upkeep_3 = 4
+
+@empire_unique_upkeep = 10
+
+### ExOverhaul AI Weights ###
+
+#base weight multipliers - use either with weight, factor or add
+@avoid = 0
+@redundant = 0.5
+@standard = 1
+@good = 10
+@important = 25
+@strategic = 100
+@crucial_1 = 1000
+@crucial_2 = 10000
+
+#additive weight modifiers - use either with factor
+@reduce_interest_1 = 0.5
+@reduce_interest_2 = 0.25
+@reduce_interest_3 = 0.1
+@increase_interest_1 = 1.25
+@increase_interest_2 = 2.5
+@increase_interest_3 = 5
+
+#use with weight only, since the 9001 trick requires weight
+@always_build_and_never_remove = 9001
+
+#########################
+### Capital Buildings ###
+#########################
+
+# Colony Shelter
+building_colony_shelter = {
+	base_buildtime = 180
+	planet_unique = yes
+	capital = yes
+	ai_replace = no
+	level = 0
+	
+	cost = {}
+	
+	produced_resources = { }
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOR = { 
+				has_country_flag = synthetic_age
+				has_country_flag = is_energy_starved
+				has_country_flag = is_food_starved
+				has_non_swapped_tradition = tr_expansion_colonization_fever
+				has_swapped_tradition = tr_expansion_colonization_fever_hive				
+			}			
+			resources = { 
+				energy = 2
+				food = 1
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_food_starved
+				NOR = { 
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive				
+				}	
+			}					
+			resources = { 
+				energy = 1
+				food = 4
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = synthetic_age
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}	
+			}	
+			resources = { energy = 3 }
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = synthetic_age				
+				NOR = { 
+					has_country_flag = is_energy_starved
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}
+			}	
+			resources = { 
+				energy = 2
+				minerals = 1
+			}
+		}						
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				has_country_flag = synthetic_age
+				NOR = { 
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}				
+			}	
+			resources = { energy = 4 }
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = is_energy_starved
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive						
+				}	
+			}	
+			resources = { minerals = 2 }
+		}	
+		modifier = {
+			AND = {
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}					
+				NOR = { 
+					has_country_flag = synthetic_age
+					has_country_flag = is_energy_starved
+					has_country_flag = is_food_starved				
+				}			
+			}			
+			resources = { 
+				energy = 2
+				food = 1
+				unity = 1
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_food_starved
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}				
+			}					
+			resources = { 
+				energy = 1
+				food = 4
+				unity = 1				
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}	
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = synthetic_age				
+				}	
+			}	
+			resources = { 
+				energy = 3
+				unity = 1				
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = synthetic_age	
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}						
+				NOT = { has_country_flag = is_energy_starved }
+			}	
+			resources = { 
+				energy = 2
+				minerals = 1
+				unity = 1
+			}
+		}						
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				has_country_flag = synthetic_age
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}			
+			}	
+			resources = { 
+				energy = 4
+				unity = 1				
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}						
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = is_energy_starved
+				}	
+			}	
+			resources = { 
+				minerals = 2
+				unity = 1
+			}
+		}				
+	}
+	
+	planet_modifier = {	pop_government_ethic_attraction = 0.05 }
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+		planet = { 
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				owner = { NOT = { has_technology = "tech_planetary_government" } }
+				AND = {					
+					owner = { has_technology = "tech_planetary_government" }
+					count_pops = {
+						count < 5
+						limit = { is_colony_pop = yes }
+					}			
+				}	
+			}
+		}	
+	}	
+	
+	destroy_if = { 
+		exists = owner 
+		owner = { has_authority = auth_machine_intelligence } 
+	}
+	
+	upgrades = {
+		building_capital_1
+		building_capital_2
+		building_capital_3
+	}
+	
+	ai_allow = {
+		tile = {
+			AND = {
+				OR = {
+					AND = {
+						has_energy = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}
+					AND = {
+						has_food = yes
+						has_minerals = no
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}	
+					has_deposit = no
+				}	
+				num_adjacent_tiles > 2
+				any_neighboring_tile = { 
+					NOR = {					
+						has_hyperstorage_building = yes
+						has_polytechnic_building = yes
+					}
+				}				
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @good
+			tile = { any_neighboring_tile = { has_resource = yes } }
+		}	
+		modifier = {
+			factor = @strategic
+			tile = { num_adjacent_tiles = 4 }
+		}									
+	}
+}
+
+# Planetary Administration
+building_capital_1 = {
+	base_buildtime = @capital_build_time_tier_1	
+	planet_unique = yes
+	capital = yes
+	ai_replace = no
+	level = 1
+	
+	cost = {
+		minerals = @capital_mineral_cost_tier_2
+		energy = @capital_energy_cost_tier_2
+	}
+	
+	produced_resources = { }
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOR = { 
+				has_country_flag = synthetic_age
+				has_country_flag = is_energy_starved
+				has_country_flag = is_food_starved
+				has_non_swapped_tradition = tr_expansion_colonization_fever
+				has_swapped_tradition = tr_expansion_colonization_fever_hive				
+			}			
+			resources = { 
+				energy = 4
+				food = 2
+				unity = 1
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_food_starved
+				NOR = { 
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive				
+				}	
+			}					
+			resources = { 
+				energy = 2
+				food = 8
+				unity = 1
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = synthetic_age
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}	
+			}	
+			resources = { 
+				energy = 6
+				unity = 1
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = synthetic_age				
+				NOR = { 
+					has_country_flag = is_energy_starved
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}
+			}	
+			resources = { 
+				energy = 4
+				minerals = 2
+				unity = 1
+			}
+		}						
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				has_country_flag = synthetic_age
+				NOR = { 
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}				
+			}	
+			resources = { 
+				energy = 8
+				unity = 1				
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = is_energy_starved
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive						
+				}	
+			}	
+			resources = { 
+				minerals = 4
+				unity = 1
+			}
+		}	
+		modifier = {
+			AND = {
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}					
+				NOR = { 
+					has_country_flag = synthetic_age
+					has_country_flag = is_energy_starved
+					has_country_flag = is_food_starved				
+				}			
+			}			
+			resources = { 
+				energy = 4
+				food = 2
+				unity = 2
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_food_starved
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}				
+			}					
+			resources = { 
+				energy = 2
+				food = 8
+				unity = 2				
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}	
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = synthetic_age				
+				}	
+			}	
+			resources = { 
+				energy = 6
+				unity = 2				
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = synthetic_age	
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}						
+				NOT = { has_country_flag = is_energy_starved }
+			}	
+			resources = { 
+				energy = 4
+				minerals = 2
+				unity = 2
+			}
+		}						
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				has_country_flag = synthetic_age
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}			
+			}	
+			resources = { 
+				energy = 8
+				unity = 2				
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}						
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = is_energy_starved
+				}	
+			}	
+			resources = { 
+				minerals = 4
+				unity = 2
+			}
+		}				
+	}
+
+	
+	adjacency_bonus = {
+		tile_building_resource_minerals_add = 1
+		tile_building_resource_food_add = 1
+		tile_building_resource_energy_add = 1
+		tile_building_resource_physics_research_add = 1
+		tile_building_resource_society_research_add = 1
+		tile_building_resource_engineering_research_add = 1
+	}
+	
+	planet_modifier = { pop_government_ethic_attraction = 0.1 }
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	prerequisites = { "tech_planetary_government" }	
+	
+	# Can't put more than one constraint on 'count' in a single 'count_xxx' statement, refactored to compensate
+	potential = {
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+		planet = { 
+			NOT = { is_planet_class = pc_habitat }
+			count_pops = {
+				count > 4
+				limit = { is_colony_pop = yes }
+			}
+			OR = {
+				owner = { NOT = { has_technology = "tech_colonial_centralization" } }
+				AND = {
+					count_pops = {
+						count < 10
+						limit = { is_colony_pop = yes }
+					}
+				}
+			}
+		}	
+	}
+
+	allow = { }
+
+	destroy_if = { 
+		AND = {
+			exists = owner 
+			owner = { has_authority = auth_machine_intelligence } 
+		}	
+	}
+	
+	upgrades = {
+		building_capital_2
+		building_capital_3
+	}
+	
+	ai_allow = {
+		tile = {
+			AND = {
+				OR = {
+					AND = {
+						has_energy = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}
+					AND = {
+						has_food = yes
+						has_minerals = no
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}	
+					has_deposit = no
+				}	
+				num_adjacent_tiles > 2
+				any_neighboring_tile = { 
+					NOR = {					
+						has_hyperstorage_building = yes
+						has_polytechnic_building = yes
+					}
+				}				
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @good
+			tile = { any_neighboring_tile = { has_resource = yes } }
+		}	
+		modifier = {
+			factor = @strategic
+			tile = { num_adjacent_tiles = 4 }
+		}									
+	}
+}
+
+# Planetary Capital
+building_capital_2 = {
+	base_buildtime = @capital_build_time_tier_2
+	planet_unique = yes
+	capital = yes
+	ai_replace = no
+	level = 2
+	
+	cost = {
+		minerals = @capital_mineral_cost_tier_2
+		energy = @capital_energy_cost_tier_2
+	}
+	
+	produced_resources = { }
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOR = { 
+				has_country_flag = synthetic_age
+				has_country_flag = is_energy_starved
+				has_country_flag = is_food_starved
+				has_non_swapped_tradition = tr_expansion_colonization_fever
+				has_swapped_tradition = tr_expansion_colonization_fever_hive				
+			}			
+			resources = { 
+				energy = 6
+				food = 3
+				unity = 2
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_food_starved
+				NOR = { 
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive				
+				}	
+			}					
+			resources = { 
+				energy = 3
+				food = 12
+				unity = 2
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = synthetic_age
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}	
+			}	
+			resources = { 
+				energy = 9
+				unity = 2
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = synthetic_age				
+				NOR = { 
+					has_country_flag = is_energy_starved
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}
+			}	
+			resources = { 
+				energy = 6
+				minerals = 3
+				unity = 2
+			}
+		}						
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				has_country_flag = synthetic_age
+				NOR = { 
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}				
+			}	
+			resources = { 
+				energy = 12
+				unity = 2				
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = is_energy_starved
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive						
+				}	
+			}	
+			resources = { 
+				minerals = 6
+				unity = 2
+			}
+		}	
+		modifier = {
+			AND = {
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}					
+				NOR = { 
+					has_country_flag = synthetic_age
+					has_country_flag = is_energy_starved
+					has_country_flag = is_food_starved				
+				}			
+			}			
+			resources = { 
+				energy = 6
+				food = 3
+				unity = 3
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_food_starved
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}				
+			}					
+			resources = { 
+				energy = 3
+				food = 12
+				unity = 3				
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}	
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = synthetic_age				
+				}	
+			}	
+			resources = { 
+				energy = 9
+				unity = 3				
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = synthetic_age	
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}						
+				NOT = { has_country_flag = is_energy_starved }
+			}	
+			resources = { 
+				energy = 6
+				minerals = 3
+				unity = 3
+			}
+		}						
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				has_country_flag = synthetic_age
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}			
+			}	
+			resources = { 
+				energy = 12
+				unity = 3				
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}						
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = is_energy_starved
+				}	
+			}	
+			resources = { 
+				minerals = 6
+				unity = 3
+			}
+		}				
+	}	
+	
+	adjacency_bonus = {
+		tile_building_resource_minerals_add = 2
+		tile_building_resource_food_add = 2
+		tile_building_resource_energy_add = 2
+		tile_building_resource_physics_research_add = 2
+		tile_building_resource_society_research_add = 2
+		tile_building_resource_engineering_research_add = 2
+	}
+	
+	planet_modifier = {	pop_government_ethic_attraction = 0.15 }
+
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+		planet = { 
+			NOT = { is_planet_class = pc_habitat }
+			AND = {					
+				OR = {
+					is_capital = no
+					owner = { NOT = { has_technology = "tech_galactic_administration" } }
+				}							
+				count_pops = {
+					count > 9
+					limit = { is_colony_pop = yes }
+				}	
+			}
+		}	
+	}
+
+	allow = { }		
+	
+	destroy_if = { 
+		exists = owner 
+		owner = { has_authority = auth_machine_intelligence } 		
+	}
+
+	prerequisites = { "tech_colonial_centralization" }	
+	
+	upgrades = { building_capital_3	}
+	
+	ai_allow = {
+		tile = {
+			AND = {
+				OR = {
+					AND = {
+						has_energy = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}
+					AND = {
+						has_food = yes
+						has_minerals = no
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}	
+					has_deposit = no
+				}	
+				num_adjacent_tiles > 2
+				any_neighboring_tile = { 
+					NOR = {					
+						has_hyperstorage_building = yes
+						has_polytechnic_building = yes
+					}
+				}				
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @good
+			tile = { any_neighboring_tile = { has_resource = yes } }
+		}	
+		modifier = {
+			factor = @strategic
+			tile = { num_adjacent_tiles = 4 }
+		}									
+	}
+}
+
+# Empire Capital-Complex
+building_capital_3 = {
+	base_buildtime = @capital_build_time_tier_3
+	planet_unique = yes
+	capital = yes
+	empire_unique = yes
+	ai_replace = no
+	level = 3
+	
+	cost = {
+		minerals = @capital_mineral_cost_tier_3
+		energy = @capital_energy_cost_tier_3
+		influence = @capital_influence_cost_tier_3	
+	}
+	
+	country_modifier = { 
+		country_resource_influence_add = 1
+		max_influence = 250
+	}
+	
+	produced_resources = { }
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOR = { 
+				has_country_flag = synthetic_age
+				has_country_flag = is_energy_starved
+				has_country_flag = is_food_starved
+				has_non_swapped_tradition = tr_expansion_colonization_fever
+				has_swapped_tradition = tr_expansion_colonization_fever_hive				
+			}			
+			resources = { 
+				energy = 8
+				food = 4
+				unity = 3
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_food_starved
+				NOR = { 
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive				
+				}	
+			}					
+			resources = { 
+				energy = 4
+				food = 16
+				unity = 3
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = synthetic_age
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}	
+			}	
+			resources = { 
+				energy = 12
+				unity = 3
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = synthetic_age				
+				NOR = { 
+					has_country_flag = is_energy_starved
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}
+			}	
+			resources = {
+				energy = 8
+				minerals = 4
+				unity = 3
+			}
+		}						
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				has_country_flag = synthetic_age
+				NOR = { 
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}				
+			}	
+			resources = { 
+				energy = 16
+				unity = 3				
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = is_energy_starved
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive						
+				}	
+			}	
+			resources = { 
+				minerals = 8
+				unity = 3
+			}
+		}	
+		modifier = {
+			AND = {
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}					
+				NOR = { 
+					has_country_flag = synthetic_age
+					has_country_flag = is_energy_starved
+					has_country_flag = is_food_starved				
+				}			
+			}			
+			resources = { 
+				energy = 8
+				food = 4
+				unity = 4
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_food_starved
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}				
+			}					
+			resources = { 
+				energy = 4
+				food = 16
+				unity = 4				
+			}
+		}
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}	
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = synthetic_age				
+				}	
+			}	
+			resources = { 
+				energy = 12
+				unity = 4				
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = synthetic_age	
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}						
+				NOT = { has_country_flag = is_energy_starved }
+			}	
+			resources = { 
+				energy = 8
+				minerals = 4
+				unity = 4
+			}
+		}						
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				has_country_flag = synthetic_age
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}			
+			}	
+			resources = { 
+				energy = 16
+				unity = 4				
+			}
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				OR = {
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+					has_swapped_tradition = tr_expansion_colonization_fever_hive					
+				}						
+				NOR = {
+					has_country_flag = is_food_starved
+					has_country_flag = is_energy_starved
+				}	
+			}	
+			resources = { 
+				minerals = 8
+				unity = 4
+			}
+		}				
+	}				
+	
+	adjacency_bonus = {
+		tile_building_resource_minerals_add = 3
+		tile_building_resource_food_add = 3
+		tile_building_resource_energy_add = 3
+		tile_building_resource_physics_research_add = 3
+		tile_building_resource_society_research_add = 3
+		tile_building_resource_engineering_research_add = 3
+	}
+	
+	planet_modifier = {	pop_government_ethic_attraction = 0.2 }
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	prerequisites = { "tech_galactic_administration" }	
+	
+	potential = {
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+		planet = { 
+			AND = {
+				is_capital = yes
+				count_pops = {
+					count > 9
+					limit = { is_colony_pop = yes }
+				}				
+			}
+		}	
+	}
+
+	allow = { }			
+	
+	destroy_if = { 
+		exists = owner 
+		owner = { has_authority = auth_machine_intelligence } 
+	}
+	
+	ai_allow = {
+		tile = {
+			AND = {
+				OR = {
+					AND = {
+						has_energy = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}
+					AND = {
+						has_food = yes
+						has_minerals = no
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}	
+					has_deposit = no
+				}	
+				num_adjacent_tiles > 2
+				any_neighboring_tile = { 
+					NOR = {					
+						has_hyperstorage_building = yes
+						has_polytechnic_building = yes
+					}
+				}				
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @good
+			tile = { any_neighboring_tile = { has_resource = yes } }
+		}	
+		modifier = {
+			factor = @strategic
+			tile = { num_adjacent_tiles = 4 }
+		}									
+	}
+}
+	
+building_deployment_post = {
+	base_buildtime = 180	
+	planet_unique = yes
+	capital = yes
+	ai_replace = no
+	level = 0
+	
+	cost = {}
+	
+	produced_resources = { }
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOR = { 
+				has_country_flag = is_energy_starved
+				has_country_flag = is_minerals_starved
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+			}	
+			resources = { 				
+				energy = 2
+				minerals = 1
+			}	
+		}					
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				NOT = { has_swapped_tradition = tr_expansion_colonization_fever_machine }
+			}	
+			resources = { 
+				energy = 4
+			}	
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				NOR = { 
+					has_country_flag = is_energy_starved
+					has_swapped_tradition = tr_expansion_colonization_fever_machine
+				}
+			}	
+			resources = { 
+				minerals = 2
+			}	
+		}			
+		modifier = {
+			AND = {
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+				NOR = { 
+					has_country_flag = is_energy_starved
+					has_country_flag = is_minerals_starved				
+				}	
+			}	
+			resources = { 				
+				energy = 2
+				minerals = 1
+				unity = 1
+			}	
+		}					
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+			}	
+			resources = { 
+				energy = 4
+				unity = 1
+			}	
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+				NOT = { has_country_flag = is_energy_starved }
+			}	
+			resources = { 
+				minerals = 2
+				unity = 1
+			}	
+		}			
+	}				
+	
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+	
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = { 
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				owner = { NOT = { has_technology = "tech_planetary_government" } }
+			}	
+			AND = {					
+				owner = { has_technology = "tech_planetary_government" }
+				count_pops = {
+					count < 5
+					limit = { is_colony_pop = yes }
+				}			
+			}
+		}	
+	}	
+
+	allow = { }	
+
+	upgrades = {
+		building_machine_capital_1
+		building_machine_capital_2
+		building_machine_capital_3
+	}	
+	
+	destroy_if = { 
+		exists = owner 
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+	}
+
+	ai_allow = {
+		tile = {
+			AND = {
+				OR = {
+					AND = {
+						has_energy = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}
+					AND = {
+						has_minerals = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}	
+					has_deposit = no
+				}	
+				num_adjacent_tiles > 2
+				any_neighboring_tile = { 
+					NOR = {					
+						has_hyperstorage_building = yes
+						has_polytechnic_building = yes
+					}
+				}				
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @good
+			tile = { any_neighboring_tile = { has_resource_machine = yes } }
+		}	
+		modifier = {
+			factor = @strategic
+			tile = { num_adjacent_tiles = 4 }
+		}									
+	}
+}
+
+# Administrative Array
+building_machine_capital_1 = {
+	base_buildtime = @capital_build_time_tier_1		
+	planet_unique = yes
+	capital = yes
+	ai_replace = no
+	level = 1
+	
+	cost = {
+		minerals = @capital_mineral_cost_tier_1
+		energy = @capital_energy_cost_tier_1
+	}
+	
+	produced_resources = { }
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOR = { 
+				has_country_flag = is_energy_starved
+				has_country_flag = is_minerals_starved
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+			}	
+			resources = { 				
+				energy = 4
+				minerals = 2
+				unity = 1
+			}	
+		}					
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				NOT = { has_swapped_tradition = tr_expansion_colonization_fever_machine }
+			}	
+			resources = { 
+				energy = 8
+				unity = 1
+			}	
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				NOR = { 
+					has_country_flag = is_energy_starved
+					has_swapped_tradition = tr_expansion_colonization_fever_machine
+				}
+			}	
+			resources = { 
+				minerals = 4
+				unity = 1
+			}	
+		}			
+		modifier = {
+			AND = {
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+				NOR = { 
+					has_country_flag = is_energy_starved
+					has_country_flag = is_minerals_starved				
+				}	
+			}	
+			resources = { 				
+				energy = 4
+				minerals = 2
+				unity = 2
+			}	
+		}					
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+			}	
+			resources = { 
+				energy = 8
+				unity = 2
+			}	
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+				NOT = { has_country_flag = is_energy_starved }
+			}	
+			resources = { 
+				minerals = 4
+				unity = 2
+			}	
+		}			
+	}						
+	
+	adjacency_bonus = {
+		tile_building_resource_minerals_add = 1
+		tile_building_resource_energy_add = 1
+		tile_building_resource_physics_research_add = 1
+		tile_building_resource_society_research_add = 1
+		tile_building_resource_engineering_research_add = 1
+	}
+	
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+
+	upgrades = {
+		building_machine_capital_2
+		building_machine_capital_3
+	}
+
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = { 
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				AND = {					
+					count_pops = {
+						count > 4
+						limit = { is_colony_pop = yes }
+					}
+					owner = { NOT = { has_technology = "tech_colonial_centralization" } }
+				}	
+				AND = {					
+					count_pops = {
+						count > 4
+						count < 10
+						limit = { is_colony_pop = yes }
+					}
+					owner = { has_technology = "tech_colonial_centralization" }
+				}					
+			}
+		}	
+	}
+
+	allow = { }		
+
+
+	destroy_if = { 
+		exists = owner 
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+	}
+
+	ai_allow = {
+		tile = {
+			AND = {
+				OR = {
+					AND = {
+						has_energy = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}
+					AND = {
+						has_minerals = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}	
+					has_deposit = no
+				}	
+				num_adjacent_tiles > 2
+				any_neighboring_tile = { 
+					NOR = {					
+						has_hyperstorage_building = yes
+						has_polytechnic_building = yes
+					}
+				}				
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @good
+			tile = { any_neighboring_tile = { has_resource_machine = yes } }
+		}	
+		modifier = {
+			factor = @strategic
+			tile = { num_adjacent_tiles = 4 }
+		}									
+	}
+}
+
+# Planetary Processor 
+building_machine_capital_2 = {
+	base_buildtime = @capital_build_time_tier_2
+	planet_unique = yes
+	capital = yes
+	ai_replace = no
+	level = 2
+	
+	cost = {
+		minerals = @capital_mineral_cost_tier_2
+		energy = @capital_energy_cost_tier_2
+	}
+	
+	produced_resources = { }
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOR = { 
+				has_country_flag = is_energy_starved
+				has_country_flag = is_minerals_starved
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+			}	
+			resources = { 				
+				energy = 6
+				minerals = 3
+				unity = 2
+			}	
+		}					
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				NOT = { has_swapped_tradition = tr_expansion_colonization_fever_machine }
+			}	
+			resources = { 
+				energy = 14
+				unity = 2
+			}	
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				NOR = { 
+					has_country_flag = is_energy_starved
+					has_swapped_tradition = tr_expansion_colonization_fever_machine
+				}
+			}	
+			resources = { 
+				minerals = 6
+				unity = 2
+			}	
+		}			
+		modifier = {
+			AND = {
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+				NOR = { 
+					has_country_flag = is_energy_starved
+					has_country_flag = is_minerals_starved				
+				}	
+			}	
+			resources = { 				
+				energy = 6
+				minerals = 3
+				unity = 3
+			}	
+		}					
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+			}	
+			resources = { 
+				energy = 14
+				unity = 3
+			}	
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+				NOT = { has_country_flag = is_energy_starved }
+			}	
+			resources = { 
+				minerals = 6
+				unity = 3
+			}	
+		}			
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_minerals_add = 2
+		tile_building_resource_energy_add = 2
+		tile_building_resource_physics_research_add = 2
+		tile_building_resource_society_research_add = 2
+		tile_building_resource_engineering_research_add = 2
+	}
+	
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+
+	upgrades = { building_machine_capital_3 }
+	
+	prerequisites = { "tech_colonial_centralization" }		
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = { 
+			NOT = { is_planet_class = pc_habitat }
+			AND = {					
+				OR = {
+					is_capital = no
+					owner = { NOT = { has_technology = "tech_galactic_administration" } }
+				}							
+				count_pops = {
+					count > 9
+					limit = { is_colony_pop = yes }
+				}	
+			}
+		}	
+	}
+
+	allow = { }		
+	
+	destroy_if = { 
+		exists = owner 
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+	}
+
+	ai_allow = {
+		tile = {
+			AND = {
+				OR = {
+					AND = {
+						has_energy = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}
+					AND = {
+						has_minerals = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}	
+					has_deposit = no
+				}	
+				num_adjacent_tiles > 2
+				any_neighboring_tile = { 
+					NOR = {					
+						has_hyperstorage_building = yes
+						has_polytechnic_building = yes
+					}
+				}				
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @good
+			tile = { any_neighboring_tile = { has_resource_machine = yes } }
+		}	
+		modifier = {
+			factor = @strategic
+			tile = { num_adjacent_tiles = 4 }
+		}									
+	}
+}
+
+# Primary Nexus
+building_machine_capital_3 = {
+	base_buildtime = @empire_unique_build_time
+	planet_unique = yes
+	capital = yes
+	empire_unique = yes
+	ai_replace = no
+	level = 3
+	
+	cost = {
+		minerals = @empire_unique_mineral_cost
+		energy = @empire_unique_energy_cost
+		influence = @empire_unique_influence_cost	
+	}
+	
+	country_modifier = { 
+		country_resource_influence_add = 1
+		max_influence = 250
+	}
+	
+	produced_resources = { }
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOR = { 
+				has_country_flag = is_energy_starved
+				has_country_flag = is_minerals_starved
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+			}	
+			resources = { 				
+				energy = 8
+				minerals = 4
+				unity = 3
+			}	
+		}					
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				NOT = { has_swapped_tradition = tr_expansion_colonization_fever_machine }
+			}	
+			resources = { 
+				energy = 20
+				unity = 3
+			}	
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				NOR = { 
+					has_country_flag = is_energy_starved
+					has_swapped_tradition = tr_expansion_colonization_fever_machine
+				}
+			}	
+			resources = { 
+				minerals = 8
+				unity = 3
+			}	
+		}			
+		modifier = {
+			AND = {
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+				NOR = { 
+					has_country_flag = is_energy_starved
+					has_country_flag = is_minerals_starved				
+				}	
+			}	
+			resources = { 				
+				energy = 8
+				minerals = 4
+				unity = 4
+			}	
+		}					
+		modifier = {
+			AND = {
+				has_country_flag = is_energy_starved
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+			}	
+			resources = { 
+				energy = 20
+				unity = 4
+			}	
+		}	
+		modifier = {
+			AND = {
+				has_country_flag = is_minerals_starved
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+				NOT = { has_country_flag = is_energy_starved }
+			}	
+			resources = { 
+				minerals = 8
+				unity = 4
+			}	
+		}			
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_minerals_add = 3
+		tile_building_resource_energy_add = 3
+		tile_building_resource_physics_research_add = 3
+		tile_building_resource_society_research_add = 3
+		tile_building_resource_engineering_research_add = 3
+	}
+	
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+
+	prerequisites = { "tech_galactic_administration" }
+	
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = { 
+			AND = {
+				is_capital = yes
+				count_pops = {
+					count > 9
+					limit = { is_colony_pop = yes }
+				}				
+			}
+		}	
+	}
+
+	allow = { }			
+
+	destroy_if = { 
+		exists = owner 
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+	}
+
+	ai_allow = {
+		tile = {
+			AND = {
+				OR = {
+					AND = {
+						has_energy = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}
+					AND = {
+						has_minerals = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}	
+					has_deposit = no
+				}	
+				num_adjacent_tiles > 2
+				any_neighboring_tile = { 
+					NOR = {					
+						has_hyperstorage_building = yes
+						has_polytechnic_building = yes
+					}
+				}				
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @good
+			tile = { any_neighboring_tile = { has_resource_machine = yes } }
+		}	
+		modifier = {
+			factor = @strategic
+			tile = { num_adjacent_tiles = 4 }
+		}									
+	}
+}
+
+
+building_hab_capital = {
+	base_buildtime = @capital_build_time_tier_2
+	planet_unique = yes
+	capital = yes
+	ai_replace = no
+	
+	cost = {}
+	
+	produced_resources = { }
+
+	adjacency_bonus = {
+		tile_building_resource_minerals_add = 1
+		tile_building_resource_energy_add = 1
+		tile_building_resource_physics_research_add = 1
+		tile_building_resource_society_research_add = 1
+		tile_building_resource_engineering_research_add = 1
+	}
+
+	country_modifier = {
+		max_energy = 1000
+		max_minerals = 1000		
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+
+			resources = { unity = 1	}
+		}
+		modifier = {
+			and = {
+				OR = {
+					AND = {
+						has_authority = auth_hive_mind
+						NOT = { has_swapped_tradition = tr_expansion_colonization_fever_hive }
+					}	
+					NOR = {
+						has_authority = auth_hive_mind
+						has_non_swapped_tradition = tr_expansion_colonization_fever
+					}			
+				}	
+				NOR = {
+					has_authority = auth_machine_intelligence
+					has_country_flag = "synthetic_age"					
+				}					
+			}	
+			resources = { 
+				energy = 4
+				food = 4
+				unity = 1
+			}
+		}
+		modifier = {
+			OR = {
+				AND = {
+					has_authority = auth_machine_intelligence
+					NOT = { has_swapped_tradition = tr_expansion_colonization_fever_machine }
+				}	
+				AND = {
+					has_country_flag = "synthetic_age"		
+					NOT = { has_non_swapped_tradition = tr_expansion_colonization_fever }
+				}	
+			}	
+			resources = { 
+				energy = 4
+				minerals = 4
+				unity = 1				
+			}
+		}
+		modifier = {
+			and = {
+				OR = {
+					AND = {
+						has_authority = auth_hive_mind
+						has_swapped_tradition = tr_expansion_colonization_fever_hive
+					}	
+					AND = {
+						NOR = {
+							has_authority = auth_machine_intelligence
+							has_authority = auth_hive_mind
+							has_country_flag = "synthetic_age"
+						}	
+						has_non_swapped_tradition = tr_expansion_colonization_fever
+					}			
+				}	
+			}	
+			resources = { 
+				energy = 4
+				food = 4
+				unity = 2
+			}
+		}
+		modifier = {
+			OR = {
+				AND = {
+					has_authority = auth_machine_intelligence
+					has_swapped_tradition = tr_expansion_colonization_fever_machine
+				}	
+				AND = {
+					has_country_flag = "synthetic_age"		
+					has_non_swapped_tradition = tr_expansion_colonization_fever
+				}	
+			}	
+			resources = { 
+				energy = 4
+				minerals = 4
+				unity = 2
+			}
+		}			
+	}
+	
+	planet_modifier = {	pop_government_ethic_attraction = 0.15 }
+	
+	potential = { 
+		planet = { 
+			is_planet_class = pc_habitat
+			OR = {
+				is_capital = no
+				AND = {
+					is_capital = yes
+					count_pops = {
+						count < 10
+						limit = { is_colony_pop = yes }
+					}								
+				}
+			}	
+		}		
+	}
+	
+	upgrades = {
+		building_capital_3
+		building_machine_capital_3
+	}	
+	
+	ai_allow = {
+		tile = {
+			AND = {
+				has_deposit = no
+				num_adjacent_tiles > 2
+				any_neighboring_tile = { 
+					NOR = {					
+						has_hyperstorage_building = yes
+						has_polytechnic_building = yes
+					}
+				}				
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @good
+			tile = { any_neighboring_tile = { has_resource_machine = yes } }
+		}	
+		modifier = {
+			factor = @strategic
+			tile = { num_adjacent_tiles = 4 }
+		}									
+	}	
+}
