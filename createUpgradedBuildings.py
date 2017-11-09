@@ -91,11 +91,23 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         val.increaseLevelRec()
   def printAll(self): #primitive print. Just for testing
     for i in range(len(self.names)):
-      print(self.names[i])
-      if isinstance(self.vals[i],NamesToValue):
-        self.vals[i].printAll()
+      for b in range(self.bracketLevel):
+        print("\t",end="")
+      if not isinstance(self.vals[i],NamesToValue):
+        print(self.names[i],end="")
+        if len(self.vals[i])>0:
+          print(" = "+self.vals[i],end="")
       else:
-        print(self.vals[i])
+        if self.bracketLevel==1:
+          print("\n",end="")
+          for b in range(self.bracketLevel):
+            print("\t",end="")
+        print(self.names[i]+" = {\n",end="")
+        self.vals[i].printAll()
+        for b in range(self.bracketLevel):
+          print("\t",end="")
+        print("}",end="")
+      print("\n",end="")
   def writeAll(self,file): #formatted writing. Paradox style minus most whitespace tailing errors
     for i in range(len(self.names)):
       for b in range(self.bracketLevel):
@@ -133,6 +145,10 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
           buildingName=toBeReplaced.split("=")[1].replace("}","").replace('"','').strip()
           self.vals[i]=self.vals[i].replace(toBeReplaced,"{ has_"+buildingName+" = yes }")
   def removeDuplicatesRec(self):
+    # try :
+      # print(self.buildingName)
+    # except AttributeError:
+      # pass
     duplicates=[]
     for i in range(len(self.names)):
       if i in duplicates:
@@ -149,6 +165,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
             if self.vals[i]==self.vals[j]: #string compare (or string vs object which gives correct 0)
               duplicates.append(j)
     for i in reversed(sorted(duplicates)):      #delete last first to make sure indices stay valid
+      # self.printAll()
       self.removeIndex(i)
     for i in range(len(self.names)): #recurively through remaining elements
       if isinstance(self.vals[i], NamesToValue):
@@ -161,8 +178,10 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         return 0
       if isinstance(self.vals[i],NamesToValue):
         if isinstance(other.vals[i],NamesToValue):
-          if self.vals[i].compare(other.vals[i]):
+          if not self.vals[i].compare(other.vals[i]):
             return 0
+        else:
+          return 0
       else:
         if self.vals[i]!=other.vals[i]:
           return 0
