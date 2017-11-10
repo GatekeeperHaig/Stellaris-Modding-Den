@@ -509,7 +509,9 @@ def main(argv):
           newRequirements.increaseLevelRec() #push them to correct level. list will always exist, might be empty if unused.
             
 
-  
+    for building in buildingNameToData.vals:
+      if "is_listed" in building.names and building.get("is_listed")=="no" and "ai_allow" in building.names:
+        building.replace("ai_allow", "{ always = yes }")
     
     buildingNameToData.removeDuplicatesRec()
       
