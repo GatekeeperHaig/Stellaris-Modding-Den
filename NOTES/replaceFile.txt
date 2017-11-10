@@ -1,72 +1,8 @@
-### NOTES:
+#replace file	
 
-# ai_allow fields for upgrades should be as simple as possible. What I suggest is this:
 
-# 	ai_allow = { 
-#		tile = {
-#			OR = {
-#				has_building = building_power_plant_1
-#				has_building = building_power_plant_1_direct_build
-#			}
-#		}
-#	}
-#
-# Of course, the above example is for the ai_allow field that should appear on building_power_plant_2, but I'm sure you get the idea.
-# 
-# At the same time that you add this ai_allow field to upgrade buildings, you should also add to the ai_allow of all direct build version a prohibition to build on tiles with buildings of the same type. For example:
-#	ai_allow = {
-#		tile = {
-#			OR = {
-#				AND = {
-#					has_energy = yes
-#					has_vanilla_or_exoverhaul_strategic_resources = no
-#					NOR = {
-#						has_building = building_power_plant_1						
-#						has_building = building_power_plant_3
-#						has_building = building_power_plant_4
-#						has_building = building_power_plant_5
-#						has_building = building_power_plant_rw
-#						has_building = building_power_plant_1_direct_build						
-#						has_building = building_power_plant_3_direct_build
-#						has_building = building_power_plant_4_direct_build
-#						has_building = building_power_plant_5_direct_build
-#						has_building = building_power_plant_rw_direct_build
-#					}	
-#				}
-#				AND = {
-#					has_vanilla_or_exoverhaul_strategic_resources = no
-#					has_energy = no
-#					has_minerals = no
-#					has_research_resources = no
-#					NOR = {
-#						has_building = building_power_plant_1						
-#						has_building = building_power_plant_3
-#						has_building = building_power_plant_4
-#						has_building = building_power_plant_5
-#						has_building = building_power_plant_rw
-#						has_building = building_power_plant_1_direct_build						
-#						has_building = building_power_plant_3_direct_build
-#						has_building = building_power_plant_4_direct_build
-#						has_building = building_power_plant_5_direct_build
-#						has_building = building_power_plant_rw_direct_build
-#					}	
-#				}
-#			}
-#		}
-#	}
-#
-# The new content in the above statement is the two NOR fields and everything within them. You can of course make this into a scripted trigger, to be more elegant. 
-#
-# Lab buildings are a bit different from the other resource buildings, because building_basic_lab_1 can upgrade into 3 different building chains. Therefore, the t1 building of each chain - even the upgrade version, should retain the full ai weights. 
-
-	
-
+IF power_plant in buildingName and is_listed==no
 # These are the ai_allow and ai_weight fields for non-listed power plant upgrades:
-
-	ai_allow = { 
-		tile = { has_building = building_basic_power_plant }   
-	} 
-	
 	ai_weight = {
 		weight = @important				
 		modifier = {
@@ -122,13 +58,9 @@
 		}
 	}
 
+
+IF mining_network in buildingName and is_listed==no
 # These are the ai_allow and ai_weight fields for non-listed mine upgrades:
-
-	ai_allow = { 
-		tile = { has_building = building_basic_mine }   
-	} 
-
-	
 	ai_weight = {
 		weight = @important
 		modifier = {
@@ -195,8 +127,8 @@
 		}
 	}
 	
+IF hydroponics_farm in buildingName and is_listed==no
 # These are the ai_allow and ai_weight fields for non-listed hydrophonics upgrades:
-
 	ai_allow = { 
 		tile = { has_building = building_basic_farm }   
 	} 
@@ -243,17 +175,11 @@
 	}
 
 
+IF engineering_facility in buildingName and is_listed==no
+
 ### Labs
 
 # Lab buildings are a bit different from the other resource buildings, because building_basic_lab_1 can upgrade into 3 different building chains. Therefore, the t1 building of each chain - even the upgrade version, should retain the full ai weights. 
-
-	ai_allow = { 
-		tile = { has_building = building_basic_lab_1 }   
-	} 
-
-### adjusted ai_weight only for t2/t3/t4/rw lab buildings:
-
-## Engineering:
 
 	ai_weight = {
 		weight = @important
@@ -306,8 +232,8 @@
 		}
 	}
 
+IF physics_lab in buildingName and is_listed==no
 ## Physics:
-
 	ai_weight = {
 		weight = @important
 		modifier = {
@@ -364,8 +290,8 @@
 		}
 	}
 	
+IF biolab in buildingName and is_listed==no
 ## Society:	
-
 	ai_weight = {
 		weight = @important
 		modifier = {
@@ -416,18 +342,14 @@
 		}
 	}
 	
+IF unique in buildingName and is_listed==no	
 ### Capitals and planet uniques, including power-nexus/mineral-processing 2/hospital/assembly palnt/hyperstorage facilities and unity buildings
 
-# Capitals/planet uniques are really easy. Since these buildings are planet unique there is no need to change the direct build versions at all. The upgrade versions should have a simplified ai_allow field: 
-
-For example:
-
-	ai_allow = { tile = { has_building = building_colony_shelter } } # this is for capital 1 of course
-	
-	ai_allow = { tile = { has_building = building_clinic } } # this is for the gene hospital building
 
 # AI weights for direct build version should remain the same, but for upgrade versions this is sufficent:
-	
+	ai_weight = { weight = @crucial_2 }
+  
+IF capital in buildingName and is_listed==no	
 	ai_weight = { weight = @crucial_2 }
 	
 	

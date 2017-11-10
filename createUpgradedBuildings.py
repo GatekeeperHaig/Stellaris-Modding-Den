@@ -20,6 +20,7 @@ def parse(argv):
   parser.add_argument('-c','--cost_discount', default=0, type=float, help="Total cost of tier n will be: Cost(tier n-1)+Cost(upgrade tier n)*(1-discount), with the restriction that total cost will never be lower than 'Cost(upgrade tier n)'(default: %(default)s)")
   parser.add_argument('-f','--foreign_scripted_trigger', action="store_true", help="If you created your own scripted_triggers file including 'has_building' mentions on buildings that will be copied by this script, run this script once with all such files as input instead of the building files. In this mode the script will simply replace all 'has_building = ...' with scripted_triggers created by the script if not run with this argument. This obviously only works if you have/will run all buildings mentioned here through the main script!")
   parser.add_argument('-o','--output_folder', default="build_upgraded", help="(default: %(default)s)")
+  parser.add_argument('--replacement_file', default="", help="Executes a very basic conditional replace on buildings. Example: 'IF unique in buildingName and is_listed==no newline	ai_weight = { weight = @crucial_2 }': For all buildings that have 'unique' in their name and are not listed, set ai_weight to given value. Any number of such replaces can be in the file. An 'IF' at the very start of a line starts a replace. the next xyz = will be the tag used for replacing")
   parser.add_argument('-j','--join_files', action="store_true", help="Output from all input files goes into a single file. Has to be activated if you have upgrades distributed over different files. Will not copy comments!")
   parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help="Removes all upgrades where the building can also be reached differently.")
   parser.add_argument('-g','--gameVersion', default="1.8.*", help="Game version of the newly created .mod file to avoid launcher warning(default: %(default)s)")
@@ -139,10 +140,13 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         while (self.vals[i].find("has_building ")!=-1 or self.vals[i].find("has_building=")!=-1) and self.vals[i].find("has_building = no")==-1:
           index=max(self.vals[i].find("has_building "),self.vals[i].find("has_building="))        #find one that is not -1
           #hidden one must have two brackets around. find those
-          leftBracked=self.vals[i].rfind("{",0,len(self.vals[i])-index)
+          leftBracked=self.vals[i].rfind("{",0,index)
           rightBracked=self.vals[i].find("}",index)
           toBeReplaced=self.vals[i][leftBracked:rightBracked+1]
-          #print(toBeReplaced)
+          # print(leftBracked)
+          # print(rightBracked)
+          # print(self.vals[i])
+          # print(toBeReplaced)
           buildingName=toBeReplaced.split("=")[1].replace("}","").replace('"','').strip()
           self.vals[i]=self.vals[i].replace(toBeReplaced,"{ has_"+buildingName+" = yes }")
   def removeDuplicatesRec(self):
@@ -512,6 +516,62 @@ def main(argv):
     for building in buildingNameToData.vals:
       if "is_listed" in building.names and building.get("is_listed")=="no" and "ai_allow" in building.names:
         building.replace("ai_allow", "{ always = yes }")
+        
+    if args.replacement_file!='':
+      equalConditions=[]
+      inConditions=[]
+      replaceClasses=[]
+      searchingForReplaceKeyword=0
+      activeReplace=0
+      with open(args.replacement_file, 'r') as replacement_file:
+        for line in replacement_file:
+          if line[:2]=="IF":
+            searchingForReplaceKeyword=1
+            activeReplace=0
+            equalConditions.append([])
+            inConditions.append([])
+            conditions=line[2:].split("and")
+            for condition in conditions:
+              if len(condition.strip().split("=="))==2: #len(condition.strip().split(" "))==1 and 
+                equalConditions[-1].append([e.strip() for e in condition.strip().split("==")])
+              elif len(condition.strip().split(" in "))==2:
+                inConditions[-1].append([e.strip() for e in condition.strip().split(" in ")])
+              else:
+                print("Invalid condition in replacement file! Exiting!")
+                print(line)
+                print(condition.strip().split("in"))
+                sys.exit(1)
+          elif searchingForReplaceKeyword and len(line.strip())>0 and line.strip()[0]!='#':
+            replaceClasses.append(NamesToValue(1))
+            replaceClasses[-1].addString(line)
+            replaceClasses[-1].vals[0]+="\n"
+            searchingForReplaceKeyword=0
+            activeReplace=1
+          elif activeReplace:
+            replaceClasses[-1].vals[0]+=line
+      for building in buildingNameToData.vals:
+        for i in range(len(replaceClasses)):
+          replace=1
+          for equalCondition in equalConditions[i]:
+            if (not equalCondition[0] in building.names) or (building.get(equalCondition[0])!=equalCondition[1]):
+              #print(building.buildingName+" failed "+" ".join(equalCondition))
+              replace=0
+          for inCondition in inConditions[i]:
+            if inCondition[1]=="buildingName":
+              if building.buildingName.find(inCondition[0])==-1:
+                #print(building.buildingName+" failed buildingName "+" ".join(inCondition))
+                replace=0
+            else:
+              if not inCondition[0] in building.get(inCondition[1]):
+                #print(building.buildingName+" failed "+" ".join(inCondition))
+                replace=0
+          if replace:
+            if replaceClasses[i].names[0] in building.names:
+              #print(building.buildingName)
+              #replaceClasses[i].printAll()
+              building.replace(replaceClasses[i].names[0], replaceClasses[i].vals[0])
+            break
+     
     
     buildingNameToData.removeDuplicatesRec()
       
