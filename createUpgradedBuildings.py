@@ -421,7 +421,7 @@ def main(argv):
               potential_rw=rw_upgrade_building.splitToListIfString("potential")
               potential_rw.addString("planet = { is_ringworld_or_machine_world = yes }")
               for adI in range(len(adjacency_bonus.vals)):
-                adjacency_bonus.vals[adI]+=str(int(adjacency_bonus.vals[adI])+1)
+                adjacency_bonus.vals[adI]=str(int(adjacency_bonus.vals[adI])+1)
               buildingData.splitToListIfString("upgrades").remove(upgradeName)
               buildingData.splitToListIfString("upgrades").addString(rw_upgrade_building.buildingName)
               buildingData_no_direct_build=buildingNameToData.get(buildingData.buildingName.replace("_direct_build",""))
@@ -433,7 +433,7 @@ def main(argv):
               potential_rw=buildingNameToData.vals[upgradeBuildingIndex].splitToListIfString("potential")
               potential_rw.addString("planet = { is_ringworld_or_machine_world = yes }")
               for adI in range(len(adjacency_bonus.vals)):
-                adjacency_bonus.vals[adI]+=str(int(adjacency_bonus.vals[adI])+1)
+                adjacency_bonus.vals[adI]=str(int(adjacency_bonus.vals[adI])+1)
                 
               buildingNameToData.insert([rw_upgrade_building.buildingName, rw_upgrade_building], upgradeBuildingIndex+1) #insert after _direct_build_rw version
               
@@ -488,10 +488,21 @@ def main(argv):
               buildingDataList.append(upgradeData) #make sure we finish one branch of a tree before we start a new branch!
             
             #ICON AND LOCALIZATION:
+            nameExtra="_direct_build"
+            nameStringExtra=""
+            if args.create_tier5_enhanced and buildingData.buildingName.replace("_direct_build","")[-3:]=="_rw":
+              nameExtra+="_rw"
+              nameStringExtra=" Enhanced"
+              if not "icon" in buildingNameToData.vals[upgradeBuildingIndex+1].names: #if icon was already a link in the original building, we can leave it
+                buildingNameToData.vals[upgradeBuildingIndex+1].add(["icon",upgradeName]) #otherwise create an icon link to the original building
+              locData.append(upgradeName+'_rw:0 "$'+upgradeName+'$'+nameStringExtra+'"') #localisation link. If anyone knows what the number behind the colon means, please PN me (@Gratak in Paradox forum)
+              locData.append(upgradeName+'_rw_desc:0 "$'+upgradeName+'_desc$"') #localisation link
+              
             if not "icon" in buildingNameToData.vals[upgradeBuildingIndex].names: #if icon was already a link in the original building, we can leave it
               buildingNameToData.vals[upgradeBuildingIndex].add(["icon",upgradeName]) #otherwise create an icon link to the original building
-            locData.append(upgradeName+'_direct_build:0 "$'+upgradeName+'$"') #localisation link. If anyone knows what the number behind the colon means, please PN me (@Gratak in Paradox forum)
-            locData.append(upgradeName+'_direct_build_desc:0 "$'+upgradeName+'_desc$"') #localisation link
+            locData.append(upgradeName+nameExtra+':0 "$'+upgradeName+'$'+nameStringExtra+'"') #localisation link. If anyone knows what the number behind the colon means, please PN me (@Gratak in Paradox forum)
+            locData.append(upgradeName+nameExtra+'_desc:0 "$'+upgradeName+'_desc$"') #localisation link
+              
             
           if isinstance(buildingData.get("potential").vals[-1], NamesToValue) and len(buildingData.get("potential").vals[-1].names)==0:
             buildingData.get("potential").removeIndex(-1)   #remove potentially empty entry thanks to empire_unique buildings that cannot be copied.
