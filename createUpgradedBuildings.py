@@ -414,7 +414,31 @@ def main(argv):
             upgradeBuildingIndex=buildingNameToData.names.index(upgradeName) #index of 'upgradeData' building in the list of all buildings (including already copied buildings)
             buildingNameToData.insert([upgradeName,upgradeData],upgradeBuildingIndex) #insert the copy before 'upgradeData'. upgradeBuildingIndex is now the index of the copy!
             buildingNameToData.vals[upgradeBuildingIndex].remove("is_listed") #removing "is_listed = no"
+            if args.create_tier5_enhanced and buildingData.buildingName.replace("_direct_build","")[-3:]=="_rw":
+              rw_upgrade_building=copy.deepcopy(buildingNameToData.get(upgradeName))
+              rw_upgrade_building.buildingName+="_rw"
+              adjacency_bonus=rw_upgrade_building.splitToListIfString("adjacency_bonus")
+              potential_rw=rw_upgrade_building.splitToListIfString("potential")
+              potential_rw.addString("planet = { is_ringworld_or_machine_world = yes }")
+              for adI in range(len(adjacency_bonus.vals)):
+                adjacency_bonus.vals[adI]+=str(int(adjacency_bonus.vals[adI])+1)
+              buildingData.splitToListIfString("upgrades").remove(upgradeName)
+              buildingData.splitToListIfString("upgrades").addString(rw_upgrade_building.buildingName)
+              buildingData_no_direct_build=buildingNameToData.get(buildingData.buildingName.replace("_direct_build",""))
+              buildingData_no_direct_build.splitToListIfString("upgrades").remove(upgradeName)
+              buildingData_no_direct_build.splitToListIfString("upgrades").addString(rw_upgrade_building.buildingName)
+              
+              buildingNameToData.names[upgradeBuildingIndex]+="_rw"
+              adjacency_bonus=buildingNameToData.vals[upgradeBuildingIndex].splitToListIfString("adjacency_bonus")
+              potential_rw=buildingNameToData.vals[upgradeBuildingIndex].splitToListIfString("potential")
+              potential_rw.addString("planet = { is_ringworld_or_machine_world = yes }")
+              for adI in range(len(adjacency_bonus.vals)):
+                adjacency_bonus.vals[adI]+=str(int(adjacency_bonus.vals[adI])+1)
+                
+              buildingNameToData.insert([rw_upgrade_building.buildingName, rw_upgrade_building], upgradeBuildingIndex+1) #insert after _direct_build_rw version
+              
             buildingNameToData.names[upgradeBuildingIndex]+="_direct_build" #renaming (as internal name needs to be unique. Not visible in-game
+            buildingNameToData.vals[upgradeBuildingIndex].buildingName=buildingNameToData.names[upgradeBuildingIndex]
             buildingNameToData.vals[upgradeBuildingIndex].lowerTier=buildingData #lower Tier will later be used to ensure uniqueness of unique buildings
             
             #create a new scripted_trigger, consisting of both the original upgrade and the copy that can be directly build
