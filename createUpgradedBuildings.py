@@ -23,6 +23,7 @@ def parse(argv):
   parser.add_argument('-j','--join_files', action="store_true", help="Output from all input files goes into a single file. Has to be activated if you have upgrades distributed over different files. Will not copy comments!")
   parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help="Removes all upgrades where the building can also be reached differently.")
   parser.add_argument('-g','--gameVersion', default="1.8.*", help="Game version of the newly created .mod file to avoid launcher warning(default: %(default)s)")
+  parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)
 
   
   if isinstance(argv, str):
@@ -242,7 +243,8 @@ def attemptGet(building, tag):
   except ValueError:
     return NamesToValue(0) #empty list
     
-def main(argv):
+def main(argv):   
+  scriptDescription='#This file was created by python createUpgradedBuildings.py '+" ".join(argv)+'\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n'
   args=parse(argv)
   
   if not os.path.exists(args.output_folder):
@@ -273,7 +275,8 @@ def main(argv):
       else:
         outPath=args.output_folder+"/common/buildings/"
       with open(outPath+os.path.basename(inputFile.name),'w') as outputFile:
-        outputFile.write("#overwrite")
+        outputFile.write(scriptDescription)
+        outputFile.write("#overwrite\n")
       lineIndex=0
       for line in inputFile:
         lineIndex+=1
@@ -475,13 +478,14 @@ def main(argv):
     
     buildingNameToData.removeDuplicatesRec()
       
-    #OUTPUT   
+    #OUTPUT
     if args.output_folder[0]==".":
       args.output_folder=args.output_folder[1:].lstrip(os.sep)
     modfileName=os.path.dirname(args.output_folder)
     if modfileName=='' or modfileName==".": #should only happen if args.output_folder is a pure foldername in which case 'os.path.dirname' is unessecary anyway
       modfileName=args.output_folder
     with open(modfileName+".mod",'w') as modfile:
+      modfile.write(scriptDescription)
       modfile.write('name="!{}"\n'.format(modfileName))
       modfile.write('path="mod/{}"\n'.format(args.output_folder.rstrip(os.sep)))
       modfile.write('tags={\n')
@@ -503,11 +507,13 @@ def main(argv):
           with codecs.open(args.output_folder+"/localisation/{}/build_upgraded_{}_l_{}.yml".format(language,outfileBaseName.replace(".txt",""),language),'w', "utf-8") as locOutPutFile:
             locOutPutFile.write(u'\ufeff')
             locOutPutFile.write("l_"+language+":"+"\n")
+            locOutPutFile.write(scriptDescription)
             for line in locData:
               locOutPutFile.write(" "+line+"\n")
         
         #scripted_triggers OUTPUT
         triggerFile=open(args.output_folder+"/common/scripted_triggers/build_upgraded_"+outfileBaseName.replace(".txt","")+"_triggers.txt",'w')
+        triggerFile.write(scriptDescription)
         triggers.writeAll(triggerFile)
       
       #BUILDING OUTPUT
@@ -515,6 +521,7 @@ def main(argv):
         b.replaceAllHasBuildings()
       
       with open(outPath+"build_upgraded_"+outfileBaseName,'w') as outputFile:
+        outputFile.write(scriptDescription)
         lineIndex=0
         curBuilding=0
         if args.join_files:
