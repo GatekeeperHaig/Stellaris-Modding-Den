@@ -654,7 +654,7 @@ ap_galactic_contender = {
 	}
 	
 	ai_weight = {
-		factor = @standard
+		weight = @standard
 		modifier = {
 			factor = @avoid
 			NOR = { 
@@ -705,8 +705,6 @@ ap_galactic_contender = {
 
 #### Regular APs
 
-# 0 prerequisites APs
-
 ap_mastery_of_nature = {
 	on_enabled = {
 		custom_tooltip = "ap_mastery_of_nature_unlocks"
@@ -727,7 +725,7 @@ ap_mastery_of_nature = {
 	potential = { NOT = { has_ascension_perk = ap_mastery_of_nature	} }
 	
 	ai_weight = {
-		factor = @standard
+		weight = @standard
 		modifier = {
 			factor = @avoid
 			OR = {
@@ -745,35 +743,6 @@ ap_mastery_of_nature = {
 				AND = {
 					has_monthly_income = {
 						resource = minerals
-						value > 200
-					}								
-					has_monthly_income = {
-						resource = energy
-						value > 250
-					}							
-					OR = {
-						AND = {
-							has_technology = "tech_tb_dense_jungle"						
-							has_technology = "tech_tb_toxic_kelp"
-						}	
-						AND = {
-							has_technology = "tech_tb_quicksand_basin"
-							has_technology = "tech_tb_deep_sinkhole"
-						}
-						AND = {
-							has_technology = "tech_tb_massive_glacier"
-							has_technology = "tech_tb_deep_sinkhole"
-						}
-						OR = {
-							has_technology = "tech_tb_noxious_swamp"
-							has_technology = "tech_tb_dangerous_wildlife"
-							has_technology = "tech_tb_volcano"
-						}
-					}	
-				}
-				AND = {
-					has_monthly_income = {
-						resource = minerals
 						value > 400
 					}								
 					has_monthly_income = {
@@ -781,11 +750,84 @@ ap_mastery_of_nature = {
 						value > 500
 					}							
 				}
+				num_owned_planets < 5
 			}	
-		}
+		}		
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				any_owned_planet = { any_tile = { has_blocker = tb_mountain_range } } 
+				NOT = { has_technology = "tech_tb_mountain_range }
+			}	
+		}		
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				any_owned_planet = { any_tile = { has_blocker = tb_active_volcano } } 
+				NOT = { has_technology = "tech_tb_active_volcano }
+			}	
+		}				
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				any_owned_planet = { any_tile = { has_blocker = tb_dangerous_wildlife } } 
+				NOT = { has_technology = "tech_tb_dangerous_wildlife }
+			}	
+		}						
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				any_owned_planet = { any_tile = { has_blocker = tb_dense_jungle } } 
+				NOT = { has_technology = "tech_tb_dense_jungle }
+			}	
+		}		
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				any_owned_planet = { any_tile = { has_blocker = tb_quicksand_basin } } 
+				NOT = { has_technology = "tech_tb_quicksand_basin }
+			}	
+		}			
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				any_owned_planet = { any_tile = { has_blocker = tb_noxious_swamp } } 
+				NOT = { has_technology = "tech_tb_noxious_swamp }
+			}	
+		}					
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				any_owned_planet = { any_tile = { has_blocker = tb_massive_glacier } } 
+				NOT = { has_technology = "tech_tb_massive_glacier }
+			}	
+		}							
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				any_owned_planet = { any_tile = { has_blocker = tb_toxic_kelp } } 
+				NOT = { has_technology = "tech_tb_toxic_kelp }
+			}	
+		}									
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				any_owned_planet = { any_tile = { has_blocker = tb_deep_sinkhole } } 
+				NOT = { has_technology = "tech_tb_deep_sinkhole }
+			}	
+		}											
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				any_owned_planet = { any_tile = { has_blocker = tb_deep_sinkhole } } 
+				NOT = { has_technology = "tech_tb_deep_sinkhole }
+			}	
+		}													
 		modifier = {
 			factor = @increase_interest_3
-			num_ascension_perks = 0
+			OR = {
+				num_ascension_perks < 2
+				num_owned_planets > 5
 		}		
 	}
 }
@@ -796,15 +838,28 @@ ap_interstellar_dominion = {
 	potential = { NOT = { has_ascension_perk = ap_interstellar_dominion } }
 	
 	ai_weight = {
-		factor = 10
+		weight = @excellent
 		modifier = {
-			factor = 2
-			has_ethic = ethic_xenophobe
+			factor = @avoid
+			num_owned_planets < 5			
+		}		
+		modifier = {
+			factor = @increase_interest_3
+			OR = {
+				is_xenophile = yes
+				is_militarist = yes
+				has_ethic = ethic_gestalt_consciousness
+			}	
 		}
 		modifier = {
-			factor = 3
-			has_ethic = ethic_fanatic_xenophobe
-		}
+			factor = @strategic
+			OR = {
+				has_ascension_perk = ap_evolutionary_mastery
+				has_ascension_perk = ap_synthetic_evolution
+				has_ascension_perk = ap_transcendence
+				is_xenophobe = yes
+			}			
+		}		
 	}
 }
 
@@ -814,14 +869,14 @@ ap_technological_ascendancy = {
 	potential = { NOT = { has_ascension_perk = ap_technological_ascendancy } }
 	
 	ai_weight = {
-		factor = 10
+		weight = @important
 		modifier = {
-			factor = 2
-			has_ethic = ethic_materialist
+			factor = @increase_interest_3
+			num_ascension_perks < 2
 		}
 		modifier = {
-			factor = 3
-			has_ethic = ethic_fanatic_materialist
+			factor = @strategic
+			is_materialist = yes
 		}
 	}
 }
