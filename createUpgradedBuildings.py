@@ -20,7 +20,7 @@ def parse(argv):
   parser.add_argument('-c','--cost_discount', default=0, type=float, help="Total cost of tier n will be: Cost(tier n-1)+Cost(upgrade tier n)*(1-discount), with the restriction that total cost will never be lower than 'Cost(upgrade tier n)'(default: %(default)s)")
   parser.add_argument('-f','--foreign_scripted_trigger', action="store_true", help="If you created your own scripted_triggers file including 'has_building' mentions on buildings that will be copied by this script, run this script once with all such files as input instead of the building files. In this mode the script will simply replace all 'has_building = ...' with scripted_triggers created by the script if not run with this argument. This obviously only works if you have/will run all buildings mentioned here through the main script!")
   parser.add_argument('-o','--output_folder', default="build_upgraded", help="(default: %(default)s)")
-  parser.add_argument('--replacement_file', default="", help="Executes a very basic conditional replace on buildings. Example: 'IF unique in buildingName and is_listed==no newline	ai_weight = { weight = @crucial_2 }': For all buildings that have 'unique' in their name and are not listed, set ai_weight to given value. Any number of such replaces can be in the file. An 'IF' at the very start of a line starts a replace. the next xyz = will be the tag used for replacing")
+  parser.add_argument('--replacement_file', default="", help="Executes a very basic conditional replace on buildings. Example: 'IF unique in buildingName and is_listed==no newline	ai_weight = { weight = @crucial_2 }': For all buildings that have 'unique' in their name and are not listed, set ai_weight to given value. Any number of such replaces can be in the file. An 'IF' at the very start of a line starts a replace. the next xyz = will be the tag used for replacing. You can also start a line with 'EVAL' instead of 'IF' to write an arbitrary condition. You need to know the class structure for this though.")
   parser.add_argument('-j','--join_files', action="store_true", help="Output from all input files goes into a single file. Has to be activated if you have upgrades distributed over different files. Will not copy comments!")
   parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help="Removes all upgrades where the building can also be reached differently.")
   parser.add_argument('-g','--gameVersion', default="1.8.*", help="Game version of the newly created .mod file to avoid launcher warning(default: %(default)s)")
@@ -551,6 +551,10 @@ def main(argv):
                 sys.exit(1)
               for e in condition.strip().split(allConditions[-1][-1][-1]):
                 allConditions[-1][-1].append(e.strip())
+          elif line[:4]=="EVAL":
+            searchingForReplaceKeyword=1
+            activeReplace=0
+            allConditions.append([[line[:4],line[4:].strip()]])
           elif searchingForReplaceKeyword and len(line.strip())>0 and line.strip()[0]!='#':
             replaceClasses.append(NamesToValue(1))
             replaceClasses[-1].addString(line)
@@ -559,13 +563,18 @@ def main(argv):
             activeReplace=1
           elif activeReplace:
             replaceClasses[-1].vals[0]+=line
-      # print(allConditions)
       for building in buildingNameToData.vals:
         for i in range(len(replaceClasses)):
           replace=1
           for condition in allConditions[i]:
             # print(condition)
-            if condition[1]=="==":
+            if condition[0]=="EVAL":
+              #print(condition[1])
+              if eval(condition[1]):
+                replace=1
+              else:
+                replace=0
+            elif condition[1]=="==":
               if condition[0]:  #negated
                 if (condition[2] in building.names) and (building.get(condition[2])==equalCondition[3]):
                   replace=0
@@ -584,7 +593,7 @@ def main(argv):
                   replace=0
           if replace:
             if replaceClasses[i].names[0] in building.names:
-              # print(building.buildingName)
+              print(building.buildingName)
               #replaceClasses[i].printAll()
               building.replace(replaceClasses[i].names[0], replaceClasses[i].vals[0])
      
