@@ -520,6 +520,7 @@ def main(argv):
     if args.replacement_file!='':
       equalConditions=[]
       inConditions=[]
+      allConditions=[] #allConditions[i][j] will be an array consisting of: negation bool, condition type, keyword 1, keyword 2, 
       replaceClasses=[]
       searchingForReplaceKeyword=0
       activeReplace=0
@@ -528,19 +529,28 @@ def main(argv):
           if line[:2]=="IF":
             searchingForReplaceKeyword=1
             activeReplace=0
-            equalConditions.append([])
-            inConditions.append([])
+            allConditions.append([])
             conditions=line[2:].split("and")
             for condition in conditions:
+              allConditions[-1].append([])
+              if condition.split()[0]=="not":
+                allConditions[-1][-1].append(True)
+                condition=" ".join(condition.split()[1:])
+              else:
+                allConditions[-1][-1].append(False)
               if len(condition.strip().split("=="))==2: #len(condition.strip().split(" "))==1 and 
-                equalConditions[-1].append([e.strip() for e in condition.strip().split("==")])
+                allConditions[-1][-1].append("==")
+                # allConditions[-1][-1].append(e.strip() for e in condition.strip().split("=="))
               elif len(condition.strip().split(" in "))==2:
-                inConditions[-1].append([e.strip() for e in condition.strip().split(" in ")])
+                allConditions[-1][-1].append(" in ")
+                # allConditions[-1][-1].append(e.strip() for e in condition.strip().split(" in "))
               else:
                 print("Invalid condition in replacement file! Exiting!")
                 print(line)
                 print(condition.strip().split("in"))
                 sys.exit(1)
+              for e in condition.strip().split(allConditions[-1][-1][-1]):
+                allConditions[-1][-1].append(e.strip())
           elif searchingForReplaceKeyword and len(line.strip())>0 and line.strip()[0]!='#':
             replaceClasses.append(NamesToValue(1))
             replaceClasses[-1].addString(line)
@@ -549,28 +559,34 @@ def main(argv):
             activeReplace=1
           elif activeReplace:
             replaceClasses[-1].vals[0]+=line
+      # print(allConditions)
       for building in buildingNameToData.vals:
         for i in range(len(replaceClasses)):
           replace=1
-          for equalCondition in equalConditions[i]:
-            if (not equalCondition[0] in building.names) or (building.get(equalCondition[0])!=equalCondition[1]):
-              #print(building.buildingName+" failed "+" ".join(equalCondition))
-              replace=0
-          for inCondition in inConditions[i]:
-            if inCondition[1]=="buildingName":
-              if building.buildingName.find(inCondition[0])==-1:
-                #print(building.buildingName+" failed buildingName "+" ".join(inCondition))
-                replace=0
-            else:
-              if not inCondition[0] in building.get(inCondition[1]):
-                #print(building.buildingName+" failed "+" ".join(inCondition))
-                replace=0
+          for condition in allConditions[i]:
+            # print(condition)
+            if condition[1]=="==":
+              if condition[0]:  #negated
+                if (condition[2] in building.names) and (building.get(condition[2])==equalCondition[3]):
+                  replace=0
+              else:
+                if (not condition[2] in building.names) or (building.get(condition[2])!=condition[3]):
+                  # print(building.buildingName+" failed "+" ".join(condition[1:]))
+                  replace=0
+            elif condition[1]==" in ":
+              if condition[3]=="buildingName":
+                if (condition[0]) != (building.buildingName.find(condition[2])==-1):
+                  # print(building.buildingName+" failed buildingName "+" ".join(condition[1:]))
+                  replace=0
+              else:
+                if (condition[0]) != (not condition[2] in building.get(condition[3])):
+                  # print(building.buildingName+" failed "+" ".join(condition[1:]))
+                  replace=0
           if replace:
             if replaceClasses[i].names[0] in building.names:
-              #print(building.buildingName)
+              # print(building.buildingName)
               #replaceClasses[i].printAll()
               building.replace(replaceClasses[i].names[0], replaceClasses[i].vals[0])
-            break
      
     
     buildingNameToData.removeDuplicatesRec()
