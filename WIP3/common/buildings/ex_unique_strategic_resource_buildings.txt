@@ -1,0 +1,107 @@
+### ExOverhaul Building Costs ###
+
+@unique_special_resource_building_mineral_cost = 300
+@unique_special_resource_building_energy_cost = 100
+@unique_special_resource_building_influence_cost = 50
+@unique_special_resource_building_build_time = 360
+
+### ExOverhaul AI Weights ###
+
+#base weight multipliers - use either with weight, factor or add
+@avoid = 0
+@redundant = 0.5
+@standard = 1
+@good = 10
+@important = 25
+@strategic = 100
+@crucial_1 = 1000
+@crucial_2 = 10000
+
+#additive weight modifiers - use either with factor
+@reduce_interest_1 = 0.5
+@reduce_interest_2 = 0.25
+@reduce_interest_3 = 0.1
+@increase_interest_1 = 1.25
+@increase_interest_2 = 2.5
+@increase_interest_3 = 5
+
+#use with weight only
+@upgrade_weight = 10000 
+
+### Output ###
+
+@sr_ex_unique_1_energy_output = 
+@sr_ex_unique_1_mineral_output = 
+@sr_ex_unique_1_food_output = 
+@sr_ex_unique_1_unity_output = 
+@sr_ex_unique_1_influence_output = 
+
+##################################
+### Empire Unique SR buildings ###
+##################################
+
+building_sr_ex_unique_1_1 = {
+	base_buildtime = @unique_special_resource_building_build_time
+	icon = "building_sr_ex_unique_1"
+	empire_unique = yes
+	ai_special_building = yes
+	ai_replace = no
+
+	show_tech_unlock_if = { 
+		OR = {
+			has_ethic = ethic_
+			has_ethic = ethic_fanatic_
+		}	
+	}
+	
+	cost = {
+		minerals = @unique_special_resource_building_mineral_cost
+		energy = @unique_special_resource_building_energy_cost
+		influence = @unique_special_resource_building_influence_cost
+	}
+	
+	potential = {
+		owner = { has_ethic = ethic_ }
+		planet = {
+			OR = {				
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}				
+		}	
+	}
+
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_ethic = ethic_ } }
+	}
+	
+	produced_resources = { 
+		energy = @sr_ex_unique_1_energy_output
+		minerals = @sr_ex_unique_1_mineral_output
+		food = @sr_ex_unique_1_food_output
+		unity = @sr_ex_unique_1_unity_output
+		influence = @sr_ex_unique_1_influence_output		
+	}
+
+	planet_modifier = { }
+	
+	country_modifier = { } 
+	
+	army_modifier = { ]
+	
+	prerequisites = { "tech_sr_ex_unique_1" }
+	
+	allow = {
+		custom_tooltip = {
+			fail_text = "requires_sr_ex_unique_1"
+			tile = {
+				has_resource = {
+					type = sr_ex_unique_1
+					amount > 0					
+				}
+			}
+		}
+	}
+	
+	ai_weight = { weight = @crucial_2 }	
+}
