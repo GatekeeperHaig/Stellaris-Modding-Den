@@ -593,7 +593,7 @@ def main(argv):
                   replace=0
           if replace:
             if replaceClasses[i].names[0] in building.names:
-              print(building.buildingName)
+              #print(building.buildingName)
               #replaceClasses[i].printAll()
               building.replace(replaceClasses[i].names[0], replaceClasses[i].vals[0])
      
