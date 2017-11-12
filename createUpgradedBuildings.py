@@ -140,7 +140,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       else: #find hidden "has_building"
         index=0
         while index>=0 and (self.vals[i].find("has_building ",index)!=-1 or self.vals[i].find("has_building=",index)!=-1):# and self.vals[i].find("has_building = no")==-1:
-          index=max(self.vals[i].find("has_building "),self.vals[i].find("has_building="))        #find one that is not -1
+          index=max(self.vals[i].find("has_building ",index),self.vals[i].find("has_building=",index))        #find one that is not -1
           #hidden one must have two brackets around. find those
           leftBracked=self.vals[i].rfind("{",0,index)
           rightBracked=self.vals[i].find("}",index)
@@ -148,6 +148,8 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
           # print(leftBracked)
           # print(rightBracked)
           # print(self.vals[i])
+          # print(index)
+          # print(self.vals[i][index])
           # print(toBeReplaced)
           buildingName=toBeReplaced.split("=")[1].replace("}","").replace('"','').strip()
           if buildingName in copiedBuildings:
