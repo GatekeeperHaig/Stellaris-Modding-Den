@@ -129,15 +129,17 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
           file.write("\t")
         file.write("}")
       file.write("\n")
-  def replaceAllHasBuildings(self): #"has_building=" fails working if different version of the same building exist (Paradox should have realised this on creation of machine empire capital buildings but they didn't... They simply created very lengthy conditions. Shame...). We replace them by scripted_triggers. Due to cross-reference in between files I do this for EVERY building, even the ones I did not copy.
+  def replaceAllHasBuildings(self, copiedBuildings): #"has_building=" fails working if different version of the same building exist (Paradox should have realised this on creation of machine empire capital buildings but they didn't... They simply created very lengthy conditions. Shame...). We replace them by scripted_triggers. Due to cross-reference in between files I do this for EVERY building, even the ones I did not copy.
     for i in range(len(self.names)):
       if isinstance(self.vals[i], NamesToValue):
-        self.vals[i].replaceAllHasBuildings()
+        self.vals[i].replaceAllHasBuildings(copiedBuildings)
       elif self.names[i]=="has_building" and self.vals[i]!="no":
-        self.names[i]="has_"+(self.vals[i].replace('"',''))
-        self.vals[i]="yes"
+        if self.vals[i].strip('"') in copiedBuildings:
+          self.names[i]="has_"+(self.vals[i].replace('"',''))
+          self.vals[i]="yes"
       else: #find hidden "has_building"
-        while (self.vals[i].find("has_building ")!=-1 or self.vals[i].find("has_building=")!=-1) and self.vals[i].find("has_building = no")==-1:
+        index=0
+        while index>=0 and (self.vals[i].find("has_building ",index)!=-1 or self.vals[i].find("has_building=",index)!=-1):# and self.vals[i].find("has_building = no")==-1:
           index=max(self.vals[i].find("has_building "),self.vals[i].find("has_building="))        #find one that is not -1
           #hidden one must have two brackets around. find those
           leftBracked=self.vals[i].rfind("{",0,index)
@@ -148,7 +150,11 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
           # print(self.vals[i])
           # print(toBeReplaced)
           buildingName=toBeReplaced.split("=")[1].replace("}","").replace('"','').strip()
-          self.vals[i]=self.vals[i].replace(toBeReplaced,"{ has_"+buildingName+" = yes }")
+          if buildingName in copiedBuildings:
+            self.vals[i]=self.vals[i].replace(toBeReplaced,"{ has_"+buildingName+" = yes }")
+            # print(toBeReplaced)
+            
+          index+=1 #prevent finding the same has_building again!
   def removeDuplicatesRec(self):
     # try :
       # print(self.buildingName)
@@ -247,7 +253,7 @@ def attemptGet(building, tag):
   except ValueError:
     return NamesToValue(0) #empty list
     
-def main(argv):   
+def main(argv, allowRestart=1):   
   scriptDescription='#This file was created by python createUpgradedBuildings.py '+" ".join(argv)+'\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n'
   args=parse(argv)
   
@@ -259,7 +265,15 @@ def main(argv):
     os.mkdir(args.output_folder+"/common/buildings")  
   if not os.path.exists(args.output_folder+"/common/scripted_triggers"):
     os.mkdir(args.output_folder+"/common/scripted_triggers")
-  
+    
+  copiedBuildingsFileName=args.output_folder+"/copiedBuildings.txt"
+  try: 
+    with open(copiedBuildingsFileName) as file:
+      copiedBuildings=[line.strip() for line in file]
+  except FileNotFoundError:
+    copiedBuildings=[]
+  if not args.foreign_scripted_trigger:
+    copiedBuildingsFile=open(copiedBuildingsFileName,'w')
   globbedList=[]
   for b in args.buildingFileNames:
     globbedList[0:0]=glob.glob(b)
@@ -360,7 +374,7 @@ def main(argv):
         baseBuildingData=buildingNameToDataOrigVals[origBuildI] #data of the lowest tier building
         if "is_listed" in baseBuildingData.names and baseBuildingData.get("is_listed")=="no":
           continue
-        triggers.add2("has_"+baseBuildingData.buildingName,"{ has_building = "+baseBuildingData.buildingName+" }")   #redundant but simplifies later replaces
+        #triggers.add2("has_"+baseBuildingData.buildingName,"{ has_building = "+baseBuildingData.buildingName+" }")   #redundant but simplifies later replaces
         triggerIndexAtStart=len(triggers.names) #later used together with "baseBuildingData" to determine what buildings are checked for if planet_unique
         
         #ITERATE THROUGH WHOLE BUILDING TREE/LINE
@@ -401,7 +415,7 @@ def main(argv):
             upgradeData=copy.deepcopy(buildingNameToData.get(upgradeName)) #now copy to prevent further editing
             
             if "empire_unique" in upgradeData.names and upgradeData.get("empire_unique")=="yes":
-              triggers.add2("has_"+upgradeName,"{ has_building = "+upgradeName+" }")   #redundant but simplifies later replaces
+              #triggers.add2("has_"+upgradeName,"{ has_building = "+upgradeName+" }")   #redundant but simplifies later replaces
               continue #do not copy empire_unique buildings EVER. Impossible to keep them unique otherwise, for some reason even if capital only
 
             #new requirements: Only buildable if one of the conditions of the next higher tier is not satisfied.
@@ -436,6 +450,12 @@ def main(argv):
               adjacency_bonus=buildingNameToData.vals[upgradeBuildingIndex].splitToListIfString("adjacency_bonus")
               potential_rw=buildingNameToData.vals[upgradeBuildingIndex].splitToListIfString("potential")
               potential_rw.addString("planet = { is_ringworld_or_machine_world = yes }")
+              
+              newList=NamesToValue(1)
+              newList.getOrCreate("OR").add2("has_building",upgradeName+"_rw") #creates the "OR" and fills it with the first entry
+              newList.get("OR").add2("has_building",upgradeName+"_rw_direct_build") #second entry to "OR"
+              triggers.add2("has_"+upgradeName+"_rw", newList)
+              copiedBuildingsFile.write(upgradeName+"_rw"+"\n")
               for adI in range(len(adjacency_bonus.vals)):
                 adjacency_bonus.vals[adI]=str(int(adjacency_bonus.vals[adI])+1)
                 
@@ -446,10 +466,12 @@ def main(argv):
             buildingNameToData.vals[upgradeBuildingIndex].lowerTier=buildingData #lower Tier will later be used to ensure uniqueness of unique buildings
             
             #create a new scripted_trigger, consisting of both the original upgrade and the copy that can be directly build
-            newList=NamesToValue(1)
-            newList.getOrCreate("OR").add2("has_building",upgradeName) #creates the "OR" and fills it with the first entry
-            newList.get("OR").add2("has_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
-            triggers.add2("has_"+upgradeName, newList)
+            if not args.create_tier5_enhanced or buildingData.buildingName.replace("_direct_build","")[-3:]!="_rw":
+              newList=NamesToValue(1)
+              newList.getOrCreate("OR").add2("has_building",upgradeName) #creates the "OR" and fills it with the first entry
+              newList.get("OR").add2("has_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
+              triggers.add2("has_"+upgradeName, newList)
+              copiedBuildingsFile.write(upgradeName+"\n")
             
             #REMOVE COPY FROM TECH TREE. Seems to remove the copy completely :( Pretty useless trigger...
             # if "show_tech_unlock_if" in buildingNameToData.vals[upgradeBuildingIndex].names:
@@ -639,8 +661,9 @@ def main(argv):
         triggers.writeAll(triggerFile)
       
       #BUILDING OUTPUT
-      for b in buildingNameToData.vals:
-        b.replaceAllHasBuildings()
+      if len(copiedBuildings)>0:
+        for b in buildingNameToData.vals:
+          b.replaceAllHasBuildings(copiedBuildings)
       
       with open(outPath+"build_upgraded_"+outfileBaseName,'w') as outputFile:
         outputFile.write(scriptDescription)
@@ -660,7 +683,12 @@ def main(argv):
               buildingNameToData.vals[curBuilding].writeAll(outputFile)
               outputFile.write("}\n")
               curBuilding+=1
-
+  if not args.foreign_scripted_trigger:
+    copiedBuildingsFile.close()
+  with open(copiedBuildingsFileName) as file:
+    newCopiedBuilings=[line.strip() for line in file]
+  if newCopiedBuilings!=copiedBuildings and not args.foreign_scripted_trigger and allowRestart:
+    main(argv,0)
   
   
   
