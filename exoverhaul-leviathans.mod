@@ -1,5 +1,5 @@
 name="(--ExOverhaul: Leviathans--)"
-path="mod/exoverhaul-leviathans"
+path="mod/exoverhaul/leviathans"
 tags={
 	"Balance"
 	"Military"

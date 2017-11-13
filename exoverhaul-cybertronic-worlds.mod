@@ -1,5 +1,5 @@
 name="(--ExOverhaul: Cybertronic Worlds--)"
-path="mod/exoverhaul-cybertronic-worlds"
+path="mod/exoverhaul/cybertronic-worlds"
 tags={
 	"ExOverhaul"
 	"Balance"

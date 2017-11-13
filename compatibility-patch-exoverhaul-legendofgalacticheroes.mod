@@ -1,5 +1,5 @@
 name="(((-ExOverhaul/LoGH Comp. Patch-)))"
-path="mod/compatibility-patch-exoverhaul-legendofgalacticheroes"
+path="mod/compatibility-patches-exoverhaul/legendofgalacticheroes"
 tags={
 	"Fixes"
 }

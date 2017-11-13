@@ -1,5 +1,5 @@
 name="(((-ExOverhaul/SCX Compatibility Mod-)))"
-path="mod/compatibility-patch-exoverhaul-scx"
+path="mod/compatibility-patches-exoverhaul/scx"
 tags={
 	"Fixes"
 }

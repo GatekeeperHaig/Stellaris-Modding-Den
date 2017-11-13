@@ -1,5 +1,5 @@
 name="((((--ExOverhaul: Enhanced Sectors & Game Difficulties--))))"
-path="mod/exoverhaul-sectors_and_difficulties"
+path="mod/exoverhaul/sectors_and_difficulties"
 tags={
 	"Overhaul"
 	"Fixes"

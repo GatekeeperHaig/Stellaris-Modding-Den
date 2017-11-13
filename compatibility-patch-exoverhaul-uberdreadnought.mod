@@ -1,5 +1,5 @@
 name="(((-ExOverhaul/UberDreadnought Comp. patch-)))"
-path="mod/compatibility-patch-exoverhaul-uberdreadnought"
+path="mod/compatibility-patches-exoverhaul/uberdreadnought"
 tags={
 	"Fixes"
 }

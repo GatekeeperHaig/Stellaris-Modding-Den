@@ -1,5 +1,5 @@
 name="(((-ExOverhaul/Realistic Ships Comp. Patch-)))"
-path="mod/compatibility-patch-exoverhaul-realistic-ships"
+path="mod/compatibility-patches-exoverhaul/realistic-ships"
 tags={
 	"Fixes"
 }

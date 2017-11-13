@@ -1,5 +1,5 @@
 name="(--ExOverhaul: Ethics and Government--)"
-path="mod/exoverhaul-ethics-and-government"
+path="mod/exoverhaul/ethics-and-government"
 tags={
 	"ExOverhaul"
 	"EXBalance"

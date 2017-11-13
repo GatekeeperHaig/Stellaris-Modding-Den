@@ -1,5 +1,5 @@
 name="(--ExOverhaul: Enhanced Tomb Worlds and Xeno-Archeology--)"
-path="mod/exoverhaul-tomb-worlds"
+path="mod/exoverhaul/tomb-worlds"
 tags={
 	"ExOverhaul"
 	"Balance"

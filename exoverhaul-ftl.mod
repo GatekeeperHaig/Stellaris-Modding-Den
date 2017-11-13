@@ -1,5 +1,5 @@
 name="(--ExOverhaul: FTL--)"
-path="mod/exoverhaul-ftl"
+path="mod/exoverhaul/ftl"
 tags={
 	"ExOverhaul"
 	"Balance"

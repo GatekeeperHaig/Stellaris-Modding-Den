@@ -1,5 +1,5 @@
 name="(--ExOverhaul: Robots and Machines--)"
-path="mod/exoverhaul-robots-and-machines"
+path="mod/exoverhaul/robots-and-machines"
 tags={
 	"ExOverhaul"
 	"ExBalance"

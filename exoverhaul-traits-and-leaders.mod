@@ -1,5 +1,5 @@
 name="(--ExOverhaul: Traits and Leaders--)"
-path="mod/exoverhaul-traits-and-leaders"
+path="mod/exoverhaul/traits-and-leaders"
 tags={
 	"ExOverhaul"
 	"Balance"

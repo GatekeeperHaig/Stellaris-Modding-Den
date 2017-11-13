@@ -1,5 +1,5 @@
 name="(((-ExOverhaul/ISB-ISBS Compatibility Patch-)))"
-path="mod/compatibility-patch-exoverhaul-isb"
+path="mod/compatibility-patches-exoverhaul/isb"
 tags={
 	"Fixes"
 }

@@ -1,5 +1,5 @@
 name="(--ExOverhaul: Buildings--)"
-path="mod/exoverhaul-buildings"
+path="mod/exoverhaul/buildings"
 tags={
 	"ExOverhaul"
 	"EXBalance"

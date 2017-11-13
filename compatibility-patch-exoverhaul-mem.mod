@@ -1,5 +1,5 @@
 name="(((-ExOverhaul/MEM Comp. Patch-)))"
-path="mod/compatibility-patch-exoverhaul-mem"
+path="mmod/compatibility-patches-exoverhaul/mem"
 tags={
 	"Fixes"
 }

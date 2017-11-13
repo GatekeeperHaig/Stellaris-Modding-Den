@@ -1,5 +1,5 @@
 name="(--ExOverhaul: Ringworlds Enhanced--)"
-path="mod/exoverhaul-ringworlds"
+path="mod/exoverhaul/ringworlds"
 tags={
 	"ExBalance"
 	"Balance"

@@ -1,5 +1,5 @@
 name="((((--ExOverhaul: Tweaks, Sectors and AI--}}})"
-path="mod/exoverhaul-tweaks"
+path="mod/exoverhaul/tweaks"
 tags={
 	"Overhaul"
 	"Fixes"

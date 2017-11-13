@@ -1,5 +1,5 @@
 name="(((-ExOverhaul/Useful Stations Comp. Patch-)))"
-path="mod/compatibility-patch-exoverhaul-useful-stations"
+path="mod/compatibility-patches-exoverhaul/useful-stations"
 tags={
 	"Fixes"
 }

@@ -476,9 +476,9 @@ def main(argv, allowRestart=1):
               copiedBuildingsFile.write(upgradeName+"\n")
             
             #REMOVE COPY FROM TECH TREE. Seems to remove the copy completely :( Pretty useless trigger...
-            # if "show_tech_unlock_if" in buildingNameToData.vals[upgradeBuildingIndex].names:
-              # buildingNameToData.vals[upgradeBuildingIndex].remove("show_tech_unlock_if")
-            # buildingNameToData.vals[upgradeBuildingIndex].add(["show_tech_unlock_if","no"])
+            if "show_tech_unlock_if" in buildingNameToData.vals[upgradeBuildingIndex].names:
+              buildingNameToData.vals[upgradeBuildingIndex].remove("show_tech_unlock_if")
+            buildingNameToData.vals[upgradeBuildingIndex].add(["show_tech_unlock_if","{ always = no }"])
             
             #compute build times
             computeNewCosts(buildingData, upgradeData, "base_buildtime", args.time_discount,varsToValue)
