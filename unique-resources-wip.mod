@@ -1,5 +1,5 @@
 name="WIP3"
-path="mod/WIP3"
+path="mod/unique-resources-wip"
 tags={
 	"Fixes"
 }
