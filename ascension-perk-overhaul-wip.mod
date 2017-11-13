@@ -1,5 +1,5 @@
 name="((((((WIP1))))"
-path="mod/WIP1"
+path="mod/ascension-perk-overhaul-wip"
 tags={
 	"Fixes"
 }
