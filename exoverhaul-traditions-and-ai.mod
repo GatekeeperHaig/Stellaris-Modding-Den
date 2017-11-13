@@ -1,5 +1,5 @@
 name="((((--ExOverhaul: Traditions and AI--))))"
-path="mod/exoverhaul-traditions-and-ai"
+path="mod/exoverhaul/traditions-and-ai"
 tags={
 	"ExOverhaul"
 	"EXBalance"

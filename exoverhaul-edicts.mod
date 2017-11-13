@@ -1,5 +1,5 @@
 name="((((--ExOverhaul: Edicts and AI--))))"
-path="mod/exoverhaul-edicts"
+path="mod/exoverhaul/edicts-and-ai"
 tags={
 	"ExOverhaul"
 	"Balance"

@@ -1,5 +1,5 @@
 name="((((--ExOverhaul: Technology and AI--))))"
-path="mod/exoverhaul-technology-and-ai"
+path="mod/exoverhaul/technology-and-ai"
 tags={
 	"Fixes"
 	"Overhaul"

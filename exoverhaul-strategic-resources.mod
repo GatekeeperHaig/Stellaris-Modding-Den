@@ -1,5 +1,5 @@
 name="(--ExOverhaul: Strategic Resources--)"
-path="mod/exoverhaul-strategic-resources"
+path="mod/exoverhaul/strategic-resources"
 tags={
 	"ExOverhaul"
 	"Balance"

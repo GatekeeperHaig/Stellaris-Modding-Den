@@ -1,5 +1,5 @@
 name="(--ExOverhaul: Armies--)"
-path="mod/exoverhaul-armies"
+path="mod/exoverhaul/armies"
 tags={
 	"ExOverhaul"
 	"Gameplay"

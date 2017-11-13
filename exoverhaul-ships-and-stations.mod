@@ -1,5 +1,5 @@
 name="(--ExOverhaul: Ships and Stations--)"
-path="mod/exoverhaul-ships-and-stations"
+path="mod/exoverhaul/ships-and-stations"
 tags={
 	"ExOverhaul"
 	"EXBalance"
