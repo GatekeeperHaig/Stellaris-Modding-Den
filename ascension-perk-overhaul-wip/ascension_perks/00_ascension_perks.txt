@@ -883,14 +883,11 @@ ap_technological_ascendancy = {
 
 ap_imperial_prerogative = {
 	modifier = { country_core_sector_system_cap = 5 }
+	on_enabled = { run_ai_strategic_data = yes }
 	
 	potential = { NOT = { has_ascension_perk = ap_imperial_prerogative } }
 	
-	ai_weight = {
-		factor = 10
-	}
-	
-	on_enabled = { run_ai_strategic_data = yes }
+	ai_weight = { weight = 0 }	
 }
 
 ap_shared_destiny = {
@@ -910,38 +907,40 @@ ap_shared_destiny = {
 	}
 	
 	ai_weight = {
-		factor = 5
-	}
+		weight = @standard
+		modifier = {
+			factor = 0
+			NOT = { 
+				any_subject = {
+					OR = {
+						is_subject_type = protectorate
+						is_subject_type = vassal
+					}
+				}			
+			}
+		}	
+		modifier = {
+			factor = @strategic
+			has_ai_personality_behaviour = subjugator
+		}			
+	}		
 }
 
 ap_one_vision = { 
-	modifier = { pop_government_ethic_attraction = 1 }
+	modifier = { country_government_civic_points_add = 1 }
 	
-	potential = {
-		NOT = {
-			has_ascension_perk = ap_one_vision
-			has_ethic = ethic_gestalt_consciousness
-		}
-	}
+	potential = { NOT = { has_ascension_perk = ap_one_vision } }
 	
 	ai_weight = {
-		factor = 10
+		weight = @excellent
 		modifier = {
-			factor = 2
-			has_ethic = ethic_authoritarian
+			factor = @increase_interest_3
+			num_ascension_perks < 2
 		}
 		modifier = {
-			factor = 3
-			has_ethic = ethic_fanatic_authoritarian
+			factor = @increase_interest_3
+			has_technology = "tech_galactic_administration"
 		}
-		modifier = {
-			factor = 2
-			has_ethic = ethic_spiritualist
-		}
-		modifier = {
-			factor = 3
-			has_ethic = ethic_fanatic_spiritualist
-		}		
 	}
 }
 
@@ -1012,7 +1011,30 @@ ap_consecrated_worlds = {
 	}
 	
 	ai_weight = {
-		factor = 50
+		weight = @standard
+		modifier = {
+			factor = @avoid
+			OR = {
+				AND = {
+					NOT = { has_global_flag = "ex_edicts_active" }
+					OR = {
+						has_edict_bonus_tradition = no 	
+						has_edict_bonus_civic = no
+					}
+				}	
+				AND = {
+					has_global_flag = "ex_edicts_active"
+					OR = {
+						has_edict_bonus_tradition = no 	
+						has_edict_bonus_civic = no
+						AND = {
+							has_global_flag = "ex_ethics_active"
+							is_pacifist = no
+						}	
+					}	
+				}
+			}
+		}					
 	}
 }
 
