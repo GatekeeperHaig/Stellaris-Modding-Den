@@ -256,11 +256,24 @@ def attemptGet(building, tag):
     return NamesToValue(0) #empty list
     
 def main(argv, allowRestart=1):   
-  scriptDescription='#This file was created by python createUpgradedBuildings.py '+" ".join(argv)+'\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n'
+  scriptDescription='#This file was created by script!\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory\n'
   args=parse(argv)
   
   if not os.path.exists(args.output_folder):
     os.mkdir(args.output_folder)
+  if args.foreign_scripted_trigger:
+    file=open(args.output_folder+"/rerun_foreign_scripted_trigger.py",'w')
+  else:
+    file=open(args.output_folder+"/rerun.py",'w')    
+  file.write("#!/usr/bin/env python3\n")
+  file.write("# -*- coding: utf-8 -*-\n")
+  file.write("import subprocess\n")
+  file.write("import os\n")
+  file.write("os.chdir(os.path.dirname(os.path.abspath(__file__)))\n")
+  file.write("os.chdir('..')\n")
+  callString=os.path.normpath("subprocess.call('python ./createUpgradedBuildings.py "+'"'+'" "'.join(argv)+'"'+"', shell=True)\n").replace(os.sep,"/")
+  file.write(callString)
+  file.close()
   if not os.path.exists(args.output_folder+"/common"):
     os.mkdir(args.output_folder+"/common")
   if not os.path.exists(args.output_folder+"/common/buildings"):
@@ -625,6 +638,7 @@ def main(argv, allowRestart=1):
     buildingNameToData.removeDuplicatesRec()
       
     #OUTPUT
+    args.output_folder=os.path.normpath(args.output_folder.strip('"'))
     if args.output_folder[0]==".":
       args.output_folder=args.output_folder[1:].lstrip(os.sep)
     modfileName=os.path.dirname(args.output_folder)
