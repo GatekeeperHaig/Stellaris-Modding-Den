@@ -1,5 +1,5 @@
 name="(((-ExOverhaul/ASBM Comp. Patch-)))"
-path="mod/compatibility-patch-exoverhaul-asbm"
+path="mod/compatibility-patches-exoverhaul/asbm"
 tags={
 	"Fixes"
 }

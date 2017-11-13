@@ -1,5 +1,5 @@
 name="(((-ExOverhaul/NSC 7 Comp, Patch-)))"
-path="mod/compatibility-patch-exoverhaul-nsc"
+path="mod/compatibility-patches-exoverhaul/nsc"
 tags={
 	"Fixes"
 }

@@ -1,5 +1,5 @@
 name="(((-ExOverhaul/Dreadnought Flagship Comp. patch-)))"
-path="mod/compatibility-patch-exoverhaul-dreadnought-flagship"
+path="mod/compatibility-patches-exoverhaul/dreadnought-flagship"
 tags={
 	"Fixes"
 }

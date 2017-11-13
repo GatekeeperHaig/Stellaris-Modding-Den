@@ -1,5 +1,5 @@
 name="((((-ExOverhaul/NSC Designable Stations Comp. Patch-))))"
-path="mod/compatibility-patch-exoverhaul-designable-stations"
+path="mod/compatibility-patches-exoverhaul/designable-stations"
 tags={
 	"Fixes"
 }
