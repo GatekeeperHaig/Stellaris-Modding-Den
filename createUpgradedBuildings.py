@@ -221,6 +221,7 @@ class Building(NamesToValue): #derived from NamesToValue with four extra variabl
     self.lineEnd=0 #line end in original file
     self.lowerTier=0
     self.buildingName=buildingName
+      
   
 def computeNewCosts(entryA, entryB, tag, discount, varsToValue):
   # magnitude=[entryA.get(tag), entryB.get(tag)]
@@ -427,6 +428,7 @@ def main(argv, allowRestart=1):
             if upgradeData.get("is_listed")=="yes":
               upgradeData.replace("is_listed","no")
               
+            origUpgradeData=upgradeData  
             upgradeData=copy.deepcopy(buildingNameToData.get(upgradeName)) #now copy to prevent further editing
             
             if "empire_unique" in upgradeData.names and upgradeData.get("empire_unique")=="yes":
@@ -504,29 +506,10 @@ def main(argv, allowRestart=1):
               computeNewCosts(costsA, costsB, name, args.cost_discount,varsToValue)
               
               
-            #MAKE UNIQUE
-            if not "upgrades" in upgradeData.names and "planet_unique" in upgradeData.names and upgradeData.get("planet_unique")=="yes": #Max tier unique
-              #create a scripted_trigger that checks if ANY building of this building tree/line exists
-              newList=NamesToValue(1)
-              newList.getOrCreate("OR").add2("has_building",baseBuildingData.buildingName)
-              for trigger in triggers.names[triggerIndexAtStart:]:
-                newList.get("OR").add2(trigger,"yes")
-              triggers.add2("has_"+upgradeName+"_or_lower", newList)
-              
-              #set this previously created scripted_trigger for unique buildings in the line, starting from top tier. Stops if there is any non-unique building (as this would become useless at that point anyway)
-              b=upgradeData
-              while 1:
-                if not "planet_unique" in b.names or b.get("planet_unique")=="no":
-                  break
-                b.getOrCreate("potential").add2("has_"+upgradeName+"_or_lower", "no")      #make unique
-                if b.lowerTier==0:
-                  break
-                else:
-                  b=b.lowerTier
-              #FINISH MAKE UNIQUE
-        
             if "upgrades" in upgradeData.names:
               buildingDataList.append(upgradeData) #make sure we finish one branch of a tree before we start a new branch!
+              
+        
             
             #ICON AND LOCALIZATION:
             nameExtra="_direct_build"
@@ -544,6 +527,37 @@ def main(argv, allowRestart=1):
             locData.append(upgradeName+nameExtra+':0 "$'+upgradeName+'$'+nameStringExtra+'"') #localisation link. If anyone knows what the number behind the colon means, please PN me (@Gratak in Paradox forum)
             locData.append(upgradeName+nameExtra+'_desc:0 "$'+upgradeName+'_desc$"') #localisation link
               
+            #MAKE UNIQUE VIA INTRODUCING A FAKE MAX TIER BUILDING
+            if not "upgrades" in upgradeData.names and "planet_unique" in upgradeData.names and upgradeData.get("planet_unique")=="yes": #Max tier unique
+              fakeBuilding=Building(baseBuildingData.lineStart, baseBuildingData.buildingName+"_hidden_tree_root")
+              fakeBuilding.lineEnd=baseBuildingData.lineEnd
+              fakeBuilding.add2("potential", "{ always=no }")
+              fakeBuilding.add2("planet_unique", "yes")
+              fakeBuilding.add2("icon",baseBuildingData.buildingName)
+              locData.append(fakeBuilding.buildingName+':0 "$'+baseBuildingData.buildingName+'$"')
+              locData.append(fakeBuilding.buildingName+'_desc:0 "$'+baseBuildingData.buildingName+'_desc$"')
+              upgradeData.getOrCreate("upgrades").add2(fakeBuilding.buildingName,"")
+              origUpgradeData.getOrCreate("upgrades").add2(fakeBuilding.buildingName,"")
+              fakeIndex=buildingNameToData.names.index(baseBuildingData.buildingName)
+              buildingNameToData.insert([fakeBuilding.buildingName,fakeBuilding],fakeIndex) #insert the fake before 'baseBuilding'. upgradeBuildingIndex is now shifted but shouldn't be used anymore
+              #create a scripted_trigger that checks if ANY building of this building tree/line exists
+              # newList=NamesToValue(1)
+              # newList.getOrCreate("OR").add2("has_building",baseBuildingData.buildingName)
+              # for trigger in triggers.names[triggerIndexAtStart:]:
+                # newList.get("OR").add2(trigger,"yes")
+              # triggers.add2("has_"+upgradeName+"_or_lower", newList)
+              
+              #set this previously created scripted_trigger for unique buildings in the line, starting from top tier. Stops if there is any non-unique building (as this would become useless at that point anyway)
+              # b=upgradeData
+              # while 1:
+                # if not "planet_unique" in b.names or b.get("planet_unique")=="no":
+                  # break
+                # b.getOrCreate("potential").add2("has_"+upgradeName+"_or_lower", "no")      #make unique
+                # if b.lowerTier==0:
+                  # break
+                # else:
+                  # b=b.lowerTier
+              #FINISH MAKE UNIQUE
             
           if isinstance(buildingData.get("potential").vals[-1], NamesToValue) and len(buildingData.get("potential").vals[-1].names)==0:
             buildingData.get("potential").removeIndex(-1)   #remove potentially empty entry thanks to empire_unique buildings that cannot be copied.
@@ -553,6 +567,8 @@ def main(argv, allowRestart=1):
     for building in buildingNameToData.vals:
       if "is_listed" in building.names and building.get("is_listed")=="no" and "ai_allow" in building.names:
         building.replace("ai_allow", "{ always = yes }")
+        
+    #buildingNameToData.printAll()
         
     if args.replacement_file!='':
       equalConditions=[]
