@@ -456,9 +456,18 @@ ap_transcendence = {
 
 ap_world_shaper = {
 	on_enabled = {
-		give_technology = { message = no tech = tech_atmospheric_manipulation }
-		give_technology = { message = no tech = tech_climate_restoration }
-		give_technology = { message = no tech = tech_gaia_creation }
+		if = {
+			limit = { NOT = { has_technology = tech_atmospheric_manipulation } }
+			give_technology = { message = no tech = tech_atmospheric_manipulation }
+		}
+		if = {
+			limit = { NOT = { has_technology = tech_climate_restoration } }
+			add_research_option = tech_atmospheric_manipulation
+		}		
+		if = {
+			limit = { NOT = { has_technology = tech_gaia_creation } }
+			add_research_option = tech_gaia_creation
+		}				
 	}
 	possible = {
 		custom_tooltip = {
@@ -480,28 +489,27 @@ ap_world_shaper = {
 			factor = @avoid
 			OR = {
 				AND = {
-					has_authority = auth_machine_intelligence
-					NOR = { 
-						has_ascension_perk = ap_machine_worlds
-						has_global_flag = "ex_cybertronic_worlds_active"
-						has_monthly_income = {
-							resource = energy
-							value < 300
-						}							
+					has_global_flag = "ex_cybertronic_worlds_active"
+					OR = {
+						has_authority = auth_machine_intelligence
+						has_country_flag = synthetic_age					
 					}
 				}	
 				AND = {
-					has_authority = auth_machine_intelligence
-					has_global_flag = "ex_cybertronic_worlds_active"
+					NOT { has_global_flag = "ex_cybertronic_worlds_active" }
+					has_authority = auth_machine_intelligence					
 					has_monthly_income = {
 						resource = energy
-						value < 200
-					}												
-					has_monthly_income = {
-						resource = minerals
 						value < 300
-					}																	
+					}												
 				}
+				AND = {
+					NOT = { has_authority = auth_machine_intelligence }
+					has_monthly_income = {
+						resource = energy
+						value < 300
+					}												
+				}	
 			}		
 		}
 		modifier = {
@@ -524,7 +532,7 @@ ap_world_shaper = {
 			}		
 		}			
 		modifier = {
-			factor = @increase_interest_2
+			factor = @increase_interest_3
 			OR = {
 				has_global_flag = "ex_terraforming_active"
 				has_global_flag = "has_guillis_planet_modifiers_mod"
