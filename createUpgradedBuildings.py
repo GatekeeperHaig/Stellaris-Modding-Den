@@ -8,11 +8,11 @@ import copy
 import io
 import codecs
 import glob
-#from shutil import copyfile
+from shutil import copyfile
 
 def parse(argv):
   parser = argparse.ArgumentParser(description="From any file containing buildings, creates a new file that allow the direct construction of upgraded buildings while keeping costs correct and ensuring uniquness of unique buildings.\n\nIMPORTANT: If you apply this script to one building file, you need to also apply it to all building file with buildings you depend on (e.g. via 'has_building').\nBuildings need to be sorted by tier!\n\nLower tier versions will be removed if higher tier is available (unless specified otherwise).\nCosts and building times will be added up (with optional discount).\nFurthermore copies icons and descriptions if according folder and file is given.\nThis mod will slightly increase the costs for every building that has a 'tier0' version as those costs are now added to the 'direct construction tier1' version as for every other building. This means those 'tier0' are no waste of resources anymore!\n\nImportant info regarding building file formatting: No 'xyz= newline {'. Open new blocks via 'xyz={ newline' as Paradox seems to have always done in their files. Limitation: Empire unique buildings will never get a direct_build copy (otherwise they would lose uniqueness)!", formatter_class=RawTextHelpFormatter)
-  parser.add_argument('buildingFileNames', nargs = '*', help='File(s)/Path(s) to file(s) to be parsed. Output is named according to each file name with some extras. Globbing star(*) can be used (even under windows :P)')
+  parser.add_argument('buildingFileNames', nargs = '*', help='File(s)/Path(s) to file(s) to be parsed or .mod file (see "--create_standalone_mod_from_mod). Output is named according to each file name with some extras. Globbing star(*) can be used (even under windows :P)')
   parser.add_argument('-l','--languages', default="braz_por,english,french,german,polish,russian,spanish", help="Languages for which files should be created. Comma separated list. Only creates links to existing titles/descriptions (but needs to do so for every language)(default: %(default)s)")
   parser.add_argument('-k','--keep_lower_tier', action="store_true", help="Does not change any building requirements. Changing of building requirements only works with regard to capital buildings and techs and will fail if any of those are negated within the original conditions")
   parser.add_argument('-s','--keep_specific_lower_tier', default='building_colony_shelter,building_deployment_post', help="Does not change building requirements for buildings in this comma separated list.(default: %(default)s)")
@@ -24,6 +24,8 @@ def parse(argv):
   parser.add_argument('-j','--join_files', action="store_true", help="Output from all input files goes into a single file. Has to be activated if you have upgrades distributed over different files. Will not copy comments!")
   parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help="Removes all upgrades where the building can also be reached differently.")
   parser.add_argument('-g','--gameVersion', default="1.8.*", help="Game version of the newly created .mod file to avoid launcher warning(default: %(default)s)")
+  parser.add_argument('-m','--create_standalone_mod_from_mod', action="store_true", help="If this flag is set, the script will create a copy of a mod folder, changing the building files and has_building triggers. Main input of the script should now be the .mod file.")
+  parser.add_argument('--custom_mod_name', help="For use with '-m'. If set, this will be the name of the new mod")
   parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)
 
   
@@ -218,7 +220,7 @@ class Building(NamesToValue): #derived from NamesToValue with four extra variabl
     self.vals=[]
     self.bracketLevel=1
     self.lineStart=lineNbr#line start in original file
-    self.lineEnd=0 #line end in original file
+    self.lineEnd=lineNbr #line end in original file
     self.lowerTier=0
     self.buildingName=buildingName
       
@@ -256,31 +258,16 @@ def attemptGet(building, tag):
   except ValueError:
     return NamesToValue(0) #empty list
     
-def main(argv, allowRestart=1):   
+def main(args, allowRestart=1):   
   scriptDescription='#This file was created by script!\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory\n'
-  args=parse(argv)
-  
-  if not os.path.exists(args.output_folder):
-    os.mkdir(args.output_folder)
-  if args.foreign_scripted_trigger:
-    file=open(args.output_folder+"/rerun_foreign_scripted_trigger.py",'w')
-  else:
-    file=open(args.output_folder+"/rerun.py",'w')    
-  file.write("#!/usr/bin/env python3\n")
-  file.write("# -*- coding: utf-8 -*-\n")
-  file.write("import subprocess\n")
-  file.write("import os\n")
-  file.write("os.chdir(os.path.dirname(os.path.abspath(__file__)))\n")
-  file.write("os.chdir('..')\n")
-  callString=os.path.normpath("subprocess.call('python ./createUpgradedBuildings.py "+'"'+'" "'.join(argv)+'"'+"', shell=True)\n").replace(os.sep,"/")
-  file.write(callString)
-  file.close()
-  if not os.path.exists(args.output_folder+"/common"):
-    os.mkdir(args.output_folder+"/common")
-  if not os.path.exists(args.output_folder+"/common/buildings"):
-    os.mkdir(args.output_folder+"/common/buildings")  
-  if not os.path.exists(args.output_folder+"/common/scripted_triggers"):
-    os.mkdir(args.output_folder+"/common/scripted_triggers")
+
+  if not args.create_standalone_mod_from_mod or not args.foreign_scripted_trigger:
+    if not os.path.exists(args.output_folder+"/common"):
+      os.mkdir(args.output_folder+"/common")
+    if not os.path.exists(args.output_folder+"/common/buildings"):
+      os.mkdir(args.output_folder+"/common/buildings")  
+    if not os.path.exists(args.output_folder+"/common/scripted_triggers"):
+      os.mkdir(args.output_folder+"/common/scripted_triggers")
     
   copiedBuildingsFileName=args.output_folder+"/copiedBuildings.txt"
   try: 
@@ -305,12 +292,16 @@ def main(argv, allowRestart=1):
     with open(buildingFileName,'r') as inputFile:
       print("Start reading "+buildingFileName)
       if args.foreign_scripted_trigger:
-        outPath=args.output_folder+"/common/scripted_triggers/"
+        if args.create_standalone_mod_from_mod:
+          outPath=args.output_folder
+        else:
+          outPath=args.output_folder+"/common/scripted_triggers/"
       else:
         outPath=args.output_folder+"/common/buildings/"
-      with open(outPath+os.path.basename(inputFile.name),'w') as outputFile:
-        outputFile.write(scriptDescription)
-        outputFile.write("#overwrite\n")
+      if not args.foreign_scripted_trigger or not args.create_standalone_mod_from_mod:
+        with open(outPath+os.path.basename(inputFile.name),'w') as outputFile:
+          outputFile.write(scriptDescription)
+          outputFile.write("#overwrite\n")
       lineIndex=0
       for line in inputFile:
         lineIndex+=1
@@ -322,7 +313,7 @@ def main(argv, allowRestart=1):
             bracketOpen=line.count("{")
             bracketClose=line.count("}")
             if bracketLevel==0:
-              if bracketOpen!=1 or bracketClose!=0:
+              if (bracketOpen!=1 or bracketClose!=0) and not args.foreign_scripted_trigger:
                 print("Error in line {!s}:\n{}\nInvalid building start line".format(lineIndex,line))
                 sys.exit(1)
               buildingName=line.split("=")[0].strip()
@@ -654,20 +645,18 @@ def main(argv, allowRestart=1):
     buildingNameToData.removeDuplicatesRec()
       
     #OUTPUT
-    args.output_folder=os.path.normpath(args.output_folder.strip('"'))
-    if args.output_folder[0]==".":
-      args.output_folder=args.output_folder[1:].lstrip(os.sep)
-    modfileName=os.path.dirname(args.output_folder)
-    if modfileName=='' or modfileName==".": #should only happen if args.output_folder is a pure foldername in which case 'os.path.dirname' is unessecary anyway
-      modfileName=args.output_folder
-    with open(modfileName+".mod",'w') as modfile:
-      modfile.write(scriptDescription)
-      modfile.write('name="!{}"\n'.format(modfileName))
-      modfile.write('path="mod/{}"\n'.format(args.output_folder.rstrip(os.sep)))
-      modfile.write('tags={\n')
-      modfile.write('\t"Buildings"\n')
-      modfile.write('}\n')
-      modfile.write('supported_version="{}"\n'.format(args.gameVersion))
+    if not args.create_standalone_mod_from_mod: #done elsewhere by mostly copying their mod file in this case
+      modfileName=os.path.dirname(args.output_folder)
+      if modfileName=='' or modfileName==".": #should only happen if args.output_folder is a pure foldername in which case 'os.path.dirname' is unessecary anyway
+        modfileName=args.output_folder
+      with open(modfileName+".mod",'w') as modfile:
+        modfile.write(scriptDescription)
+        modfile.write('name="!{}"\n'.format(modfileName))
+        modfile.write('path="mod/{}"\n'.format(args.output_folder.rstrip(os.sep)))
+        modfile.write('tags={\n')
+        modfile.write('\t"Buildings"\n')
+        modfile.write('}\n')
+        modfile.write('supported_version="{}"\n'.format(args.gameVersion))
     with open(buildingFileName,'r') as inputFile:
       if args.join_files:
         outfileBaseName="JOINED"+os.path.basename(inputFile.name)+".txt"
@@ -697,7 +686,11 @@ def main(argv, allowRestart=1):
         for b in buildingNameToData.vals:
           b.replaceAllHasBuildings(copiedBuildings)
       
-      with open(outPath+"build_upgraded_"+outfileBaseName,'w') as outputFile:
+      if args.create_standalone_mod_from_mod and args.foreign_scripted_trigger:
+        outputFileName=outPath+outfileBaseName
+      else:
+        outputFileName=outPath+"build_upgraded_"+outfileBaseName
+      with open(outputFileName,'w') as outputFile:
         outputFile.write(scriptDescription)
         lineIndex=0
         curBuilding=0
@@ -717,13 +710,108 @@ def main(argv, allowRestart=1):
               curBuilding+=1
   if not args.foreign_scripted_trigger:
     copiedBuildingsFile.close()
-  with open(copiedBuildingsFileName) as file:
-    newCopiedBuilings=[line.strip() for line in file]
-  if newCopiedBuilings!=copiedBuildings and not args.foreign_scripted_trigger and allowRestart:
-    main(argv,0)
+    with open(copiedBuildingsFileName) as file:
+      newCopiedBuilings=[line.strip() for line in file]
+    if newCopiedBuilings!=copiedBuildings and not args.foreign_scripted_trigger and allowRestart:
+      main(copy.deepcopy(args),0)
   
   
   
   
 if __name__ == "__main__":
-  main(sys.argv[1:])
+  argv=sys.argv[1:]
+  args=parse(argv)
+  
+  args.output_folder=os.path.normpath(args.output_folder.strip('"'))
+  if args.output_folder[0]==".":
+    args.output_folder=args.output_folder[1:].lstrip(os.sep)
+  args.output_folder+="/"
+  
+  if not os.path.exists(args.output_folder):
+    os.mkdir(args.output_folder)
+  if args.create_standalone_mod_from_mod:
+    rerunName=os.path.split(os.path.dirname(args.output_folder))[-1]+"_rerun.py" #foldername, not path!
+  elif args.foreign_scripted_trigger:
+   rerunName=args.output_folder+"/rerun_foreign_scripted_trigger.py"
+  else:
+    rerunName=args.output_folder+"/rerun.py" 
+  with open(rerunName, 'w') as file:
+    file.write("#!/usr/bin/env python3\n")
+    file.write("# -*- coding: utf-8 -*-\n")
+    file.write("import subprocess\n")
+    file.write("import os\n")
+    file.write("os.chdir(os.path.dirname(os.path.abspath(__file__)))\n")
+    if not args.create_standalone_mod_from_mod:
+      file.write("os.chdir('..')\n")
+    callString=os.path.normpath("subprocess.call('python ./createUpgradedBuildings.py "+'"'+'" "'.join(argv)+'"'+"', shell=True)\n").replace(os.sep,"/")
+    file.write(callString)
+  if args.create_standalone_mod_from_mod:
+    modFileName=args.buildingFileNames[0]
+    # print(modFileName)
+    with open(modFileName) as modFile:
+      modFileCont=[line for line in modFile]
+      pathString='path="mod/'+args.output_folder.lstrip(".")+'"\n'
+    for i in range(len(modFileCont)):
+      if modFileCont[i][:5].strip()=="path=":
+        path=os.path.normpath(modFileCont[i][5:].strip().strip('"')).replace(os.sep,"/")      
+        modFileCont[i]=pathString
+      if modFileCont[i][:8].strip()=="archive=":
+        path=os.path.normpath(modFileCont[i][8:].strip().strip('"')).replace(os.sep,"/")
+        import zipfile
+        zip_ref = zipfile.ZipFile(path, 'r')
+        path=path.replace(".zip","/")
+        zip_ref.extractall(path)
+        zip_ref.close()
+        modFileCont[i]=pathString
+      if modFileCont[i][:5].strip()=="name=":
+        if args.custom_mod_name:
+          modFileCont[i]='name="'+args.custom_mod_name+'"\n'
+        else:
+          modFileCont[i]=modFileCont[i].strip()[:-1] #remove quote and newline
+          modFileCont[i]+='_direct_build"\n'
+    if path[:3]=="mod":
+      path=path[4:]#hopefully taking away mod and slash, backslash
+    path=path.strip()
+    # if args.custom_mod_name:
+      # newModFileName=args.custom_mod_name+".mod"
+    # else:
+      # newModFileName=modFileName.replace(".mod","_direct_build.mod")
+    newModFileName=os.path.split(os.path.dirname(args.output_folder))[-1]+".mod" #foldername, not path!
+    with open(newModFileName,'w') as modFile:
+      for line in modFileCont:
+        modFile.write(line)
+        
+    buildingArgs=copy.deepcopy(args)
+    buildingArgs.buildingFileNames=[path+"/common/buildings/*"]
+    main(buildingArgs,0)
+        
+    otherFilesArgs=copy.deepcopy(args)
+    otherFilesArgs.buildingFileNames=[]    
+    otherFilesArgs.foreign_scripted_trigger=True
+    otherFilesArgs.join_files=False
+    # otherFilesArgs.replacement_file=''
+    for root, dirs, files in os.walk(path):
+      # if len(files)>0:
+      rootWithoutPath=root.rstrip(".").replace(path,"",1)
+      if not os.path.exists(args.output_folder+rootWithoutPath):
+        os.mkdir(args.output_folder+rootWithoutPath)
+      if not root[-16:]=="common"+os.sep+"buildings":
+        for file in files:
+          if file[-4:]==".txt" and rootWithoutPath!="":
+            # print(rootWithoutPath)
+            # sys.exit(0)
+            otherFilesArgs.output_folder=args.output_folder+rootWithoutPath+"/"
+            otherFilesArgs.buildingFileNames=[root+"/"+file]
+            main(otherFilesArgs,0)
+          else:
+            # print(root)
+            # print(file)
+            copyfile(root+"/"+file, args.output_folder+"/"+rootWithoutPath+"/"+file)
+    # print(otherFilesArgs.buildingFileNames)   
+    # sys.exit(0)
+    #otherFilesArgs.buildingFileNames=path+"/common/scripted_triggers/*"
+
+    
+    main(buildingArgs,0)
+  else:
+    main(args)
