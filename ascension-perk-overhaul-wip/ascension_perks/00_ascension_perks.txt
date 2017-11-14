@@ -534,6 +534,7 @@ ap_world_shaper = {
 		modifier = {
 			factor = @increase_interest_3
 			OR = {
+				has_country_strategic_resource = sr_terraform_gases
 				has_global_flag = "ex_terraforming_active"
 				has_global_flag = "has_guillis_planet_modifiers_mod"
 				has_technology = "tech_cofh_se_atmospheric_purification"
@@ -1210,15 +1211,73 @@ ap_voidborn = {
 	on_enabled = { custom_tooltip = "allow_habitats" }
 	
 	ai_weight = {
-		factor = 10
+		weight = @important
 		modifier = {
-			factor = 2
-			has_ethic = ethic_pacifist
+			factor = @avoid
+			OR = {
+				years_passed < 60
+				OR = {
+					num_owned_planets > 25
+					galaxy_percentage > 33
+				}	
+				AND = {
+					has_global_flag = "ex_cybertronic_worlds_active"
+					OR = {
+						has_authority = auth_machine_intelligence
+						has_country_flag = synthetic_age
+					}
+					NOT = { has_ascension_perk = ap_machine_worlds }
+				}	
+				has_monthly_income = {
+					resource = minerals
+					value < 250
+				}					
+			}					
 		}
 		modifier = {
-			factor = 3
-			has_ethic = ethic_fanatic_pacifist
+			factor = @increase_interest_3
+			OR = {
+				is_pacifist = yes
+				is_materialist = yes
+				AND = {
+					NOT = { has_global_flag = "ex_cybertronic_worlds_active" }
+					has_authority = auth_machine_intelligence
+				}
+			}			
 		}
+		modifier = {
+			factor = @increase_interest_3
+			OR = {
+				AND = {
+					has_global_flag = "ex_resources_active"	
+					has_country_strategic_resource = sr_living_metal				
+					has_country_strategic_resource = sr_ex_7
+				}	
+				AND = {
+					NOT = { has_global_flag = "ex_resources_active"	}
+					has_country_strategic_resource = sr_living_metal											
+				}	
+			}				
+		}		
+		modifier = {
+			factor = @increase_interest_3
+			has_ascension_perk = ap_master_builders
+		}		
+		modifier = {
+			factor = @increase_interest_3
+			has_monthly_income = {
+				resource = minerals
+				value > 500
+			}	
+		}				
+		modifier = {
+			factor = @strategic
+			OR = {
+				has_ascension_perk = ap_transcendence	
+				has_ascension_perk = ap_evolutionary_mastery
+				has_ascension_perk = ap_synthetic_evolution					
+			}
+		}					
 	}
 }
 
@@ -1257,18 +1316,83 @@ ap_master_builders = {
 	potential = { NOT = { has_ascension_perk = ap_master_builders } }
 	
 	ai_weight = {
-		factor = 10
+		weight = @standard
 		modifier = {
-			factor = 2
-			has_ethic = ethic_pacifist
+			factor = @avoid
+			OR = {
+				years_passed < 60
+				AND = {
+					has_technology = tech_mega_engineering
+					has_monthly_income = {
+						resource = minerals
+						value < 250
+					}					
+					NOR = {
+						has_ascension_perk = ap_voidborn
+						has_ascension_perk = ap_the_circle_of_life
+						has_ascension_perk = ap_galactic_wonders
+						AND = {
+							has_global_flag = "ex_cybertronic_worlds_active"
+							has_ascension_perk = ap_machine_worlds
+						}
+					}	
+				}
+				AND = {
+					has_technology = tech_mega_engineering
+					has_any_megastructure_in_empire = no						
+				}	
+				AND = {
+					has_global_flag = "ex_cybertronic_worlds_active"
+					OR = {
+						has_authority = auth_machine_intelligence
+						has_country_flag = synthetic_age
+					}
+					NOT = { has_ascension_perk = ap_machine_worlds }
+				}	
+			}					
 		}
 		modifier = {
-			factor = 3
-			has_ethic = ethic_fanatic_pacifist
+			factor = @important
+			has_ascension_perk = ap_voidborn	
 		}
+		modifier = {
+			factor = @strategic
+			has_ascension_perk = ap_the_circle_of_life
+		}	
+		modifier = {
+			factor = @increase_interest_3
+			has_ascension_perk = ap_galactic_wonders
+		}		
+		modifier = {
+			factor = @strategic
+			AND = {
+				has_global_flag = "ex_cybertronic_worlds_active"
+				has_ascension_perk = ap_machine_worlds				
+			}			
+		}		
+		modifier = {
+			factor = @increase_interest_3
+			OR = {
+				AND = {
+					has_global_flag = "ex_resources_active"	
+					has_country_strategic_resource = sr_living_metal				
+					has_country_strategic_resource = sr_ex_7
+				}	
+				AND = {
+					NOT = { has_global_flag = "ex_resources_active"	}
+					has_country_strategic_resource = sr_living_metal											
+				}	
+			}				
+		}		
+		modifier = {
+			factor = @increase_interest_3
+			has_monthly_income = {
+				resource = minerals
+				value > 1000
+			}	
+		}									
 	}
 }
-
 
 ap_galactic_wonders = {
 	on_enabled = {
@@ -1294,30 +1418,67 @@ ap_galactic_wonders = {
 	
 	potential = { NOT = { has_ascension_perk = ap_galactic_wonders } }
 	
-	ai_weight = {
-		factor = 20
+	ai_weight = { 
+		weight = @important
 		modifier = {
-			factor = 2
-			has_ethic = ethic_pacifist
+			factor = @avoid
+			OR = {
+				has_monthly_income = {
+					resource = minerals
+					value < 500
+				}	
+				AND = {
+					has_global_flag = "ex_cybertronic_worlds_active"
+					OR = {
+						has_authority = auth_machine_intelligence
+						has_country_flag = synthetic_age
+					}
+					NOT = { has_ascension_perk = ap_machine_worlds }
+				}
+			}
 		}
 		modifier = {
-			factor = 3
-			has_ethic = ethic_fanatic_pacifist
-		}
+			factor = @increase_interest_3
+			OR = {
+				AND = {
+					has_global_flag = "ex_resources_active"	
+					has_country_strategic_resource = sr_living_metal				
+					has_country_strategic_resource = sr_ex_7
+				}	
+				AND = {
+					NOT = { has_global_flag = "ex_resources_active"	}
+					has_country_strategic_resource = sr_living_metal											
+				}	
+			}				
+		}		
 		modifier = {
-			factor = 2
-			has_ethic = ethic_materialist
-		}
-		modifier = {
-			factor = 3
-			has_ethic = ethic_fanatic_materialist
-		}
-		modifier = { #stacking bonuses
-			factor = 1.5
+			factor = @increase_interest_3
 			has_ascension_perk = ap_master_builders
 		}
-	}
-}
+		modifier = {
+			factor = @increase_interest_3
+			OR = {
+				is_pacifist = yes
+				is_materialist = yes
+			}	
+		}			
+		modifier = {
+			factor = @increase_interest_3
+			has_monthly_income = {
+				resource = minerals
+				value > 1000
+			}	
+		}						
+		modifier = {
+			factor = @strategic
+			OR = {
+				has_ascension_perk = ap_transcendence	
+				has_ascension_perk = ap_evolutionary_mastery
+				has_ascension_perk = ap_synthetic_evolution					
+			}
+		}			
+	}	
+}	
 
 ap_the_circle_of_life = {
 	on_enabled = { custom_tooltip = "allow_ring_world" }
@@ -1339,20 +1500,63 @@ ap_the_circle_of_life = {
 
 	potential = { NOT = { has_ascension_perk = ap_the_circle_of_life } }
 	
-	ai_weight = {
-		weight = @standard
+	ai_weight = { 
+		weight = @important
 		modifier = {
 			factor = @avoid
 			OR = {
-				has_authority = auth_machine_intelligence
+				has_monthly_income = {
+					resource = minerals
+					value < 500
+				}	
 				AND = {
-					has_global_flag = ex_cybertronic_worlds_active
-					has_country_flag = synthetic_age
+					has_global_flag = "ex_cybertronic_worlds_active"
+					OR = {
+						has_authority = auth_machine_intelligence
+						has_country_flag = synthetic_age
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_3
+			OR = {
+				AND = {
+					has_global_flag = "ex_resources_active"	
+					has_country_strategic_resource = sr_living_metal				
+					has_country_strategic_resource = sr_ex_7
+				}	
+				AND = {
+					NOT = { has_global_flag = "ex_resources_active"	}
+					has_country_strategic_resource = sr_living_metal											
 				}	
 			}				
+		}	
+		modifier = {
+			factor = @increase_interest_3
+			has_ascension_perk = ap_master_builders
 		}
-	}
-}
+		modifier = {
+			factor = @increase_interest_3
+			is_pacifist = yes
+		}			
+		modifier = {
+			factor = @increase_interest_3
+			has_monthly_income = {
+				resource = minerals
+				value > 1000
+			}	
+		}						
+		modifier = {
+			factor = @strategic
+			OR = {
+				has_ascension_perk = ap_transcendence	
+				has_ascension_perk = ap_evolutionary_mastery
+				has_ascension_perk = ap_synthetic_evolution					
+			}
+		}			
+	}	
+}	
 
 ap_machine_worlds = {
 	on_enabled = {
@@ -1408,5 +1612,84 @@ ap_machine_worlds = {
 		}
 	}	
 	
-	ai_weight = { weight = @crucial_2 }	
+	ai_weight = { 
+		weight = @standard
+		modifier = {
+			factor = @avoid
+			OR = {
+				AND = {
+					NOT = { has_global_flag = "ex_cybertronic_worlds_active" }
+					has_monthly_income = {
+						resource = energy
+						value < 300
+					}				
+				}	
+				AND = {
+					has_global_flag = "ex_cybertronic_worlds_active"
+					has_monthly_income = {
+						resource = minerals
+						value < 400
+					}									
+					has_monthly_income = {
+						resource = energy
+						value < 200
+					}				
+				}				
+			}
+		}
+		modifier = {
+			factor = @increase_interest_3
+			OR = {
+				AND = {
+					NOT = { has_global_flag = "ex_cybertronic_worlds_active" }
+					has_country_strategic_resource = sr_terraform_gases
+				}	
+				AND = {
+					has_global_flag = "ex_cybertronic_worlds_active"
+					OR = {
+						AND = {
+							has_global_flag = "ex_resources_active"	
+							has_country_strategic_resource = sr_living_metal				
+							has_country_strategic_resource = sr_ex_7
+						}	
+						AND = {
+							NOT = { has_global_flag = "ex_resources_active"	}
+							has_country_strategic_resource = sr_living_metal											
+						}						
+					}	
+				}				
+			}
+		}
+		modifier = {
+			factor = @increase_interest_3
+			AND = {
+				has_global_flag = "ex_cybertronic_worlds_active"
+				has_ascension_perk = ap_master_builders
+			}
+		}			
+		modifier = {
+			factor = @crucial_2
+			OR = {
+				AND = {
+					NOT = { has_global_flag = "ex_cybertronic_worlds_active" }
+					has_monthly_income = {
+						resource = energy
+						value > 300
+					}
+					has_ascension_perk = ap_synthetic_age
+				}	
+				AND = {
+					has_global_flag = "ex_cybertronic_worlds_active"
+					has_monthly_income = {
+						resource = minerals
+						value > 500
+					}									
+					has_monthly_income = {
+						resource = energy
+						value > 250
+					}					
+				}				
+			}
+		}			
+	}	
 }	
