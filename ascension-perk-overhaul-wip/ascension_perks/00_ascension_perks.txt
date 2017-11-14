@@ -578,6 +578,18 @@ ap_galactic_force_projection = {
 				has_federation = yes
 			}	
 		}	
+		modifier = {
+			factor = @increase_interest_1
+			used_naval_capacity_percent > 100
+		}			
+		modifier = {
+			factor = @increase_interest_2
+			used_naval_capacity_percent > 150
+		}					
+		modifier = {
+			factor = @increase_interest_3
+			used_naval_capacity_percent > 200
+		}							
 	}
 }
 
@@ -693,7 +705,13 @@ ap_galactic_contender = {
 							is_country_type = fallen_empire
 							is_country_type = awakened_fallen_empire
 						}							
-						is_at_war_with = ROOT
+						OR = {
+							is_hostile_to = root
+							is_angry_to = root
+							is_domineering_to = root
+							is_rival = root
+							is_at_war_with = root
+						}					
 					} 
 				}				
 				is_subject = yes
@@ -893,7 +911,11 @@ ap_interstellar_dominion = {
 }
 
 ap_technological_ascendancy = {
-	modifier = { all_technology_research_speed = 0.15 }
+	modifier = { 
+		tile_resource_physics_research_mult = 0.25
+		tile_resource_engineering_research_mult = 0.25
+		tile_resource_society_research_mult = 0.25
+	}
 	
 	potential = { NOT = { has_ascension_perk = ap_technological_ascendancy } }
 	
@@ -903,6 +925,15 @@ ap_technological_ascendancy = {
 			factor = @increase_interest_3
 			num_ascension_perks < 2
 		}
+		modifier = {
+			factor = @increase_interest_3
+			any_neighbor_country = {
+				tech_unlocked_ratio = {
+					who = from
+					ratio > 1.25 
+				}
+			}
+		}		
 		modifier = {
 			factor = @strategic
 			is_materialist = yes
@@ -923,6 +954,8 @@ ap_shared_destiny = {
 	modifier = {
 		subject_integration_influence_cost_mult = -0.5
 		country_integration_cooldown_mult = -0.5
+		country_vassal_naval_capacity_contribution_mult = 0.15
+		subject_tribute_mult = 0.15
 	}
 	
 	potential = {
@@ -944,13 +977,17 @@ ap_shared_destiny = {
 					OR = {
 						is_subject_type = protectorate
 						is_subject_type = vassal
+						is_subject_type = tributary
 					}
 				}			
 			}
 		}	
 		modifier = {
 			factor = @strategic
-			has_ai_personality_behaviour = subjugator
+			AND = {
+				has_ai_personality_behaviour = subjugator
+				any_subject = {	is_subject_type = vassal }
+			}	
 		}			
 	}		
 }
@@ -1152,7 +1189,7 @@ ap_master_builders = {
 	on_enabled = {
 		if = {
 			limit = { NOT = { has_technology = tech_mega_engineering } }
-			add_research_option = tech_mega_engineering
+			give_technology = { message = no tech = tech_mega_engineering }			
 		}
 	}
 	possible = {
@@ -1198,49 +1235,12 @@ ap_voidborn = {
 	
 	possible = {
 		custom_tooltip = {
-			fail_text = "requires_space_defense_station_3"
-			has_technology = tech_space_defense_station_3
-		}
-		custom_tooltip = {
-			fail_text = "requires_spaceport_6"
-			has_technology = tech_spaceport_6
+			fail_text = "requires_master_builders"
+			has_ascension_perk = ap_master_builders
 		}
 	}
 	
 	on_enabled = { custom_tooltip = "allow_habitats" }
-	
-	ai_weight = {
-		factor = 10
-		modifier = {
-			factor = 2
-			has_ethic = ethic_pacifist
-		}
-		modifier = {
-			factor = 3
-			has_ethic = ethic_fanatic_pacifist
-		}
-	}
-}
-
-ap_the_circle_of_life = {
-	on_enabled = { custom_tooltip = "allow_ring_world" }
-	
-	possible = {
-		custom_tooltip = {
-			fail_text = "requires_ascension_perks_3"
-			num_ascension_perks > 2
-		}
-		custom_tooltip = {
-			fail_text = "requires_ap_voidborn"
-			has_ascension_perk = ap_voidborn
-		}
-		custom_tooltip = {
-			fail_text = "requires_mega_engineering"
-			has_technology = tech_mega_engineering
-		}		
-	}
-
-	potential = { NOT = { has_ascension_perk = ap_the_circle_of_life } }
 	
 	ai_weight = {
 		factor = 10
@@ -1264,19 +1264,15 @@ ap_galactic_wonders = {
 	
 	possible = {
 		custom_tooltip = {
-			fail_text = "requires_ascension_perks_3"
-			num_ascension_perks > 2
+			fail_text = "requires_master_builders"
+			has_ascension_perk = ap_master_builders
 		}
-		custom_tooltip = {
-			fail_text = "requires_mega_engineering"
-			has_technology = tech_mega_engineering
-		}		
-	}				
+	}
 	
 	potential = { NOT = { has_ascension_perk = ap_galactic_wonders } }
 	
 	ai_weight = {
-		factor = 10
+		factor = 20
 		modifier = {
 			factor = 2
 			has_ethic = ethic_pacifist
@@ -1284,6 +1280,48 @@ ap_galactic_wonders = {
 		modifier = {
 			factor = 3
 			has_ethic = ethic_fanatic_pacifist
+		}
+		modifier = {
+			factor = 2
+			has_ethic = ethic_materialist
+		}
+		modifier = {
+			factor = 3
+			has_ethic = ethic_fanatic_materialist
+		}
+		modifier = { #stacking bonuses
+			factor = 1.5
+			has_ascension_perk = ap_master_builders
+		}
+	}
+}
+
+ap_the_circle_of_life = {
+	on_enabled = { custom_tooltip = "allow_ring_world" }
+	
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_ap_voidborn_or_ap_galactic_wonders"
+			OR = {
+				has_ascension_perk = ap_voidborn
+				has_ascension_perk = ap_galactic_wonders
+			}	
+		}
+	}
+
+	potential = { NOT = { has_ascension_perk = ap_the_circle_of_life } }
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @avoid
+			OR = {
+				has_authority = auth_machine_intelligence
+				AND = {
+					has_global_flag = ex_cybertronic_worlds_active
+					has_country_flag = synthetic_age
+				}	
+			}				
 		}
 	}
 }
@@ -1293,48 +1331,51 @@ ap_machine_worlds = {
 		custom_tooltip = "allow_machine_worlds"
 		custom_tooltip = "describe_machine_worlds"
 	}
-
+	
 	potential = {
 		OR = {
 			AND = {
 				has_global_flag = ex_cybertronic_worlds_active
-				OR = {
+				OR = {				
 					has_authority = auth_machine_intelligence
 					has_country_flag = synthetic_age
 				}
-			}	
+			}
 			AND = {
 				NOT = { has_global_flag = ex_cybertronic_worlds_active }
-				has_authority = auth_machine_intelligence				
-			}	
-		}	
+				has_authority = auth_machine_intelligence
+			}
+		}
 		NOT = {	has_ascension_perk = ap_machine_worlds }
 	}
 	
 	possible = {
 		if = {
 			limit = { NOT = { has_global_flag = "ex_cybertronic_worlds_active" } }
-			custom_tooltip = {
-				fail_text = "requires_technology_tech_climate_restoration"
-				has_technology = tech_climate_restoration
+				custom_tooltip = {
+					fail_text = "requires_technology_tech_climate_restoration"
+					has_technology = tech_climate_restoration
+				}
+				custom_tooltip = {
+					fail_text = "requires_ascension_perks_2"
+					num_ascension_perks > 1
+				}
 			}
-			custom_tooltip = {
-				fail_text = "requires_ascension_perks_2"
-				num_ascension_perks > 1
-			}								
 		}	
 		if = {
 			limit = { has_global_flag = "ex_cybertronic_worlds_active" }
 			custom_tooltip = {
-				fail_text = "requires_mega_engineering"
-				has_technology = tech_mega_engineering
-			}											
-			custom_tooltip = {
-				fail_text = "requires_ascension_perks_1"
-				num_ascension_perks > 0
+				fail_text = "requires_ap_voidborn_or_ap_galactic_wonders"
+				OR = {
+					has_ascension_perk = ap_voidborn
+					has_ascension_perk = ap_galactic_wonders
+				}
 			}
-		}	
-	}
+		}
+	}	
 	
-	ai_weight = { factor = @crucial_2 }
-}
+	ai_weight = { weight = @crucial_2 }	
+}	
+	
+	
+	
