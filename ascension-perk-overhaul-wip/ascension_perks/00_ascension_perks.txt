@@ -83,6 +83,7 @@ ap_engineered_evolution = {
 					has_global_flag = "ex_ethics_active"
 					is_xenophobe = yes
 				}					
+				years_passed < 60
 			}
 		}						
 		modifier = {
@@ -91,7 +92,8 @@ ap_engineered_evolution = {
 				has_global_flag = "ex_ethics_active"
 				OR = {
 					is_materialist = yes
-					is_spiritualist = yes					
+					is_spiritualist = yes
+					num_owned_planets < 5					
 				}
 			}
 		}				
@@ -220,6 +222,8 @@ ap_the_flesh_is_weak = {
 						}	
 					}	
 				}
+				NOT = { any_owned_pop = { is_robot_pop = yes } }				
+				years_passed < 60
 			}
 		}			
 		modifier = {
@@ -239,6 +243,10 @@ ap_the_flesh_is_weak = {
 					NOT = { has_global_flag = "ex_technologies_active" }
 					has_technology = "tech_gene_expressions"
 					is_materialist = no					
+				}		
+				count_owned_pops = {
+					limit = { is_robot_pop = yes }
+					count < 10
 				}				
 			}
 		}							
@@ -358,10 +366,13 @@ ap_mind_over_matter = {
 		weight = @standard
 		modifier = {
 			factor = @avoid
-			AND = {
-				NOT = { has_global_flag = "ex_ethics_active" }	
-				is_spiritualist = no
-			}
+			OR = {
+				AND = {
+					NOT = { has_global_flag = "ex_ethics_active" }	
+					is_spiritualist = no
+				}
+				years_passed < 60
+			}	
 		}	
 		modifier = {
 			factor = @reduce_interest_2
@@ -446,6 +457,8 @@ ap_transcendence = {
 ap_world_shaper = {
 	on_enabled = {
 		give_technology = { message = no tech = tech_atmospheric_manipulation }
+		give_technology = { message = no tech = tech_climate_restoration }
+		give_technology = { message = no tech = tech_gaia_creation }
 	}
 	possible = {
 		custom_tooltip = {
@@ -502,6 +515,14 @@ ap_world_shaper = {
 				}				
 			}		
 		}	
+		modifier = {
+			factor = @reduce_interest_2
+			OR = {
+				has_ascension_perk = ap_engineered_evolution
+				has_ascension_perk = ap_the_flesh_is_weak
+				has_ascension_perk = ap_voidborn				
+			}		
+		}			
 		modifier = {
 			factor = @increase_interest_2
 			OR = {
@@ -1011,7 +1032,7 @@ ap_consecrated_worlds = {
 	}
 	
 	ai_weight = {
-		weight = @standard
+		weight = @excellent
 		modifier = {
 			factor = @avoid
 			OR = {
@@ -1033,19 +1054,52 @@ ap_consecrated_worlds = {
 						}	
 					}	
 				}
+				has_monthly_income = {
+					resource = influence
+					value < 2
+				}	
 			}
 		}					
+		modifier = {
+			factor = @increase_interest_2
+			has_monthly_income = {
+				resource = influence
+				value > 3
+			}	
+		modifier = {
+			factor = @increase_interest_3
+			has_edict_bonus_civic = yes
+		}					
+		modifier = {
+			factor = @increase_interest_3
+			AND = {
+				has_global_flag = "ex_ethics_active"
+				is_pacifist = yes				
+			}				
+		}				
+		modifier = {
+			factor = @increase_interest_3
+			has_edict_bonus_tradition = yes
+		}					
+		modifier = {
+			factor = @increase_interest_1
+			owner = { has_edict_bonus_leader = yes }
+		}		
 	}
 }
 
 ap_synthetic_age = {
 	modifier = {
 		MACHINE_species_trait_points_add = 2
+		ROBOT_species_trait_points_add = 2
 		modify_species_cost_mult = -0.33
 	}
 	
 	potential = {
-		has_authority = auth_machine_intelligence
+		OR = {
+			has_authority = auth_machine_intelligence
+			has_country_flag = synthetic_age
+		}			
 		NOT = {	has_ascension_perk = ap_synthetic_age }
 	}
 	
@@ -1058,13 +1112,29 @@ ap_synthetic_age = {
 			}
 		}
 		custom_tooltip = {
-			fail_text = "requires_ascension_perks_2"
-			num_ascension_perks > 1
+			fail_text = "requires_ascension_perks_1"
+			num_ascension_perks > 0
 		}				
 	}
 	
-	ai_weight = {
-		factor = 10
+	ai_weight = { 
+		factor = @important
+		modifier = {
+			factor = @increase_interest_3
+			has_global_flag = ex_tweaks_active
+		}	
+		modifier = {
+			factor = @increase_interest_3
+			has_global_flag = ex_traits_active			
+		}			
+		modifier = {
+			factor = @increase_interest_3
+			has_global_flag = ex_robots_active
+		}			
+		modifier = {
+			factor = @increase_interest_3
+			has_global_flag = ex_technology_active
+		}				
 	}
 }
 
@@ -1079,20 +1149,20 @@ ap_master_builders = {
 	}
 	possible = {
 		custom_tooltip = {
-			fail_text = "requires_ascension_perks_2"
-			num_ascension_perks > 1
+			fail_text = "requires_space_defense_station_3"
+			has_technology = tech_space_defense_station_3
 		}
 		custom_tooltip = {
-			fail_text = "requires_ap_voidborn_OR_ap_galactic_wonders"
-			OR = {
-				has_ascension_perk = ap_voidborn
-				has_ascension_perk = ap_galactic_wonders
-				has_ascension_perk = ap_machine_worlds
-			}
-		}
+			fail_text = "requires_spaceport_6"
+			has_technology = tech_spaceport_6
+		}				
 		custom_tooltip = {
 			fail_text = "requires_technology_zero_point_power"
 			has_technology = tech_zero_point_power
+		}			
+		custom_tooltip = {
+			fail_text = "requires_ascension_perks_1"
+			num_ascension_perks > 0
 		}		
 	}
 	modifier = {
@@ -1217,10 +1287,20 @@ ap_machine_worlds = {
 	}
 
 	potential = {
-		has_authority = auth_machine_intelligence
-		NOT = {
-			has_ascension_perk = ap_machine_worlds
-		}
+		OR = {
+			AND = {
+				has_global_flag = ex_cybertronic_worlds_active
+				OR = {
+					has_authority = auth_machine_intelligence
+					has_country_flag = synthetic_age
+				}
+			}	
+			AND = {
+				NOT = { has_global_flag = ex_cybertronic_worlds_active }
+				has_authority = auth_machine_intelligence				
+			}	
+		}	
+		NOT = {	has_ascension_perk = ap_machine_worlds }
 	}
 	
 	possible = {
@@ -1238,25 +1318,15 @@ ap_machine_worlds = {
 		if = {
 			limit = { has_global_flag = "ex_cybertronic_worlds_active" }
 			custom_tooltip = {
-				fail_text = "requires_space_defense_station_3"
-				has_technology = tech_space_defense_station_3
-			}
-			custom_tooltip = {
-				fail_text = "requires_spaceport_6"
-				has_technology = tech_spaceport_6
-			}		
+				fail_text = "requires_mega_engineering"
+				has_technology = tech_mega_engineering
+			}											
 			custom_tooltip = {
 				fail_text = "requires_ascension_perks_1"
 				num_ascension_perks > 0
 			}
-			custom_tooltip = {
-				fail_text = "requires_mega_engineering"
-				has_technology = tech_mega_engineering
-			}								
 		}	
 	}
 	
-	ai_weight = {
-		factor = 10
-	}
+	ai_weight = { factor = @crucial_2 }
 }
