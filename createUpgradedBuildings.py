@@ -738,7 +738,8 @@ def main(args, allowRestart=1):
       main(copy.deepcopy(args),0)
   
   
-  
+def killWindowsBackSlashesWithFire(string):
+  return os.path.normpath(string).replace(os.sep,"/")
   
 if __name__ == "__main__":
   argv=sys.argv[1:]
@@ -772,7 +773,7 @@ if __name__ == "__main__":
     # print(modFileName)
     with open(modFileName) as modFile:
       modFileCont=[line for line in modFile]
-      pathString='path="mod/'+args.output_folder.lstrip(".")+'"\n'
+      pathString='path="mod/'+killWindowsBackSlashesWithFire(args.output_folder.lstrip("."))+'"\n'
     for i in range(len(modFileCont)):
       if modFileCont[i][:5].strip()=="path=":
         path=os.path.normpath(modFileCont[i][5:].strip().strip('"')).replace(os.sep,"/")      

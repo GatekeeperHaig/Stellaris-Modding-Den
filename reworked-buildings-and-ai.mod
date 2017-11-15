@@ -1,5 +1,5 @@
 name="((((--ExOverhaul: Reworked Buildings and AI--))))"
-path="mod/exoverhaul\reworked-buildings-and-ai/"
+path="mod/exoverhaul/reworked-buildings-and-ai"
 tags={
 	"ExOverhaul"
 	"Buildings"
