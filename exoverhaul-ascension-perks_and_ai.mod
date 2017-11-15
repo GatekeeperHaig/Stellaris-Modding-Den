@@ -10,4 +10,5 @@ tags={
 	"AI"
 }
 picture="thumb_ascension_perks.png"
+remote_file_id="1201823407"
 supported_version="1.8.*"
