@@ -15,7 +15,7 @@ def parse(argv):
   parser.add_argument('buildingFileNames', nargs = '*', help='File(s)/Path(s) to file(s) to be parsed or .mod file (see "--create_standalone_mod_from_mod). Output is named according to each file name with some extras. Globbing star(*) can be used (even under windows :P)')
   parser.add_argument('-l','--languages', default="braz_por,english,french,german,polish,russian,spanish", help="Languages for which files should be created. Comma separated list. Only creates links to existing titles/descriptions (but needs to do so for every language)(default: %(default)s)")
   parser.add_argument('-k','--keep_lower_tier', action="store_true", help="Does not change any building requirements. Changing of building requirements only works with regard to capital buildings and techs and will fail if any of those are negated within the original conditions")
-  parser.add_argument('-s','--keep_specific_lower_tier', default='building_colony_shelter,building_deployment_post', help="Does not change building requirements for buildings in this comma separated list.(default: %(default)s)")
+  parser.add_argument('-s','--t0_buildings', default='building_colony_shelter,building_deployment_post,building_basic_power_plant,building_basic_farm,building_basic_mine', help="Does not change building requirements for buildings in this comma separated list. Furthermore, their cost will not be added to the t1 buildings (but deducted from the upgrade version) (default: %(default)s)")
   parser.add_argument('-t','--time_discount', default=0.25, type=float, help="Total time of tier n will be: Time(tier n-1)+Time(upgrade tier n)*(1-discount), with the restriction that total time will never be lower than 'Time(upgrade tier n)' (default: %(default)s)")
   parser.add_argument('-c','--cost_discount', default=0, type=float, help="Total cost of tier n will be: Cost(tier n-1)+Cost(upgrade tier n)*(1-discount), with the restriction that total cost will never be lower than 'Cost(upgrade tier n)'(default: %(default)s)")
   parser.add_argument('-f','--foreign_scripted_trigger', action="store_true", help="If you created your own scripted_triggers file including 'has_building' mentions on buildings that will be copied by this script, run this script once with all such files as input instead of the building files. In this mode the script will simply replace all 'has_building = ...' with scripted_triggers created by the script if not run with this argument. This obviously only works if you have/will run all buildings mentioned here through the main script!")
@@ -33,7 +33,7 @@ def parse(argv):
     argv=argv.split()
   args=parser.parse_args(argv)
 
-  args.keep_specific_lower_tier=args.keep_specific_lower_tier.split(",")
+  args.t0_buildings=args.t0_buildings.split(",")
   
   return(args)
 
@@ -223,9 +223,20 @@ class Building(NamesToValue): #derived from NamesToValue with four extra variabl
     self.lineEnd=lineNbr #line end in original file
     self.lowerTier=0
     self.buildingName=buildingName
-      
+    self.wasVisited=0
+ 
+def computeNewCosts_Part1(buildingData, upgradeData, args, varsToValue, t1Costfix=False):
+  #compute build times
+  computeNewCosts(buildingData, upgradeData, "base_buildtime", args.time_discount,varsToValue, t1Costfix)
   
-def computeNewCosts(entryA, entryB, tag, discount, varsToValue):
+  #compute costs
+  costsA=buildingData.splitToListIfString("cost")
+  costsB=upgradeData.splitToListIfString("cost")
+  allCostNames=list(set(costsA.names)|set(costsB.names)) #create a list that includes any cost name from either building exactly once
+  for name in allCostNames:
+    computeNewCosts(costsA, costsB, name, args.cost_discount,varsToValue, t1Costfix) 
+  
+def computeNewCosts(entryA, entryB, tag, discount, varsToValue, t1Costfix=False):
   # magnitude=[entryA.get(tag), entryB.get(tag)]
   magnitude=[]
   try:
@@ -242,9 +253,12 @@ def computeNewCosts(entryA, entryB, tag, discount, varsToValue):
     if magnitude[i][0]=="@":
       magnitude[i]=varsToValue.get(magnitude[i])
     magnitude[i]=float(magnitude[i])
-  finalVal=int(magnitude[0]+(1-discount)*magnitude[1]) #TODO possibly you would want some rounding here
-  if (finalVal<magnitude[1]):
-    finalVal=int(magnitude[1])
+  if t1Costfix:
+    finalVal=int((magnitude[1]-magnitude[0])/(1-discount)) #Making sure the the new t1 "direct build" will have the same costs as in the original version where t1 was also direct build. The t1 upgrade version on the other hand will be cheaper now!
+  else:
+    finalVal=int(magnitude[0]+(1-discount)*magnitude[1]) #TODO possibly you would want some rounding here
+    if (finalVal<magnitude[1]):
+      finalVal=int(magnitude[1])
     
   finalVal=str(finalVal)
   if B:
@@ -399,7 +413,7 @@ def main(args, allowRestart=1):
           
           #new building requirements to ensure that only the highest currently available is buildable. Keep the building list as short as possible. Done via "potential" to compeltely remove them from the list (not even greyed out)
           newRequirements=NamesToValue(2)
-          if len(upgrades.names)>0 and not args.keep_lower_tier and not buildingData.buildingName in args.keep_specific_lower_tier:
+          if len(upgrades.names)>0 and not args.keep_lower_tier and not buildingData.buildingName in args.t0_buildings:
             buildingData.getOrCreate("potential")
             buildingData.splitToListIfString("potential").add(["NAND", newRequirements])
            
@@ -412,12 +426,19 @@ def main(args, allowRestart=1):
               if "planet_unique" in buildingData.names:
                 print("EXTRA WARNING: The problematic building is planet_unique. This error might destroy uniqueness!")
               continue
+            if upgradeData.wasVisited:
+              print("Script tried to visit "+upgradeData.buildingName +" twice (second time via "+buildingData.buildingName+"). This is to be expected if different buildings upgrade into this building, but could also indicate an error in ordering: Of all 'is_listed=yes' buildings in a tree, the lowest tier must always be first!")
               
             #this is a higher tier building. If there is no pure upgrade version yet, create it now. A direct build one will be created anyway!
             if not "is_listed" in upgradeData.names:
               upgradeData.add2("is_listed","no")
             if upgradeData.get("is_listed")=="yes":
               upgradeData.replace("is_listed","no")
+            upgradeData.wasVisited=1
+            
+            if buildingData.buildingName in args.t0_buildings:
+              computeNewCosts_Part1(buildingData, upgradeData, args, varsToValue, True) #fix t0-t1 costs
+              
               
             origUpgradeData=upgradeData  
             upgradeData=copy.deepcopy(buildingNameToData.get(upgradeName)) #now copy to prevent further editing
@@ -486,15 +507,16 @@ def main(args, allowRestart=1):
               buildingNameToData.vals[upgradeBuildingIndex].remove("show_tech_unlock_if")
             buildingNameToData.vals[upgradeBuildingIndex].add(["show_tech_unlock_if","{ always = no }"])
             
-            #compute build times
-            computeNewCosts(buildingData, upgradeData, "base_buildtime", args.time_discount,varsToValue)
+            computeNewCosts_Part1(buildingData, upgradeData, args, varsToValue)
+            # #compute build times
+            # computeNewCosts(buildingData, upgradeData, "base_buildtime", args.time_discount,varsToValue)
             
-            #compute costs
-            costsA=buildingData.splitToListIfString("cost")
-            costsB=upgradeData.splitToListIfString("cost")
-            allCostNames=list(set(costsA.names)|set(costsB.names)) #create a list that includes any cost name from either building exactly once
-            for name in allCostNames:
-              computeNewCosts(costsA, costsB, name, args.cost_discount,varsToValue)
+            # #compute costs
+            # costsA=buildingData.splitToListIfString("cost")
+            # costsB=upgradeData.splitToListIfString("cost")
+            # allCostNames=list(set(costsA.names)|set(costsB.names)) #create a list that includes any cost name from either building exactly once
+            # for name in allCostNames:
+              # computeNewCosts(costsA, costsB, name, args.cost_discount,varsToValue)
               
               
             if "upgrades" in upgradeData.names:
@@ -550,7 +572,7 @@ def main(args, allowRestart=1):
                   # b=b.lowerTier
               #FINISH MAKE UNIQUE
             
-          if isinstance(buildingData.get("potential").vals[-1], NamesToValue) and len(buildingData.get("potential").vals[-1].names)==0:
+          if isinstance(buildingData.splitToListIfString("potential").vals[-1], NamesToValue) and len(buildingData.get("potential").vals[-1].names)==0:
             buildingData.get("potential").removeIndex(-1)   #remove potentially empty entry thanks to empire_unique buildings that cannot be copied.
           newRequirements.increaseLevelRec() #push them to correct level. list will always exist, might be empty if unused.
             

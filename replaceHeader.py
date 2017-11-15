@@ -31,22 +31,32 @@ def main(argv):
   globbedList=[]
   for b in args.fileNames:
     globbedList[0:0]=glob.glob(b)
+  # print(globbedList)
+  # sys.exit(0)
   for buildingFileName in globbedList:
     with open(buildingFileName,'r') as file:
       fileContent=[line for line in file]
     if len(fileContent)<10:
       continue
     endOfHeader=0
+    commentLine=0
     curI=-1
     for line in fileContent:
       curI+=1
       if len(line.strip())>0:
         if line[0]=="@":
           endOfHeader=curI
-        elif line[0]!='#':
+        elif line[0]=='#':
+          if commentLine<endOfHeader:
+            commentLine=curI
+        else:
           break
     headerContent.append("\n")
-    fileContent[:endOfHeader+1]=headerContent[:]
+    if commentLine > endOfHeader:
+      endOfHeader=commentLine-1
+    else:
+      endOfHeader=curI-1
+    fileContent[:endOfHeader]=headerContent[:]
     with open(buildingFileName,'w') as file:
       for line in fileContent:
         file.write(line)
