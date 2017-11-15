@@ -64,6 +64,9 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
   def addString(self, string): #add via raw data. Only works for lines that are bracketClosed within
     array=string.split("=")
     array[1:]=["=".join(array[1:]).strip()]
+    indexComment=array[1].find("#")
+    if indexComment>0:
+      array[1]=array[1][:indexComment]
     self.add(array)
   def remove(self, name): #remove via name
     i=self.names.index(name)
