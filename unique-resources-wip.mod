@@ -1,4 +1,4 @@
-name="WIP3"
+name="!!!Unique Resources"
 path="mod/unique-resources-wip"
 tags={
 	"Fixes"
