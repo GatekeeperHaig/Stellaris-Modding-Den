@@ -428,6 +428,8 @@ def main(args, allowRestart=1):
               continue
             if upgradeData.wasVisited:
               print("Script tried to visit "+upgradeData.buildingName +" twice (second time via "+buildingData.buildingName+"). This is to be expected if different buildings upgrade into this building, but could also indicate an error in ordering: Of all 'is_listed=yes' buildings in a tree, the lowest tier must always be first!")
+            elif buildingData.buildingName in args.t0_buildings: #don't do if visited twice!
+              computeNewCosts_Part1(buildingData, upgradeData, args, varsToValue, True) #fix t0-t1 costs
               
             #this is a higher tier building. If there is no pure upgrade version yet, create it now. A direct build one will be created anyway!
             if not "is_listed" in upgradeData.names:
@@ -436,8 +438,6 @@ def main(args, allowRestart=1):
               upgradeData.replace("is_listed","no")
             upgradeData.wasVisited=1
             
-            if buildingData.buildingName in args.t0_buildings:
-              computeNewCosts_Part1(buildingData, upgradeData, args, varsToValue, True) #fix t0-t1 costs
               
               
             origUpgradeData=upgradeData  
