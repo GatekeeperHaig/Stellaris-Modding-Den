@@ -41,6 +41,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
   def __init__(self,level):
     self.names=[]
     self.vals=[]
+    self.comments=[]
     self.bracketLevel=level
   def get(self,name): #allows changing of content if vals[i] is an object
     return self.vals[self.names.index(name)]
@@ -54,30 +55,44 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
     self.names[index:index]=[array[0].strip()]
     val=array[1]
     self.vals[index:index]=[val]
+    if len(array)>2:
+      comment=array[2]
+    else:
+      comment=""
+    self.comments[index:index]=[comment]
   def add(self,array): #add a 2-size array
     self.names.append(array[0].strip())
     val=array[1]
     self.vals.append(val)
-  def add2(self,name,val): #add via two separate pre-formated variables
+    if len(array)>2:
+      comment=array[2]
+    else:
+      comment=""
+    self.comments.append(comment)
+  def add2(self,name,val, comment=''): #add via two separate pre-formated variables
     self.names.append(name)
     self.vals.append(val)
+    self.comments.append(comment)
   def addString(self, string): #add via raw data. Only works for lines that are bracketClosed within
     array=string.split("=")
     array[1:]=["=".join(array[1:]).strip()]
     indexComment=array[1].find("#")
     if indexComment>0:
+      comment=array[1][indexComment:]
       array[1]=array[1][:indexComment]
+      array.append(comment)
     self.add(array)
   def remove(self, name): #remove via name
     i=self.names.index(name)
-    del self.names[i]
-    del self.vals[i]
+    self.removeIndex(i)
   def removeIndex(self, i): #remove via name
     del self.names[i]
     del self.vals[i]
-  def replace(self, name,val): #replace via name
+    del self.comments[i]
+  def replace(self, name,val,comment=''): #replace via name
     i=self.names.index(name)
     self.vals[i]=val
+    self.comments[i]=comment
   def splitToListIfString(self,name): #I do not generally split lines that open and close brackets within the line (to prevent enlarging the file). Yet sometimes it's necessary...
     try:
       i=self.names.index(name)
@@ -114,6 +129,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         for b in range(self.bracketLevel):
           print("\t",end="")
         print("}",end="")
+      print(self.comments[i],end="")
       print("\n",end="")
   def writeAll(self,file): #formatted writing. Paradox style minus most whitespace tailing errors
     for i in range(len(self.names)):
@@ -133,6 +149,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         for b in range(self.bracketLevel):
           file.write("\t")
         file.write("}")
+      file.write(self.comments[i])
       file.write("\n")
   def replaceAllHasBuildings(self, copiedBuildings): #"has_building=" fails working if different version of the same building exist (Paradox should have realised this on creation of machine empire capital buildings but they didn't... They simply created very lengthy conditions. Shame...). We replace them by scripted_triggers. Due to cross-reference in between files I do this for EVERY building, even the ones I did not copy.
     for i in range(len(self.names)):
@@ -221,6 +238,7 @@ class Building(NamesToValue): #derived from NamesToValue with four extra variabl
   def __init__(self, lineNbr,buildingName):
     self.names=[]
     self.vals=[]
+    self.comments=[]
     self.bracketLevel=1
     self.lineStart=lineNbr#line start in original file
     self.lineEnd=lineNbr #line end in original file
