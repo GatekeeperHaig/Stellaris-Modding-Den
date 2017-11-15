@@ -255,7 +255,8 @@ def computeNewCosts_Part1(buildingData, upgradeData, args, varsToValue, t1Costfi
   costsB=upgradeData.splitToListIfString("cost")
   allCostNames=list(set(costsA.names)|set(costsB.names)) #create a list that includes any cost name from either building exactly once
   for name in allCostNames:
-    computeNewCosts(costsA, costsB, name, args.cost_discount,varsToValue, t1Costfix) 
+    if name[0]!="#":
+      computeNewCosts(costsA, costsB, name, args.cost_discount,varsToValue, t1Costfix) 
   
 def computeNewCosts(entryA, entryB, tag, discount, varsToValue, t1Costfix=False):
   # magnitude=[entryA.get(tag), entryB.get(tag)]
