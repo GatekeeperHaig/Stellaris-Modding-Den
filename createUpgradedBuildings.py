@@ -688,8 +688,8 @@ def main(args, allowRestart=1):
               #replaceClasses[i].printAll()
               building.replace(replaceClasses[i].names[0], replaceClasses[i].vals[0])
      
-    
-    buildingNameToData.removeDuplicatesRec()
+    if not args.just_copy_and_check:
+      buildingNameToData.removeDuplicatesRec()
       
     #OUTPUT
     if not args.create_standalone_mod_from_mod: #done elsewhere by mostly copying their mod file in this case
