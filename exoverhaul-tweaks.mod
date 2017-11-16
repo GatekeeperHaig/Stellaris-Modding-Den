@@ -1,10 +1,8 @@
-name="((((--ExOverhaul: Tweaks, Sectors and AI--}}})"
+name="(-ExOverhaul: 1.8.* Tweaks-)"
 path="mod/exoverhaul/tweaks"
 tags={
 	"Overhaul"
 	"Fixes"
-	"Sectors"
-	"AI"
 }
 picture="thumb_tweaks.png"
 remote_file_id="1150146305"
