@@ -308,12 +308,25 @@ def main(args, allowRestart=1):
     if not os.path.exists(args.output_folder+"/common/scripted_triggers"):
       os.mkdir(args.output_folder+"/common/scripted_triggers")
     
-  copiedBuildingsFileName=args.output_folder+"/copiedBuildings.txt"
-  try: 
-    with open(copiedBuildingsFileName) as file:
-      copiedBuildings=[line.strip() for line in file]
-  except FileNotFoundError:
-    copiedBuildings=[]
+  copiedBuildingsFileFolder=args.output_folder
+  copiedBuildingsFileName="/copiedBuildings.txt"
+  levelsToCheck=3
+  if not args.just_copy_and_check or not args.create_standalone_mod_from_mod:
+    levelsToCheck=1
+  level=0
+  
+  while 1:
+    if level==levelsToCheck:
+      copiedBuildings=[]
+    try: 
+      with open(copiedBuildingsFileFolder+copiedBuildingsFileName) as file:
+        copiedBuildings=[line.strip() for line in file]
+      break
+    except FileNotFoundError:
+      level+=1
+      copiedBuildingsFileFolder+="/.."
+  copiedBuildingsFileName=copiedBuildingsFileFolder+copiedBuildingsFileName
+  print(copiedBuildings)
   if not args.just_copy_and_check:
     copiedBuildingsFile=open(copiedBuildingsFileName,'w')
   globbedList=[]
