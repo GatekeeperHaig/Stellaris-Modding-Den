@@ -19,17 +19,19 @@ def parse(argv):
   parser.add_argument('-s','--t0_buildings', default='building_colony_shelter,building_deployment_post,building_basic_power_plant,building_basic_farm,building_basic_mine', help="Does not change building requirements for buildings in this comma separated list. Furthermore, their cost will not be added to the t1 buildings (but deducted from the upgrade version) (default: %(default)s)")
   parser.add_argument('-t','--time_discount', default=0.25, type=float, help="Total time of tier n will be: Time(tier n-1)+Time(upgrade tier n)*(1-discount), with the restriction that total time will never be lower than 'Time(upgrade tier n)' (default: %(default)s)")
   parser.add_argument('-c','--cost_discount', default=0, type=float, help="Total cost of tier n will be: Cost(tier n-1)+Cost(upgrade tier n)*(1-discount), with the restriction that total cost will never be lower than 'Cost(upgrade tier n)'(default: %(default)s)")
+  parser.add_argument('--custom_direct_build_AI_allow', action="store_true", help="By default, the script will replace the direct build AI_allows by the lowest tier AI_allow (since the checks of the lowest tiers are usually meant for tile validity which is also important for direct build high tier, but unessecary for upgrade). This will not happen with this option")
+  parser.add_argument('--simplify_upgrade_AI_allow', action="store_true", help="Allows every single upgrade to AI (that means if the player would be able to build it, so does AI)")
   parser.add_argument('-f','--just_copy_and_check', action="store_true", help="If any non-building file in your mod includes 'has_building' mentions on buildings that will be copied by this script, run this mode once with all such files as input instead of the building files. In this mode the script will simply replace all 'has_building = ...' with scripted_triggers also checking for direct_build versions. IMPORTANT: 1. You need to apply the main script FIRST! 2. --output_folder will have to include the subfolder for this call!")
   parser.add_argument('-o','--output_folder', default="build_upgraded", help="Main output folder name. Specific subfolder needs to be included for '--just_copy_and_check' (default: %(default)s)")
   parser.add_argument('--replacement_file', default="", help="Executes a very basic conditional replace on buildings. Example: 'IF unique in buildingName and is_listed==no newline	ai_weight = { weight = @crucial_2 }': For all buildings that have 'unique' in their name and are not listed, set ai_weight to given value. Any number of such replaces can be in the file. An 'IF' at the very start of a line starts a replace. the next xyz = will be the tag used for replacing. You can also start a line with 'EVAL' instead of 'IF' to write an arbitrary condition. You need to know the class structure for this though.")
   parser.add_argument('-j','--join_files', action="store_true", help="Output from all input files goes into a single file. Has to be activated if you have upgrades distributed over different files. Will not copy comments!")
-  parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help="Removes all upgrades where the building can also be reached differently.")
   parser.add_argument('-g','--gameVersion', default="1.8.*", help="Game version of the newly created .mod file to avoid launcher warning. Ignored for standalone mod creation. (default: %(default)s)")
   parser.add_argument('--tags', default="buildings", help="Comma separated list of tags. Ignored for standalone mod creation.")
   parser.add_argument('--picture_file', default="", help="Picture file set in the mod file. Ignored for standalone mod creation. This file must be manually added to the mod folder!")
   parser.add_argument('--load_order_priority', action="store_true", help="If enabled, mod will be placed first in mod priority by adding '!' to filename. This allows the construction of mod extensions. Alternatively, you can create a standalone version , see '--create_standalone_mod_from_mod'.")
   parser.add_argument('-m','--create_standalone_mod_from_mod', action="store_true", help="If this flag is set, the script will create a copy of a mod folder, changing the building files and has_building triggers. Main input of the script should now be the .mod file.")
   parser.add_argument('--custom_mod_name', help="If set, this will be the name of the new mod")
+  parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help=argparse.SUPPRESS)
   parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)
 
   
@@ -38,6 +40,9 @@ def parse(argv):
   args=parser.parse_args(argv)
 
   args.t0_buildings=args.t0_buildings.split(",")
+  
+  args.scriptDescription='#This file was created by script!\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory\n'
+
   
   return(args)
 
@@ -52,7 +57,12 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
   def getOrCreate(self,name): #required to add something a a category that may already exist "getOrCreate(name).add..."
     if not name in self.names:
       self.add2(name, NamesToValue(self.bracketLevel+1))
-    return self.vals[self.names.index(name)]
+    return self.vals[self.names.index(name)]  
+  def attemptGet(self,name): 
+    try:
+      return self.get(name)
+    except ValueError:
+      return NamesToValue(0) #empty list
   def getAll(self):
     return [[self.names[i],self.vals[i]] for i in range(len(self.names))]
   def insert(self,array,index): #insert via index
@@ -94,9 +104,12 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
     del self.vals[i]
     del self.comments[i]
   def replace(self, name,val,comment=''): #replace via name
-    i=self.names.index(name)
-    self.vals[i]=val
-    self.comments[i]=comment
+    try:
+      i=self.names.index(name)
+      self.vals[i]=val
+      self.comments[i]=comment
+    except ValueError:
+      self.add2(name,val,comment)
   def splitToListIfString(self,name): #I do not generally split lines that open and close brackets within the line (to prevent enlarging the file). Yet sometimes it's necessary...
     try:
       i=self.names.index(name)
@@ -155,12 +168,12 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         file.write("}")
       file.write(self.comments[i])
       file.write("\n")
-  def replaceAllHasBuildings(self, copiedBuildings): #"has_building=" fails working if different version of the same building exist (Paradox should have realised this on creation of machine empire capital buildings but they didn't... They simply created very lengthy conditions. Shame...). We replace them by scripted_triggers. Due to cross-reference in between files I do this for EVERY building, even the ones I did not copy.
+  def replaceAllHasBuildings(self, args): #"has_building=" fails working if different version of the same building exist (Paradox should have realised this on creation of machine empire capital buildings but they didn't... They simply created very lengthy conditions. Shame...). We replace them by scripted_triggers. Due to cross-reference in between files I do this for EVERY building, even the ones I did not copy.
     for i in range(len(self.names)):
       if isinstance(self.vals[i], NamesToValue):
-        self.vals[i].replaceAllHasBuildings(copiedBuildings)
+        self.vals[i].replaceAllHasBuildings(args)
       elif self.names[i]=="has_building" and self.vals[i]!="no":
-        if self.vals[i].strip('"') in copiedBuildings:
+        if self.vals[i].strip('"') in args.copiedBuildings:
           self.names[i]="has_"+(self.vals[i].replace('"',''))
           self.vals[i]="yes"
       else: #find hidden "has_building"
@@ -178,7 +191,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
           # print(self.vals[i][index])
           # print(toBeReplaced)
           buildingName=toBeReplaced.split("=")[1].replace("}","").replace('"','').strip()
-          if buildingName in copiedBuildings:
+          if buildingName in args.copiedBuildings:
             self.vals[i]=self.vals[i].replace(toBeReplaced,"{ has_"+buildingName+" = yes }")
             # print(toBeReplaced)
             
@@ -237,104 +250,47 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
           duplicates.append(j)
     for i in reversed(sorted(duplicates)):      #delete last first to make sure indices stay valid
       self.removeIndex(i)
+  def computeNewVals(self, other, tag, discount, varsToValue, inverse=False):
+    # magnitude=[entryA.get(tag), entryB.get(tag)]
+    magnitude=[]
+    try:
+      magnitude.append(other.get(tag))
+    except ValueError:
+      magnitude.append("0")  
+    try:
+      magnitude.append(self.get(tag))
+      alreadyExists=1
+    except ValueError:
+      magnitude.append("0")
+      alreadyExists=0
+    for i in range(len(magnitude)):
+      if magnitude[i][0]=="@":
+        magnitude[i]=varsToValue.get(magnitude[i])
+      magnitude[i]=float(magnitude[i])
+    if inverse:
+      finalVal=int((magnitude[1]-magnitude[0])/(1-discount)) #Making sure the the new t1 "direct build" will have the same costs as in the original version where t1 was also direct build. The t1 upgrade version on the other hand will be cheaper now!
+    else:
+      finalVal=int(magnitude[0]+(1-discount)*magnitude[1]) #TODO possibly you would want some rounding here
+      if (finalVal<magnitude[1]):
+        finalVal=int(magnitude[1])
       
-class Building(NamesToValue): #derived from NamesToValue with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
-  def __init__(self, lineNbr,buildingName):
-    self.names=[]
-    self.vals=[]
-    self.comments=[]
-    self.bracketLevel=1
-    self.lineStart=lineNbr#line start in original file
-    self.lineEnd=lineNbr #line end in original file
-    self.lowerTier=0
-    self.buildingName=buildingName
-    self.wasVisited=0
- 
-def computeNewCosts_Part1(buildingData, upgradeData, args, varsToValue, t1Costfix=False):
-  #compute build times
-  computeNewCosts(buildingData, upgradeData, "base_buildtime", args.time_discount,varsToValue, t1Costfix)
-  
-  #compute costs
-  costsA=buildingData.splitToListIfString("cost")
-  costsB=upgradeData.splitToListIfString("cost")
-  allCostNames=list(set(costsA.names)|set(costsB.names)) #create a list that includes any cost name from either building exactly once
-  for name in allCostNames:
-    if name[0]!="#":
-      computeNewCosts(costsA, costsB, name, args.cost_discount,varsToValue, t1Costfix) 
-  
-def computeNewCosts(entryA, entryB, tag, discount, varsToValue, t1Costfix=False):
-  # magnitude=[entryA.get(tag), entryB.get(tag)]
-  magnitude=[]
-  try:
-    magnitude.append(entryA.get(tag))
-  except ValueError:
-    magnitude.append("0")  
-  try:
-    magnitude.append(entryB.get(tag))
-    B=1
-  except ValueError:
-    magnitude.append("0")
-    B=0
-  for i in range(len(magnitude)):
-    if magnitude[i][0]=="@":
-      magnitude[i]=varsToValue.get(magnitude[i])
-    magnitude[i]=float(magnitude[i])
-  if t1Costfix:
-    finalVal=int((magnitude[1]-magnitude[0])/(1-discount)) #Making sure the the new t1 "direct build" will have the same costs as in the original version where t1 was also direct build. The t1 upgrade version on the other hand will be cheaper now!
-  else:
-    finalVal=int(magnitude[0]+(1-discount)*magnitude[1]) #TODO possibly you would want some rounding here
-    if (finalVal<magnitude[1]):
-      finalVal=int(magnitude[1])
-    
-  finalVal=str(finalVal)
-  if B:
-    entryB.replace(tag,finalVal)
-  else:
-    entryB.add([tag, finalVal])
-
-def attemptGet(building, tag): 
-  try:
-    return building.get(tag)
-  except ValueError:
-    return NamesToValue(0) #empty list
-    
-def main(args, allowRestart=1):   
-  scriptDescription='#This file was created by script!\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory\n'
-
-  if not args.just_copy_and_check:
-    if not os.path.exists(args.output_folder+"/common"):
-      os.mkdir(args.output_folder+"/common")
-    if not os.path.exists(args.output_folder+"/common/buildings"):
-      os.mkdir(args.output_folder+"/common/buildings")
-    if not os.path.exists(args.output_folder+"/common/scripted_triggers"): #folder always needed parallel to build_upgraded building output!
-     os.mkdir(args.output_folder+"/common/scripted_triggers")
-    
- 
-  # print(copiedBuildings)
-  if not args.just_copy_and_check:
-    copyfile(os.path.abspath(__file__), args.output_folder+"/"+ntpath.basename(__file__)+".txt")
-    copiedBuildingsFile=open(args.copiedBuildingsFileName,'w')
-  globbedList=[]
-  for b in args.buildingFileNames:
-    globbedList[0:0]=glob.glob(b)
-  fileIndex=-1
-  for buildingFileName in globbedList:#args.buildingFileNames:
-    fileIndex+=1
-    #READ FILE
-    if fileIndex==0 or not args.join_files:
-      varsToValue=NamesToValue(0)
-      buildingNameToData=NamesToValue(0)
+    finalVal=str(finalVal)
+    if alreadyExists:
+      self.replace(tag,finalVal)
+    else:
+      self.add([tag, finalVal])
+  def readFile(self,fileName,args, varsToValue):#stores content of buildingFileName in self and varsToValue
     bracketLevel=0
     objectList=[] #objects currently open objectList[0] would be lowest bracket object (a building), etc
-    with open(buildingFileName,'r') as inputFile:
-      print("Start reading "+buildingFileName)
+    with open(fileName,'r') as inputFile:
+      print("Start reading "+fileName)
       if args.just_copy_and_check:
-        outPath=args.output_folder
+        args.outPath=args.output_folder
       else:
-        outPath=args.output_folder+"/common/buildings/"
+        args.outPath=args.output_folder+"/common/buildings/"
       if not args.just_copy_and_check or not args.create_standalone_mod_from_mod:
-        with open(outPath+os.path.basename(inputFile.name),'w') as outputFile:
-          outputFile.write(scriptDescription)
+        with open(args.outPath+os.path.basename(inputFile.name),'w') as outputFile:
+          outputFile.write(args.scriptDescription)
           outputFile.write("#overwrite\n")
       lineIndex=0
       for line in inputFile:
@@ -352,7 +308,7 @@ def main(args, allowRestart=1):
                 sys.exit(1)
               buildingName=line.split("=")[0].strip()
               objectList.append(Building(lineIndex,buildingName))
-              buildingNameToData.add2(buildingName,objectList[-1])
+              self.add2(buildingName,objectList[-1])
             else:
               if bracketOpen>bracketClose:
                 newObject=NamesToValue(bracketLevel+1)
@@ -364,21 +320,71 @@ def main(args, allowRestart=1):
             bracketLevel+=bracketOpen
             bracketLevel-=bracketClose
             if bracketLevel==0 and bracketClose>0:
-              buildingNameToData.vals[-1].lineEnd=lineIndex
+              self.vals[-1].lineEnd=lineIndex
             objectList=objectList[0:bracketLevel]
-    #END OF READ FILE
+      
+class Building(NamesToValue): #derived from NamesToValue with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
+  def __init__(self, lineNbr,buildingName):
+    self.names=[]
+    self.vals=[]
+    self.comments=[]
+    self.bracketLevel=1
+    self.lineStart=lineNbr#line start in original file
+    self.lineEnd=lineNbr #line end in original file
+    self.lowerTier=0
+    self.buildingName=buildingName
+    self.wasVisited=0
+  def costChangeUpgradeToDirectBuild(self, lowerTierData, args, varsToValue, inverse=False): #Will change the costs of self from being an upgrade to being direct build (or the other way round if inverse is True):
+    #compute build times
+    self.computeNewVals(lowerTierData, "base_buildtime", args.time_discount,varsToValue, inverse)
+    #compute costs
+    costsLowerTier=lowerTierData.splitToListIfString("cost")
+    costsSelf=self.splitToListIfString("cost")
+    allCostNames=list(set(costsLowerTier.names)|set(costsSelf.names)) #create a list that includes any cost name from either building exactly once
+    for name in allCostNames:
+      if name[0]!="#":
+        costsSelf.computeNewVals(costsLowerTier, name, args.cost_discount,varsToValue, inverse)   #compute costs
+    
+ 
+
+
+    
+def main(args, allowRestart=1):   
+
+  if not args.just_copy_and_check:
+    if not os.path.exists(args.output_folder+"/common"):
+      os.mkdir(args.output_folder+"/common")
+    if not os.path.exists(args.output_folder+"/common/buildings"):
+      os.mkdir(args.output_folder+"/common/buildings")
+    if not os.path.exists(args.output_folder+"/common/scripted_triggers"): #folder always needed parallel to build_upgraded building output!
+     os.mkdir(args.output_folder+"/common/scripted_triggers")
+    
+ 
+  # print(args.copiedBuildings)
+  if not args.just_copy_and_check:
+    copyfile(os.path.abspath(__file__), args.output_folder+"/"+ntpath.basename(__file__)+".txt")
+    copiedBuildingsFile=open(args.copiedBuildingsFileName,'w')
+  globbedList=[]
+  for b in args.buildingFileNames:
+    globbedList[0:0]=glob.glob(b)
+  fileIndex=-1
+  for buildingFileName in globbedList:#args.buildingFileNames:
+    fileIndex+=1
+    #READ FILE
+    if fileIndex==0 or not args.join_files: #create empty lists. Do only in first iteration when args.join_files is active as we add to the lists in each iteration here
+      varsToValue=NamesToValue(0)
+      buildingNameToData=NamesToValue(0)
+    buildingNameToData.readFile(buildingFileName,args, varsToValue) 
+    
     if args.join_files:
       if fileIndex<len(globbedList)-1:
-        continue
+        continue  #read all Files before processing
       else:
-        varsToValue.removeDuplicateNames()
+        varsToValue.removeDuplicateNames()  #Duplicate names in the header variables will give errors in Stellaris. Thus we remove all duplicates, even if values differ!
         
-    if args.remove_reduntant_upgrades:
+    if args.remove_reduntant_upgrades: #ExOverhaul specific. If there are upgrade shortcuts (i.e. tn->tn+2 upgrades) they will be removed here (as this contratics with my pricing policy). This does not apply to tree branches that later join again!
       for buildingData in buildingNameToData.vals:
-        #print(len(buildingNameToData.vals))
-        #print(buildingData.buildingName)
         upgrades=buildingData.splitToListIfString("upgrades")
-        #print(upgrades.names)
         upgradeIndex=-1
         while 1:
           upgradeIndex+=1
@@ -395,12 +401,8 @@ def main(args, allowRestart=1):
               if len(upgradeList)==0:
                 break
               upgrade=upgradeList[0]
-              # print(upgrades.names)
-              # print(upgrade.buildingName)
               if upgrade.buildingName in upgrades.names:
-                #print(upgrades.names)
                 upgrades.names.remove(upgrade.buildingName)
-                #print(upgrades.names)
               
               
             
@@ -449,7 +451,7 @@ def main(args, allowRestart=1):
             if upgradeData.wasVisited:
               print("Script tried to visit "+upgradeData.buildingName +" twice (second time via "+buildingData.buildingName+"). This is to be expected if different buildings upgrade into this building, but could also indicate an error in ordering: Of all 'is_listed=yes' buildings in a tree, the lowest tier must always be first!")
             elif buildingData.buildingName in args.t0_buildings: #don't do if visited twice!
-              computeNewCosts_Part1(buildingData, upgradeData, args, varsToValue, True) #fix t0-t1 costs
+              upgradeData.costChangeUpgradeToDirectBuild(buildingData, args, varsToValue, True) #fix t0-t1 costs
               
             #this is a higher tier building. If there is no pure upgrade version yet, create it now. A direct build one will be created anyway!
             if not "is_listed" in upgradeData.names:
@@ -462,6 +464,8 @@ def main(args, allowRestart=1):
               
             origUpgradeData=upgradeData  
             upgradeData=copy.deepcopy(buildingNameToData.get(upgradeName)) #now copy to prevent further editing
+            if not args.custom_direct_build_AI_allow:
+              upgradeData.replace("ai_allow", baseBuildingData.getOrCreate("ai_allow"))
             
             if "empire_unique" in upgradeData.names and upgradeData.get("empire_unique")=="yes":
               #triggers.add2("has_"+upgradeName,"{ has_building = "+upgradeName+" }")   #redundant but simplifies later replaces
@@ -527,16 +531,8 @@ def main(args, allowRestart=1):
               buildingNameToData.vals[upgradeBuildingIndex].remove("show_tech_unlock_if")
             buildingNameToData.vals[upgradeBuildingIndex].add(["show_tech_unlock_if","{ always = no }"])
             
-            computeNewCosts_Part1(buildingData, upgradeData, args, varsToValue)
-            # #compute build times
-            # computeNewCosts(buildingData, upgradeData, "base_buildtime", args.time_discount,varsToValue)
-            
-            # #compute costs
-            # costsA=buildingData.splitToListIfString("cost")
-            # costsB=upgradeData.splitToListIfString("cost")
-            # allCostNames=list(set(costsA.names)|set(costsB.names)) #create a list that includes any cost name from either building exactly once
-            # for name in allCostNames:
-              # computeNewCosts(costsA, costsB, name, args.cost_discount,varsToValue)
+            upgradeData.costChangeUpgradeToDirectBuild(buildingData,args, varsToValue)
+
               
               
             if "upgrades" in upgradeData.names:
@@ -573,33 +569,16 @@ def main(args, allowRestart=1):
               origUpgradeData.getOrCreate("upgrades").add2(fakeBuilding.buildingName,"")
               fakeIndex=buildingNameToData.names.index(baseBuildingData.buildingName)
               buildingNameToData.insert([fakeBuilding.buildingName,fakeBuilding],fakeIndex) #insert the fake before 'baseBuilding'. upgradeBuildingIndex is now shifted but shouldn't be used anymore
-              #create a scripted_trigger that checks if ANY building of this building tree/line exists
-              # newList=NamesToValue(1)
-              # newList.getOrCreate("OR").add2("has_building",baseBuildingData.buildingName)
-              # for trigger in triggers.names[triggerIndexAtStart:]:
-                # newList.get("OR").add2(trigger,"yes")
-              # triggers.add2("has_"+upgradeName+"_or_lower", newList)
-              
-              #set this previously created scripted_trigger for unique buildings in the line, starting from top tier. Stops if there is any non-unique building (as this would become useless at that point anyway)
-              # b=upgradeData
-              # while 1:
-                # if not "planet_unique" in b.names or b.get("planet_unique")=="no":
-                  # break
-                # b.getOrCreate("potential").add2("has_"+upgradeName+"_or_lower", "no")      #make unique
-                # if b.lowerTier==0:
-                  # break
-                # else:
-                  # b=b.lowerTier
-              #FINISH MAKE UNIQUE
             
           if isinstance(buildingData.splitToListIfString("potential").vals[-1], NamesToValue) and len(buildingData.get("potential").vals[-1].names)==0:
             buildingData.get("potential").removeIndex(-1)   #remove potentially empty entry thanks to empire_unique buildings that cannot be copied.
           newRequirements.increaseLevelRec() #push them to correct level. list will always exist, might be empty if unused.
-            
+    #END OF COPY AND MODIFY        
 
-    for building in buildingNameToData.vals:
-      if "is_listed" in building.names and building.get("is_listed")=="no" and "ai_allow" in building.names:
-        building.replace("ai_allow", "{ always = yes }")
+    if args.simplify_upgrade_AI_allow:
+      for building in buildingNameToData.vals: #Allow all upgrades to AI.
+        if "is_listed" in building.names and building.get("is_listed")=="no" and "ai_allow" in building.names:
+          building.replace("ai_allow", "{ always = yes }")
         
     #buildingNameToData.printAll()
         
@@ -692,7 +671,7 @@ def main(args, allowRestart=1):
       if modfileName=='' or modfileName==".": #should only happen if args.output_folder is a pure foldername in which case 'os.path.dirname' is unessecary anyway
         modfileName=args.output_folder
       with open(modfileName+".mod",'w') as modfile:
-        modfile.write(scriptDescription)
+        modfile.write(args.scriptDescription)
         prio=""
         if args.load_order_priority:
           prio="!"
@@ -724,26 +703,26 @@ def main(args, allowRestart=1):
           with codecs.open(args.output_folder+"/localisation/{}/build_upgraded_{}_l_{}.yml".format(language,outfileBaseName.replace(".txt",""),language),'w', "utf-8") as locOutPutFile:
             locOutPutFile.write(u'\ufeff')
             locOutPutFile.write("l_"+language+":"+"\n")
-            locOutPutFile.write(scriptDescription)
+            locOutPutFile.write(args.scriptDescription)
             for line in locData:
               locOutPutFile.write(" "+line+"\n")
         
         #scripted_triggers OUTPUT
         triggerFile=open(args.output_folder+"/common/scripted_triggers/build_upgraded_"+outfileBaseName.replace(".txt","")+"_triggers.txt",'w')
-        triggerFile.write(scriptDescription)
+        triggerFile.write(args.scriptDescription)
         triggers.writeAll(triggerFile)
       
       #BUILDING OUTPUT
-      if len(copiedBuildings)>0:
+      if len(args.copiedBuildings)>0:
         for b in buildingNameToData.vals:
-          b.replaceAllHasBuildings(copiedBuildings)
+          b.replaceAllHasBuildings(args)
       
       if args.create_standalone_mod_from_mod and args.just_copy_and_check:
-        outputFileName=outPath+outfileBaseName
+        outputFileName=args.outPath+outfileBaseName
       else:
-        outputFileName=outPath+"build_upgraded_"+outfileBaseName
+        outputFileName=args.outPath+"build_upgraded_"+outfileBaseName
       with open(outputFileName,'w') as outputFile:
-        outputFile.write(scriptDescription)
+        outputFile.write(args.scriptDescription)
         lineIndex=0
         curBuilding=0
         if args.join_files:
@@ -764,15 +743,16 @@ def main(args, allowRestart=1):
     copiedBuildingsFile.close()
     with open(args.copiedBuildingsFileName) as file:
       newCopiedBuilings=[line.strip() for line in file]
-    if newCopiedBuilings!=copiedBuildings and not args.just_copy_and_check and allowRestart:
-      main(copy.deepcopy(args),0)
+    if newCopiedBuilings!=args.copiedBuildings and not args.just_copy_and_check:
+      args.copiedBuildings=newCopiedBuilings
+      if allowRestart:
+        main(copy.deepcopy(args),0)
   
   
 def killWindowsBackSlashesWithFire(string):
   return os.path.normpath(string).replace(os.sep,"/")
   
-if __name__ == "__main__":
-  argv=sys.argv[1:]
+def preprocess(argv):
   args=parse(argv)
   
   args.output_folder=os.path.normpath(args.output_folder.strip('"'))
@@ -781,10 +761,10 @@ if __name__ == "__main__":
   args.output_folder+="/"
   
   if not os.path.exists(args.output_folder):
-    os.mkdir(args.output_folder)
+    os.makedirs(args.output_folder)
     
   copiedBuildingsFileFolder=args.output_folder
-  copiedBuildingsFileName="/copiedBuildings.txt"
+  args.copiedBuildingsFileName="/copiedBuildings.txt"
   levelsToCheck=4
   if not args.just_copy_and_check:
     levelsToCheck=1
@@ -792,15 +772,21 @@ if __name__ == "__main__":
   
   while 1:
     if level==levelsToCheck:
-      copiedBuildings=[]
+      if args.just_copy_and_check:
+        print("No copiedBuildings.txt file found! This file is created by the main script and is mandatory for the --just_copy_and_check variant! Exiting!")
+        sys.exit(1)
+      break
     try: 
-      with open(copiedBuildingsFileFolder+copiedBuildingsFileName) as file:
-        copiedBuildings=[line.strip() for line in file]
+      with open(copiedBuildingsFileFolder+args.copiedBuildingsFileName) as file:
+        args.copiedBuildings=[line.strip() for line in file]
       break
     except FileNotFoundError:
+      if not args.just_copy_and_check:
+        args.copiedBuildings=[]
+        break
       level+=1
       copiedBuildingsFileFolder+="/.."
-  args.copiedBuildingsFileName=copiedBuildingsFileFolder+copiedBuildingsFileName
+  args.copiedBuildingsFileName=copiedBuildingsFileFolder+args.copiedBuildingsFileName
   
     
   if args.create_standalone_mod_from_mod:
@@ -822,7 +808,7 @@ if __name__ == "__main__":
       
     callString=os.path.normpath("subprocess.call('python ./createUpgradedBuildings.py "+'"'+'" "'.join(argv)+'"'+"', shell=True)\n").replace(os.sep,"/")
     file.write(callString)
-    if not args.just_copy_and_check:
+    if not args.just_copy_and_check and not args.create_standalone_mod_from_mod:
       file.write("import fnmatch\n")
       file.write("for root, dirnames, filenames in os.walk('.'):\n")
       file.write("\tfor filename in fnmatch.filter(filenames,'rerun_just_copy_and_check.py'):\n")
@@ -898,3 +884,7 @@ if __name__ == "__main__":
     main(buildingArgs,0)
   else:
     main(args)
+  
+if __name__ == "__main__":
+  preprocess(sys.argv[1:])
+  
