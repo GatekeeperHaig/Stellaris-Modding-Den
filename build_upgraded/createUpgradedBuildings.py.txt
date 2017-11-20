@@ -169,6 +169,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       file.write(self.comments[i])
       file.write("\n")
   def replaceAllHasBuildings(self, args): #"has_building=" fails working if different version of the same building exist (Paradox should have realised this on creation of machine empire capital buildings but they didn't... They simply created very lengthy conditions. Shame...). We replace them by scripted_triggers. Due to cross-reference in between files I do this for EVERY building, even the ones I did not copy.
+  #beware that this function will not replace "has_building" hidden in the name (i.e. a longer name including it somewhere in the middle). This is WAD. This can only be added like this manually. This can be used to prevent a replace.
     for i in range(len(self.names)):
       if isinstance(self.vals[i], NamesToValue):
         self.vals[i].replaceAllHasBuildings(args)
@@ -465,7 +466,11 @@ def main(args, allowRestart=1):
             origUpgradeData=upgradeData  
             upgradeData=copy.deepcopy(buildingNameToData.get(upgradeName)) #now copy to prevent further editing
             if not args.custom_direct_build_AI_allow:
-              upgradeData.replace("ai_allow", baseBuildingData.getOrCreate("ai_allow"))
+              try:
+                upgradeData.replace("ai_allow", baseBuildingData.get("ai_allow"))
+              except ValueError:
+                pass
+                
             
             if "empire_unique" in upgradeData.names and upgradeData.get("empire_unique")=="yes":
               #triggers.add2("has_"+upgradeName,"{ has_building = "+upgradeName+" }")   #redundant but simplifies later replaces
@@ -533,10 +538,11 @@ def main(args, allowRestart=1):
             
             upgradeData.costChangeUpgradeToDirectBuild(buildingData,args, varsToValue)
 
-              
+            #Make sure you cannot replace a building by itself (i.e. upgraded version by same tier direct build)
+            upgradeData.getOrCreate("potential").add2("NOT = { tile = { has_building = "+origUpgradeData.buildingName+" } }",""," #Prevent self replace") #Since has_building is hidden in the name of the data, no replace of has_building will take place. Should be a minimal performance improvement.
               
             if "upgrades" in upgradeData.names:
-              buildingDataList.append(upgradeData) #make sure we finish one branch of a tree before we start a new branch!
+              buildingDataList.append(upgradeData)
               
         
             
