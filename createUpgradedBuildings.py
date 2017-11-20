@@ -150,24 +150,26 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       print("\n",end="")
   def writeAll(self,file): #formatted writing. Paradox style minus most whitespace tailing errors
     for i in range(len(self.names)):
-      for b in range(self.bracketLevel):
-        file.write("\t")
-      if not isinstance(self.vals[i],NamesToValue):
-        file.write(self.names[i])
-        if len(self.vals[i])>0:
-          file.write(" = "+self.vals[i])
-      else:
-        if self.bracketLevel==1:
-          file.write("\n")
-          for b in range(self.bracketLevel):
-            file.write("\t")
-        file.write(self.names[i]+" = {\n")
-        self.vals[i].writeAll(file)
+      self.writeEntry(file, i)
+  def writeEntry(self, file,i):
+    for b in range(self.bracketLevel):
+      file.write("\t")
+    if not isinstance(self.vals[i],NamesToValue):
+      file.write(self.names[i])
+      if len(self.vals[i])>0:
+        file.write(" = "+self.vals[i])
+    else:
+      if self.bracketLevel==1:
+        file.write("\n")
         for b in range(self.bracketLevel):
           file.write("\t")
-        file.write("}")
-      file.write(self.comments[i])
-      file.write("\n")
+      file.write(self.names[i]+" = {\n")
+      self.vals[i].writeAll(file)
+      for b in range(self.bracketLevel):
+        file.write("\t")
+      file.write("}")
+    file.write(self.comments[i])
+    file.write("\n")
   def replaceAllHasBuildings(self, args): #"has_building=" fails working if different version of the same building exist (Paradox should have realised this on creation of machine empire capital buildings but they didn't... They simply created very lengthy conditions. Shame...). We replace them by scripted_triggers. Due to cross-reference in between files I do this for EVERY building, even the ones I did not copy.
   #beware that this function will not replace "has_building" hidden in the name (i.e. a longer name including it somewhere in the middle). This is WAD. This can only be added like this manually. This can be used to prevent a replace.
     for i in range(len(self.names)):
@@ -304,12 +306,18 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
             bracketOpen=line.count("{")
             bracketClose=line.count("}")
             if bracketLevel==0:
-              if (bracketOpen!=1 or bracketClose!=0) and not args.just_copy_and_check:
-                print("Error in line {!s}:\n{}\nInvalid building start line".format(lineIndex,line))
-                sys.exit(1)
-              buildingName=line.split("=")[0].strip()
-              objectList.append(Building(lineIndex,buildingName))
-              self.add2(buildingName,objectList[-1])
+              if (bracketOpen!=1 or bracketClose!=0):
+                if not args.just_copy_and_check:
+                  print("Error in line {!s}:\n{}\nInvalid building start line".format(lineIndex,line))
+                  sys.exit(1)
+                else:
+                  self.addString(line)
+                  args.preventLinePrint.append(lineIndex)
+                  # print(line)
+              else:
+                buildingName=line.split("=")[0].strip()
+                objectList.append(Building(lineIndex,buildingName))
+                self.add2(buildingName,objectList[-1])
             else:
               if bracketOpen>bracketClose:
                 newObject=NamesToValue(bracketLevel+1)
@@ -317,10 +325,10 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
                 objectList.append(newObject)
               elif bracketOpen==bracketClose:
                 objectList[-1].addString(line)
-              
-            bracketLevel+=bracketOpen
-            bracketLevel-=bracketClose
-            if bracketLevel==0 and bracketClose>0:
+            bracketDiff=bracketOpen-bracketClose
+            bracketLevel+=bracketDiff
+            # print(line)
+            if bracketLevel==0 and bracketDiff<0:
               self.vals[-1].lineEnd=lineIndex
             objectList=objectList[0:bracketLevel]
       
@@ -375,6 +383,7 @@ def main(args, allowRestart=1):
     if fileIndex==0 or not args.join_files: #create empty lists. Do only in first iteration when args.join_files is active as we add to the lists in each iteration here
       varsToValue=NamesToValue(0)
       buildingNameToData=NamesToValue(0)
+      args.preventLinePrint=[]
     buildingNameToData.readFile(buildingFileName,args, varsToValue) 
     
     if args.join_files:
@@ -385,6 +394,8 @@ def main(args, allowRestart=1):
         
     if args.remove_reduntant_upgrades: #ExOverhaul specific. If there are upgrade shortcuts (i.e. tn->tn+2 upgrades) they will be removed here (as this contratics with my pricing policy). This does not apply to tree branches that later join again!
       for buildingData in buildingNameToData.vals:
+        if not isinstance(buildingData, Building):
+          continue
         upgrades=buildingData.splitToListIfString("upgrades")
         upgradeIndex=-1
         while 1:
@@ -583,8 +594,9 @@ def main(args, allowRestart=1):
 
     if args.simplify_upgrade_AI_allow:
       for building in buildingNameToData.vals: #Allow all upgrades to AI.
-        if "is_listed" in building.names and building.get("is_listed")=="no" and "ai_allow" in building.names:
-          building.replace("ai_allow", "{ always = yes }")
+        if isinstance(building, Building):
+          if "is_listed" in building.names and building.get("is_listed")=="no" and "ai_allow" in building.names:
+            building.replace("ai_allow", "{ always = yes }")
         
     #buildingNameToData.printAll()
         
@@ -635,6 +647,8 @@ def main(args, allowRestart=1):
           elif activeReplace:
             replaceClasses[-1].vals[0]+=line
       for building in buildingNameToData.vals:
+        if not isinstance(building, Building):
+          continue
         for i in range(len(replaceClasses)):
           replace=1
           for condition in allConditions[i]:
@@ -720,8 +734,9 @@ def main(args, allowRestart=1):
       
       #BUILDING OUTPUT
       if len(args.copiedBuildings)>0:
-        for b in buildingNameToData.vals:
-          b.replaceAllHasBuildings(args)
+        buildingNameToData.replaceAllHasBuildings(args)
+        # for b in buildingNameToData.vals:
+          # b.replaceAllHasBuildings(args)
       
       if args.create_standalone_mod_from_mod and args.just_copy_and_check:
         outputFileName=args.outPath+outfileBaseName
@@ -738,12 +753,14 @@ def main(args, allowRestart=1):
         else:
           for line in inputFile:          
             lineIndex+=1
-            if curBuilding>=len(buildingNameToData.vals) or lineIndex<buildingNameToData.vals[curBuilding].lineStart:
-              outputFile.write(line)
-            while curBuilding<len(buildingNameToData.vals) and lineIndex==buildingNameToData.vals[curBuilding].lineEnd:
-              outputFile.write(buildingNameToData.names[curBuilding]+" = {\n")
-              buildingNameToData.vals[curBuilding].writeAll(outputFile)
-              outputFile.write("}\n")
+            if curBuilding>=len(buildingNameToData.vals) or isinstance(buildingNameToData.vals[curBuilding], Building) and lineIndex<buildingNameToData.vals[curBuilding].lineStart:
+              if not lineIndex in args.preventLinePrint:
+                outputFile.write(line)
+            while curBuilding<len(buildingNameToData.vals) and (not isinstance(buildingNameToData.vals[curBuilding], Building) or lineIndex==buildingNameToData.vals[curBuilding].lineEnd):
+              # outputFile.write(buildingNameToData.names[curBuilding]+" = {\n")
+              # buildingNameToData.vals[curBuilding].writeAll(outputFile)
+              # outputFile.write("}\n")
+              buildingNameToData.writeEntry(outputFile, curBuilding)
               curBuilding+=1
   if not args.just_copy_and_check:
     copiedBuildingsFile.close()
