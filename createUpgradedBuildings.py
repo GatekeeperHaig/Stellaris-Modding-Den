@@ -287,14 +287,6 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
     objectList=[] #objects currently open objectList[0] would be lowest bracket object (a building), etc
     with open(fileName,'r') as inputFile:
       print("Start reading "+fileName)
-      if args.just_copy_and_check:
-        args.outPath=args.output_folder
-      else:
-        args.outPath=args.output_folder+"/common/buildings/"
-      if not args.just_copy_and_check or not args.create_standalone_mod_from_mod:
-        with open(args.outPath+os.path.basename(inputFile.name),'w') as outputFile:
-          outputFile.write(args.scriptDescription)
-          outputFile.write("#overwrite\n")
       lineIndex=0
       for line in inputFile:
         lineIndex+=1
@@ -331,7 +323,54 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
             if bracketLevel==0 and bracketDiff<0:
               self.vals[-1].lineEnd=lineIndex
             objectList=objectList[0:bracketLevel]
-      
+  def addTags(self, tagList):
+    for name, entry in self.getAll():
+      tagEntry=tagList.getOrCreate(name)
+      if isinstance(entry, NamesToValue):
+        entry.addTags(tagEntry)
+      # else:
+        # tagList.replace(name,"")
+  def countDeepestLevelEntries(self):
+    if len(self.names)==0:
+      return 1
+    count=0
+    for val in self.vals:
+      if isinstance(val, NamesToValue):
+        count+=val.countDeepestLevelEntries()
+    return count
+  def determineDepth(self):
+    depth=self.bracketLevel
+    for val in self.vals:
+      if isinstance(val, NamesToValue):
+        depth=max(depth, val.determineDepth())
+    return depth
+  def toCSVHeader(self, outStrings): #called using taglist!
+    if len(self.names)==0:
+      for i in range(self.bracketLevel,len(outStrings)):
+        outStrings[i]+=","
+    for name,val in self.getAll():
+      outStrings[self.bracketLevel]+=name
+      for i in range(val.countDeepestLevelEntries()):
+        outStrings[self.bracketLevel]+=","
+      val.toCSVHeader(outStrings)
+  def toCSV(self, file, tagList,varsToValue):
+    for name,val in tagList.getAll():
+      if name in self.names:
+        if len(val.names)>0:
+          # print(name)
+          # print(self.get(name))
+          self.splitToListIfString(name).toCSV(file, val,varsToValue)
+        else:
+          output=self.get(name)
+          if len(output)>0 and output[0]=="@":
+            try:
+              output=varsToValue.get(output)
+            except ValueError:
+              print("Missing variable: "+output)
+          file.write(output+',')
+      else:
+        for i in range(val.countDeepestLevelEntries()):
+          file.write(",")
 class Building(NamesToValue): #derived from NamesToValue with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
   def __init__(self, lineNbr,buildingName):
     self.names=[]
@@ -380,11 +419,19 @@ def main(args, allowRestart=1):
   for buildingFileName in globbedList:#args.buildingFileNames:
     fileIndex+=1
     #READ FILE
+    if args.just_copy_and_check:
+      args.outPath=args.output_folder
+    else:
+      args.outPath=args.output_folder+"/common/buildings/"
+    if not args.just_copy_and_check or not args.create_standalone_mod_from_mod:
+      with open(args.outPath+os.path.basename(buildingFileName),'w') as outputFile:
+        outputFile.write(args.scriptDescription)
+        outputFile.write("#overwrite\n")
     if fileIndex==0 or not args.join_files: #create empty lists. Do only in first iteration when args.join_files is active as we add to the lists in each iteration here
       varsToValue=NamesToValue(0)
       buildingNameToData=NamesToValue(0)
       args.preventLinePrint=[]
-    buildingNameToData.readFile(buildingFileName,args, varsToValue) 
+    buildingNameToData.readFile(buildingFileName,args, varsToValue)
     
     if args.join_files:
       if fileIndex<len(globbedList)-1:
@@ -875,8 +922,9 @@ def preprocess(argv):
         
     buildingArgs=copy.deepcopy(args)
     buildingArgs.buildingFileNames=[path+"/common/buildings/*"]
-    main(buildingArgs,0)
-        
+    main(buildingArgs,1)
+    with open(args.copiedBuildingsFileName) as file:
+        args.copiedBuildings=[line.strip() for line in file]
     otherFilesArgs=copy.deepcopy(args)
     otherFilesArgs.buildingFileNames=[]    
     otherFilesArgs.just_copy_and_check=True
@@ -904,7 +952,7 @@ def preprocess(argv):
     #otherFilesArgs.buildingFileNames=path+"/common/scripted_triggers/*"
 
     
-    main(buildingArgs,0)
+    # main(buildingArgs,0)
   else:
     main(args)
   
