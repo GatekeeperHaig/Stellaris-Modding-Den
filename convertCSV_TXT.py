@@ -326,13 +326,19 @@ def main(args):
     globbedList.extend(glob.glob(b))
   for fileName in globbedList:
     fileIndex+=1
-    if fileName.replace(".txt",".csv")==fileName:
-      print("Non .txt file!")
-      continue
     if fileIndex==0 or not args.join_files:
       varsToValue=BU.NamesToValue(0)
       nameToData=BU.NamesToValue(0)
       tagList=BU.NamesToValue(0)
+      
+    if fileName.strip()[-4:]==".csv":
+      print("CSV read not done yet!")
+      continue
+      
+    if fileName.replace(".txt",".csv")==fileName:
+      print("Non .txt file!")
+      continue
+      
     #READ FILE
     nameToData.readFile(fileName,args, varsToValue) 
     nameToData.addTags(tagList)
