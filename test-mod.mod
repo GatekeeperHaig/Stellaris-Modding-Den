@@ -1,5 +1,5 @@
 name="!component overhaul development mod"
-path="combat-overhaul-beta"
+path="mod/combat-overhaul-beta"
 tags={
 	"Balance"
 }
