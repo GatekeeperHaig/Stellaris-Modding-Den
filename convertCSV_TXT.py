@@ -15,6 +15,7 @@ import createUpgradedBuildings as BU
 def parse(argv):
   parser = argparse.ArgumentParser(description="", formatter_class=RawTextHelpFormatter)
   parser.add_argument('fileNames', nargs = '*', help='File(s)/Path(s) to file(s) to be parsed or .mod file (see "--create_standalone_mod_from_mod). Output is named according to each file name with some extras. Globbing star(*) can be used (even under windows :P)')
+  parser.add_argument('-j','--join_files', action="store_true", help="Do not mix different top level tags!")
   
   if isinstance(argv, str):
     argv=argv.split()
@@ -324,21 +325,30 @@ def main(args):
   for b in args.fileNames:
     globbedList.extend(glob.glob(b))
   for fileName in globbedList:
+    fileIndex+=1
     if fileName.replace(".txt",".csv")==fileName:
       print("Non .txt file!")
       continue
-    varsToValue=BU.NamesToValue(0)
-    nameToData=BU.NamesToValue(0)
-    tagList=BU.NamesToValue(0)
-    fileIndex+=1
+    if fileIndex==0 or not args.join_files:
+      varsToValue=BU.NamesToValue(0)
+      nameToData=BU.NamesToValue(0)
+      tagList=BU.NamesToValue(0)
     #READ FILE
     nameToData.readFile(fileName,args, varsToValue) 
     nameToData.addTags(tagList)
+    
+    if args.join_files:
+      if fileIndex<len(globbedList)-1:
+        continue
+        
     # nameToData.printAll()
     headerString=["" for i in range(tagList.determineDepth())]
     tagList.toCSVHeader(headerString)
     try:
-      csvFileName=fileName.replace(".txt",".csv")
+      if args.join_files:
+        csvFileName=fileName.replace(".txt","JOINED.csv")
+      else:
+        csvFileName=fileName.replace(".txt",".csv")
       if os.path.exists(csvFileName):
         os.remove(csvFileName) #hopyfully fixing the strange bug for ExNihil that he can't overwrite the file...
       with open(csvFileName,'w') as file:
