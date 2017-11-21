@@ -1,5 +1,5 @@
-name="!component rebalance test mod"
-path="mod/test-mod"
+name="!component overhaul development mod"
+path="combat-overhaul-beta"
 tags={
 	"Balance"
 }
