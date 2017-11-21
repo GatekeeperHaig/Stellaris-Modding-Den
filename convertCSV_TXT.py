@@ -337,12 +337,18 @@ def main(args):
     # nameToData.printAll()
     headerString=["" for i in range(tagList.determineDepth())]
     tagList.toCSVHeader(headerString)
-    with open(fileName.replace(".txt",".csv"),'w') as file:
-      for line in headerString:
-        file.write(line+"\n")
-      for name, val in nameToData.getAll():
-        val.toCSV(file, tagList.get(name),varsToValue)
-        file.write("\n")
+    try:
+      csvFileName=fileName.replace(".txt",".csv")
+      if os.path.exists(csvFileName):
+        os.remove(csvFileName) #hopyfully fixing the strange bug for ExNihil that he can't overwrite the file...
+      with open(csvFileName,'w') as file:
+        for line in headerString:
+          file.write(line+"\n")
+        for name, val in nameToData.getAll():
+          val.toCSV(file, tagList.get(name),varsToValue)
+          file.write("\n")
+    except PermissionError:
+      print("PermissionError on file write. You must close all csv files before running the script")
     # for compName, component in nameToData.getAll():
       # print(compName)
       # for name,val in component.getAll():
