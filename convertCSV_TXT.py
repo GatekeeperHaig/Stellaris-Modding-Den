@@ -17,18 +17,13 @@ def parse(argv):
   parser = argparse.ArgumentParser(description="", formatter_class=RawTextHelpFormatter)
   parser.add_argument('fileNames', nargs = '*', help='File(s)/Path(s) to file(s) to be parsed or .mod file (see "--create_standalone_mod_from_mod). Output is named according to each file name with some extras. Globbing star(*) can be used (even under windows :P)')
   parser.add_argument('-j','--join_files', action="store_true", help="Do not mix different top level tags!")
-  parser.add_argument('--filter', help="Comma separated file with tags that are to be outputted. Everything below that key will be used")
-  parser.add_argument('--to_txt', help="The csv file here will be used to try and find tags in the opened txt files whos value will be replaced by the entry in the txt files. If the txt file value is a variable, the value will we written in the header (possibly overwriting something else!")
+  parser.add_argument('--filter', action="store_true", help="Use a comma separated file to determine with tags that are to be outputted. Everything below that key will be used. Filter file that will we tried to use is <filename(no .txt)>_filter.txt")
+  parser.add_argument('--to_txt', action="store_true", help="The csv file(s) previously created (<filename(no .txt)>.csv) will be used to try and find tags in the opened txt files whos value will be replaced by the entry in the txt files. If the txt file value is a variable, the value will we written in the header (possibly overwriting something else!")
   
   
   if isinstance(argv, str):
     argv=argv.split()
   args=parser.parse_args(argv)
-  if args.filter:
-    with open(args.filter) as file:
-      args.filter=[word.strip() for line in file for word in line.split(",") ]
-    if not "key" in args.filter:
-      args.filter[0:0]=["key"]#always need to be able to convert back to txt
   # args.t0_buildings=args.t0_buildings.split(",")
   
   args.scriptDescription='#This file was created by script!\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory\n'
@@ -343,6 +338,15 @@ def main(args):
     if fileName.replace(".txt",".csv")==fileName:
       print("Non .txt file!")
       continue
+    if args.filter:
+      filterFile=fileName.replace(".txt","_filter.txt")
+      if os.path.exists(filterFile):
+        with open(filterFile) as file:
+          args.filter=[word.strip() for line in file for word in line.split(",") ]
+        if not "key" in args.filter:
+          args.filter[0:0]=["key"]#always need to be able to convert back to txt
+      else:
+        print("No filter file for: "+fileName)
       
     #READ FILE
     if args.to_txt:
@@ -353,7 +357,11 @@ def main(args):
     nameToData.addTags(tagList)
     
     if args.to_txt:
-      with open(args.to_txt) as file:
+      csvFile=fileName.replace(".txt",".csv")
+      if not os.path.exists(csvFile):
+        print("No csv file for: "+fileName)
+        continue
+      with open(csvFile) as file:
         csvContent=[re.split(",|;",line.strip()) for line in file]
         for i in range(len(csvContent)):
           # print("".join(csvContent[i]))
@@ -375,7 +383,7 @@ def main(args):
           if bodyEntry[keyCSVIndex]==key:
             val.setValFromCSV(header, bodyEntry,varsToValue)
             break
-      with open("test.txt",'w') as file:
+      with open(fileName.replace(".txt","_csvMod.txt"),'w') as file:
         varsToValue.writeAll(file)
         nameToData.writeAll(file)
       continue
