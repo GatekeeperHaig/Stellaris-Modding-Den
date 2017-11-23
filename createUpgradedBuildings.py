@@ -342,7 +342,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       return 1
     count=0
     for name,val in self.getAll():
-      if active or name in args.filter:
+      if active or not args.filter or name in args.filter:
         count+=val.countDeepestLevelEntries(args,True)
       elif len(val.vals)>0:
         count+=val.countDeepestLevelEntries(args)
@@ -359,11 +359,11 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         outStrings[i]+=","
     for name,val in self.getAll():
       # print(val.countDeepestLevelEntries(args))
-      if active or name in args.filter or (len(val.vals)>0 and val.countDeepestLevelEntries(args)>0):
+      if active or not args.filter or name in args.filter or (len(val.vals)>0 and val.countDeepestLevelEntries(args)>0):
         outStrings[self.bracketLevel]+=name
         for i in range(val.countDeepestLevelEntries(args)):
           outStrings[self.bracketLevel]+=","
-        if active or name in args.filter:
+        if active or not args.filter or name in args.filter:
           nextActive=True
         else:
           nextActive=False
@@ -372,7 +372,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         self.remove(name)
   def toCSV(self, file, tagList,varsToValue,args):
     for name,val in tagList.getAll():
-      print(name)
+      # print(name)
       if name in self.names:
         if len(val.names)>0:
           # print(name)

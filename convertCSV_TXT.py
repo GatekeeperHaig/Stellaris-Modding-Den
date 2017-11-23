@@ -345,7 +345,11 @@ def main(args):
       continue
       
     #READ FILE
-    nameToData.readFile(fileName,args, varsToValue, True) 
+    if args.to_txt:
+      keepExtraLines=True
+    else:
+      keepExtraLines=False
+    nameToData.readFile(fileName,args, varsToValue, keepExtraLines) 
     nameToData.addTags(tagList)
     
     if args.to_txt:
