@@ -11,16 +11,24 @@ import codecs
 import glob
 from shutil import copyfile
 import createUpgradedBuildings as BU
+import re
 
 def parse(argv):
   parser = argparse.ArgumentParser(description="", formatter_class=RawTextHelpFormatter)
   parser.add_argument('fileNames', nargs = '*', help='File(s)/Path(s) to file(s) to be parsed or .mod file (see "--create_standalone_mod_from_mod). Output is named according to each file name with some extras. Globbing star(*) can be used (even under windows :P)')
   parser.add_argument('-j','--join_files', action="store_true", help="Do not mix different top level tags!")
+  parser.add_argument('--filter', help="Comma separated file with tags that are to be outputted. Everything below that key will be used")
+  parser.add_argument('--to_txt', help="The csv file here will be used to try and find tags in the opened txt files whos value will be replaced by the entry in the txt files. If the txt file value is a variable, the value will we written in the header (possibly overwriting something else!")
+  
   
   if isinstance(argv, str):
     argv=argv.split()
   args=parser.parse_args(argv)
-
+  if args.filter:
+    with open(args.filter) as file:
+      args.filter=[word.strip() for line in file for word in line.split(",") ]
+    if not "key" in args.filter:
+      args.filter[0:0]=["key"]#always need to be able to convert back to txt
   # args.t0_buildings=args.t0_buildings.split(",")
   
   args.scriptDescription='#This file was created by script!\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory\n'
@@ -331,25 +339,50 @@ def main(args):
       nameToData=BU.NamesToValue(0)
       tagList=BU.NamesToValue(0)
       
-    if fileName.strip()[-4:]==".csv":
-      print("CSV read not done yet!")
-      continue
       
     if fileName.replace(".txt",".csv")==fileName:
       print("Non .txt file!")
       continue
       
     #READ FILE
-    nameToData.readFile(fileName,args, varsToValue) 
+    nameToData.readFile(fileName,args, varsToValue, True) 
     nameToData.addTags(tagList)
     
+    if args.to_txt:
+      with open(args.to_txt) as file:
+        csvContent=[re.split(",|;",line.strip()) for line in file]
+        for i in range(len(csvContent)):
+          # print("".join(csvContent[i]))
+          if "".join(csvContent[i])=="":
+            header=csvContent[:i]
+            body=csvContent[i+1:]
+            break
+        if i==len(csvContent)-1:
+          print("Error: No end of header found. There needs to be an empty line!")
+          sys.exit(1)
+      for name, val in nameToData.getAll():
+        if name!=header[0][0]:
+          continue;
+        key=val.get("key").strip('"')
+        keyCSVIndex=header[1].index("key")
+        # print(key)
+        for bodyEntry in body:
+          # print(bodyEntry[keyCSVIndex])
+          if bodyEntry[keyCSVIndex]==key:
+            val.setValFromCSV(header, bodyEntry,varsToValue)
+            break
+      with open("test.txt",'w') as file:
+        varsToValue.writeAll(file)
+        nameToData.writeAll(file)
+      continue
+      
     if args.join_files:
       if fileIndex<len(globbedList)-1:
         continue
         
     # nameToData.printAll()
     headerString=["" for i in range(tagList.determineDepth())]
-    tagList.toCSVHeader(headerString)
+    tagList.toCSVHeader(headerString,args)
     try:
       if args.join_files:
         csvFileName=fileName.replace(".txt","JOINED.csv")
@@ -361,7 +394,7 @@ def main(args):
         for line in headerString:
           file.write(line+"\n")
         for name, val in nameToData.getAll():
-          val.toCSV(file, tagList.get(name),varsToValue)
+          val.toCSV(file, tagList.get(name),varsToValue,args)
           file.write("\n")
     except PermissionError:
       print("PermissionError on file write. You must close all csv files before running the script")

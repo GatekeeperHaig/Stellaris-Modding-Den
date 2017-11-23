@@ -282,19 +282,21 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       self.replace(tag,finalVal)
     else:
       self.add([tag, finalVal])
-  def readFile(self,fileName,args, varsToValue):#stores content of buildingFileName in self and varsToValue
+  def readFile(self,fileName,args, varsToValue,keepEmptryLinesAndComments=False):#stores content of buildingFileName in self and varsToValue
     bracketLevel=0
     objectList=[] #objects currently open objectList[0] would be lowest bracket object (a building), etc
+    currentlyInHeader=True
     with open(fileName,'r') as inputFile:
       print("Start reading "+fileName)
       lineIndex=0
       for line in inputFile:
         lineIndex+=1
         line=line.strip()
-        if len(line)>0 :
+        if len(line)>0 and (line[0]!="#" or bracketLevel>0) :
           if line[0]=="@":
             varsToValue.addString(line)
           elif line[0]!="#" or bracketLevel>0:
+            currentlyInHeader=False
             bracketOpen=line.count("{")
             bracketClose=line.count("}")
             if bracketLevel==0:
@@ -323,6 +325,11 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
             if bracketLevel==0 and bracketDiff<0:
               self.vals[-1].lineEnd=lineIndex
             objectList=objectList[0:bracketLevel]
+        elif keepEmptryLinesAndComments:
+          if currentlyInHeader:
+            varsToValue.addString(line)
+          elif bracketLevel==0:
+            self.addString(line)
   def addTags(self, tagList):
     for name, entry in self.getAll():
       tagEntry=tagList.getOrCreate(name)
@@ -330,36 +337,47 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         entry.addTags(tagEntry)
       # else:
         # tagList.replace(name,"")
-  def countDeepestLevelEntries(self):
+  def countDeepestLevelEntries(self,args, active=False):
     if len(self.names)==0:
       return 1
     count=0
-    for val in self.vals:
-      if isinstance(val, NamesToValue):
-        count+=val.countDeepestLevelEntries()
+    for name,val in self.getAll():
+      if active or name in args.filter:
+        count+=val.countDeepestLevelEntries(args,True)
+      elif len(val.vals)>0:
+        count+=val.countDeepestLevelEntries(args)
     return count
   def determineDepth(self):
-    depth=self.bracketLevel
+    depth=self.bracketLevel+1 #one extra depth on purpose. Empty line to determine end of header
     for val in self.vals:
       if isinstance(val, NamesToValue):
         depth=max(depth, val.determineDepth())
     return depth
-  def toCSVHeader(self, outStrings): #called using taglist!
+  def toCSVHeader(self, outStrings,args, active=False): #called using taglist!
     if len(self.names)==0:
       for i in range(self.bracketLevel,len(outStrings)):
         outStrings[i]+=","
     for name,val in self.getAll():
-      outStrings[self.bracketLevel]+=name
-      for i in range(val.countDeepestLevelEntries()):
-        outStrings[self.bracketLevel]+=","
-      val.toCSVHeader(outStrings)
-  def toCSV(self, file, tagList,varsToValue):
+      # print(val.countDeepestLevelEntries(args))
+      if active or name in args.filter or (len(val.vals)>0 and val.countDeepestLevelEntries(args)>0):
+        outStrings[self.bracketLevel]+=name
+        for i in range(val.countDeepestLevelEntries(args)):
+          outStrings[self.bracketLevel]+=","
+        if active or name in args.filter:
+          nextActive=True
+        else:
+          nextActive=False
+        val.toCSVHeader(outStrings,args,nextActive)
+      else:
+        self.remove(name)
+  def toCSV(self, file, tagList,varsToValue,args):
     for name,val in tagList.getAll():
+      print(name)
       if name in self.names:
         if len(val.names)>0:
           # print(name)
           # print(self.get(name))
-          self.splitToListIfString(name).toCSV(file, val,varsToValue)
+          self.splitToListIfString(name).toCSV(file, val,varsToValue,args)
         else:
           output=self.get(name)
           if len(output)>0 and output[0]=="@":
@@ -369,8 +387,21 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
               print("Missing variable: "+output)
           file.write(output+',')
       else:
-        for i in range(val.countDeepestLevelEntries()):
+        for i in range(val.countDeepestLevelEntries(args)):
           file.write(",")
+  def setValFromCSV(self, header, bodyEntry, varsToValue):
+    for name, val in self.getAll():
+      if name in header[self.bracketLevel]:
+        if isinstance(val, NamesToValue):
+          val.setValFromCSV(header, bodyEntry,varsToValue)
+        else:
+          entry=bodyEntry[header[self.bracketLevel].index(name)]
+          # print(entry)
+          if val[0]=="@":
+            varsToValue.replace(val,entry)
+          else:
+            self.val=entry
+          
 class Building(NamesToValue): #derived from NamesToValue with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
   def __init__(self, lineNbr,buildingName):
     self.names=[]
