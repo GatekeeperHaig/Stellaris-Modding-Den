@@ -18,7 +18,8 @@ def parse(argv):
   parser.add_argument('fileNames', nargs = '*', help='File(s)/Path(s) to file(s) to be parsed or .mod file (see "--create_standalone_mod_from_mod). Output is named according to each file name with some extras. Globbing star(*) can be used (even under windows :P)')
   parser.add_argument('-j','--join_files', action="store_true", help="Do not mix different top level tags!")
   parser.add_argument('--filter', action="store_true", help="Use a comma separated file to determine with tags that are to be outputted. Everything below that key will be used. Filter file that will we tried to use is <filename(no .txt)>_filter.txt")
-  parser.add_argument('--to_txt', action="store_true", help="The csv file(s) previously created (<filename(no .txt)>.csv) will be used to try and find tags in the opened txt files whos value will be replaced by the entry in the txt files. If the txt file value is a variable, the value will we written in the header (possibly overwriting something else!")
+  parser.add_argument('-t','--to_txt', action="store_true", help="The csv file(s) previously created (<filename(no .txt)>.csv) will be used to try and find tags in the opened txt files whos value will be replaced by the entry in the txt files. If the txt file value is a variable, the value will we written in the header (possibly overwriting something else!")
+  parser.add_argument('-a','--allow_addition_to_txt', action="store_true", help="Columns that are added in the csv files are actually added to the txt files. So far no addition of rows (aka new components)")
   
   
   if isinstance(argv, str):
@@ -366,7 +367,7 @@ def main(args):
         for i in range(len(csvContent)):
           # print("".join(csvContent[i]))
           if "".join(csvContent[i])=="":
-            header=csvContent[:i]
+            header=csvContent[:i+1]
             body=csvContent[i+1:]
             break
         if i==len(csvContent)-1:
@@ -381,7 +382,7 @@ def main(args):
         for bodyEntry in body:
           # print(bodyEntry[keyCSVIndex])
           if bodyEntry[keyCSVIndex]==key:
-            val.setValFromCSV(header, bodyEntry,varsToValue)
+            val.setValFromCSV(header, bodyEntry,varsToValue,args)
             break
       with open(fileName.replace(".txt","_csvMod.txt"),'w') as file:
         varsToValue.writeAll(file)

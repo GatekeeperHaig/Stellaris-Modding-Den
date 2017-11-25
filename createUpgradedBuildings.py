@@ -361,7 +361,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       # print(val.countDeepestLevelEntries(args))
       if active or not args.filter or name in args.filter or (len(val.vals)>0 and val.countDeepestLevelEntries(args)>0):
         outStrings[self.bracketLevel]+=name
-        for i in range(val.countDeepestLevelEntries(args)):
+        for i in range(val.countDeepestLevelEntries(args,True)):
           outStrings[self.bracketLevel]+=","
         if active or not args.filter or name in args.filter:
           nextActive=True
@@ -389,18 +389,43 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       else:
         for i in range(val.countDeepestLevelEntries(args)):
           file.write(",")
-  def setValFromCSV(self, header, bodyEntry, varsToValue):
-    for name, val in self.getAll():
-      if name in header[self.bracketLevel]:
-        if isinstance(val, NamesToValue):
-          val.setValFromCSV(header, bodyEntry,varsToValue)
+  def setValFromCSV(self, header, bodyEntry, varsToValue,args):
+    print(header[self.bracketLevel])
+    print(self.names)
+    headerIndex=-1
+    for headerName in header[self.bracketLevel]:
+      headerIndex+=1
+      if headerName=="":
+        continue
+      print(headerName)
+      if args.allow_addition_to_txt and not headerName in self.names:
+        if header[self.bracketLevel+1][headerIndex]!="":
+          val=self.getOrCreate(headerName)
+          val.setValFromCSV(header, bodyEntry,varsToValue,args)
         else:
-          entry=bodyEntry[header[self.bracketLevel].index(name)]
-          # print(entry)
-          if val[0]=="@":
-            varsToValue.replace(val,entry)
-          else:
-            self.val=entry
+          self.add2(headerName,bodyEntry[headerIndex]) 
+        continue
+      val=self.get(headerName)
+      if isinstance(val, NamesToValue):
+        val.setValFromCSV(header, bodyEntry,varsToValue,args)
+      else:
+        entry=bodyEntry[headerIndex]
+        # print(entry)
+        if val[0]=="@":
+          varsToValue.replace(val,entry)
+        else:
+          self.val=entry
+    # for name, val in self.getAll():
+      # if name in header[self.bracketLevel]:
+        # if isinstance(val, NamesToValue):
+          # val.setValFromCSV(header, bodyEntry,varsToValue)
+        # else:
+          # entry=bodyEntry[header[self.bracketLevel].index(name)]
+          # # print(entry)
+          # if val[0]=="@":
+            # varsToValue.replace(val,entry)
+          # else:
+            # self.val=entry
           
 class Building(NamesToValue): #derived from NamesToValue with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
   def __init__(self, lineNbr,buildingName):
