@@ -398,7 +398,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       if headerName=="":
         continue
       print(headerName)
-      if args.allow_addition_to_txt and not headerName in self.names:
+      if args.allow_additions and not headerName in self.names:
         if header[self.bracketLevel+1][headerIndex]!="":
           val=self.getOrCreate(headerName)
           val.setValFromCSV(header, bodyEntry,varsToValue,args)
