@@ -18,7 +18,7 @@ def parse(argv):
   parser.add_argument('-k','--keep_lower_tier', action="store_true", help="Does not change any building requirements. Changing of building requirements only works with regard to capital buildings and techs and will fail if any of those are negated within the original conditions")
   parser.add_argument('-s','--t0_buildings', default='building_colony_shelter,building_deployment_post,building_basic_power_plant,building_basic_farm,building_basic_mine', help="Does not change building requirements for buildings in this comma separated list. Furthermore, their cost will not be added to the t1 buildings (but deducted from the upgrade version) (default: %(default)s)")
   parser.add_argument('-t','--time_discount', default=0.25, type=float, help="Total time of tier n will be: Time(tier n-1)+Time(upgrade tier n)*(1-discount), with the restriction that total time will never be lower than 'Time(upgrade tier n)' (default: %(default)s)")
-  parser.add_argument('-c','--cost_discount', default=0, type=float, help="Total cost of tier n will be: Cost(tier n-1)+Cost(upgrade tier n)*(1-discount), with the restriction that total cost will never be lower than 'Cost(upgrade tier n)'(default: %(default)s)")
+  parser.add_argument('-c','--cost_discount', default=0., type=float, help="Total cost of tier n will be: Cost(tier n-1)+Cost(upgrade tier n)*(1-discount), with the restriction that total cost will never be lower than 'Cost(upgrade tier n)'(default: %(default)s)")
   parser.add_argument('--custom_direct_build_AI_allow', action="store_true", help="By default, the script will replace the direct build AI_allows by the lowest tier AI_allow (since the checks of the lowest tiers are usually meant for tile validity which is also important for direct build high tier, but unessecary for upgrade). This will not happen with this option")
   parser.add_argument('--simplify_upgrade_AI_allow', action="store_true", help="Allows every single upgrade to AI (that means if the player would be able to build it, so does AI)")
   parser.add_argument('-f','--just_copy_and_check', action="store_true", help="If any non-building file in your mod includes 'has_building' mentions on buildings that will be copied by this script, run this mode once with all such files as input instead of the building files. In this mode the script will simply replace all 'has_building = ...' with scripted_triggers also checking for direct_build versions. IMPORTANT: 1. You need to apply the main script FIRST! 2. --output_folder will have to include the subfolder for this call!")
@@ -30,7 +30,7 @@ def parse(argv):
   parser.add_argument('--picture_file', default="", help="Picture file set in the mod file. Ignored for standalone mod creation. This file must be manually added to the mod folder!")
   parser.add_argument('--load_order_priority', action="store_true", help="If enabled, mod will be placed first in mod priority by adding '!' to filename. This allows the construction of mod extensions. Alternatively, you can create a standalone version , see '--create_standalone_mod_from_mod'.")
   parser.add_argument('-m','--create_standalone_mod_from_mod', action="store_true", help="If this flag is set, the script will create a copy of a mod folder, changing the building files and has_building triggers. Main input of the script should now be the .mod file.")
-  parser.add_argument('--custom_mod_name', help="If set, this will be the name of the new mod")
+  parser.add_argument('--custom_mod_name', default='', help="If set, this will be the name of the new mod")
   parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help=argparse.SUPPRESS)
   parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)
 
@@ -39,7 +39,7 @@ def parse(argv):
     argv=argv.split()
   args=parser.parse_args(argv)
 
-  args.t0_buildings=args.t0_buildings.split(",")
+
   
   args.scriptDescription='#This file was created by script!\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory\n'
 
@@ -880,6 +880,7 @@ def killWindowsBackSlashesWithFire(string):
   
 def preprocess(argv):
   args=parse(argv)
+  args.t0_buildings=args.t0_buildings.split(",")
   
   args.output_folder=os.path.normpath(args.output_folder.strip('"'))
   if args.output_folder[0]==".":

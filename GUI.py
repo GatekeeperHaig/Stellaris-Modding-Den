@@ -12,6 +12,7 @@ from scrollframe import ScrollFrame
 import webbrowser
 import platform
 import convertCSV_TXT
+import createUpgradedBuildings
 
 class Logger(object):
     def __init__(self, nb, tabs):
@@ -287,7 +288,46 @@ class TabClass:
       #event.widget.grid_columnconfigure(0, weight=1)
     #scrollbar.ScrolledWindow(self.mainFrame)
 
+class Option:
+  def __init__(self,  name='',description='', val=''):
+    self.name=name
+    if description=='':
+      self.description=self.name.replace("_"," ")
+    else:
+      self.description=description
+    self.val=val #boolean or string
+
+class OptionWindow:
+  def __init__(self,root,name, options,script):
+    self.window=tk.Toplevel(root)
+    self.window.withdraw()
+    self.window.title(name)   
+    self.window.protocol('WM_DELETE_WINDOW', self.window.withdraw)  # root is your root window
+    self.vals=[]
+    self.names=[]
+    frameL=tk.Frame(self.window)
+    frameL.pack(side="left", fill="both", expand=True)
+    frameR=tk.Frame(self.window)
+    frameR.pack(side="right", fill="both", expand=True)
+    scriptArgs=vars(script.parse(""))
+    for option in options:
+      l=Label(frameL, text=option.description)
+      l.pack(side=tk.TOP)
+      option.val=scriptArgs[option.name]
+      if isinstance(option.val, str) or isinstance(option.val, float):
+        self.vals.append(StringVar())
+        self.vals[-1].set(str(option.val))
+        e=Entry(frameR, bg="white",textvariable=self.vals[-1])
+        e.pack(side=tk.TOP)
+      else:
+        self.vals.append(IntVar())
+        self.vals[-1].set(option.val)
+        c=Checkbutton(frameR,  text='', variable=self.vals[-1])
+        c.pack(side=tk.TOP)
+        
+    #self.check=Checkbutton(line, text="filter", variable=self.checkvar)
   
+
 def repeatedChecks(tabClasses, root):
   for tab in tabClasses:
     tab.checkValid()
@@ -329,12 +369,36 @@ def main():
   tabs=[]
   tabs.append([("text files","*.txt"),"txt to csv", ["filter"], convertCSV_TXT,[],ttk.Frame(tabControl)])
   tabs.append([("comma separated files","*.csv"),"csv to txt", ["allow_additions", "overwrite"], convertCSV_TXT,["--to_txt"], ttk.Frame(tabControl)])
+  tabs.append([("text files","*.txt"),"createUpgradedBuildings", ["filter"], createUpgradedBuildings,[],ttk.Frame(tabControl)])
   tabClasses=[]
   for defaultFileFilter,name,options,command,fixedOptions,tab in tabs:
     tabControl.add(tab, text=name)
     tabClasses.append(TabClass(tab,root,command,fixedOptions, defaultFileFilter,options))
 
   tabControl.pack(expand=1, fill="both")  # Pack to make visible
+
+  
+  optionWindow=OptionWindow(root,"Create Upgraded buildings options",[
+    Option("output_folder"), 
+    Option("custom_mod_name"), 
+    Option("gameVersion","version"),
+    Option("t0_buildings"), 
+    Option("languages"),
+    Option("replacement_file"), 
+    Option("time_discount"), 
+    Option("cost_discount"),
+    Option("remove_reduntant_upgrades"), 
+    Option("keep_lower_tier"),
+    Option("custom_direct_build_AI_allow"), 
+    Option("simplify_upgrade_AI_allow"),
+    Option("load_order_priority"),
+    Option("join_files")
+    ],createUpgradedBuildings)
+  #b = tk.Button(tabClasses[0].scrollFrame, text="hide", command=optionWindow.window.withdraw)
+  #b.pack(side=tk.TOP)
+  #b = tk.Button(tabClasses[0].scrollFrame, text="show", command=optionWindow.window.deiconify)
+  #b.pack(side=tk.TOP)
+  
 
 
   sys.stdout = Logger(tabControl,tabClasses) #ensures output goes to right tab and console
