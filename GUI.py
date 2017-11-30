@@ -101,8 +101,9 @@ class Line:
     #self.check.pack(side=tk.LEFT)
     self.bConvTooltip= CreateToolTip(self.bConv, "Init")
     self.bEditSTooltip= CreateToolTip(self.bEditS, "Init")
-    self.bEditFTooltip= CreateToolTip(self.bEditS, "Init")
-    self.bEditRTooltip= CreateToolTip(self.bEditS, "Init")
+    self.bEditFTooltip= CreateToolTip(self.bEditF, "Init")
+    self.bEditRTooltip= CreateToolTip(self.bEditR, "Init")
+    CreateToolTip(self.bDel, "Remove line. No files will be deleted!")
   def getTxt(self):
     return self.txt.get().strip()
   def getTxt2(self):
@@ -185,13 +186,13 @@ class TabClass:
           
         ##and not os.access(line.result,os.W_OK):
         ##resultW=0
-      #if not os.access(line.result,os.W_OK):
-        #resultR=0
+      if not os.access(line.result,os.W_OK):
+        resultR=0
       #if not os.access(line.getTxt().replace(".txt","_filter.txt"),os.W_OK):
         #filterR=0
       if resultW and sourceR:
         line.bConv.config(state="normal")
-        line.bConvTooltip.update("Valid")
+        line.bConvTooltip.update("Start script")
       else:
         line.bConv.config(state="disabled")
         if not sourceR:
@@ -200,22 +201,22 @@ class TabClass:
           line.bConvTooltip.update("Result file access problem. Might be locked by program that has it open")
       if sourceR:
         line.bEditS.config(state="normal")
-        line.bEditSTooltip.update("Valid")
+        line.bEditSTooltip.update("Open source file in default editor")
       else:
         line.bEditS.config(state="disabled")
-        line.bEditSTooltip.update("Invalid")
+        line.bEditSTooltip.update("Invalid source file")
       if filterR:
         line.bEditF.config(state="normal")
-        line.bEditFTooltip.update("Valid")
+        line.bEditFTooltip.update("Open or create and open filter file. Comma separated list of tags")
       else:
         line.bEditF.config(state="disabled")
         line.bEditFTooltip.update("Invalid")
       if resultR and resultW:
         line.bEditR.config(state="normal")
-        line.bEditRTooltip.update("Valid")
+        line.bEditRTooltip.update("Open result file.")
       else:
         line.bEditR.config(state="disabled")
-        line.bEditRTooltip.update("Invalid")
+        line.bEditRTooltip.update("Missing result file. You probably need to create it first via 'Convert'")
         
     #os.F_OK − Value to pass as the mode parameter of access() to test the existence of path.
     #os.R_OK − Value to include in the mode parameter of access() to test the readability of path.
@@ -254,8 +255,8 @@ class TabClass:
       check.pack(side=tk.RIGHT)
     #b = tk.Button(self.extraLineMain, text="(Un-)check all", command=self.checkAll)
     #b.pack(side=tk.RIGHT)
-    b = tk.Button(self.extraLineMain, text="Add line", command=self.addLine)
-    b.pack(side=tk.RIGHT)
+    #b = tk.Button(self.extraLineMain, text="Add line", command=self.addLine)
+    #b.pack(side=tk.RIGHT)
     b = tk.Button(self.extraLineMain, text="Add file(s)", command=self.addFiles)
     b.pack(side=tk.RIGHT)
     b = tk.Button(self.extraLineMain, text="Convert All", command=self.invokeAll)
