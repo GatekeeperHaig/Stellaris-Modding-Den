@@ -445,7 +445,6 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
             if args.allow_additions:
               self.add2(headerName,copy.deepcopy(self.getN_th(headerName, n_th_occurence-1)))
               valIndex=self.n_thIndex(headerName,n_th_occurence)
-              print(self.vals[valIndex])
             else:
               raise
           local_n_th_occurence=0
@@ -461,11 +460,25 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args,local_n_th_occurence)
       else:
         entry=bodyEntry[headerIndex]
-        # print(entry)
-        if self.vals[valIndex][0]=="@":
+        # print(entry)         
+        if self.vals[valIndex][0]=="@" and entry!="#delete":
           varsToValue.replace(self.vals[valIndex],entry)
         else:
           self.vals[valIndex]=entry
+  def deleteMarked(self):
+    delete=[]
+    for i in range(len(self.names)):
+      if isinstance(self.vals[i],NamesToValue):
+        if self.vals[i].deleteMarked():
+          delete.append(i)
+      else:
+        if self.vals[i]=="#delete":
+          delete.append(i)
+    if len(delete)==len(self.names) or len(delete)==len(self.names)-1 and "key" in self.names:
+      return True #fully deleted. Delete head tag
+    for i in reversed(sorted(delete)):      #delete last first to make sure indices stay valid
+      self.removeIndex(i)
+    return False
           
 class Building(NamesToValue): #derived from NamesToValue with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
   def __init__(self, lineNbr,buildingName):

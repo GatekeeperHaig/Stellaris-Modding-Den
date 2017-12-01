@@ -142,6 +142,7 @@ def main(args):
         outFileName=fileName.replace(".txt","_csvMod.txt")
       lastOutFile=outFileName
       if not args.test_run:
+        nameToData.deleteMarked()
         with open(outFileName,'w') as file:       
           varsToValue.writeAll(file)
           nameToData.writeAll(file)
