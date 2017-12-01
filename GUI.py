@@ -24,10 +24,10 @@ class Logger(object):
     def write(self, message):
         self.terminal.write(message)
         txt=self.tabs[self.nb.index(self.nb.select())].txt
-        txt.config(state=NORMAL)
+        #txt.config(state=NORMAL)
         txt.insert(tk.END,message)
         txt.see(tk.END)
-        txt.config(state=DISABLED)
+        #txt.config(state=DISABLED)
 
     def flush(self):
         #this flush method is needed for python 3 compatibility.
@@ -39,17 +39,23 @@ class Logger(object):
   
 
 def startEditor(filename, forceEditor=False):
+  if not os.path.exists(filename):
+    with open(filename,'w') as file:
+      pass
   if platform.system()=='Windows':
     if forceEditor:
       subprocess.Popen("notepad "+filename, shell=True)
     else:
       subprocess.Popen(filename, shell=True)
   else:
-    editor = os.getenv('EDITOR')
-    if editor:
-        subprocess.Popen(editor + ' ' + filename, shell=True)
+    if (filename.find(".ods")!=-1):
+      subprocess.Popen("xdg-open "+filename, shell=True)
     else:
-        webbrowser.open(filename)
+      editor = os.getenv('EDITOR')
+      if editor:
+          subprocess.Popen(editor + ' ' + filename, shell=True)
+      else:
+          webbrowser.open(filename)
 
 class Line:
   def openFile(self):
@@ -275,8 +281,9 @@ class TabClass:
     txt_frm.grid_columnconfigure(0, weight=1)
     
     # create a Text widget
-    self.txt = tk.Text(txt_frm, borderwidth=3,bg="grey", relief="sunken")
-    self.txt.config(state=DISABLED)
+    self.txt = tk.Text(txt_frm, borderwidth=3,bg="light grey", relief="sunken")
+    #self.txt.config(state=DISABLED)
+    self.txt.bind("<Key>", lambda e: "break")
     self.txt.config(font=("consolas", 12), undo=True, wrap='word')
     self.txt.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
 
@@ -371,8 +378,8 @@ def main():
 
   tabControl = ttk.Notebook(root)          # Create Tab Control
   tabs=[]
-  tabs.append([("text files","*.txt"),"txt to csv", ["filter"], convertCSV_TXT,[],ttk.Frame(tabControl)])
-  tabs.append([("comma separated files","*.csv"),"csv to txt", ["allow_additions", "overwrite"], convertCSV_TXT,["--to_txt"], ttk.Frame(tabControl)])
+  tabs.append([("text files","*.txt"),"txt to ods", ["filter"], convertCSV_TXT,[],ttk.Frame(tabControl)])
+  tabs.append([("table documents","*.ods"),"ods to txt", ["allow_additions", "overwrite"], convertCSV_TXT,["--to_txt"], ttk.Frame(tabControl)])
   tabs.append([("text files","*.txt"),"createUpgradedBuildings", ["filter"], createUpgradedBuildings,[],ttk.Frame(tabControl)])
   tabClasses=[]
   for defaultFileFilter,name,options,command,fixedOptions,tab in tabs:

@@ -167,8 +167,8 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       file.write("\t")
     if not isinstance(self.vals[i],NamesToValue):
       file.write(self.names[i])
-      if len(self.vals[i])>0:
-        file.write(" = "+self.vals[i])
+      if len(str(self.vals[i]))>0:
+        file.write(" = "+str(self.vals[i]))
     else:
       if self.bracketLevel==1:
         file.write("\n")
@@ -364,23 +364,29 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       if isinstance(val, NamesToValue):
         depth=max(depth, val.determineDepth())
     return depth
-  def toCSVHeader(self, outStrings,args, active=False): #called using taglist!
+  def toCSVHeader(self, outArray,args, active=False, curIndex=0): #called using taglist!
     if len(self.names)==0:
-      for i in range(self.bracketLevel,len(outStrings)):
-        outStrings[i]+=";"
+      curIndex+=1
+      #for i in range(self.bracketLevel,len(outStrings)):
+        #outStrings[i]+=";"
     for name,val in self.getAll():
       # print(val.countDeepestLevelEntries(args))
       if active or not args.filter or name in args.filter or (len(val.vals)>0 and val.countDeepestLevelEntries(args)>0):
-        outStrings[self.bracketLevel]+=name
-        for i in range(val.countDeepestLevelEntries(args,True)):
-          outStrings[self.bracketLevel]+=";"
+        #print(name)
+        #print(curIndex)
+        #print(len(outArray[0]))
+        outArray[self.bracketLevel][curIndex]=name
+       # curIndex+=1
+        #for i in range(val.countDeepestLevelEntries(args,True)):
+          #outStrings[self.bracketLevel]+=";"
         if active or not args.filter or name in args.filter:
           nextActive=True
         else:
           nextActive=False
-        val.toCSVHeader(outStrings,args,nextActive)
+        curIndex=val.toCSVHeader(outArray,args,nextActive,curIndex)
       else:
         self.remove(name)
+    return curIndex
   def toCSV(self, lineArray, tagList,varsToValue,args,curIndex=0, curLineIndex=0):
     for name,val in tagList.getAll():
       # print(name)
@@ -419,7 +425,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
     headerIndex=-1
     for headerName in header[self.bracketLevel]:
       headerIndex+=1
-      if headerName=="" or bodyEntry[headerIndex]=="":
+      if headerName=="" or len(bodyEntry)<=headerIndex or bodyEntry[headerIndex]=="":
         continue
       # print(headerName)
       if args.allow_additions and not headerName in self.names:
@@ -449,7 +455,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         entry=bodyEntry[headerIndex]
         # print(entry)
         if self.vals[valIndex][0]=="@":
-          varsToValue.replace(val,entry)
+          varsToValue.replace(self.vals[valIndex],entry)
         else:
           self.vals[valIndex]=entry
           

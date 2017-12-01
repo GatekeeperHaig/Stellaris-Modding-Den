@@ -12,6 +12,7 @@ import glob
 from shutil import copyfile
 import createUpgradedBuildings as BU
 import re
+from collections import OrderedDict
 
 def parse(argv):
   #print(argv)
@@ -23,7 +24,14 @@ def parse(argv):
   parser.add_argument('-a','--allow_additions', action="store_true", help="Columns that are added in the csv files are actually added to the txt files. So far no addition of rows (aka new components)")
   parser.add_argument('--overwrite', action="store_true", help="Overwrites the original txt file when converting to txt. By default the script creates an additional one. CSV files are always overwritten!")
   parser.add_argument('--test_run', action="store_true", help="No Output.")
+  parser.add_argument('--use_csv', action="store_true", help="Due to problems with quotation marks going missing on opening a file in Excel or OpenOffice I have changed to storing and opening ods files. You can revert to csv using this option")
   
+  try:
+    import pyexcel_ods
+  except ModuleNotFoundError:
+    print("'Pyexcel-ods' plugin not found. Install it via 'pip install pyexcel-ods' (or 'pip install pyexcel-ods --user' if you are missing write access to the python folder)")
+    print("Using cvs mode. This can cause problems with Excel/OpenOffice removing quotation marks!")
+    args.use_csv=True
   
   if isinstance(argv, str):
     argv=argv.split()
@@ -37,6 +45,10 @@ def parse(argv):
 
         
 def main(args):
+  if args.use_csv:
+    tableFileEnding=".csv"
+  else:
+    tableFileEnding=".ods"
   args.just_copy_and_check=False
   lastOutFile=""
   fileIndex=-1
@@ -45,8 +57,8 @@ def main(args):
     globbedList.extend(glob.glob(b.strip('"')))
   for fileName in globbedList:
     if args.to_txt:
-      if fileName[-4:]==".csv":
-        fileName=fileName.replace(".csv",".txt")
+      if fileName[-4:]==tableFileEnding:
+        fileName=fileName.replace(tableFileEnding,".txt")
     fileIndex+=1
     if fileIndex==0 or not args.join_files:
       varsToValue=BU.NamesToValue(0)
@@ -54,7 +66,7 @@ def main(args):
       tagList=BU.NamesToValue(0)
       
       
-    if fileName.replace(".txt",".csv")==fileName:
+    if fileName.replace(".txt",tableFileEnding)==fileName:
       print("Non .txt file!")
       continue
     if args.filter:
@@ -76,21 +88,28 @@ def main(args):
     nameToData.addTags(tagList)
     
     if args.to_txt:
-      csvFile=fileName.replace(".txt",".csv")
+      csvFile=fileName.replace(".txt",tableFileEnding)
       if not os.path.exists(csvFile):
-        print("No csv file for: "+fileName)
+        print("No "+tableFileEnding+" file for: "+fileName)
         continue
-      with open(csvFile) as file:
-        csvContent=[re.split(",|;",line.strip()) for line in file]
-        for i in range(len(csvContent)):
-          # print("".join(csvContent[i]))
-          if "".join(csvContent[i])=="":
-            header=csvContent[:i+1]
-            body=csvContent[i+1:]
-            break
-        if i==len(csvContent)-1:
-          print("Error: No end of header found. There needs to be an empty line!")
-          sys.exit(1)
+      if args.use_csv:
+        with open(csvFile) as file:
+          csvContent=[re.split(",|;",line.strip()) for line in file]
+      else:
+        import pyexcel_ods
+        sheets=pyexcel_ods.get_data(csvFile)
+        sheet=sheets.popitem() #should be the first sheet. Others are ignored!
+        csvContent=sheet[1] #0 is the sheetname
+        #print(csvContent)
+      for i in range(len(csvContent)):
+        # print("".join(csvContent[i]))
+        if "".join(csvContent[i])=="":
+          header=csvContent[:i+1]
+          body=csvContent[i+1:]
+          break
+      if i==len(csvContent)-1:
+        print("Error: No end of header found. There needs to be an empty line!")
+        sys.exit(1)
       for name, val in nameToData.getAll():
         if name!=header[0][0]:
           continue;
@@ -109,7 +128,7 @@ def main(args):
           # print(bodyEntry[keyCSVIndex])
           # if bodyEntry[keyCSVIndex].strip('"')==key:
           if bodyEntry[keyCSVIndex]==key:
-            print(key)
+            #print(key)
             val.setValFromCSV(header, bodyEntry,varsToValue,args)
             found+=1
             # break
@@ -129,27 +148,35 @@ def main(args):
         continue
         
     # nameToData.printAll()
-    headerString=["" for i in range(tagList.determineDepth())]
-    tagList.toCSVHeader(headerString,args)
+    lineArrayT=['' for i in range(tagList.countDeepestLevelEntries(args, True))]
+    headerArray=[copy.deepcopy(lineArrayT) for i in range(tagList.determineDepth())]
+    tagList.toCSVHeader(headerArray,args)
     if args.join_files:
-      csvFileName=fileName.replace(".txt","JOINED.csv")
+      csvFileName=fileName.replace(".txt","JOINED"+tableFileEnding)
     else:
-      csvFileName=fileName.replace(".txt",".csv")
+      csvFileName=fileName.replace(".txt",tableFileEnding)
     lastOutFile=csvFileName
     if not args.test_run:
       try:
         if os.path.exists(csvFileName):
           os.remove(csvFileName) #hopyfully fixing the strange bug for ExNihil that he can't overwrite the file...
-        with open(csvFileName,'w') as file:
-          lineArrayT=[['' for i in range(tagList.countDeepestLevelEntries(args, True))]]
-          for line in headerString:
-            file.write(line+"\n")
-          for name, val in nameToData.getAll():
-            lineArray=copy.deepcopy(lineArrayT)
-            val.toCSV(lineArray, tagList.get(name),varsToValue,args)
-            for lineArray_ in lineArray:
-              file.write(";".join(lineArray_)+";\n")
-            # file.write("\n")
+        bodyArray=[]
+        for name, val in nameToData.getAll():
+          lineArray=[copy.deepcopy(lineArrayT)]
+          val.toCSV(lineArray, tagList.get(name),varsToValue,args)
+          bodyArray+=lineArray
+        if args.use_csv:
+          with open(csvFileName,'w') as file:         
+            for headerLine in headerArray:
+              file.write(";".join(headerLine)+";\n")            
+            for bodyLine in lineArray:
+              file.write(";".join(bodyLine)+";\n")
+              # file.write("\n")
+        else:
+          data=OrderedDict()
+          data.update({"DataSheet": headerArray+bodyArray})
+          import pyexcel_ods
+          pyexcel_ods.save_data(csvFileName, data)
       except PermissionError:
         print("PermissionError on file write. You must close "+csvFileName+" before running the script")
     # for compName, component in nameToData.getAll():
