@@ -97,11 +97,21 @@ def main(args):
         key=val.get("key").strip('"')
         keyCSVIndex=header[1].index("key")
         # print(key)
+        found=0
         for bodyEntry in body:
+          if found>0:
+            if bodyEntry[keyCSVIndex]:
+              break
+            else:
+              val.setValFromCSV(header, bodyEntry,varsToValue,args,found)
+              found+=1
+            
           # print(bodyEntry[keyCSVIndex])
-          if bodyEntry[keyCSVIndex]==key:
+          if bodyEntry[keyCSVIndex].strip('"')==key:
+            # print(key)
             val.setValFromCSV(header, bodyEntry,varsToValue,args)
-            break
+            found+=1
+            # break
       if args.overwrite:
         outFileName=fileName
       else:
@@ -130,11 +140,15 @@ def main(args):
         if os.path.exists(csvFileName):
           os.remove(csvFileName) #hopyfully fixing the strange bug for ExNihil that he can't overwrite the file...
         with open(csvFileName,'w') as file:
+          lineArrayT=[['' for i in range(tagList.countDeepestLevelEntries(args, True))]]
           for line in headerString:
             file.write(line+"\n")
           for name, val in nameToData.getAll():
-            val.toCSV(file, tagList.get(name),varsToValue,args)
-            file.write("\n")
+            lineArray=copy.deepcopy(lineArrayT)
+            val.toCSV(lineArray, tagList.get(name),varsToValue,args)
+            for lineArray_ in lineArray:
+              file.write(";".join(lineArray_)+";\n")
+            # file.write("\n")
       except PermissionError:
         print("PermissionError on file write. You must close "+csvFileName+" before running the script")
     # for compName, component in nameToData.getAll():

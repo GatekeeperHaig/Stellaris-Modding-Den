@@ -53,7 +53,15 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
     self.comments=[]
     self.bracketLevel=level
   def get(self,name): #allows changing of content if vals[i] is an object
-    return self.vals[self.names.index(name)]
+    return self.vals[self.names.index(name)]  
+  def getN_th(self,name,n): #allows changing of content if vals[i] is an object
+    index=self.n_thIndex(name,n)
+    return self.vals[index]
+  def n_thIndex(self,name,n):
+    indexedOccurences=[i for i, n in enumerate(self.names) if n == name]
+    if len(indexedOccurences)<=n:
+      raise ValueError("Not enough occurences in list!")
+    return indexedOccurences[n]
   def getOrCreate(self,name): #required to add something a a category that may already exist "getOrCreate(name).add..."
     if not name in self.names:
       self.add2(name, NamesToValue(self.bracketLevel+1))
@@ -110,9 +118,12 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       self.comments[i]=comment
     except ValueError:
       self.add2(name,val,comment)
-  def splitToListIfString(self,name): #I do not generally split lines that open and close brackets within the line (to prevent enlarging the file). Yet sometimes it's necessary...
+  def splitToListIfString(self,name,n=0): #I do not generally split lines that open and close brackets within the line (to prevent enlarging the file). Yet sometimes it's necessary...
     try:
-      i=self.names.index(name)
+      if n==0:
+        i=self.names.index(name)
+      else:
+        i=self.n_thIndex(name,n)
     except ValueError:
       return NamesToValue(0)
     if not isinstance(self.vals[i],NamesToValue):
@@ -356,13 +367,13 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
   def toCSVHeader(self, outStrings,args, active=False): #called using taglist!
     if len(self.names)==0:
       for i in range(self.bracketLevel,len(outStrings)):
-        outStrings[i]+=","
+        outStrings[i]+=";"
     for name,val in self.getAll():
       # print(val.countDeepestLevelEntries(args))
       if active or not args.filter or name in args.filter or (len(val.vals)>0 and val.countDeepestLevelEntries(args)>0):
         outStrings[self.bracketLevel]+=name
         for i in range(val.countDeepestLevelEntries(args,True)):
-          outStrings[self.bracketLevel]+=","
+          outStrings[self.bracketLevel]+=";"
         if active or not args.filter or name in args.filter:
           nextActive=True
         else:
@@ -370,34 +381,47 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         val.toCSVHeader(outStrings,args,nextActive)
       else:
         self.remove(name)
-  def toCSV(self, file, tagList,varsToValue,args):
+  def toCSV(self, lineArray, tagList,varsToValue,args,curIndex=0, curLineIndex=0):
     for name,val in tagList.getAll():
       # print(name)
-      if name in self.names:
+      occurences=self.names.count(name)
+      # if name in self.names:
+      curIndexTmp=curIndex
+      for occurenceIndex in range(occurences):
+        curIndex=curIndexTmp
+        if occurenceIndex+curLineIndex>= len(lineArray):
+          lineArray.append(['' for i in lineArray[0]])
+        
         if len(val.names)>0:
           # print(name)
           # print(self.get(name))
-          self.splitToListIfString(name).toCSV(file, val,varsToValue,args)
+          curIndex=self.splitToListIfString(name,occurenceIndex).toCSV(lineArray, val,varsToValue,args,curIndex, curLineIndex+occurenceIndex)
         else:
-          output=self.get(name)
+          output=self.getN_th(name,occurenceIndex)
           if len(output)>0 and output[0]=="@":
             try:
               output=varsToValue.get(output)
             except ValueError:
               print("Missing variable: "+output)
-          file.write(output+',')
-      else:
-        for i in range(val.countDeepestLevelEntries(args)):
-          file.write(",")
-  def setValFromCSV(self, header, bodyEntry, varsToValue,args):
-    print(header[self.bracketLevel])
-    print(self.names)
+          lineArray[curLineIndex+occurenceIndex][curIndex]=output
+          curIndex+=1
+      if occurences==0:
+        if isinstance(val, NamesToValue):
+          curIndex+=val.countDeepestLevelEntries(args, True)
+        else:
+          curIndex+=1
+    return curIndex
+        # for i in range(val.countDeepestLevelEntries(args)):
+          # file.write(",")
+  def setValFromCSV(self, header, bodyEntry, varsToValue,args, n_th_occurence=0):
+    # print(header[self.bracketLevel])
+    # print(self.names)
     headerIndex=-1
     for headerName in header[self.bracketLevel]:
       headerIndex+=1
-      if headerName=="":
+      if headerName=="" or bodyEntry[headerIndex]=="":
         continue
-      print(headerName)
+      # print(headerName)
       if args.allow_additions and not headerName in self.names:
         if header[self.bracketLevel+1][headerIndex]!="":
           val=self.getOrCreate(headerName)
@@ -405,27 +429,29 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         else:
           self.add2(headerName,bodyEntry[headerIndex]) 
         continue
-      val=self.get(headerName)
-      if isinstance(val, NamesToValue):
-        val.setValFromCSV(header, bodyEntry,varsToValue,args)
+      valIndex=-1
+      local_n_th_occurence=n_th_occurence
+      if n_th_occurence>0:
+        if self.names.count(headerName)>=n_th_occurence:
+          valIndex=self.n_thIndex(headerName,n_th_occurence)
+          local_n_th_occurence=0
+      if valIndex<=0:
+        try:
+          valIndex=self.names.index(headerName)
+        except ValueError:
+          print("Invalid tag '{}' with data '{}'. You need to allow additions if you add tags".format(headerName,bodyEntry[headerIndex]))
+          print(n_th_occurence)
+          print(self.names)
+          continue
+      if isinstance(self.vals[valIndex], NamesToValue):
+        self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args,local_n_th_occurence)
       else:
         entry=bodyEntry[headerIndex]
         # print(entry)
-        if val[0]=="@":
+        if self.vals[valIndex][0]=="@":
           varsToValue.replace(val,entry)
         else:
-          self.val=entry
-    # for name, val in self.getAll():
-      # if name in header[self.bracketLevel]:
-        # if isinstance(val, NamesToValue):
-          # val.setValFromCSV(header, bodyEntry,varsToValue)
-        # else:
-          # entry=bodyEntry[header[self.bracketLevel].index(name)]
-          # # print(entry)
-          # if val[0]=="@":
-            # varsToValue.replace(val,entry)
-          # else:
-            # self.val=entry
+          self.vals[valIndex]=entry
           
 class Building(NamesToValue): #derived from NamesToValue with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
   def __init__(self, lineNbr,buildingName):

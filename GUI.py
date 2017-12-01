@@ -23,8 +23,11 @@ class Logger(object):
 
     def write(self, message):
         self.terminal.write(message)
-        self.tabs[self.nb.index(self.nb.select())].txt.insert(tk.END,message)
-        self.tabs[self.nb.index(self.nb.select())].txt.see(tk.END)
+        txt=self.tabs[self.nb.index(self.nb.select())].txt
+        txt.config(state=NORMAL)
+        txt.insert(tk.END,message)
+        txt.see(tk.END)
+        txt.config(state=DISABLED)
 
     def flush(self):
         #this flush method is needed for python 3 compatibility.
@@ -272,7 +275,8 @@ class TabClass:
     txt_frm.grid_columnconfigure(0, weight=1)
     
     # create a Text widget
-    self.txt = tk.Text(txt_frm, borderwidth=3, relief="sunken")
+    self.txt = tk.Text(txt_frm, borderwidth=3,bg="grey", relief="sunken")
+    self.txt.config(state=DISABLED)
     self.txt.config(font=("consolas", 12), undo=True, wrap='word')
     self.txt.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
 
