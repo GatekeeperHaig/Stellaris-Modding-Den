@@ -18,7 +18,7 @@ def parse(argv):
   parser.add_argument('-k','--keep_lower_tier', action="store_true", help="Does not change any building requirements. Changing of building requirements only works with regard to capital buildings and techs and will fail if any of those are negated within the original conditions")
   parser.add_argument('-s','--t0_buildings', default='building_colony_shelter,building_deployment_post,building_basic_power_plant,building_basic_farm,building_basic_mine', help="Does not change building requirements for buildings in this comma separated list. Furthermore, their cost will not be added to the t1 buildings (but deducted from the upgrade version) (default: %(default)s)")
   parser.add_argument('-t','--time_discount', default=0.25, type=float, help="Total time of tier n will be: Time(tier n-1)+Time(upgrade tier n)*(1-discount), with the restriction that total time will never be lower than 'Time(upgrade tier n)' (default: %(default)s)")
-  parser.add_argument('-c','--cost_discount', default=0, type=float, help="Total cost of tier n will be: Cost(tier n-1)+Cost(upgrade tier n)*(1-discount), with the restriction that total cost will never be lower than 'Cost(upgrade tier n)'(default: %(default)s)")
+  parser.add_argument('-c','--cost_discount', default=0., type=float, help="Total cost of tier n will be: Cost(tier n-1)+Cost(upgrade tier n)*(1-discount), with the restriction that total cost will never be lower than 'Cost(upgrade tier n)'(default: %(default)s)")
   parser.add_argument('--custom_direct_build_AI_allow', action="store_true", help="By default, the script will replace the direct build AI_allows by the lowest tier AI_allow (since the checks of the lowest tiers are usually meant for tile validity which is also important for direct build high tier, but unessecary for upgrade). This will not happen with this option")
   parser.add_argument('--simplify_upgrade_AI_allow', action="store_true", help="Allows every single upgrade to AI (that means if the player would be able to build it, so does AI)")
   parser.add_argument('-f','--just_copy_and_check', action="store_true", help="If any non-building file in your mod includes 'has_building' mentions on buildings that will be copied by this script, run this mode once with all such files as input instead of the building files. In this mode the script will simply replace all 'has_building = ...' with scripted_triggers also checking for direct_build versions. IMPORTANT: 1. You need to apply the main script FIRST! 2. --output_folder will have to include the subfolder for this call!")
@@ -30,7 +30,7 @@ def parse(argv):
   parser.add_argument('--picture_file', default="", help="Picture file set in the mod file. Ignored for standalone mod creation. This file must be manually added to the mod folder!")
   parser.add_argument('--load_order_priority', action="store_true", help="If enabled, mod will be placed first in mod priority by adding '!' to filename. This allows the construction of mod extensions. Alternatively, you can create a standalone version , see '--create_standalone_mod_from_mod'.")
   parser.add_argument('-m','--create_standalone_mod_from_mod', action="store_true", help="If this flag is set, the script will create a copy of a mod folder, changing the building files and has_building triggers. Main input of the script should now be the .mod file.")
-  parser.add_argument('--custom_mod_name', help="If set, this will be the name of the new mod")
+  parser.add_argument('--custom_mod_name', default='', help="If set, this will be the name of the new mod")
   parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help=argparse.SUPPRESS)
   parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)
 
@@ -39,7 +39,7 @@ def parse(argv):
     argv=argv.split()
   args=parser.parse_args(argv)
 
-  args.t0_buildings=args.t0_buildings.split(",")
+
   
   args.scriptDescription='#This file was created by script!\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory\n'
 
@@ -53,7 +53,15 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
     self.comments=[]
     self.bracketLevel=level
   def get(self,name): #allows changing of content if vals[i] is an object
-    return self.vals[self.names.index(name)]
+    return self.vals[self.names.index(name)]  
+  def getN_th(self,name,n): #allows changing of content if vals[i] is an object
+    index=self.n_thIndex(name,n)
+    return self.vals[index]
+  def n_thIndex(self,name,n):
+    indexedOccurences=[i for i, n in enumerate(self.names) if n == name]
+    if len(indexedOccurences)<=n:
+      raise ValueError("Not enough occurences in list!")
+    return indexedOccurences[n]
   def getOrCreate(self,name): #required to add something a a category that may already exist "getOrCreate(name).add..."
     if not name in self.names:
       self.add2(name, NamesToValue(self.bracketLevel+1))
@@ -110,9 +118,12 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       self.comments[i]=comment
     except ValueError:
       self.add2(name,val,comment)
-  def splitToListIfString(self,name): #I do not generally split lines that open and close brackets within the line (to prevent enlarging the file). Yet sometimes it's necessary...
+  def splitToListIfString(self,name,n=0): #I do not generally split lines that open and close brackets within the line (to prevent enlarging the file). Yet sometimes it's necessary...
     try:
-      i=self.names.index(name)
+      if n==0:
+        i=self.names.index(name)
+      else:
+        i=self.n_thIndex(name,n)
     except ValueError:
       return NamesToValue(0)
     if not isinstance(self.vals[i],NamesToValue):
@@ -156,8 +167,8 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       file.write("\t")
     if not isinstance(self.vals[i],NamesToValue):
       file.write(self.names[i])
-      if len(self.vals[i])>0:
-        file.write(" = "+self.vals[i])
+      if len(str(self.vals[i]))>0:
+        file.write(" = "+str(self.vals[i]))
     else:
       if self.bracketLevel==1:
         file.write("\n")
@@ -282,19 +293,21 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       self.replace(tag,finalVal)
     else:
       self.add([tag, finalVal])
-  def readFile(self,fileName,args, varsToValue):#stores content of buildingFileName in self and varsToValue
+  def readFile(self,fileName,args, varsToValue,keepEmptryLinesAndComments=False):#stores content of buildingFileName in self and varsToValue
     bracketLevel=0
     objectList=[] #objects currently open objectList[0] would be lowest bracket object (a building), etc
+    currentlyInHeader=True
     with open(fileName,'r') as inputFile:
       print("Start reading "+fileName)
       lineIndex=0
       for line in inputFile:
         lineIndex+=1
         line=line.strip()
-        if len(line)>0 :
+        if len(line)>0 and (line[0]!="#" or bracketLevel>0) :
           if line[0]=="@":
             varsToValue.addString(line)
           elif line[0]!="#" or bracketLevel>0:
+            currentlyInHeader=False
             bracketOpen=line.count("{")
             bracketClose=line.count("}")
             if bracketLevel==0:
@@ -323,6 +336,11 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
             if bracketLevel==0 and bracketDiff<0:
               self.vals[-1].lineEnd=lineIndex
             objectList=objectList[0:bracketLevel]
+        elif keepEmptryLinesAndComments:
+          if currentlyInHeader:
+            varsToValue.addString(line)
+          elif bracketLevel==0:
+            self.addString(line)
   def addTags(self, tagList):
     for name, entry in self.getAll():
       tagEntry=tagList.getOrCreate(name)
@@ -330,47 +348,138 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         entry.addTags(tagEntry)
       # else:
         # tagList.replace(name,"")
-  def countDeepestLevelEntries(self):
+  def countDeepestLevelEntries(self,args, active=False):
     if len(self.names)==0:
       return 1
     count=0
-    for val in self.vals:
-      if isinstance(val, NamesToValue):
-        count+=val.countDeepestLevelEntries()
+    for name,val in self.getAll():
+      if active or not args.filter or name in args.filter:
+        count+=val.countDeepestLevelEntries(args,True)
+      elif len(val.vals)>0:
+        count+=val.countDeepestLevelEntries(args)
     return count
   def determineDepth(self):
-    depth=self.bracketLevel
+    depth=self.bracketLevel+1 #one extra depth on purpose. Empty line to determine end of header
     for val in self.vals:
       if isinstance(val, NamesToValue):
         depth=max(depth, val.determineDepth())
     return depth
-  def toCSVHeader(self, outStrings): #called using taglist!
+  def toCSVHeader(self, outArray,args, active=False, curIndex=0): #called using taglist!
     if len(self.names)==0:
-      for i in range(self.bracketLevel,len(outStrings)):
-        outStrings[i]+=","
+      curIndex+=1
+      #for i in range(self.bracketLevel,len(outStrings)):
+        #outStrings[i]+=";"
     for name,val in self.getAll():
-      outStrings[self.bracketLevel]+=name
-      for i in range(val.countDeepestLevelEntries()):
-        outStrings[self.bracketLevel]+=","
-      val.toCSVHeader(outStrings)
-  def toCSV(self, file, tagList,varsToValue):
+      # print(val.countDeepestLevelEntries(args))
+      if active or not args.filter or name in args.filter or (len(val.vals)>0 and val.countDeepestLevelEntries(args)>0):
+        #print(name)
+        #print(curIndex)
+        #print(len(outArray[0]))
+        outArray[self.bracketLevel][curIndex]=name
+       # curIndex+=1
+        #for i in range(val.countDeepestLevelEntries(args,True)):
+          #outStrings[self.bracketLevel]+=";"
+        if active or not args.filter or name in args.filter:
+          nextActive=True
+        else:
+          nextActive=False
+        curIndex=val.toCSVHeader(outArray,args,nextActive,curIndex)
+      else:
+        self.remove(name)
+    return curIndex
+  def toCSV(self, lineArray, tagList,varsToValue,args,curIndex=0, curLineIndex=0):
     for name,val in tagList.getAll():
-      if name in self.names:
+      # print(name)
+      occurences=self.names.count(name)
+      # if name in self.names:
+      curIndexTmp=curIndex
+      for occurenceIndex in range(occurences):
+        curIndex=curIndexTmp
+        if occurenceIndex+curLineIndex>= len(lineArray):
+          lineArray.append(['' for i in lineArray[0]])
+        
         if len(val.names)>0:
           # print(name)
           # print(self.get(name))
-          self.splitToListIfString(name).toCSV(file, val,varsToValue)
+          curIndex=self.splitToListIfString(name,occurenceIndex).toCSV(lineArray, val,varsToValue,args,curIndex, curLineIndex+occurenceIndex)
         else:
-          output=self.get(name)
+          output=self.getN_th(name,occurenceIndex)
           if len(output)>0 and output[0]=="@":
             try:
               output=varsToValue.get(output)
             except ValueError:
               print("Missing variable: "+output)
-          file.write(output+',')
+          lineArray[curLineIndex+occurenceIndex][curIndex]=output
+          curIndex+=1
+      if occurences==0:
+        if isinstance(val, NamesToValue):
+          curIndex+=val.countDeepestLevelEntries(args, True)
+        else:
+          curIndex+=1
+    return curIndex
+        # for i in range(val.countDeepestLevelEntries(args)):
+          # file.write(",")
+  def setValFromCSV(self, header, bodyEntry, varsToValue,args, n_th_occurence=0):
+    # print(header[self.bracketLevel])
+    # print(self.names)
+    headerIndex=-1
+    for headerName in header[self.bracketLevel]:
+      headerIndex+=1
+      if headerName=="" or len(bodyEntry)<=headerIndex or bodyEntry[headerIndex]=="":
+        continue
+      # print(headerName)
+      if args.allow_additions and not headerName in self.names:
+        if header[self.bracketLevel+1][headerIndex]!="":
+          val=self.getOrCreate(headerName)
+          val.setValFromCSV(header, bodyEntry,varsToValue,args)
+        else:
+          self.add2(headerName,bodyEntry[headerIndex]) 
+        continue
+      valIndex=-1
+      local_n_th_occurence=n_th_occurence
+      if n_th_occurence>0:
+        if self.names.count(headerName)>=1:
+          try:
+            valIndex=self.n_thIndex(headerName,n_th_occurence)
+          except ValueError:
+            if args.allow_additions:
+              self.add2(headerName,copy.deepcopy(self.getN_th(headerName, n_th_occurence-1)))
+              valIndex=self.n_thIndex(headerName,n_th_occurence)
+            else:
+              raise
+          local_n_th_occurence=0
+      if valIndex<=0:
+        try:
+          valIndex=self.names.index(headerName)
+        except ValueError:
+          print("Invalid tag '{}' with data '{}'. You need to allow additions if you add tags".format(headerName,bodyEntry[headerIndex]))
+          print(n_th_occurence)
+          print(self.names)
+          continue
+      if isinstance(self.vals[valIndex], NamesToValue):
+        self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args,local_n_th_occurence)
       else:
-        for i in range(val.countDeepestLevelEntries()):
-          file.write(",")
+        entry=bodyEntry[headerIndex]
+        # print(entry)         
+        if self.vals[valIndex][0]=="@" and entry!="#delete":
+          varsToValue.replace(self.vals[valIndex],entry)
+        else:
+          self.vals[valIndex]=entry
+  def deleteMarked(self):
+    delete=[]
+    for i in range(len(self.names)):
+      if isinstance(self.vals[i],NamesToValue):
+        if self.vals[i].deleteMarked():
+          delete.append(i)
+      else:
+        if self.vals[i]=="#delete":
+          delete.append(i)
+    if len(delete)==len(self.names) or len(delete)==len(self.names)-1 and "key" in self.names:
+      return True #fully deleted. Delete head tag
+    for i in reversed(sorted(delete)):      #delete last first to make sure indices stay valid
+      self.removeIndex(i)
+    return False
+          
 class Building(NamesToValue): #derived from NamesToValue with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
   def __init__(self, lineNbr,buildingName):
     self.names=[]
@@ -824,6 +933,7 @@ def killWindowsBackSlashesWithFire(string):
   
 def preprocess(argv):
   args=parse(argv)
+  args.t0_buildings=args.t0_buildings.split(",")
   
   args.output_folder=os.path.normpath(args.output_folder.strip('"'))
   if args.output_folder[0]==".":
