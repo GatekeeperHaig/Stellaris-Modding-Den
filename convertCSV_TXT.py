@@ -100,6 +100,7 @@ def main(args):
         sheets=pyexcel_ods.get_data(csvFile)
         sheet=sheets.popitem() #should be the first sheet. Others are ignored!
         csvContent=sheet[1] #0 is the sheetname
+        csvContent=[[str(e) for e in line] for line in csvContent]
         #print(csvContent)
       for i in range(len(csvContent)):
         # print("".join(csvContent[i]))
@@ -118,20 +119,23 @@ def main(args):
         # print(key)
         found=0
         for bodyEntry in body:
-          if found>0:
-            if bodyEntry[keyCSVIndex]:
-              break
-            else:
-              val.setValFromCSV(header, bodyEntry,varsToValue,args,found)
-              found+=1
+          if "".join(bodyEntry):
+            #print("'"+"".join(bodyEntry)+'"')
+            #print(keyCSVIndex)
+            if found>0:
+              if bodyEntry[keyCSVIndex]:
+                break
+              else:
+                val.setValFromCSV(header, bodyEntry,varsToValue,args,found)
+                found+=1
             
-          # print(bodyEntry[keyCSVIndex])
-          # if bodyEntry[keyCSVIndex].strip('"')==key:
-          if bodyEntry[keyCSVIndex]==key:
-            #print(key)
-            val.setValFromCSV(header, bodyEntry,varsToValue,args)
-            found+=1
-            # break
+            # print(bodyEntry[keyCSVIndex])
+            # if bodyEntry[keyCSVIndex].strip('"')==key:
+            if bodyEntry[keyCSVIndex]==key:
+              #print(key)
+              val.setValFromCSV(header, bodyEntry,varsToValue,args)
+              found+=1
+              # break
       if args.overwrite:
         outFileName=fileName
       else:

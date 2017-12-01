@@ -413,6 +413,7 @@ def main():
 
 
   sys.stdout = Logger(tabControl,tabClasses) #ensures output goes to right tab and console
+  sys.stderr = Logger(tabControl,tabClasses) #ensures output goes to right tab and console
 
   root.minsize(1000, 0)
   root.after(5, lambda:repeatedChecks(tabClasses,root))
