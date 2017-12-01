@@ -94,7 +94,7 @@ def main(args):
       for name, val in nameToData.getAll():
         if name!=header[0][0]:
           continue;
-        key=val.get("key").strip('"')
+        key=val.get("key")#.strip('"')
         keyCSVIndex=header[1].index("key")
         # print(key)
         found=0
@@ -107,8 +107,9 @@ def main(args):
               found+=1
             
           # print(bodyEntry[keyCSVIndex])
-          if bodyEntry[keyCSVIndex].strip('"')==key:
-            # print(key)
+          # if bodyEntry[keyCSVIndex].strip('"')==key:
+          if bodyEntry[keyCSVIndex]==key:
+            print(key)
             val.setValFromCSV(header, bodyEntry,varsToValue,args)
             found+=1
             # break
