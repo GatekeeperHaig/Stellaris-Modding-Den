@@ -438,8 +438,16 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       valIndex=-1
       local_n_th_occurence=n_th_occurence
       if n_th_occurence>0:
-        if self.names.count(headerName)>=n_th_occurence:
-          valIndex=self.n_thIndex(headerName,n_th_occurence)
+        if self.names.count(headerName)>=1:
+          try:
+            valIndex=self.n_thIndex(headerName,n_th_occurence)
+          except ValueError:
+            if args.allow_additions:
+              self.add2(headerName,copy.deepcopy(self.getN_th(headerName, n_th_occurence-1)))
+              valIndex=self.n_thIndex(headerName,n_th_occurence)
+              print(self.vals[valIndex])
+            else:
+              raise
           local_n_th_occurence=0
       if valIndex<=0:
         try:
