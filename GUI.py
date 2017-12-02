@@ -56,7 +56,7 @@ def startEditor(filename, forceEditor=False):
     if forceEditor:
       subprocess.Popen("notepad "+filename, shell=True)
     else:
-      subprocess.Popen(filename, shell=True)
+      subprocess.Popen("start "+filename, shell=True)
   else:
     if (filename.find(".ods")!=-1):
       subprocess.Popen("xdg-open "+filename, shell=True)
@@ -83,21 +83,22 @@ class Line:
         file.write(self.root.lastPath)
   def convert(self):
     argList=[self.getTxt()]
-    argList+=self.root.fixedOptions
-    # +" "+" ".join(self.root.fixedOptions)
+    self.root.addArguments(argList)
+    # argList+=self.root.fixedOptions
+    # # +" "+" ".join(self.root.fixedOptions)
     
-    if self.root.optionWindow:
-      argList+=self.root.optionWindow.getOptions()
-    for i in range(len(self.root.options)):
-      if self.root.checkVars[i].get():
-        argList.append(self.root.options[i][1])
+    # if self.root.optionWindow:
+      # argList+=self.root.optionWindow.getOptions()
+    # for i in range(len(self.root.options)):
+      # if self.root.checkVars[i].get():
+        # argList.append(self.root.options[i][1])
     # print(argList)
     # return 
     args=self.root.command.parse(argList)
     # args.buildingFileNames=[self.getTxt()]
     # args.fileNames=[self.getTxt()]
     self.result=self.root.command.main(args, argList)
-    # print(self.result)
+    print(self.result)
   def getResultFileName(self):
     return self.result
   def __init__(self,root):
@@ -119,7 +120,8 @@ class Line:
     self.bEditR = tk.Button(line, text="Edit Result", command=lambda:startEditor(self.getResultFileName()))
     self.bFile = tk.Button(line, text="...", command=self.openFile)
     self.bDel = tk.Button(line, fg="red", text="X", command=lambda:root.removeLineByReference(line))
-    self.bConv.pack(side=tk.LEFT)
+    if self.root.separateStart:
+      self.bConv.pack(side=tk.LEFT)
     self.txt.pack(side=tk.LEFT)
     self.bFile.pack(side=tk.LEFT)
     self.bDel.pack(side=tk.LEFT)
@@ -196,8 +198,23 @@ class TabClass:
     for line in self. lines:
       line.checkvar.set(0)
   def invokeAll(self):
-    for line in self.lines:
-      line.bConv.invoke()
+    if self.separateStart:
+      for line in self.lines:
+        line.bConv.invoke()
+    else:
+      argList=[]
+      for line in self.lines:
+        argList.append(line.getTxt())
+      self.addArguments(argList)
+      args=self.command.parse(argList)
+      self.command.main(args,argList)
+  def addArguments(self, argList):
+    argList+=self.fixedOptions   
+    if self.optionWindow:
+      argList+=self.optionWindow.getOptions()
+    for i in range(len(self.options)):
+      if self.checkVars[i].get():
+        argList.append(self.options[i][1])
   def checkValid(self):
     self.setSize()
     for line in self.lines:
@@ -264,6 +281,7 @@ class TabClass:
     self.mainFrame=self.scrollFrame.frame
     self.optionWindow=optionWindow
     self.lastPath="."
+    self.separateStart=True
     if os.path.exists(".GUI_last_path"):
       with open(".GUI_last_path") as file:
         self.lastPath=file.read().strip()
@@ -428,6 +446,7 @@ class TabControlClass:
     tabClasses[0].helpText="Creates an ods file from a Stellaris .txt file. Currently works for txt files that are lists of same top-tag entries (for example all components and sections." #txt to ods
     tabClasses[1].helpText="Uses an ods file to changes the accordingly named .txt file: Entries that are in the ods file are written into the txt file at the right place (overwriting what was there before or written directly in the header instead of overwriting a variable. \nEmpty or missing entries in the ods file remain unchanged! \n To delete something from the txt file, write '#delete' in the according cell in the ods file. If all subtags of a supertag are deleted, the supertag will also be deleted. Never delete a 'key'! It suffices to delete all other tags to delete a top-level tag (e.g. a whole component)" #ods to txt
     tabClasses[2].helpText="Not finished yet!" #createUpgradedBuildings
+    tabClasses[2].separateStart=False
     nb.pack(expand=1, fill="both")  # Pack to make visible
   def getActiveTabClass(self):
     return self.tabClasses[self.nb.index(self.nb.select())]

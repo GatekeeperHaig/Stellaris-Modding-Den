@@ -40,8 +40,8 @@ def parse(argv):
     # argv=argv.split()
   args=parser.parse_args(argv)
 
-  if args.test_run:
-    args.just_copy_and_check=True
+  # if args.test_run:
+    # args.just_copy_and_check=True
 
   
   args.scriptDescription='#This file was created by script!\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory\n'
@@ -516,7 +516,7 @@ class Building(NamesToValue): #derived from NamesToValue with four extra variabl
 def readAndConvert(args, allowRestart=1):   
   lastOutPutFileName=""
 
-  if not args.just_copy_and_check:
+  if not args.just_copy_and_check and not args.test_run:
     if not os.path.exists(args.output_folder+"/common"):
       os.mkdir(args.output_folder+"/common")
     if not os.path.exists(args.output_folder+"/common/buildings"):
@@ -526,7 +526,7 @@ def readAndConvert(args, allowRestart=1):
     
  
   # print(args.copiedBuildings)
-  if not args.just_copy_and_check:
+  if not args.just_copy_and_check and not args.test_run:
     copyfile(os.path.abspath(__file__), args.output_folder+"/"+ntpath.basename(__file__)+".txt")
     copiedBuildingsFile=open(args.copiedBuildingsFileName,'w')
   globbedList=[]
@@ -688,7 +688,8 @@ def readAndConvert(args, allowRestart=1):
               newList.getOrCreate("OR").add2("has_building",upgradeName+"_rw") #creates the "OR" and fills it with the first entry
               newList.get("OR").add2("has_building",upgradeName+"_rw_direct_build") #second entry to "OR"
               triggers.add2("has_"+upgradeName+"_rw", newList)
-              copiedBuildingsFile.write(upgradeName+"_rw"+"\n")
+              if not args.test_run:
+                copiedBuildingsFile.write(upgradeName+"_rw"+"\n")
               for adI in range(len(adjacency_bonus.vals)):
                 adjacency_bonus.vals[adI]=str(int(adjacency_bonus.vals[adI])+1)
                 
@@ -704,7 +705,8 @@ def readAndConvert(args, allowRestart=1):
               newList.getOrCreate("OR").add2("has_building",upgradeName) #creates the "OR" and fills it with the first entry
               newList.get("OR").add2("has_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
               triggers.add2("has_"+upgradeName, newList)
-              copiedBuildingsFile.write(upgradeName+"\n")
+              if not args.test_run:
+                copiedBuildingsFile.write(upgradeName+"\n")
             
             #REMOVE COPY FROM TECH TREE. Seems to remove the copy completely :( Pretty useless trigger...
             if "show_tech_unlock_if" in buildingNameToData.vals[upgradeBuildingIndex].names:
@@ -850,7 +852,7 @@ def readAndConvert(args, allowRestart=1):
       buildingNameToData.removeDuplicatesRec()
       
     #OUTPUT
-    if not args.create_standalone_mod_from_mod and not args.just_copy_and_check: #done elsewhere by mostly copying their mod file in this case
+    if not args.create_standalone_mod_from_mod and not args.just_copy_and_check and not args.test_run: #done elsewhere by mostly copying their mod file in this case
       modfileName=os.path.dirname(args.output_folder)
       if modfileName=='' or modfileName==".": #should only happen if args.output_folder is a pure foldername in which case 'os.path.dirname' is unessecary anyway
         modfileName=args.output_folder
@@ -877,7 +879,7 @@ def readAndConvert(args, allowRestart=1):
         outfileBaseName="JOINED"+os.path.basename(inputFile.name)+".txt"
       else:
         outfileBaseName=os.path.basename(inputFile.name)
-      if not args.just_copy_and_check:
+      if not args.just_copy_and_check and not args.test_run:
         #LOCALISATION OUTPUT
         if not os.path.exists(args.output_folder+"/localisation"):
           os.mkdir(args.output_folder+"/localisation")
