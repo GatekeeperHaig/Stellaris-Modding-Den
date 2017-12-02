@@ -15,19 +15,27 @@ import convertCSV_TXT
 import createUpgradedBuildings
 
 class Logger(object):
-    def __init__(self, nb, tabs):
-        self.terminal = sys.stdout
-        self.nb = nb
-        self.tabs=tabs
+    def __init__(self, tabControl,error=False):
+        if error:
+          self.terminal=sys.stderr
+        else:
+          self.terminal = sys.stdout
+        self.tabControl=tabControl
+        # self.tabs=tabs
+        self.error=error
         
 
     def write(self, message):
         self.terminal.write(message)
-        txt=self.tabs[self.nb.index(self.nb.select())].txt
-        #txt.config(state=NORMAL)
-        txt.insert(tk.END,message)
+        txt=self.tabControl.getActiveTabClass().txt
+        txt.config(state=NORMAL)
+        if self.error:
+          txt.tag_config("n", background="yellow", foreground="red")
+          txt.insert(tk.END,message,("n"))
+        else:
+          txt.insert(tk.END,message)
         txt.see(tk.END)
-        #txt.config(state=DISABLED)
+        txt.config(state=DISABLED)
 
     def flush(self):
         #this flush method is needed for python 3 compatibility.
@@ -233,7 +241,8 @@ class TabClass:
     #os.W_OK Value to include in the mode parameter of access() to test the writability of path.
     #os.X_OK Value to include in the mode parameter of access() to determine if path can be executed.
 
-  def __init__(self,tab,root,command, fixedOptions, defaultFileFilter,options=[]):
+  def __init__(self,name,tab,root,command, fixedOptions, defaultFileFilter,options=[]):
+    self.name=name
     self.root=root
     self.tab=tab
     self.lines=[]
@@ -283,9 +292,9 @@ class TabClass:
     
     # create a Text widget
     self.txt = tk.Text(txt_frm, borderwidth=3,bg="light grey", relief="sunken")
-    #self.txt.config(state=DISABLED)
-    self.txt.bind("<Key>", lambda e: "break")
-    self.txt.config(font=("consolas", 12), undo=True, wrap='word')
+    self.txt.config(state=DISABLED)
+    #self.txt.bind("<Key>", lambda e: "break")
+    #self.txt.config(font=("consolas", 12), undo=True, wrap='word')
     self.txt.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
 
     # create a Scrollbar and associate it with txt
@@ -338,72 +347,101 @@ class OptionWindow:
         c.pack(side=tk.TOP)
         
     #self.check=Checkbutton(line, text="filter", variable=self.checkvar)
-  
+
+class TabControlClass:
+  def __init__(self,root):
+    nb = ttk.Notebook(root)          # Create Tab Control
+    self.nb=nb
+    tabs=[]
+    tabs.append([
+    "txt to ods", 
+    ("text files","*.txt"),
+    [["Apply filter","--filter","Will only create tags from the filter file (including all subtags of those and the key tag). Only these will be changed when converting back"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.ods'. Beware that this file can only be used for back-conversion if such a txt file also exists!"]], 
+    convertCSV_TXT,[],ttk.Frame(nb)
+    ])
+    tabs.append([
+    "ods to txt", 
+    ("table documents","*.ods"),
+    [["Forbid additions","--forbid_additions","Gives an error if you try to add new tags"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.txt'. Be careful: The game will load both files!"]], 
+    convertCSV_TXT,["--to_txt"], 
+    ttk.Frame(nb)
+    ])
+    tabs.append([
+    "createUpgradedBuildings", 
+    ("text files","*.txt"),
+    [], 
+    createUpgradedBuildings,[],ttk.Frame(nb)
+    ])
+    tabClasses=[]
+    self.tabClasses=tabClasses
+    for name,defaultFileFilter,options,command,fixedOptions,tab in tabs:
+      nb.add(tab, text=name)
+      tabClasses.append(TabClass(name,tab,root,command,fixedOptions, defaultFileFilter,options))
+
+    tabClasses[0].helpText="Creates an ods file from a Stellaris .txt file. Currently works for txt files that are lists of same top-tag entries (for example all components and sections." #txt to ods
+    tabClasses[1].helpText="Uses an ods file to changes the accordingly named .txt file: Entries that are in the ods file are written into the txt file at the right place (overwriting what was there before or written directly in the header instead of overwriting a variable. \nEmpty or missing entries in the ods file remain unchanged! \n To delete something from the txt file, write '#delete' in the according cell in the ods file. If all subtags of a supertag are deleted, the supertag will also be deleted. Never delete a 'key'! It suffices to delete all other tags to delete a top-level tag (e.g. a whole component)" #ods to txt
+    tabClasses[2].helpText="Not finished yet!" #createUpgradedBuildings
+    nb.pack(expand=1, fill="both")  # Pack to make visible
+  def getActiveTabClass(self):
+    return self.tabClasses[self.nb.index(self.nb.select())]
+    
 
 def repeatedChecks(tabClasses, root):
   for tab in tabClasses:
     tab.checkValid()
   root.after(100, lambda:repeatedChecks(tabClasses,root))
 
+def about():
+  #window=tk.Toplevel(root)
+  print("Created by Gratak and Stellaris 1.8.*")
+  print("Feel free to use for your mod project but please mention me including the links to my mods ")
+  print("http://steamcommunity.com/profiles/76561198087073498/myworkshopfiles")
+  print("and our git repository:")
+  print("https://github.com/Goldziher/ExOverhaul")
+  
+def help(tabControl):
+  #window=tk.Toplevel(root)
+  print("Help for '"+str(tabControl.getActiveTabClass().name)+"':")
+  print(tabControl.getActiveTabClass().helpText)
+  print("For more help, visit:")
+  print("https://discord.gg/mVerKF5")
+  
 def main():
   root = Tk()
   root.title("Stellaris Python Script Helper")
   screen_width = root.winfo_screenwidth()
   screen_height = root.winfo_screenheight()
   root.geometry("{!s}x{!s}".format(1000,screen_height*2//3))
-  ## create a toplevel menu
-  #menubar = Menu(root)
+  # create a toplevel menu
+  menubar = Menu(root)
 
-  ## create a pulldown menu, and add it to the menu bar
-  #filemenu = Menu(menubar, tearoff=0)
+  # create a pulldown menu, and add it to the menu bar
+  filemenu = Menu(menubar, tearoff=0)
   #filemenu.add_command(label="Open", command=hello)
   #filemenu.add_command(label="Save", command=hello)
   #filemenu.add_separator()
-  #filemenu.add_command(label="Exit", command=root.quit)
-  #menubar.add_cascade(label="File", menu=filemenu)
+  filemenu.add_command(label="Exit", command=root.quit)
+  menubar.add_cascade(label="File", menu=filemenu)
 
-  ## create more pulldown menus
+  # create more pulldown menus
   #editmenu = Menu(menubar, tearoff=0)
   #editmenu.add_command(label="Cut", command=hello)
   #editmenu.add_command(label="Copy", command=hello)
   #editmenu.add_command(label="Paste", command=hello)
   #menubar.add_cascade(label="Edit", menu=editmenu)
 
-  #helpmenu = Menu(menubar, tearoff=0)
-  #helpmenu.add_command(label="About", command=hello)
-  #menubar.add_cascade(label="Help", menu=helpmenu)
+  helpmenu = Menu(menubar, tearoff=0)
+  helpmenu.add_command(label="About", command=about)
+  helpmenu.add_cascade(label="Help", command=lambda:help(tabControl))  
+  # helpmenu.add_command(label="About", command=lambda:about(root))
+  # helpmenu.add_cascade(label="Help", command=lambda:help(root))
+  menubar.add_cascade(label="Help", menu=helpmenu)
 
-  ## display the menu
-  #root.config(menu=menubar)
+  # display the menu
+  root.config(menu=menubar)
 
 
-  tabControl = ttk.Notebook(root)          # Create Tab Control
-  tabs=[]
-  tabs.append([
-  ("text files","*.txt"),
-  "txt to ods", 
-  [["Apply filter","--filter","Will only create tags from the filter file (including all subtags of those and the key tag). Only these will be changed when converting back"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.ods'. Beware that this file can only be used for back-conversion if such a txt file also exists!"]], 
-  convertCSV_TXT,[],ttk.Frame(tabControl)
-  ])
-  tabs.append([
-  ("table documents","*.ods"),
-  "ods to txt", 
-  [["Forbid additions","--forbid_additions","Gives an error if you try to add new tags"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.txt'. Be careful: The game will load both files!"]], 
-  convertCSV_TXT,["--to_txt"], 
-  ttk.Frame(tabControl)
-  ])
-  tabs.append([
-  ("text files","*.txt"),
-  "createUpgradedBuildings", 
-  [], 
-  createUpgradedBuildings,[],ttk.Frame(tabControl)
-  ])
-  tabClasses=[]
-  for defaultFileFilter,name,options,command,fixedOptions,tab in tabs:
-    tabControl.add(tab, text=name)
-    tabClasses.append(TabClass(tab,root,command,fixedOptions, defaultFileFilter,options))
-
-  tabControl.pack(expand=1, fill="both")  # Pack to make visible
+  tabControl=TabControlClass(root)
 
   
   optionWindow=OptionWindow(root,"Create Upgraded buildings options",[
@@ -429,11 +467,11 @@ def main():
   
 
 
-  sys.stdout = Logger(tabControl,tabClasses) #ensures output goes to right tab and console
-  sys.stderr = Logger(tabControl,tabClasses) #ensures output goes to right tab and console
+  sys.stdout = Logger(tabControl) #ensures output goes to right tab and console
+  sys.stderr = Logger(tabControl,True) #ensures output goes to right tab and console
 
   root.minsize(1000, 0)
-  root.after(5, lambda:repeatedChecks(tabClasses,root))
+  root.after(5, lambda:repeatedChecks(tabControl.tabClasses,root))
   root.mainloop()
   
   
