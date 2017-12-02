@@ -75,7 +75,7 @@ class Line:
     argString=self.getTxt2()+" "+" ".join(self.root.fixedOptions)
     for i in range(len(self.root.options)):
       if self.root.checkVars[i].get():
-        argString+=" --"+self.root.options[i]
+        argString+=" "+self.root.options[i][1]
     args=self.root.command.parse(argString)
     args.fileNames=[self.getTxt()]
     self.result=self.root.command.main(args)
@@ -105,7 +105,7 @@ class Line:
     self.bFile.pack(side=tk.LEFT)
     self.bDel.pack(side=tk.LEFT)
     self.bEditS.pack(side=tk.LEFT)
-    if "filter" in root.options:
+    if ["Apply filter","--filter"] in root.options:
       self.bEditF.pack(side=tk.LEFT)
     self.bEditR.pack(side=tk.LEFT)
     #self.check.pack(side=tk.LEFT)
@@ -261,8 +261,9 @@ class TabClass:
     self.extraLineMain.pack(side=tk.TOP)
     for option in options:
       self.checkVars.append(IntVar())
-      check=Checkbutton(self.extraLineMain, text=option, variable=self.checkVars[-1])
+      check=Checkbutton(self.extraLineMain, text=option[0], variable=self.checkVars[-1])
       check.pack(side=tk.RIGHT)
+      CreateToolTip(check, option[2])
     #b = tk.Button(self.extraLineMain, text="(Un-)check all", command=self.checkAll)
     #b.pack(side=tk.RIGHT)
     #b = tk.Button(self.extraLineMain, text="Add line", command=self.addLine)
@@ -378,9 +379,25 @@ def main():
 
   tabControl = ttk.Notebook(root)          # Create Tab Control
   tabs=[]
-  tabs.append([("text files","*.txt"),"txt to ods", ["filter"], convertCSV_TXT,[],ttk.Frame(tabControl)])
-  tabs.append([("table documents","*.ods"),"ods to txt", ["allow_additions", "overwrite"], convertCSV_TXT,["--to_txt"], ttk.Frame(tabControl)])
-  tabs.append([("text files","*.txt"),"createUpgradedBuildings", ["filter"], createUpgradedBuildings,[],ttk.Frame(tabControl)])
+  tabs.append([
+  ("text files","*.txt"),
+  "txt to ods", 
+  [["Apply filter","--filter","Will only create tags from the filter file (including all subtags of those and the key tag). Only these will be changed when converting back"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.ods'. Beware that this file can only be used for back-conversion if such a txt file also exists!"]], 
+  convertCSV_TXT,[],ttk.Frame(tabControl)
+  ])
+  tabs.append([
+  ("table documents","*.ods"),
+  "ods to txt", 
+  [["Forbid additions","--forbid_additions","Gives an error if you try to add new tags"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.txt'. Be careful: The game will load both files!"]], 
+  convertCSV_TXT,["--to_txt"], 
+  ttk.Frame(tabControl)
+  ])
+  tabs.append([
+  ("text files","*.txt"),
+  "createUpgradedBuildings", 
+  [], 
+  createUpgradedBuildings,[],ttk.Frame(tabControl)
+  ])
   tabClasses=[]
   for defaultFileFilter,name,options,command,fixedOptions,tab in tabs:
     tabControl.add(tab, text=name)

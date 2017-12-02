@@ -21,10 +21,16 @@ def parse(argv):
   parser.add_argument('-j','--join_files', action="store_true", help="Do not mix different top level tags!")
   parser.add_argument('--filter', action="store_true", help="Use a comma separated file to determine with tags that are to be outputted. Everything below that key will be used. Filter file that will we tried to use is <filename(no .txt)>_filter.txt")
   parser.add_argument('-t','--to_txt', action="store_true", help="The csv file(s) previously created (<filename(no .txt)>.csv) will be used to try and find tags in the opened txt files whos value will be replaced by the entry in the txt files. If the txt file value is a variable, the value will we written in the header (possibly overwriting something else!")
-  parser.add_argument('-a','--allow_additions', action="store_true", help="Columns that are added in the csv files are actually added to the txt files. So far no addition of rows (aka new components)")
-  parser.add_argument('--overwrite', action="store_true", help="Overwrites the original txt file when converting to txt. By default the script creates an additional one. CSV files are always overwritten!")
+  parser.add_argument('-a','--forbid_additions', action="store_true", help="Check that you do not accidentally add tags to entries. Will only allow value changed in this mode")
+  parser.add_argument('--create_new_file', default='', help="Instead of overwriting the input txt file (or the default output csv file) the script creates a new one. Useful if you are not in a repository environment. Be careful to not leave two txt file for the game to load! '@orig' will be replaced by the original file name")
   parser.add_argument('--test_run', action="store_true", help="No Output.")
   parser.add_argument('--use_csv', action="store_true", help="Due to problems with quotation marks going missing on opening a file in Excel or OpenOffice I have changed to storing and opening ods files. You can revert to csv using this option")
+  
+  
+  if isinstance(argv, str):
+    argv=argv.split()
+  args=parser.parse_args(argv)
+  # args.t0_buildings=args.t0_buildings.split(",")
   
   try:
     import pyexcel_ods
@@ -32,12 +38,6 @@ def parse(argv):
     print("'Pyexcel-ods' plugin not found. Install it via 'pip install pyexcel-ods' (or 'pip install pyexcel-ods --user' if you are missing write access to the python folder)")
     print("Using cvs mode. This can cause problems with Excel/OpenOffice removing quotation marks!")
     args.use_csv=True
-  
-  if isinstance(argv, str):
-    argv=argv.split()
-  args=parser.parse_args(argv)
-  # args.t0_buildings=args.t0_buildings.split(",")
-  
   args.scriptDescription='#This file was created by script!\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory\n'
 
   
@@ -136,10 +136,12 @@ def main(args):
               val.setValFromCSV(header, bodyEntry,varsToValue,args)
               found+=1
               # break
-      if args.overwrite:
-        outFileName=fileName
+      if args.create_new_file:
+        outFileName=args.create_new_file+".txt"
+        outFileName=outFileName.replace("@orig",fileName.replace(".txt",""))
+        print("Saving to "+outFileName)
       else:
-        outFileName=fileName.replace(".txt","_csvMod.txt")
+        outFileName=fileName
       lastOutFile=outFileName
       if not args.test_run:
         nameToData.deleteMarked()
@@ -159,7 +161,12 @@ def main(args):
     if args.join_files:
       csvFileName=fileName.replace(".txt","JOINED"+tableFileEnding)
     else:
-      csvFileName=fileName.replace(".txt",tableFileEnding)
+      if args.create_new_file:
+        csvFileName=args.create_new_file+tableFileEnding
+        csvFileName=csvFileName.replace("@orig",fileName.replace(".txt",""))
+        print("Saving to "+csvFileName)
+      else:
+        csvFileName=fileName.replace(".txt",tableFileEnding)
     lastOutFile=csvFileName
     if not args.test_run:
       try:

@@ -425,10 +425,10 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
     headerIndex=-1
     for headerName in header[self.bracketLevel]:
       headerIndex+=1
-      if headerName=="" or len(bodyEntry)<=headerIndex or bodyEntry[headerIndex]=="":
+      if headerName=="" or len(bodyEntry)<=headerIndex:# or bodyEntry[headerIndex]=="":
         continue
       # print(headerName)
-      if args.allow_additions and not headerName in self.names:
+      if not args.forbid_additions and not headerName in self.names and bodyEntry[headerIndex]:
         if header[self.bracketLevel+1][headerIndex]!="":
           val=self.getOrCreate(headerName)
           val.setValFromCSV(header, bodyEntry,varsToValue,args)
@@ -442,26 +442,30 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
           try:
             valIndex=self.n_thIndex(headerName,n_th_occurence)
           except ValueError:
-            if args.allow_additions:
-              self.add2(headerName,copy.deepcopy(self.getN_th(headerName, n_th_occurence-1)))
-              valIndex=self.n_thIndex(headerName,n_th_occurence)
+            if bodyEntry[headerIndex]:
+              if not args.forbid_additions:
+                self.add2(headerName,copy.deepcopy(self.getN_th(headerName, n_th_occurence-1)))
+                valIndex=self.n_thIndex(headerName,n_th_occurence)
+              else:
+                raise
             else:
-              raise
+              continue
           local_n_th_occurence=0
       if valIndex<=0:
         try:
           valIndex=self.names.index(headerName)
         except ValueError:
-          print("Invalid tag '{}' with data '{}'. You need to allow additions if you add tags".format(headerName,bodyEntry[headerIndex]))
-          print(n_th_occurence)
-          print(self.names)
+          if bodyEntry[headerIndex]:
+            print("Invalid tag '{}' with data '{}'. You need to allow additions if you add tags".format(headerName,bodyEntry[headerIndex]))
+            print(n_th_occurence)
+            print(self.names)
           continue
       if isinstance(self.vals[valIndex], NamesToValue):
         self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args,local_n_th_occurence)
       else:
         entry=bodyEntry[headerIndex]
         # print(entry)         
-        if self.vals[valIndex][0]=="@" and entry!="#delete":
+        if self.vals[valIndex][0]=="@" and entry!="#delete" and entry:
           varsToValue.replace(self.vals[valIndex],entry)
         else:
           self.vals[valIndex]=entry
@@ -472,7 +476,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         if self.vals[i].deleteMarked():
           delete.append(i)
       else:
-        if self.vals[i]=="#delete":
+        if self.vals[i]=="#delete":# or not self.vals[i]:
           delete.append(i)
     if len(delete)==len(self.names) or len(delete)==len(self.names)-1 and "key" in self.names:
       return True #fully deleted. Delete head tag
