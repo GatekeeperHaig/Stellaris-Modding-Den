@@ -4,6 +4,7 @@
 import sys, argparse, subprocess,os
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 from tkinter import *
 #from tkinter.tix import *
 from tkinter import ttk
@@ -13,6 +14,7 @@ import webbrowser
 import platform
 import convertCSV_TXT
 import createUpgradedBuildings
+import pickle
 
 class Logger(object):
     def __init__(self, tabControl,error=False):
@@ -83,7 +85,7 @@ class Line:
         file.write(self.root.lastPath)
   def convert(self):
     argList=[self.getTxt()]
-    self.root.addArguments(argList)
+    self.root.addArguments(argList, self)
     # argList+=self.root.fixedOptions
     # # +" "+" ".join(self.root.fixedOptions)
     
@@ -101,6 +103,16 @@ class Line:
     print(self.result)
   def getResultFileName(self):
     return self.result
+  def focusNextTxt(self,event):
+    txt=self.root.lines[(self.root.lines.index(self)+1)%len(self.root.lines)].txt
+    txt.focus_set()
+    txt.selection_range(0, END) 
+    return "break"  
+  def focusNextSubfolderTxt(self,event):
+    txt=self.root.lines[(self.root.lines.index(self)+1)%len(self.root.lines)].subfolderTxt
+    txt.focus_set()
+    txt.selection_range(0, END) 
+    return "break"
   def __init__(self,root):
     line= tk.Frame(root.mainFrame)
     self.lineFrame=line
@@ -111,7 +123,11 @@ class Line:
     #self.check=Checkbutton(line, text="filter", variable=self.checkvar)
     #self.txt= tk.Text(line, bg="white",width=60, height=1)
     self.txt= tk.Entry(line, bg="white",width=60)
+    
+    self.txt.bind("<Tab>", self.focusNextTxt)
     self.result=""
+    self.subfolderTxt=tk.Entry(line, bg="white", width=20)
+    self.subfolderTxt.bind("<Tab>", self.focusNextSubfolderTxt)
         
     self.bConv = tk.Button(line, text="Convert", command=self.convert)
     #self.bConv = tk.Button(line, text="Convert", command=lambda:webbrowser.open_new(self.getTxt()))
@@ -124,6 +140,8 @@ class Line:
       self.bConv.pack(side=tk.LEFT)
     self.txt.pack(side=tk.LEFT)
     self.bFile.pack(side=tk.LEFT)
+    if self.root.subfolder:
+      self.subfolderTxt.pack(side=tk.LEFT)
     self.bDel.pack(side=tk.LEFT)
     self.bEditS.pack(side=tk.LEFT)
     if ["Apply filter","--filter"] in root.options:
@@ -135,6 +153,7 @@ class Line:
     self.bEditFTooltip= CreateToolTip(self.bEditF, "Init")
     self.bEditRTooltip= CreateToolTip(self.bEditR, "Init")
     CreateToolTip(self.bDel, "Remove line. No files will be deleted!")
+    #root.redoTabOrder()
   def getTxt(self):
     return self.txt.get().strip()
   def getTxt2(self):
@@ -159,7 +178,7 @@ class TabClass:
     self.lines.append(Line(self))
     self.lines[-1].bFile.invoke()
   def addFiles(self):
-    files=filedialog.askopenfilenames(initialdir = self.lastPath,title = "Select file",filetypes = (self.defaultFileFilter, ("all files","*")))
+    files=filedialog.askopenfilenames(initialdir = self.lastPath,title = "Select file(s)",filetypes = (self.defaultFileFilter, ("all files","*")))
     if files:
       self.lastPath=os.path.dirname(files[0].strip())
       with open(".GUI_last_path",'w') as file:
@@ -168,6 +187,14 @@ class TabClass:
       self.lines.append(Line(self))
       self.lines[-1].setTxt(fileName)
     #print (root.filename)
+  # def redoTabOrder(self):
+    # for line in self.lines:
+      # print(line.txt.get())
+      # line.txt.lower()  
+    # if self.subfolder:
+      # for line in self.lines:
+        # print(line.subfolderTxt.get())
+        # line.subfolderTxt.lower()
   def removeLineByIndex(self, index):
     self.lines[index].lineFrame.pack_forget()
     del self.lines[index]
@@ -208,10 +235,10 @@ class TabClass:
       self.addArguments(argList)
       args=self.command.parse(argList)
       self.command.main(args,argList)
-  def addArguments(self, argList):
+  def addArguments(self, argList,line=0):
     argList+=self.fixedOptions   
     if self.optionWindow:
-      argList+=self.optionWindow.getOptions()
+      argList+=self.optionWindow.getOptions(line)
     for i in range(len(self.options)):
       if self.checkVars[i].get():
         argList.append(self.options[i][1])
@@ -268,7 +295,52 @@ class TabClass:
     #os.R_OK − Value to include in the mode parameter of access() to test the readability of path.
     #os.W_OK Value to include in the mode parameter of access() to test the writability of path.
     #os.X_OK Value to include in the mode parameter of access() to determine if path can be executed.
-
+  def save(self):
+    fileName=filedialog.asksaveasfilename(defaultextension=".pkl",initialdir = ".",title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
+    if fileName:
+      with open(fileName, 'wb') as f:
+        pickle.dump([var.get() for var in self.checkVars],f)
+        if self.optionWindow:
+          pickle.dump([var.get() for var in self.optionWindow.vals],f)
+        else:
+          pickle.dump([],f)
+        pickle.dump([line.txt.get() for line in self.lines], f)
+        pickle.dump([line.subfolderTxt.get() for line in self.lines], f)
+      # print("save")
+  def load(self):
+    fileName=filedialog.askopenfilename(initialdir = ".",title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
+    if fileName:
+      for i in range(len(self.lines)):
+        self.removeLineByIndex(0)
+      with open(fileName, 'rb') as f:
+        # print(pickle.load(f))
+        # print(pickle.load(f))
+        # print(pickle.load(f))
+        # print(pickle.load(f))
+        for i,val in enumerate(pickle.load(f)):
+          self.checkVars[i].set(val)
+        if self.optionWindow:
+          for i,val in enumerate(pickle.load(f)):
+            self.optionWindow.vals[i].set(val)
+        else:
+          pickle.load(f)
+        self.loadLines(f)
+  def loadAdd(self):
+    fileName=filedialog.askopenfilename(initialdir = ".",title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
+    if fileName:
+      with open(fileName, 'rb') as f:
+        pickle.load(f)
+        pickle.load(f)
+        self.loadLines(f)
+  def loadLines(self,f):
+    i=len(self.lines)
+    for entry in pickle.load(f):
+      self.addLine()
+      self.lines[-1].setTxt(entry)
+    for entry in pickle.load(f):
+      if self.subfolder:
+        self.lines[i].subfolderTxt.insert(0,entry)
+        i+=1
   def __init__(self,name,tab,root,command, fixedOptions, defaultFileFilter,options=[], optionWindow=0):
     self.name=name
     self.root=root
@@ -282,6 +354,7 @@ class TabClass:
     self.optionWindow=optionWindow
     self.lastPath="."
     self.separateStart=True
+    self.subfolder=False
     if os.path.exists(".GUI_last_path"):
       with open(".GUI_last_path") as file:
         self.lastPath=file.read().strip()
@@ -326,7 +399,6 @@ class TabClass:
     # create a Text widget
     self.txt = tk.Text(txt_frm, borderwidth=3,bg="light grey", relief="sunken")
     self.txt.config(state=DISABLED)
-    #self.txt.bind("<Key>", lambda e: "break")
     #self.txt.config(font=("consolas", 12), undo=True, wrap='word')
     self.txt.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
 
@@ -382,13 +454,15 @@ class OptionWindow:
         c=Checkbutton(self.window,  text='', variable=self.vals[-1])
         # c.pack(side=tk.TOP)
         c.grid(row=i,column=1)
-  def getOptions(self):
+  def getOptions(self, line=0):
     outList=[]
     for option, val in zip(self.options, self.vals):
       if val.get():
         outList.append("--"+option.name)
         if isinstance(option.defaultVal, str) or isinstance(option.defaultVal, float):
           outList.append(val.get())
+          if line and option.name=="output_folder" and line.root.subfolder:
+            outList[-1]+="/"+line.subfolderTxt.get().strip()
         else:
           outList.append("--"+option.name)
     return outList
@@ -436,6 +510,12 @@ class TabControlClass:
     ("text files","*.txt"),
     [], 
     createUpgradedBuildings,[],ttk.Frame(nb),optionWindowUB
+    ])    
+    tabs.append([
+    "createUpgradedBuildings - Trigger files", 
+    ("text files","*.txt"),
+    [], 
+    createUpgradedBuildings,["--just_copy_and_check"],ttk.Frame(nb),optionWindowUB
     ])
     tabClasses=[]
     self.tabClasses=tabClasses
@@ -447,10 +527,18 @@ class TabControlClass:
     tabClasses[1].helpText="Uses an ods file to changes the accordingly named .txt file: Entries that are in the ods file are written into the txt file at the right place (overwriting what was there before or written directly in the header instead of overwriting a variable. \nEmpty or missing entries in the ods file remain unchanged! \n To delete something from the txt file, write '#delete' in the according cell in the ods file. If all subtags of a supertag are deleted, the supertag will also be deleted. Never delete a 'key'! It suffices to delete all other tags to delete a top-level tag (e.g. a whole component)" #ods to txt
     tabClasses[2].helpText="Not finished yet!" #createUpgradedBuildings
     tabClasses[2].separateStart=False
+    tabClasses[3].helpText="Not finished yet!" #createUpgradedBuildings - Trigger files
+    tabClasses[3].subfolder=True
     nb.pack(expand=1, fill="both")  # Pack to make visible
   def getActiveTabClass(self):
     return self.tabClasses[self.nb.index(self.nb.select())]
-    
+  def save(self):
+    self.getActiveTabClass().save()
+  def load(self):
+    if messagebox.askquestion("Overwrite", "This will overwrite current content. Are you sure?", icon='warning') == 'yes':
+      self.getActiveTabClass().load()  
+  def loadAdd(self):
+    self.getActiveTabClass().loadAdd()
 
 def repeatedChecks(tabClasses, root):
   for tab in tabClasses:
@@ -483,9 +571,13 @@ def main():
 
   # create a pulldown menu, and add it to the menu bar
   filemenu = Menu(menubar, tearoff=0)
-  #filemenu.add_command(label="Open", command=hello)
-  #filemenu.add_command(label="Save", command=hello)
-  #filemenu.add_separator()
+  tabControl=TabControlClass(root)
+  
+  
+  filemenu.add_command(label="Load Current Tab", command=tabControl.load)
+  filemenu.add_command(label="Load Current Tab (add files, no options changed)", command=tabControl.loadAdd)
+  filemenu.add_command(label="Save Current Tab", command=tabControl.save)
+  filemenu.add_separator()
   filemenu.add_command(label="Exit", command=root.quit)
   menubar.add_cascade(label="File", menu=filemenu)
 
@@ -508,7 +600,6 @@ def main():
 
 
 
-  tabControl=TabControlClass(root)
 
   
   #b = tk.Button(tabClasses[0].scrollFrame, text="hide", command=optionWindow.window.withdraw)
