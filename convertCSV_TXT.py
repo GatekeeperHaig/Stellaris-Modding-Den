@@ -27,8 +27,8 @@ def parse(argv):
   parser.add_argument('--use_csv', action="store_true", help="Due to problems with quotation marks going missing on opening a file in Excel or OpenOffice I have changed to storing and opening ods files. You can revert to csv using this option")
   
   
-  if isinstance(argv, str):
-    argv=argv.split()
+  # if isinstance(argv, str):
+    # argv=argv.split()
   args=parser.parse_args(argv)
   # args.t0_buildings=args.t0_buildings.split(",")
   
@@ -44,7 +44,7 @@ def parse(argv):
   return(args)
 
         
-def main(args):
+def main(args,unused=0):
   if args.use_csv:
     tableFileEnding=".csv"
   else:

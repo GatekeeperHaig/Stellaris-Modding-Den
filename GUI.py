@@ -26,6 +26,8 @@ class Logger(object):
         
 
     def write(self, message):
+        # if self.error:
+          # sys.stdout.write(self.error)
         self.terminal.write(message)
         txt=self.tabControl.getActiveTabClass().txt
         txt.config(state=NORMAL)
@@ -80,13 +82,22 @@ class Line:
       with open(".GUI_last_path",'w') as file:
         file.write(self.root.lastPath)
   def convert(self):
-    argString=self.getTxt2()+" "+" ".join(self.root.fixedOptions)
+    argList=[self.getTxt()]
+    argList+=self.root.fixedOptions
+    # +" "+" ".join(self.root.fixedOptions)
+    
+    if self.root.optionWindow:
+      argList+=self.root.optionWindow.getOptions()
     for i in range(len(self.root.options)):
       if self.root.checkVars[i].get():
-        argString+=" "+self.root.options[i][1]
-    args=self.root.command.parse(argString)
-    args.fileNames=[self.getTxt()]
-    self.result=self.root.command.main(args)
+        argList.append(self.root.options[i][1])
+    # print(argList)
+    # return 
+    args=self.root.command.parse(argList)
+    # args.buildingFileNames=[self.getTxt()]
+    # args.fileNames=[self.getTxt()]
+    self.result=self.root.command.main(args, argList)
+    # print(self.result)
   def getResultFileName(self):
     return self.result
   def __init__(self,root):
@@ -126,7 +137,7 @@ class Line:
     return self.txt.get().strip()
   def getTxt2(self):
     #return self.txt.get("1.0",END).strip()
-    return "'"+self.txt.get().strip()+"'"
+    return '"'+self.txt.get().strip()+'"'
   def setTxt(self, string):
     self.txt.delete(0,END)
     self.txt.insert(0, string.strip())
@@ -241,7 +252,7 @@ class TabClass:
     #os.W_OK Value to include in the mode parameter of access() to test the writability of path.
     #os.X_OK Value to include in the mode parameter of access() to determine if path can be executed.
 
-  def __init__(self,name,tab,root,command, fixedOptions, defaultFileFilter,options=[]):
+  def __init__(self,name,tab,root,command, fixedOptions, defaultFileFilter,options=[], optionWindow=0):
     self.name=name
     self.root=root
     self.tab=tab
@@ -251,6 +262,7 @@ class TabClass:
     self.scrollFrame=ScrollFrame(self.lineFrame)
     self.scrollFrame.pack(side="top", fill="both", expand=True)
     self.mainFrame=self.scrollFrame.frame
+    self.optionWindow=optionWindow
     self.lastPath="."
     if os.path.exists(".GUI_last_path"):
       with open(".GUI_last_path") as file:
@@ -277,6 +289,9 @@ class TabClass:
     #b.pack(side=tk.RIGHT)
     #b = tk.Button(self.extraLineMain, text="Add line", command=self.addLine)
     #b.pack(side=tk.RIGHT)
+    if optionWindow:
+      b= tk.Button(self.extraLineMain, text="Options", command=self.optionWindow.window.deiconify)
+      b.pack(side=tk.RIGHT)
     b = tk.Button(self.extraLineMain, text="Add file(s)", command=self.addFiles)
     b.pack(side=tk.RIGHT)
     b = tk.Button(self.extraLineMain, text="Convert All", command=self.invokeAll)
@@ -326,30 +341,62 @@ class OptionWindow:
     self.window.protocol('WM_DELETE_WINDOW', self.window.withdraw)  # root is your root window
     self.vals=[]
     self.names=[]
-    frameL=tk.Frame(self.window)
-    frameL.pack(side="left", fill="both", expand=True)
-    frameR=tk.Frame(self.window)
-    frameR.pack(side="right", fill="both", expand=True)
+    # frameL=tk.Frame(self.window)
+    # frameL.pack(side="left", fill="both", expand=True)
+    # frameR=tk.Frame(self.window)
+    # frameR.pack(side="right", fill="both", expand=True)
     scriptArgs=vars(script.parse(""))
-    for option in options:
-      l=Label(frameL, text=option.description)
-      l.pack(side=tk.TOP)
-      option.val=scriptArgs[option.name]
-      if isinstance(option.val, str) or isinstance(option.val, float):
+    self.options=options
+    for i,option in enumerate(options):
+      l=Label(self.window, text=option.description)
+      # l.pack(side=tk.TOP)
+      l.grid(row=i,column=0)
+      option.defaultVal=scriptArgs[option.name]
+      if isinstance(option.defaultVal, str) or isinstance(option.defaultVal, float):
         self.vals.append(StringVar())
-        self.vals[-1].set(str(option.val))
-        e=Entry(frameR, bg="white",textvariable=self.vals[-1])
-        e.pack(side=tk.TOP)
+        self.vals[-1].set(str(option.defaultVal))
+        e=Entry(self.window, bg="white",textvariable=self.vals[-1],width=40)
+        # e.pack(side=tk.TOP)
+        e.grid(row=i,column=1)
       else:
         self.vals.append(IntVar())
-        self.vals[-1].set(option.val)
-        c=Checkbutton(frameR,  text='', variable=self.vals[-1])
-        c.pack(side=tk.TOP)
-        
+        self.vals[-1].set(option.defaultVal)
+        c=Checkbutton(self.window,  text='', variable=self.vals[-1])
+        # c.pack(side=tk.TOP)
+        c.grid(row=i,column=1)
+  def getOptions(self):
+    outList=[]
+    for option, val in zip(self.options, self.vals):
+      if val.get():
+        outList.append("--"+option.name)
+        if isinstance(option.defaultVal, str) or isinstance(option.defaultVal, float):
+          outList.append(val.get())
+        else:
+          outList.append("--"+option.name)
+    return outList
     #self.check=Checkbutton(line, text="filter", variable=self.checkvar)
 
 class TabControlClass:
   def __init__(self,root):
+    
+    optionWindowUB=OptionWindow(root,"Create Upgraded buildings options",[
+      Option("output_folder"), 
+      Option("custom_mod_name"), 
+      Option("gameVersion","version"),
+      Option("t0_buildings"), 
+      Option("languages"),
+      Option("replacement_file"), 
+      Option("time_discount"), 
+      Option("cost_discount"),
+      Option("remove_reduntant_upgrades"), 
+      Option("keep_lower_tier"),
+      Option("custom_direct_build_AI_allow"), 
+      Option("simplify_upgrade_AI_allow"),
+      Option("load_order_priority"),
+      Option("join_files")
+      ],createUpgradedBuildings)
+    
+    
     nb = ttk.Notebook(root)          # Create Tab Control
     self.nb=nb
     tabs=[]
@@ -357,26 +404,26 @@ class TabControlClass:
     "txt to ods", 
     ("text files","*.txt"),
     [["Apply filter","--filter","Will only create tags from the filter file (including all subtags of those and the key tag). Only these will be changed when converting back"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.ods'. Beware that this file can only be used for back-conversion if such a txt file also exists!"]], 
-    convertCSV_TXT,[],ttk.Frame(nb)
+    convertCSV_TXT,[],ttk.Frame(nb),0
     ])
     tabs.append([
     "ods to txt", 
     ("table documents","*.ods"),
     [["Forbid additions","--forbid_additions","Gives an error if you try to add new tags"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.txt'. Be careful: The game will load both files!"]], 
     convertCSV_TXT,["--to_txt"], 
-    ttk.Frame(nb)
+    ttk.Frame(nb),0
     ])
     tabs.append([
     "createUpgradedBuildings", 
     ("text files","*.txt"),
     [], 
-    createUpgradedBuildings,[],ttk.Frame(nb)
+    createUpgradedBuildings,[],ttk.Frame(nb),optionWindowUB
     ])
     tabClasses=[]
     self.tabClasses=tabClasses
-    for name,defaultFileFilter,options,command,fixedOptions,tab in tabs:
+    for name,defaultFileFilter,options,command,fixedOptions,tab,optionWindow in tabs:
       nb.add(tab, text=name)
-      tabClasses.append(TabClass(name,tab,root,command,fixedOptions, defaultFileFilter,options))
+      tabClasses.append(TabClass(name,tab,root,command,fixedOptions, defaultFileFilter,options,optionWindow))
 
     tabClasses[0].helpText="Creates an ods file from a Stellaris .txt file. Currently works for txt files that are lists of same top-tag entries (for example all components and sections." #txt to ods
     tabClasses[1].helpText="Uses an ods file to changes the accordingly named .txt file: Entries that are in the ods file are written into the txt file at the right place (overwriting what was there before or written directly in the header instead of overwriting a variable. \nEmpty or missing entries in the ods file remain unchanged! \n To delete something from the txt file, write '#delete' in the according cell in the ods file. If all subtags of a supertag are deleted, the supertag will also be deleted. Never delete a 'key'! It suffices to delete all other tags to delete a top-level tag (e.g. a whole component)" #ods to txt
@@ -441,25 +488,10 @@ def main():
   root.config(menu=menubar)
 
 
+
   tabControl=TabControlClass(root)
 
   
-  optionWindow=OptionWindow(root,"Create Upgraded buildings options",[
-    Option("output_folder"), 
-    Option("custom_mod_name"), 
-    Option("gameVersion","version"),
-    Option("t0_buildings"), 
-    Option("languages"),
-    Option("replacement_file"), 
-    Option("time_discount"), 
-    Option("cost_discount"),
-    Option("remove_reduntant_upgrades"), 
-    Option("keep_lower_tier"),
-    Option("custom_direct_build_AI_allow"), 
-    Option("simplify_upgrade_AI_allow"),
-    Option("load_order_priority"),
-    Option("join_files")
-    ],createUpgradedBuildings)
   #b = tk.Button(tabClasses[0].scrollFrame, text="hide", command=optionWindow.window.withdraw)
   #b.pack(side=tk.TOP)
   #b = tk.Button(tabClasses[0].scrollFrame, text="show", command=optionWindow.window.deiconify)

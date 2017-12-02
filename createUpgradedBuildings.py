@@ -22,7 +22,7 @@ def parse(argv):
   parser.add_argument('--custom_direct_build_AI_allow', action="store_true", help="By default, the script will replace the direct build AI_allows by the lowest tier AI_allow (since the checks of the lowest tiers are usually meant for tile validity which is also important for direct build high tier, but unessecary for upgrade). This will not happen with this option")
   parser.add_argument('--simplify_upgrade_AI_allow', action="store_true", help="Allows every single upgrade to AI (that means if the player would be able to build it, so does AI)")
   parser.add_argument('-f','--just_copy_and_check', action="store_true", help="If any non-building file in your mod includes 'has_building' mentions on buildings that will be copied by this script, run this mode once with all such files as input instead of the building files. In this mode the script will simply replace all 'has_building = ...' with scripted_triggers also checking for direct_build versions. IMPORTANT: 1. You need to apply the main script FIRST! 2. --output_folder will have to include the subfolder for this call!")
-  parser.add_argument('-o','--output_folder', default="build_upgraded", help="Main output folder name. Specific subfolder needs to be included for '--just_copy_and_check' (default: %(default)s)")
+  parser.add_argument('-o','--output_folder', default="BU", help="Main output folder name. Specific subfolder needs to be included for '--just_copy_and_check' (default: %(default)s)")
   parser.add_argument('--replacement_file', default="", help="Executes a very basic conditional replace on buildings. Example: 'IF unique in buildingName and is_listed==no newline	ai_weight = { weight = @crucial_2 }': For all buildings that have 'unique' in their name and are not listed, set ai_weight to given value. Any number of such replaces can be in the file. An 'IF' at the very start of a line starts a replace. the next xyz = will be the tag used for replacing. You can also start a line with 'EVAL' instead of 'IF' to write an arbitrary condition. You need to know the class structure for this though.")
   parser.add_argument('-j','--join_files', action="store_true", help="Output from all input files goes into a single file. Has to be activated if you have upgrades distributed over different files. Will not copy comments!")
   parser.add_argument('-g','--gameVersion', default="1.8.*", help="Game version of the newly created .mod file to avoid launcher warning. Ignored for standalone mod creation. (default: %(default)s)")
@@ -33,12 +33,15 @@ def parse(argv):
   parser.add_argument('--custom_mod_name', default='', help="If set, this will be the name of the new mod")
   parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help=argparse.SUPPRESS)
   parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)
+  parser.add_argument('--test_run', action="store_true", help="No Output.")
 
   
-  if isinstance(argv, str):
-    argv=argv.split()
+  # if isinstance(argv, str):
+    # argv=argv.split()
   args=parser.parse_args(argv)
 
+  if args.test_run:
+    args.just_copy_and_check=True
 
   
   args.scriptDescription='#This file was created by script!\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory\n'
@@ -510,7 +513,8 @@ class Building(NamesToValue): #derived from NamesToValue with four extra variabl
 
 
     
-def main(args, allowRestart=1):   
+def readAndConvert(args, allowRestart=1):   
+  lastOutPutFileName=""
 
   if not args.just_copy_and_check:
     if not os.path.exists(args.output_folder+"/common"):
@@ -536,7 +540,7 @@ def main(args, allowRestart=1):
       args.outPath=args.output_folder
     else:
       args.outPath=args.output_folder+"/common/buildings/"
-    if not args.just_copy_and_check or not args.create_standalone_mod_from_mod:
+    if not args.test_run and (not args.just_copy_and_check or not args.create_standalone_mod_from_mod):
       with open(args.outPath+os.path.basename(buildingFileName),'w') as outputFile:
         outputFile.write(args.scriptDescription)
         outputFile.write("#overwrite\n")
@@ -902,6 +906,9 @@ def main(args, allowRestart=1):
         outputFileName=args.outPath+outfileBaseName
       else:
         outputFileName=args.outPath+"build_upgraded_"+outfileBaseName
+      lastOutPutFileName=outputFileName
+      if args.test_run:
+        continue
       with open(outputFileName,'w') as outputFile:
         outputFile.write(args.scriptDescription)
         lineIndex=0
@@ -922,21 +929,24 @@ def main(args, allowRestart=1):
               # outputFile.write("}\n")
               buildingNameToData.writeEntry(outputFile, curBuilding)
               curBuilding+=1
-  if not args.just_copy_and_check:
+  if not args.just_copy_and_check and not args.test_run:
     copiedBuildingsFile.close()
     with open(args.copiedBuildingsFileName) as file:
       newCopiedBuilings=[line.strip() for line in file]
     if newCopiedBuilings!=args.copiedBuildings and not args.just_copy_and_check:
       args.copiedBuildings=newCopiedBuilings
       if allowRestart:
-        main(copy.deepcopy(args),0)
-  
+        readAndConvert(copy.deepcopy(args),0)
+  return lastOutPutFileName
   
 def killWindowsBackSlashesWithFire(string):
   return os.path.normpath(string).replace(os.sep,"/")
   
 def preprocess(argv):
   args=parse(argv)
+  main(args,argv)
+  
+def main(args, argv):
   args.t0_buildings=args.t0_buildings.split(",")
   
   args.output_folder=os.path.normpath(args.output_folder.strip('"'))
@@ -954,50 +964,54 @@ def preprocess(argv):
     levelsToCheck=1
   level=0
   
-  while 1:
-    if level==levelsToCheck:
-      if args.just_copy_and_check:
-        print("No copiedBuildings.txt file found! This file is created by the main script and is mandatory for the --just_copy_and_check variant! Exiting!")
-        sys.exit(1)
-      break
-    try: 
-      with open(copiedBuildingsFileFolder+args.copiedBuildingsFileName) as file:
-        args.copiedBuildings=[line.strip() for line in file]
-      break
-    except FileNotFoundError:
-      if not args.just_copy_and_check:
-        args.copiedBuildings=[]
+  if not args.test_run:
+    while 1:
+      if level==levelsToCheck:
+        if args.just_copy_and_check:
+          print("No copiedBuildings.txt file found! This file is created by the main script and is mandatory for the --just_copy_and_check variant! Exiting!")
+          sys.exit(1)
         break
-      level+=1
-      copiedBuildingsFileFolder+="/.."
-  args.copiedBuildingsFileName=copiedBuildingsFileFolder+args.copiedBuildingsFileName
+      try: 
+        with open(copiedBuildingsFileFolder+args.copiedBuildingsFileName) as file:
+          args.copiedBuildings=[line.strip() for line in file]
+        break
+      except FileNotFoundError:
+        if not args.just_copy_and_check:
+          args.copiedBuildings=[]
+          break
+        level+=1
+        copiedBuildingsFileFolder+="/.."
+    args.copiedBuildingsFileName=copiedBuildingsFileFolder+args.copiedBuildingsFileName
+  else:
+    args.copiedBuildings=[]
   
     
   if args.create_standalone_mod_from_mod:
     rerunName=os.path.split(os.path.dirname(args.output_folder))[-1]+"_rerun.py" #foldername, not path!
   elif args.just_copy_and_check:
-   rerunName=args.output_folder+"/rerun_just_copy_and_check.py"
+    rerunName=args.output_folder+"/rerun_just_copy_and_check.py"
   else:
     rerunName=args.output_folder+"/rerun.py" 
-  with open(rerunName, 'w') as file:
-    file.write("#!/usr/bin/env python3\n")
-    file.write("# -*- coding: utf-8 -*-\n")
-    file.write("import subprocess\n")
-    file.write("import os\n")
-    file.write("os.chdir(os.path.dirname(os.path.abspath(__file__)))\n")
-    if not args.create_standalone_mod_from_mod:
-      file.write("os.chdir('..')\n")
-      for i in range(level):
-        file.write("os.chdir('..')\n")  #script will have been placed is subdir!
-      
-    callString=os.path.normpath("subprocess.call('python ./createUpgradedBuildings.py "+'"'+'" "'.join(argv)+'"'+"', shell=True)\n").replace(os.sep,"/")
-    file.write(callString)
-    if not args.just_copy_and_check and not args.create_standalone_mod_from_mod:
-      file.write("import fnmatch\n")
-      file.write("for root, dirnames, filenames in os.walk('.'):\n")
-      file.write("\tfor filename in fnmatch.filter(filenames,'rerun_just_copy_and_check.py'):\n")
-      file.write("\t\tsubprocess.call('python {}'+{}+'{}', shell=True)\n".format('"',"os.path.join(root,filename)",'"'))
-      # file.write("\t\tsubprocess.call('python "+'+"'+'filename'+'"'+"', shell=True)\n")
+  if not args.test_run:
+    with open(rerunName, 'w') as file:
+      file.write("#!/usr/bin/env python3\n")
+      file.write("# -*- coding: utf-8 -*-\n")
+      file.write("import subprocess\n")
+      file.write("import os\n")
+      file.write("os.chdir(os.path.dirname(os.path.abspath(__file__)))\n")
+      if not args.create_standalone_mod_from_mod:
+        file.write("os.chdir('..')\n")
+        for i in range(level):
+          file.write("os.chdir('..')\n")  #script will have been placed is subdir!
+        
+      callString=os.path.normpath("subprocess.call('python ./createUpgradedBuildings.py "+'"'+'" "'.join(argv)+'"'+"', shell=True)\n").replace(os.sep,"/")
+      file.write(callString)
+      if not args.just_copy_and_check and not args.create_standalone_mod_from_mod:
+        file.write("import fnmatch\n")
+        file.write("for root, dirnames, filenames in os.walk('.'):\n")
+        file.write("\tfor filename in fnmatch.filter(filenames,'rerun_just_copy_and_check.py'):\n")
+        file.write("\t\tsubprocess.call('python {}'+{}+'{}', shell=True)\n".format('"',"os.path.join(root,filename)",'"'))
+        # file.write("\t\tsubprocess.call('python "+'+"'+'filename'+'"'+"', shell=True)\n")
   if args.create_standalone_mod_from_mod:
     modFileName=args.buildingFileNames[0]
     # print(modFileName)
@@ -1036,7 +1050,7 @@ def preprocess(argv):
         
     buildingArgs=copy.deepcopy(args)
     buildingArgs.buildingFileNames=[path+"/common/buildings/*"]
-    main(buildingArgs,1)
+    readAndConvert(buildingArgs,1)
     with open(args.copiedBuildingsFileName) as file:
         args.copiedBuildings=[line.strip() for line in file]
     otherFilesArgs=copy.deepcopy(args)
@@ -1056,7 +1070,7 @@ def preprocess(argv):
             # sys.exit(0)
             otherFilesArgs.output_folder=args.output_folder+rootWithoutPath+"/"
             otherFilesArgs.buildingFileNames=[root+"/"+file]
-            main(otherFilesArgs,0)
+            readAndConvert(otherFilesArgs,0)
           else:
             # print(root)
             # print(file)
@@ -1066,10 +1080,10 @@ def preprocess(argv):
     #otherFilesArgs.buildingFileNames=path+"/common/scripted_triggers/*"
 
     
-    # main(buildingArgs,0)
+    # readAndConvert(buildingArgs,0)
   else:
-    main(args)
+    return readAndConvert(args)
   
-if __name__ == "__main__":
+if __name__ == "__mainmain__":
   preprocess(sys.argv[1:])
   
