@@ -58,7 +58,7 @@ def startEditor(filename, forceEditor=False):
     if forceEditor:
       subprocess.Popen("notepad "+filename, shell=True)
     else:
-      subprocess.Popen("start "+filename, shell=True)
+      subprocess.Popen('"'+filename+'"', shell=True)
   else:
     if (filename.find(".ods")!=-1):
       subprocess.Popen("xdg-open "+filename, shell=True)
