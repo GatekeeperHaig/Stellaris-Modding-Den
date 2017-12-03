@@ -494,7 +494,7 @@ class TabControlClass:
     tabs=[]
     tabs.append([
     "txt to ods", 
-    ("text files","*.txt"),
+    ("text files","*.txt;*.gfx"),
     [["Apply filter","--filter","Will only create tags from the filter file (including all subtags of those and the key tag). Only these will be changed when converting back"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.ods'. Beware that this file can only be used for back-conversion if such a txt file also exists!"]], 
     convertCSV_TXT,[],ttk.Frame(nb),0
     ])

@@ -58,7 +58,7 @@ def main(args,unused=0):
   for fileName in globbedList:
     if args.to_txt:
       if fileName[-4:]==tableFileEnding:
-        fileName=fileName.replace(tableFileEnding,".txt")
+        fileName=fileName.replace(tableFileEnding,"")
     fileIndex+=1
     if fileIndex==0 or not args.join_files:
       varsToValue=BU.NamesToValue(0)
@@ -66,16 +66,22 @@ def main(args,unused=0):
       tagList=BU.NamesToValue(0)
       
       
-    if fileName.replace(".txt",tableFileEnding)==fileName:
-      print("Non .txt file!")
+    if fileName.replace(".txt",tableFileEnding)==fileName and fileName.replace(".gfx",tableFileEnding)==fileName:
+      print("Non .txt/.gfx file!")
       continue
+    else:
+      if fileName.replace(".txt",tableFileEnding)!=fileName:
+        keyString="key"
+      if fileName.replace(".gfx",tableFileEnding)!=fileName:
+        keyString="name"
     if args.filter:
       filterFile=fileName.replace(".txt",".filter")
       if os.path.exists(filterFile):
         with open(filterFile) as file:
           args.filter=[word.strip() for line in file for word in line.split(",") ]
-        if not "key" in args.filter:
-          args.filter[0:0]=["key"]#always need to be able to convert back to txt
+        fileName.replace(".txt",tableFileEnding)!=fileName
+        if not keyString in args.filter:
+          args.filter[0:0]=[keyString]#always need to be able to convert back to txt        
       else:
         print("No filter file for: "+fileName)
       
@@ -85,10 +91,16 @@ def main(args,unused=0):
     else:
       keepExtraLines=False
     nameToData.readFile(fileName,args, varsToValue, keepExtraLines) 
+    fullNameToData=nameToData
+    if fileName.replace(".gfx",tableFileEnding)!=fileName:
+      nameToData=nameToData.vals[0]
+      nameToData.increaseLevelRec(-1)
+      # nameToData.printAll()
+      # fullNameToData.printAll()
     nameToData.addTags(tagList)
     
     if args.to_txt:
-      csvFile=fileName.replace(".txt",tableFileEnding)
+      csvFile=fileName+tableFileEnding
       if not os.path.exists(csvFile):
         print("No "+tableFileEnding+" file for: "+fileName)
         continue
@@ -112,7 +124,7 @@ def main(args,unused=0):
         print("Error: No end of header found. There needs to be an empty line!")
         sys.exit(1)
       
-      keyCSVIndex=header[1].index("key")
+      keyCSVIndex=header[1].index(keyString)
       repeatIndex=0
       for bodyEntry in body:
         if "".join(bodyEntry):
@@ -121,18 +133,18 @@ def main(args,unused=0):
             for name, val in nameToData.getAll():
               if name!=header[0][0]:
                 continue;
-              if val.get("key")==bodyKey:
+              if val.get(keyString)==bodyKey:
                 break; #name,val should now have the correct value
             repeatIndex=0
           else:
             repeatIndex+=1
-          if val.get("key")!=bodyKey: #did not find correct one. probably a new one was added
+          if val.get(keyString)!=bodyKey: #did not find correct one. probably a new one was added
             if args.forbid_additions:
               print("New key found. Additions where forbidden!")
               continue
             nameToData.add2(header[0][0],BU.Building(0,header[0][0]))
             val=nameToData.vals[-1]
-            val.add2("key", bodyKey)
+            val.add2(keyString, bodyKey)
             for name, val in nameToData.getAll():
               if name!=header[0][0]:
                 continue;
@@ -148,7 +160,9 @@ def main(args,unused=0):
         nameToData.deleteMarked()
         with open(outFileName,'w') as file:       
           varsToValue.writeAll(file)
-          nameToData.writeAll(file)
+          if fileName.replace(".gfx",tableFileEnding)!=fileName:
+            nameToData.increaseLevelRec(1)
+          fullNameToData.writeAll(file)
       continue
       
     if args.join_files:
@@ -160,14 +174,14 @@ def main(args,unused=0):
     headerArray=[copy.deepcopy(lineArrayT) for i in range(tagList.determineDepth())]
     tagList.toCSVHeader(headerArray,args)
     if args.join_files:
-      csvFileName=fileName.replace(".txt","JOINED"+tableFileEnding)
+      csvFileName=fileName+"JOINED"+tableFileEnding
     else:
       if args.create_new_file:
         csvFileName=args.create_new_file+tableFileEnding
-        csvFileName=csvFileName.replace("@orig",fileName.replace(".txt",""))
+        csvFileName=csvFileName.replace("@orig",fileName)
         print("Saving to "+csvFileName)
       else:
-        csvFileName=fileName.replace(".txt",tableFileEnding)
+        csvFileName=fileName+tableFileEnding
     lastOutFile=csvFileName
     if not args.test_run:
       try:
@@ -176,8 +190,9 @@ def main(args,unused=0):
         bodyArray=[]
         for name, val in nameToData.getAll():
           lineArray=[copy.deepcopy(lineArrayT)]
-          val.toCSV(lineArray, tagList.get(name),varsToValue,args)
-          bodyArray+=lineArray
+          if isinstance(val,BU.NamesToValue):
+            val.toCSV(lineArray, tagList.get(name),varsToValue,args)
+            bodyArray+=lineArray
         if args.use_csv:
           with open(csvFileName,'w') as file:         
             for headerLine in headerArray:

@@ -137,11 +137,11 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       if len(string)>0:
         self.vals[i].addString(string)
     return self.vals[i]
-  def increaseLevelRec(self): #increase the bracket level for this object and every object below. Beware that as the head name of this object is stored one level higher, the head name of the object is not shifted
-    self.bracketLevel+=1
+  def increaseLevelRec(self, amount=1): #increase the bracket level for this object and every object below. Beware that as the head name of this object is stored one level higher, the head name of the object is not shifted
+    self.bracketLevel+=amount
     for val in self.vals:
-      if isinstance(val, NamesToValue):
-        val.increaseLevelRec()
+      if isinstance(val, NamesToValue,):
+        val.increaseLevelRec(amount)
   def printAll(self): #primitive print. Just for testing
     for i in range(len(self.names)):
       for b in range(self.bracketLevel):
@@ -485,7 +485,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
       else:
         if self.vals[i]=="#delete":# or not self.vals[i]:
           delete.append(i)
-    if len(delete)==len(self.names) or len(delete)==len(self.names)-1 and "key" in self.names:
+    if len(delete)==len(self.names) or len(delete)==len(self.names)-1 and ("key" in self.names or "name" in self.names):
       return True #fully deleted. Delete head tag
     for i in reversed(sorted(delete)):      #delete last first to make sure indices stay valid
       self.removeIndex(i)
