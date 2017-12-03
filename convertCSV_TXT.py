@@ -111,31 +111,32 @@ def main(args,unused=0):
       if i==len(csvContent)-1:
         print("Error: No end of header found. There needs to be an empty line!")
         sys.exit(1)
-      for name, val in nameToData.getAll():
-        if name!=header[0][0]:
-          continue;
-        key=val.get("key")#.strip('"')
-        keyCSVIndex=header[1].index("key")
-        # print(key)
-        found=0
-        for bodyEntry in body:
-          if "".join(bodyEntry):
-            #print("'"+"".join(bodyEntry)+'"')
-            #print(keyCSVIndex)
-            if found>0:
-              if bodyEntry[keyCSVIndex]:
-                break
-              else:
-                val.setValFromCSV(header, bodyEntry,varsToValue,args,found)
-                found+=1
-            
-            # print(bodyEntry[keyCSVIndex])
-            # if bodyEntry[keyCSVIndex].strip('"')==key:
-            if bodyEntry[keyCSVIndex]==key:
-              #print(key)
-              val.setValFromCSV(header, bodyEntry,varsToValue,args)
-              found+=1
-              # break
+      
+      keyCSVIndex=header[1].index("key")
+      repeatIndex=0
+      for bodyEntry in body:
+        if "".join(bodyEntry):
+          if bodyEntry[keyCSVIndex].strip():
+            bodyKey=bodyEntry[keyCSVIndex].strip()
+            for name, val in nameToData.getAll():
+              if name!=header[0][0]:
+                continue;
+              if val.get("key")==bodyKey:
+                break; #name,val should now have the correct value
+            repeatIndex=0
+          else:
+            repeatIndex+=1
+          if val.get("key")!=bodyKey: #did not find correct one. probably a new one was added
+            if args.forbid_additions:
+              print("New key found. Additions where forbidden!")
+              continue
+            nameToData.add2(header[0][0],BU.Building(0,header[0][0]))
+            val=nameToData.vals[-1]
+            val.add2("key", bodyKey)
+            for name, val in nameToData.getAll():
+              if name!=header[0][0]:
+                continue;
+          val.setValFromCSV(header, bodyEntry,varsToValue,args, repeatIndex)
       if args.create_new_file:
         outFileName=args.create_new_file+".txt"
         outFileName=outFileName.replace("@orig",fileName.replace(".txt",""))

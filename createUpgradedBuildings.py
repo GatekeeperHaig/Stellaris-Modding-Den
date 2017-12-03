@@ -432,7 +432,7 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
         continue
       # print(headerName)
       if not args.forbid_additions and not headerName in self.names and bodyEntry[headerIndex]:
-        if header[self.bracketLevel+1][headerIndex]!="":
+        if len(header)>self.bracketLevel+1 and len(header[self.bracketLevel+1])>headerIndex and header[self.bracketLevel+1][headerIndex]!="":
           val=self.getOrCreate(headerName)
           val.setValFromCSV(header, bodyEntry,varsToValue,args)
         else:
@@ -447,7 +447,11 @@ class NamesToValue: #Basically everything is stored recursively in objects of th
           except ValueError:
             if bodyEntry[headerIndex]:
               if not args.forbid_additions:
-                self.add2(headerName,copy.deepcopy(self.getN_th(headerName, n_th_occurence-1)))
+                if isinstance(self.getN_th(headerName, n_th_occurence-1), NamesToValue):
+                  self.add2(headerName, NamesToValue(self.bracketLevel+1))
+                else:
+                  self.add2(headerName, "")
+                # self.add2(headerName,copy.deepcopy(self.getN_th(headerName, n_th_occurence-1)))
                 valIndex=self.n_thIndex(headerName,n_th_occurence)
               else:
                 raise
@@ -939,6 +943,8 @@ def readAndConvert(args, allowRestart=1):
       args.copiedBuildings=newCopiedBuilings
       if allowRestart:
         readAndConvert(copy.deepcopy(args),0)
+  if lastOutPutFileName and lastOutPutFileName[0]!="." and lastOutPutFileName[0]!=os.sep and lastOutPutFileName[0]!="/":
+    lastOutPutFileName="./"+lastOutPutFileName
   return lastOutPutFileName
   
 def killWindowsBackSlashesWithFire(string):

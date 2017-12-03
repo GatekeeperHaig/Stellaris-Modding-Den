@@ -241,7 +241,7 @@ class TabClass:
       argList+=self.optionWindow.getOptions(line)
     for i in range(len(self.options)):
       if self.checkVars[i].get():
-        argList.append(self.options[i][1])
+        argList+=self.options[i][1].split()
   def checkValid(self):
     self.setSize()
     for line in self.lines:
