@@ -73,8 +73,10 @@ def main(args,unused=0):
     else:
       if fileName.replace(".txt",tableFileEnding)!=fileName:
         keyString="key"
+        altkey="name"
       if fileName.replace(".gfx",tableFileEnding)!=fileName:
         keyString="name"
+        altkey="key"
     if args.filter:
       filterFile=fileName.replace(".txt",".filter")
       if os.path.exists(filterFile):
@@ -125,7 +127,11 @@ def main(args,unused=0):
         print("Error: No end of header found. There needs to be an empty line!")
         sys.exit(1)
       
-      keyCSVIndex=header[1].index(keyString)
+      try:
+      	keyCSVIndex=header[1].index(keyString)
+      except ValueError:
+        keyString=altkey
+        keyCSVIndex=header[1].index(keyString)
       repeatIndex=0
       for bodyEntry in body:
         if "".join(bodyEntry):
