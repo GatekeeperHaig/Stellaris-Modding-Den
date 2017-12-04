@@ -4,7 +4,7 @@
 import sys, argparse, subprocess,os
 from argparse import RawTextHelpFormatter
 import math
-import createUpgradedBuildings as BU
+from stellarisTxtRead import TagList
 
 def parse(argv):
   #print(argv)
@@ -26,8 +26,8 @@ def parse(argv):
 def main(args):
   args.just_copy_and_check=True
   args.preventLinePrint=[]
-  varsToValue=BU.NamesToValue(0)
-  eventNameToData=BU.NamesToValue(0)
+  varsToValue=TagList(0)
+  eventNameToData=TagList(0)
   eventNameToData.readFile(args.inputfileName,args, varsToValue)
   eventNameToData.printAll()
   with open(args.outputfileName,'w') as file:

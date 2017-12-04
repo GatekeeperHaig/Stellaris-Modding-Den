@@ -10,7 +10,8 @@ import ntpath
 import codecs
 import glob
 from shutil import copyfile
-import createUpgradedBuildings as BU
+from stellarisTxtRead import TagList
+from stellarisTxtRead import NamedTagList
 import re
 from collections import OrderedDict
 
@@ -61,9 +62,9 @@ def main(args,unused=0):
         fileName=fileName.replace(tableFileEnding,"")
     fileIndex+=1
     if fileIndex==0 or not args.join_files:
-      varsToValue=BU.NamesToValue(0)
-      nameToData=BU.NamesToValue(0)
-      tagList=BU.NamesToValue(0)
+      varsToValue=TagList(0)
+      nameToData=TagList(0)
+      tagList=TagList(0)
       
       
     if fileName.replace(".txt",tableFileEnding)==fileName and fileName.replace(".gfx",tableFileEnding)==fileName:
@@ -142,7 +143,7 @@ def main(args,unused=0):
             if args.forbid_additions:
               print("New key found. Additions where forbidden!")
               continue
-            nameToData.add2(header[0][0],BU.Building(0,header[0][0]))
+            nameToData.add2(header[0][0],NamedTagList(0,header[0][0]))
             val=nameToData.vals[-1]
             val.add2(keyString, bodyKey)
             for name, val in nameToData.getAll():
@@ -190,7 +191,7 @@ def main(args,unused=0):
         bodyArray=[]
         for name, val in nameToData.getAll():
           lineArray=[copy.deepcopy(lineArrayT)]
-          if isinstance(val,BU.NamesToValue):
+          if isinstance(val,TagList):
             val.toCSV(lineArray, tagList.get(name),varsToValue,args)
             bodyArray+=lineArray
         if args.use_csv:
