@@ -12,6 +12,7 @@ import glob
 from shutil import copyfile
 from stellarisTxtRead import TagList
 from stellarisTxtRead import NamedTagList
+from stellarisTxtRead import TxtReadHelperFunctions
 import re
 from collections import OrderedDict
 
@@ -26,8 +27,12 @@ def parse(argv):
   parser.add_argument('--create_new_file', default='', help="Instead of overwriting the input txt file (or the default output csv file) the script creates a new one. Useful if you are not in a repository environment. Be careful to not leave two txt file for the game to load! '@orig' will be replaced by the original file name")
   parser.add_argument('--test_run', action="store_true", help="No Output.")
   parser.add_argument('--use_csv', action="store_true", help="Due to problems with quotation marks going missing on opening a file in Excel or OpenOffice I have changed to storing and opening ods files. You can revert to csv using this option")
+  parser.add_argument('--changes_to_body', action="store_true", help="If a header variables ('@'<name>) is changed more then once, all but the first change is written to the body, i.e. as values directly inthe tags.")
+  parser.add_argument('--clean_header', action="store_true", help="Header ('@' variables) will be cleaned of unused variables (after the ods file is applied)")
+  parser.add_argument('--remove_header', action="store_true", help="Header ('@' variables) will be converted into values inside the tags. Allows easier changes in ods.")
   
   
+
   # if isinstance(argv, str):
     # argv=argv.split()
   args=parser.parse_args(argv)
@@ -94,6 +99,11 @@ def main(args,unused=0):
     else:
       keepExtraLines=False
     nameToData.readFile(fileName,args, varsToValue, keepExtraLines) 
+    nameToData.applyOnLowestLevel( TxtReadHelperFunctions.splitIfSplitable,[], ["bracketLevel"])
+    if args.remove_header:
+      nameToData.applyOnLowestLevel( TxtReadHelperFunctions.getVariableValue, [varsToValue])
+      varsToValue.clear()
+    varsToValue.changed=[0 for i in varsToValue.vals]
     fullNameToData=nameToData
     if fileName.replace(".gfx",tableFileEnding)!=fileName:
       nameToData=nameToData.vals[0]
@@ -133,6 +143,7 @@ def main(args,unused=0):
         keyString=altkey
         keyCSVIndex=header[1].index(keyString)
       repeatIndex=0
+      # nameToData[0].printAll()
       for bodyEntry in body:
         if "".join(bodyEntry):
           if bodyEntry[keyCSVIndex].strip():
@@ -156,6 +167,7 @@ def main(args,unused=0):
               if name!=header[0][0]:
                 continue;
           val.setValFromCSV(header, bodyEntry,varsToValue,args, repeatIndex)
+      # nameToData[0].printAll()
       if args.create_new_file:
         outFileName=args.create_new_file+".txt"
         outFileName=outFileName.replace("@orig",fileName.replace(".txt",""))
@@ -165,6 +177,14 @@ def main(args,unused=0):
       lastOutFile=outFileName
       if not args.test_run:
         nameToData.deleteMarked()
+        if args.clean_header:
+          varsToValue.changed=[0 for i in varsToValue.vals]
+          nameToData.applyOnLowestLevel( TxtReadHelperFunctions.checkVariableUsage, [varsToValue])
+          delList=[]
+          for i in range(len(varsToValue.changed)):
+            if varsToValue.changed[i]==0 and varsToValue.names[i] and varsToValue.names[i][0]=="@":
+              delList.append(i)
+          varsToValue.removeIndexList(delList)
         with open(outFileName,'w') as file:       
           varsToValue.writeAll(file)
           if fileName.replace(".gfx",tableFileEnding)!=fileName:
@@ -180,6 +200,8 @@ def main(args,unused=0):
     lineArrayT=['' for i in range(tagList.countDeepestLevelEntries(args, True))]
     headerArray=[copy.deepcopy(lineArrayT) for i in range(tagList.determineDepth())]
     tagList.toCSVHeader(headerArray,args)
+    # tagList.printAll()
+    # nameToData[0].printAll()
     if args.join_files:
       csvFileName=fileName+"JOINED"+tableFileEnding
     else:

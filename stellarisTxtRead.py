@@ -8,6 +8,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     self.vals=[]
     self.comments=[]
     self.bracketLevel=level
+  def __getitem__(self, index):
+    return self.vals[index]
   def get(self,name): #allows changing of content if vals[i] is an object
     return self.vals[self.names.index(name)]  
   def getN_th(self,name,n): #allows changing of content if vals[i] is an object
@@ -59,6 +61,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       comment=array[1][indexComment:]
       array[1]=array[1][:indexComment]
       array.append(comment)
+    # print(array[0])
+    # print("'"+array[1]+"'")
     self.add(array)
   def remove(self, name): #remove via name
     i=self.names.index(name)
@@ -67,6 +71,12 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     del self.names[i]
     del self.vals[i]
     del self.comments[i]
+  def removeIndexList(self, indexList):
+    for i in reversed(sorted(indexList)):      #delete last first to make sure indices stay valid
+      self.removeIndex(i)
+  def clear(self):
+    self.names=[]
+    self.vals=[]
   def replace(self, name,val,comment=''): #replace via name
     try:
       i=self.names.index(name)
@@ -83,12 +93,13 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     except ValueError:
       return TagList(0)
     if not isinstance(self.vals[i],TagList):
-      string=self.vals[i].strip()
-      if string[0]=="{":
-        string=string[1:-1].strip() #remove on bracket layer
-      self.vals[i]=TagList(self.bracketLevel+1)
-      if len(string)>0:
-        self.vals[i].addString(string)
+      self.vals[i]=splitAlways(self.vals[i], self.bracketLevel)
+    #   string=self.vals[i].strip()
+    #   if string[0]=="{":
+    #     string=string[1:-1].strip() #remove on bracket layer
+    #   self.vals[i]=TagList(self.bracketLevel+1)
+    #   if len(string)>0:
+    #     self.vals[i].addString(string)
     return self.vals[i]
   def increaseLevelRec(self, amount=1): #increase the bracket level for this object and every object below. Beware that as the head name of this object is stored one level higher, the head name of the object is not shifted
     self.bracketLevel+=amount
@@ -186,9 +197,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           else:
             if self.vals[i]==self.vals[j]: #string compare (or string vs object which gives correct 0)
               duplicates.append(j)
-    for i in reversed(sorted(duplicates)):      #delete last first to make sure indices stay valid
-      # self.printAll()
-      self.removeIndex(i)
+    self.removeIndexList(duplicates)
     for i in range(len(self.names)): #recurively through remaining elements
       if isinstance(self.vals[i], TagList):
         self.vals[i].removeDuplicatesRec()
@@ -218,8 +227,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           continue
         if self.names[i]==self.names[j]:
           duplicates.append(j)
-    for i in reversed(sorted(duplicates)):      #delete last first to make sure indices stay valid
-      self.removeIndex(i)
+    self.removeIndexList(duplicates)
   def computeNewVals(self, other, tag, discount, varsToValue, inverse=False):
     # magnitude=[entryA.get(tag), entryB.get(tag)]
     magnitude=[]
@@ -249,6 +257,13 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       self.replace(tag,finalVal)
     else:
       self.add([tag, finalVal])
+  def applyOnLowestLevel(self, func, argList=[],attributeList=[]):
+    for i,val in enumerate(self.vals):
+      if not isinstance(val, TagList):
+        FilledAttributeList=[vars(self)[a] for a in attributeList]
+        self.vals[i]=func(val,*argList, *FilledAttributeList)
+      if isinstance(val,TagList): #might be one now!
+        val.applyOnLowestLevel(func, argList,attributeList)
   def readFile(self,fileName,args, varsToValue,keepEmptryLinesAndComments=False):#stores content of buildingFileName in self and varsToValue
     bracketLevel=0
     objectList=[] #objects currently open objectList[0] would be lowest bracket object (a building), etc
@@ -299,9 +314,12 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             self.addString(line)
   def addTags(self, tagList):
     for name, entry in self.getAll():
-      tagEntry=tagList.getOrCreate(name)
-      if isinstance(entry, TagList):
-        entry.addTags(tagEntry)
+      if entry:
+        tagEntry=tagList.getOrCreate(name)
+        # print (name)
+        # print(entry)
+        if isinstance(entry, TagList):
+          entry.addTags(tagEntry)
       # else:
         # tagList.replace(name,"")
   def countDeepestLevelEntries(self,args, active=False):
@@ -328,7 +346,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     for name,val in self.getAll():
       # print(val.countDeepestLevelEntries(args))
       if active or not args.filter or name in args.filter or (len(val.vals)>0 and val.countDeepestLevelEntries(args)>0):
-        #print(name)
+        # print(len(val.vals))
         #print(curIndex)
         #print(len(outArray[0]))
         outArray[self.bracketLevel][curIndex]=name
@@ -360,6 +378,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           curIndex=self.splitToListIfString(name,occurenceIndex).toCSV(lineArray, val,varsToValue,args,curIndex, curLineIndex+occurenceIndex)
         else:
           output=self.getN_th(name,occurenceIndex)
+          if isinstance(output,TagList):
+            output=" ".join(output.names)
           if len(output)>0 and output[0]=="@":
             try:
               output=varsToValue.get(output)
@@ -430,7 +450,17 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         entry=bodyEntry[headerIndex]
         # print(entry)         
         if self.vals[valIndex][0]=="@" and entry!="#delete" and entry and entry[0]!="@":
-          varsToValue.replace(self.vals[valIndex],entry)
+          varsToValueIndex=varsToValue.names.index(self.vals[valIndex])
+          if (varsToValue[varsToValueIndex]==entry): #nothing changed
+            continue
+          if varsToValue.changed[varsToValueIndex]>0:
+            if args.changes_to_body:
+              self.vals[valIndex]=entry
+            else:
+              print("Trying to change variable {} in header for {!s}. time! It can only have one value! This call from {} (header {}) is ignored. Use '--remove_header', '--changes_to_body' or enter variable names into the ods file instead!".format(self.vals[valIndex],varsToValue.changed[varsToValueIndex]+1, bodyEntry[0], headerName ))
+          else:
+            varsToValue.replace(self.vals[valIndex],entry)
+          varsToValue.changed[varsToValueIndex]+=1
         else:
           self.vals[valIndex]=entry
   def deleteMarked(self):
@@ -442,10 +472,9 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       else:
         if self.vals[i]=="#delete":# or not self.vals[i]:
           delete.append(i)
-    if len(delete)==len(self.names) or len(delete)==len(self.names)-1 and ("key" in self.names or "name" in self.names):
+    if len(self.names)>0 and (len(delete)==len(self.names) or len(delete)==len(self.names)-1 and ("key" in self.names or "name" in self.names)):
       return True #fully deleted. Delete head tag
-    for i in reversed(sorted(delete)):      #delete last first to make sure indices stay valid
-      self.removeIndex(i)
+    self.removeIndexList(delete)
     return False
           
 class NamedTagList(TagList): #derived from TagList with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
@@ -470,3 +499,25 @@ class NamedTagList(TagList): #derived from TagList with four extra variables and
       if name[0]!="#":
         costsSelf.computeNewVals(costsLowerTier, name, args.cost_discount,varsToValue, inverse)   #compute costs
     
+class TxtReadHelperFunctions:
+  def getVariableValue(variable, varsToValue):
+    if variable and variable[0]=="@":
+      return varsToValue.get(variable)
+    else:
+      return variable 
+  def checkVariableUsage(variable,varsToValue): 
+    if variable and variable[0]=="@":
+      varsToValue.changed[varsToValue.names.index(variable)]+=1
+    return variable
+  def splitIfSplitable(variable, bracketLevel):
+    if not "=" in variable:# and not "{" in variable:
+      return variable
+    return TxtReadHelperFunctions.splitAlways(variable,bracketLevel)
+  def splitAlways(variable, bracketLevel):
+    string=variable.strip()
+    if string[0]=="{":
+      string=string[1:-1].strip() #remove one bracket layer
+    out=TagList(bracketLevel+1)
+    if len(string)>0:
+      out.addString(string)
+    return out

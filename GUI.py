@@ -361,6 +361,26 @@ class TabClass:
         #print(self.lastPath)
     self.options=options
     self.command=command
+    if platform.system()=="Linux":
+      if ";" in defaultFileFilter[1]:
+        splitList=defaultFileFilter[1].split(";")
+        outString=""
+        for entry in zip(*splitList):
+          equal=1
+          for e in entry:
+            if e!=entry[0]:
+              equal=0
+          if equal:
+            outString+=entry[0]
+          else:
+            outString+="["
+            for e in entry:
+              outString+=e
+            outString+="]"
+        defaultFileFilter=(defaultFileFilter[0],outString)
+          # print(b)
+          # if splitList[0][i]=="*" or splitList[0][i]==".":
+            # outString+=spltL
     self.defaultFileFilter=defaultFileFilter
     self.checkVars=[]
     self.fixedOptions=fixedOptions
@@ -494,14 +514,22 @@ class TabControlClass:
     tabs=[]
     tabs.append([
     "txt to ods", 
-    ("text files","*.txt;*.gfx"),
+     ("text files",'*.txt;*.gfx'),
+    #("text files",'*.[tg][xf][tx]'),
     [["Apply filter","--filter","Will only create tags from the filter file (including all subtags of those and the key tag). Only these will be changed when converting back"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.ods'. Beware that this file can only be used for back-conversion if such a txt file also exists!"]], 
     convertCSV_TXT,[],ttk.Frame(nb),0
     ])
     tabs.append([
     "ods to txt", 
     ("table documents","*.ods"),
-    [["Forbid additions","--forbid_additions","Gives an error if you try to add new tags"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.txt'. Be careful: The game will load both files!"]], 
+    [
+      ["Clean Header","--clean_header","Header ('@' variables) will be cleaned of unused variables (after the ods file is applied)"],
+      ["Changes to body","--changes_to_body","If a header variables ('@'<name>) is changed more then once, all but the first change is written to the body, i.e. as values directly in the tags."],
+      ["Remove Header","--remove_header","Header ('@' variables) will be converted into values inside the tags. Allows easier changes in ods. Changes to body does similar things but only to prevent conflicts."],
+      ["Forbid additions","--forbid_additions","Gives an error if you try to add new tags"],
+      ["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.txt'. Be careful: The game will load both files!"]
+
+    ], 
     convertCSV_TXT,["--to_txt"], 
     ttk.Frame(nb),0
     ])
@@ -535,7 +563,8 @@ class TabControlClass:
   def save(self):
     self.getActiveTabClass().save()
   def load(self):
-    if messagebox.askquestion("Overwrite", "This will overwrite current content. Are you sure?", icon='warning') == 'yes':
+    tab=self.getActiveTabClass()
+    if (len(tab.lines)==0) or  linesmessagebox.askquestion("Overwrite", "This will overwrite current content. Are you sure?", icon='warning') == 'yes':
       self.getActiveTabClass().load()  
   def loadAdd(self):
     self.getActiveTabClass().loadAdd()
@@ -598,6 +627,9 @@ def main():
   # display the menu
   root.config(menu=menubar)
 
+  if os.path.exists("python.ico"):
+    root.iconbitmap('python.ico')
+        # root.iconbitmap(os.path.abspath("python.ico"))
 
 
 
