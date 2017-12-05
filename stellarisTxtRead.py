@@ -375,19 +375,23 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     return curIndex
         # for i in range(val.countDeepestLevelEntries(args)):
           # file.write(",")
-  def setValFromCSV(self, header, bodyEntry, varsToValue,args, n_th_occurence=0):
+  def setValFromCSV(self, header, bodyEntry, varsToValue,args, minIndex=0, maxIndex=-1, n_th_occurence=0):
     # print(header[self.bracketLevel])
     # print(self.names)
-    headerIndex=-1
-    for headerName in header[self.bracketLevel]:
+    if maxIndex==-1:
+      maxIndex=len(header[self.bracketLevel])-1
+    headerIndex=minIndex-1
+    for headerName in header[self.bracketLevel][minIndex:(maxIndex+1)]:
       headerIndex+=1
       if headerName=="" or len(bodyEntry)<=headerIndex:# or bodyEntry[headerIndex]=="":
         continue
-      # print(headerName)
+      nextMaxIndex=nextMinIndex=headerIndex
+      while nextMaxIndex+1<len(header[self.bracketLevel]) and not header[self.bracketLevel][nextMaxIndex+1]:
+        nextMaxIndex+=1
       if not args.forbid_additions and not headerName in self.names and bodyEntry[headerIndex]:
         if len(header)>self.bracketLevel+1 and len(header[self.bracketLevel+1])>headerIndex and header[self.bracketLevel+1][headerIndex]!="":
           val=self.getOrCreate(headerName)
-          val.setValFromCSV(header, bodyEntry,varsToValue,args)
+          val.setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,n_th_occurence)
         else:
           self.add2(headerName,bodyEntry[headerIndex]) 
         continue
@@ -421,11 +425,11 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             print(self.names)
           continue
       if isinstance(self.vals[valIndex], TagList):
-        self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args,local_n_th_occurence)
+        self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,local_n_th_occurence)
       else:
         entry=bodyEntry[headerIndex]
         # print(entry)         
-        if self.vals[valIndex][0]=="@" and entry!="#delete" and entry:
+        if self.vals[valIndex][0]=="@" and entry!="#delete" and entry and entry[0]!="@":
           varsToValue.replace(self.vals[valIndex],entry)
         else:
           self.vals[valIndex]=entry
