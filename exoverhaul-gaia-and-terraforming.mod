@@ -11,4 +11,4 @@ tags={
 }
 picture="thumb_gaia.png"
 remote_file_id="1109752837"
-supported_version="1.8.*"
+supported_version="1.9.*"

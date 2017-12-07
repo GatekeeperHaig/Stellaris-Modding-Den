@@ -9,4 +9,4 @@ tags={
 	"AI"
 }
 picture="thumb_reworked_buildings.png"
-supported_version="1.8.*"
+supported_version="1.9.*"

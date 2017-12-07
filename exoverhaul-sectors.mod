@@ -1,4 +1,4 @@
-name="((((--ExOverhaul: Enhanced Sectors & Game Difficulties--))))"
+name="((((--ExOverhaul: Enhanced Sector AI & Game Difficulties--))))"
 path="mod/exoverhaul/sectors_and_difficulties"
 tags={
 	"Overhaul"
@@ -8,4 +8,4 @@ tags={
 }
 picture="thumb_sectors_and_difficulties.png"
 remote_file_id="1185870703"
-supported_version="1.8.*"
+supported_version="1.9.*"

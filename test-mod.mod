@@ -3,4 +3,4 @@ path="mod/combat-overhaul-beta"
 tags={
 	"Balance"
 }
-supported_version="1.8.3"
+supported_version="1.9.*"

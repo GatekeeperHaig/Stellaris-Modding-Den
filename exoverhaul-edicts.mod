@@ -11,4 +11,4 @@ tags={
 }
 picture="thumb_edicts.png"
 remote_file_id="1160140461"
-supported_version="1.8.*"
+supported_version="1.9.*"

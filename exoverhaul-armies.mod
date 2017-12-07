@@ -10,4 +10,4 @@ tags={
 }
 picture="thumb_army.png"
 remote_file_id="1162689065"
-supported_version="1.8.*"
+supported_version="1.9.*"

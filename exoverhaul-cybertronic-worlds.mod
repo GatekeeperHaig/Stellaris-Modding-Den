@@ -10,4 +10,4 @@ tags={
 }
 picture="thumb_cybertronic_worlds.png"
 remote_file_id="1163945451"
-supported_version="1.8.*"
+supported_version="1.9.*"

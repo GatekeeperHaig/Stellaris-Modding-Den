@@ -9,4 +9,4 @@ tags={
 }
 picture="thumb_ethics_and_government.png"
 remote_file_id="1146723673"
-supported_version="1.8.*"
+supported_version="1.9.*"

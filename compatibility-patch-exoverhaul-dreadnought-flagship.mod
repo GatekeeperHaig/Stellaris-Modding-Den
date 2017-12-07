@@ -5,4 +5,4 @@ tags={
 }
 picture="thumb_compatibility_patch.png"
 remote_file_id="1143822305"
-supported_version="1.8.*"
+supported_version="1.9.*"

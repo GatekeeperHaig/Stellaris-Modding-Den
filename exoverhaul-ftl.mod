@@ -10,4 +10,4 @@ tags={
 }
 picture="thumb_ftl.png"
 remote_file_id="1156505747"
-supported_version="1.8.*"
+supported_version="1.9.*"

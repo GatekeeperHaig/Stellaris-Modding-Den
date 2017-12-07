@@ -12,4 +12,4 @@ tags={
 }
 picture="thumb_strategic_resources.png"
 remote_file_id="1193585277"
-supported_version="1.8.*"
+supported_version="1.9.*"
