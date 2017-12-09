@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
+
 
 class TagList: #Basically everything is stored recursively in objects of this class. Each file is one such object. Each tag within is one such object. The variables defined in a file are one such object. Only out-of-building comments are ignored and simply copied file to file.
   def __init__(self,level):
@@ -278,6 +280,9 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           if line[0]=="@":
             varsToValue.addString(line)
           elif line[0]!="#" or bracketLevel>0:
+            if line[0]=="#":
+              objectList[-1].add2("","",line)
+              continue
             currentlyInHeader=False
             bracketOpen=line.count("{")
             bracketClose=line.count("}")
@@ -402,6 +407,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       maxIndex=len(header[self.bracketLevel])-1
     headerIndex=minIndex-1
     for headerName in header[self.bracketLevel][minIndex:(maxIndex+1)]:
+      headerName=headerName.strip()
       headerIndex+=1
       if headerName=="" or len(bodyEntry)<=headerIndex:# or bodyEntry[headerIndex]=="":
         continue
