@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import sys, argparse, subprocess,os
@@ -541,7 +541,7 @@ def main(args, argv):
     rerunName=args.output_folder+"/rerun.py" 
   if not args.test_run:
     with open(rerunName, 'w') as file:
-      file.write("#!/usr/bin/env python3\n")
+      file.write("#!/usr/bin/env python\n")
       file.write("# -*- coding: utf-8 -*-\n")
       file.write("import subprocess\n")
       file.write("import os\n")
