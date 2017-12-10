@@ -122,7 +122,7 @@ class Line:
     #self.checkvar = IntVar()
     #self.check=Checkbutton(line, text="filter", variable=self.checkvar)
     #self.txt= tk.Text(line, bg="white",width=60, height=1)
-    self.txt= tk.Entry(line, bg="white",width=60)
+    self.txt= tk.Entry(line, bg="white",width=85)
     
     self.txt.bind("<Tab>", self.focusNextTxt)
     self.result=""
@@ -206,6 +206,7 @@ class TabClass:
   def setSize(self):
     if len(self.lines)>0:
       lineWidth=self.lines[-1].lineFrame.winfo_height()
+      # print(lineWidth)
       if lineWidth>1: #make sure we do not kill the init!
         self.scrollFrame.canvas.config(width=self.lines[-1].lineFrame.winfo_width())
       self.scrollFrame.canvas.config(height=min(-self.mainFrame.winfo_rooty()+self.lines[-1].lineFrame.winfo_rooty() + self.lines[-1].lineFrame.winfo_height(),self.tab.winfo_height()//3*2))
@@ -214,6 +215,7 @@ class TabClass:
       lineWidth=0
       for element in elements:
         lineWidth=max(lineWidth,-self.mainFrame.winfo_rootx()+element.winfo_rootx() + element.winfo_width())
+      # print(lineWidth)
       if lineWidth>10: #make sure we do not kill the init!
         self.scrollFrame.canvas.config(width=lineWidth)
   def checkAll(self):
@@ -516,7 +518,7 @@ class TabControlClass:
     "txt to ods", 
      ("text files",'*.txt;*.gfx'),
     #("text files",'*.[tg][xf][tx]'),
-    [["Apply filter","--filter","Will only create tags from the filter file (including all subtags of those and the key tag). Only these will be changed when converting back"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.ods'. Beware that this file can only be used for back-conversion if such a txt file also exists!"]], 
+    [["Apply filter","--filter","Will only create tags from the filter file (including all subtags of those and the key tag). Only these will be changed when converting back"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.ods'. Beware that this file can only be used for back-conversion if such a txt file also exists!"],["Keep inlines","--keep_inlines","With this option, the script will try not to split inlines into the long tag form."]], 
     convertCSV_TXT,[],ttk.Frame(nb),0
     ])
     tabs.append([

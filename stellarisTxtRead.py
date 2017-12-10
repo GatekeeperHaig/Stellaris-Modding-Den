@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-
+import shlex
 
 class TagList: #Basically everything is stored recursively in objects of this class. Each file is one such object. Each tag within is one such object. The variables defined in a file are one such object. Only out-of-building comments are ignored and simply copied file to file.
   def __init__(self,level):
@@ -95,7 +95,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     except ValueError:
       return TagList(0)
     if not isinstance(self.vals[i],TagList):
-      self.vals[i]=splitAlways(self.vals[i], self.bracketLevel)
+      self.vals[i]=TxtReadHelperFunctions.splitAlways(self.vals[i], self.bracketLevel)
     #   string=self.vals[i].strip()
     #   if string[0]=="{":
     #     string=string[1:-1].strip() #remove on bracket layer
@@ -260,12 +260,12 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     else:
       self.add([tag, finalVal])
   def applyOnLowestLevel(self, func, argList=[],attributeList=[]):
-    for i,val in enumerate(self.vals):
-      if not isinstance(val, TagList):
+    for i in range(len(self.vals)):
+      if not isinstance(self.vals[i], TagList):
         FilledAttributeList=[vars(self)[a] for a in attributeList]
-        self.vals[i]=func(val,*argList, *FilledAttributeList)
-      if isinstance(val,TagList): #might be one now!
-        val.applyOnLowestLevel(func, argList,attributeList)
+        self.vals[i]=func(self.vals[i],self,*argList, *FilledAttributeList)
+      if isinstance(self.vals[i],TagList): #might be one now!
+        self.vals[i].applyOnLowestLevel(func, argList,attributeList)
   def readFile(self,fileName,args, varsToValue,keepEmptryLinesAndComments=False):#stores content of buildingFileName in self and varsToValue
     bracketLevel=0
     objectList=[] #objects currently open objectList[0] would be lowest bracket object (a building), etc
@@ -403,6 +403,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def setValFromCSV(self, header, bodyEntry, varsToValue,args, minIndex=0, maxIndex=-1, n_th_occurence=0):
     # print(header[self.bracketLevel])
     # print(self.names)
+    # print(minIndex)
+    # print(maxIndex)
     if maxIndex==-1:
       maxIndex=len(header[self.bracketLevel])-1
     headerIndex=minIndex-1
@@ -414,6 +416,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       nextMaxIndex=nextMinIndex=headerIndex
       while nextMaxIndex+1<len(header[self.bracketLevel]) and not header[self.bracketLevel][nextMaxIndex+1]:
         nextMaxIndex+=1
+      if nextMaxIndex+1>=len(header[self.bracketLevel]):
+        nextMaxIndex=-1 #end of list reached. make all possible (ods lists are shorter if only empty elements are following)
       if not args.forbid_additions and not headerName in self.names and bodyEntry[headerIndex]:
         if len(header)>self.bracketLevel+1 and len(header[self.bracketLevel+1])>headerIndex and header[self.bracketLevel+1][headerIndex]!="":
           val=self.getOrCreate(headerName)
@@ -506,21 +510,52 @@ class NamedTagList(TagList): #derived from TagList with four extra variables and
         costsSelf.computeNewVals(costsLowerTier, name, args.cost_discount,varsToValue, inverse)   #compute costs
     
 class TxtReadHelperFunctions:
-  def getVariableValue(variable, varsToValue):
+  def getVariableValue(variable,caller, varsToValue):
     if variable and variable[0]=="@":
       return varsToValue.get(variable)
     else:
       return variable 
-  def checkVariableUsage(variable,varsToValue): 
+  def checkVariableUsage(variable,caller,varsToValue): 
     if variable and variable[0]=="@":
       varsToValue.changed[varsToValue.names.index(variable)]+=1
     return variable
-  def splitIfSplitable(variable, bracketLevel):
+  def splitIfSplitable(variable,caller, bracketLevel):
     if not "=" in variable:# and not "{" in variable:
       return variable
+    varSplit=shlex.split(variable)
+    #print(varSplit)
+    if len(varSplit) >1 and variable.find("{")==-1: #no further subtags but a list of tags
+      i=1#first element is value
+      while i <len(varSplit):
+        if varSplit[i][-1]!="=" and varSplit[i].find("=")!=-1: #equal somewhere in the middle
+          caller.addString(varSplit[i])
+        elif i<len(varSplit)+1 and varSplit[i][-1]=="=":
+          caller.names.append(varSplit[i][:-1])
+          caller.vals.append(varSplit[i+1])
+          caller.comments.append("")
+          i+=1 #extra index increase
+        elif  i<len(varSplit)+1 and varSplit[i+1][0]=="=":
+          caller.names.append(varSplit[i])
+          caller.comments.append("")
+          if len(varSplit[i+1])>1:
+            caller.vals.append(varSplit[i+1][1:])
+          elif i<len(varSplit)+2:
+            caller.vals.append(varSplit[i+2])
+            i+=1 #extra extra index increase
+          else:
+            print("Invalid splitting of string "+variable)
+            caller.vals.append('')
+          i+=1 #extra index increase
+        else:
+          print("Invalid splitting of string "+variable)
+        i+=1
+      return varSplit[0]
+
+
     return TxtReadHelperFunctions.splitAlways(variable,bracketLevel)
   def splitAlways(variable, bracketLevel):
     string=variable.strip()
+      
     if string[0]=="{":
       string=string[1:-1].strip() #remove one bracket layer
     out=TagList(bracketLevel+1)

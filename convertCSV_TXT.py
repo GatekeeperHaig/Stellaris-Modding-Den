@@ -30,6 +30,7 @@ def parse(argv):
   parser.add_argument('--changes_to_body', action="store_true", help="If a header variables ('@'<name>) is changed more then once, all but the first change is written to the body, i.e. as values directly inthe tags.")
   parser.add_argument('--clean_header', action="store_true", help="Header ('@' variables) will be cleaned of unused variables (after the ods file is applied)")
   parser.add_argument('--remove_header', action="store_true", help="Header ('@' variables) will be converted into values inside the tags. Allows easier changes in ods.")
+  parser.add_argument('--keep_inlines', action="store_true", help="With this option, the script will try not to split inlines into the long tag form.")
   
   
 
@@ -99,7 +100,8 @@ def main(args,unused=0):
     else:
       keepExtraLines=False
     nameToData.readFile(fileName,args, varsToValue, keepExtraLines) 
-    nameToData.applyOnLowestLevel( TxtReadHelperFunctions.splitIfSplitable,[], ["bracketLevel"])
+    if not args.keep_inlines:
+      nameToData.applyOnLowestLevel( TxtReadHelperFunctions.splitIfSplitable,[], ["bracketLevel"])
     if args.remove_header:
       nameToData.applyOnLowestLevel( TxtReadHelperFunctions.getVariableValue, [varsToValue])
       varsToValue.clear()
