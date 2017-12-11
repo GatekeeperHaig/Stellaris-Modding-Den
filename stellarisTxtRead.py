@@ -403,6 +403,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def setValFromCSV(self, header, bodyEntry, varsToValue,args, minIndex=0, maxIndex=-1, n_th_occurence=0):
     # print(header[self.bracketLevel])
     # print(self.names)
+    # print(n_th_occurence)
     # print(minIndex)
     # print(maxIndex)
     if maxIndex==-1:
@@ -442,9 +443,9 @@ class TagList: #Basically everything is stored recursively in objects of this cl
                 valIndex=self.n_thIndex(headerName,n_th_occurence)
               else:
                 raise
-            else:
-              continue
-          local_n_th_occurence=0
+              local_n_th_occurence=0
+            # else:
+            #  no continue! empty things will be ignored anyway. And there might be some extra tags lower down
       if valIndex<=0:
         try:
           valIndex=self.names.index(headerName)
@@ -459,20 +460,21 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       else:
         entry=bodyEntry[headerIndex]
         # print(entry)         
-        if self.vals[valIndex][0]=="@" and entry!="#delete" and entry and entry[0]!="@":
-          varsToValueIndex=varsToValue.names.index(self.vals[valIndex])
-          if (varsToValue[varsToValueIndex]==entry): #nothing changed
-            continue
-          if varsToValue.changed[varsToValueIndex]>0:
-            if args.changes_to_body:
-              self.vals[valIndex]=entry
+        if entry:
+          if self.vals[valIndex][0]=="@" and entry!="#delete" and entry[0]!="@":
+            varsToValueIndex=varsToValue.names.index(self.vals[valIndex])
+            if (varsToValue[varsToValueIndex]==entry): #nothing changed
+              continue
+            if varsToValue.changed[varsToValueIndex]>0:
+              if args.changes_to_body:
+                self.vals[valIndex]=entry
+              else:
+                print("Trying to change variable {} in header for {!s}. time! It can only have one value! This call from {} (header {}) is ignored. Use '--remove_header', '--changes_to_body' or enter variable names into the ods file instead!".format(self.vals[valIndex],varsToValue.changed[varsToValueIndex]+1, bodyEntry[0], headerName ))
             else:
-              print("Trying to change variable {} in header for {!s}. time! It can only have one value! This call from {} (header {}) is ignored. Use '--remove_header', '--changes_to_body' or enter variable names into the ods file instead!".format(self.vals[valIndex],varsToValue.changed[varsToValueIndex]+1, bodyEntry[0], headerName ))
+              varsToValue.replace(self.vals[valIndex],entry)
+            varsToValue.changed[varsToValueIndex]+=1
           else:
-            varsToValue.replace(self.vals[valIndex],entry)
-          varsToValue.changed[varsToValueIndex]+=1
-        else:
-          self.vals[valIndex]=entry
+            self.vals[valIndex]=entry
   def deleteMarked(self):
     delete=[]
     for i in range(len(self.names)):

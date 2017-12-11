@@ -156,19 +156,19 @@ def main(args,unused=0):
               if val.get(keyString)==bodyKey:
                 break; #name,val should now have the correct value
             repeatIndex=0
+            if val.get(keyString)!=bodyKey: #did not find correct one. probably a new one was added
+              if args.forbid_additions:
+                print("New key found. Additions where forbidden!")
+                continue
+              nameToData.add2(header[0][0],NamedTagList(0,header[0][0]))
+              val=nameToData.vals[-1]
+              val.add2(keyString, bodyKey)
+              for name, val in nameToData.getAll():
+                if name!=header[0][0]:
+                  continue;
           else:
             repeatIndex+=1
-          if val.get(keyString)!=bodyKey: #did not find correct one. probably a new one was added
-            if args.forbid_additions:
-              print("New key found. Additions where forbidden!")
-              continue
-            nameToData.add2(header[0][0],NamedTagList(0,header[0][0]))
-            val=nameToData.vals[-1]
-            val.add2(keyString, bodyKey)
-            for name, val in nameToData.getAll():
-              if name!=header[0][0]:
-                continue;
-          val.setValFromCSV(header, bodyEntry,varsToValue,args, repeatIndex)
+          val.setValFromCSV(header, bodyEntry,varsToValue,args, 0,-1,repeatIndex)
       # nameToData[0].printAll()
       if args.create_new_file:
         outFileName=args.create_new_file+".txt"
