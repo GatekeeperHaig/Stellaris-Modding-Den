@@ -411,6 +411,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     headerIndex=minIndex-1
     for headerName in header[self.bracketLevel][minIndex:(maxIndex+1)]:
       headerName=headerName.strip()
+      # print(headerName)
       headerIndex+=1
       if headerName=="" or len(bodyEntry)<=headerIndex:# or bodyEntry[headerIndex]=="":
         continue
@@ -432,6 +433,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         if self.names.count(headerName)>=1:
           try:
             valIndex=self.n_thIndex(headerName,n_th_occurence)
+            local_n_th_occurence=0
           except ValueError:
             if bodyEntry[headerIndex]:
               if not args.forbid_additions:
@@ -461,6 +463,11 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         entry=bodyEntry[headerIndex]
         # print(entry)         
         if entry:
+          # print(headerName)
+          # print(n_th_occurence)
+          # print(self.vals[valIndex])
+          # print(entry)
+          # self.printAll()
           if self.vals[valIndex][0]=="@" and entry!="#delete" and entry[0]!="@":
             varsToValueIndex=varsToValue.names.index(self.vals[valIndex])
             if (varsToValue[varsToValueIndex]==entry): #nothing changed
