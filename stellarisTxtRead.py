@@ -423,6 +423,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       if not args.forbid_additions and not headerName in self.names and bodyEntry[headerIndex]:
         if len(header)>self.bracketLevel+1 and len(header[self.bracketLevel+1])>headerIndex and header[self.bracketLevel+1][headerIndex]!="":
           val=self.getOrCreate(headerName)
+          self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
           val.setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,n_th_occurence)
         else:
           self.add2(headerName,bodyEntry[headerIndex]) 
@@ -457,11 +458,12 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             print(n_th_occurence)
             print(self.names)
           continue
+      self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
       if isinstance(self.vals[valIndex], TagList):
         self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,local_n_th_occurence)
       else:
-        entry=bodyEntry[headerIndex]
         # print(entry)         
+        entry=bodyEntry[headerIndex]
         if entry:
           # print(headerName)
           # print(n_th_occurence)
@@ -495,6 +497,13 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       return True #fully deleted. Delete head tag
     self.removeIndexList(delete)
     return False
+  def addLines(self, headerName, bodyEntry, headerIndex,n_th_occurence):
+    if bodyEntry[headerIndex][:9].lower()=="#addlines":
+      extraLines=int(bodyEntry[headerIndex][9:])
+      bodyEntry[headerIndex]="addedLines"
+      for i in range(extraLines-1):
+        self.add2(headerName, self.getN_th(headerName, n_th_occurence-1))
+
           
 class NamedTagList(TagList): #derived from TagList with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
   def __init__(self, lineNbr,tagName):
