@@ -90,12 +90,17 @@ def main(args,unused=0):
     else:
       keepExtraLines=False
     nameToData.readFile(fileName,args, varsToValue, keepExtraLines) 
+    keyString='addKey'
     for k in keyStrings:
       for v in nameToData.vals:
         if isinstance(v,TagList) and len(v.names):
           if k in v.names:
             keyString=k
           break
+    if keyString=="addKey":
+      for i in range(len(nameToData.vals)):
+        nameToData.vals[i].add2(keyString, nameToData.names[i])
+        nameToData.names[i]="keyAdded"
 
     if args.filter:
       filterFile=fileName.replace(".txt",".filter")
@@ -195,6 +200,10 @@ def main(args,unused=0):
             if varsToValue.changed[i]==0 and varsToValue.names[i] and varsToValue.names[i][0]=="@":
               delList.append(i)
           varsToValue.removeIndexList(delList)
+        if keyString=="addKey":
+          for i in range(len(nameToData.vals)):
+            nameToData.names[i]=nameToData.vals[i].get(keyString)
+            nameToData.vals[i].remove(keyString)
         with open(outFileName,'w') as file:       
           varsToValue.writeAll(file)
           if fileName.replace(".gfx",tableFileEnding)!=fileName:
