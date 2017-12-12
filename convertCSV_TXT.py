@@ -72,17 +72,31 @@ def main(args,unused=0):
       nameToData=TagList(0)
       tagList=TagList(0)
       
-      
+    keyStrings=["key","name","id"]  
     if fileName.replace(".txt",tableFileEnding)==fileName and fileName.replace(".gfx",tableFileEnding)==fileName:
       print("Non .txt/.gfx file!")
       continue
+    # else:
+      # if fileName.replace(".txt",tableFileEnding)!=fileName:
+      #   keyString="key"
+      #   altkey="name"
+      # if fileName.replace(".gfx",tableFileEnding)!=fileName:
+      #   keyString="name"
+      #   altkey="key"
+      
+    #READ FILE
+    if args.to_txt:
+      keepExtraLines=True
     else:
-      if fileName.replace(".txt",tableFileEnding)!=fileName:
-        keyString="key"
-        altkey="name"
-      if fileName.replace(".gfx",tableFileEnding)!=fileName:
-        keyString="name"
-        altkey="key"
+      keepExtraLines=False
+    nameToData.readFile(fileName,args, varsToValue, keepExtraLines) 
+    for k in keyStrings:
+      for v in nameToData.vals:
+        if isinstance(v,TagList) and len(v.names):
+          if k in v.names:
+            keyString=k
+          break
+
     if args.filter:
       filterFile=fileName.replace(".txt",".filter")
       if os.path.exists(filterFile):
@@ -93,13 +107,7 @@ def main(args,unused=0):
           args.filter[0:0]=[keyString]#always need to be able to convert back to txt        
       else:
         print("No filter file for: "+fileName)
-      
-    #READ FILE
-    if args.to_txt:
-      keepExtraLines=True
-    else:
-      keepExtraLines=False
-    nameToData.readFile(fileName,args, varsToValue, keepExtraLines) 
+
     if not args.keep_inlines:
       nameToData.applyOnLowestLevel( TxtReadHelperFunctions.splitIfSplitable,[], ["bracketLevel"])
     if args.remove_header:

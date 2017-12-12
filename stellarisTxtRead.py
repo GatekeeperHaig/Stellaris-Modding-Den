@@ -288,11 +288,11 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             bracketClose=line.count("}")
             if bracketLevel==0:
               if (bracketOpen!=1 or bracketClose!=0):
-                if not args.just_copy_and_check:
-                  print("Error in line {!s}:\n{}\nInvalid building start line".format(lineIndex,line))
-                  sys.exit(1)
-                else:
-                  self.addString(line)
+                #   print("Error in line {!s}:\n{}\nInvalid building start line".format(lineIndex,line))
+                #   sys.exit(1)
+                # else:
+                self.addString(line)
+                if args.just_copy_and_check:
                   args.preventLinePrint.append(lineIndex)
                   # print(line)
               else:
