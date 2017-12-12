@@ -526,7 +526,7 @@ class TabControlClass:
     ("table documents","*.ods"),
     [
       ["Clean Header","--clean_header","Header ('@' variables) will be cleaned of unused variables (after the ods file is applied)"],
-      ["Changes to body","--changes_to_body","If a header variables ('@'<name>) is changed more then once, all but the first change is written to the body, i.e. as values directly in the tags."],
+      ["Changes to body","--changes_to_body","Every change is written to body, even if it was previously a header variable ('@')"],
       ["Remove Header","--remove_header","Header ('@' variables) will be converted into values inside the tags. Allows easier changes in ods. Changes to body does similar things but only to prevent conflicts."],
       ["Forbid additions","--forbid_additions","Gives an error if you try to add new tags"],
       ["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.txt'. Be careful: The game will load both files!"]

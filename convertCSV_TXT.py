@@ -27,7 +27,7 @@ def parse(argv):
   parser.add_argument('--create_new_file', default='', help="Instead of overwriting the input txt file (or the default output csv file) the script creates a new one. Useful if you are not in a repository environment. Be careful to not leave two txt file for the game to load! '@orig' will be replaced by the original file name")
   parser.add_argument('--test_run', action="store_true", help="No Output.")
   parser.add_argument('--use_csv', action="store_true", help="Due to problems with quotation marks going missing on opening a file in Excel or OpenOffice I have changed to storing and opening ods files. You can revert to csv using this option")
-  parser.add_argument('--changes_to_body', action="store_true", help="If a header variables ('@'<name>) is changed more then once, all but the first change is written to the body, i.e. as values directly inthe tags.")
+  parser.add_argument('--changes_to_body', action="store_true", help="Every change is written to body, even if it was previously a header variable ('@')")
   parser.add_argument('--clean_header', action="store_true", help="Header ('@' variables) will be cleaned of unused variables (after the ods file is applied)")
   parser.add_argument('--remove_header', action="store_true", help="Header ('@' variables) will be converted into values inside the tags. Allows easier changes in ods.")
   parser.add_argument('--keep_inlines', action="store_true", help="With this option, the script will try not to split inlines into the long tag form.")
