@@ -319,7 +319,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             self.addString(line)
   def addTags(self, tagList):
     for name, entry in self.getAll():
-      if entry:
+      if name!="namespace" and entry:
         tagEntry=tagList.getOrCreate(name)
         # print (name)
         # print(entry)
