@@ -48,15 +48,19 @@ for opt, val in options:
 		print('Setting source language to ' + val)
 targetLanguages = allLanguages - ignoreLanguages - set([sourceLanguage])
 
-for filename in os.listdir('localisation')[:]:
-	sourceFile = open('localisation/' + filename, 'r')
+sourceFolder='localisation/'+sourceLanguage[2:]+"/"
+for filename in os.listdir(sourceFolder)[:]:
+	sourceFile = open(sourceFolder + filename, 'r')
 	for target in targetLanguages:
+		targetFolder='localisation/'+target[2:]+"/"
+		if not os.path.exists(targetFolder):
+			os.mkdir(targetFolder)
 		newFilename = filename.replace(sourceLanguage, target)
 		if newFilename == filename: continue	#Only copy files that actually contained l_english
-		if os.path.isfile('localisation/' + newFilename) and not overwrite: continue
-		targetFile = open('localisation/' + newFilename, 'w+')
-		for line in sourceFile:
-			targetFile.write(line.replace(sourceLanguage + ':', target + ':'))
-		targetFile.close()
+		if os.path.isfile(targetFolder + newFilename) and not overwrite: continue
+		with open(targetFolder + newFilename,'w') as targetFile:
+			# targetFile.write(u'\ufeff')
+			for line in sourceFile:
+				targetFile.write(line.replace(sourceLanguage + ':', target + ':'))
 		sourceFile.seek(0)
 print(sourceLanguage + ' localisation export complete.')
