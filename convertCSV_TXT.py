@@ -113,6 +113,7 @@ def main(args,unused=0):
           args.filter[0:0]=[keyString]#always need to be able to convert back to txt        
       else:
         print("No filter file for: "+fileName)
+        args.filter=0
 
     if not args.keep_inlines:
       nameToData.applyOnLowestLevel( TxtReadHelperFunctions.splitIfSplitable,[], ["bracketLevel"])
