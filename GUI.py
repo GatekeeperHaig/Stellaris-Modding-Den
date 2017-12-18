@@ -535,7 +535,7 @@ class TabControlClass:
       ["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.txt'. Be careful: The game will load both files!"]
 
     ], 
-    convertCSV_TXT,["--to_txt", "--keep_inlines"], 
+    convertCSV_TXT,["--to_txt"], 
     ttk.Frame(nb),0
     ])
     tabs.append([
