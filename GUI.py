@@ -535,7 +535,7 @@ class TabControlClass:
       ["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.txt'. Be careful: The game will load both files!"]
 
     ], 
-    convertCSV_TXT,["--to_txt"], 
+    convertCSV_TXT,["--to_txt", "--keep_inlines"], 
     ttk.Frame(nb),0
     ])
     tabs.append([
@@ -599,7 +599,7 @@ def main():
   root.title("Stellaris Python Script Helper")
   screen_width = root.winfo_screenwidth()
   screen_height = root.winfo_screenheight()
-  root.geometry("{!s}x{!s}".format(1000,screen_height*2//3))
+  root.geometry("{!s}x{!s}".format(1400,screen_height*2//3))
   # create a toplevel menu
   menubar = Menu(root)
 

@@ -540,34 +540,39 @@ class TxtReadHelperFunctions:
   def splitIfSplitable(variable,caller, bracketLevel):
     if not "=" in variable:# and not "{" in variable:
       return variable
-    varSplit=shlex.split(variable)
-    #print(varSplit)
-    if len(varSplit) >1 and variable.find("{")==-1: #no further subtags but a list of tags
-      i=1#first element is value
-      while i <len(varSplit):
-        if varSplit[i][-1]!="=" and varSplit[i].find("=")!=-1: #equal somewhere in the middle
-          caller.addString(varSplit[i])
-        elif i<len(varSplit)+1 and varSplit[i][-1]=="=":
-          caller.names.append(varSplit[i][:-1])
-          caller.vals.append(varSplit[i+1])
-          caller.comments.append("")
-          i+=1 #extra index increase
-        elif  i<len(varSplit)+1 and varSplit[i+1][0]=="=":
-          caller.names.append(varSplit[i])
-          caller.comments.append("")
-          if len(varSplit[i+1])>1:
-            caller.vals.append(varSplit[i+1][1:])
-          elif i<len(varSplit)+2:
-            caller.vals.append(varSplit[i+2])
-            i+=1 #extra extra index increase
+    try:
+      varSplit=shlex.split(variable)
+      if len(varSplit) >1 and variable.find("{")==-1: #no further subtags but a list of tags
+        i=1#first element is value
+        while i <len(varSplit):
+          if varSplit[i][-1]!="=" and varSplit[i].find("=")!=-1: #equal somewhere in the middle
+            caller.addString(varSplit[i])
+          elif i<len(varSplit)+1 and varSplit[i][-1]=="=":
+            caller.names.append(varSplit[i][:-1])
+            caller.vals.append(varSplit[i+1])
+            caller.comments.append("")
+            i+=1 #extra index increase
+          elif  i<len(varSplit)+1 and varSplit[i+1][0]=="=":
+            caller.names.append(varSplit[i])
+            caller.comments.append("")
+            if len(varSplit[i+1])>1:
+              caller.vals.append(varSplit[i+1][1:])
+            elif i<len(varSplit)+2:
+              caller.vals.append(varSplit[i+2])
+              i+=1 #extra extra index increase
+            else:
+              print("Invalid splitting of string "+variable)
+              caller.vals.append('')
+            i+=1 #extra index increase
           else:
             print("Invalid splitting of string "+variable)
-            caller.vals.append('')
-          i+=1 #extra index increase
-        else:
-          print("Invalid splitting of string "+variable)
-        i+=1
-      return varSplit[0]
+          i+=1
+        return varSplit[0]
+    except ValueError:
+      print("Error while splitting {}".format(variable))
+      print("Caller:")
+      caller.printAll()
+    #print(varSplit)
 
 
     return TxtReadHelperFunctions.splitAlways(variable,bracketLevel)
