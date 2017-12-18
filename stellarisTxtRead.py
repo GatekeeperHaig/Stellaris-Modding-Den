@@ -471,9 +471,14 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           # print(entry)
           # self.printAll()
           if self.vals[valIndex][0]=="@" and entry!="#delete" and entry[0]!="@":
-            varsToValueIndex=varsToValue.names.index(self.vals[valIndex])
-            if (varsToValue[varsToValueIndex]==entry): #nothing changed
-              continue
+            try:
+              varsToValueIndex=varsToValue.names.index(self.vals[valIndex])
+              if (varsToValue[varsToValueIndex]==entry): #nothing changed
+                continue
+            except ValueError:
+              if not args.changes_to_body:
+                print("Warning: Did not find {}! Omitting this!".format(self.vals[valIndex]))
+                continue
             if args.changes_to_body:
               self.vals[valIndex]=entry
             else:
@@ -481,7 +486,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
                 print("Trying to change variable {} in header for {!s}. time! It can only have one value! This call from {} (header {}) is ignored. Use '--remove_header', '--changes_to_body' or enter variable names into the ods file instead!".format(self.vals[valIndex],varsToValue.changed[varsToValueIndex]+1, bodyEntry[0], headerName ))
               else:
                 varsToValue.replace(self.vals[valIndex],entry)
-            varsToValue.changed[varsToValueIndex]+=1
+              varsToValue.changed[varsToValueIndex]+=1
           else:
             self.vals[valIndex]=entry
   def deleteMarked(self):
