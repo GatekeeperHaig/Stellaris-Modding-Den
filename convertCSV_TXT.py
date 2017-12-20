@@ -243,7 +243,9 @@ def main(args,unused=0):
         for name, val in nameToData.getAll():
           lineArray=[copy.deepcopy(lineArrayT)]
           if isinstance(val,TagList):
-            val.toCSV(lineArray, tagList.get(name),varsToValue,args)
+            occurenceList=copy.deepcopy(tagList.get(name))
+            val.toCSV(lineArray, tagList.get(name),occurenceList,varsToValue,args)
+            # occurenceList.printAll()
             bodyArray+=lineArray
         if args.use_csv:
           with open(csvFileName,'w') as file:         

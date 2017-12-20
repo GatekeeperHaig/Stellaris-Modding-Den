@@ -371,10 +371,13 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       else:
         self.remove(name)
     return curIndex
-  def toCSV(self, lineArray, tagList,varsToValue,args,curIndex=0, curLineIndex=0):
+  def toCSV(self, lineArray, tagList,occurenceList,varsToValue,args,curIndex=0, curLineIndex=0):
+    i=-1
     for name,val in tagList.getAll():
+      i+=1
       # print(name)
       occurences=self.names.count(name)
+      occurenceList.names[i]=str(occurences)
       # if name in self.names:
       curIndexTmp=curIndex
       for occurenceIndex in range(occurences):
@@ -385,7 +388,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         if len(val.names)>0:
           # print(name)
           # print(self.get(name))
-          curIndex=self.splitToListIfString(name,occurenceIndex).toCSV(lineArray, val,varsToValue,args,curIndex, curLineIndex+occurenceIndex)
+          curIndex=self.splitToListIfString(name,occurenceIndex).toCSV(lineArray, val,occurenceList.vals[i],varsToValue,args,curIndex, curLineIndex+occurenceIndex)
         else:
           output=self.getN_th(name,occurenceIndex)
           if isinstance(output,TagList):
