@@ -117,6 +117,7 @@ def main(args,unused=0):
 
     if not args.keep_inlines:
       nameToData.applyOnLowestLevel( TxtReadHelperFunctions.splitIfSplitable,[], ["bracketLevel"])
+    # nameToData.printAll()
     if args.remove_header:
       nameToData.applyOnLowestLevel( TxtReadHelperFunctions.getVariableValue, [varsToValue])
       varsToValue.clear()
@@ -163,7 +164,7 @@ def main(args,unused=0):
       # nameToData[0].printAll()
       for bodyEntry in body:
         if "".join(bodyEntry):
-          if bodyEntry[keyCSVIndex].strip():
+          if len(bodyEntry)>keyCSVIndex and bodyEntry[keyCSVIndex].strip():
             bodyKey=bodyEntry[keyCSVIndex].strip()
             for name, val in nameToData.getAll():
               if name!=header[0][0]:

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import shlex
+# import shlex
 
 class TagList: #Basically everything is stored recursively in objects of this class. Each file is one such object. Each tag within is one such object. The variables defined in a file are one such object. Only out-of-building comments are ignored and simply copied file to file.
   def __init__(self,level):
@@ -95,7 +95,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     except ValueError:
       return TagList(0)
     if not isinstance(self.vals[i],TagList):
-      self.vals[i]=TxtReadHelperFunctions.splitAlways(self.vals[i], self.bracketLevel)
+      self.vals[i]=TxtReadHelperFunctions.splitAlways(self.vals[i], self, self.bracketLevel)
     #   string=self.vals[i].strip()
     #   if string[0]=="{":
     #     string=string[1:-1].strip() #remove on bracket layer
@@ -260,12 +260,17 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     else:
       self.add([tag, finalVal])
   def applyOnLowestLevel(self, func, argList=[],attributeList=[]):
-    for i in range(len(self.vals)):
+    i=0
+    while self.vals: #loop that allows size changes of the array and actually includes those new entries!
+    # for i in range(len(self.vals)):
       if not isinstance(self.vals[i], TagList):
         FilledAttributeList=[vars(self)[a] for a in attributeList]
         self.vals[i]=func(self.vals[i],self,*argList, *FilledAttributeList)
       if isinstance(self.vals[i],TagList): #might be one now!
         self.vals[i].applyOnLowestLevel(func, argList,attributeList)
+      i+=1
+      if i==len(self.vals):
+        break
   def readFile(self,fileName,args, varsToValue,keepEmptryLinesAndComments=False):#stores content of buildingFileName in self and varsToValue
     bracketLevel=0
     objectList=[] #objects currently open objectList[0] would be lowest bracket object (a building), etc
@@ -546,7 +551,7 @@ class TxtReadHelperFunctions:
     if not "=" in variable:# and not "{" in variable:
       return variable
     try:
-      varSplit=shlex.split(variable)
+      varSplit=variable.split()
       if len(varSplit) >1 and variable.find("{")==-1: #no further subtags but a list of tags
         i=1#first element is value
         while i <len(varSplit):
@@ -580,13 +585,43 @@ class TxtReadHelperFunctions:
     #print(varSplit)
 
 
-    return TxtReadHelperFunctions.splitAlways(variable,bracketLevel)
-  def splitAlways(variable, bracketLevel):
+    return TxtReadHelperFunctions.splitAlways(variable,caller, bracketLevel)
+  def splitAlways(variable, caller,bracketLevel):
     string=variable.strip()
       
     if string[0]=="{":
+      endOfStringPart=TxtReadHelperFunctions.findClosingBracked(string)
+      excessString=string[endOfStringPart+1:].strip()
+      if excessString:
+        # print("excess")
+        # print(excessString)
+        varSplit=excessString.split()
+        # print(varSplit)
+        # caller.printAll()
+        caller.names.append(varSplit[0])
+        caller.comments.append("")
+        caller.vals.append(" ".join(varSplit[2:]))
+        string=string[:endOfStringPart+1]
+        # caller.printAll()
+      # print("removing bracket layer")
+      # print(string)
       string=string[1:-1].strip() #remove one bracket layer
+      # print(string)
     out=TagList(bracketLevel+1)
     if len(string)>0:
       out.addString(string)
     return out
+
+  def findClosingBracked(string):
+    bracketCounter=0
+    for i,char in enumerate(string):
+      if char=="{":
+        bracketCounter+=1
+      elif char=="}":
+        bracketCounter-=1
+        if bracketCounter==0:
+          break
+    if bracketCounter>1:
+      print("Missing closing bracket in "+string)
+      return -1
+    return i
