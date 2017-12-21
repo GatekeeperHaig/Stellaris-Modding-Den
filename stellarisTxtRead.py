@@ -12,6 +12,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     self.bracketLevel=level
   def __getitem__(self, index):
     return self.vals[index]
+  def count(self,name):
+    return self.names.count(name)
   def get(self,name): #allows changing of content if vals[i] is an object
     return self.vals[self.names.index(name)]  
   def getN_th(self,name,n): #allows changing of content if vals[i] is an object
@@ -412,12 +414,43 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     return curIndex
         # for i in range(val.countDeepestLevelEntries(args)):
           # file.write(",")
-  def setValFromCSV(self, header, bodyEntry, varsToValue,args, minIndex=0, maxIndex=-1, n_th_occurence=0):
-    # print(header[self.bracketLevel])
-    # print(self.names)
-    # print(n_th_occurence)
-    # print(minIndex)
-    # print(maxIndex)
+  def prepareOccurences(self,occEntry,header, minIndex=0, maxIndex=-1):
+    bodyEntry=occEntry[self.bracketLevel-1]
+    # print(bodyEntry)
+    if maxIndex==-1:
+      maxIndex=len(header[self.bracketLevel])-1
+    headerIndex=minIndex-1
+    for headerName in header[self.bracketLevel][minIndex:(maxIndex+1)]:
+      headerName=headerName.strip()
+      # print(headerName)
+      headerIndex+=1
+      if headerName=="" or len(bodyEntry)<=headerIndex or bodyEntry[headerIndex]=="":
+        continue
+      nextMaxIndex=nextMinIndex=headerIndex
+      while nextMaxIndex+1<len(header[self.bracketLevel]) and not header[self.bracketLevel][nextMaxIndex+1]:
+        nextMaxIndex+=1
+      if nextMaxIndex+1>=len(header[self.bracketLevel]):
+        nextMaxIndex=-1 #end of list reached. make all possible (ods lists are shorter if only empty elements are following)
+      #if not args.forbid_additions and not headerName in self.names:
+      try:
+        occurenceNumber=int(bodyEntry[headerIndex]) #occ Entry is missing first line compared to header
+      except ValueError:
+        continue #no int or not even existent -> no need to add anything. Deleting is not possible here anyway!
+      # print(occurenceNumber)
+      # print(self.count(headerName))
+      while self.count(headerName)<occurenceNumber:
+        # print(headerName)
+        if len(header)>self.bracketLevel+1 and len(header[self.bracketLevel+1])>headerIndex and header[self.bracketLevel+1][headerIndex]:
+          self.add(headerName,TagList(self.bracketLevel+1))
+          # self.vals[-1].prepareOccurences(occEntry,header,nextMinIndex,nextMaxIndex)
+        else:
+          self.add(headerName,'#delete') #will be deleted again unless filled later
+      for i in range(occurenceNumber):
+        val=self.getN_th(headerName,i)
+        if isinstance(val,TagList):
+          val.prepareOccurences(occEntry,header,nextMinIndex,nextMaxIndex)
+
+  def setValFromCSV(self, header, bodyEntry, varsToValue,args, minIndex=0, maxIndex=-1, n_th_occurence=0, occHeader=[],occEntry=[]):
     if maxIndex==-1:
       maxIndex=len(header[self.bracketLevel])-1
     headerIndex=minIndex-1
@@ -432,13 +465,16 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         nextMaxIndex+=1
       if nextMaxIndex+1>=len(header[self.bracketLevel]):
         nextMaxIndex=-1 #end of list reached. make all possible (ods lists are shorter if only empty elements are following)
-      if not args.forbid_additions and not headerName in self.names and bodyEntry[headerIndex]:
+      if not args.forbid_additions and not headerName in self.names:# and bodyEntry[headerIndex]:
         if len(header)>self.bracketLevel+1 and len(header[self.bracketLevel+1])>headerIndex and header[self.bracketLevel+1][headerIndex]!="":
           val=self.getOrCreate(headerName)
           self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
-          val.setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,n_th_occurence)
+          val.setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,n_th_occurence,occHeader,occEntry)
         else:
-          self.add(headerName,bodyEntry[headerIndex]) 
+          if bodyEntry[headerIndex]:
+            self.add(headerName,bodyEntry[headerIndex]) 
+          else:
+            self.add(headerName,'#delete') #delete again later. It is important that this is added as otherwise empty stuff remains!
         continue
       valIndex=-1
       local_n_th_occurence=n_th_occurence
@@ -448,7 +484,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             valIndex=self.n_thIndex(headerName,n_th_occurence)
             local_n_th_occurence=0
           except ValueError:
-            if bodyEntry[headerIndex]:
+            if bodyEntry[headerIndex] and not isinstance(self.get(headerName),TagList):
               if not args.forbid_additions:
                 if isinstance(self.getN_th(headerName, n_th_occurence-1), TagList):
                   self.add(headerName, TagList(self.bracketLevel+1))
@@ -472,7 +508,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           continue
       self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
       if isinstance(self.vals[valIndex], TagList):
-        self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,local_n_th_occurence)
+        self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,local_n_th_occurence,occHeader,occEntry)
       else:
         # print(entry)         
         entry=bodyEntry[headerIndex]
@@ -482,7 +518,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           # print(self.vals[valIndex])
           # print(entry)
           # self.printAll()
-          if self.vals[valIndex][0]=="@" and entry!="#delete" and entry[0]!="@":
+          if self.vals[valIndex] and self.vals[valIndex][0]=="@" and entry!="#delete" and entry[0]!="@":
             try:
               varsToValueIndex=varsToValue.names.index(self.vals[valIndex])
               if (varsToValue[varsToValueIndex]==entry): #nothing changed

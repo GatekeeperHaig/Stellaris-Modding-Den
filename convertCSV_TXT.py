@@ -135,15 +135,33 @@ def main(args,unused=0):
       if not os.path.exists(csvFile):
         print("No "+tableFileEnding+" file for: "+fileName)
         continue
+      foundData=False
+      foundOcc=False
       if args.use_csv:
         with open(csvFile) as file:
           csvContent=[re.split(",|;",line.strip()) for line in file]
       else:
         import pyexcel_ods
         sheets=pyexcel_ods.get_data(csvFile)
-        sheet=sheets.popitem() #should be the first sheet. Others are ignored!
-        csvContent=sheet[1] #0 is the sheetname
-        csvContent=[[str(e) for e in line] for line in csvContent]
+        while 1:
+          try:
+            sheet=sheets.popitem() #should be the first sheet. Others are ignored!
+            if sheet[0]=="DataSheet":
+              csvContent=sheet[1] #0 is the sheetname
+              csvContent=[[str(e) for e in line] for line in csvContent]
+              foundData=True
+            elif sheet[0]=="OccurenceNumbers":
+              csvOccurences=sheet[1]
+              foundOcc=True
+            if foundData and foundOcc:
+              break
+          except KeyError:
+            break
+        if not foundData:
+          print("ERROR: Invalid ods file. DataSheet missing! Exiting!")
+          sys.exit(1)
+        if not foundOcc:
+          print("Warning: No OccurenceNumbers sheet found. Downward compatibility allows using the file but it might lead to problems (if non-unique occurence numbers exist)")
         #print(csvContent)
       for i in range(len(csvContent)):
         # print("".join(csvContent[i]))
@@ -153,19 +171,56 @@ def main(args,unused=0):
           break
       if i==len(csvContent)-1:
         print("Error: No end of header found. There needs to be an empty line!")
-        sys.exit(1)
-      
+        return("")
+
+      occHeader=[]
+      if foundOcc:
+        occBodyNames=[]
+        occBody=[]
+        lastI=0
+        for i in range(len(csvOccurences)):
+          # print("".join(csvContent[i]))
+          if not csvOccurences[i]:
+            if lastI:
+              occBodyNames.append(csvOccurences[lastI+1][0])
+              occBody.append(csvOccurences[lastI+2:i])
+            else:
+              occHeader=csvOccurences[:i+1]
+            lastI=i
+        # print(occBodyNames)
+        # print(occBody)
+
       try:
       	keyCSVIndex=header[1].index(keyString)
       except ValueError:
         keyString=altkey
         keyCSVIndex=header[1].index(keyString)
-      repeatIndex=0
       # nameToData[0].printAll()
+      if foundOcc:
+        for occName, occEntry in zip(occBodyNames,occBody):
+          for name, val in nameToData.getAll():
+            if name!=occHeader[0][0]:
+              continue;
+            if val.get(keyString)==occName:
+              break; #name,val should now have the correct value
+          val.prepareOccurences(occEntry,occHeader)
+
+
+
+      repeatIndex=0
       for bodyEntry in body:
         if "".join(bodyEntry):
           if len(bodyEntry)>keyCSVIndex and bodyEntry[keyCSVIndex].strip():
             bodyKey=bodyEntry[keyCSVIndex].strip()
+            occIndex=-1
+            if foundOcc:
+              try:
+                occIndex=occBodyNames.index(bodyKey)
+              except ValueError:
+                print("Warning: Entry not found in occurence list")
+            occEntry=[]
+            if occIndex>0:
+              occEntry=occBody[occIndex]
             for name, val in nameToData.getAll():
               if name!=header[0][0]:
                 continue;
@@ -184,7 +239,7 @@ def main(args,unused=0):
                   continue;
           else:
             repeatIndex+=1
-          val.setValFromCSV(header, bodyEntry,varsToValue,args, 0,-1,repeatIndex)
+          val.setValFromCSV(header, bodyEntry,varsToValue,args, 0,-1,repeatIndex,occHeader,occEntry)
       # nameToData[0].printAll()
       if args.create_new_file:
         outFileName=args.create_new_file+".txt"
