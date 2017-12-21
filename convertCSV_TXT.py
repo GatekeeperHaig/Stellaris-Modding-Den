@@ -100,7 +100,7 @@ def main(args,unused=0):
     if keyString=="addKey":
       for i in range(len(nameToData.vals)):
         if (isinstance(nameToData.vals[i],TagList)):
-          nameToData.vals[i].add2(keyString, nameToData.names[i])
+          nameToData.vals[i].addFront(keyString, nameToData.names[i])
           nameToData.names[i]="keyAdded"
 
     if args.filter:
@@ -176,9 +176,9 @@ def main(args,unused=0):
               if args.forbid_additions:
                 print("New key found. Additions where forbidden!")
                 continue
-              nameToData.add2(header[0][0],NamedTagList(0,header[0][0]))
+              nameToData.add(header[0][0],NamedTagList(0,header[0][0]))
               val=nameToData.vals[-1]
-              val.add2(keyString, bodyKey)
+              val.add(keyString, bodyKey)
               for name, val in nameToData.getAll():
                 if name!=header[0][0]:
                   continue;
@@ -223,6 +223,7 @@ def main(args,unused=0):
     lineArrayT=['' for i in range(tagList.countDeepestLevelEntries(args, True))]
     headerArray=[copy.deepcopy(lineArrayT) for i in range(tagList.determineDepth())]
     tagList.toCSVHeader(headerArray,args)
+    occurenceArray=[]
     # tagList.printAll()
     # nameToData[0].printAll()
     if args.join_files:
@@ -245,6 +246,13 @@ def main(args,unused=0):
           if isinstance(val,TagList):
             occurenceList=copy.deepcopy(tagList.get(name))
             val.toCSV(lineArray, tagList.get(name),occurenceList,varsToValue,args)
+            occurenceEntry=copy.deepcopy(headerArray)
+            occurenceList.toCSVHeader(occurenceEntry,args)
+            keyValue=val.vals[val.names.index(keyString)]
+            # keyIndex=tagList.vals.index(keyString)
+            occurenceEntry[0][0]=keyValue
+            # print(occurenceEntry)
+            occurenceArray+=occurenceEntry
             # occurenceList.printAll()
             bodyArray+=lineArray
         if args.use_csv:
@@ -257,6 +265,7 @@ def main(args,unused=0):
         else:
           data=OrderedDict()
           data.update({"DataSheet": headerArray+bodyArray})
+          data.update({"OccurenceNumbers": headerArray+occurenceArray})
           import pyexcel_ods
           pyexcel_ods.save_data(csvFileName, data)
       except PermissionError:

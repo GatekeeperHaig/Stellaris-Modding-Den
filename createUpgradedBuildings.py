@@ -136,7 +136,7 @@ def readAndConvert(args, allowRestart=1):
         baseBuildingData=buildingNameToDataOrigVals[origBuildI] #data of the lowest tier building
         if "is_listed" in baseBuildingData.names and baseBuildingData.get("is_listed")=="no":
           continue
-        #triggers.add2("has_"+baseBuildingData.tagName,"{ has_building = "+baseBuildingData.tagName+" }")   #redundant but simplifies later replaces
+        #triggers.add("has_"+baseBuildingData.tagName,"{ has_building = "+baseBuildingData.tagName+" }")   #redundant but simplifies later replaces
         triggerIndexAtStart=len(triggers.names) #later used together with "baseBuildingData" to determine what buildings are checked for if planet_unique
         
         #ITERATE THROUGH WHOLE BUILDING TREE/LINE
@@ -156,7 +156,7 @@ def readAndConvert(args, allowRestart=1):
           newRequirements=TagList(2)
           if len(upgrades.names)>0 and not args.keep_lower_tier and not buildingData.tagName in args.t0_buildings:
             buildingData.getOrCreate("potential")
-            buildingData.splitToListIfString("potential").add(["NAND", newRequirements])
+            buildingData.splitToListIfString("potential").addArray(["NAND", newRequirements])
            
           #iterate through all upgrades: Create a copy of each upgrade, compute costs. Finish requirements for current building and add the copies to the todo-list
           for upgradeName in upgrades.names:
@@ -174,7 +174,7 @@ def readAndConvert(args, allowRestart=1):
               
             #this is a higher tier building. If there is no pure upgrade version yet, create it now. A direct build one will be created anyway!
             if not "is_listed" in upgradeData.names:
-              upgradeData.add2("is_listed","no")
+              upgradeData.add("is_listed","no")
             if upgradeData.get("is_listed")=="yes":
               upgradeData.replace("is_listed","no")
             upgradeData.wasVisited=1
@@ -191,7 +191,7 @@ def readAndConvert(args, allowRestart=1):
                 
             
             if "empire_unique" in upgradeData.names and upgradeData.get("empire_unique")=="yes":
-              #triggers.add2("has_"+upgradeName,"{ has_building = "+upgradeName+" }")   #redundant but simplifies later replaces
+              #triggers.add("has_"+upgradeName,"{ has_building = "+upgradeName+" }")   #redundant but simplifies later replaces
               continue #do not copy empire_unique buildings EVER. Impossible to keep them unique otherwise, for some reason even if capital only
 
             #new requirements: Only buildable if one of the conditions of the next higher tier is not satisfied.
@@ -201,7 +201,7 @@ def readAndConvert(args, allowRestart=1):
               poss[0].names[eI]='owner'
             for p in poss:
               for e in p.getAll():
-                newRequirements.add(e)
+                newRequirements.addArray(e)
             
             
             
@@ -228,9 +228,9 @@ def readAndConvert(args, allowRestart=1):
               potential_rw.addString("planet = { is_ringworld_or_machine_world = yes }")
               
               newList=TagList(1)
-              newList.getOrCreate("OR").add2("has_building",upgradeName+"_rw") #creates the "OR" and fills it with the first entry
-              newList.get("OR").add2("has_building",upgradeName+"_rw_direct_build") #second entry to "OR"
-              triggers.add2("has_"+upgradeName+"_rw", newList)
+              newList.getOrCreate("OR").add("has_building",upgradeName+"_rw") #creates the "OR" and fills it with the first entry
+              newList.get("OR").add("has_building",upgradeName+"_rw_direct_build") #second entry to "OR"
+              triggers.add("has_"+upgradeName+"_rw", newList)
               if not args.test_run:
                 copiedBuildingsFile.write(upgradeName+"_rw"+"\n")
               for adI in range(len(adjacency_bonus.vals)):
@@ -245,21 +245,21 @@ def readAndConvert(args, allowRestart=1):
             #create a new scripted_trigger, consisting of both the original upgrade and the copy that can be directly build
             if not args.create_tier5_enhanced or buildingData.tagName.replace("_direct_build","")[-3:]!="_rw":
               newList=TagList(1)
-              newList.getOrCreate("OR").add2("has_building",upgradeName) #creates the "OR" and fills it with the first entry
-              newList.get("OR").add2("has_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
-              triggers.add2("has_"+upgradeName, newList)
+              newList.getOrCreate("OR").add("has_building",upgradeName) #creates the "OR" and fills it with the first entry
+              newList.get("OR").add("has_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
+              triggers.add("has_"+upgradeName, newList)
               if not args.test_run:
                 copiedBuildingsFile.write(upgradeName+"\n")
             
             #REMOVE COPY FROM TECH TREE. Seems to remove the copy completely :( Pretty useless trigger...
             if "show_tech_unlock_if" in buildingNameToData.vals[upgradeBuildingIndex].names:
               buildingNameToData.vals[upgradeBuildingIndex].remove("show_tech_unlock_if")
-            buildingNameToData.vals[upgradeBuildingIndex].add(["show_tech_unlock_if","{ always = no }"])
+            buildingNameToData.vals[upgradeBuildingIndex].addArray(["show_tech_unlock_if","{ always = no }"])
             
             upgradeData.costChangeUpgradeToDirectBuild(buildingData,args, varsToValue)
 
             #Make sure you cannot replace a building by itself (i.e. upgraded version by same tier direct build)
-            upgradeData.getOrCreate("potential").add2("NOT = { tile = { has_building = "+origUpgradeData.tagName+" } }",""," #Prevent self replace") #Since has_building is hidden in the name of the data, no replace of has_building will take place. Should be a minimal performance improvement.
+            upgradeData.getOrCreate("potential").add("NOT = { tile = { has_building = "+origUpgradeData.tagName+" } }",""," #Prevent self replace") #Since has_building is hidden in the name of the data, no replace of has_building will take place. Should be a minimal performance improvement.
               
             if "upgrades" in upgradeData.names:
               buildingDataList.append(upgradeData)
@@ -273,12 +273,12 @@ def readAndConvert(args, allowRestart=1):
               nameExtra+="_rw"
               nameStringExtra=" Enhanced"
               if not "icon" in buildingNameToData.vals[upgradeBuildingIndex+1].names: #if icon was already a link in the original building, we can leave it
-                buildingNameToData.vals[upgradeBuildingIndex+1].add(["icon",upgradeName]) #otherwise create an icon link to the original building
+                buildingNameToData.vals[upgradeBuildingIndex+1].addArray(["icon",upgradeName]) #otherwise create an icon link to the original building
               locData.append(upgradeName+'_rw:0 "$'+upgradeName+'$'+nameStringExtra+'"') #localisation link. If anyone knows what the number behind the colon means, please PN me (@Gratak in Paradox forum)
               locData.append(upgradeName+'_rw_desc:0 "$'+upgradeName+'_desc$"') #localisation link
               
             if not "icon" in buildingNameToData.vals[upgradeBuildingIndex].names: #if icon was already a link in the original building, we can leave it
-              buildingNameToData.vals[upgradeBuildingIndex].add(["icon",upgradeName]) #otherwise create an icon link to the original building
+              buildingNameToData.vals[upgradeBuildingIndex].addArray(["icon",upgradeName]) #otherwise create an icon link to the original building
             locData.append(upgradeName+nameExtra+':0 "$'+upgradeName+'$'+nameStringExtra+'"') #localisation link. If anyone knows what the number behind the colon means, please PN me (@Gratak in Paradox forum)
             locData.append(upgradeName+nameExtra+'_desc:0 "$'+upgradeName+'_desc$"') #localisation link
               
@@ -286,13 +286,13 @@ def readAndConvert(args, allowRestart=1):
             if not "upgrades" in upgradeData.names and "planet_unique" in upgradeData.names and upgradeData.get("planet_unique")=="yes": #Max tier unique
               fakeBuilding=NamedTagList(baseBuildingData.lineStart, baseBuildingData.tagName+"_hidden_tree_root")
               fakeBuilding.lineEnd=baseBuildingData.lineEnd
-              fakeBuilding.add2("potential", "{ always=no }")
-              fakeBuilding.add2("planet_unique", "yes")
-              fakeBuilding.add2("icon",baseBuildingData.tagName)
+              fakeBuilding.add("potential", "{ always=no }")
+              fakeBuilding.add("planet_unique", "yes")
+              fakeBuilding.add("icon",baseBuildingData.tagName)
               locData.append(fakeBuilding.tagName+':0 "$'+baseBuildingData.tagName+'$"')
               locData.append(fakeBuilding.tagName+'_desc:0 "$'+baseBuildingData.tagName+'_desc$"')
-              upgradeData.getOrCreate("upgrades").add2(fakeBuilding.tagName,"")
-              origUpgradeData.getOrCreate("upgrades").add2(fakeBuilding.tagName,"")
+              upgradeData.getOrCreate("upgrades").add(fakeBuilding.tagName,"")
+              origUpgradeData.getOrCreate("upgrades").add(fakeBuilding.tagName,"")
               fakeIndex=buildingNameToData.names.index(baseBuildingData.tagName)
               buildingNameToData.insert([fakeBuilding.tagName,fakeBuilding],fakeIndex) #insert the fake before 'baseBuilding'. upgradeBuildingIndex is now shifted but shouldn't be used anymore
             
