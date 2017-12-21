@@ -1,0 +1,452 @@
+#ai_weight - checks that required resources are available by AI will be made in code for performance reasons
+
+#modifiers that can be added from modules
+#"modifier", category: MODIFIER_CATEGORY_SPACEPORT. things that affect the builder part of the spaceport. like construction costs and speeds
+#"orbit_modifier", category: MODIFIER_CATEGORY_FLEET | MODIFIER_CATEGORY_SHIP. applied on all orbiting fleets and ships
+#"planet_modifier", category: MODIFIER_CATEGORY_PLANET | MODIFIER_CATEGORY_POP | MODIFIER_CATEGORY_TILE. affects the planet
+#"station_modifier", category: MODIFIER_CATEGORY_FLEET | MODIFIER_CATEGORY_SHIP. affects the ship part of the spaceport. like health and armor
+#"ship_modifier", category: MODIFIER_CATEGORY_SHIP. affects all ships that are built by this space port
+	
+projectile_weapon = {
+	icon = "GFX_spaceport_modules"
+	icon_frame = 1
+	initial = yes
+	initial_only = yes
+	replaceable = no
+	#section = "CORE_SPACEPORT_SECTION"
+	component_set = "SPACEPORT_MASS_DRIVER"
+	prerequisites = { "tech_mass_drivers_1" }
+	ai_weight = { weight = 0 }
+}
+
+laser_weapon = {
+	icon = "GFX_spaceport_modules"
+	icon_frame = 2
+	initial = yes
+	initial_only = yes
+	replaceable = no
+	#section = "CORE_SPACEPORT_SECTION"
+	component_set = "SPACEPORT_LASER"
+	prerequisites = { "tech_lasers_1" }
+	ai_weight = { weight = 0 }
+}
+
+missile_weapon = {
+	icon = "GFX_spaceport_modules"
+	icon_frame = 3
+	initial = yes
+	initial_only = yes
+	replaceable = no
+	#section = "CORE_SPACEPORT_SECTION"
+	component_set = "SPACEPORT_MISSILE"
+	prerequisites = { "tech_missiles_1" }
+	ai_weight = { weight = 0 }
+}
+
+swarm_weapon = {
+	icon = "GFX_spaceport_modules"
+	icon_frame = 3
+	initial = yes
+	initial_only = yes
+	replaceable = no
+	#section = "CORE_SPACEPORT_SECTION"
+	component_set = "SPACEPORT_SCOURGE_MISSILE"
+	potential = {
+		owner = {
+			is_country_type = "swarm"
+		}
+	}
+	ai_weight = { weight = 0 }
+}
+
+fallen_empire_weapon = {
+	icon = "GFX_spaceport_modules"
+	icon_frame = 2
+	initial = yes
+	initial_only = yes
+	replaceable = no
+	#section = "CORE_SPACEPORT_SECTION"
+	component_set = "FALLEN_EMPIRE_SPACEPORT_LANCE"
+	potential = {
+		owner = {
+			is_country_type = "fallen_empire"
+		}
+	}
+	ai_weight = { weight = 0 }
+}
+
+#################
+#### LEVEL 1 ####
+#################
+
+solar_panel_network = {
+	icon = "GFX_solar_panel_network"
+	#section = "ASSEMBLYYARD_SPACEPORT_SECTION"
+	construction_days = 180
+	prerequisites = { "tech_solar_panel_network" }
+	spaceport_level = 1
+	
+	cost = {
+		minerals = 75
+	}	
+	
+	produced_resources = {
+		energy = 3
+	}
+}
+
+#dockyard = {
+#	icon = "GFX_spaceport_module_crew_quarters"
+#	#section = "HANGARBAY_SPACEPORT_SECTION"
+#	construction_days = 180
+#	prerequisites = { "tech_doctrine_fleet_size_1" }
+#	spaceport_level = 1
+#	
+#	cost = {
+#		minerals = 250
+#	}
+#	
+#	required_resources = {
+#		energy = 1
+#	}
+#	
+#	modifier = {
+#		navy_size_add = 5
+#	}
+#	
+#	ai_weight = {
+#		modifier = {
+#			factor = 0
+#			from = { sector_controlled = yes }
+#		}
+#		modifier = {
+#			factor = 0
+#			from = { NOT = { has_spaceport_module = solar_panel_network } }
+#		}
+#	}
+#}
+
+crew_quarters = {
+	icon = "GFX_spaceport_module_crew_quarters"
+	#section = "HANGARBAY_SPACEPORT_SECTION"
+	construction_days = 180
+	prerequisites = { "tech_doctrine_fleet_support" }
+	spaceport_level = 1
+	
+	cost = {
+		minerals = 100
+	}
+	
+	orbit_modifier = {
+		ship_upkeep_mult = -0.10
+	}
+	
+	ai_weight = {
+		modifier = {
+			factor = 0
+			from = { sector_controlled = yes }
+		}
+		modifier = {
+			factor = 0
+			from = { NOT = { has_spaceport_module = solar_panel_network } }
+		}
+	}
+}
+
+observatory = {
+	icon = "GFX_spaceport_module_observatory"
+	#section = "SCIENCE_SPACEPORT_SECTION"
+	construction_days = 180
+	prerequisites = { "tech_orbital_sensor_array" }
+	spaceport_level = 1
+	
+	cost = {
+		minerals = 100
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	planet_modifier = {
+		planet_sensor_range_mult = 0.5	
+		tile_resource_physics_research_mult = 0.1
+		tile_resource_society_research_mult = 0.1
+		tile_resource_engineering_research_mult = 0.1
+	}
+}
+
+engineering_bay = {
+	icon = "GFX_spaceport_module_engineering_bay"
+	#section = "REFINERY_SPACEPORT_SECTION"
+	construction_days = 180	
+	prerequisites = { "tech_doctrine_fleet_support" }
+	spaceport_level = 1
+	
+	cost = {
+		minerals = 100
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	orbit_modifier = {
+		ship_reparation_speed_mult = 0.5
+	}
+	
+	ship_modifier = {
+		ship_upkeep_mult = -0.05
+	}
+	
+	ai_weight = {
+		modifier = {
+			factor = 0
+			from = { sector_controlled = yes }
+		}
+		modifier = {
+			factor = 0
+			from = { NOT = { has_spaceport_module = solar_panel_network } }
+		}
+	}
+}
+
+hydroponic_farms = {
+	icon = "GFX_spaceport_module_hydroponic_farms"
+	#section = "SCIENCE_SPACEPORT_SECTION"
+	construction_days = 180
+	prerequisites = { "tech_orbital_hydroponics" }
+	spaceport_level = 1
+	
+	cost = {
+		minerals = 100
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	planet_modifier = {
+		planet_resource_food_add = 3
+	}
+}
+
+synchronized_defenses = {
+	icon = "GFX_spaceport_synchronized_defenses"
+	#section = "SCIENCE_SPACEPORT_SECTION"
+	construction_days = 180	
+	prerequisites = { tech_synchronized_defences }
+	spaceport_level = 1
+	
+	cost = {
+		minerals = 150
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	station_modifier = {
+		ship_fire_rate_mult = 0.25
+		ship_weapon_damage = 0.25
+	}
+}
+
+#################
+#### LEVEL 2 ####
+#################
+
+corvette_assembly_yards = {
+	icon = "GFX_spaceport_module_corvette_assembly_yard"
+	#section = "ASSEMBLYYARD_SPACEPORT_SECTION"
+	construction_days = 270
+	prerequisites = { tech_spaceport_2 }
+	spaceport_level = 2
+	
+	cost = {
+		minerals = 100
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	modifier = {
+		shipsize_corvette_construction_speed_mult = 0.33
+	}
+	
+	ai_weight = {
+		modifier = {
+			factor = 0
+			from = { sector_controlled = yes }
+		}
+		modifier = {
+			factor = 0
+			from = { NOT = { has_spaceport_module = solar_panel_network } }
+		}
+	}
+}
+
+#################
+#### LEVEL 3 ####
+#################
+
+destroyer_assembly_yards = {
+	icon = "GFX_spaceport_module_destroyer_assembly_yard"
+	#section = "ASSEMBLYYARD_SPACEPORT_SECTION"
+	construction_days = 360
+	prerequisites = { "tech_spaceport_4" }
+	spaceport_level = 4
+	
+	cost = {
+		minerals = 300
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	modifier = {
+		shipsize_destroyer_construction_speed_mult = 0.33
+	}	
+	
+	ai_weight = {
+		modifier = {
+			factor = 0
+			from = { sector_controlled = yes }
+		}
+		modifier = {
+			factor = 0
+			from = { NOT = { has_spaceport_module = solar_panel_network } }
+		}
+	}
+}
+
+fleet_academy = {
+	icon = "GFX_spaceport_module_fleet_academy"
+	#section = "SCIENCE_SPACEPORT_SECTION"
+	construction_days = 360
+	prerequisites = { "tech_interstellar_fleet_traditions" }
+	spaceport_level = 3
+	
+	cost = {
+		minerals = 400
+	}
+	
+	required_resources = {
+		energy = 4
+	}
+	
+	ship_modifier = {
+		ship_fire_rate_mult = 0.05
+		ship_accuracy_add = 3
+		ship_tracking_add = 3
+	}
+
+	ai_weight = {
+		modifier = {
+			factor = 0
+			from = { sector_controlled = yes }
+		}
+		modifier = {
+			factor = 0
+			from = { NOT = { has_spaceport_module = solar_panel_network } }
+		}
+	}	
+}
+
+#################
+#### LEVEL 4 ####
+#################
+
+orbital_mind_control_laser = {
+	icon = "GFX_spaceport_module_orbital_mind_control_lazer"
+	#section = "SCIENCE_SPACEPORT_SECTION"
+	construction_days = 360
+	prerequisites = { "tech_will_to_power" }
+	spaceport_level = 4
+	
+	cost = {
+		minerals = 400
+		influence = 10
+	}
+	
+	required_resources = {
+		energy = 5
+	}
+	
+	planet_modifier = {
+		pop_government_ethic_attraction = 0.5
+		planet_unrest_add = -100
+	}	
+}
+
+#################
+#### LEVEL 5 ####
+#################
+
+cruiser_assembly_yards = {
+	icon = "GFX_spaceport_module_cruiser_assembly_yard"
+	#section = "ASSEMBLYYARD_SPACEPORT_SECTION"
+	construction_days = 360
+	prerequisites = { "tech_cruiser_yard" }
+	spaceport_level = 5
+	
+	cost = {
+		minerals = 400
+	}
+	
+	required_resources = {
+		energy = 3
+	}
+	
+	modifier = {
+		shipsize_cruiser_construction_speed_mult = 0.33
+	}	
+	
+	ai_weight = {
+		modifier = {
+			factor = 0
+			from = { sector_controlled = yes }
+		}
+		modifier = {
+			factor = 0
+			from = { NOT = { has_spaceport_module = solar_panel_network } }
+		}
+	}
+}
+
+#################
+#### LEVEL 6 ####
+#################
+
+battleship_assembly_yards = {
+	icon = "GFX_spaceport_module_battleship_assembly_yard"
+	#section = "ASSEMBLYYARD_SPACEPORT_SECTION"
+	construction_days = 180
+	prerequisites = { "tech_battleship_yard" }
+	spaceport_level = 6
+	
+	cost = {
+		minerals = 500
+	}	
+	
+	required_resources = {
+		energy = 4
+	}
+	
+	modifier = {
+		shipsize_battleship_construction_speed_mult = 0.33
+	}
+	
+	ai_weight = {
+		modifier = {
+			factor = 0
+			from = { sector_controlled = yes }
+		}
+		modifier = {
+			factor = 0
+			from = { NOT = { has_spaceport_module = solar_panel_network } }
+		}
+	}
+}
