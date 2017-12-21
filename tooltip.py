@@ -37,9 +37,7 @@ class CreateToolTip(object):
         if self.tw:
             self.tw.destroy()
     def remove(self):
-      self.widget.unbind("<Enter>")
-      self.widget.unbind("<Leave>")
+        self.widget.unbind("<Enter>")
+        self.widget.unbind("<Leave>")
     def update(self, text):
-      self.text = text
-      self.widget.unbind("<Enter>")
-      self.widget.bind("<Enter>", self.enter)
+        self.text = text
