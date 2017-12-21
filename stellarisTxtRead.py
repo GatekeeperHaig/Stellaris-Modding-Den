@@ -24,7 +24,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     return indexedOccurences[n]
   def getOrCreate(self,name): #required to add something a a category that may already exist "getOrCreate(name).add..."
     if not name in self.names:
-      self.add2(name, TagList(self.bracketLevel+1))
+      self.add(name, TagList(self.bracketLevel+1))
     return self.vals[self.names.index(name)]  
   def attemptGet(self,name): 
     try:
@@ -42,7 +42,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     else:
       comment=""
     self.comments[index:index]=[comment]
-  def add(self,array): #add a 2-size array
+  def addArray(self,array): #add a 2-size array
     self.names.append(array[0].strip())
     val=array[1]
     self.vals.append(val)
@@ -51,10 +51,14 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     else:
       comment=""
     self.comments.append(comment)
-  def add2(self,name,val, comment=''): #add via two separate pre-formated variables
+  def add(self,name,val, comment=''): #add via two separate pre-formated variables
     self.names.append(name)
     self.vals.append(val)
     self.comments.append(comment)
+  def addFront(self,name,val,comment=''):
+    self.names.insert(0,name)
+    self.vals.insert(0,val)
+    self.comments.insert(0,comment)
   def addString(self, string): #add via raw data. Only works for lines that are bracketClosed within
     array=string.split("=")
     array[1:]=["=".join(array[1:]).strip()]
@@ -65,7 +69,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       array.append(comment)
     # print(array[0])
     # print("'"+array[1]+"'")
-    self.add(array)
+    self.addArray(array)
   def remove(self, name): #remove via name
     i=self.names.index(name)
     self.removeIndex(i)
@@ -85,7 +89,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       self.vals[i]=val
       self.comments[i]=comment
     except ValueError:
-      self.add2(name,val,comment)
+      self.add(name,val,comment)
   def splitToListIfString(self,name,n=0): #I do not generally split lines that open and close brackets within the line (to prevent enlarging the file). Yet sometimes it's necessary...
     try:
       if n==0:
@@ -258,7 +262,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     if alreadyExists:
       self.replace(tag,finalVal)
     else:
-      self.add([tag, finalVal])
+      self.addArray([tag, finalVal])
   def applyOnLowestLevel(self, func, argList=[],attributeList=[]):
     i=0
     while self.vals: #loop that allows size changes of the array and actually includes those new entries!
@@ -286,7 +290,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             varsToValue.addString(line)
           elif line[0]!="#" or bracketLevel>0:
             if line[0]=="#":
-              objectList[-1].add2("","",line)
+              objectList[-1].add("","",line)
               continue
             currentlyInHeader=False
             bracketOpen=line.count("{")
@@ -303,11 +307,11 @@ class TagList: #Basically everything is stored recursively in objects of this cl
               else:
                 tagName=line.split("=")[0].strip()
                 objectList.append(NamedTagList(lineIndex,tagName))
-                self.add2(tagName,objectList[-1])
+                self.add(tagName,objectList[-1])
             else:
               if bracketOpen>bracketClose:
                 newObject=TagList(bracketLevel+1)
-                objectList[-1].add([line.split("=")[0],newObject])
+                objectList[-1].addArray([line.split("=")[0],newObject])
                 objectList.append(newObject)
               elif bracketOpen==bracketClose:
                 objectList[-1].addString(line)
@@ -434,7 +438,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
           val.setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,n_th_occurence)
         else:
-          self.add2(headerName,bodyEntry[headerIndex]) 
+          self.add(headerName,bodyEntry[headerIndex]) 
         continue
       valIndex=-1
       local_n_th_occurence=n_th_occurence
@@ -447,10 +451,10 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             if bodyEntry[headerIndex]:
               if not args.forbid_additions:
                 if isinstance(self.getN_th(headerName, n_th_occurence-1), TagList):
-                  self.add2(headerName, TagList(self.bracketLevel+1))
+                  self.add(headerName, TagList(self.bracketLevel+1))
                 else:
-                  self.add2(headerName, "")
-                # self.add2(headerName,copy.deepcopy(self.getN_th(headerName, n_th_occurence-1)))
+                  self.add(headerName, "")
+                # self.add(headerName,copy.deepcopy(self.getN_th(headerName, n_th_occurence-1)))
                 valIndex=self.n_thIndex(headerName,n_th_occurence)
               else:
                 raise
@@ -515,7 +519,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       extraLines=int(bodyEntry[headerIndex][9:])
       bodyEntry[headerIndex]="addedLines"
       for i in range(extraLines-1):
-        self.add2(headerName, self.getN_th(headerName, n_th_occurence-1))
+        self.add(headerName, self.getN_th(headerName, n_th_occurence-1))
 
           
 class NamedTagList(TagList): #derived from TagList with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
