@@ -1,76 +1,26 @@
 namespace = ex_spaceport_events
 
-event = {
-	id = ex_spaceport_events.0
+country_event = {
+	id = ex_spaceport_events.0 #gamestart event
 	hide_window = yes
 
 	immediate = {
-		every_country = {
-			limit = { is_country_type = default }		 
-			every_owned_planet = {
-				limit = { has_spaceport = yes }							
-				if = { 
-					limit = { has_spaceport_module = projectile_weapon }
-					delete_ship = orbital_station
-					settings = { spawn_debris = no }
-					create_spaceport = {
-						owner = root.owner
-						initial_module = "space_port_core_module_kinetic_1"
-					}		
-					set_spaceport_level = 1		
-				}	
-				if = { 
-					limit = { has_spaceport_module = laser_weapon }
-					destroy_fleet = spaceport
-					settings = { spawn_debris = no }
-					create_spaceport = {
-						owner = root.owner
-						initial_module = "space_port_core_module_energy_1"
-					}					
-					set_spaceport_level = 1		
-				}					
-				if = { 
-					limit = { has_spaceport_module = missile_weapon }
-					destroy_fleet = spaceport
-					settings = { spawn_debris = no }
-					create_spaceport = {
-						owner = root.owner
-						initial_module = "space_port_core_module_explosives_1"
-					}					
-					set_spaceport_level = 1		
-				}				
+		every_owned_planet = {
+			limit = { has_spaceport = yes }	
+			if = { 
+				limit = { has_spaceport_module = projectile_weapon }									
+				owner = { add_ship_design = "NAME_Kinetic_Spaceport" }				
+			}	
+			if = { 
+				limit = { has_spaceport_module = laser_weapon }				
+				owner = { add_ship_design = "NAME_Energy_Spaceport" }
+			}	
+			if = { 
+				limit = { has_spaceport_module = missile_weapon }
+				owner = { add_ship_design = "NAME_Explosives_Spaceport" } 
 			}
-		}
-	}	
-}					
-
-ship_event = {
-	id = ex_spaceport_events.1
-	hide_window = yes
-
-	immediate = {
-		if = {
-			limit = { owner = { is_preferred_weapons = weapon_type_kinetic } }
-			from = {
-				remove_spaceport_module = slot = 1
-				set_spaceport_module = { slot = 1 module = space_port_core_module_kinetic_1 }
-			}	
 		}	
-		if = {
-			limit = { owner = { is_preferred_weapons = weapon_type_energy } }
-			from = {
-				remove_spaceport_module = slot = 1
-				set_spaceport_module = { slot = 1 module = space_port_core_module_energy_1 }
-			}	
-		}			
-		if = {
-			limit = { owner = { is_preferred_weapons = weapon_type_explosives } }
-			from = {
-				remove_spaceport_module = slot = 1
-				set_spaceport_module = { slot = 1 module = space_port_core_module_explosives_1 }
-			}	
-		}					
-	}
+	}	
 }
 
 planet_event = {
@@ -78,483 +28,78 @@ planet_event = {
 	hide_window = yes
 
 	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 2
-		has_spaceport_module = space_port_core_module_kinetic
+		has_spaceport = yes				
+		OR = {
+			has_spaceport_module = projectile_weapon
+			has_spaceport_module = laser_weapon
+			has_spaceport_module = missile_weapon
+		}	
 	}
 
 	immediate = {
-		remove_spaceport_module = { module = space_port_core_module_kinetic_1 }
-		set_spaceport_module = { slot = 1 module = space_port_core_module_kinetic_2 }
+		if = {
+			limit = { is_spaceport_module_slot_free = 1 }
+			if = { 
+				limit = { has_spaceport_module = projectile_weapon }
+				spaceport = { delete_ship = this }
+				create_spaceport = {
+					owner = root
+					initial_module = "space_port_core_module_kinetic_1"
+				}		
+				set_spaceport_level = 1	
+				set_planet_flag = ex_spaceport_created	
+			}	
+			if = { 
+				limit = { has_spaceport_module = laser_weapon }
+				spaceport = { delete_ship = this }
+				create_spaceport = {
+					owner = root
+					initial_module = "space_port_core_module_energy_1"
+				}		
+				set_spaceport_level = 1		
+				set_planet_flag = ex_spaceport_created	
+			}	
+			if = { 
+				limit = { has_spaceport_module = missile_weapon }
+				spaceport = { delete_ship = this }
+				create_spaceport = {
+					owner = root
+					initial_module = "space_port_core_module_explosives_1"
+				}		
+			set_spaceport_level = 1		
+			set_planet_flag = ex_spaceport_created	
+			}
+		}	
+		# else = { } 	
 	}
-}
+}		
 
 planet_event = {
-	id = ex_spaceport_events.3
+	id = ex_spaceport_events.10 
 	hide_window = yes
 
 	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 3
-		has_spaceport_module = space_port_core_module_kinetic_2
+		has_planet_flag = ex_spaceport_created
+		has_owner = yes
+		has_spaceport = yes			
+		is_spaceport_module_slot_free = 2		
 	}
 
 	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_kinetic_3 }
+		if = { 
+			limit = { has_spaceport_module = space_port_core_module_kinetic_1 }			
+			remove_spaceport_module = space_port_core_module_kinetic_1
+			set_spaceport_module = { slot = 1 module = space_port_core_module_kinetic_2 }
+		}	
+		if = { 
+			limit = { has_spaceport_module = space_port_core_module_energy_1 }			
+			remove_spaceport_module = space_port_core_module_energy_1
+			set_spaceport_module = { slot = 1 module = space_port_core_module_energy_2 }
+		}			
+		if = { 
+			limit = { has_spaceport_module = space_port_core_module_explosives_1 }			
+			remove_spaceport_module = space_port_core_module_explosives_1
+			set_spaceport_module = { slot = 1 module = space_port_core_module_explosives_2 }
+		}			
 	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.4
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 4
-		has_spaceport_module = space_port_core_module_kinetic_3
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_kinetic_4 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.5
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 5
-		has_spaceport_module = space_port_core_module_kinetic_4
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_kinetic_5 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.6
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 6
-		has_spaceport_module = space_port_core_module_kinetic_5
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_kinetic_6 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.7
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 7
-		has_spaceport_module = space_port_core_module_kinetic_6
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_kinetic_7 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.8
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 8
-		has_spaceport_module = space_port_core_module_kinetic_7
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_kinetic_8 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.9
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 9
-		has_spaceport_module = space_port_core_module_kinetic_8
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_kinetic_9 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.10
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 10
-		has_spaceport_module = space_port_core_module_kinetic_9
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_kinetic_10 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.11
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 2
-		has_spaceport_module = space_port_core_module_energy
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_energy_2 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.12
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 3
-		has_spaceport_module = space_port_core_module_energy_2
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_energy_3 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.13
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 4
-		has_spaceport_module = space_port_core_module_energy_3
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_energy_4 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.14
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 5
-		has_spaceport_module = space_port_core_module_energy_4
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_energy_5 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.15
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 6
-		has_spaceport_module = space_port_core_module_energy_5
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_energy_6 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.16
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 7
-		has_spaceport_module = space_port_core_module_energy_6
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_energy_7 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.17
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 8
-		has_spaceport_module = space_port_core_module_energy_7
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_energy_8 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.18
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 9
-		has_spaceport_module = space_port_core_module_energy_8
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_energy_9 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.19
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 10
-		has_spaceport_module = space_port_core_module_energy_9
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_energy_10 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.20
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 2
-		has_spaceport_module = space_port_core_module_explosives
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_explosives_2 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.21
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 3
-		has_spaceport_module = space_port_core_module_explosives_2
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_explosives_3 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.22
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 4
-		has_spaceport_module = space_port_core_module_explosives_3
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_explosives_4 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.23
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 5
-		has_spaceport_module = space_port_core_module_explosives_4
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_explosives_5 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.24
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 6
-		has_spaceport_module = space_port_core_module_explosives_5
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_explosives_6 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.25
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 7
-		has_spaceport_module = space_port_core_module_explosives_6
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_explosives_7 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.26
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 8
-		has_spaceport_module = space_port_core_module_explosives_7
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_explosives_8 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.27
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 9
-		has_spaceport_module = space_port_core_module_explosives_8
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_explosives_9 }
-	}
-}
-
-planet_event = {
-	id = ex_spaceport_events.28
-	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes		
-		#is_colony = yes
-		#has_owner = yes	
-		is_spaceport_module_slot_free = 10
-		has_spaceport_module = space_port_core_module_explosives_9
-	}
-
-	immediate = {
-		remove_spaceport_module = { slot = 1 } 
-		set_spaceport_module = { slot = 1 space_port_core_module_explosives_10 }
-	}
-}
+}	
