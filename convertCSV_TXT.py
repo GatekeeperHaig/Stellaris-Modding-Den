@@ -64,8 +64,18 @@ def main(args,unused=0):
     globbedList.extend(glob.glob(b.strip('"')))
   for fileName in globbedList:
     if args.to_txt:
-      if fileName[-4:]==tableFileEnding:
+      if fileName[-4:]==tableFileEnding: #table given as input
+        tableFileName=fileName
         fileName=fileName.replace(tableFileEnding,"")
+        if not os.path.exists(fileName):
+          superFolderFile=os.path.join(os.path.dirname(fileName),"../",os.path.basename(fileName))
+          if os.path.exists(superFolderFile):
+            fileName=superFolderFile
+      else:
+        tableFileName=fileName+tableFileEnding
+        subFolderTableFileName=os.path.join(os.path.dirname(fileName),"ods/",os.path.basename(fileName))
+        if os.path.exists(subFolderTableFileName):
+          tableFileName=subFolderTableFileName
     fileIndex+=1
     if fileIndex==0 or not args.join_files:
       varsToValue=TagList(0)
@@ -73,7 +83,7 @@ def main(args,unused=0):
       tagList=TagList(0)
       
     keyStrings=["key","name","id"]  
-    if fileName.replace(".txt",tableFileEnding)==fileName and fileName.replace(".gfx",tableFileEnding)==fileName:
+    if fileName[-4:]!=".txt" and fileName[-4:]!=".gfx":
       print("Non .txt/.gfx file!")
       continue
     # else:
@@ -108,7 +118,6 @@ def main(args,unused=0):
       if os.path.exists(filterFile):
         with open(filterFile) as file:
           args.filter=[word.strip() for line in file for word in line.split(",") ]
-        fileName.replace(".txt",tableFileEnding)!=fileName
         if not keyString in args.filter:
           args.filter[0:0]=[keyString]#always need to be able to convert back to txt        
       else:
@@ -123,7 +132,7 @@ def main(args,unused=0):
       varsToValue.clear()
     varsToValue.changed=[0 for i in varsToValue.vals]
     fullNameToData=nameToData
-    if fileName.replace(".gfx",tableFileEnding)!=fileName:
+    if fileName[-4:]==".gfx":
       nameToData=nameToData.vals[0]
       nameToData.increaseLevelRec(-1)
       # nameToData.printAll()
@@ -131,18 +140,17 @@ def main(args,unused=0):
     nameToData.addTags(tagList)
     
     if args.to_txt:
-      csvFile=fileName+tableFileEnding
-      if not os.path.exists(csvFile):
+      if not os.path.exists(tableFileName):
         print("No "+tableFileEnding+" file for: "+fileName)
         continue
       foundData=False
       foundOcc=False
       if args.use_csv:
-        with open(csvFile) as file:
+        with open(tableFileName) as file:
           csvContent=[re.split(",|;",line.strip()) for line in file]
       else:
         import pyexcel_ods
-        sheets=pyexcel_ods.get_data(csvFile)
+        sheets=pyexcel_ods.get_data(tableFileName)
         while 1:
           try:
             sheet=sheets.popitem() #should be the first sheet. Others are ignored!
@@ -265,7 +273,7 @@ def main(args,unused=0):
               nameToData.vals[i].remove(keyString)
         with open(outFileName,'w') as file:       
           varsToValue.writeAll(file)
-          if fileName.replace(".gfx",tableFileEnding)!=fileName:
+          if fileName[-4:]==".gfx":
             nameToData.increaseLevelRec(1)
           fullNameToData.writeAll(file)
       continue
@@ -281,20 +289,25 @@ def main(args,unused=0):
     occurenceArray=[]
     # tagList.printAll()
     # nameToData[0].printAll()
+    subFolderTable=os.path.join(os.path.dirname(fileName),"ods/")#++os.path.basename(fileName))
+    print(subFolderTable)
+    if not args.just_copy_and_check and not os.path.exists(subFolderTable):
+      os.mkdir(subFolderTable)
     if args.join_files:
-      csvFileName=fileName+"JOINED"+tableFileEnding
+      tableFileNameName=os.path.join(subFolderTable,os.path.basename(fileName)+"JOINED"+tableFileEnding)
     else:
       if args.create_new_file:
-        csvFileName=args.create_new_file+tableFileEnding
-        csvFileName=csvFileName.replace("@orig",fileName)
-        print("Saving to "+csvFileName)
+        tableFileNameName=args.create_new_file+tableFileEnding
+        tableFileNameName=tableFileNameName.replace("@orig",os.path.join(subFolderTable,os.path.basename(fileName)))
+        print("Saving to "+tableFileNameName)
       else:
-        csvFileName=fileName+tableFileEnding
-    lastOutFile=csvFileName
+        tableFileNameName=os.path.join(subFolderTable,os.path.basename(fileName)+tableFileEnding)
+    print("Saving into subfolder!")
+    lastOutFile=tableFileNameName
     if not args.test_run:
       try:
-        if os.path.exists(csvFileName):
-          os.remove(csvFileName) #hopyfully fixing the strange bug for ExNihil that he can't overwrite the file...
+        if os.path.exists(tableFileNameName):
+          os.remove(tableFileNameName) #hopyfully fixing the strange bug for ExNihil that he can't overwrite the file...
         bodyArray=[]
         for name, val in nameToData.getAll():
           lineArray=[copy.deepcopy(lineArrayT)]
@@ -311,7 +324,7 @@ def main(args,unused=0):
             # occurenceList.printAll()
             bodyArray+=lineArray
         if args.use_csv:
-          with open(csvFileName,'w') as file:         
+          with open(tableFileNameName,'w') as file:         
             for headerLine in headerArray:
               file.write(";".join(headerLine)+";\n")            
             for bodyLine in lineArray:
@@ -322,9 +335,9 @@ def main(args,unused=0):
           data.update({"DataSheet": headerArray+bodyArray})
           data.update({"OccurenceNumbers": headerArray+occurenceArray})
           import pyexcel_ods
-          pyexcel_ods.save_data(csvFileName, data)
+          pyexcel_ods.save_data(tableFileNameName, data)
       except PermissionError:
-        print("PermissionError on file write. You must close "+csvFileName+" before running the script")
+        print("PermissionError on file write. You must close "+tableFileNameName+" before running the script")
     # for compName, component in nameToData.getAll():
       # print(compName)
       # for name,val in component.getAll():
