@@ -9,3 +9,5 @@ Layer file : 	txt file containing the different outputs wanted: Each line is one
 Output folder: 	valid folder (didn't find a way to select a folder, sry)
 Layer by Name: 	Decides whether layers are chosen by name or index. Index would be the order in which they are visible in the layer view. 
 		Top entry is 0. List can also be accessed from behind (-1 is last, -2 second to last, etc)
+Tech Icon (52x52): Will scale the whole icon to 52x52. You need to add the tech background as first layer in the list for every dds output. 
+Icon rescale to: The size the original icon will be rescaled to. 54x54 seems to be the standard. It is then cut to 52x52 (without changing the size again)
