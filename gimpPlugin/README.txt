@@ -20,3 +20,4 @@ Icon rescale to: The size the original icon will be rescaled to. 54x54 seems to 
 
 
 "createTechIcons.py": Same init as above.C:\WINDOWS\system32>mklink "F:\Program Files\GIMP 2\lib\gimp\2.0\plug-ins\layertodds.py" "C:\Users\David\Documents\Paradox Interactive\Stellaris\mod\gimpPlugin\layertodds.py"
+You have to insert the folder names by hand (can only give the "get file interface" for files). You can simply insert them from windows explorer!
