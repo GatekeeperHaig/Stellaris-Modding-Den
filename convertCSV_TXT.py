@@ -22,6 +22,7 @@ def parse(argv):
   parser.add_argument('fileNames', nargs = '*', help='File(s)/Path(s) to file(s) to be parsed or .mod file (see "--create_standalone_mod_from_mod). Output is named according to each file name with some extras. Globbing star(*) can be used (even under windows :P)')
   parser.add_argument('-j','--join_files', action="store_true", help="Do not mix different top level tags!")
   parser.add_argument('--filter', action="store_true", help="Use a comma separated file to determine with tags that are to be outputted. Everything below that key will be used. Filter file that will we tried to use is <filename(no .txt)>_filter.txt")
+  parser.add_argument('--manual_filter', default="", help="filter file used for all input files")
   parser.add_argument('-t','--to_txt', action="store_true", help="The csv file(s) previously created (<filename(no .txt)>.csv) will be used to try and find tags in the opened txt files whos value will be replaced by the entry in the txt files. If the txt file value is a variable, the value will we written in the header (possibly overwriting something else!")
   parser.add_argument('-a','--forbid_additions', action="store_true", help="Check that you do not accidentally add tags to entries. Will only allow value changed in this mode")
   parser.add_argument('--create_new_file', default='', help="Instead of overwriting the input txt file (or the default output csv file) the script creates a new one. Useful if you are not in a repository environment. Be careful to not leave two txt file for the game to load! '@orig' will be replaced by the original file name")
@@ -61,7 +62,7 @@ def main(args,unused=0):
   fileIndex=-1
   globbedList=[]
   for b in args.fileNames:
-    globbedList.extend(glob.glob(b.strip('"')))
+    globbedList.extend(glob.glob(b.strip('"').strip("'")))
   for fileName in globbedList:
     if args.to_txt:
       if fileName[-4:]==tableFileEnding: #table given as input
@@ -100,6 +101,11 @@ def main(args,unused=0):
     else:
       keepExtraLines=False
     nameToData.readFile(fileName,args, varsToValue, keepExtraLines) 
+
+    if args.join_files:
+      if fileIndex<len(globbedList)-1:
+        continue
+        
     keyString='addKey'
     for k in keyStrings:
       for v in nameToData.vals:
@@ -113,7 +119,17 @@ def main(args,unused=0):
           nameToData.vals[i].addFront(keyString, nameToData.names[i])
           nameToData.names[i]="keyAdded"
 
-    if args.filter:
+    if args.manual_filter:
+      filterFile=args.manual_filter
+      if os.path.exists(filterFile):
+        with open(filterFile) as file:
+          args.filter=[word.strip() for line in file for word in line.split(",") ]
+        if not keyString in args.filter:
+          args.filter[0:0]=[keyString]#always need to be able to convert back to txt        
+      else:
+        print("No filter file for: "+fileName)
+        args.filter=0
+    elif args.filter:
       filterFile=fileName.replace(".txt",".filter")
       if os.path.exists(filterFile):
         with open(filterFile) as file:
@@ -278,9 +294,7 @@ def main(args,unused=0):
           fullNameToData.writeAll(file)
       continue
       
-    if args.join_files:
-      if fileIndex<len(globbedList)-1:
-        continue
+
         
     # nameToData.printAll()
     lineArrayT=['' for i in range(tagList.countDeepestLevelEntries(args, True))]
