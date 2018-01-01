@@ -1,55 +1,76 @@
-namespace = ex_terraforming
+namespace = ex_terraforming_events
 
 planet_event = {
-	id = ex_terraforming.1
-	hide_window = yes
-	
+	id = ex_terraforming_events.1
+	hide_window = yes	
 	is_triggered_only = yes
 	
 	immediate = {
-		remove_modifier = "atmospheric_hallucinogen"
-		remove_modifier = "atmospheric_aphrodisiac"
-		remove_modifier = "bleak_planet"
-		remove_modifier = "wild_storms"
-		remove_modifier = "asteroid_impacts"
-		remove_modifier = "unstable_tectonics"
-		remove_modifier = "weak_magnetic_field"
-		remove_modifier = "hazardous_weather"
-		remove_modifier = "dangerous_wildlife"
-		remove_modifier = "irradiated_planet"		
+		root = {
+			if = {
+				limit = { has_modifier = "atmospheric_hallucinogen" }
+				remove_modifier = atmospheric_hallucinogen
+			}	
+			if = {
+				limit = { has_modifier = "atmospheric_aphrodisiac" }
+				remove_modifier = atmospheric_aphrodisiac
+			}		
+			if = {
+				limit = { has_modifier = "bleak_planet" }
+				remove_modifier = bleak_planet
+			}		
+			if = {
+				limit = { has_modifier = "wild_storms" }
+				remove_modifier = wild_storms
+			}				
+			if = {
+				limit = { has_modifier = "asteroid_impacts" }
+				remove_modifier = asteroid_impacts
+			}	
+			if = {
+				limit = { has_modifier = "unstable_tectonics" }
+				remove_modifier = unstable_tectonics
+			}	
+			if = {
+				limit = { has_modifier = "weak_magnetic_field" }
+				remove_modifier = weak_magnetic_field
+			}	
+			if = {
+				limit = { has_modifier = "hazardous_weather" }
+				remove_modifier = hazardous_weather
+			}	
+			if = {
+				limit = { has_modifier = "dangerous_wildlife" }
+				remove_modifier = dangerous_wildlife
+			}	
+			if = {
+				limit = { has_modifier = "irradiated_planet" }
+				remove_modifier = irradiated_planet
+			}						
+		}	
 	}
 }
 
 planet_event = {
-	id = ex_terraforming.2
-	hide_window = yes
-	
+	id = ex_terraforming_events.2
+	hide_window = yes	
 	is_triggered_only = yes
 	
 	immediate = {
 		if = {
-			limit = { 
-				NOT = { has_modifier = ex_terraformed }
-			}
-			add_modifier = { 
-				modifier = "ex_terraformed" 
-				days = -1 
-			}
+			limit = { NOT = { has_modifier = "ex_terraformed" }	}
+			add_modifier = { modifier = "ex_terraformed" days = -1 }
 		}	
 		if = {
 			limit = { is_planet_class = pc_gaia }									
- 			add_modifier = { 
-				modifier = "ex_gaia_world" 
-				days = -1 
-			}									
+ 			add_modifier = { modifier = "ex_gaia_world" days = -1 }									
 		}					
 	}
 }
 
 planet_event = {
-	id = ex_terraforming.3
-	hide_window = yes
-	
+	id = ex_terraforming_events.3
+	hide_window = yes	
 	is_triggered_only = yes
 	
 	immediate = {
@@ -59,41 +80,54 @@ planet_event = {
 }
 
 planet_event = {
-	id = ex_terraforming.4
-	hide_window = yes
-	
+	id = ex_terraforming_events.4
+	hide_window = yes	
 	is_triggered_only = yes
+	
+	trigger = { root = { NOT = { has_planet_flag = ex_size_increased } } }
 	
 	immediate = {
 		if = {
-			limit = { 
-				AND = {
-						planet_size < 23
-						NOT = { has_planet_flag = ex_size_increased }						
-				}												
-			}
-			ex_roll_size_increase_large = yes			
+			limit = { planet_size < 15 }												
+			random_list = {
+				20 = { change_planet_size = 3 }		
+				30 = { change_planet_size = 2 }		
+				50 = { change_planet_size = 1 }	
+			}	
 		}
-		set_planet_flag = ex_size_increased			
-	}
-}
-
-planet_event = {
-	id = ex_terraforming.5
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
 		if = {
 			limit = { 
-				AND = {
-						planet_size > 23
-						NOT = { has_planet_flag = ex_size_increased }						
-				}												
-			}
-			ex_roll_size_increase_small = yes			
-		}
-		set_planet_flag = ex_size_increased			
+				planet_size > 15
+				planet_size < 20
+			}												
+			random_list = {
+				10 = { change_planet_size = 3 }		
+				30 = { change_planet_size = 2 }		
+				60 = { change_planet_size = 1 }	
+			}	
+		}	
+		if = {
+			limit = { 
+				planet_size > 20
+				planet_size < 23
+			}												
+			random_list = {
+				30 = { change_planet_size = 2 }		
+				70 = { change_planet_size = 1 }	
+			}	
+		}		
+		if = {
+			limit = { 
+				OR = {
+					planet_size = 23
+					planet_size = 24
+				}	
+			}												
+			random_list = {
+				50 = { change_planet_size = 1 }		
+				50 = { }	
+			}	
+		}			
+		set_planet_flag = ex_size_increased
 	}
 }
