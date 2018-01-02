@@ -487,7 +487,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             # print(bodyEntry[headerIndex])
             # print(headerName)
             # print(bodyEntry)
-            if bodyEntry[headerIndex] and not isinstance(self.get(headerName),TagList):
+            if bodyEntry[headerIndex] and (not isinstance(self.get(headerName),TagList) or self.names.count(headerName)>1):
               if not args.forbid_additions:
                 if isinstance(self.getN_th(headerName, n_th_occurence-1), TagList):
                   self.add(headerName, TagList(self.bracketLevel+1))
