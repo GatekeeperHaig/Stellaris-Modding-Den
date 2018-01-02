@@ -330,7 +330,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             self.addString(line)
   def addTags(self, tagList):
     for name, entry in self.getAll():
-      if name!="namespace" and entry:
+      if name!="namespace" and entry!="":
         tagEntry=tagList.getOrCreate(name)
         # print (name)
         # print(entry)
@@ -492,7 +492,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
           val.setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,n_th_occurence,occHeader,occEntry)
         else:
-          if bodyEntry[headerIndex] and headerName!="OCCNUM":
+          if bodyEntry[headerIndex]!="" and headerName!="OCCNUM":
             self.add(headerName,bodyEntry[headerIndex]) 
           else:
             self.add(headerName,'#delete') #delete again later. It is important that this is added as otherwise empty stuff remains!
@@ -532,7 +532,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             # print(headerName)
             # print(local_n_th_occurence)
             # print(bodyEntry)
-            if bodyEntry[headerIndex] and (not isinstance(self.get(headerName),TagList) or self.names.count(headerName)>1):
+            if bodyEntry[headerIndex]!="" and (not isinstance(self.get(headerName),TagList) or self.names.count(headerName)>1):
               if not args.forbid_additions:
                 if isinstance(self.getN_th(headerName, n_th_occurence-1), TagList):
                   self.add(headerName, TagList(self.bracketLevel+1))
@@ -553,7 +553,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         try:
           valIndex=self.names.index(headerName)
         except ValueError:
-          if bodyEntry[headerIndex]:
+          if bodyEntry[headerIndex]!="":
             print("Invalid tag '{}' with data '{}'. You need to allow additions if you add tags".format(headerName,bodyEntry[headerIndex]))
             print(n_th_occurence)
             print(self.names)
@@ -564,7 +564,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       else:
         # print(entry)         
         entry=bodyEntry[headerIndex]
-        if entry and headerName!="OCCNUM":
+        if entry!="" and headerName!="OCCNUM":
           # print(entry)
           # self.printAll()
           if self.vals[valIndex] and self.vals[valIndex][0]=="@" and entry!="#delete" and entry[0]!="@":
@@ -684,7 +684,7 @@ class TxtReadHelperFunctions:
     if string[0]=="{":
       endOfStringPart=TxtReadHelperFunctions.findClosingBracked(string)
       excessString=string[endOfStringPart+1:].strip()
-      if excessString:
+      if excessString!="":
         # print("excess")
         # print(excessString)
         varSplit=excessString.split()
