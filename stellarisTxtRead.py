@@ -416,7 +416,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           # file.write(",")
   def prepareOccurences(self,occEntry,header, minIndex=0, maxIndex=-1):
     bodyEntry=occEntry[self.bracketLevel-1]
-    # print(bodyEntry)
+    #print(bodyEntry)
     if maxIndex==-1:
       maxIndex=len(header[self.bracketLevel])-1
     headerIndex=minIndex-1
@@ -484,6 +484,9 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             valIndex=self.n_thIndex(headerName,n_th_occurence)
             local_n_th_occurence=0
           except ValueError:
+            # print(bodyEntry[headerIndex])
+            # print(headerName)
+            # print(bodyEntry)
             if bodyEntry[headerIndex] and not isinstance(self.get(headerName),TagList):
               if not args.forbid_additions:
                 if isinstance(self.getN_th(headerName, n_th_occurence-1), TagList):
