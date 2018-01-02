@@ -521,7 +521,12 @@ class TabControlClass:
     "txt to ods", 
      ("text files",'*.txt;*.gfx'),
     #("text files",'*.[tg][xf][tx]'),
-    [["Apply filter","--filter","Will only create tags from the filter file (including all subtags of those and the key tag). Only these will be changed when converting back"],["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.ods'. Beware that this file can only be used for back-conversion if such a txt file also exists!"],["Keep inlines","--keep_inlines","With this option, the script will try not to split inlines into the long tag form."]], 
+    [
+    ["Apply filter","--filter","Will only create tags from the filter file (including all subtags of those and the key tag). Only these will be changed when converting back"],
+    ["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.ods'. Beware that this file can only be used for back-conversion if such a txt file also exists!"],
+    ["Keep inlines","--keep_inlines","With this option, the script will try not to split inlines into the long tag form."],
+    ["Occurence Sheet","--occ_sheet","Activates the old occurence mode in a different sheet. I think this is no longer needed with the OCCNUM column (which is certainly able of doing things the occ sheet wasn't able to do)"]
+    ], 
     convertCSV_TXT,[],ttk.Frame(nb),0
     ])
     tabs.append([

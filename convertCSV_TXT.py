@@ -32,6 +32,7 @@ def parse(argv):
   parser.add_argument('--clean_header', action="store_true", help="Header ('@' variables) will be cleaned of unused variables (after the ods file is applied)")
   parser.add_argument('--remove_header', action="store_true", help="Header ('@' variables) will be converted into values inside the tags. Allows easier changes in ods.")
   parser.add_argument('--keep_inlines', action="store_true", help="With this option, the script will try not to split inlines into the long tag form.")
+  parser.add_argument('--occ_sheet',action="store_true",help="Create occ sheet. Depricated")
   
   
 
@@ -184,7 +185,7 @@ def main(args,unused=0):
         if not foundData:
           print("ERROR: Invalid ods file. DataSheet missing! Exiting!")
           sys.exit(1)
-        if not foundOcc:
+        if not foundOcc and args.occ_sheet:
           print("Warning: No OccurenceNumbers sheet found. Downward compatibility allows using the file but it might lead to problems (if non-unique occurence numbers exist)")
         #print(csvContent)
       for i in range(len(csvContent)):
@@ -263,7 +264,15 @@ def main(args,unused=0):
                   continue;
           else:
             repeatIndex+=1
-          val.setValFromCSV(header, bodyEntry,varsToValue,args, 0,-1,repeatIndex,occHeader,occEntry)
+          try:
+            # nameToData[0].printAll()
+            val.setValFromCSV(header, bodyEntry,varsToValue,args, 0,-1,repeatIndex,occHeader,occEntry)
+            # nameToData[0].printAll()
+            # sys.exit(0)
+          except:
+            print("Error trying to write into {}, occurence {!s}".format(bodyKey, repeatIndex))
+            print(bodyEntry)
+            raise
       # nameToData[0].printAll()
       if args.create_new_file:
         outFileName=args.create_new_file+".txt"
@@ -347,7 +356,8 @@ def main(args,unused=0):
         else:
           data=OrderedDict()
           data.update({"DataSheet": headerArray+bodyArray})
-          data.update({"OccurenceNumbers": headerArray+occurenceArray})
+          if args.occ_sheet:
+            data.update({"OccurenceNumbers": headerArray+occurenceArray})
           import pyexcel_ods
           pyexcel_ods.save_data(tableFileNameName, data)
       except PermissionError:

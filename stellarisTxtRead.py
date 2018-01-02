@@ -336,6 +336,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         # print(entry)
         if isinstance(entry, TagList):
           entry.addTags(tagEntry)
+          if self.bracketLevel>0 and self.names.count(name)>1 and isinstance(tagEntry,TagList) and tagEntry.names[0]!="OCCNUM":
+            tagEntry.addFront("OCCNUM",TagList(self.bracketLevel+1))
       # else:
         # tagList.replace(name,"")
   def countDeepestLevelEntries(self,args, active=False):
@@ -379,6 +381,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     return curIndex
   def toCSV(self, lineArray, tagList,occurenceList,varsToValue,args,curIndex=0, curLineIndex=0):
     i=-1
+    maxExtraLines=0
     for name,val in tagList.getAll():
       i+=1
       # print(name)
@@ -386,15 +389,31 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       occurenceList.names[i]=str(occurences)
       # if name in self.names:
       curIndexTmp=curIndex
+      sumExtraLines=0
+      extraLines=0
       for occurenceIndex in range(occurences):
         curIndex=curIndexTmp
+        curLineIndex+=extraLines
         if occurenceIndex+curLineIndex>= len(lineArray):
           lineArray.append(['' for i in lineArray[0]])
         
         if len(val.names)>0:
           # print(name)
+          # print(occurences)
           # print(self.get(name))
-          curIndex=self.splitToListIfString(name,occurenceIndex).toCSV(lineArray, val,occurenceList.vals[i],varsToValue,args,curIndex, curLineIndex+occurenceIndex)
+          curIndex,extraLines=self.splitToListIfString(name,occurenceIndex).toCSV(lineArray, val,occurenceList.vals[i],varsToValue,args,curIndex, curLineIndex+occurenceIndex)
+          if occurences>1:
+            for extraLine in range(extraLines+1):
+              # print(occurenceIndex)
+              # try:
+              if extraLines>0:
+                lineArray[curLineIndex+occurenceIndex+extraLine][curIndexTmp]="OCC{!s}-{!s}".format(occurenceIndex,extraLine)
+              else:
+                lineArray[curLineIndex+occurenceIndex+extraLine][curIndexTmp]="OCC{!s}".format(occurenceIndex)
+              # except:
+                # print("{!s},{!s},{!s},{!s}".format(curLineIndex,sumExtraLines,occurenceIndex,extraLine))
+                # pass
+          sumExtraLines+=extraLines
         else:
           output=self.getN_th(name,occurenceIndex)
           if isinstance(output,TagList):
@@ -411,7 +430,9 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           curIndex+=val.countDeepestLevelEntries(args, True)
         else:
           curIndex+=1
-    return curIndex
+      if sumExtraLines+occurences-1>maxExtraLines:
+        maxExtraLines=sumExtraLines+occurences-1
+    return curIndex, maxExtraLines
         # for i in range(val.countDeepestLevelEntries(args)):
           # file.write(",")
   def prepareOccurences(self,occEntry,header, minIndex=0, maxIndex=-1):
@@ -471,14 +492,37 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
           val.setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,n_th_occurence,occHeader,occEntry)
         else:
-          if bodyEntry[headerIndex]:
+          if bodyEntry[headerIndex] and headerName!="OCCNUM":
             self.add(headerName,bodyEntry[headerIndex]) 
           else:
             self.add(headerName,'#delete') #delete again later. It is important that this is added as otherwise empty stuff remains!
         continue
       valIndex=-1
       local_n_th_occurence=n_th_occurence
-      if n_th_occurence>0:
+      if bodyEntry[headerIndex][:3]=="OCC" and headerName!="OCCNUM": #in the tag ABOVE OCCNUM
+        occs=bodyEntry[headerIndex][3:].split("-");
+        # [actual_OCC,local_n_th_occurence]=
+        actual_OCC=int(occs[0].strip())
+        if len(occs)>1:
+          local_n_th_occurence=int(occs[1].strip())
+        else:
+          local_n_th_occurence=0
+        # -=actual_OCC
+        try:
+          valIndex=self.n_thIndex(headerName,actual_OCC)
+        except ValueError:
+          if not args.forbid_additions:
+            print(headerName)
+            print(actual_OCC)
+            if isinstance(self.getN_th(headerName, actual_OCC-1), TagList):
+              self.add(headerName, TagList(self.bracketLevel+1))
+            else:
+              self.add(headerName, "#delete")
+            # self.add(headerName,copy.deepcopy(self.getN_th(headerName, n_th_occurence-1)))
+            valIndex=self.n_thIndex(headerName,actual_OCC)
+          else:
+            raise
+      elif n_th_occurence>0:
         if self.names.count(headerName)>=1:
           try:
             valIndex=self.n_thIndex(headerName,n_th_occurence)
@@ -486,18 +530,23 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           except ValueError:
             # print(bodyEntry[headerIndex])
             # print(headerName)
+            # print(local_n_th_occurence)
             # print(bodyEntry)
             if bodyEntry[headerIndex] and (not isinstance(self.get(headerName),TagList) or self.names.count(headerName)>1):
               if not args.forbid_additions:
                 if isinstance(self.getN_th(headerName, n_th_occurence-1), TagList):
                   self.add(headerName, TagList(self.bracketLevel+1))
                 else:
-                  self.add(headerName, "")
+                  self.add(headerName, "#delete")
                 # self.add(headerName,copy.deepcopy(self.getN_th(headerName, n_th_occurence-1)))
                 valIndex=self.n_thIndex(headerName,n_th_occurence)
               else:
                 raise
               local_n_th_occurence=0
+            elif self.names.count(headerName)>1:
+              valIndex=self.n_thIndex(headerName,self.names.count(headerName)-1)
+              local_n_th_occurence-=self.names.count(headerName)-1
+              # print(local_n_th_occurence)
             # else:
             #  no continue! empty things will be ignored anyway. And there might be some extra tags lower down
       if valIndex<=0:
@@ -515,10 +564,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       else:
         # print(entry)         
         entry=bodyEntry[headerIndex]
-        if entry:
-          # print(headerName)
-          # print(n_th_occurence)
-          # print(self.vals[valIndex])
+        if entry and headerName!="OCCNUM":
           # print(entry)
           # self.printAll()
           if self.vals[valIndex] and self.vals[valIndex][0]=="@" and entry!="#delete" and entry[0]!="@":
