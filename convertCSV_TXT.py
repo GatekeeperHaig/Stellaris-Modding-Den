@@ -106,7 +106,10 @@ def main(args,unused=0):
     if args.join_files:
       if fileIndex<len(globbedList)-1:
         continue
-        
+    fullNameToData=nameToData
+    if fileName[-4:]==".gfx":
+      nameToData=nameToData.vals[0]
+      nameToData.increaseLevelRec(-1)   
     keyString='addKey'
     for k in keyStrings:
       for v in nameToData.vals:
@@ -148,10 +151,7 @@ def main(args,unused=0):
       nameToData.applyOnLowestLevel( TxtReadHelperFunctions.getVariableValue, [varsToValue])
       varsToValue.clear()
     varsToValue.changed=[0 for i in varsToValue.vals]
-    fullNameToData=nameToData
-    if fileName[-4:]==".gfx":
-      nameToData=nameToData.vals[0]
-      nameToData.increaseLevelRec(-1)
+
       # nameToData.printAll()
       # fullNameToData.printAll()
     nameToData.addTags(tagList)
