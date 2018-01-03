@@ -10,7 +10,10 @@ def layerToDDS(timg, tdrawable,file,argumentFile, outFolder, byName,scaleBool,sc
         for l in argfile:
           image = pdb.gimp_file_load(file, file)
           if scaleBool:
-            pdb.gimp_image_resize(image,52,52,-26,-26)
+            if scaleTo:
+              pdb.gimp_image_resize(image,52,52,-26,-26)
+            else:
+              pdb.gimp_image_scale(image,52,52)
           line=shlex.split(l)
           outFile=outFolder+"/"+line[0]
           if outFile[-4:]!=".dds":
@@ -19,20 +22,37 @@ def layerToDDS(timg, tdrawable,file,argumentFile, outFolder, byName,scaleBool,sc
           #   layer = pdb.gimp_image_get_layer_by_name(image, id)
             pdb.gimp_item_set_visible(layer, False)
           layers=[]
-          for i in line[1:]:
-            #outTxt.write(i+"\n")
-            #layers.append(pdb.gimp_layer_copy(image.layers[int(i)],False))
-            #pdb.gimp_image_insert_layer(image, layer,image.layers[int(i)], 0)
+          for i,word in enumerate(line[1:]):
             if byName:
-              pdb.gimp_item_set_visible(pdb.gimp_image_get_layer_by_name(image, i),True)
+              if word[:4]=="MOVE":
+                word2=word[5:]
+                layer=pdb.gimp_image_get_layer_by_name(image, word2)
+                # pdb.gimp_item_set_visible(layer,True)
+                pdb.gimp_layer_scale(layer, 40, 40, False)
+                pdb.gimp_image_set_active_layer(image, layer)
+                drawable = pdb.gimp_image_get_active_layer(image)
+                if word[4]=="L":
+                  pdb.script_fu_move_layer_to(image, drawable, -2.5, 5)
+                elif word[4]=="R":
+                  pdb.script_fu_move_layer_to(image, drawable, 17.5, 5)
+                line[1+i]=line[1+i][5:]
+                # pdb.gimp_item_set_visible(layer,False)
+                  
+
+          for word in line[1:]:
+            #outTxt.write(word+"\n")
+            #layers.append(pdb.gimp_layer_copy(image.layers[int(word)],False))
+            #pdb.gimp_image_insert_layer(image, layer,image.layers[int(word)], 0)
+            if byName:
+              pdb.gimp_item_set_visible(pdb.gimp_image_get_layer_by_name(image, word),True)
             else:
-              pdb.gimp_item_set_visible(image.layers[int(i)], True)
-          if scaleBool:
-            for i in line[2:]:
+              pdb.gimp_item_set_visible(image.layers[int(word)], True)
+          if scaleBool and scaleTo:
+            for word in line[2:]:
               if byName:
-                layer=pdb.gimp_image_get_layer_by_name(image, i)
+                layer=pdb.gimp_image_get_layer_by_name(image, word)
               else:
-                layer=image.layers[int(i)]
+                layer=image.layers[int(word)]
               pdb.gimp_layer_scale(layer, scaleTo, scaleTo, False)
               pdb.gimp_layer_resize(layer, 52, 52, -1,-1)
 
@@ -45,7 +65,7 @@ def layerToDDS(timg, tdrawable,file,argumentFile, outFolder, byName,scaleBool,sc
           pdb.gimp_image_set_active_layer(image, layer)
           drawable = pdb.gimp_image_get_active_layer(image)
           for layerIt in image.layers:
-            if layerIt!=layer:
+            if layerIt!=layer or not scaleTo:
               pdb.gimp_layer_resize_to_image_size(layerIt)
           pdb.file_dds_save(image, drawable, outFile,outFile,0,0,0,0,0,0,0)
           # pdb.gimp_image_remove_layer(image, layer)
