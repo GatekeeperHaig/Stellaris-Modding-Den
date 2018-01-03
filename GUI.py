@@ -637,7 +637,7 @@ def main():
   # display the menu
   root.config(menu=menubar)
 
-  if os.path.exists("python.ico"):
+  if os.path.exists("python.ico") and platform.system()=='Windows':
     root.iconbitmap('python.ico')
         # root.iconbitmap(os.path.abspath("python.ico"))
 
