@@ -10,7 +10,13 @@ event = { #this event fires on game start, firing ex_spaceport_events.10
 			limit = { is_country_type = default }
 			every_owned_planet = { 
 				set_planet_flag = game_start_economic_spaceport		
-				planet_event = { id = ex_spaceport_events.10 }
+				if = {
+					limit = { 
+						has_spaceport = yes
+						is_spaceport_module_slot_free = 1
+					}
+					planet_event = { id = ex_spaceport_events.10 }
+				}	
 			}
 		}
 	}	
@@ -48,112 +54,192 @@ country_event = { #this event fires whenever a new technology is researched and 
 	
 	immediate = {
 		every_owned_planet = {
+			limit = { has_spaceport = yes }	
 			if = {
 				limit = { 
-					owner = { has_technology = "tech_mass_drivers_2" }
-					has_tier_1_kinetic_spaceport_module = yes
+					OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
+					NOT = { has_planet_flag = spaceport_kinetic_t2_modifier }
+					owner = { tier_2_kinetics = yes }						
 				}
-				remove_tier_1_core_module_kinetic = yes
-				set_tier_2_core_module_kinetic = yes
+				spaceport = { 
+					random_owned_ship = { 
+						add_modifier = { modifier = spaceport_kinetic_t2 days = -1 }
+					}
+				}
+				set_planet_flag = spaceport_kinetic_t2_modifier
+			}
+			if = {
+				limit = { 
+					OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
+					NOT = { has_planet_flag = spaceport_kinetic_t3_modifier }
+					owner = { tier_3_kinetics = yes }
+				}
+				spaceport = { 
+					random_owned_ship = { 
+						remove_modifier = spaceport_kinetic_t2
+						add_modifier = { modifier = spaceport_kinetic_t3 days = -1 }
+					}
+				}	
+				remove_planet_flag = spaceport_kinetic_t2_modifier					
+				set_planet_flag = spaceport_kinetic_t3_modifier					
+			}
+			if = {
+				limit = { 
+					OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
+					NOT = { has_planet_flag = spaceport_kinetic_t4_modifier }
+					owner = { tier_4_kinetics = yes }
+				}
+				spaceport = { 
+					random_owned_ship = { 
+						remove_modifier = spaceport_kinetic_t3
+						add_modifier = { modifier = spaceport_kinetic_t4 days = -1 }
+					}
+				}	
+				remove_planet_flag = spaceport_kinetic_t3_modifier					
+				set_planet_flag = spaceport_kinetic_t4_modifier						
 			}	
 			if = {
 				limit = { 
-					owner = { has_technology = "tech_mass_drivers_3" }
-					has_tier_2_kinetic_spaceport_module = yes
+					OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
+					NOT = { has_planet_flag = spaceport_kinetic_t5_modifier }
+					owner = { tier_5_kinetics = yes }
 				}
-				remove_tier_2_core_module_kinetic = yes
-				set_tier_3_core_module_kinetic = yes
-			}			
+				spaceport = { 
+					random_owned_ship = { 
+						remove_modifier = spaceport_kinetic_t4
+						add_modifier = { modifier = spaceport_kinetic_t5 days = -1 }
+					}
+				}	
+				remove_planet_flag = spaceport_kinetic_t4_modifier					
+				set_planet_flag = spaceport_kinetic_t5_modifier						
+			}
 			if = {
 				limit = { 
-					owner = { has_technology = "tech_mass_drivers_4" }
-					has_tier_3_kinetic_spaceport_module = yes
+					OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
+					NOT = { has_planet_flag = spaceport_energy_t2_modifier }
+					owner = { tier_2_energy = yes }							
 				}
-				remove_tier_3_core_module_kinetic = yes
-				set_tier_4_core_module_kinetic = yes
-			}			
+				spaceport = { 
+					random_owned_ship = { 
+						add_modifier = { modifier = spaceport_energy_t2 days = -1 }
+					}
+				}	
+				set_planet_flag = spaceport_energy_t2_modifier
+			}
 			if = {
 				limit = { 
-					owner = { has_technology = "tech_mass_drivers_5" }
-					has_tier_4_kinetic_spaceport_module = yes
+					OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
+					NOT = { has_planet_flag = spaceport_energy_t3_modifier }
+					owner = { tier_3_energy = yes }			
 				}
-				remove_tier_4_core_module_kinetic = yes
-				set_tier_5_core_module_kinetic = yes
-			}		
+				spaceport = { 
+					random_owned_ship = { 
+						remove_modifier = spaceport_energy_t2
+						add_modifier = { modifier = spaceport_energy_t3 days = -1 }
+					}
+				}	
+				remove_planet_flag = spaceport_energy_t2_modifier					
+				set_planet_flag = spaceport_energy_t3_modifier					
+			}
 			if = {
 				limit = { 
-					owner = { has_technology = "tech_lasers_2" }
-					has_tier_1_kinetic_spaceport_module = yes
+					OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
+					NOT = { has_planet_flag = spaceport_energy_t4_modifier }
+					owner = { tier_4_energy = yes }			
 				}
-				remove_tier_1_core_module_energy = yes
-				set_tier_2_core_module_kinetic = yes
+				spaceport = { 
+					random_owned_ship = { 
+						remove_modifier = spaceport_energy_t3
+						add_modifier = { modifier = spaceport_energy_t4 days = -1 }
+					}
+				}	
+				remove_planet_flag = spaceport_energy_t3_modifier					
+				set_planet_flag = spaceport_energy_t4_modifier						
 			}	
 			if = {
 				limit = { 
-					owner = { has_technology = "tech_lasers_3" }
-					has_tier_2_kinetic_spaceport_module = yes
+					OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
+					NOT = { has_planet_flag = spaceport_energy_t5_modifier }
+					owner = { tier_5_energy = yes }			
 				}
-				remove_tier_2_core_module_kinetic = yes
-				set_tier_3_core_module_kinetic = yes
-			}			
-			if = {
-				limit = { 
-					owner = { has_technology = "tech_lasers_4" }
-					has_tier_3_kinetic_spaceport_module = yes
-				}
-				remove_tier_3_core_module_kinetic = yes
-				set_tier_4_core_module_kinetic = yes
-			}			
-			if = {
-				limit = { 
-					owner = { has_technology = "tech_lasers_5" }
-					has_tier_4_kinetic_spaceport_module = yes
-				}
-				remove_tier_4_core_module_kinetic = yes
-				set_tier_5_core_module_kinetic = yes
-			}							
-			if = {
-				limit = { 
-					owner = { has_technology = "tech_missiles_2" }
-					has_tier_1_explosives_spaceport_module = yes
-				}
-				remove_tier_1_core_module_energy = yes
-				set_tier_2_core_module_explosives = yes
+				spaceport = { 
+					random_owned_ship = { 
+						remove_modifier = spaceport_energy_t4
+						add_modifier = { modifier = spaceport_energy_t5 days = -1 }
+					}
+				}	
+				remove_planet_flag = spaceport_energy_t4_modifier					
+				set_planet_flag = spaceport_energy_t5_modifier						
 			}	
 			if = {
 				limit = { 
-					owner = { has_technology = "tech_missiles_3" }
-					has_tier_2_explosives_spaceport_module = yes
+					OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
+					NOT = { has_planet_flag = spaceport_explosive_t2_modifier }
+					owner = { tier_2_explosives = yes }							
 				}
-				remove_tier_2_core_module_explosives = yes
-				set_tier_3_core_module_explosives = yes
-			}			
+				spaceport = { 
+					random_owned_ship = { 
+						add_modifier = { modifier = spaceport_explosive_t2 days = -1 }
+					}
+				}	
+				set_planet_flag = spaceport_explosive_t2_modifier	
+			}
 			if = {
 				limit = { 
-					owner = { has_technology = "tech_missiles_4" }
-					has_tier_3_explosives_spaceport_module = yes
+					OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
+					NOT = { has_planet_flag = spaceport_explosive_t3_modifier }
+					owner = { tier_3_explosives = yes }		
 				}
-				remove_tier_3_core_module_explosives = yes
-				set_tier_4_core_module_explosives = yes
-			}			
+				spaceport = { 
+					random_owned_ship = { 
+						remove_modifier = spaceport_explosive_t2
+						add_modifier = { modifier = spaceport_explosive_t3 days = -1 }
+					}
+				}
+				remove_planet_flag = spaceport_explosive_t2_modifier					
+				set_planet_flag = spaceport_explosive_t3_modifier						
+			}
 			if = {
 				limit = { 
-					owner = { has_technology = "tech_missiles_5" }
-					has_tier_4_explosives_spaceport_module = yes
+					OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
+					NOT = { has_planet_flag = spaceport_explosive_t4_modifier }
+					owner = { tier_4_explosives = yes }		
 				}
-				remove_tier_4_core_module_explosives = yes
-				set_tier_5_core_module_explosives = yes
-			}								
+				spaceport = { 
+					random_owned_ship = { 
+						remove_modifier = spaceport_explosive_t3
+						add_modifier = { modifier = spaceport_explosive_t4 days = -1 }
+					}
+				}	
+				remove_planet_flag = spaceport_explosive_t3_modifier					
+				set_planet_flag = spaceport_explosive_t4_modifier											
+			}	
+			if = {
+				limit = { 
+					OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
+					NOT = { has_planet_flag = spaceport_explosive_t5_modifier }
+					owner = { tier_5_explosives = yes }		
+				}
+				spaceport = { 
+					random_owned_ship = { 
+						remove_modifier = spaceport_explosive_t4
+						add_modifier = { modifier = spaceport_explosive_t5 days = -1 }
+					}
+				}		
+				remove_planet_flag = spaceport_explosive_t4_modifier					
+				set_planet_flag = spaceport_explosive_t5_modifier											
+			}				
 		}
 	}
-}					
+}	
 
 planet_event = {
 	id = ex_spaceport_events.3
 	hide_window = yes
 
     trigger = {
-		OR = {
+		has_spaceport = no	
+		OR = {				
 			has_planet_flag = ex_spaceport_1
 			has_planet_flag = ex_spaceport_2
 			has_planet_flag = ex_spaceport_3
@@ -163,22 +249,199 @@ planet_event = {
 			has_planet_flag = ex_spaceport_7
 			has_planet_flag = ex_spaceport_8
 			has_planet_flag = ex_spaceport_9
-		}					
-		has_spaceport = no		
+			has_modifier = economic_spaceport_1
+			has_modifier = economic_spaceport_2
+			has_modifier = economic_spaceport_3
+			has_modifier = economic_spaceport_4
+			has_modifier = economic_spaceport_5
+			has_modifier = economic_spaceport_6
+			has_modifier = economic_spaceport_7
+			has_modifier = economic_spaceport_8
+			has_modifier = economic_spaceport_9
+			has_modifier = stardock_spaceport_1
+			has_modifier = stardock_spaceport_2
+			has_modifier = stardock_spaceport_3
+			has_modifier = stardock_spaceport_4
+			has_modifier = stardock_spaceport_5
+			has_modifier = stardock_spaceport_6
+			has_modifier = stardock_spaceport_7
+			has_modifier = stardock_spaceport_8
+			has_modifier = stardock_spaceport_9
+			has_planet_flag = spaceport_kinetic_t2_modifier
+			has_planet_flag = spaceport_kinetic_t3_modifier
+			has_planet_flag = spaceport_kinetic_t4_modifier
+			has_planet_flag = spaceport_kinetic_t5_modifier
+			has_planet_flag = spaceport_energy_t2_modifier
+			has_planet_flag = spaceport_energy_t3_modifier
+			has_planet_flag = spaceport_energy_t4_modifier
+			has_planet_flag = spaceport_energy_t5_modifier
+			has_planet_flag = spaceport_explosive_t2_modifier
+			has_planet_flag = spaceport_explosive_t3_modifier
+			has_planet_flag = spaceport_explosive_t4_modifier
+			has_planet_flag = spaceport_explosive_t5_modifier			
+		}							
 	}
 
 	immediate = {
-		remove_planet_flag = ex_spaceport_1
-		remove_planet_flag = ex_spaceport_2
-		remove_planet_flag = ex_spaceport_3
-		remove_planet_flag = ex_spaceport_4
-		remove_planet_flag = ex_spaceport_5
-		remove_planet_flag = ex_spaceport_6
-		remove_planet_flag = ex_spaceport_7
-		remove_planet_flag = ex_spaceport_8
-		remove_planet_flag = ex_spaceport_9					
+		if = {
+			limit = { has_planet_flag = ex_spaceport_1 }
+			remove_planet_flag = ex_spaceport_1
+		}	
+		if = {
+			limit = { has_planet_flag = ex_spaceport_2 }
+			remove_planet_flag = ex_spaceport_2
+		}
+		if = {
+			limit = { has_planet_flag = ex_spaceport_3 }
+			remove_planet_flag = ex_spaceport_3
+		}
+		if = {
+			limit = { has_planet_flag = ex_spaceport_4 }
+			remove_planet_flag = ex_spaceport_4
+		}
+		if = {
+			limit = { has_planet_flag = ex_spaceport_5 }
+			remove_planet_flag = ex_spaceport_5
+		}
+		if = {
+			limit = { has_planet_flag = ex_spaceport_6 }
+			remove_planet_flag = ex_spaceport_6
+		}
+		if = {
+			limit = { has_planet_flag = ex_spaceport_7 }
+			remove_planet_flag = ex_spaceport_7
+		}
+		if = {
+			limit = { has_planet_flag = ex_spaceport_8 }
+			remove_planet_flag = ex_spaceport_8
+		}
+		if = {
+			limit = { has_planet_flag = ex_spaceport_9 }
+			remove_planet_flag = ex_spaceport_9
+		}	
+		if = {
+			limit = { has_modifier = economic_spaceport_1 }
+			remove_modifier = economic_spaceport_1
+		}	
+		if = {
+			limit = { has_modifier = economic_spaceport_2 }
+			remove_modifier = economic_spaceport_2
+		}
+		if = {
+			limit = { has_modifier = economic_spaceport_3 }
+			remove_modifier = economic_spaceport_3
+		}
+		if = {
+			limit = { has_modifier = economic_spaceport_4 }
+			remove_modifier = economic_spaceport_4
+		}
+		if = {
+			limit = { has_modifier = economic_spaceport_5 }
+			remove_modifier = economic_spaceport_5
+		}
+		if = {
+			limit = { has_modifier = economic_spaceport_6 }
+			remove_modifier = economic_spaceport_6
+		}
+		if = {
+			limit = { has_modifier = economic_spaceport_7 }
+			remove_modifier = economic_spaceport_7
+		}
+		if = {
+			limit = { has_modifier = economic_spaceport_8 }
+			remove_modifier = economic_spaceport_8
+		}
+		if = {
+			limit = { has_modifier = economic_spaceport_9 }
+			remove_modifier = economic_spaceport_9
+		}	
+		if = {
+			limit = { has_modifier = stardock_spaceport_1 }
+			remove_modifier = stardock_spaceport_1
+		}	
+		if = {
+			limit = { has_modifier = stardock_spaceport_2 }
+			remove_modifier = stardock_spaceport_2
+		}
+		if = {
+			limit = { has_modifier = stardock_spaceport_3 }
+			remove_modifier = stardock_spaceport_3
+		}
+		if = {
+			limit = { has_modifier = stardock_spaceport_4 }
+			remove_modifier = stardock_spaceport_4
+		}
+		if = {
+			limit = { has_modifier = stardock_spaceport_5 }
+			remove_modifier = stardock_spaceport_5
+		}
+		if = {
+			limit = { has_modifier = stardock_spaceport_6 }
+			remove_modifier = stardock_spaceport_6
+		}
+		if = {
+			limit = { has_modifier = stardock_spaceport_7 }
+			remove_modifier = stardock_spaceport_7
+		}
+		if = {
+			limit = { has_modifier = stardock_spaceport_8 }
+			remove_modifier = stardock_spaceport_8
+		}
+		if = {
+			limit = { has_modifier = stardock_spaceport_9 }
+			remove_modifier = stardock_spaceport_9
+		}		
+		if = {
+			limit = { has_planet_flag = spaceport_kinetic_t2_modifier }
+			remove_planet_flag = spaceport_kinetic_t2_modifier
+		}
+		if = {
+			limit = { has_planet_flag = spaceport_kinetic_t3_modifier }
+			remove_planet_flag = spaceport_kinetic_t3_modifier				
+		}			
+		if = {
+			limit = { has_planet_flag = spaceport_kinetic_t4_modifier }
+			remove_planet_flag = spaceport_kinetic_t4_modifier
+		}			
+		if = {
+			limit = { has_planet_flag = spaceport_kinetic_t5_modifier }
+			remove_planet_flag = spaceport_kinetic_t5_modifier
+		}			
+		if = {
+			limit = { has_planet_flag = spaceport_energy_t2_modifier }
+			remove_planet_flag = spaceport_energy_t2_modifier
+		}			
+		if = {
+			limit = { has_planet_flag = spaceport_energy_t3_modifier }
+			remove_planet_flag = spaceport_energy_t3_modifier
+		}						
+		if = {
+			limit = { has_planet_flag = spaceport_energy_t4_modifier }
+			remove_planet_flag = spaceport_energy_t4_modifier
+		}						
+		if = {
+			limit = { has_planet_flag = spaceport_energy_t5_modifier }
+			remove_planet_flag = spaceport_energy_t5_modifier
+		}						
+		if = {
+			limit = { has_planet_flag = spaceport_explosive_t2_modifier }
+			remove_planet_flag = spaceport_explosive_t2_modifier
+		}						
+		if = {
+			limit = { has_planet_flag = spaceport_explosive_t3_modifier }
+			remove_planet_flag = spaceport_explosive_t3_modifier
+		}									
+		if = {
+			limit = { has_planet_flag = spaceport_explosive_t4_modifier }
+			remove_planet_flag = spaceport_explosive_t4_modifier
+		}									
+		if = {
+			limit = { has_planet_flag = spaceport_explosive_t5_modifier }
+			remove_planet_flag = spaceport_explosive_t5_modifier
+		}											
 	}
 }				
+
 country_event = {
 	id = ex_spaceport_events.4
 	hide_window = yes
@@ -200,102 +463,467 @@ country_event = {
 					has_planet_flag = ex_spaceport_7
 					has_planet_flag = ex_spaceport_8
 					has_planet_flag = ex_spaceport_9
+					has_modifier = economic_spaceport_1
+					has_modifier = economic_spaceport_2
+					has_modifier = economic_spaceport_3
+					has_modifier = economic_spaceport_4
+					has_modifier = economic_spaceport_5
+					has_modifier = economic_spaceport_6
+					has_modifier = economic_spaceport_7
+					has_modifier = economic_spaceport_8
+					has_modifier = economic_spaceport_9
+					has_modifier = stardock_spaceport_1
+					has_modifier = stardock_spaceport_2
+					has_modifier = stardock_spaceport_3
+					has_modifier = stardock_spaceport_4
+					has_modifier = stardock_spaceport_5
+					has_modifier = stardock_spaceport_6
+					has_modifier = stardock_spaceport_7
+					has_modifier = stardock_spaceport_8
+					has_modifier = stardock_spaceport_9	
+					has_planet_flag = spaceport_kinetic_t2_modifier
+					has_planet_flag = spaceport_kinetic_t3_modifier
+					has_planet_flag = spaceport_kinetic_t4_modifier
+					has_planet_flag = spaceport_kinetic_t5_modifier
+					has_planet_flag = spaceport_energy_t2_modifier
+					has_planet_flag = spaceport_energy_t3_modifier
+					has_planet_flag = spaceport_energy_t4_modifier
+					has_planet_flag = spaceport_energy_t5_modifier
+					has_planet_flag = spaceport_explosive_t2_modifier
+					has_planet_flag = spaceport_explosive_t3_modifier
+					has_planet_flag = spaceport_explosive_t4_modifier
+					has_planet_flag = spaceport_explosive_t5_modifier
 				}
 			}	
-			remove_planet_flag = ex_spaceport_1
-			remove_planet_flag = ex_spaceport_2
-			remove_planet_flag = ex_spaceport_3
-			remove_planet_flag = ex_spaceport_4
-			remove_planet_flag = ex_spaceport_5
-			remove_planet_flag = ex_spaceport_6
-			remove_planet_flag = ex_spaceport_7
-			remove_planet_flag = ex_spaceport_8
-			remove_planet_flag = ex_spaceport_9							
+			if = {
+				limit = { has_planet_flag = ex_spaceport_1 }
+				remove_planet_flag = ex_spaceport_1
+			}	
+			if = {
+				limit = { has_planet_flag = ex_spaceport_2 }
+				remove_planet_flag = ex_spaceport_2
+			}
+			if = {
+				limit = { has_planet_flag = ex_spaceport_3 }
+				remove_planet_flag = ex_spaceport_3
+			}
+			if = {
+				limit = { has_planet_flag = ex_spaceport_4 }
+				remove_planet_flag = ex_spaceport_4
+			}
+			if = {
+				limit = { has_planet_flag = ex_spaceport_5 }
+				remove_planet_flag = ex_spaceport_5
+			}
+			if = {
+				limit = { has_planet_flag = ex_spaceport_6 }
+				remove_planet_flag = ex_spaceport_6
+			}
+			if = {
+				limit = { has_planet_flag = ex_spaceport_7 }
+				remove_planet_flag = ex_spaceport_7
+			}
+			if = {
+				limit = { has_planet_flag = ex_spaceport_8 }
+				remove_planet_flag = ex_spaceport_8
+			}
+			if = {
+				limit = { has_planet_flag = ex_spaceport_9 }
+				remove_planet_flag = ex_spaceport_9
+			}	
+			if = {
+				limit = { has_modifier = economic_spaceport_1 }
+				remove_modifier = economic_spaceport_1
+			}	
+			if = {
+				limit = { has_modifier = economic_spaceport_2 }
+				remove_modifier = economic_spaceport_2
+			}
+			if = {
+				limit = { has_modifier = economic_spaceport_3 }
+				remove_modifier = economic_spaceport_3
+			}
+			if = {
+				limit = { has_modifier = economic_spaceport_4 }
+				remove_modifier = economic_spaceport_4
+			}
+			if = {
+				limit = { has_modifier = economic_spaceport_5 }
+				remove_modifier = economic_spaceport_5
+			}
+			if = {
+				limit = { has_modifier = economic_spaceport_6 }
+				remove_modifier = economic_spaceport_6
+			}
+			if = {
+				limit = { has_modifier = economic_spaceport_7 }
+				remove_modifier = economic_spaceport_7
+			}
+			if = {
+				limit = { has_modifier = economic_spaceport_8 }
+				remove_modifier = economic_spaceport_8
+			}
+			if = {
+				limit = { has_modifier = economic_spaceport_9 }
+				remove_modifier = economic_spaceport_9
+			}	
+			if = {
+				limit = { has_modifier = stardock_spaceport_1 }
+				remove_modifier = stardock_spaceport_1
+			}	
+			if = {
+				limit = { has_modifier = stardock_spaceport_2 }
+				remove_modifier = stardock_spaceport_2
+			}
+			if = {
+				limit = { has_modifier = stardock_spaceport_3 }
+				remove_modifier = stardock_spaceport_3
+			}
+			if = {
+				limit = { has_modifier = stardock_spaceport_4 }
+				remove_modifier = stardock_spaceport_4
+			}
+			if = {
+				limit = { has_modifier = stardock_spaceport_5 }
+				remove_modifier = stardock_spaceport_5
+			}
+			if = {
+				limit = { has_modifier = stardock_spaceport_6 }
+				remove_modifier = stardock_spaceport_6
+			}
+			if = {
+				limit = { has_modifier = stardock_spaceport_7 }
+				remove_modifier = stardock_spaceport_7
+			}
+			if = {
+				limit = { has_modifier = stardock_spaceport_8 }
+				remove_modifier = stardock_spaceport_8
+			}
+			if = {
+				limit = { has_modifier = stardock_spaceport_9 }
+				remove_modifier = stardock_spaceport_9
+			}	
+			if = {
+				limit = { has_planet_flag = spaceport_kinetic_t2_modifier }
+				remove_planet_flag = spaceport_kinetic_t2_modifier
+			}
+			if = {
+				limit = { has_planet_flag = spaceport_kinetic_t3_modifier }
+				remove_planet_flag = spaceport_kinetic_t3_modifier				
+			}			
+			if = {
+				limit = { has_planet_flag = spaceport_kinetic_t4_modifier }
+				remove_planet_flag = spaceport_kinetic_t4_modifier
+			}			
+			if = {
+				limit = { has_planet_flag = spaceport_kinetic_t5_modifier }
+				remove_planet_flag = spaceport_kinetic_t5_modifier
+			}			
+			if = {
+				limit = { has_planet_flag = spaceport_energy_t2_modifier }
+				remove_planet_flag = spaceport_energy_t2_modifier
+			}			
+			if = {
+				limit = { has_planet_flag = spaceport_energy_t3_modifier }
+				remove_planet_flag = spaceport_energy_t3_modifier
+			}						
+			if = {
+				limit = { has_planet_flag = spaceport_energy_t4_modifier }
+				remove_planet_flag = spaceport_energy_t4_modifier
+			}						
+			if = {
+				limit = { has_planet_flag = spaceport_energy_t5_modifier }
+				remove_planet_flag = spaceport_energy_t5_modifier
+			}						
+			if = {
+				limit = { has_planet_flag = spaceport_explosive_t2_modifier }
+				remove_planet_flag = spaceport_explosive_t2_modifier
+			}						
+			if = {
+				limit = { has_planet_flag = spaceport_explosive_t3_modifier }
+				remove_planet_flag = spaceport_explosive_t3_modifier
+			}									
+			if = {
+				limit = { has_planet_flag = spaceport_explosive_t4_modifier }
+				remove_planet_flag = spaceport_explosive_t4_modifier
+			}									
+			if = {
+				limit = { has_planet_flag = spaceport_explosive_t5_modifier }
+				remove_planet_flag = spaceport_explosive_t5_modifier
+			}									
 		}
 	}
 }	
 
-planet_event = {
+event = { #this event fires on a monthly pulse
+	id = ex_spaceport_events.6
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		every_country = {
+			limit = {
+				OR = {
+					is_country_type = default
+					is_country_type = fallen_empire
+					is_country_type = awakened_fallen_empire
+				}				
+			}			
+			every_owned_planet = {
+				limit = { has_spaceport = yes }	
+				if = {
+					limit = { 
+						OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
+						NOT = { has_planet_flag = spaceport_kinetic_t2_modifier }
+						owner = { tier_2_kinetics = yes }						
+					}
+					spaceport = { 
+						random_owned_ship = { 
+							add_modifier = { modifier = spaceport_kinetic_t2 days = -1 }
+						}
+					}
+					set_planet_flag = spaceport_kinetic_t2_modifier
+				}
+				if = {
+					limit = { 
+						OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
+						NOT = { has_planet_flag = spaceport_kinetic_t3_modifier }
+						owner = { tier_3_kinetics = yes }
+					}
+					spaceport = { 
+						random_owned_ship = { 
+							remove_modifier = spaceport_kinetic_t2
+							add_modifier = { modifier = spaceport_kinetic_t3 days = -1 }
+						}
+					}	
+					remove_planet_flag = spaceport_kinetic_t2_modifier					
+					set_planet_flag = spaceport_kinetic_t3_modifier					
+				}
+				if = {
+					limit = { 
+						OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
+						NOT = { has_planet_flag = spaceport_kinetic_t4_modifier }
+						owner = { tier_4_kinetics = yes }
+					}
+					spaceport = { 
+						random_owned_ship = { 
+							remove_modifier = spaceport_kinetic_t3
+							add_modifier = { modifier = spaceport_kinetic_t4 days = -1 }
+						}
+					}	
+					remove_planet_flag = spaceport_kinetic_t3_modifier					
+					set_planet_flag = spaceport_kinetic_t4_modifier						
+				}	
+				if = {
+					limit = { 
+						OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
+						NOT = { has_planet_flag = spaceport_kinetic_t5_modifier }
+						owner = { tier_5_kinetics = yes }
+					}
+					spaceport = { 
+						random_owned_ship = { 
+							remove_modifier = spaceport_kinetic_t4
+							add_modifier = { modifier = spaceport_kinetic_t5 days = -1 }
+						}
+					}	
+					remove_planet_flag = spaceport_kinetic_t4_modifier					
+					set_planet_flag = spaceport_kinetic_t5_modifier						
+				}
+				if = {
+					limit = { 
+						OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
+						NOT = { has_planet_flag = spaceport_energy_t2_modifier }
+						owner = { tier_2_energy = yes }							
+					}
+					spaceport = { 
+						random_owned_ship = { 
+							add_modifier = { modifier = spaceport_energy_t2 days = -1 }
+						}
+					}	
+					set_planet_flag = spaceport_energy_t2_modifier
+				}
+				if = {
+					limit = { 
+						OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
+						NOT = { has_planet_flag = spaceport_energy_t3_modifier }
+						owner = { tier_3_energy = yes }			
+					}
+					spaceport = { 
+						random_owned_ship = { 
+							remove_modifier = spaceport_energy_t2
+							add_modifier = { modifier = spaceport_energy_t3 days = -1 }
+						}
+					}	
+					remove_planet_flag = spaceport_energy_t2_modifier					
+					set_planet_flag = spaceport_energy_t3_modifier					
+				}
+				if = {
+					limit = { 
+						OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
+						NOT = { has_planet_flag = spaceport_energy_t4_modifier }
+						owner = { tier_4_energy = yes }			
+					}
+					spaceport = { 
+						random_owned_ship = { 
+							remove_modifier = spaceport_energy_t3
+							add_modifier = { modifier = spaceport_energy_t4 days = -1 }
+						}
+					}	
+					remove_planet_flag = spaceport_energy_t3_modifier					
+					set_planet_flag = spaceport_energy_t4_modifier						
+				}	
+				if = {
+					limit = { 
+						OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
+						NOT = { has_planet_flag = spaceport_energy_t5_modifier }
+						owner = { tier_5_energy = yes }			
+					}
+					spaceport = { 
+						random_owned_ship = { 
+							remove_modifier = spaceport_energy_t4
+							add_modifier = { modifier = spaceport_energy_t5 days = -1 }
+						}
+					}	
+					remove_planet_flag = spaceport_energy_t4_modifier					
+					set_planet_flag = spaceport_energy_t5_modifier						
+				}	
+				if = {
+					limit = { 
+						OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
+						NOT = { has_planet_flag = spaceport_explosive_t2_modifier }
+						owner = { tier_2_explosives = yes }							
+					}
+					spaceport = { 
+						random_owned_ship = { 
+							add_modifier = { modifier = spaceport_explosive_t2 days = -1 }
+						}
+					}	
+					set_planet_flag = spaceport_explosive_t2_modifier	
+				}
+				if = {
+					limit = { 
+						OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
+						NOT = { has_planet_flag = spaceport_explosive_t3_modifier }
+						owner = { tier_3_explosives = yes }		
+					}
+					spaceport = { 
+						random_owned_ship = { 
+							remove_modifier = spaceport_explosive_t2
+							add_modifier = { modifier = spaceport_explosive_t3 days = -1 }
+						}
+					}
+					remove_planet_flag = spaceport_explosive_t2_modifier					
+					set_planet_flag = spaceport_explosive_t3_modifier						
+				}
+				if = {
+					limit = { 
+						OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
+						NOT = { has_planet_flag = spaceport_explosive_t4_modifier }
+						owner = { tier_4_explosives = yes }		
+					}
+					spaceport = { 
+						random_owned_ship = { 
+							remove_modifier = spaceport_explosive_t3
+							add_modifier = { modifier = spaceport_explosive_t4 days = -1 }
+						}
+					}	
+					remove_planet_flag = spaceport_explosive_t3_modifier					
+					set_planet_flag = spaceport_explosive_t4_modifier											
+				}	
+				if = {
+					limit = { 
+						OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
+						NOT = { has_planet_flag = spaceport_explosive_t5_modifier }
+						owner = { tier_5_explosives = yes }		
+					}
+					spaceport = { 
+						random_owned_ship = { 
+							remove_modifier = spaceport_explosive_t4
+							add_modifier = { modifier = spaceport_explosive_t5 days = -1 }
+						}
+					}		
+					remove_planet_flag = spaceport_explosive_t4_modifier					
+					set_planet_flag = spaceport_explosive_t5_modifier											
+				}				
+			}
+		}
+	}	
+}	
+
+planet_event = { #this event adds base spaceport weapons to level 1 spaceports
 	id = ex_spaceport_events.10
 	hide_window = yes
-
-	trigger = {
-		has_spaceport = yes
-		is_spaceport_module_slot_free = 1
-	}
+	is_triggered_only = yes
 
 	immediate = {
 		if = {
-			limit = { has_spaceport_module = projectile_weapon }
-			if = {
-				limit = { owner = { tier_1_kinetics = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_1_tier_1" }
+			limit = { 
+				OR = {
+					has_spaceport_module = economic_spaceport_kinetic
+					has_spaceport_module = economic_spaceport_energy
+					has_spaceport_module = economic_spaceport_explosives
+					
+				}
 			}	
-			if = {
-				limit = { owner = { tier_2_kinetics = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_1_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_kinetics = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_1_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_kinetics = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_1_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_kinetics = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_1_tier_5" }
-			}
+			set_spaceport_module = { slot = 1 module = "spaceport_kinetic_weapon" }
 		}	
 		if = {
-			limit = { has_spaceport_module = laser_weapon }
-			if = {
-				limit = { owner = { tier_1_energy = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_1_tier_1" }
+			limit = { 
+				OR = {
+					has_spaceport_module = stardock_spaceport_kinetic
+					has_spaceport_module = stardock_spaceport_energy
+					has_spaceport_module = stardock_spaceport_explosives
+					
+				}
 			}	
-			if = {
-				limit = { owner = { tier_2_energy = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_1_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_energy = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_1_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_energy = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_1_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_energy = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_1_tier_5" }
-			}
+			set_spaceport_module = { slot = 1 module = "spaceport_energy_weapon" }
 		}	
 		if = {
-			limit = { has_spaceport_module = missile_weapon }
-			if = {
-				limit = { owner = { tier_1_explosives = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_1_tier_1" }
+			limit = { 
+				OR = {
+					has_spaceport_module = defensive_spaceport_kinetic
+					has_spaceport_module = defensive_spaceport_energy
+					has_spaceport_module = defensive_spaceport_explosives
+					
+				}
 			}	
-			if = {
-				limit = { owner = { tier_2_explosives = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_1_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_explosives = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_1_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_explosives = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_1_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_explosives = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_1_tier_5" }
-			}
-		}					
+			set_spaceport_module = { slot = 1 module = "spaceport_explosive_weapon" }
+		}	
 		set_planet_flag = ex_spaceport_1
-		
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = economic_spaceport_kinetic
+					has_spaceport_module = economic_spaceport_energy
+					has_spaceport_module = economic_spaceport_explosives
+				}
+			}
+			add_modifier = { modifier = economic_spaceport_1 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = stardock_spaceport_kinetic
+					has_spaceport_module = stardock_spaceport_energy
+					has_spaceport_module = stardock_spaceport_explosives
+				}
+			}
+			add_modifier = { modifier = stardock_spaceport_1 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = defensive_spaceport_kinetic
+					has_spaceport_module = defensive_spaceport_energy
+					has_spaceport_module = defensive_spaceport_explosives
+				}
+			}
+			spaceport = { 
+				random_owned_ship = { 
+					add_modifier = { modifier = defensive_spaceport_1 days = -1 }
+				}
+			}	
+		}			
 	}
 }
 
@@ -319,103 +947,46 @@ planet_event = {
 	}
 
 	immediate = {
-		if = {
-			limit = { has_spaceport_module = projectile_weapon }
-			remove_level_1_core_module_kinetic = yes
-			if = {
-				limit = { owner = { tier_1_kinetics = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_2_tier_1" }				
-			}	
-			if = {
-				limit = { owner = { tier_2_kinetics = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_2_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_kinetics = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_2_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_kinetics = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_2_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_kinetics = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_2_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = laser_weapon }
-			remove_level_1_core_module_energy = yes
-			if = {
-				limit = { owner = { tier_1_energy = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_2_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_energy = yes } }
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_2_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_2_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_2_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_2_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = missile_weapon }
-			remove_level_1_core_module_explosives = yes
-			if = {
-				limit = { owner = { tier_1_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_2_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_2_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_2_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_2_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_2_tier_5" }
-			}
-		}	
-		if = {
-			limit = {
-				OR = {
-					has_planet_flag = edict_economic_spaceport_in_effect
-					has_planet_flag = game_start_economic_spaceport
-					sector_controlled = yes
-				}
-			}
-			set_spaceport_module = { slot = 2 module = "economic_spaceport_module_level_2" }
-		}	
-		if = {
-			limit = {
-				has_planet_flag = edict_stardock_spaceport_in_effect
-			}
-			set_spaceport_module = { slot = 2 module = "stardock_shipyard_module_level_2" }
-		}		
-		if = {
-			limit = {
-				has_planet_flag = edict_defensive_spaceport_in_effect
-			}
-			set_spaceport_module = { slot = 2 module = "fortress_spaceport_module_level_2" }
-		}					
 		remove_planet_flag = ex_spaceport_1
 		set_planet_flag = ex_spaceport_2
-		planet_event = { id = ex_spaceport_events.100 }
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = economic_spaceport_kinetic
+					has_spaceport_module = economic_spaceport_energy
+					has_spaceport_module = economic_spaceport_explosives
+				}
+			}
+			remove_modifier = economic_spaceport_1
+			add_modifier = { modifier = economic_spaceport_2 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = stardock_spaceport_kinetic
+					has_spaceport_module = stardock_spaceport_energy
+					has_spaceport_module = stardock_spaceport_explosives
+				}
+			}
+			remove_modifier = stardock_spaceport_1
+			add_modifier = { modifier = stardock_spaceport_2 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = defensive_spaceport_kinetic
+					has_spaceport_module = defensive_spaceport_energy
+					has_spaceport_module = defensive_spaceport_explosives
+				}
+			}
+			spaceport = { 
+				random_owned_ship = { 
+					remove_modifier = defensive_spaceport_1
+					add_modifier = { modifier = defensive_spaceport_2 days = -1 }
+				}
+			}	
+		}
+		#planet_event = { id = ex_spaceport_events.100 }
 	}
 }
 
@@ -438,106 +1009,46 @@ planet_event = {
 	}
 
 	immediate = {
-		if = {
-			limit = { has_spaceport_module = projectile_weapon }
-			remove_level_2_core_module_kinetic = yes
-			if = {
-				limit = { owner = { tier_1_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_3_tier_1" }				
-			}	
-			if = {
-				limit = { owner = { tier_2_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_3_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_3_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_3_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_3_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = laser_weapon }
-			remove_level_2_core_module_energy = yes
-			if = {
-				limit = { owner = { tier_1_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_3_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_3_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_3_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_3_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_3_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = missile_weapon }
-			remove_level_2_core_module_explosives = yes
-			if = {
-				limit = { owner = { tier_1_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_3_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_3_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_3_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_3_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_3_tier_5" }
-			}
-		}	
-		if = {
-			limit = {
-				OR = {
-					has_planet_flag = edict_economic_spaceport_in_effect
-					has_planet_flag = game_start_economic_spaceport
-					sector_controlled = yes
-				}
-			}
-			remove_spaceport_module = economic_spaceport_module_level_2
-			set_spaceport_module = { slot = 2 module = "economic_spaceport_module_level_3" }
-		}	
-		if = {
-			limit = {
-				has_planet_flag = edict_stardock_spaceport_in_effect
-			}
-			remove_spaceport_module = stardock_shipyard_module_level_2
-			set_spaceport_module = { slot = 2 module = "stardock_shipyard_module_level_3" }
-		}		
-		if = {
-			limit = {
-				has_planet_flag = edict_defensive_spaceport_in_effect
-			}
-			remove_spaceport_module = fortress_spaceport_module_level_2
-			set_spaceport_module = { slot = 2 module = "fortress_spaceport_module_level_3" }
-		}			
 		remove_planet_flag = ex_spaceport_2
 		set_planet_flag = ex_spaceport_3
-		planet_event = { id = ex_spaceport_events.100 }
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = economic_spaceport_kinetic
+					has_spaceport_module = economic_spaceport_energy
+					has_spaceport_module = economic_spaceport_explosives
+				}
+			}
+			remove_modifier = economic_spaceport_2
+			add_modifier = { modifier = economic_spaceport_3 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = stardock_spaceport_kinetic
+					has_spaceport_module = stardock_spaceport_energy
+					has_spaceport_module = stardock_spaceport_explosives
+				}
+			}
+			remove_modifier = stardock_spaceport_2
+			add_modifier = { modifier = stardock_spaceport_3 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = defensive_spaceport_kinetic
+					has_spaceport_module = defensive_spaceport_energy
+					has_spaceport_module = defensive_spaceport_explosives
+				}
+			}
+			spaceport = { 
+				random_owned_ship = { 
+					remove_modifier = defensive_spaceport_2
+					add_modifier = { modifier = defensive_spaceport_3 days = -1 }
+				}
+			}	
+		}
+		#planet_event = { id = ex_spaceport_events.100 }
 	}
 }
 
@@ -559,106 +1070,46 @@ planet_event = {
 	}
 
 	immediate = {
-		if = {
-			limit = { has_spaceport_module = projectile_weapon }
-			remove_level_3_core_module_kinetic = yes
-			if = {
-				limit = { owner = { tier_1_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_4_tier_1" }				
-			}	
-			if = {
-				limit = { owner = { tier_2_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_4_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_4_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_4_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_4_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = laser_weapon }
-			remove_level_3_core_module_energy = yes
-			if = {
-				limit = { owner = { tier_1_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_4_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_4_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_4_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_4_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_4_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = missile_weapon }
-			remove_level_3_core_module_explosives = yes
-			if = {
-				limit = { owner = { tier_1_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_4_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_4_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_4_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_4_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_4_tier_5" }
-			}
-		}	
-		if = {
-			limit = {
-				OR = {
-					has_planet_flag = edict_economic_spaceport_in_effect
-					has_planet_flag = game_start_economic_spaceport
-					sector_controlled = yes
-				}
-			}
-			remove_spaceport_module = economic_spaceport_module_level_3
-			set_spaceport_module = { slot = 2 module = "economic_spaceport_module_level_4" }
-		}	
-		if = {
-			limit = {
-				has_planet_flag = edict_stardock_spaceport_in_effect
-			}
-			remove_spaceport_module = stardock_shipyard_module_level_3
-			set_spaceport_module = { slot = 2 module = "stardock_shipyard_module_level_4" }
-		}		
-		if = {
-			limit = {
-				has_planet_flag = edict_defensive_spaceport_in_effect
-			}
-			remove_spaceport_module = fortress_spaceport_module_level_3
-			set_spaceport_module = { slot = 2 module = "fortress_spaceport_module_level_4" }
-		}			
 		remove_planet_flag = ex_spaceport_3
 		set_planet_flag = ex_spaceport_4
-		planet_event = { id = ex_spaceport_events.100 }
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = economic_spaceport_kinetic
+					has_spaceport_module = economic_spaceport_energy
+					has_spaceport_module = economic_spaceport_explosives
+				}
+			}
+			remove_modifier = economic_spaceport_3
+			add_modifier = { modifier = economic_spaceport_4 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = stardock_spaceport_kinetic
+					has_spaceport_module = stardock_spaceport_energy
+					has_spaceport_module = stardock_spaceport_explosives
+				}
+			}
+			remove_modifier = stardock_spaceport_3
+			add_modifier = { modifier = stardock_spaceport_4 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = defensive_spaceport_kinetic
+					has_spaceport_module = defensive_spaceport_energy
+					has_spaceport_module = defensive_spaceport_explosives
+				}
+			}
+			spaceport = { 
+				random_owned_ship = { 
+					remove_modifier = defensive_spaceport_3
+					add_modifier = { modifier = defensive_spaceport_4 days = -1 }
+				}
+			}	
+		}
+		#planet_event = { id = ex_spaceport_events.100 }
 	}
 }
 
@@ -679,106 +1130,46 @@ planet_event = {
 	}
 
 	immediate = {
-		if = {
-			limit = { has_spaceport_module = projectile_weapon }
-			remove_level_4_core_module_kinetic = yes
-			if = {
-				limit = { owner = { tier_1_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_5_tier_1" }				
-			}	
-			if = {
-				limit = { owner = { tier_2_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_5_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_5_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_5_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_5_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = laser_weapon }
-			remove_level_4_core_module_energy = yes
-			if = {
-				limit = { owner = { tier_1_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_5_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_5_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_5_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_5_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_5_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = missile_weapon }
-			remove_level_4_core_module_explosives = yes
-			if = {
-				limit = { owner = { tier_1_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_5_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_5_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_5_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_5_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_5_tier_5" }
-			}
-		}	
-		if = {
-			limit = {
-				OR = {
-					has_planet_flag = edict_economic_spaceport_in_effect
-					has_planet_flag = game_start_economic_spaceport
-					sector_controlled = yes
-				}
-			}
-			remove_spaceport_module = economic_spaceport_module_level_4
-			set_spaceport_module = { slot = 2 module = "economic_spaceport_module_level_5" }
-		}	
-		if = {
-			limit = {
-				has_planet_flag = edict_stardock_spaceport_in_effect
-			}
-			remove_spaceport_module = stardock_shipyard_module_level_4
-			set_spaceport_module = { slot = 2 module = "stardock_shipyard_module_level_5" }
-		}		
-		if = {
-			limit = {
-				has_planet_flag = edict_defensive_spaceport_in_effect
-			}
-			remove_spaceport_module = fortress_spaceport_module_level_4
-			set_spaceport_module = { slot = 2 module = "fortress_spaceport_module_level_5" }
-		}			
 		remove_planet_flag = ex_spaceport_4
 		set_planet_flag = ex_spaceport_5
-		planet_event = { id = ex_spaceport_events.100 }
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = economic_spaceport_kinetic
+					has_spaceport_module = economic_spaceport_energy
+					has_spaceport_module = economic_spaceport_explosives
+				}
+			}
+			remove_modifier = economic_spaceport_4
+			add_modifier = { modifier = economic_spaceport_5 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = stardock_spaceport_kinetic
+					has_spaceport_module = stardock_spaceport_energy
+					has_spaceport_module = stardock_spaceport_explosives
+				}
+			}
+			remove_modifier = stardock_spaceport_4
+			add_modifier = { modifier = stardock_spaceport_5 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = defensive_spaceport_kinetic
+					has_spaceport_module = defensive_spaceport_energy
+					has_spaceport_module = defensive_spaceport_explosives
+				}
+			}
+			spaceport = { 
+				random_owned_ship = { 
+					remove_modifier = defensive_spaceport_4
+					add_modifier = { modifier = defensive_spaceport_5 days = -1 }
+				}
+			}	
+		}
+		#planet_event = { id = ex_spaceport_events.100 }
 	}
 }
 
@@ -798,106 +1189,46 @@ planet_event = {
 	}
 
 	immediate = {
-		if = {
-			limit = { has_spaceport_module = projectile_weapon }
-			remove_level_5_core_module_kinetic = yes
-			if = {
-				limit = { owner = { tier_1_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_6_tier_1" }				
-			}	
-			if = {
-				limit = { owner = { tier_2_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_6_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_6_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_6_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_6_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = laser_weapon }
-			remove_level_5_core_module_energy = yes
-			if = {
-				limit = { owner = { tier_1_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_6_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_6_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_6_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_6_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_6_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = missile_weapon }
-			remove_level_5_core_module_explosives = yes
-			if = {
-				limit = { owner = { tier_1_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_6_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_6_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_6_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_explosives = yes } }			
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_6_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_6_tier_5" }
-			}
-		}	
-		if = {
-			limit = {
-				OR = {
-					has_planet_flag = edict_economic_spaceport_in_effect
-					has_planet_flag = game_start_economic_spaceport
-					sector_controlled = yes
-				}
-			}
-			remove_spaceport_module = economic_spaceport_module_level_5
-			set_spaceport_module = { slot = 2 module = "economic_spaceport_module_level_6" }
-		}	
-		if = {
-			limit = {
-				has_planet_flag = edict_stardock_spaceport_in_effect
-			}
-			remove_spaceport_module = stardock_shipyard_module_level_5
-			set_spaceport_module = { slot = 2 module = "stardock_shipyard_module_level_6" }
-		}		
-		if = {
-			limit = {
-				has_planet_flag = edict_defensive_spaceport_in_effect
-			}
-			remove_spaceport_module = fortress_spaceport_module_level_5
-			set_spaceport_module = { slot = 2 module = "fortress_spaceport_module_level_6" }
-		}			
 		remove_planet_flag = ex_spaceport_5
 		set_planet_flag = ex_spaceport_6
-		planet_event = { id = ex_spaceport_events.100 }
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = economic_spaceport_kinetic
+					has_spaceport_module = economic_spaceport_energy
+					has_spaceport_module = economic_spaceport_explosives
+				}
+			}
+			remove_modifier = economic_spaceport_5
+			add_modifier = { modifier = economic_spaceport_6 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = stardock_spaceport_kinetic
+					has_spaceport_module = stardock_spaceport_energy
+					has_spaceport_module = stardock_spaceport_explosives
+				}
+			}
+			remove_modifier = stardock_spaceport_5
+			add_modifier = { modifier = stardock_spaceport_6 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = defensive_spaceport_kinetic
+					has_spaceport_module = defensive_spaceport_energy
+					has_spaceport_module = defensive_spaceport_explosives
+				}
+			}
+			spaceport = { 
+				random_owned_ship = { 
+					remove_modifier = defensive_spaceport_5
+					add_modifier = { modifier = defensive_spaceport_6 days = -1 }
+				}
+			}	
+		}
+		#planet_event = { id = ex_spaceport_events.100 }
 	}
 }
 
@@ -916,103 +1247,6 @@ planet_event = {
 	}
 
 	immediate = {
-		if = {
-			limit = { has_spaceport_module = projectile_weapon }
-			remove_level_6_core_module_kinetic = yes
-			if = {
-				limit = { owner = { tier_1_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_7_tier_1" }				
-			}	
-			if = {
-				limit = { owner = { tier_2_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_7_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_7_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_7_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_7_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = laser_weapon }
-			remove_level_6_core_module_energy = yes
-			if = {
-				limit = { owner = { tier_1_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_7_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_7_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_7_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_7_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_7_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = missile_weapon }
-			remove_level_6_core_module_explosives = yes
-			if = {
-				limit = { owner = { tier_1_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_7_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_7_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_7_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_7_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_7_tier_5" }
-			}
-		}		
-		if = {
-			limit = {
-				OR = {
-					has_planet_flag = edict_economic_spaceport_in_effect
-					has_planet_flag = game_start_economic_spaceport
-					sector_controlled = yes
-				}
-			}
-			remove_spaceport_module = economic_spaceport_module_level_6
-			set_spaceport_module = { slot = 2 module = "economic_spaceport_module_level_7" }
-		}	
-		if = {
-			limit = {
-				has_planet_flag = edict_stardock_spaceport_in_effect
-			}
-			remove_spaceport_module = stardock_shipyard_module_level_6
-			set_spaceport_module = { slot = 2 module = "stardock_shipyard_module_level_7" }
-		}		
-		if = {
-			limit = {
-				has_planet_flag = edict_defensive_spaceport_in_effect
-			}
-			remove_spaceport_module = fortress_spaceport_module_level_6
-			set_spaceport_module = { slot = 2 module = "fortress_spaceport_module_level_7" }
-		}			
 		remove_planet_flag = ex_spaceport_6
 		set_planet_flag = ex_spaceport_7
 		spaceport = { 
@@ -1020,7 +1254,45 @@ planet_event = {
 				remove_modifier = spaceport_level_6
 				add_modifier = { modifier = spaceport_level_7 days = -1 }
 			}
-		}		
+		}				
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = economic_spaceport_kinetic
+					has_spaceport_module = economic_spaceport_energy
+					has_spaceport_module = economic_spaceport_explosives
+				}
+			}
+			remove_modifier = economic_spaceport_6
+			add_modifier = { modifier = economic_spaceport_7 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = stardock_spaceport_kinetic
+					has_spaceport_module = stardock_spaceport_energy
+					has_spaceport_module = stardock_spaceport_explosives
+				}
+			}
+			remove_modifier = stardock_spaceport_6
+			add_modifier = { modifier = stardock_spaceport_7 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = defensive_spaceport_kinetic
+					has_spaceport_module = defensive_spaceport_energy
+					has_spaceport_module = defensive_spaceport_explosives
+				}
+			}
+			spaceport = { 
+				random_owned_ship = { 
+					remove_modifier = defensive_spaceport_6
+					add_modifier = { modifier = defensive_spaceport_7 days = -1 }
+				}
+			}	
+		}
+		#planet_event = { id = ex_spaceport_events.100 }
 	}
 }
 
@@ -1038,103 +1310,6 @@ planet_event = {
 	}
 
 	immediate = {
-		if = {
-			limit = { has_spaceport_module = projectile_weapon }
-			remove_level_7_core_module_kinetic = yes
-			if = {
-				limit = { owner = { tier_1_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_8_tier_1" }				
-			}	
-			if = {
-				limit = { owner = { tier_2_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_8_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_8_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_8_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_8_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = laser_weapon }
-			remove_level_7_core_module_energy = yes
-			if = {
-				limit = { owner = { tier_1_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_8_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_8_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_8_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_8_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_8_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = missile_weapon }
-			remove_level_7_core_module_explosives = yes
-			if = {
-				limit = { owner = { tier_1_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_8_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_8_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_8_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_8_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_8_tier_5" }
-			}
-		}	
-		if = {
-			limit = {
-				OR = {
-					has_planet_flag = edict_economic_spaceport_in_effect
-					has_planet_flag = game_start_economic_spaceport
-					sector_controlled = yes
-				}
-			}
-			remove_spaceport_module = economic_spaceport_module_level_7
-			set_spaceport_module = { slot = 2 module = "economic_spaceport_module_level_8" }
-		}	
-		if = {
-			limit = {
-				has_planet_flag = edict_stardock_spaceport_in_effect
-			}
-			remove_spaceport_module = stardock_shipyard_module_level_7
-			set_spaceport_module = { slot = 2 module = "stardock_shipyard_module_level_8" }
-		}		
-		if = {
-			limit = {
-				has_planet_flag = edict_defensive_spaceport_in_effect
-			}
-			remove_spaceport_module = fortress_spaceport_module_level_7
-			set_spaceport_module = { slot = 2 module = "fortress_spaceport_module_level_8" }
-		}			
 		remove_planet_flag = ex_spaceport_7
 		set_planet_flag = ex_spaceport_8
 		spaceport = { 
@@ -1142,8 +1317,45 @@ planet_event = {
 				remove_modifier = spaceport_level_7
 				add_modifier = { modifier = spaceport_level_8 days = -1 }
 			}
-		}		
-		planet_event = { id = ex_spaceport_events.100 }
+		}				
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = economic_spaceport_kinetic
+					has_spaceport_module = economic_spaceport_energy
+					has_spaceport_module = economic_spaceport_explosives
+				}
+			}
+			remove_modifier = economic_spaceport_7
+			add_modifier = { modifier = economic_spaceport_8 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = stardock_spaceport_kinetic
+					has_spaceport_module = stardock_spaceport_energy
+					has_spaceport_module = stardock_spaceport_explosives
+				}
+			}
+			remove_modifier = stardock_spaceport_7
+			add_modifier = { modifier = stardock_spaceport_8 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = defensive_spaceport_kinetic
+					has_spaceport_module = defensive_spaceport_energy
+					has_spaceport_module = defensive_spaceport_explosives
+				}
+			}
+			spaceport = { 
+				random_owned_ship = { 
+					remove_modifier = defensive_spaceport_7
+					add_modifier = { modifier = defensive_spaceport_8 days = -1 }
+				}
+			}	
+		}
+		#planet_event = { id = ex_spaceport_events.100 }
 	}
 }
 
@@ -1157,104 +1369,7 @@ planet_event = {
 		NOT = { has_planet_flag = ex_spaceport_9 }
 	}
 
-	immediate = {
-		if = {
-			limit = { has_spaceport_module = projectile_weapon }
-			remove_level_8_core_module_kinetic = yes
-			if = {
-				limit = { owner = { tier_1_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_9_tier_1" }				
-			}	
-			if = {
-				limit = { owner = { tier_2_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_9_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_9_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_9_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_kinetics = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_kinetic_level_9_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = laser_weapon }
-			remove_level_8_core_module_energy = yes
-			if = {
-				limit = { owner = { tier_1_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_9_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_9_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_9_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_9_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_energy = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_energy_level_9_tier_5" }
-			}
-		}	
-		if = {
-			limit = { has_spaceport_module = missile_weapon }
-			remove_level_8_core_module_explosives = yes
-			if = {
-				limit = { owner = { tier_1_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_9_tier_1" }
-			}	
-			if = {
-				limit = { owner = { tier_2_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_9_tier_2" }
-			}				
-			if = {
-				limit = { owner = { tier_3_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_9_tier_3" }
-			}				
-			if = {
-				limit = { owner = { tier_4_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_9_tier_4" }
-			}	
-			if = {
-				limit = { owner = { tier_5_explosives = yes } }				
-				set_spaceport_module = { slot = 1 module = "space_port_core_module_explosives_level_9_tier_5" }
-			}
-		}	
-		if = {
-			limit = {
-				OR = {
-					has_planet_flag = edict_economic_spaceport_in_effect
-					has_planet_flag = game_start_economic_spaceport
-					sector_controlled = yes
-				}
-			}
-			remove_spaceport_module = economic_spaceport_module_level_7
-			set_spaceport_module = { slot = 2 module = "economic_spaceport_module_level_9" }
-		}	
-		if = {
-			limit = {
-				has_planet_flag = edict_stardock_spaceport_in_effect
-			}
-			remove_spaceport_module = stardock_shipyard_module_level_7
-			set_spaceport_module = { slot = 2 module = "stardock_shipyard_module_level_9" }
-		}		
-		if = {
-			limit = {
-				has_planet_flag = edict_defensive_spaceport_in_effect
-			}
-			remove_spaceport_module = fortress_spaceport_module_level_7
-			set_spaceport_module = { slot = 2 module = "fortress_spaceport_module_level_9" }
-		}			
+		immediate = {
 		remove_planet_flag = ex_spaceport_8
 		set_planet_flag = ex_spaceport_9
 		spaceport = { 
@@ -1262,140 +1377,44 @@ planet_event = {
 				remove_modifier = spaceport_level_8
 				add_modifier = { modifier = spaceport_level_9 days = -1 }
 			}
+		}				
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = economic_spaceport_kinetic
+					has_spaceport_module = economic_spaceport_energy
+					has_spaceport_module = economic_spaceport_explosives
+				}
+			}
+			remove_modifier = economic_spaceport_8
+			add_modifier = { modifier = economic_spaceport_9 days = -1 }
 		}
-		planet_event = { id = ex_spaceport_events.100 }
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = stardock_spaceport_kinetic
+					has_spaceport_module = stardock_spaceport_energy
+					has_spaceport_module = stardock_spaceport_explosives
+				}
+			}
+			remove_modifier = stardock_spaceport_8
+			add_modifier = { modifier = stardock_spaceport_9 days = -1 }
+		}
+		if = {
+			limit = { 
+				OR = {
+					has_spaceport_module = defensive_spaceport_kinetic
+					has_spaceport_module = defensive_spaceport_energy
+					has_spaceport_module = defensive_spaceport_explosives
+				}
+			}
+			spaceport = { 
+				random_owned_ship = { 
+					remove_modifier = defensive_spaceport_8
+					add_modifier = { modifier = defensive_spaceport_9 days = -1 }
+				}
+			}	
+		}
+		#planet_event = { id = ex_spaceport_events.100 }
 	}
 }
-
-planet_event = {
-	id = ex_spaceport_events.100 #this is a hub event, used to fill up empty slots. It fires tertiary events instead of using MTTH to preserve performance.
-	hide_window = yes
-	is_triggered_only
-
-	immediate = {
-		if = {
-			limit = {
-				NOT = { has_planet_flag = spaceport_specialization_conversion_in_effect }
-			}			
-			if = {
-				limit = {					
-					is_spaceport_module_slot_free = 3		
-				}	
-				if = {
-					limit = { has_spaceport_module = economic_spaceport_module_level_3 }
-					set_economic_module_slot_3 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = stardock_shipyard_module_level_3 }
-					set_stardock_module_slot_3 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = fortress_spaceport_module_level_3 }
-					set_defensive_module_slot_3 = yes					
-				}				
-			}	
-			if = {
-				limit = {					
-					is_spaceport_module_slot_free = 4		
-				}	
-				if = {
-					limit = { has_spaceport_module = economic_spaceport_module_level_4 }
-					set_economic_module_slot_4 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = stardock_shipyard_module_level_4 }
-					set_stardock_module_slot_4 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = fortress_spaceport_module_level_4 }
-					set_defensive_module_slot_4 = yes					
-				}				
-			}	
-			if = {
-				limit = {					
-					is_spaceport_module_slot_free = 5		
-				}	
-				if = {
-					limit = { has_spaceport_module = economic_spaceport_module_level_5 }
-					set_economic_module_slot_5 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = stardock_shipyard_module_level_5 }
-					set_stardock_module_slot_5 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = fortress_spaceport_module_level_5 }
-					set_defensive_module_slot_5 = yes					
-				}				
-			}	
-			if = {
-				limit = {					
-					is_spaceport_module_slot_free = 6		
-				}	
-				if = {
-					limit = { has_spaceport_module = economic_spaceport_module_level_6 }
-					set_economic_module_slot_6 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = stardock_shipyard_module_level_6 }
-					set_stardock_module_slot_6 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = fortress_spaceport_module_level_6 }
-					set_defensive_module_slot_6 = yes					
-				}				
-			}		
-			if = {
-				limit = {					
-					is_spaceport_module_slot_free = 7		
-				}	
-				if = {
-					limit = { has_spaceport_module = economic_spaceport_module_level_7 }
-					set_economic_module_slot_7 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = stardock_shipyard_module_level_7 }
-					set_stardock_module_slot_7 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = fortress_spaceport_module_level_7 }
-					set_defensive_module_slot_7 = yes					
-				}				
-			}		
-			if = {
-				limit = {					
-					is_spaceport_module_slot_free = 8		
-				}	
-				if = {
-					limit = { has_spaceport_module = economic_spaceport_module_level_8 }
-					set_economic_module_slot_8 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = stardock_shipyard_module_level_8 }
-					set_stardock_module_slot_8 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = fortress_spaceport_module_level_8 }
-					set_defensive_module_slot_8 = yes					
-				}				
-			}	
-			if = {
-				limit = {					
-					is_spaceport_module_slot_free = 9		
-				}	
-				if = {
-					limit = { has_spaceport_module = economic_spaceport_module_level_9 }
-					set_economic_module_slot_9 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = stardock_shipyard_module_level_9 }
-					set_stardock_module_slot_9 = yes					
-				}		
-				if = {
-					limit = { has_spaceport_module = fortress_spaceport_module_level_9 }
-					set_defensive_module_slot_9 = yes					
-				}				
-			}				
-		}
-	}
-}	
