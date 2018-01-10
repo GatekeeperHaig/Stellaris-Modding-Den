@@ -1,0 +1,2233 @@
+### This file changes vanlla leviathans. It includes only pertinent events.
+
+namespace = guardian
+
+@tier1influencecontact = 7
+@tier1influencecontactxenophile = 8
+@tier1influencecontactmin = 20
+@tier1influencecontactmax = 80
+
+@tier2influencecontact = 10
+@tier2influencecontactxenophile = 12
+@tier2influencecontactmin = 40
+@tier2influencecontactmax = 100
+
+@tier1materialreward = 6
+@tier1materialmin = 100
+@tier1materialmax = 500
+@tier2materialreward = 12
+@tier2materialmin = 150
+@tier2materialmax = 1000
+@tier3materialreward = 18
+@tier3materialmin = 250
+@tier3materialmax = 1500
+@tier4materialreward = 24
+@tier4materialmin = 350
+@tier4materialmax = 2000
+@tier5materialreward = 48
+@tier5materialmin = 700
+@tier5materialmax = 4000
+
+@tier1influencereward = 6
+@tier1influencemin = 40
+@tier1influencemax = 100
+@tier2influencereward = 12
+@tier2influencemin = 80
+@tier2influencemax = 175
+@tier3influencereward = 18
+@tier3influencemin = 125
+@tier3influencemax = 250
+@tier4influencereward = 24
+@tier4influencemin = 150
+@tier4influencemax = 300
+@tier5influencereward = 36
+@tier5influencemin = 250
+@tier5influencemax = 500
+@tier6influencereward = 48
+@tier6influencemin = 300
+@tier6influencemax = 600
+
+@tier1researchreward = 6
+@tier1researchmin = 60
+@tier1researchmax = 150
+@tier2researchreward = 12
+@tier2researchmin = 90
+@tier2researchmax = 250
+@tier3researchreward = 18
+@tier3researchmin = 120
+@tier3researchmax = 350
+@tier4researchreward = 24
+@tier4researchmin = 150
+@tier4researchmax = 500
+@tier5researchreward = 48
+@tier5researchmin = 300
+@tier5researchmax = 1000
+
+# Stellarite system is updated and Gaia world unlocks
+ship_event = {
+	id = guardian.1018
+	title = guardian.1000.name
+	desc = {
+		trigger = {
+			hidden:owner = {
+				switch = {
+					trigger = has_country_flag
+					stellarite_project_success = { text = guardian.1018.desc }
+					default = { text = guardian.1018.alt.desc }
+				}
+			}
+		}
+	}
+	picture = GFX_evt_star_yellow
+	show_sound = event_radio_chatter
+	location = root
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_system = {
+			limit = {
+				has_star_flag = guardians_stellarite_system
+			}
+			save_event_target_as = guardians_stellarite_home_system
+			random_system_planet = {
+				limit = {
+					is_planet_class = pc_frozen
+				}
+				save_event_target_as = stellarite_rich_planet
+			}
+		}
+		random_list = { #chance increased from 70 to 80
+			80 = { owner = { set_country_flag = stellarite_project_success } }
+			20 = {
+				root = {
+					kill_leader = { type = scientist show_notification = no }
+					fleet = {
+						destroy_fleet = this
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		custom_tooltip = guardian.1018.a.tooltip
+		trigger = {
+			owner = {
+				has_country_flag = stellarite_project_success
+			}
+		}
+		hidden_effect = {
+			owner = { remove_country_flag = stellarite_project_success }
+			random_system = {
+				limit = {
+					has_star_flag = guardians_stellarite_system
+				}
+				random_system_planet = {
+					limit = {
+						is_star = yes
+					}
+					change_planet_size = 12
+					spawn_sun_temperature_effect = yes
+				}
+				every_system_planet = {
+					limit = {
+						is_star = no
+						is_asteroid = no
+					}
+					spawn_planet_temperature_effect = yes
+					remove_modifier = stellarite_low_temp
+					if = {
+						limit = {
+							is_planet_class = pc_frozen
+							NOT = { has_planet_flag = stellarite_terraformed }
+							solar_system = {
+								NOT = { has_star_flag = gaia_planet_gained }
+							}
+						}
+						change_pc = pc_gaia
+						change_planet_size = 25 #added size increase
+						set_planet_flag = stellarite_terraformed
+						reroll_planet = yes
+						solar_system = { set_star_flag = gaia_planet_gained }
+						else = {
+							if = {
+								limit = {
+									is_planet_class = pc_frozen
+									NOT = { has_planet_flag = stellarite_terraformed }
+									solar_system = {
+										has_star_flag = gaia_planet_gained
+									}
+								}
+								increase_planet_temperature = yes
+								set_planet_flag = stellarite_terraformed
+								else = {
+									increase_planet_temperature = yes
+									set_planet_flag = stellarite_terraformed
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = UNFORTUNATE
+		custom_tooltip = guardian.1018.b.tooltip
+		trigger = {
+			owner = {
+				NOT = { has_country_flag = stellarite_project_success }
+			}
+		}
+		hidden_effect = {
+			random_system = {
+				limit = {
+					has_star_flag = guardians_stellarite_system
+				}
+				random_system_planet = {
+					limit = {
+						is_star = yes
+					}
+					change_planet_size = 8
+					planet_event = { id = guardian.1019 }
+				}
+				every_system_planet = {
+					limit = {
+						is_star = no
+						is_asteroid = no
+					}
+					spawn_planet_temperature_effect = yes
+					remove_modifier = stellarite_low_temp
+					if = {
+						limit = {
+							is_planet_class = pc_frozen
+							NOT = { has_planet_flag = stellarite_terraformed }
+						}
+						change_pc = pc_tundra
+						change_planet_size = 25 #added size increase
+						set_planet_flag = stellarite_terraformed
+						reroll_planet = yes
+						else = {
+							if = {
+								limit = {
+									is_planet_class = pc_frozen
+									NOT = { has_planet_flag = stellarite_terraformed }
+									solar_system = {
+										has_star_flag = gaia_planet_gained
+									}
+								}
+								increase_planet_temperature = yes
+								set_planet_flag = stellarite_terraformed
+								reroll_planet = yes
+								else = {
+									increase_planet_temperature = yes
+									set_planet_flag = stellarite_terraformed
+									reroll_planet = yes
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+#Hacking the technosphere - success ##changed the computer tech given
+country_event = {
+	id = guardian.1052
+	title = guardian.1050.name
+	desc = {
+		trigger = {
+			NOT = { has_ethic = ethic_gestalt_consciousness }
+		}
+		text = guardian.1052.desc
+	}
+	desc = {
+		trigger = { has_ethic = ethic_gestalt_consciousness }
+		text = guardian.1052.gestalt.desc
+	}
+	picture = GFX_evt_technosphere
+	show_sound = event_ai_started
+	location = event_target:technosphere_ship
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:technosphere_ship
+	}
+
+	immediate = {
+		event_target:guardian_technosphere_country = {
+			random_owned_ship = {
+				limit = {
+					is_ship_size = sphere
+				}
+				save_event_target_as = technosphere_location
+			}
+		}
+	}
+	after = {
+		add_modifier = {
+			modifier = infinity_calculations_hacked
+			days = -1
+		}
+		event_target:technosphere_location = {
+			solar_system = {
+				save_event_target_as = slain_guardian_system
+			}
+			fleet = {
+				destroy_fleet = this
+			}
+		}
+		hidden_effect = {
+			country_event = { id = guardian.1039 }
+		}
+	}
+	option = {
+		name = guardian.1052.a
+		give_technology = { tech = tech_sentient_computer }
+		trigger = {
+			NOT = {
+				has_technology = tech_sentient_computer
+			}
+		}
+	}
+	option = {
+		name = guardian.1052.a
+		trigger = {
+			has_technology = tech_sentient_computer
+			NOT = {
+				has_technology = tech_zero_point_power
+			}
+		}
+		give_technology = { tech = tech_zero_point_power }
+	}
+	option = {
+		name = guardian.1052.a
+		trigger = {
+			has_technology = tech_sentient_computer
+			has_technology = tech_zero_point_power
+		}
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = 24
+			min = 1000
+			max = 5000
+		}
+	}
+}
+
+
+#Researching the black hole - success
+country_event = {
+	id = guardian.1061
+	title = sphere
+	desc = guardian.1061.desc
+	is_triggered_only = yes
+	diplomatic = yes
+
+	trigger = { exists = event_target:technosphere_ship }
+
+	picture_event_data = {
+		room = technosphere_room
+	}
+
+	immediate = {
+		random_system = {
+			limit = {
+				has_star_flag = guardians_technosphere_system
+			}
+			random_system_planet = {
+				limit = {
+					is_star = yes
+				}
+				save_event_target_as = technosphere_blackhole
+			}
+		}
+	}
+
+	option = {
+		name = guardian.1061.a
+		response_text = guardian.1061.a.reply
+		give_technology = { tech = tech_sentient_computer }
+		add_influence = 150
+		trigger = {
+			NOT = {
+				has_technology = tech_sentient_computer
+			}
+		}
+	}
+	option = {
+		name = guardian.1061.a
+		response_text = guardian.1061.a.reply
+		give_technology = { tech = tech_zero_point_power }
+		add_influence = 150
+		trigger = {
+			has_technology = tech_sentient_computer
+			NOT = {
+				has_technology = tech_zero_point_power
+			}
+		}
+	}
+	option = {
+		name = guardian.1061.b
+		response_text = guardian.1061.b.reply
+		add_modifier = {
+			modifier = infinity_calculations
+			days = -1
+		}
+		trigger = {
+			NOR = {
+				has_technology = tech_sentient_computer
+				has_technology = tech_zero_point_power
+			}
+		}
+	}
+	option = {
+		name = guardian.1061.b.alt
+		response_text = guardian.1061.b.reply
+		add_modifier = {
+			modifier = infinity_calculations
+			days = -1
+		}
+		trigger = {
+			has_technology = tech_sentient_computer
+			has_technology = tech_zero_point_power
+		}
+	}
+}
+
+#The technosphere submerges itself into the hole - FAIL
+country_event = {
+	id = guardian.1063
+	title = sphere
+	desc = guardian.1063.desc
+	is_triggered_only = yes
+	picture = GFX_evt_technosphere
+	show_sound = event_mystic_reveal
+	location = event_target:technosphere_ship
+
+	is_triggered_only = yes
+
+	trigger = { exists = event_target:technosphere_ship }
+
+	option = {
+		name = PECULIAR
+		custom_tooltip = guardian.1063.a.tooltip
+		add_influence = 150
+		if = {
+			limit = {
+				NOT = {
+					has_technology = tech_sentient_computer
+				}
+			}
+			give_technology = { tech = tech_sentient_computer }
+			else = {
+				if = {
+					limit = {
+						NOT = { has_technology = tech_zero_point_power }
+					}
+					give_technology = { tech = tech_zero_point_power }
+					else = {
+						add_influence = 150
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:technosphere_ship = {
+				solar_system = {
+					random_system_planet = {
+						limit = { is_star = yes }
+						orbital_deposit_tile = {
+							add_deposit =  d_immense_physics_deposit
+							add_deposit =  d_immense_engineering_deposit
+							add_deposit =  d_immense_society_deposit
+						}
+					}
+				}
+			}
+			event_target:technosphere_ship = {
+				solar_system = {
+					save_event_target_as = slain_guardian_system
+				}
+				delete_fleet = this
+			}
+			country_event = { id = guardian.1039 }
+		}
+	}
+}
+
+# Ship destroyed perp port
+country_event = {
+	id = guardian.2099
+	title = "guardian.2101.name"
+	desc = {
+		text = "guardian.2101.desc"
+		trigger = { NOT = { owner = { has_ethic = ethic_gestalt_consciousness } } }
+	}
+	desc = {
+		text = "guardian.2101.desc.gesta"
+		trigger = { owner = { has_ethic = ethic_gestalt_consciousness } }
+	}
+	picture = GFX_evt_enigmatic_fortress
+	show_sound = event_space_battle
+	location = fromfrom
+
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:fortress_country
+		from = { is_same_value = event_target:fortress_country }
+		exists = event_target:fortress_vault_core
+		event_target:fortress_country = {
+			count_owned_ships = { # Check that all ships are disabled
+				limit = { is_disabled = no }
+				count < 1
+			}
+		}
+	}
+
+	immediate = {
+		establish_communications_no_message = event_target:fortress_country
+		#event_target:fortress_country = {
+			event_target:fortress_vault_core = {
+				#limit = { has_ship_flag = fortress_vault }
+				save_global_event_target_as = disabled_enigmatic_fortress
+			}
+		#}
+		every_playable_country = {
+			limit = { has_event_chain = "enigmatic_fortress_chain" }
+			end_event_chain = "enigmatic_fortress_chain"
+		}
+	}
+
+	option = {
+		name = "guardian.2101.a"
+		begin_event_chain = {
+			event_chain = "enigmatic_fortress_chain"
+			target = root
+		}
+		hidden_effect = { country_event = { id = guardian.2111 } }
+		trigger = { NOT = { has_ethic = ethic_gestalt_consciousness } }
+	}
+
+	option = {
+		name = "guardian.2101.b"
+		hidden_effect = { country_event = { id = guardian.2160 days = 360 } }
+		trigger = { NOT = { has_ethic = ethic_gestalt_consciousness } }
+	}
+
+	option = {
+		name = guardian.2101.c.gesta
+		trigger = { has_ethic = ethic_gestalt_consciousness }
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = 24
+				min = 1000
+				max = 5000
+			}
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = 24
+				min = 1000
+				max = 5000
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = 24
+				min = 1000
+				max = 5000
+			}
+			random_list = { ## event reworked to a base 25 for all tech outcomes
+				25 = {
+					add_research_option = tech_enigmatic_deflector
+					add_tech_progress = {
+						tech = tech_enigmatic_deflector
+						progress = 0.30
+					}
+				}
+				25 = {
+					add_research_option = tech_enigmatic_power_core
+					add_tech_progress = {
+						tech = tech_enigmatic_power_core
+						progress = 0.30
+					}
+				}
+				25 = {
+					add_research_option = tech_enigmatic_encoder
+					add_tech_progress = {
+						tech = tech_enigmatic_encoder
+						progress = 0.30
+					}
+				}
+				25 = {
+					add_research_option = tech_enigmatic_decoder
+					add_tech_progress = {
+						tech = tech_enigmatic_decoder
+						progress = 0.30
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			# scuttle fortress
+			event_target:fortress_vault_core = {
+				fleet = {
+					set_event_locked = no
+					destroy_fleet = this
+				}
+			}
+			#event_target:fortress_country = {
+			#	every_owned_fleet = {
+			#		delete_fleet = this
+			#	}
+			#}
+			#event_target:fortress_vault_core = {
+			#	solar_system = {
+			#		random_system_planet = {
+			#			limit = { is_star = yes }
+			#			create_ambient_object = {
+			#				type = "dead_enigmatic_fortress_object"
+			#				location = solar_system
+			#			}
+			#			last_created_ambient_object = {
+			#				save_global_event_target_as = fortress_ambient
+			#				set_location = {
+			#					target = PREV
+			#					distance = 110
+			#					angle = 110
+			#				}
+			#			}
+			#		}
+			#	}
+			#	fleet = {
+			#		delete_fleet = this
+			#	}
+			#}
+		}
+	}
+}
+
+# The Heart of Dark Matter
+country_event = {
+	id = guardian.2151
+	title = "guardian.2151.name"
+	desc = "guardian.2151.desc"
+	picture = GFX_evt_enigmatic_fortress
+	show_sound = event_laboratory_sound
+	location = from
+	
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = fortress_solved
+		event_target:disabled_enigmatic_fortress = {
+			save_event_target_as = slain_guardian_system
+		}
+		every_country = {
+			limit = {
+				is_country_type = default
+				has_event_chain = curator_poi_chain
+				event_target:slain_guardian_system = {
+					is_point_of_interest = {
+						id = curator_poi_fortress
+						event_chain = curator_poi_chain
+						owner = prev
+					}
+				}
+			}
+			remove_point_of_interest = curator_poi_fortress
+			end_curator_chain = yes
+		}
+		event_target:disabled_enigmatic_fortress = {
+			solar_system = {
+				random_system_planet = {
+					limit = { is_star = yes }
+					create_ambient_object = {
+						type = "dead_enigmatic_fortress_object"
+						location = solar_system
+					}
+					last_created_ambient_object = {
+						save_global_event_target_as = fortress_ambient
+						set_location = {
+							target = PREV
+							distance = 110
+							angle = 110
+						}
+					}
+				}
+
+			}
+			fleet = {
+				delete_fleet = this
+			}
+		}
+	}
+	
+	option = {
+		name = "guardian.2151.a"
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = 24
+			min = 1000
+			max = 5000
+		}
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = 24
+			min = 1000
+			max = 5000
+		}
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = 24
+			min = 1000
+			max = 5000
+		}
+		random_list = {
+			20 = {
+				add_research_option = tech_enigmatic_deflector
+				add_tech_progress = {
+					tech = tech_enigmatic_deflector
+					progress = 0.30
+				}
+			}
+			20 = {
+				add_research_option = tech_enigmatic_power_core
+				add_tech_progress = {
+					tech = tech_enigmatic_power_core
+					progress = 0.30
+				}
+			}
+			5 = {
+				add_research_option = tech_enigmatic_encoder
+				add_tech_progress = {
+					tech = tech_enigmatic_encoder
+					progress = 0.30
+				} ###to this point
+				add_research_option = tech_enigmatic_decoder
+				add_tech_progress = {
+					tech = tech_enigmatic_decoder
+					progress = 0.30
+				}				
+			}
+			5 = {
+				add_research_option = tech_enigmatic_encoder
+				add_tech_progress = {
+					tech = tech_enigmatic_encoder
+					progress = 0.30
+				}
+				add_research_option = tech_enigmatic_power_core
+				add_tech_progress = {
+					tech = tech_enigmatic_power_core
+					progress = 0.30
+				}				
+			}			
+			5 = {
+				add_research_option = tech_enigmatic_encoder
+				add_tech_progress = {
+					tech = tech_enigmatic_encoder
+					progress = 0.30
+				}
+				add_research_option = tech_enigmatic_power_core
+				add_tech_progress = {
+					tech = tech_enigmatic_power_core
+					progress = 0.30
+				}				
+			}						
+		}
+		end_event_chain = "enigmatic_fortress_chain"
+	}
+}
+
+# Our Star Witness
+country_event = {
+	id = guardian.2152
+	title = "guardian.2152.name"
+	desc = "guardian.2152.desc"
+	picture = GFX_evt_enigmatic_fortress
+	show_sound = event_alien_signal
+	location = event_target:disabled_enigmatic_fortress
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "guardian.2152.a"
+		hidden_effect = { country_event = { id = guardian.2153 } }
+	}
+	option = {
+		name = "guardian.2152.b"
+		hidden_effect = { country_event = { id = guardian.2154 } }
+	}
+	option = {
+		name = "guardian.2152.c"
+		hidden_effect = { country_event = { id = guardian.2155 } }
+	}
+}
+
+# Fruitless Beginnings
+country_event = {
+	id = guardian.2153
+	title = "guardian.2153.name"
+	desc = "guardian.2153.desc"
+	picture = GFX_evt_enigmatic_fortress
+	show_sound = event_activating_unknown_technology
+	location = event_target:disabled_enigmatic_fortress
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "guardian.2153.a"
+		end_event_chain = "enigmatic_fortress_chain"
+		hidden_effect = {
+			event_target:disabled_enigmatic_fortress = {
+				set_disabled = no
+				repair_ship = yes
+			}
+		}
+	}
+}
+
+# The Middle Path
+country_event = {
+	id = guardian.2154
+	title = "guardian.2154.name"
+	desc = "guardian.2154.desc"
+	picture = GFX_evt_enigmatic_fortress
+	show_sound = event_laboratory_sound
+	location = event_target:disabled_enigmatic_fortress
+	
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = fortress_solved
+		event_target:disabled_enigmatic_fortress = {
+			save_event_target_as = slain_guardian_system
+		}
+		every_country = {
+			limit = {
+				is_country_type = default
+				has_event_chain = curator_poi_chain
+				event_target:slain_guardian_system = {
+					is_point_of_interest = {
+						id = curator_poi_fortress
+						event_chain = curator_poi_chain
+						owner = prev
+					}
+				}
+			}
+			remove_point_of_interest = curator_poi_fortress
+			end_curator_chain = yes
+		}
+		event_target:disabled_enigmatic_fortress = {
+			solar_system = {
+				random_system_planet = {
+					limit = { is_star = yes }
+					create_ambient_object = {
+						type = "dead_enigmatic_fortress_object"
+						location = solar_system
+					}
+					last_created_ambient_object = {
+						save_global_event_target_as = fortress_ambient
+						set_location = {
+							target = PREV
+							distance = 110
+							angle = 110
+						}
+					}
+					#create_ambient_object = {
+					#	type = explosion_particle_object
+					#	location = this
+					#	use_3d_location = yes
+					#	duration = 10
+					#	scale = 20
+					#}
+					#last_created_ambient_object = {
+					#	set_location = {
+					#		target = PREV
+					#		distance = 110
+					#		angle = 110
+					#	}
+					#}
+				}
+			}
+			fleet = {
+				delete_fleet = this
+			}
+		}
+	}
+	
+	option = {
+		name = "guardian.2154.a"
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = 24
+			min = 1000
+			max = 5000
+		}
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = 24
+			min = 1000
+			max = 5000
+		}
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = 24
+			min = 1000
+			max = 5000
+		}
+		random_list = {
+			15 = {
+				add_research_option = tech_enigmatic_deflector
+				add_tech_progress = {
+					tech = tech_enigmatic_deflector
+					progress = 0.30
+				}
+			}
+			15 = {
+				add_research_option = tech_enigmatic_power_core
+				add_tech_progress = {
+					tech = tech_enigmatic_power_core
+					progress = 0.30
+				}
+			}
+			30 = {
+				add_research_option = tech_enigmatic_encoder
+				add_tech_progress = {
+					tech = tech_enigmatic_encoder
+					progress = 0.30
+				}
+			}
+			30 = {
+				add_research_option = tech_enigmatic_decoder
+				add_tech_progress = {
+					tech = tech_enigmatic_decoder
+					progress = 0.30
+				}
+			}
+		}
+		end_event_chain = "enigmatic_fortress_chain"
+	}
+}
+
+# The End
+country_event = {
+	id = guardian.2155
+	title = "guardian.2155.name"
+	desc = "guardian.2155.desc"
+	picture = GFX_evt_enigmatic_fortress
+	show_sound = event_activating_unknown_technology
+	location = event_target:disabled_enigmatic_fortress
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "guardian.2155.a"
+		end_event_chain = "enigmatic_fortress_chain"
+		hidden_effect = {
+			event_target:disabled_enigmatic_fortress = {
+				set_disabled = no
+				repair_ship = yes
+			}
+		}
+	}
+}
+
+# Dark Matter Gambit
+country_event = {
+	id = guardian.2156
+	title = "guardian.2156.name"
+	desc = "guardian.2156.desc"
+	picture = GFX_evt_enigmatic_fortress
+	show_sound = event_laboratory_sound
+	location = event_target:disabled_enigmatic_fortress
+	
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = fortress_solved
+		event_target:disabled_enigmatic_fortress = {
+			save_event_target_as = slain_guardian_system
+		}
+		every_country = {
+			limit = {
+				is_country_type = default
+				has_event_chain = curator_poi_chain
+				event_target:slain_guardian_system = {
+					is_point_of_interest = {
+						id = curator_poi_fortress
+						event_chain = curator_poi_chain
+						owner = prev
+					}
+				}
+			}
+			remove_point_of_interest = curator_poi_fortress
+			end_curator_chain = yes
+		}
+		event_target:disabled_enigmatic_fortress = {
+			solar_system = {
+				random_system_planet = {
+					limit = { is_star = yes }
+					create_ambient_object = {
+						type = "dead_enigmatic_fortress_object"
+						location = solar_system
+					}
+					last_created_ambient_object = {
+						save_global_event_target_as = fortress_ambient
+						set_location = {
+							target = PREV
+							distance = 110
+							angle = 110
+						}
+					}
+				}
+
+			}
+			fleet = {
+				delete_fleet = this
+			}
+		}
+	}
+	
+	option = {
+		name = "guardian.2156.a"
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = 24
+			min = 1000
+			max = 5000
+		}
+		add_monthly_resource_mult = {
+			resource = physics_research
+			value = 24
+			min = 1000
+			max = 5000
+		}
+		add_monthly_resource_mult = {
+			resource = society_research
+			value = 24
+			min = 1000
+			max = 5000
+		}
+		random_list = {
+			15 = {
+				add_research_option = tech_enigmatic_deflector
+				add_tech_progress = {
+					tech = tech_enigmatic_deflector
+					progress = 0.30
+				}
+			}
+			15 = {
+				add_research_option = tech_enigmatic_power_core
+				add_tech_progress = {
+					tech = tech_enigmatic_power_core
+					progress = 0.30
+				}
+			}
+			30 = {
+				add_research_option = tech_enigmatic_encoder
+				add_tech_progress = {
+					tech = tech_enigmatic_encoder
+					progress = 0.30
+				}
+			}
+			30 = {
+				add_research_option = tech_enigmatic_decoder
+				add_tech_progress = {
+					tech = tech_enigmatic_decoder
+					progress = 0.30
+				}
+			}
+		}
+		end_event_chain = "enigmatic_fortress_chain"
+	}
+}
+
+# Shot Through the Heart
+country_event = {
+	id = guardian.2157
+	title = "guardian.2157.name"
+	desc = "guardian.2157.desc"
+	picture = GFX_evt_exploding_ship
+	show_sound = event_super_explosion
+	location = event_target:disabled_enigmatic_fortress
+	
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:disabled_enigmatic_fortress = {
+			save_event_target_as = slain_guardian_system
+		}
+		every_country = {
+			limit = {
+				is_country_type = default
+				has_event_chain = curator_poi_chain
+				event_target:slain_guardian_system = {
+					is_point_of_interest = {
+						id = curator_poi_fortress
+						event_chain = curator_poi_chain
+						owner = prev
+					}
+				}
+			}
+			remove_point_of_interest = curator_poi_fortress
+			end_curator_chain = yes
+		}
+		event_target:disabled_enigmatic_fortress = {
+			solar_system = {
+				random_system_planet = {
+					limit = { is_star = yes }
+					create_ambient_object = {
+						type = "large_debris_object" # Actually explosion
+						location = solar_system
+					}
+					last_created_ambient_object = {
+						save_global_event_target_as = fortress_ambient
+						set_location = {
+							target = PREV
+							distance = 110
+							angle = 110
+						}
+					}
+				}
+
+			}
+			create_ambient_object = {
+				type = explosion_particle_object
+				location = this
+				use_3d_location = yes
+				duration = 10
+				scale = 30
+			}
+			fleet = {
+				delete_fleet = this
+			}
+		}
+	}
+	
+	option = {
+		name = "guardian.2157.a"
+		custom_tooltip = guardian.2157.a.tooltip
+		end_event_chain = "enigmatic_fortress_chain"
+		hidden_effect = {
+			event_target:disabled_enigmatic_fortress = {
+				solar_system = {
+					every_system_planet = {
+						limit = {
+							habitable_planet = yes
+							NOR = {
+								is_planet_class = pc_ringworld_habitable
+								is_planet_class = pc_habitat
+							}
+						}
+						create_ambient_object = {
+							type = explosion_particle_object
+							location = this
+							use_3d_location = yes
+							duration = 10
+							scale = 20
+						}
+						change_pc = pc_nuked
+						reset_planet = yes
+					}
+					every_system_planet = {
+						limit = {
+							habitable_planet = no
+							is_asteroid = no
+							is_star = no
+							NOT = { is_planet_class = pc_gas_giant }
+						}
+						create_ambient_object = {
+							type = explosion_particle_object
+							location = this
+							use_3d_location = yes
+							duration = 10
+							scale = 20
+						}
+						change_pc = pc_molten
+						reset_planet = yes
+					}
+					every_fleet_in_system = { destroy_fleet = this }
+				}
+			}
+		}
+	}
+}
+
+# Fortress Repowers (Generic)
+country_event = {
+	id = guardian.2160
+	title = "guardian.2160.name"
+	desc = "guardian.2160.desc"
+	picture = GFX_evt_enigmatic_fortress
+	show_sound = event_activating_unknown_technology
+	location = event_target:disabled_enigmatic_fortress
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "guardian.2160.a"
+		end_event_chain = "enigmatic_fortress_chain"
+		hidden_effect = {
+			event_target:disabled_enigmatic_fortress = {
+				set_disabled = no
+				repair_ship = yes
+			}
+		}
+	}
+}
+
+# 3000 DIMENSIONAL HORROR
+
+# Entering System
+ship_event = {
+	id = guardian.3000
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		owner = {
+			NOT = { has_country_flag = encountered_horror }
+		}
+		FROM = {
+			has_star_flag = guardians_horror_system
+			OR = {
+				NOT = { has_star_flag = horror_spawned }
+				any_ship = { is_ship_size = dimensional_horror }
+			}
+		}
+	}
+	
+	immediate = {
+		if = {
+			limit = {
+				solar_system = {
+					NOT = { has_star_flag = horror_spawned }
+				}
+			}
+			solar_system = {
+				set_star_flag = horror_spawned
+				save_event_target_as = horror_system
+				random_system_planet = {
+					limit = { is_planet_class = pc_black_hole }
+					create_country = {
+						name = "NAME_Dimensional_Horror"
+						type = guardian_horror
+						flag = {
+							icon = {
+								category = "zoological"
+								file = "flag_zoological_3.dds"
+							}
+							background = {
+								category = "backgrounds"
+								file = "00_solid.dds"
+							}
+							colors={
+								"red"
+								"red"
+								"null"
+								"null"
+							}
+						}
+					}
+					last_created_country = {
+						guardian_difficulty = yes
+						save_global_event_target_as = dimensional_horror_country
+						set_country_flag = dimensional_horror_country
+					}
+					create_fleet = {
+						name = "NAME_Dimensional_Horror"
+						settings = {
+							spawn_debris = no
+							is_boss = yes
+						}
+						effect = {
+							set_owner = event_target:dimensional_horror_country
+							save_global_event_target_as = dimensional_horror
+							create_ship = {
+								name = "NAME_Dimensional_Horror"
+								design = "NAME_Dimensional_Horror"
+								effect = { set_disabled = yes }
+							}
+							set_location = {
+								target = PREV
+								distance = 100
+								angle = random
+							}
+						}
+					}
+					last_created_fleet = {
+						create_ambient_object = {
+							type = "horror_spawn_object"
+							location = THIS
+							use_3d_location = yes
+							duration = 10
+						}
+						fleet_event = { id = guardian.3220 days = 8 }
+					}
+				}
+			}
+		}
+		owner = { 
+			set_country_flag = encountered_horror
+			establish_communications_no_message = event_target:dimensional_horror_country
+			country_event = { id = guardian.3001 }
+		}
+	}
+}
+
+# Entering System
+country_event = {
+	id = guardian.3001
+	title = "guardian.3001"
+	desc = "guardian.3001.desc"
+	picture = GFX_evt_dimensional_horror
+	show_sound = event_activating_unknown_technology
+	location = event_target:horror_system
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "guardian.3001.a"
+	}
+}
+
+# Horror Destroyed (HIDDEN)
+country_event = {
+	id = guardian.3002
+	hide_window = yes
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		is_country_type = guardian_horror
+		has_country_flag = dimensional_horror_country
+		FROMFROM = { is_ship_size = dimensional_horror }
+	}
+	
+	immediate = {
+		FROMFROM = {
+			solar_system = { save_event_target_as = guardians_horror_system }
+		}
+		create_ambient_object = {
+			type = "horror_energy_object"
+			location = FROMFROM
+		}
+		last_created_ambient_object = { 
+			save_event_target_as = horror_energy
+			set_ambient_object_flag = horror_energy
+		}
+		FROM = {
+			country_event = { id = guardian.3003 days = 6 }
+		}
+		destroy_country = yes
+		every_country = {
+			limit = { 
+				is_country_type = default
+				has_modifier = dimensional_horror_weak_points
+			}
+			remove_modifier = "dimensional_horror_weak_points"
+		}
+		every_country = {
+			limit = {
+				is_country_type = default
+				has_event_chain = curator_poi_chain
+				event_target:guardians_horror_system = {
+					is_point_of_interest = {
+						id = curator_poi_horror
+						event_chain = curator_poi_chain
+						owner = prev
+					}
+				}
+			}
+			remove_point_of_interest = curator_poi_horror
+			end_curator_chain = yes
+		}
+	}
+}
+
+# Horror Destroyed
+country_event = {
+	id = guardian.3003
+	title = "guardian.3003"
+	desc = "guardian.3003.desc"
+	picture = GFX_evt_dimensional_horror
+	show_sound = event_super_explosion
+	location = event_target:guardians_horror_system
+	
+	is_triggered_only = yes
+
+	immediate = { set_country_flag = horror_killed }
+	
+	option = {
+		name = "guardian.3003.a"
+		event_target:horror_energy = {
+			enable_special_project = {
+				name = "DIMENSIONAL_HORROR_PROJECT"
+				location = THIS
+				owner = ROOT
+			}
+		}
+	}
+}
+
+# Special Project Completed
+ship_event = {
+	id = guardian.3004
+	title = "PROJECT_COMPLETE"
+	picture = GFX_evt_dimensional_horror
+	show_sound = event_laboratory_sound
+	
+	desc = {
+		text = "guardian.3004a.desc"
+		trigger = {
+			owner = {
+				NOT = { 
+					has_technology = tech_jump_drive_1
+					has_technology = tech_psi_jump_drive_1
+				}
+			}
+		}
+	}
+	desc = {
+		text = "guardian.3004b.desc"
+		trigger = {
+			owner = {
+				OR = {
+					has_technology = tech_jump_drive_1
+					has_technology = tech_psi_jump_drive_1
+				}
+			}
+		}
+	}
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		random_ambient_object = {
+			limit = { has_ambient_object_flag = horror_energy }
+			destroy_ambient_object = this
+		}
+	}
+	
+	option = {
+		name = "EXCELLENT"
+		trigger = {
+			owner = {
+				NOT = { 
+					has_technology = tech_jump_drive_1
+					has_technology = tech_psi_jump_drive_1
+				}
+			}
+		}
+		owner = {
+			add_research_option = tech_jump_drive_1
+			add_tech_progress = {
+				tech = tech_jump_drive_1
+				progress = 0.5
+			}
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = 24
+				min = 4000
+				max = 6000
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = 24
+				min = 4000
+				max = 6000
+			}
+		}
+	}
+	option = {
+		name = "EXCELLENT"
+		trigger = {
+			owner = {
+				OR = {
+					has_technology = tech_jump_drive_1
+					has_technology = tech_psi_jump_drive_1
+				}
+			}
+		}
+		owner = {
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = 24
+				min = 4000
+				max = 6000
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = 24
+				min = 4000
+				max = 6000
+			}
+		}
+	}
+}
+
+# 3100 AUTOMATED DREADNOUGHT
+
+# Entering System
+ship_event = {
+	id = guardian.3100
+	title = "guardian.3100"
+	desc = {
+		trigger = { owner = { NOT = { has_authority = auth_machine_intelligence } } }
+		text = guardian.3100.desc
+	}
+	desc = {
+		trigger = { owner = { has_authority = auth_machine_intelligence } }
+		text = guardian.3100.desc.mach
+	}
+	picture = GFX_evt_automated_dreadnought
+	show_sound = event_radio_chatter
+	location = FROM
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		owner = {
+			NOT = { has_country_flag = encountered_dreadnought }
+		}
+		FROM = {
+			has_star_flag = guardians_dreadnought_system
+			any_ship = { 
+				AND = {
+					is_ship_size = npc_warship_01
+					owner = { is_country_type = guardian_dreadnought }
+				}
+			}
+		}
+	}
+	
+	immediate = {
+		FROM = { save_event_target_as = dreadnought_system }
+		owner = { 
+			set_country_flag = encountered_dreadnought
+		}
+	}		
+	
+	option = {
+		name = "guardian.3100.a"
+	}
+}
+
+# Dreadnought Disabled (HIDDEN)
+country_event = {
+	id = guardian.3101
+	hide_window = yes
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		is_country_type = guardian_dreadnought
+		has_country_flag = automated_dreadnought_country
+		FROMFROM = { is_ship_size = npc_warship_01 }
+		FROM = { is_ai = no }
+	}
+	
+	immediate = {
+		FROMFROM = {
+			solar_system = { save_event_target_as = guardians_dreadnought_system }
+			create_ambient_object = {
+				type = "dreadnought_object"
+				location = THIS
+			}
+			last_created_ambient_object = { save_global_event_target_as = disabled_dreadnought_object }
+			create_ambient_object = {
+				type = "large_debris_object"
+				location = THIS
+			}
+			last_created_ambient_object = { set_ambient_object_flag = dreadnought_debris }
+		}
+		FROM = {
+			country_event = { id = guardian.3102 }
+		}
+		destroy_country = yes
+		every_country = {
+			limit = { 
+				is_country_type = default
+				has_modifier = automated_dreadnought_weak_points
+			}
+			remove_modifier = "automated_dreadnought_weak_points"
+		}
+		every_country = {
+			limit = {
+				is_country_type = default
+				has_event_chain = curator_poi_chain
+				event_target:guardians_dreadnought_system = {
+					is_point_of_interest = {
+						id = curator_poi_dreadnought
+						event_chain = curator_poi_chain
+						owner = prev
+					}
+				}
+			}
+			remove_point_of_interest = curator_poi_dreadnought
+			end_curator_chain = yes
+		}
+	}
+}
+
+# Dreadnought Disabled
+country_event = {
+	id = guardian.3102
+	title = "guardian.3102"
+	desc = "guardian.3102.desc"
+	picture = GFX_evt_automated_dreadnought
+	show_sound = event_ship_bridge
+	location = event_target:guardians_dreadnought_system
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "guardian.3102.a"
+		event_target:disabled_dreadnought_object = {
+			enable_special_project = {
+				name = "DISABLED_DREADNOUGHT_PROJECT"
+				location = THIS
+				owner = ROOT
+			}
+		}
+	}
+	option = {
+		name = "guardian.3102.b"
+		add_minerals = 5000
+		add_energy = 5000
+		add_monthly_resource_mult = {
+			resource = engineering_research
+			value = 30
+			min = 1000
+			max = 5000
+		}
+	}
+}
+
+# Dreadnought Rebuilt
+ship_event = {
+	id = guardian.3103
+	title = "guardian.3103"
+	desc = {
+		trigger = { owner = { NOT = { has_authority = auth_machine_intelligence } } }
+		text = guardian.3103.desc
+	}
+	desc = {
+		trigger = { owner = { has_authority = auth_machine_intelligence } }
+		text = guardian.3103.desc.mach
+	}
+	picture = GFX_evt_automated_dreadnought
+	show_sound = event_construction
+	location = event_target:guardians_dreadnought_system
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		owner = {
+			save_event_target_as = project_owner
+			set_country_flag = restored_dreadnought
+		}
+	}
+	
+	option = {
+		name = "guardian.3103.a"
+		
+		# Psi Jump Dreadnought if owner has it
+		if = {
+			limit = {
+				owner = { has_technology = "tech_psi_jump_drive_1" }
+			}
+			create_fleet = {
+				name = "NAME_Dreadnought"
+				effect = {
+					set_owner = event_target:project_owner
+					create_ship = {
+						name = random
+						design = "NAME_Type_37" # Psi Jump Dreadnought
+						graphical_culture = "npf_01"
+						upgradable = no
+					}
+					set_location = {
+						target = event_target:disabled_dreadnought_object
+						distance = 0
+						angle = random
+					}
+				}
+			}
+			hidden_effect = {
+				event_target:disabled_dreadnought_object = { destroy_ambient_object = this }
+				solar_system = {
+					random_system_ambient_object = {
+						limit = { has_ambient_object_flag = dreadnought_debris }
+						destroy_ambient_object = this
+					}
+				}
+			}
+			break = yes
+		}
+		# Jump Dreadnought if owner has it
+		if = {
+			limit = {
+				owner = { has_technology = "tech_jump_drive_1" }
+			}
+			create_fleet = {
+				name = "NAME_Dreadnought"
+				effect = {
+					set_owner = event_target:project_owner
+					create_ship = {
+						name = random
+						design = "NAME_Type_46" # Jump Dreadnought
+						graphical_culture = "npf_01"
+						upgradable = no
+					}
+					set_location = {
+						target = event_target:disabled_dreadnought_object
+						distance = 0
+						angle = random
+					}
+				}
+			}
+			hidden_effect = {
+				event_target:disabled_dreadnought_object = { destroy_ambient_object = this }
+				solar_system = {
+					random_system_ambient_object = {
+						limit = { has_ambient_object_flag = dreadnought_debris }
+						destroy_ambient_object = this
+					}
+				}
+			}
+			break = yes
+		}
+		# Warp Dreadnought if owner has it
+		if = {
+			limit = {
+				owner = { 
+					OR = {
+						has_technology = "tech_warp_drive_1"
+						has_technology = "tech_warp_drive_2"
+						has_technology = "tech_warp_drive_3"
+					}
+				}
+			}
+			create_fleet = {
+				name = "NAME_Dreadnought"
+				effect = {
+					set_owner = event_target:project_owner
+					create_ship = {
+						name = random
+						design = "NAME_Type_14" # Warp Dreadnought
+						graphical_culture = "npf_01"
+						upgradable = no
+					}
+					set_location = {
+						target = event_target:disabled_dreadnought_object
+						distance = 0
+						angle = random
+					}
+				}
+			}
+			hidden_effect = {
+				event_target:disabled_dreadnought_object = { destroy_ambient_object = this }
+				solar_system = {
+					random_system_ambient_object = {
+						limit = { has_ambient_object_flag = dreadnought_debris }
+						destroy_ambient_object = this
+					}
+				}
+			}
+			break = yes
+		}
+		# Hyper Dreadnought if owner has it
+		if = {
+			limit = {
+				owner = { 
+					OR = {
+						has_technology = "tech_hyper_drive_1"
+						has_technology = "tech_hyper_drive_2"
+						has_technology = "tech_hyper_drive_3"
+					}
+				}
+			}
+			create_fleet = {
+				name = "NAME_Dreadnought"
+				effect = {
+					set_owner = event_target:project_owner
+					create_ship = {
+						name = random
+						design = "NAME_Type_92" # Hyper Dreadnought
+						graphical_culture = "npf_01"
+						upgradable = no
+					}
+					set_location = {
+						target = event_target:disabled_dreadnought_object
+						distance = 0
+						angle = random
+					}
+				}
+			}
+			hidden_effect = {
+				event_target:disabled_dreadnought_object = { destroy_ambient_object = this }
+				solar_system = {
+					random_system_ambient_object = {
+						limit = { has_ambient_object_flag = dreadnought_debris }
+						destroy_ambient_object = this
+					}
+				}
+			}
+			break = yes
+		}
+		# Wormhole Dreadnought if owner has it
+		if = {
+			limit = {
+				owner = { 
+					OR = {
+						has_technology = "tech_wormhole_generation_1"
+						has_technology = "tech_wormhole_generation_2"
+						has_technology = "tech_wormhole_generation_3"
+					}
+				}
+			}
+			create_fleet = {
+				name = "NAME_Dreadnought"
+				effect = {
+					set_owner = event_target:project_owner
+					create_ship = {
+						name = random
+						design = "NAME_Type_69" # Wormhole Dreadnought
+						graphical_culture = "npf_01"
+						upgradable = no
+					}
+					set_location = {
+						target = event_target:disabled_dreadnought_object
+						distance = 0
+						angle = random
+					}
+				}
+			}
+			hidden_effect = {
+				event_target:disabled_dreadnought_object = { destroy_ambient_object = this }
+				solar_system = {
+					random_system_ambient_object = {
+						limit = { has_ambient_object_flag = dreadnought_debris }
+						destroy_ambient_object = this
+					}
+				}
+			}
+			break = yes
+		}
+	}
+}
+
+# 3200 HIVE ASTEROID
+
+# Built Hive Mine (HIDDEN)
+ship_event = {
+	id = guardian.3200
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			is_planet_class = pc_crystal_asteroid
+		}
+	}
+	
+	immediate = {
+		owner = {
+			set_country_flag = built_hiver_mine
+		}
+	}
+}
+
+# Hivers Appear (HIDDEN)
+country_event = {
+	id = guardian.3210
+	hide_window = yes
+	
+	fire_only_once = yes
+	
+	trigger = {
+		is_country_type = default
+		has_country_flag = built_hiver_mine
+		any_planet_within_border = {
+			OR = {
+				has_planet_flag = hiver_asteroid_1
+				has_planet_flag = hiver_asteroid_2
+				has_planet_flag = hiver_asteroid_3
+				has_planet_flag = hiver_asteroid_4
+				has_planet_flag = hiver_asteroid_5
+			}
+			has_mining_station = yes
+		}	
+	}
+	
+	mean_time_to_happen = {
+		years = 100
+		
+		modifier = {
+			factor = 0.3
+			any_planet_within_border = {
+				has_mining_station = yes
+				has_planet_flag = hiver_asteroid_1
+			}
+		}
+		modifier = {
+			factor = 0.3
+			any_planet_within_border = {
+				has_mining_station = yes
+				has_planet_flag = hiver_asteroid_2
+			}
+		}
+		modifier = {
+			factor = 0.3
+			any_planet_within_border = {
+				has_mining_station = yes
+				has_planet_flag = hiver_asteroid_3
+			}
+		}
+		modifier = {
+			factor = 0.3
+			any_planet_within_border = {
+				has_mining_station = yes
+				has_planet_flag = hiver_asteroid_4
+			}
+		}
+		modifier = {
+			factor = 0.3
+			any_planet_within_border = {
+				has_mining_station = yes
+				has_planet_flag = hiver_asteroid_5
+			}
+		}
+	}
+	
+	immediate = {
+		random_system = {
+			limit = { has_star_flag = guardians_hive_system }
+			save_event_target_as = hiver_system
+		}
+		country_event = { id = guardian.3201 }
+		set_global_flag = hivers_appeared
+	}
+}
+
+# Hivers Appear
+country_event = {
+	id = guardian.3201
+	title = "guardian.3201"
+	desc = "guardian.3201.desc"
+	picture = GFX_evt_hive
+	show_sound = event_red_alert
+	location = event_target:hiver_system
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		event_target:hiver_system = {
+			random_system_ambient_object = {
+				limit = { has_ambient_object_flag = hive_asteroid_1 }
+				save_event_target_as = ambient_hive_1
+			}
+			random_system_ambient_object = {
+				limit = { has_ambient_object_flag = hive_asteroid_2 }
+				save_event_target_as = ambient_hive_2
+			}
+			random_system_ambient_object = {
+				limit = { has_ambient_object_flag = hive_asteroid_3 }
+				save_event_target_as = ambient_hive_3
+			}
+			random_system_ambient_object = {
+				limit = { has_ambient_object_flag = hive_asteroid_4 }
+				save_event_target_as = ambient_hive_4
+			}
+			random_system_ambient_object = {
+				limit = { has_ambient_object_flag = hive_asteroid_5 }
+				save_event_target_as = ambient_hive_5
+			}
+			random_system_ambient_object = {
+				limit = { has_ambient_object_flag = hive_asteroid_6 }
+				save_event_target_as = ambient_hive_6
+			}
+		}
+		create_country = {
+			name = "NAME_Alien_Hive"
+			type = guardian_hiver
+			flag = {
+				icon = {
+					category = "spherical"
+					file = "flag_spherical_6.dds"
+				}
+				background= {
+					category = "backgrounds"
+					file = "00_solid.dds"
+				}
+				colors={
+					"red"
+					"red"
+					"null"
+					"null"
+				}
+			}
+		}
+		last_created_country = {
+			save_global_event_target_as = hive_country
+			set_country_flag = hive_country
+		}
+		create_fleet = {
+			name = "NAME_Hiver_Nest"
+			settings = { spawn_debris = no }
+			effect = {
+				set_owner = event_target:hive_country
+				create_ship = {
+					name = "NAME_Hiver_Nest"
+					design = "NAME_Hive_Asteroid"
+				}
+				set_location = event_target:ambient_hive_1			
+			}
+		}
+		event_target:ambient_hive_1 = { destroy_ambient_object = this }
+		create_fleet = {
+			name = "NAME_Hiver_Nest"
+			settings = { spawn_debris = no }
+			effect = {
+				set_owner = event_target:hive_country
+				create_ship = {
+					name = "NAME_Hiver_Nest"
+					design = "NAME_Hive_Asteroid"
+				}
+				set_location = event_target:ambient_hive_2	
+			}
+		}
+		event_target:ambient_hive_2 = { destroy_ambient_object = this }
+		create_fleet = {
+			name = "NAME_Hiver_Nest"
+			settings = { spawn_debris = no }
+			effect = {
+				set_owner = event_target:hive_country
+				create_ship = {
+					name = "NAME_Hiver_Nest"
+					design = "NAME_Hive_Asteroid"
+				}
+				set_location = event_target:ambient_hive_3	
+			}
+		}
+		event_target:ambient_hive_3 = { destroy_ambient_object = this }
+		create_fleet = {
+			name = "NAME_Hiver_Nest"
+			settings = { spawn_debris = no }
+			effect = {
+				set_owner = event_target:hive_country
+				create_ship = {
+					name = "NAME_Hiver_Nest"
+					design = "NAME_Hive_Asteroid"
+				}
+				set_location = event_target:ambient_hive_4		
+			}
+		}
+		event_target:ambient_hive_4 = { destroy_ambient_object = this }
+		create_fleet = {
+			name = "NAME_Hiver_Nest"
+			settings = { spawn_debris = no }
+			effect = {
+				set_owner = event_target:hive_country
+				create_ship = {
+					name = "NAME_Hiver_Nest"
+					design = "NAME_Hive_Asteroid"
+				}
+				set_location = event_target:ambient_hive_5	
+			}
+		}
+		event_target:ambient_hive_5 = { destroy_ambient_object = this }
+		create_fleet = {
+			name = "NAME_Hiver_Nest"
+			settings = { spawn_debris = no }
+			effect = {
+				set_owner = event_target:hive_country
+				create_ship = {
+					name = "NAME_Hiver_Nest"
+					design = "NAME_Hive_Asteroid"
+				}
+				set_location = event_target:ambient_hive_6
+			}
+		}
+		event_target:ambient_hive_6 = { destroy_ambient_object = this }
+		set_country_flag = provoked_hivers
+	}
+	
+	option = {
+		name = "guardian.3201.a"
+	}
+}
+
+# Entering System
+ship_event = {
+	id = guardian.3202
+	title = "guardian.3202"
+	desc = "guardian.3202.desc"
+	picture = GFX_evt_hive
+	show_sound = event_ship_bridge
+	location = FROM
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		NOT = { has_global_flag = hivers_appeared }
+		owner = {
+			NOT = { has_country_flag = encountered_hivers }
+			is_ai = no
+		}
+		FROM = {
+			has_star_flag = guardians_hive_system
+			NOT = { has_star_flag = hivers_defeated }
+		}
+	}
+	
+	immediate = {
+		FROM = { save_event_target_as = hiver_system }
+		owner = { 
+			set_country_flag = encountered_hivers
+		}
+	}		
+	
+	option = {
+		name = "guardian.3202.a"
+	}
+}
+
+# Hivers Destroyed (HIDDEN)
+country_event = {
+	id = guardian.3203
+	hide_window = yes
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		is_country_type = guardian_hiver
+		has_country_flag = hive_country
+		count_owned_ships = {
+			limit = { is_ship_size = hive_asteroid }
+			count < 1 # count_owned_ships no longer counts dead ships
+		}
+		FROM = { 
+			has_country_flag = provoked_hivers 
+			is_ai = no
+		}
+	}
+	
+	immediate = {
+		random_system = {
+			limit = { has_star_flag = guardians_hive_system }
+			save_event_target_as = hive_system
+			set_star_flag = hivers_defeated
+		}
+		create_ambient_object = {
+			type = "dormant_hive_base_2_object"
+		}
+		last_created_ambient_object = {
+			set_location = FROMFROM
+			set_ambient_object_flag = boardable_hive_asteroid
+			save_event_target_as = boardable_hive_asteroid
+		}
+		FROM = {
+			country_event = { id = guardian.3204 }
+		}
+		every_country = {
+			limit = { 
+				is_country_type = default
+				has_modifier = asteroid_hive_weak_points
+			}
+			remove_modifier = "asteroid_hive_weak_points"
+		}
+		every_country = {
+			limit = {
+				is_country_type = default
+				has_event_chain = curator_poi_chain
+				event_target:hive_system = {
+					is_point_of_interest = {
+						id = curator_poi_hiver
+						event_chain = curator_poi_chain
+						owner = prev
+					}
+				}
+			}
+			remove_point_of_interest = curator_poi_hiver
+			end_curator_chain = yes
+		}
+	}
+}
+
+# Hivers Destroyed
+country_event = {
+	id = guardian.3204
+	title = "guardian.3204"
+	desc = "guardian.3204.desc"
+	picture = GFX_evt_hive
+	show_sound = event_scanner
+	location = event_target:hive_system
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "guardian.3204.a"
+		event_target:boardable_hive_asteroid = {
+			enable_special_project = {
+				name = "HIVE_ASTEROID_PROJECT"
+				location = THIS
+				owner = ROOT
+			}
+		}
+	}
+}
+
+# Special Project Completed
+ship_event = {
+	id = guardian.3205
+	title = "PROJECT_COMPLETE"
+	desc = "guardian.3205.desc"
+	picture = GFX_evt_hive
+	show_sound = event_airlock
+	location = event_target:boardable_hive_asteroid
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "EXCELLENT"
+		owner = {
+			add_society_research = 2000
+			add_energy = 500
+		}
+		hidden_effect = {
+			random_ambient_object = {
+				limit = { has_ambient_object_flag = boardable_hive_asteroid }
+				destroy_ambient_object = this
+			}
+		}
+	}
+}
+
+# Undisable Horror
+fleet_event = {
+	id = guardian.3220
+	hide_window = yes
+
+	is_triggered_only = yes
+	
+	immediate = {
+		owner = {
+			random_owned_ship = {
+				set_disabled = no
+			}
+		}
+	}
+}
