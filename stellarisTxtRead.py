@@ -134,9 +134,14 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         print("}",end="")
       print(self.comments[i],end="")
       print("\n",end="")
-  def writeAll(self,file): #formatted writing. Paradox style minus most whitespace tailing errors
+  def writeAll(self,file,checkForHelpers=False): #formatted writing. Paradox style minus most whitespace tailing errors
     for i in range(len(self.names)):
-      self.writeEntry(file, i)
+      try:
+        if not checkForHelpers or self.vals[i].helper==False:
+          self.writeEntry(file, i)
+      except:
+        self.printAll()
+        raise
   def writeEntry(self, file,i):
     for b in range(self.bracketLevel):
       file.write("\t")
@@ -225,12 +230,19 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         if self.vals[i]!=other.vals[i]:
           return 0
     return 1
-  def removeDuplicateNames(self):
+  def removeDuplicateNames(self,reverse=False):
     duplicates=[]
-    for i in range(len(self.names)):
+    iRange=range(len(self.names))
+    if reverse:
+      iRange=reversed(iRange)
+    for i in iRange:
       if i in duplicates:
         continue
-      for j in range(i+1, len(self.names)):
+      if reverse:
+        jRange=range(0,i)
+      else:
+        jRange=range(i+1, len(self.names))
+      for j in jRange:
         if j in duplicates:
           continue
         if self.names[i]==self.names[j]:
@@ -618,6 +630,7 @@ class NamedTagList(TagList): #derived from TagList with four extra variables and
     self.lowerTier=0
     self.tagName=tagName
     self.wasVisited=0
+    self.helper=False
   def costChangeUpgradeToDirectBuild(self, lowerTierData, args, varsToValue, inverse=False): #Will change the costs of self from being an upgrade to being direct build (or the other way round if inverse is True):
     #compute build times
     self.computeNewVals(lowerTierData, "base_buildtime", args.time_discount,varsToValue, inverse)

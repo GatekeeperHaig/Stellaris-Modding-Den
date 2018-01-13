@@ -119,8 +119,8 @@ class Line:
     self.root=root
     #root.lines.append(line)
     line.pack(side=tk.TOP)
-    #self.checkvar = IntVar()
-    #self.check=Checkbutton(line, text="filter", variable=self.checkvar)
+    self.helpFileCheckVar = IntVar()
+    self.helpFileCheck=Checkbutton(line, text="Helper file", variable=self.helpFileCheckVar)
     #self.txt= tk.Text(line, bg="white",width=60, height=1)
     self.txt= tk.Entry(line, bg="white",width=85)
     
@@ -150,7 +150,10 @@ class Line:
         self.bEditF.pack(side=tk.LEFT)
         break
     self.bEditR.pack(side=tk.LEFT)
-    #self.check.pack(side=tk.LEFT)
+
+
+    if root.helperFileCheck:
+      self.helpFileCheck.pack(side=tk.LEFT)
     self.bConvTooltip= CreateToolTip(self.bConv, "Init")
     self.bEditSTooltip= CreateToolTip(self.bEditS, "Init")
     self.bEditFTooltip= CreateToolTip(self.bEditF, "Init")
@@ -247,6 +250,14 @@ class TabClass:
     for i in range(len(self.options)):
       if self.checkVars[i].get():
         argList+=self.options[i][1].split()
+    if self.helperFileCheck:
+      argList.append("--helper_file_list")
+      argList.append("")
+      for line in reversed(self.lines):
+        if line.helpFileCheckVar.get():
+          argList[-1]+="1"
+        else:
+          argList[-1]+="0"
   def checkValid(self):
     self.setSize()
     for line in self.lines:
@@ -360,6 +371,10 @@ class TabClass:
     self.lastPath="."
     self.separateStart=True
     self.subfolder=False
+    if name == "createUpgradedBuildings":
+      self.helperFileCheck=True
+    else:
+      self.helperFileCheck=False
     if os.path.exists(".GUI_last_path"):
       with open(".GUI_last_path") as file:
         self.lastPath=file.read().strip()

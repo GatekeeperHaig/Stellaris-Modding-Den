@@ -31,12 +31,13 @@ def parse(argv):
   parser.add_argument('-g','--gameVersion', default="1.9.*", help="Game version of the newly created .mod file to avoid launcher warning. Ignored for standalone mod creation. (default: %(default)s)")
   parser.add_argument('--tags', default="buildings", help="Comma separated list of tags. Ignored for standalone mod creation.")
   parser.add_argument('--picture_file', default="", help="Picture file set in the mod file. Ignored for standalone mod creation. This file must be manually added to the mod folder!")
-  parser.add_argument('--load_order_priority', action="store_true", help="If enabled, mod will be placed first in mod priority by adding '!' to filename. This allows the construction of mod extensions. Alternatively, you can create a standalone version , see '--create_standalone_mod_from_mod'.")
+  parser.add_argument('--load_order_priority', action="store_true", help="If enabled, mod will be placed first in mod priority by adding '!' to the mod name and a 'z' to building building and trigger file names. This allows the construction of mod extensions. Alternatively, you can create a standalone version , see '--create_standalone_mod_from_mod'.")
   parser.add_argument('-m','--create_standalone_mod_from_mod', action="store_true", help="If this flag is set, the script will create a copy of a mod folder, changing the building files and has_building triggers. Main input of the script should now be the .mod file.")
   parser.add_argument('--custom_mod_name', default='', help="If set, this will be the name of the new mod")
   parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help=argparse.SUPPRESS)
   parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)
   parser.add_argument('--test_run', action="store_true", help="No Output.")
+  parser.add_argument('--helper_file_list', default="", help="Non-separated list of zeros and ones. N-th number defines whether file number n is a helper file (1 helperfile, 0 standard file)")
 
   
   # if isinstance(argv, str):
@@ -59,6 +60,10 @@ def parse(argv):
 def readAndConvert(args, allowRestart=1):   
   lastOutPutFileName=""
 
+  prioFile=""
+  if args.load_order_priority:
+    prioFile="z_"
+
   if not args.just_copy_and_check and not args.test_run:
     if not os.path.exists(args.output_folder+"/common"):
       os.mkdir(args.output_folder+"/common")
@@ -75,9 +80,38 @@ def readAndConvert(args, allowRestart=1):
   globbedList=[]
   for b in args.buildingFileNames:
     globbedList[0:0]=glob.glob(b)
+  isHelperFileItList=[] #list later used in main iteration
+  if "1" in args.helper_file_list:
+    origGlobbedList=globbedList
+    helperList=[] #local
+
+    lHFL=len(args.helper_file_list)
+    lFL=len(globbedList)
+    if lHFL!=lFL:
+      print("Warning: Invalid helper_file_list got {!s}, expected {!s}".format(lHFL,lFL))
+      for i in range(lHFL,lFL):
+        args.helper_file_list+="0"
+
+    for i in range(lFL):
+      if args.helper_file_list[i]=="1":
+        helperList.append(globbedList[i])
+    globbedList=[]
+    for i in range(lFL):
+      if args.helper_file_list[i]=="0":
+        globbedList+=helperList
+        globbedList.append(origGlobbedList[i])
+        for _ in helperList:
+          isHelperFileItList.append(True)
+        isHelperFileItList.append(False)
+        if args.join_files: #with join files, only one run of the helper files is needed
+          helperList=[]
   fileIndex=-1
   for buildingFileName in globbedList:#args.buildingFileNames:
     fileIndex+=1
+    if isHelperFileItList and isHelperFileItList[fileIndex]:
+      thisFileIsAHelper=True
+    else:
+      thisFileIsAHelper=False
     #READ FILE
     if args.just_copy_and_check:
       args.outPath=args.output_folder
@@ -87,17 +121,49 @@ def readAndConvert(args, allowRestart=1):
       with open(args.outPath+os.path.basename(buildingFileName),'w') as outputFile:
         outputFile.write(args.scriptDescription)
         outputFile.write("#overwrite\n")
-    if fileIndex==0 or not args.join_files: #create empty lists. Do only in first iteration when args.join_files is active as we add to the lists in each iteration here
+    if fileIndex==0 or (not args.join_files) and (not isHelperFileItList): #create empty lists. Do only in first iteration when args.join_files is active as we add to the lists in each iteration here
       varsToValue=TagList(0)
       buildingNameToData=TagList(0)
       args.preventLinePrint=[]
+    prevLen=len(buildingNameToData.vals)
     buildingNameToData.readFile(buildingFileName,args, varsToValue)
+    if isHelperFileItList: #mark helper buildings
+      if thisFileIsAHelper:
+        for b in buildingNameToData[prevLen:]:
+          if isinstance(b,TagList):
+            b.helper=True
+            # print(b.helper)
+            # print(b.tagName)
+      # else:
+      #   for b in buildingNameToData[prevLen:]:
+      #     if isinstance(b,TagList):
+      #       b.helper=False
+      # for b in buildingNameToData:
+      #   if isinstance(b,TagList):
+      #     try:
+      #       print(b.helper)
+      #     except:
+      #       print("missing")
+      #       print(b.tagName)
+
+        # for i in range(prevLen:len(buildingNameToData)):
+        #   if isinstance(buildingNameToData[i],TagList):
+        #     buildingNameToData[i]
+
     
     if args.join_files:
       if fileIndex<len(globbedList)-1:
         continue  #read all Files before processing
       else:
         varsToValue.removeDuplicateNames()  #Duplicate names in the header variables will give errors in Stellaris. Thus we remove all duplicates, even if values differ!
+        if isHelperFileItList:
+          buildingNameToData.removeDuplicateNames(True) #remove duplicate buildings. Last file that has been read has highest priority (won't be deleted). Thus lowest priority for the helper files.
+    elif isHelperFileItList:
+      if thisFileIsAHelper:
+        continue
+      else:
+        varsToValue.removeDuplicateNames()  #Duplicate names in the header variables will give errors in Stellaris. Thus we remove all duplicates, even if values differ!
+        buildingNameToData.removeDuplicateNames(True) #remove duplicate buildings. Last file that has been read has highest priority (won't be deleted). Thus lowest priority for the helper files.
         
     if args.remove_reduntant_upgrades: #ExOverhaul specific. If there are upgrade shortcuts (i.e. tn->tn+2 upgrades) they will be removed here (as this contratics with my pricing policy). This does not apply to tree branches that later join again!
       for buildingData in buildingNameToData.vals:
@@ -437,7 +503,7 @@ def readAndConvert(args, allowRestart=1):
               locOutPutFile.write(" "+line+"\n")
         
         #scripted_triggers OUTPUT
-        triggerFile=open(args.output_folder+"/common/scripted_triggers/build_upgraded_"+outfileBaseName.replace(".txt","")+"_triggers.txt",'w')
+        triggerFile=open(args.output_folder+"/common/scripted_triggers/{}build_upgraded_".format(prioFile)+outfileBaseName.replace(".txt","")+"_triggers.txt",'w')
         triggerFile.write(args.scriptDescription)
         triggers.writeAll(triggerFile)
       
@@ -448,9 +514,9 @@ def readAndConvert(args, allowRestart=1):
           # b.replaceAllHasBuildings(args)
       
       if args.create_standalone_mod_from_mod and args.just_copy_and_check:
-        outputFileName=args.outPath+outfileBaseName
+        outputFileName=args.outPath+prioFile+outfileBaseName
       else:
-        outputFileName=args.outPath+"build_upgraded_"+outfileBaseName
+        outputFileName=args.outPath+prioFile+"build_upgraded_"+outfileBaseName
       lastOutPutFileName=outputFileName
       if args.test_run:
         continue
@@ -458,10 +524,10 @@ def readAndConvert(args, allowRestart=1):
         outputFile.write(args.scriptDescription)
         lineIndex=0
         curBuilding=0
-        if args.join_files:
+        if args.join_files or isHelperFileItList:
           varsToValue.writeAll(outputFile)
           outputFile.write("\n")
-          buildingNameToData.writeAll(outputFile)
+          buildingNameToData.writeAll(outputFile,len(isHelperFileItList))
         else:
           for line in inputFile:          
             lineIndex+=1
@@ -474,6 +540,9 @@ def readAndConvert(args, allowRestart=1):
               # outputFile.write("}\n")
               buildingNameToData.writeEntry(outputFile, curBuilding)
               curBuilding+=1
+    if isHelperFileItList and not args.join_files:  #reset after doing a file
+      varsToValue=TagList(0)
+      buildingNameToData=TagList(0)
   if not args.just_copy_and_check and not args.test_run:
     copiedBuildingsFile.close()
     with open(args.copiedBuildingsFileName) as file:
