@@ -1,61 +1,100 @@
 namespace = ex_spaceport_events
 
-event = { #this event fires on game start and with a monthly pulse, firing ex_spaceport_events.10-18
+event = { #this event fires on game start and with a monthly pulse
 	id = ex_spaceport_events.0
 	hide_window = yes
 	is_triggered_only = yes
 
 	immediate = { 
 		every_country = { 
-			if = {
-				limit = { is_country_type = default }
-				if = {
-					limit = { 
-						NOT = { has_global_flag = ex_spaceport_game_start }
-						is_ai = yes
-					} 
-					every_owned_planet = {
-						limit = { 
-							is_colony = yes
-							has_spaceport = yes							
-							sector_controlled = no
-						}					
-						set_timed_planet_flag = { flag = spaceport_automation_economic days = 3600 }
-					}	
-					set_global_flag = ex_spaceport_game_start
-				}	
+			limit = {
+				OR = {
+					is_country_type = default
+					is_country_type = fallen_empire
+					is_country_type = awakened_fallen_empire
+				}
 			}	
 			every_owned_planet = { 				
-				limit = { 
-					is_colony = yes
-					has_spaceport = yes
-				}
+				limit = { has_spaceport = yes }
+				planet_event = { id = ex_spaceport_events.2 }
 				if = {
 					limit = { 
-						owner = { NOT = { has_country_flag = ex_spaceport_automation_disabled } } 						
-						sector_controlled = yes
+						has_free_module_slot = yes
 						OR = {
-							has_spaceport = yes
-							has_spaceport_construction = yes
-						}						
-						NOT = { has_planet_flag = spaceport_automation_economic }
+							AND = {
+								is_spaceport_module_slot_free = 1
+								NOT = { has_planet_flag = ex_spaceport_1 }
+							}	
+							AND = {
+								is_spaceport_module_slot_free = 2
+								NOT = { has_planet_flag = ex_spaceport_2 }
+							}						
+							AND = {
+								is_spaceport_module_slot_free = 3
+								NOT = { has_planet_flag = ex_spaceport_3 }
+							}						
+							AND = {
+								is_spaceport_module_slot_free = 4
+								NOT = { has_planet_flag = ex_spaceport_4 }
+							}						
+							AND = {
+								is_spaceport_module_slot_free = 5
+								NOT = { has_planet_flag = ex_spaceport_5 }
+							}						
+							AND = {
+								is_spaceport_module_slot_free = 6
+								NOT = { has_planet_flag = ex_spaceport_6 }
+							}						
+							AND = {
+								is_spaceport_module_slot_free = 7
+								NOT = { has_planet_flag = ex_spaceport_7 }
+							}						
+							AND = {
+								is_spaceport_module_slot_free = 8
+								NOT = { has_planet_flag = ex_spaceport_8 }
+							}						
+							AND = {
+								is_spaceport_module_slot_free = 9
+								NOT = { has_planet_flag = ex_spaceport_9 }
+							}
+							AND = {
+								OR = {	
+									AND = {
+										sector_controlled = yes
+										owner = {
+											OR = {
+												has_policy_flag = full_automation
+												has_policy_flag = sector_automation
+											}
+										}
+									}	
+									AND = {
+										sector_controlled = no
+										OR = {
+											owner = { has_policy_flag = full_automation }	
+											AND = {
+												owner = { has_policy_flag = core_edicts }
+												OR = {
+													has_planet_flag = spaceport_automation_economic
+													has_planet_flag = spaceport_automation_stardock
+													has_planet_flag = spaceport_automation_defensive
+												}	
+											}
+										}										
+									}								
+								}
+								NOT = { has_spaceport_module = module_under_construction }
+							}							
+						}		
 					}
-					if = {
-						limit = { has_planet_flag = spaceport_automation_stardock }
-						remove_planet_flag = spaceport_automation_stardock	
-					}	
-					if = {
-						limit = { has_planet_flag = spaceport_automation_defensive }
-						remove_planet_flag = spaceport_automation_defensive
-					}					
-					set_planet_flag = spaceport_automation_economic					
-				}	
-			}			
+					planet_event = { id = ex_spaceport_events.10 }
+				}					
+			}	
 		}
 	}	
 }
 
-ship_event = { #this event fires the moment a spaceport is built, firing in turn ex_spaceport_events.10
+ship_event = { #this event fires the moment a spaceport is built
 	id = ex_spaceport_events.1
 	hide_window = yes
 	is_triggered_only = yes
@@ -63,51 +102,19 @@ ship_event = { #this event fires the moment a spaceport is built, firing in turn
 	immediate = { from = { planet_event = { id = ex_spaceport_events.10 } } }		
 }
 
-country_event = { #this event fires whenever a new technology is researched and it updates core spaceport modules, if applicable
+country_event = { #this event fires whenever a new technology is researched and also on a monthly pulse.
 	id = ex_spaceport_events.2
 	hide_window = yes
 	is_triggered_only = yes
-	
-	trigger = {
-		OR = {			
-			last_increased_tech = "tech_mass_drivers_2"
-			last_increased_tech = "tech_mass_drivers_3"
-			last_increased_tech = "tech_mass_drivers_4"
-			last_increased_tech = "tech_mass_drivers_5"				
-			last_increased_tech = "tech_lasers_2"
-			last_increased_tech = "tech_lasers_3"
-			last_increased_tech = "tech_lasers_4"
-			last_increased_tech = "tech_lasers_5"			
-			last_increased_tech = "tech_missiles_2"
-			last_increased_tech = "tech_missiles_3"
-			last_increased_tech = "tech_missiles_4"
-			last_increased_tech = "tech_missiles_5"		
-			last_increased_tech = "tech_plasma_1"
-			last_increased_tech = "tech_plasma_2"
-			last_increased_tech = "tech_plasma_3"
-			last_increased_tech = "tech_disruptors_1"
-			last_increased_tech = "tech_disruptors_2"
-			last_increased_tech = "tech_disruptors_3"
-			last_increased_tech = "tech_swarmer_missiles_1"
-			last_increased_tech = "tech_swarmer_missiles_2"
-			last_increased_tech = "tech_swarmer_missiles_3"
-			last_increased_tech = "tech_kinetic_artillery_1"
-			last_increased_tech = "tech_kinetic_artillery_2"
-			last_increased_tech = "tech_kinetic_artillery_3"
-			last_increased_tech = "tech_strike_craft_1"
-			last_increased_tech = "tech_strike_craft_2"
-			last_increased_tech = "tech_strike_craft_3"
-		}
-	}	
 	
 	immediate = {
 		every_owned_planet = {
 			limit = { has_spaceport = yes }	
 			if = {
 				limit = { 
+					owner = { tier_2_kinetics = yes }
 					OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
-					NOT = { has_planet_flag = spaceport_kinetic_t2_modifier }
-					owner = { tier_2_kinetics = yes }						
+					NOT = { has_planet_flag = spaceport_kinetic_t2_modifier }											
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -118,9 +125,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
-					NOT = { has_planet_flag = spaceport_kinetic_t3_modifier }
 					owner = { tier_3_kinetics = yes }
+					OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
+					NOT = { has_planet_flag = spaceport_kinetic_t3_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -133,9 +140,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
-					NOT = { has_planet_flag = spaceport_kinetic_t4_modifier }
 					owner = { tier_4_kinetics = yes }
+					OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
+					NOT = { has_planet_flag = spaceport_kinetic_t4_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -148,9 +155,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}	
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
-					NOT = { has_planet_flag = spaceport_kinetic_t5_modifier }
 					owner = { tier_5_kinetics = yes }
+					OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
+					NOT = { has_planet_flag = spaceport_kinetic_t5_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -163,9 +170,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
-					NOT = { has_planet_flag = spaceport_energy_t2_modifier }
 					owner = { tier_2_energy = yes }							
+					OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
+					NOT = { has_planet_flag = spaceport_energy_t2_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -176,9 +183,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
-					NOT = { has_planet_flag = spaceport_energy_t3_modifier }
 					owner = { tier_3_energy = yes }			
+					OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
+					NOT = { has_planet_flag = spaceport_energy_t3_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -191,9 +198,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
-					NOT = { has_planet_flag = spaceport_energy_t4_modifier }
 					owner = { tier_4_energy = yes }			
+					OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
+					NOT = { has_planet_flag = spaceport_energy_t4_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -206,9 +213,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}	
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
-					NOT = { has_planet_flag = spaceport_energy_t5_modifier }
 					owner = { tier_5_energy = yes }			
+					OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
+					NOT = { has_planet_flag = spaceport_energy_t5_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -221,9 +228,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}	
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
-					NOT = { has_planet_flag = spaceport_explosive_t2_modifier }
 					owner = { tier_2_explosives = yes }							
+					OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
+					NOT = { has_planet_flag = spaceport_explosive_t2_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -234,9 +241,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
-					NOT = { has_planet_flag = spaceport_explosive_t3_modifier }
 					owner = { tier_3_explosives = yes }		
+					OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
+					NOT = { has_planet_flag = spaceport_explosive_t3_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -249,9 +256,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
-					NOT = { has_planet_flag = spaceport_explosive_t4_modifier }
 					owner = { tier_4_explosives = yes }		
+					OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
+					NOT = { has_planet_flag = spaceport_explosive_t4_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -264,9 +271,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}	
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
-					NOT = { has_planet_flag = spaceport_explosive_t5_modifier }
 					owner = { tier_5_explosives = yes }		
+					OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
+					NOT = { has_planet_flag = spaceport_explosive_t5_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -279,9 +286,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_disruptor_1 has_spaceport_module = spaceport_disruptor_2 has_spaceport_module = spaceport_disruptor_3 }
-					NOT = { has_planet_flag = spaceport_disruptor_t2_modifier }
 					owner = { tier_2_disruptors = yes }		
+					OR = { has_spaceport_module = spaceport_disruptor_1 has_spaceport_module = spaceport_disruptor_2 has_spaceport_module = spaceport_disruptor_3 }
+					NOT = { has_planet_flag = spaceport_disruptor_t2_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -292,9 +299,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}	
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_disruptor_1 has_spaceport_module = spaceport_disruptor_2 has_spaceport_module = spaceport_disruptor_3 }
-					NOT = { has_planet_flag = spaceport_disruptor_t3_modifier }
 					owner = { tier_3_disruptors = yes }		
+					OR = { has_spaceport_module = spaceport_disruptor_1 has_spaceport_module = spaceport_disruptor_2 has_spaceport_module = spaceport_disruptor_3 }
+					NOT = { has_planet_flag = spaceport_disruptor_t3_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -307,9 +314,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}	
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_plasma_1 has_spaceport_module = spaceport_plasma_2 has_spaceport_module = spaceport_plasma_3 }
-					NOT = { has_planet_flag = spaceport_plasma_t2_modifier }
 					owner = { tier_2_plasma = yes }		
+					OR = { has_spaceport_module = spaceport_plasma_1 has_spaceport_module = spaceport_plasma_2 has_spaceport_module = spaceport_plasma_3 }
+					NOT = { has_planet_flag = spaceport_plasma_t2_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -320,9 +327,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}	
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_plasma_1 has_spaceport_module = spaceport_plasma_2 has_spaceport_module = spaceport_plasma_3 }
-					NOT = { has_planet_flag = spaceport_plasma_t3_modifier }
 					owner = { tier_3_plasma = yes }		
+					OR = { has_spaceport_module = spaceport_plasma_1 has_spaceport_module = spaceport_plasma_2 has_spaceport_module = spaceport_plasma_3 }
+					NOT = { has_planet_flag = spaceport_plasma_t3_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -335,9 +342,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}	
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_swarmer_missile_1 has_spaceport_module = spaceport_swarmer_missile_2 has_spaceport_module = spaceport_swarmer_missile_3 }
-					NOT = { has_planet_flag = spaceport_swarmer_missile_t2_modifier }
 					owner = { tier_2_swarmer_missiles = yes }		
+					OR = { has_spaceport_module = spaceport_swarmer_missile_1 has_spaceport_module = spaceport_swarmer_missile_2 has_spaceport_module = spaceport_swarmer_missile_3 }
+					NOT = { has_planet_flag = spaceport_swarmer_missile_t2_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -348,9 +355,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}	
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_swarmer_missile_1 has_spaceport_module = spaceport_swarmer_missile_2 has_spaceport_module = spaceport_swarmer_missile_3 }
-					NOT = { has_planet_flag = spaceport_swarmer_missile_t3_modifier }
 					owner = { tier_3_swarmer_missiles = yes }		
+					OR = { has_spaceport_module = spaceport_swarmer_missile_1 has_spaceport_module = spaceport_swarmer_missile_2 has_spaceport_module = spaceport_swarmer_missile_3 }
+					NOT = { has_planet_flag = spaceport_swarmer_missile_t3_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -363,9 +370,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}	
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_kinetic_artillery_1 has_spaceport_module = spaceport_kinetic_artillery_2 has_spaceport_module = spaceport_kinetic_artillery_3 }
-					NOT = { has_planet_flag = spaceport_kinetic_artillery_t2_modifier }
 					owner = { tier_2_kinetic_artillery = yes }		
+					OR = { has_spaceport_module = spaceport_kinetic_artillery_1 has_spaceport_module = spaceport_kinetic_artillery_2 has_spaceport_module = spaceport_kinetic_artillery_3 }
+					NOT = { has_planet_flag = spaceport_kinetic_artillery_t2_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -376,9 +383,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}	
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_kinetic_artillery_1 has_spaceport_module = spaceport_kinetic_artillery_2 has_spaceport_module = spaceport_kinetic_artillery_3 }
-					NOT = { has_planet_flag = spaceport_kinetic_artillery_t3_modifier }
 					owner = { tier_3_kinetic_artillery = yes }		
+					OR = { has_spaceport_module = spaceport_kinetic_artillery_1 has_spaceport_module = spaceport_kinetic_artillery_2 has_spaceport_module = spaceport_kinetic_artillery_3 }
+					NOT = { has_planet_flag = spaceport_kinetic_artillery_t3_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -391,9 +398,9 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}		
 			if = {
 				limit = { 
-					OR = { has_spaceport_module = spaceport_fighter_strike_craft_1 has_spaceport_module = spaceport_fighter_strike_craft_2 has_spaceport_module = spaceport_fighter_strike_craft_3 has_spaceport_module = spaceport_interceptor_strike_craft_1 has_spaceport_module = spaceport_interceptor_strike_craft_2 has_spaceport_module = spaceport_interceptor_strike_craft_3	}
-					NOT = { has_planet_flag = spaceport_strike_craft_t2_modifier }
 					owner = { tier_2_strike_craft = yes }		
+					OR = { has_spaceport_module = spaceport_fighter_strike_craft_1 has_spaceport_module = spaceport_fighter_strike_craft_2 has_spaceport_module = spaceport_fighter_strike_craft_3 has_spaceport_module = spaceport_interceptor_strike_craft_1 has_spaceport_module = spaceport_interceptor_strike_craft_2 has_spaceport_module = spaceport_interceptor_strike_craft_3	}
+					NOT = { has_planet_flag = spaceport_strike_craft_t2_modifier }					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -404,9 +411,10 @@ country_event = { #this event fires whenever a new technology is researched and 
 			}	
 			if = {
 				limit = { 
+					owner = { tier_3_strike_craft = yes }		
 					OR = { has_spaceport_module = spaceport_fighter_strike_craft_1 has_spaceport_module = spaceport_fighter_strike_craft_2 has_spaceport_module = spaceport_fighter_strike_craft_3 has_spaceport_module = spaceport_interceptor_strike_craft_1 has_spaceport_module = spaceport_interceptor_strike_craft_2 has_spaceport_module = spaceport_interceptor_strike_craft_3	}
 					NOT = { has_planet_flag = spaceport_strike_craft_t3_modifier }
-					owner = { tier_3_strike_craft = yes }		
+					
 				}
 				spaceport = { 
 					random_owned_ship = { 
@@ -421,940 +429,33 @@ country_event = { #this event fires whenever a new technology is researched and 
 	}
 }	
 
-country_event = { #this event is triggered when a spaceport is destroyed (not dismantled)
+country_event = { #this event is triggered when a spaceport is destroyed (not dismantled).
 	id = ex_spaceport_events.3
 	hide_window = yes
 	is_triggered_only = yes
-	trigger = {	fromfrom = { is_ship_size = orbital_station } }		
-		
-
-    immediate = {
-		fromfrom = {
-			orbit = {
-				planet = {
-					if = {
-						limit = { has_planet_flag = ex_spaceport_1 }
-						remove_planet_flag = ex_spaceport_1
-					}	
-					if = {
-						limit = { has_planet_flag = ex_spaceport_2 }
-						remove_planet_flag = ex_spaceport_2
-					}
-					if = {
-						limit = { has_planet_flag = ex_spaceport_3 }
-						remove_planet_flag = ex_spaceport_3
-					}
-					if = {
-						limit = { has_planet_flag = ex_spaceport_4 }
-						remove_planet_flag = ex_spaceport_4
-					}
-					if = {
-						limit = { has_planet_flag = ex_spaceport_5 }
-						remove_planet_flag = ex_spaceport_5
-					}
-					if = {
-						limit = { has_planet_flag = ex_spaceport_6 }
-						remove_planet_flag = ex_spaceport_6
-					}
-					if = {
-						limit = { has_planet_flag = ex_spaceport_7 }
-						remove_planet_flag = ex_spaceport_7
-					}
-					if = {
-						limit = { has_planet_flag = ex_spaceport_8 }
-						remove_planet_flag = ex_spaceport_8
-					}
-					if = {
-						limit = { has_planet_flag = ex_spaceport_9 }
-						remove_planet_flag = ex_spaceport_9
-					}	
-					if = {
-						limit = { has_planet_flag = economic_spaceport_1_modifier }
-						remove_modifier = economic_spaceport_1
-						remove_planet_flag = economic_spaceport_1_modifier
-					}	
-					if = {
-						limit = { has_planet_flag = economic_spaceport_2_modifier }
-						remove_modifier = economic_spaceport_2
-						remove_planet_flag = economic_spaceport_2_modifier
-					}
-					if = {
-						limit = { has_planet_flag = economic_spaceport_3_modifier }
-						remove_modifier = economic_spaceport_3
-						remove_planet_flag = economic_spaceport_3_modifier
-					}
-					if = {
-						limit = { has_planet_flag = economic_spaceport_4_modifier }
-						remove_modifier = economic_spaceport_4
-						remove_planet_flag = economic_spaceport_4_modifier
-					}
-					if = {
-						limit = { has_planet_flag = economic_spaceport_5_modifier }
-						remove_modifier = economic_spaceport_5
-						remove_planet_flag = economic_spaceport_5_modifier
-					}
-					if = {
-						limit = { has_planet_flag = economic_spaceport_6_modifier }
-						remove_modifier = economic_spaceport_6
-						remove_planet_flag = economic_spaceport_6_modifier
-					}
-					if = {
-						limit = { has_planet_flag = economic_spaceport_7_modifier }
-						remove_modifier = economic_spaceport_7
-						remove_planet_flag = economic_spaceport_7_modifier
-					}
-					if = {
-						limit = { has_planet_flag = economic_spaceport_8_modifier }
-						remove_modifier = economic_spaceport_8
-						remove_planet_flag = economic_spaceport_8_modifier
-					}
-					if = {
-						limit = { has_planet_flag = economic_spaceport_9_modifier }
-						remove_modifier = economic_spaceport_9
-						remove_planet_flag = economic_spaceport_9_modifier
-					}	
-					if = {
-						limit = { has_planet_flag = stardock_spaceport_1_modifier }
-						remove_modifier = stardock_spaceport_1
-						remove_planet_flag = stardock_spaceport_1_modifier
-					}	
-					if = {
-						limit = { has_planet_flag = stardock_spaceport_2_modifier }
-						remove_modifier = stardock_spaceport_2
-						remove_planet_flag = stardock_spaceport_2_modifier
-					}
-					if = {
-						limit = { has_planet_flag = stardock_spaceport_3_modifier }
-						remove_modifier = stardock_spaceport_3
-						remove_planet_flag = stardock_spaceport_3_modifier
-					}
-					if = {
-						limit = { has_planet_flag = stardock_spaceport_4_modifier }
-						remove_modifier = stardock_spaceport_4
-						remove_planet_flag = stardock_spaceport_4_modifier
-					}
-					if = {
-						limit = { has_planet_flag = stardock_spaceport_5_modifier }
-						remove_modifier = stardock_spaceport_5
-						remove_planet_flag = stardock_spaceport_5_modifier
-					}
-					if = {
-						limit = { has_planet_flag = stardock_spaceport_6_modifier }
-						remove_modifier = stardock_spaceport_6
-						remove_planet_flag = stardock_spaceport_6_modifier
-					}
-					if = {
-						limit = { has_planet_flag = stardock_spaceport_7_modifier }
-						remove_modifier = stardock_spaceport_7
-						remove_planet_flag = stardock_spaceport_7_modifier
-					}
-					if = {
-						limit = { has_planet_flag = stardock_spaceport_8_modifier }
-						remove_modifier = stardock_spaceport_8
-						remove_planet_flag = stardock_spaceport_8_modifier
-					}
-					if = {
-						limit = { has_planet_flag = stardock_spaceport_9_modifier }
-						remove_modifier = stardock_spaceport_9
-						remove_planet_flag = stardock_spaceport_9_modifier
-					}	
-					if = {
-						limit = { has_planet_flag = defensive_spaceport_1_modifier }
-						remove_planet_flag = defensive_spaceport_1_modifier
-					}	
-					if = {
-						limit = { has_planet_flag = defensive_spaceport_2_modifier }
-						remove_planet_flag = defensive_spaceport_2_modifier
-					}
-					if = {
-						limit = { has_planet_flag = defensive_spaceport_3_modifier }
-						remove_planet_flag = defensive_spaceport_3_modifier
-					}
-					if = {
-						limit = { has_planet_flag = defensive_spaceport_4_modifier }
-						remove_planet_flag = defensive_spaceport_4_modifier
-					}
-					if = {
-						limit = { has_planet_flag = defensive_spaceport_5_modifier }
-						remove_planet_flag = defensive_spaceport_5_modifier
-					}
-					if = {
-						limit = { has_planet_flag = defensive_spaceport_6_modifier }
-						remove_planet_flag = defensive_spaceport_6_modifier
-					}
-					if = {
-						limit = { has_planet_flag = defensive_spaceport_7_modifier }
-						remove_planet_flag = defensive_spaceport_7_modifier
-					}
-					if = {
-						limit = { has_planet_flag = defensive_spaceport_8_modifier }
-						remove_planet_flag = defensive_spaceport_8_modifier
-					}
-					if = {
-						limit = { has_planet_flag = defensive_spaceport_9_modifier }
-						remove_planet_flag = defensive_spaceport_9_modifier
-					}						
-					if = {
-						limit = { has_planet_flag = spaceport_kinetic_t2_modifier }
-						remove_planet_flag = spaceport_kinetic_t2_modifier
-					}
-					if = {
-						limit = { has_planet_flag = spaceport_kinetic_t3_modifier }
-						remove_planet_flag = spaceport_kinetic_t3_modifier				
-					}			
-					if = {
-						limit = { has_planet_flag = spaceport_kinetic_t4_modifier }
-						remove_planet_flag = spaceport_kinetic_t4_modifier
-					}			
-					if = {
-						limit = { has_planet_flag = spaceport_kinetic_t5_modifier }
-						remove_planet_flag = spaceport_kinetic_t5_modifier
-					}			
-					if = {
-						limit = { has_planet_flag = spaceport_energy_t2_modifier }
-						remove_planet_flag = spaceport_energy_t2_modifier
-					}			
-					if = {
-						limit = { has_planet_flag = spaceport_energy_t3_modifier }
-						remove_planet_flag = spaceport_energy_t3_modifier
-					}						
-					if = {
-						limit = { has_planet_flag = spaceport_energy_t4_modifier }
-						remove_planet_flag = spaceport_energy_t4_modifier
-					}						
-					if = {
-						limit = { has_planet_flag = spaceport_energy_t5_modifier }
-						remove_planet_flag = spaceport_energy_t5_modifier
-					}						
-					if = {
-						limit = { has_planet_flag = spaceport_explosive_t2_modifier }
-						remove_planet_flag = spaceport_explosive_t2_modifier
-					}						
-					if = {
-						limit = { has_planet_flag = spaceport_explosive_t3_modifier }
-						remove_planet_flag = spaceport_explosive_t3_modifier
-					}									
-					if = {
-						limit = { has_planet_flag = spaceport_explosive_t4_modifier }
-						remove_planet_flag = spaceport_explosive_t4_modifier
-					}									
-					if = {
-						limit = { has_planet_flag = spaceport_explosive_t5_modifier }
-						remove_planet_flag = spaceport_explosive_t5_modifier
-					}	
-					if = {
-						limit = { has_planet_flag = spaceport_disruptor_t2_modifier }
-						remove_planet_flag = spaceport_disruptor_t2_modifier
-					}	
-					if = {
-						limit = { has_planet_flag = spaceport_disruptor_t3_modifier }
-						remove_planet_flag = spaceport_disruptor_t3_modifier
-					}			
-					if = {
-						limit = { has_planet_flag = spaceport_plasma_t2_modifier }
-						remove_planet_flag = spaceport_plasma_t2_modifier
-					}			
-					if = {
-						limit = { has_planet_flag = spaceport_plasma_t3_modifier }
-						remove_planet_flag = spaceport_plasma_t3_modifier
-					}				
-					if = {
-						limit = { has_planet_flag = spaceport_swarmer_missile_t2_modifier }
-						remove_planet_flag = spaceport_swarmer_missile_t2_modifier
-					}	
-					if = {
-						limit = { has_planet_flag = spaceport_swarmer_missile_t3_modifier }
-						remove_planet_flag = spaceport_swarmer_missile_t3_modifier
-					}					
-					if = {
-						limit = { has_planet_flag = spaceport_kinetic_artillery_t2_modifier }
-						remove_planet_flag = spaceport_kinetic_artillery_t2_modifier
-					}					
-					if = {
-						limit = { has_planet_flag = spaceport_kinetic_artillery_t3_modifier }
-						remove_planet_flag = spaceport_kinetic_artillery_t3_modifier
-					}							
-					if = {
-						limit = { has_planet_flag = spaceport_strike_craft_t2_modifier }
-						remove_planet_flag = spaceport_strike_craft_t2_modifier
-					}							
-					if = {
-						limit = { has_planet_flag = spaceport_strike_craft_t3_modifier }
-						remove_planet_flag = spaceport_strike_craft_t3_modifier
-					}
-				}
-			}
-		}	
-	}
+	trigger = {	fromfrom = { is_ship_size = orbital_station } }			
+    immediate = { fromfrom = { orbit = { planet = {	remove_spaceport_flags_and_modifiers = yes } } } }
 }
 				
-country_event = {
+country_event = { #this event is triggered when a spaceport is dismantled.
 	id = ex_spaceport_events.4
 	hide_window = yes
 	is_triggered_only = yes
-
-	trigger = { 
-		from = { 
-			is_ship_size = orbital_station
-		}
-	}
-	
-	immediate = {
-		from = { 
-			orbit = {
-				planet = {
-					switch = {
-					trigger = has_planet_flag
-					ex_spaceport_1 = { ex_spaceport_1 ### to this point
-					ex_spaceport_2
-					ex_spaceport_3
-					ex_spaceport_4
-					ex_spaceport_5
-					ex_spaceport_6
-					ex_spaceport_7
-					ex_spaceport_8
-					ex_spaceport_9
-					economic_spaceport_1_modifier
-					economic_spaceport_2_modifier
-					economic_spaceport_3_modifier
-					economic_spaceport_4_modifier
-					economic_spaceport_5_modifier
-					economic_spaceport_6_modifier
-					economic_spaceport_7_modifier
-					economic_spaceport_8_modifier
-					economic_spaceport_9_modifier
-					stardock_spaceport_1_modifier
-					stardock_spaceport_2_modifier
-					stardock_spaceport_3_modifier
-					stardock_spaceport_4_modifier
-					stardock_spaceport_5_modifier
-					stardock_spaceport_6_modifier
-					stardock_spaceport_7_modifier
-					stardock_spaceport_8_modifier
-					stardock_spaceport_9_modifier
-					spaceport_kinetic_t2_modifier
-					spaceport_kinetic_t3_modifier
-					spaceport_kinetic_t4_modifier
-					spaceport_kinetic_t5_modifier
-					spaceport_energy_t2_modifier
-					spaceport_energy_t3_modifier
-					spaceport_energy_t4_modifier
-					spaceport_energy_t5_modifier
-					spaceport_explosive_t2_modifier
-					spaceport_explosive_t3_modifier
-					spaceport_explosive_t4_modifier
-					spaceport_explosive_t5_modifier
-					spaceport_disruptor_t2_modifier
-					spaceport_disruptor_t3_modifier
-					spaceport_plasma_t2_modifier
-					spaceport_plasma_t3_modifier
-					spaceport_swarmer_missile_t2_modifier
-					spaceport_swarmer_missile_t3_modifier
-					spaceport_kinetic_artillery_t2_modifier
-					spaceport_kinetic_artillery_t3_modifier
-					spaceport_strike_craft_t2_modifier					
-					spaceport_strike_craft_t3_modifier
-				}
-			}	
-			if = {
-				limit = { has_planet_flag = ex_spaceport_1 }
-				remove_planet_flag = ex_spaceport_1
-			}	
-			if = {
-				limit = { has_planet_flag = ex_spaceport_2 }
-				remove_planet_flag = ex_spaceport_2
-			}
-			if = {
-				limit = { has_planet_flag = ex_spaceport_3 }
-				remove_planet_flag = ex_spaceport_3
-			}
-			if = {
-				limit = { has_planet_flag = ex_spaceport_4 }
-				remove_planet_flag = ex_spaceport_4
-			}
-			if = {
-				limit = { has_planet_flag = ex_spaceport_5 }
-				remove_planet_flag = ex_spaceport_5
-			}
-			if = {
-				limit = { has_planet_flag = ex_spaceport_6 }
-				remove_planet_flag = ex_spaceport_6
-			}
-			if = {
-				limit = { has_planet_flag = ex_spaceport_7 }
-				remove_planet_flag = ex_spaceport_7
-			}
-			if = {
-				limit = { has_planet_flag = ex_spaceport_8 }
-				remove_planet_flag = ex_spaceport_8
-			}
-			if = {
-				limit = { has_planet_flag = ex_spaceport_9 }
-				remove_planet_flag = ex_spaceport_9
-			}	
-			if = {
-				limit = { has_planet_flag = economic_spaceport_1_modifier }
-				remove_modifier = economic_spaceport_1
-				remove_planet_flag = economic_spaceport_1_modifier
-			}	
-			if = {
-				limit = { has_planet_flag = economic_spaceport_2_modifier }
-				remove_modifier = economic_spaceport_2
-				remove_planet_flag = economic_spaceport_2_modifier
-			}
-			if = {
-				limit = { has_planet_flag = economic_spaceport_3_modifier }
-				remove_modifier = economic_spaceport_3
-				remove_planet_flag = economic_spaceport_3_modifier
-			}
-			if = {
-				limit = { has_planet_flag = economic_spaceport_4_modifier }
-				remove_modifier = economic_spaceport_4
-				remove_planet_flag = economic_spaceport_4_modifier
-			}
-			if = {
-				limit = { has_planet_flag = economic_spaceport_5_modifier }
-				remove_modifier = economic_spaceport_5
-				remove_planet_flag = economic_spaceport_5_modifier
-			}
-			if = {
-				limit = { has_planet_flag = economic_spaceport_6_modifier }
-				remove_modifier = economic_spaceport_6
-				remove_planet_flag = economic_spaceport_6_modifier
-			}
-			if = {
-				limit = { has_planet_flag = economic_spaceport_7_modifier }
-				remove_modifier = economic_spaceport_7
-				remove_planet_flag = economic_spaceport_7_modifier
-			}
-			if = {
-				limit = { has_planet_flag = economic_spaceport_8_modifier }
-				remove_modifier = economic_spaceport_8
-				remove_planet_flag = economic_spaceport_8_modifier
-			}
-			if = {
-				limit = { has_planet_flag = economic_spaceport_9_modifier }
-				remove_modifier = economic_spaceport_9
-				remove_planet_flag = economic_spaceport_9_modifier
-			}	
-			if = {
-				limit = { has_planet_flag = stardock_spaceport_1_modifier }
-				remove_modifier = stardock_spaceport_1
-				remove_planet_flag = stardock_spaceport_1_modifier
-			}	
-			if = {
-				limit = { has_planet_flag = stardock_spaceport_2_modifier }
-				remove_modifier = stardock_spaceport_2
-				remove_planet_flag = stardock_spaceport_2_modifier
-			}
-			if = {
-				limit = { has_planet_flag = stardock_spaceport_3_modifier }
-				remove_modifier = stardock_spaceport_3
-				remove_planet_flag = stardock_spaceport_3_modifier
-			}
-			if = {
-				limit = { has_planet_flag = stardock_spaceport_4_modifier }
-				remove_modifier = stardock_spaceport_4
-				remove_planet_flag = stardock_spaceport_4_modifier
-			}
-			if = {
-				limit = { has_planet_flag = stardock_spaceport_5_modifier }
-				remove_modifier = stardock_spaceport_5
-				remove_planet_flag = stardock_spaceport_5_modifier
-			}
-			if = {
-				limit = { has_planet_flag = stardock_spaceport_6_modifier }
-				remove_modifier = stardock_spaceport_6
-				remove_planet_flag = stardock_spaceport_6_modifier
-			}
-			if = {
-				limit = { has_planet_flag = stardock_spaceport_7_modifier }
-				remove_modifier = stardock_spaceport_7
-				remove_planet_flag = stardock_spaceport_7_modifier
-			}
-			if = {
-				limit = { has_planet_flag = stardock_spaceport_8_modifier }
-				remove_modifier = stardock_spaceport_8
-				remove_planet_flag = stardock_spaceport_8_modifier
-			}
-			if = {
-				limit = { has_planet_flag = stardock_spaceport_9_modifier }
-				remove_modifier = stardock_spaceport_9
-				remove_planet_flag = stardock_spaceport_9_modifier
-			}	
-			if = {
-				limit = { has_planet_flag = defensive_spaceport_1_modifier }
-				remove_planet_flag = defensive_spaceport_1_modifier
-			}	
-			if = {
-				limit = { has_planet_flag = defensive_spaceport_2_modifier }
-				remove_planet_flag = defensive_spaceport_2_modifier
-			}
-			if = {
-				limit = { has_planet_flag = defensive_spaceport_3_modifier }
-				remove_planet_flag = defensive_spaceport_3_modifier
-			}
-			if = {
-				limit = { has_planet_flag = defensive_spaceport_4_modifier }
-				remove_planet_flag = defensive_spaceport_4_modifier
-			}
-			if = {
-				limit = { has_planet_flag = defensive_spaceport_5_modifier }
-				remove_planet_flag = defensive_spaceport_5_modifier
-			}
-			if = {
-				limit = { has_planet_flag = defensive_spaceport_6_modifier }
-				remove_planet_flag = defensive_spaceport_6_modifier
-			}
-			if = {
-				limit = { has_planet_flag = defensive_spaceport_7_modifier }
-				remove_planet_flag = defensive_spaceport_7_modifier
-			}
-			if = {
-				limit = { has_planet_flag = defensive_spaceport_8_modifier }
-				remove_planet_flag = defensive_spaceport_8_modifier
-			}
-			if = {
-				limit = { has_planet_flag = defensive_spaceport_9_modifier }
-				remove_planet_flag = defensive_spaceport_9_modifier
-			}				
-			if = {
-				limit = { has_planet_flag = spaceport_kinetic_t2_modifier }
-				remove_planet_flag = spaceport_kinetic_t2_modifier
-			}
-			if = {
-				limit = { has_planet_flag = spaceport_kinetic_t3_modifier }
-				remove_planet_flag = spaceport_kinetic_t3_modifier				
-			}			
-			if = {
-				limit = { has_planet_flag = spaceport_kinetic_t4_modifier }
-				remove_planet_flag = spaceport_kinetic_t4_modifier
-			}			
-			if = {
-				limit = { has_planet_flag = spaceport_kinetic_t5_modifier }
-				remove_planet_flag = spaceport_kinetic_t5_modifier
-			}			
-			if = {
-				limit = { has_planet_flag = spaceport_energy_t2_modifier }
-				remove_planet_flag = spaceport_energy_t2_modifier
-			}			
-			if = {
-				limit = { has_planet_flag = spaceport_energy_t3_modifier }
-				remove_planet_flag = spaceport_energy_t3_modifier
-			}						
-			if = {
-				limit = { has_planet_flag = spaceport_energy_t4_modifier }
-				remove_planet_flag = spaceport_energy_t4_modifier
-			}						
-			if = {
-				limit = { has_planet_flag = spaceport_energy_t5_modifier }
-				remove_planet_flag = spaceport_energy_t5_modifier
-			}						
-			if = {
-				limit = { has_planet_flag = spaceport_explosive_t2_modifier }
-				remove_planet_flag = spaceport_explosive_t2_modifier
-			}						
-			if = {
-				limit = { has_planet_flag = spaceport_explosive_t3_modifier }
-				remove_planet_flag = spaceport_explosive_t3_modifier
-			}									
-			if = {
-				limit = { has_planet_flag = spaceport_explosive_t4_modifier }
-				remove_planet_flag = spaceport_explosive_t4_modifier
-			}									
-			if = {
-				limit = { has_planet_flag = spaceport_explosive_t5_modifier }
-				remove_planet_flag = spaceport_explosive_t5_modifier
-			}									
-			if = {
-				limit = { has_planet_flag = spaceport_disruptor_t2_modifier }
-				remove_planet_flag = spaceport_disruptor_t2_modifier
-			}	
-			if = {
-				limit = { has_planet_flag = spaceport_disruptor_t3_modifier }
-				remove_planet_flag = spaceport_disruptor_t3_modifier
-			}			
-			if = {
-				limit = { has_planet_flag = spaceport_plasma_t2_modifier }
-				remove_planet_flag = spaceport_plasma_t2_modifier
-			}			
-			if = {
-				limit = { has_planet_flag = spaceport_plasma_t3_modifier }
-				remove_planet_flag = spaceport_plasma_t3_modifier
-			}				
-			if = {
-				limit = { has_planet_flag = spaceport_swarmer_missile_t2_modifier }
-				remove_planet_flag = spaceport_swarmer_missile_t2_modifier
-			}	
-			if = {
-				limit = { has_planet_flag = spaceport_swarmer_missile_t3_modifier }
-				remove_planet_flag = spaceport_swarmer_missile_t3_modifier
-			}					
-			if = {
-				limit = { has_planet_flag = spaceport_kinetic_artillery_t2_modifier }
-				remove_planet_flag = spaceport_kinetic_artillery_t2_modifier
-			}					
-			if = {
-				limit = { has_planet_flag = spaceport_kinetic_artillery_t3_modifier }
-				remove_planet_flag = spaceport_kinetic_artillery_t3_modifier
-			}							
-			if = {
-				limit = { has_planet_flag = spaceport_strike_craft_t2_modifier }
-				remove_planet_flag = spaceport_strike_craft_t2_modifier
-			}							
-			if = {
-				limit = { has_planet_flag = spaceport_strike_craft_t3_modifier }
-				remove_planet_flag = spaceport_strike_craft_t3_modifier
-			}										
-		}
-	}
-}	
-
-event = { #this event fires on a monthly pulse
-	id = ex_spaceport_events.6
-	hide_window = yes
-	is_triggered_only = yes
-	
-	immediate = {
-		every_country = {
-			limit = {
-				OR = {
-					is_country_type = default
-					is_country_type = fallen_empire
-					is_country_type = awakened_fallen_empire
-				}				
-			}			
-			every_owned_planet = {
-				limit = { has_spaceport = yes }	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
-						NOT = { has_planet_flag = spaceport_kinetic_t2_modifier }
-						owner = { tier_2_kinetics = yes }						
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							add_modifier = { modifier = spaceport_kinetic_t2 days = -1 }
-						}
-					}
-					set_planet_flag = spaceport_kinetic_t2_modifier
-				}
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
-						NOT = { has_planet_flag = spaceport_kinetic_t3_modifier }
-						owner = { tier_3_kinetics = yes }
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_kinetic_t2
-							add_modifier = { modifier = spaceport_kinetic_t3 days = -1 }
-						}
-					}	
-					remove_planet_flag = spaceport_kinetic_t2_modifier					
-					set_planet_flag = spaceport_kinetic_t3_modifier					
-				}
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
-						NOT = { has_planet_flag = spaceport_kinetic_t4_modifier }
-						owner = { tier_4_kinetics = yes }
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_kinetic_t3
-							add_modifier = { modifier = spaceport_kinetic_t4 days = -1 }
-						}
-					}	
-					remove_planet_flag = spaceport_kinetic_t3_modifier					
-					set_planet_flag = spaceport_kinetic_t4_modifier						
-				}	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_kinetic_weapon_1 has_spaceport_module = spaceport_kinetic_weapon_2 has_spaceport_module = spaceport_kinetic_weapon_3 }
-						NOT = { has_planet_flag = spaceport_kinetic_t5_modifier }
-						owner = { tier_5_kinetics = yes }
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_kinetic_t4
-							add_modifier = { modifier = spaceport_kinetic_t5 days = -1 }
-						}
-					}	
-					remove_planet_flag = spaceport_kinetic_t4_modifier					
-					set_planet_flag = spaceport_kinetic_t5_modifier						
-				}
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
-						NOT = { has_planet_flag = spaceport_energy_t2_modifier }
-						owner = { tier_2_energy = yes }							
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							add_modifier = { modifier = spaceport_energy_t2 days = -1 }
-						}
-					}	
-					set_planet_flag = spaceport_energy_t2_modifier
-				}
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
-						NOT = { has_planet_flag = spaceport_energy_t3_modifier }
-						owner = { tier_3_energy = yes }			
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_energy_t2
-							add_modifier = { modifier = spaceport_energy_t3 days = -1 }
-						}
-					}	
-					remove_planet_flag = spaceport_energy_t2_modifier					
-					set_planet_flag = spaceport_energy_t3_modifier					
-				}
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
-						NOT = { has_planet_flag = spaceport_energy_t4_modifier }
-						owner = { tier_4_energy = yes }			
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_energy_t3
-							add_modifier = { modifier = spaceport_energy_t4 days = -1 }
-						}
-					}	
-					remove_planet_flag = spaceport_energy_t3_modifier					
-					set_planet_flag = spaceport_energy_t4_modifier						
-				}	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_energy_weapon_1 has_spaceport_module = spaceport_energy_weapon_2 has_spaceport_module = spaceport_energy_weapon_3 }
-						NOT = { has_planet_flag = spaceport_energy_t5_modifier }
-						owner = { tier_5_energy = yes }			
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_energy_t4
-							add_modifier = { modifier = spaceport_energy_t5 days = -1 }
-						}
-					}	
-					remove_planet_flag = spaceport_energy_t4_modifier					
-					set_planet_flag = spaceport_energy_t5_modifier						
-				}	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
-						NOT = { has_planet_flag = spaceport_explosive_t2_modifier }
-						owner = { tier_2_explosives = yes }							
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							add_modifier = { modifier = spaceport_explosive_t2 days = -1 }
-						}
-					}	
-					set_planet_flag = spaceport_explosive_t2_modifier	
-				}
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
-						NOT = { has_planet_flag = spaceport_explosive_t3_modifier }
-						owner = { tier_3_explosives = yes }		
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_explosive_t2
-							add_modifier = { modifier = spaceport_explosive_t3 days = -1 }
-						}
-					}
-					remove_planet_flag = spaceport_explosive_t2_modifier					
-					set_planet_flag = spaceport_explosive_t3_modifier						
-				}
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
-						NOT = { has_planet_flag = spaceport_explosive_t4_modifier }
-						owner = { tier_4_explosives = yes }		
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_explosive_t3
-							add_modifier = { modifier = spaceport_explosive_t4 days = -1 }
-						}
-					}	
-					remove_planet_flag = spaceport_explosive_t3_modifier					
-					set_planet_flag = spaceport_explosive_t4_modifier											
-				}	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_explosive_weapon_1 has_spaceport_module = spaceport_explosive_weapon_2 has_spaceport_module = spaceport_explosive_weapon_3 }
-						NOT = { has_planet_flag = spaceport_explosive_t5_modifier }
-						owner = { tier_5_explosives = yes }		
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_explosive_t4
-							add_modifier = { modifier = spaceport_explosive_t5 days = -1 }
-						}
-					}		
-					remove_planet_flag = spaceport_explosive_t4_modifier					
-					set_planet_flag = spaceport_explosive_t5_modifier											
-				}	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_disruptor_1 has_spaceport_module = spaceport_disruptor_2 has_spaceport_module = spaceport_disruptor_3 }
-						NOT = { has_planet_flag = spaceport_disruptor_t2_modifier }
-						owner = { tier_2_disruptors = yes }		
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							add_modifier = { modifier = spaceport_disruptor_t2 days = -1 }
-						}
-					}		
-					set_planet_flag = spaceport_disruptor_t2_modifier											
-				}	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_disruptor_1 has_spaceport_module = spaceport_disruptor_2 has_spaceport_module = spaceport_disruptor_3 }
-						NOT = { has_planet_flag = spaceport_disruptor_t3_modifier }
-						owner = { tier_3_disruptors = yes }		
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_disruptor_t2
-							add_modifier = { modifier = spaceport_disruptor_t3 days = -1 }
-						}
-					}		
-					remove_planet_flag = spaceport_disruptor_t2_modifier
-					set_planet_flag = spaceport_disruptor_t3_modifier											
-				}	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_plasma_1 has_spaceport_module = spaceport_plasma_2 has_spaceport_module = spaceport_plasma_3 }
-						NOT = { has_planet_flag = spaceport_plasma_t2_modifier }
-						owner = { tier_2_plasma = yes }		
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							add_modifier = { modifier = spaceport_plasma_t2 days = -1 }
-						}
-					}		
-					set_planet_flag = spaceport_plasma_t2_modifier											
-				}	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_plasma_1 has_spaceport_module = spaceport_plasma_2 has_spaceport_module = spaceport_plasma_3 }
-						NOT = { has_planet_flag = spaceport_plasma_t3_modifier }
-						owner = { tier_3_plasma = yes }		
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_plasma_t2
-							add_modifier = { modifier = spaceport_plasma_t3 days = -1 }
-						}
-					}		
-					remove_planet_flag = spaceport_plasma_t2_modifier
-					set_planet_flag = spaceport_plasma_t3_modifier											
-				}	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_swarmer_missile_1 has_spaceport_module = spaceport_swarmer_missile_2 has_spaceport_module = spaceport_swarmer_missile_3 }
-						NOT = { has_planet_flag = spaceport_swarmer_missile_t2_modifier }
-						owner = { tier_2_swarmer_missiles = yes }		
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							add_modifier = { modifier = spaceport_swarmer_missile_t2 days = -1 }
-						}
-					}		
-					set_planet_flag = spaceport_swarmer_missile_t2_modifier											
-				}	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_swarmer_missile_1 has_spaceport_module = spaceport_swarmer_missile_2 has_spaceport_module = spaceport_swarmer_missile_3 }
-						NOT = { has_planet_flag = spaceport_swarmer_missile_t3_modifier }
-						owner = { tier_3_swarmer_missiles = yes }		
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_swarmer_missile_t2
-							add_modifier = { modifier = spaceport_swarmer_missile_t3 days = -1 }
-						}
-					}		
-					remove_planet_flag = spaceport_swarmer_missile_t2_modifier
-					set_planet_flag = spaceport_swarmer_missile_t3_modifier											
-				}	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_kinetic_artillery_1 has_spaceport_module = spaceport_kinetic_artillery_2 has_spaceport_module = spaceport_kinetic_artillery_3 }
-						NOT = { has_planet_flag = spaceport_kinetic_artillery_t2_modifier }
-						owner = { tier_2_kinetic_artillery = yes }		
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							add_modifier = { modifier = spaceport_kinetic_artillery_t2 days = -1 }
-						}
-					}		
-					set_planet_flag = spaceport_kinetic_artillery_t2_modifier											
-				}	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_kinetic_artillery_1 has_spaceport_module = spaceport_kinetic_artillery_2 has_spaceport_module = spaceport_kinetic_artillery_3 }
-						NOT = { has_planet_flag = spaceport_kinetic_artillery_t3_modifier }
-						owner = { tier_3_kinetic_artillery = yes }		
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_kinetic_artillery_t2
-							add_modifier = { modifier = spaceport_kinetic_artillery_t3 days = -1 }
-						}
-					}		
-					remove_planet_flag = spaceport_kinetic_artillery_t2_modifier
-					set_planet_flag = spaceport_kinetic_artillery_t3_modifier											
-				}		
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_fighter_strike_craft_1 has_spaceport_module = spaceport_fighter_strike_craft_2 has_spaceport_module = spaceport_fighter_strike_craft_3 has_spaceport_module = spaceport_interceptor_strike_craft_1 has_spaceport_module = spaceport_interceptor_strike_craft_2 has_spaceport_module = spaceport_interceptor_strike_craft_3	}
-						NOT = { has_planet_flag = spaceport_strike_craft_t2_modifier }
-						owner = { tier_2_strike_craft = yes }		
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							add_modifier = { modifier = spaceport_strike_craft_t2 days = -1 }
-						}
-					}		
-					set_planet_flag = spaceport_strike_craft_t2_modifier											
-				}	
-				if = {
-					limit = { 
-						OR = { has_spaceport_module = spaceport_fighter_strike_craft_1 has_spaceport_module = spaceport_fighter_strike_craft_2 has_spaceport_module = spaceport_fighter_strike_craft_3 has_spaceport_module = spaceport_interceptor_strike_craft_1 has_spaceport_module = spaceport_interceptor_strike_craft_2 has_spaceport_module = spaceport_interceptor_strike_craft_3	}
-						NOT = { has_planet_flag = spaceport_strike_craft_t3_modifier }
-						owner = { tier_3_strike_craft = yes }		
-					}
-					spaceport = { 
-						random_owned_ship = { 
-							remove_modifier = spaceport_strike_craft_t2
-							add_modifier = { modifier = spaceport_strike_craft_t3 days = -1 }
-						}
-					}		
-					remove_planet_flag = spaceport_strike_craft_t2_modifier
-					set_planet_flag = spaceport_strike_craft_t3_modifier											
-				}					
-			}
-		}
-	}	
+	trigger = { from = { is_ship_size = orbital_station } }	
+	immediate = { from = { orbit = { planet = {	remove_spaceport_flags_and_modifiers = yes } } } }
 }	
 
 planet_event = { # this event runs on every tick (day), checking and adding/removing planet flags/modifiers as necessary. 
 	id = ex_spaceport_events.10
 	hide_window = yes
+	is_triggered_only = yes
 	
-	trigger = { 
-		#NOT = { has_planet_flag = level_check_delay }
-		has_owner = yes
-		has_spaceport = yes		
-		has_free_module_slot = yes		
-	}
+	#trigger = { 
+	#	#NOT = { has_planet_flag = level_check_delay }
+	#	has_owner = yes
+	#	has_spaceport = yes		
+	#	has_free_module_slot = yes		
+	#}
 	
 	immediate = {
 		if = {
