@@ -5,26 +5,25 @@ planet_edict = {
 	effect = {
 		planet = {
 			hidden_effect = {
-				set_timed_planet_flag = { flag = edict_economic_spaceport_in_effect days = 3600 }
-				#add_economic_spaceport_modifier = yes				
-				#planet_event = { id = edict.events.10 days = 1 }				
+				set_planet_flag = spaceport_automation_economic							
+				set_timed_planet_flag = { flag = reset_delay days = 360 }
+				planet_event = { id = ex_spaceport_events.100 }				
 			}
 		}
 	}	
 	
-	potential = { 
-		owner = { has_technology = "tech_spaceport_2" }
+	potential = { 		
+		owner = { has_policy_flag = core_edicts }			
 		planet = {
 			AND = {			
 				NOT = {
-					has_planet_flag = edict_economic_spaceport_in_effect
-					has_planet_flag = edict_defensive_spaceport_in_effect
-					has_planet_flag = edict_stardock_spaceport_in_effect
-					has_planet_flag = game_start_economic_spaceport
+					has_planet_flag = spaceport_automation_economic
+					has_planet_flag = spaceport_automation_stardock
+					has_planet_flag = spaceport_automation_defensive					
 				}					
 				OR = {
 					has_spaceport = yes
-					has_spaceport_construction = yes					
+					has_spaceport_construction = no
 				}		
 			}
 		}	
@@ -50,25 +49,25 @@ planet_edict = {
 	effect = {
 		planet = {
 			hidden_effect = {
-				set_timed_planet_flag = { flag = edict_stardock_spaceport_in_effect days = 3600 }
-				#planet_event = { id = edict.events.10 days = 1 }				
+				set_planet_flag = spaceport_automation_stardock
+				set_timed_planet_flag = { flag = reset_delay days = 360 }	
+				planet_event = { id = ex_spaceport_events.100 }				
 			}
 		}
-	}
+	}	
 		
-	potential = { 
-		owner = { has_technology = "tech_spaceport_2" }
+	potential = { 		
+		owner = { has_policy_flag = core_edicts }			
 		planet = {
 			AND = {			
 				NOT = {
-					has_planet_flag = edict_economic_spaceport_in_effect
-					has_planet_flag = edict_defensive_spaceport_in_effect
-					has_planet_flag = edict_stardock_spaceport_in_effect
-					has_planet_flag = game_start_economic_spaceport
+					has_planet_flag = spaceport_automation_economic
+					has_planet_flag = spaceport_automation_stardock
+					has_planet_flag = spaceport_automation_defensive					
 				}					
 				OR = {
 					has_spaceport = yes
-					has_spaceport_construction = yes					
+					has_spaceport_construction = no
 				}		
 			}
 		}	
@@ -96,33 +95,32 @@ planet_edict = {
 planet_edict = {
 	name = "defensive_spaceport_specialization"
 	influence_cost = 0
-	
-	potential = { 
-		owner = { has_technology = "tech_spaceport_2" }
-		planet = {
-			AND = {			
-				NOT = {
-					has_planet_flag = edict_economic_spaceport_in_effect
-					has_planet_flag = edict_defensive_spaceport_in_effect
-					has_planet_flag = edict_stardock_spaceport_in_effect
-					has_planet_flag = game_start_economic_spaceport
-				}					
-				OR = {
-					has_spaceport = yes
-					has_spaceport_construction = yes					
-				}		
-			}
-		}	
-	}
-	
+
 	effect = {
 		planet = {
 			hidden_effect = {
-				set_timed_planet_flag = { flag = edict_defensive_spaceport_in_effect days = 3600 }
-				#add_defensive_spaceport_modifier = yes				
-				#planet_event = { id = edict.events.10 days = 1 }				
+				set_planet_flag = spaceport_automation_defensive							
+				set_timed_planet_flag = { flag = reset_delay days = 360 }
+				planet_event = { id = ex_spaceport_events.100 }				
 			}
 		}
+	}	
+	
+	potential = { 		
+		owner = { has_policy_flag = core_edicts }			
+		planet = {
+			AND = {			
+				NOT = {
+					has_planet_flag = spaceport_automation_economic
+					has_planet_flag = spaceport_automation_stardock
+					has_planet_flag = spaceport_automation_defensive					
+				}					
+				OR = {
+					has_spaceport = yes
+					has_spaceport_construction = no
+				}		
+			}
+		}	
 	}
 	
 	ai_weight = {
@@ -152,15 +150,39 @@ planet_edict = {
 }	
 
 planet_edict = {
-	name = "reset_default_spaceport_specialization"
+	name = "reset_spaceport_specialization"
 	influence_cost = 0
 	
-	potential = { planet = { has_planet_flag = game_start_economic_spaceport } }
+	potential = { 		
+		owner = { has_policy_flag = core_edicts }			
+		planet = {
+			AND = {			
+				OR = {
+					has_planet_flag = spaceport_automation_economic
+					has_planet_flag = spaceport_automation_stardock
+					has_planet_flag = spaceport_automation_defensive					
+				}					
+				OR = {
+					has_spaceport = yes
+					has_spaceport_construction = no
+				}						
+			}
+		}	
+	}
+
+	allow = { 
+		custom_tooltip = {
+			fail_text = "reset_delay_in_effect"
+			NOT = { has_planet_flag = reset_delay }
+		}		
+	}
 	
 	effect = {
 		planet = {
 			hidden_effect = {
-				remove_planet_flag = game_start_economic_spaceport			
+				remove_planet_flag = spaceport_automation_economic
+				remove_planet_flag = spaceport_automation_stardock
+				remove_planet_flag = spaceport_automation_defensive				remove_planet_flag = game_start_economic_spaceport			
 			}
 		}
 
