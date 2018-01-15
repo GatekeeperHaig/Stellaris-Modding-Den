@@ -313,7 +313,7 @@ def main(args,unused=0):
     # tagList.printAll()
     # nameToData[0].printAll()
     subFolderTable=os.path.join(os.path.dirname(fileName),"ods/")#++os.path.basename(fileName))
-    print(subFolderTable)
+    # print(subFolderTable)
     if not args.just_copy_and_check and not os.path.exists(subFolderTable):
       os.mkdir(subFolderTable)
     if args.join_files:
@@ -334,12 +334,16 @@ def main(args,unused=0):
         bodyArray=[]
         for name, val in nameToData.getAll():
           lineArray=[copy.deepcopy(lineArrayT)]
-          if isinstance(val,TagList):
+          if isinstance(val,TagList) and len(val.names):
             occurenceList=copy.deepcopy(tagList.get(name))
             val.toCSV(lineArray, tagList.get(name),occurenceList,varsToValue,args)
             occurenceEntry=copy.deepcopy(headerArray)
             occurenceList.toCSVHeader(occurenceEntry,args)
-            keyValue=val.vals[val.names.index(keyString)]
+            try:
+              keyValue=val.vals[val.names.index(keyString)]
+            except:
+              val.printAll()
+              raise
             # keyIndex=tagList.vals.index(keyString)
             occurenceEntry[0][0]=keyValue
             # print(occurenceEntry)
