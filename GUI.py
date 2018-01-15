@@ -71,8 +71,8 @@ def startEditor(filename, forceEditor=False):
 
 class Line:
   def openFile(self):
-    current=self.getTxt2()#("1.0",END).strip()
-    if current=='""' or not os.path.exists(current):
+    current=self.getTxt()
+    if current=='' or not os.path.exists(current):
       fileName=filedialog.askopenfilename(initialdir = self.root.lastPath,title = "Select file",filetypes = (self.root.defaultFileFilter, ("all files","*")))
     else:
       fileName=filedialog.askopenfilename(initialdir = os.path.dirname(current),title = "Select file",filetypes = (self.root.defaultFileFilter, ("all files","*")))
