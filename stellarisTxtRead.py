@@ -524,8 +524,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           valIndex=self.n_thIndex(headerName,actual_OCC)
         except ValueError:
           if not args.forbid_additions:
-            print(headerName)
-            print(actual_OCC)
+            # print(headerName)
+            # print(actual_OCC)
             if isinstance(self.getN_th(headerName, actual_OCC-1), TagList):
               self.add(headerName, TagList(self.bracketLevel+1))
             else:
