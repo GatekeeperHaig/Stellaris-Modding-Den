@@ -27,7 +27,12 @@ ship_event = { #this event fires the moment a spaceport is built
 	hide_window = yes
 	is_triggered_only = yes
 
-	immediate = { from = { planet_event = { id = ex_spaceport_events.10 } } }		
+	immediate = { 
+		from = { 
+			remove_spaceport_flags_and_modifiers = yes
+			planet_event = { id = ex_spaceport_events.10 }
+		}
+	} 		
 }
 
 country_event = { #this event fires whenever a new technology is researched
@@ -74,21 +79,23 @@ event = { #this event fires on a monthly pulse
 				}
 			}	
 			every_owned_planet = { 				
-				limit = { has_spaceport = yes }
-				update_spaceport_weapon_modifiers = yes	
-				if = { 
-					limit = { has_free_spaceport_module_slot = yes } 
-					if = { limit = { NOT = { has_spaceport_module = module_under_construction } is_automation_enabled = yes	} planet_event = { id = ex_spaceport_events.10 }	
-					else = { if = { limit = { is_spaceport_module_slot_free = 1 has_no_spaceport_level_flag = yes }	planet_event = { id = ex_spaceport_events.10 }
-					else = { if = {	limit = { is_spaceport_module_slot_free = 2 no_spaceport_level_flag_2_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
-					else = { if = { limit = { is_spaceport_module_slot_free = 3 no_spaceport_level_flag_3_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
-					else = { if = {	limit = { is_spaceport_module_slot_free = 4 no_spaceport_level_flag_4_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
-					else = { if = {	limit = { is_spaceport_module_slot_free = 5 no_spaceport_level_flag_5_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
-					else = { if = {	limit = { is_spaceport_module_slot_free = 6 no_spaceport_level_flag_6_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
-					else = { if = {	limit = { is_spaceport_module_slot_free = 7 no_spaceport_level_flag_7_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
-					else = { if = {	limit = { is_spaceport_module_slot_free = 8 no_spaceport_level_flag_8_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
-					else = { if = { limit = { is_spaceport_module_slot_free = 9 no_spaceport_level_flag_9 = yes } planet_event = { id = ex_spaceport_events.10 }
-}}}}}}}}}}}}}}}}}}}}}}}}
+				if = { limit = { has_spaceport = no	NOT = { has_planet_flag = spaceport_flags_removed } has_spaceport_level_flag = yes } remove_spaceport_flags_and_modifiers = yes	}
+				if = { limit = { has_spaceport = yes has_planet_flag = spaceport_flags_removed } planet_event = { id = ex_spaceport_events.10 } }
+				if = { limit = { has_spaceport = yes } 
+					update_spaceport_weapon_modifiers = yes					
+					if = { 
+						limit = { has_free_spaceport_module_slot = yes } 
+						if = { limit = { NOT = { has_spaceport_module = module_under_construction } is_automation_enabled = yes	} planet_event = { id = ex_spaceport_events.10 }	
+						else = { if = { limit = { is_spaceport_module_slot_free = 1 has_no_spaceport_level_flag = yes }	planet_event = { id = ex_spaceport_events.10 }
+						else = { if = {	limit = { is_spaceport_module_slot_free = 2 no_spaceport_level_flag_2_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
+						else = { if = { limit = { is_spaceport_module_slot_free = 3 no_spaceport_level_flag_3_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
+						else = { if = {	limit = { is_spaceport_module_slot_free = 4 no_spaceport_level_flag_4_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
+						else = { if = {	limit = { is_spaceport_module_slot_free = 5 no_spaceport_level_flag_5_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
+						else = { if = {	limit = { is_spaceport_module_slot_free = 6 no_spaceport_level_flag_6_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
+						else = { if = {	limit = { is_spaceport_module_slot_free = 7 no_spaceport_level_flag_7_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
+						else = { if = {	limit = { is_spaceport_module_slot_free = 8 no_spaceport_level_flag_8_and_higher = yes } planet_event = { id = ex_spaceport_events.10 }
+						else = { if = { limit = { is_spaceport_module_slot_free = 9 no_spaceport_level_flag_9 = yes } planet_event = { id = ex_spaceport_events.10 }
+}}}}}}}}}}}}}}}}}}}}}}}}}
 
 planet_event = { # this event runs on every tick (day), checking and adding/removing planet flags/modifiers as necessary. 
 	id = ex_spaceport_events.10
@@ -103,6 +110,7 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 	#}
 	
 	immediate = {
+		if = { limit = { has_planet_flag = spaceport_flags_removed } remove_planet_flag = spaceport_flags_removed }
 		if = {
 			limit = { is_spaceport_module_slot_free = 9	}
 			if = { 
