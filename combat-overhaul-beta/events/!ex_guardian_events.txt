@@ -1328,7 +1328,7 @@ ship_event = { #the horror was changed to drop extra-dimensional weapons instead
 }
 
 # Dreadnought Rebuilt
-ship_event = { ###this event needs to be rebuilt properly. point!
+ship_event = {
 	id = guardian.3103
 	title = "guardian.3103"
 	desc = {
@@ -1354,30 +1354,88 @@ ship_event = { ###this event needs to be rebuilt properly. point!
 	
 	option = {
 		name = "guardian.3103.a"
-		create_fleet = {
-			name = "NAME_Juggernaut"
-			effect = {
-				set_owner = event_target:project_owner
-				create_ship = {
-					name = random
-					random_existing_design = juggernaut
-				}
-				set_location = {
-					target = event_target:disabled_dreadnought_object
-					distance = 0
-					angle = random
+		
+		# Psi Jump Dreadnought if owner has it
+		if = {
+			limit = {
+				owner = { has_technology = "tech_psi_jump_drive_1" }
+			}
+			create_fleet = {
+				name = "NAME_Juggernaut"
+				effect = {
+					set_owner = event_target:project_owner
+					create_ship = {
+						name = random
+						design = "NAME_Type_1" # Psi Jump Dreadnought
+						graphical_culture = "npf_01"
+						upgradable = no
+					}
+					set_location = {
+						target = event_target:disabled_dreadnought_object
+						distance = 0
+						angle = random
+					}
 				}
 			}
+			hidden_effect = {
+				event_target:disabled_dreadnought_object = { destroy_ambient_object = this }
+				solar_system = {
+					random_system_ambient_object = {
+						limit = { has_ambient_object_flag = dreadnought_debris }
+						destroy_ambient_object = this
+					}
+				}
+			}
+			break = yes
 		}
-		hidden_effect = {
-			event_target:disabled_dreadnought_object = { destroy_ambient_object = this }
-			solar_system = {
-				random_system_ambient_object = {
-					limit = { has_ambient_object_flag = dreadnought_debris }
-					destroy_ambient_object = this
+		# Jump Dreadnought if owner doesn't have psi.
+		if = {
+			limit = {
+				owner = { 
+					OR = {
+						has_technology = "tech_jump_drive_1"
+						has_technology = "tech_jump_drive_2"
+						has_technology = "tech_warp_drive_1"
+						has_technology = "tech_warp_drive_2"
+						has_technology = "tech_warp_drive_3"
+						has_technology = "tech_hyper_drive_1"
+						has_technology = "tech_hyper_drive_2"
+						has_technology = "tech_hyper_drive_3"
+						has_technology = "tech_wormhole_generation_1"
+						has_technology = "tech_wormhole_generation_2"
+						has_technology = "tech_wormhole_generation_3"						
+					}
+				}	
+			}
+			create_fleet = {
+				name = "NAME_Juggernaut"
+				effect = {
+					set_owner = event_target:project_owner
+					create_ship = {
+						name = random
+						design = "NAME_Type_3" # Jump Dreadnought
+						graphical_culture = "npf_01"
+						upgradable = no
+					}
+					set_location = {
+						target = event_target:disabled_dreadnought_object
+						distance = 0
+						angle = random
+					}
 				}
 			}
-		}	
-	}		
+			hidden_effect = {
+				event_target:disabled_dreadnought_object = { destroy_ambient_object = this }
+				solar_system = {
+					random_system_ambient_object = {
+						limit = { has_ambient_object_flag = dreadnought_debris }
+						destroy_ambient_object = this
+					}
+				}
+			}
+			break = yes
+		}
+	}
 }
+
 
