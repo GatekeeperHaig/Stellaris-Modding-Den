@@ -85,7 +85,7 @@ def main(args,unused=0):
       tagList=TagList(0)
       
     keyStrings=["key","name","id"]  
-    if fileName[-4:]!=".txt" and fileName[-4:]!=".gfx":
+    if fileName[-4:]!=".txt" and fileName[-4:]!=".gfx" and fileName[-6:]!=".asset":
       print("Non .txt/.gfx file!")
       continue
     # else:
