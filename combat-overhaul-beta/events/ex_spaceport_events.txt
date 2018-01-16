@@ -100,14 +100,13 @@ event = { #this event fires on a monthly pulse
 planet_event = { # this event runs on every tick (day), checking and adding/removing planet flags/modifiers as necessary. 
 	id = ex_spaceport_events.10
 	hide_window = yes
-	is_triggered_only = yes
+	#is_triggered_only = yes
 	
-	#trigger = { 
-	#	#NOT = { has_planet_flag = level_check_delay }
-	#	has_owner = yes
-	#	has_spaceport = yes		
-	#	has_free_spaceport_module_slot = yes		
-	#}
+	trigger = { 	
+		has_owner = yes
+		has_spaceport = yes		
+		has_free_spaceport_module_slot = yes		
+	}
 	
 	immediate = {
 		if = { limit = { has_planet_flag = spaceport_flags_removed } remove_planet_flag = spaceport_flags_removed }
@@ -251,6 +250,8 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 		}
 		if = {
 			limit = { is_spaceport_module_slot_free = 1	}
+			clear_base_weapon_flags = yes
+			check_base_weapon = yes
 			set_base_weapon = yes
 			if = { 
 				limit = { 
@@ -281,6 +282,30 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 	is_triggered_only = yes
 
 	trigger = {
+		NOR = {
+			has_planet_flag = spaceport_automation_disable_local			
+			owner = { has_policy_flag = spaceport_automation_disabled }
+		}		
+		if = { 
+			limit = { 
+				sector_controlled = no
+				OR = {
+					has_planet_flag = spaceport_automation_economic_specialized	
+					has_planet_flag = spaceport_automation_economic_mixed
+					has_planet_flag = spaceport_automation_stardock_specialized
+					has_planet_flag = spaceport_automation_defensive_specialized
+					has_planet_flag = spaceport_automation_defensive_mixed
+				}				
+				owner = { 
+					OR = {
+						has_policy_flag = core_automation
+						AND = {
+							has_policy_flag = core_edicts
+						}	
+					}
+				}	
+			}
+		}			
 		if = {
 			limit = { owner = { has_policy_flag = minimum_250_for_module_auto_construction } }
 			owner = { minerals > 250 }
@@ -344,6 +369,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 						has_economic_spaceport = no					
 						owner = { has_policy_flag = sector_specialized_economic_module_construction }
 					}
+					clear_base_weapon_flags = yes
 					check_base_weapon = yes
 					scrap_stardock_modules = yes
 					scrap_defensive_modules = yes
@@ -351,6 +377,12 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					clear_slot_flag = yes
 					rebuild_spaceport_economic = yes
 					rebuild_economic_modules = yes
+					set_base_weapon = yes
+					set_level = yes					
+					remove_spaceport_flags_and_modifiers = yes
+					remove_planet_flag = spaceport_flags_removed					
+					update_spaceport_modifiers = yes
+					update_spaceport_weapon_modifiers = yes					
 					flag_module_slots = yes					
 					flag_modules = yes
 					check_module_flags = yes				
@@ -362,6 +394,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 						has_economic_spaceport = no					
 						owner = { has_policy_flag = sector_mixed_economic_emphasis_module_construction }
 					}
+					clear_base_weapon_flags = yes
 					check_base_weapon = yes
 					scrap_stardock_modules = yes					
 					spaceport = { dismantle = yes }
@@ -369,6 +402,12 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					rebuild_spaceport_economic = yes
 					rebuild_economic_modules = yes
 					rebuild_defensive_modules = yes
+					set_base_weapon = yes
+					set_level = yes					
+					remove_spaceport_flags_and_modifiers = yes
+					remove_planet_flag = spaceport_flags_removed					
+					update_spaceport_modifiers = yes
+					update_spaceport_weapon_modifiers = yes							
 					flag_module_slots = yes					
 					flag_modules = yes
 					check_module_flags = yes				
@@ -415,6 +454,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 						has_defensive_spaceport = no					
 						owner = { has_policy_flag = sector_specialized_defensive_module_construction }
 					}
+					clear_base_weapon_flags = yes
 					check_base_weapon = yes
 					scrap_stardock_modules = yes
 					scrap_economic_modules = yes
@@ -422,6 +462,12 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					clear_slot_flag = yes
 					rebuild_spaceport_defensive = yes
 					rebuild_defensive_modules = yes
+					set_base_weapon = yes
+					set_level = yes
+					remove_spaceport_flags_and_modifiers = yes
+					remove_planet_flag = spaceport_flags_removed					
+					update_spaceport_modifiers = yes
+					update_spaceport_weapon_modifiers = yes							
 					flag_module_slots = yes					
 					flag_modules = yes
 					check_module_flags = yes				
@@ -433,6 +479,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 						has_defensive_spaceport = no					
 						owner = { has_policy_flag = sector_mixed_defensive_emphasis_module_construction }
 					}
+					clear_base_weapon_flags = yes
 					check_base_weapon = yes
 					scrap_stardock_modules = yes					
 					spaceport = { dismantle = yes }
@@ -440,6 +487,12 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					rebuild_spaceport_defensive = yes
 					rebuild_economic_modules = yes
 					rebuild_defensive_modules = yes
+					set_base_weapon = yes
+					set_level = yes					
+					remove_spaceport_flags_and_modifiers = yes
+					remove_planet_flag = spaceport_flags_removed					
+					update_spaceport_modifiers = yes
+					update_spaceport_weapon_modifiers = yes							
 					flag_module_slots = yes					
 					flag_modules = yes
 					check_module_flags = yes				
@@ -512,6 +565,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 							has_planet_flag = spaceport_automation_economic_specialized
 						}	
 					}
+					clear_base_weapon_flags = yes
 					check_base_weapon = yes
 					scrap_stardock_modules = yes
 					scrap_defensive_modules = yes
@@ -519,6 +573,12 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					clear_slot_flag = yes
 					rebuild_spaceport_economic = yes
 					rebuild_economic_modules = yes
+					set_base_weapon = yes
+					set_level = yes					
+					remove_spaceport_flags_and_modifiers = yes
+					remove_planet_flag = spaceport_flags_removed					
+					update_spaceport_modifiers = yes
+					update_spaceport_weapon_modifiers = yes							
 					flag_module_slots = yes					
 					flag_modules = yes
 					check_module_flags = yes				
@@ -533,6 +593,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 							has_planet_flag = spaceport_automation_economic_mixed
 						}	
 					}
+					clear_base_weapon_flags = yes
 					check_base_weapon = yes
 					scrap_stardock_modules = yes					
 					spaceport = { dismantle = yes }
@@ -540,6 +601,12 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					rebuild_spaceport_economic = yes
 					rebuild_economic_modules = yes
 					rebuild_defensive_modules = yes
+					set_base_weapon = yes
+					set_level = yes					
+					remove_spaceport_flags_and_modifiers = yes
+					remove_planet_flag = spaceport_flags_removed					
+					update_spaceport_modifiers = yes
+					update_spaceport_weapon_modifiers = yes							
 					flag_module_slots = yes					
 					flag_modules = yes
 					check_module_flags = yes				
@@ -601,6 +668,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 							has_planet_flag = spaceport_automation_defensive_specialized
 						}	
 					}
+					clear_base_weapon_flags = yes
 					check_base_weapon = yes
 					scrap_stardock_modules = yes
 					scrap_economic_modules = yes
@@ -608,6 +676,12 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					clear_slot_flag = yes
 					rebuild_spaceport_defensive = yes
 					rebuild_defensive_modules = yes
+					set_base_weapon = yes
+					set_level = yes					
+					remove_spaceport_flags_and_modifiers = yes
+					remove_planet_flag = spaceport_flags_removed					
+					update_spaceport_modifiers = yes
+					update_spaceport_weapon_modifiers = yes							
 					flag_module_slots = yes					
 					flag_modules = yes
 					check_module_flags = yes				
@@ -622,6 +696,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 							has_planet_flag = spaceport_automation_defensive_mixed
 						}	
 					}
+					clear_base_weapon_flags = yes
 					check_base_weapon = yes
 					scrap_stardock_modules = yes					
 					spaceport = { dismantle = yes }
@@ -629,6 +704,12 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					rebuild_spaceport_defensive = yes
 					rebuild_economic_modules = yes
 					rebuild_defensive_modules = yes
+					set_base_weapon = yes
+					set_level = yes					
+					remove_spaceport_flags_and_modifiers = yes
+					remove_planet_flag = spaceport_flags_removed					
+					update_spaceport_modifiers = yes
+					update_spaceport_weapon_modifiers = yes							
 					flag_module_slots = yes					
 					flag_modules = yes
 					check_module_flags = yes				
@@ -661,6 +742,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					limit = { 
 						has_stardock_spaceport = no					
 					}
+					clear_base_weapon_flags = yes
 					check_base_weapon = yes
 					scrap_defensive_modules = yes
 					scrap_economic_modules = yes
@@ -668,6 +750,12 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					clear_slot_flag = yes
 					rebuild_spaceport_stardock = yes
 					rebuild_stardock_modules = yes
+					set_base_weapon = yes
+					set_level = yes					
+					remove_spaceport_flags_and_modifiers = yes
+					remove_planet_flag = spaceport_flags_removed					
+					update_spaceport_modifiers = yes
+					update_spaceport_weapon_modifiers = yes							
 					flag_module_slots = yes					
 					flag_modules = yes
 					check_module_flags = yes				
@@ -679,7 +767,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 	}
 }
 
-planet_event = { #this event is WIP HERE
+planet_event = { #this event builds spaceport modules as necessary.
 	id = ex_spaceport_events.101
 	hide_window = yes
 	is_triggered_only = yes
@@ -919,3 +1007,36 @@ planet_event = { #this event is WIP HERE
 		}	
 	}
 }
+
+#cleanup events fired using the on policy change on action trigger. 
+
+country_event = { #this event is WIP HERE
+	id = ex_spaceport_events.110
+	hide_window = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		last_changed_policy = spaceport_automation
+		NOT = { has_policy_flag = core_edicts }
+	}	
+	
+	immediate = {
+		every_owned_planet = {
+			limit = {
+				OR = {
+					has_planet_flag = spaceport_automation_economic_specialized	
+					has_planet_flag = spaceport_automation_economic_mixed
+					has_planet_flag = spaceport_automation_stardock_specialized
+					has_planet_flag = spaceport_automation_defensive_specialized
+					has_planet_flag = spaceport_automation_defensive_mixed
+				}		
+			}
+			remove_planet_flag = spaceport_automation_economic_specialized	
+			remove_planet_flag = spaceport_automation_economic_mixed
+			remove_planet_flag = spaceport_automation_stardock_specialized
+			remove_planet_flag = spaceport_automation_defensive_specialized
+			remove_planet_flag = spaceport_automation_defensive_mixed			
+		}
+	}
+}	
+	
