@@ -1,11 +1,11 @@
 planet_edict = {
-	name = "economic_spaceport_specialization"
+	name = "spaceport_automation_economic_specialized"
 	influence_cost = 0
 	
 	effect = {
 		planet = {
 			hidden_effect = {
-				set_planet_flag = spaceport_automation_economic							
+				set_planet_flag = spaceport_automation_economic_specialized							
 				set_timed_planet_flag = { flag = reset_delay days = 360 }
 				planet_event = { id = ex_spaceport_events.100 }				
 			}
@@ -15,16 +15,12 @@ planet_edict = {
 	potential = { 		
 		owner = { has_policy_flag = core_edicts }			
 		planet = {
-			AND = {			
-				NOT = {
-					has_planet_flag = spaceport_automation_economic
-					has_planet_flag = spaceport_automation_stardock
-					has_planet_flag = spaceport_automation_defensive					
-				}					
+			AND = {								
 				OR = {
 					has_spaceport = yes
 					has_spaceport_construction = no
-				}		
+				}
+				NOT = { has_planet_flag = reset_delay }	
 			}
 		}	
 	}
@@ -43,13 +39,53 @@ planet_edict = {
 }	
 
 planet_edict = {
-	name = "stardock_spaceport_specialization"
+	name = "spaceport_automation_economic_mixed"
 	influence_cost = 0
 	
 	effect = {
 		planet = {
 			hidden_effect = {
-				set_planet_flag = spaceport_automation_stardock
+				set_planet_flag = spaceport_automation_economic_mixed							
+				set_timed_planet_flag = { flag = reset_delay days = 360 }
+				planet_event = { id = ex_spaceport_events.100 }				
+			}
+		}
+	}	
+	
+	potential = { 		
+		owner = { has_policy_flag = core_edicts }			
+		planet = {
+			AND = {								
+				OR = {
+					has_spaceport = yes
+					has_spaceport_construction = no
+				}
+				NOT = { has_planet_flag = reset_delay }	
+			}
+		}	
+	}
+	
+	ai_weight = {
+		weight = 5
+		modifier = {
+			factor = 0.25
+			is_capital = yes
+		}			
+		#modifier = {
+		#	factor = 10 
+		#	is_slave_robot_or_prole_planet = yes			
+		#}		
+	}	
+}	
+
+planet_edict = {
+	name = "spaceport_automation_stardock_specialized"
+	influence_cost = 0
+	
+	effect = {
+		planet = {
+			hidden_effect = {
+				set_planet_flag = spaceport_automation_stardock_specialized
 				set_timed_planet_flag = { flag = reset_delay days = 360 }	
 				planet_event = { id = ex_spaceport_events.100 }				
 			}
@@ -59,16 +95,12 @@ planet_edict = {
 	potential = { 		
 		owner = { has_policy_flag = core_edicts }			
 		planet = {
-			AND = {			
-				NOT = {
-					has_planet_flag = spaceport_automation_economic
-					has_planet_flag = spaceport_automation_stardock
-					has_planet_flag = spaceport_automation_defensive					
-				}					
+			AND = {								
 				OR = {
 					has_spaceport = yes
 					has_spaceport_construction = no
-				}		
+				}
+				NOT = { has_planet_flag = reset_delay }	
 			}
 		}	
 	}
@@ -93,13 +125,13 @@ planet_edict = {
 }	
 
 planet_edict = {
-	name = "defensive_spaceport_specialization"
+	name = "spaceport_automation_defensive_specialized"
 	influence_cost = 0
 
 	effect = {
 		planet = {
 			hidden_effect = {
-				set_planet_flag = spaceport_automation_defensive							
+				set_planet_flag = spaceport_automation_defensive_specialized							
 				set_timed_planet_flag = { flag = reset_delay days = 360 }
 				planet_event = { id = ex_spaceport_events.100 }				
 			}
@@ -109,16 +141,12 @@ planet_edict = {
 	potential = { 		
 		owner = { has_policy_flag = core_edicts }			
 		planet = {
-			AND = {			
-				NOT = {
-					has_planet_flag = spaceport_automation_economic
-					has_planet_flag = spaceport_automation_stardock
-					has_planet_flag = spaceport_automation_defensive					
-				}					
+			AND = {								
 				OR = {
 					has_spaceport = yes
 					has_spaceport_construction = no
-				}		
+				}
+				NOT = { has_planet_flag = reset_delay }	
 			}
 		}	
 	}
@@ -142,51 +170,88 @@ planet_edict = {
 				} 
 			}	
 		}			
-		#modifier = {
-		#	factor = 0.5
-		#	from = { is_slave_robot_or_prole_planet = yes }
-		#}
 	}	
 }	
 
 planet_edict = {
-	name = "reset_spaceport_specialization"
+	name = "spaceport_automation_defensive_mixed"
 	influence_cost = 0
+
+	effect = {
+		planet = {
+			hidden_effect = {
+				set_planet_flag = spaceport_automation_defensive_mixed
+				set_timed_planet_flag = { flag = reset_delay days = 360 }
+				planet_event = { id = ex_spaceport_events.100 }				
+			}
+		}
+	}	
 	
 	potential = { 		
 		owner = { has_policy_flag = core_edicts }			
 		planet = {
-			AND = {			
-				OR = {
-					has_planet_flag = spaceport_automation_economic
-					has_planet_flag = spaceport_automation_stardock
-					has_planet_flag = spaceport_automation_defensive					
-				}					
+			AND = {								
 				OR = {
 					has_spaceport = yes
 					has_spaceport_construction = no
-				}						
+				}
+				NOT = { has_planet_flag = reset_delay }	
 			}
 		}	
 	}
-
-	allow = { 
-		custom_tooltip = {
-			fail_text = "reset_delay_in_effect"
-			NOT = { has_planet_flag = reset_delay }
-		}		
-	}
 	
+	ai_weight = {
+		weight = 5
+		modifier = {
+			factor = 10
+			AND = {			
+				is_capital = yes
+				years_passed > 50
+			}	
+		}			
+		modifier = {
+			factor = 4
+			AND = {
+				years_passed > 50
+				count_pops = { 
+					limit = { has_citizenship_type = { type = citizenship_full } } 
+					count > 16
+				} 
+			}	
+		}			
+	}	
+}	
+
+planet_edict = {
+	name = "spaceport_automation_disable_local"
+	influence_cost = 0
+
 	effect = {
 		planet = {
 			hidden_effect = {
-				remove_planet_flag = spaceport_automation_economic
-				remove_planet_flag = spaceport_automation_stardock
-				remove_planet_flag = spaceport_automation_defensive				remove_planet_flag = game_start_economic_spaceport			
+				set_planet_flag = spaceport_automation_disable_local	
 			}
 		}
-
-	}
+	}	
 	
-	ai_weight = { weight = 0 }	
+	potential = { owner = { has_policy_flag = core_automation }	}
+	
+	ai_weight = { weight = 0 }				
+}	
+
+planet_edict = {
+	name = "spaceport_automation_enable_local"
+	influence_cost = 0
+
+	effect = {
+		planet = {
+			hidden_effect = {
+				remove_planet_flag = spaceport_automation_disable_local	
+			}
+		}
+	}	
+	
+	potential = { has_planet_flag = spaceport_automation_disabled_local }
+	
+	ai_weight = { weight = 0 }				
 }	

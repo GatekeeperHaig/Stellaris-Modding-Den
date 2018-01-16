@@ -118,9 +118,10 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 					NOT = { has_planet_flag = ex_spaceport_9 }
 				}
 				set_planet_flag = ex_spaceport_9
-				update_spaceport_modifiers = yes				
+				update_spaceport_modifiers = yes
 			}			
 			if = { limit = { NOT = { has_planet_flag = slot_9_free } } set_planet_flag = slot_9_free }
+			planet_event = { id = ex_spaceport_events.100 }				
 		}	
 		if = {
 			limit = { is_spaceport_module_slot_free = 8	}
@@ -132,9 +133,10 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 					}
 				}
 				set_planet_flag = ex_spaceport_8
-				update_spaceport_modifiers = yes				
+				update_spaceport_modifiers = yes
 			}			
 			if = { limit = { NOT = { has_planet_flag = slot_8_free } } set_planet_flag = slot_8_free }
+			planet_event = { id = ex_spaceport_events.100 }				
 		}	
 		if = {
 			limit = { is_spaceport_module_slot_free = 7	}
@@ -147,9 +149,10 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 					}
 				}
 				set_planet_flag = ex_spaceport_7
-				update_spaceport_modifiers = yes				
+				update_spaceport_modifiers = yes
 			}			
 			if = { limit = { NOT = { has_planet_flag = slot_7_free } } set_planet_flag = slot_7_free }
+			planet_event = { id = ex_spaceport_events.100 }				
 		}		
 		if = {
 			limit = { is_spaceport_module_slot_free = 6	}
@@ -163,9 +166,10 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 					}
 				}
 				set_planet_flag = ex_spaceport_6
-				update_spaceport_modifiers = yes	
+				update_spaceport_modifiers = yes
 			}			
 			if = { limit = { NOT = { has_planet_flag = slot_6_free } } set_planet_flag = slot_6_free }
+			planet_event = { id = ex_spaceport_events.100 }				
 		}	
 		if = {
 			limit = { is_spaceport_module_slot_free = 5	}
@@ -180,9 +184,10 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 					}
 				}
 				set_planet_flag = ex_spaceport_5
-				update_spaceport_modifiers = yes				
+				update_spaceport_modifiers = yes
 			}			
-			if = { limit = { NOT = { has_planet_flag = slot_5_free } } set_planet_flag = slot_5_free }
+			if = { limit = { NOT = { has_planet_flag = slot_5_free } } set_planet_flag = slot_5_free }	
+			planet_event = { id = ex_spaceport_events.100 }				
 		}	
 		if = {
 			limit = { is_spaceport_module_slot_free = 4	}
@@ -200,7 +205,8 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 				set_planet_flag = ex_spaceport_4
 				update_spaceport_modifiers = yes				
 			}			
-			if = { limit = { NOT = { has_planet_flag = slot_4_free } } set_planet_flag = slot_4_free }
+			if = { limit = { NOT = { has_planet_flag = slot_4_free } } set_planet_flag = slot_4_free  }
+			planet_event = { id = ex_spaceport_events.100 }				
 		}	
 		if = {
 			limit = { is_spaceport_module_slot_free = 3	}
@@ -220,6 +226,7 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 				update_spaceport_modifiers = yes
 			}			
 			if = { limit = { NOT = { has_planet_flag = slot_3_free } } set_planet_flag = slot_3_free }
+			planet_event = { id = ex_spaceport_events.100 }	
 		}	
 		if = {
 			limit = { is_spaceport_module_slot_free = 2	}
@@ -237,9 +244,10 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 					}
 				}
 				set_planet_flag = ex_spaceport_2
-				update_spaceport_modifiers = yes				
+				update_spaceport_modifiers = yes					
 			}			
 			if = { limit = { NOT = { has_planet_flag = slot_2_free } } set_planet_flag = slot_2_free }
+			planet_event = { id = ex_spaceport_events.100 }	
 		}
 		if = {
 			limit = { is_spaceport_module_slot_free = 1	}
@@ -259,10 +267,9 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 					}
 				}
 				set_planet_flag = ex_spaceport_1	
-				update_spaceport_modifiers = yes
-			}						
-		}			
-		#set_timed_planet_flag = { flag = level_check_delay days = 180 }
+				update_spaceport_modifiers = yes				
+			}			
+		}	
 	}
 }	
 
@@ -273,35 +280,51 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 	hide_window = yes
 	is_triggered_only = yes
 
-	trigger = { 		
-		NOT = { 
-			has_planet_flag = spaceport_automation_disabled_local			
-			owner = { has_policy_flag = spaceport_automation_disabled }
-		}		
-	}
-	
 	immediate = {
-		if = {
+		if = { 
 			limit = { 
-				has_planet_flag = spaceport_automation_economic				
-			}	
-			if = {
-				limit = {	
-					OR = {
-						has_spaceport_module = economic_spaceport_kinetic
-						has_spaceport_module = economic_spaceport_energy
-						has_spaceport_module = economic_spaceport_explosives								
+				sector_controlled = yes
+				owner = { has_policy_flag = sector_automation }
+			}
+			if = { #### economic spaceports
+				limit = {
+					owner = {
+						OR = {
+							has_policy_flag = sector_specialized_economic_module_construction
+							has_policy_flag = sector_mixed_economic_emphasis_module_construction
+						}
 					}
+				}	
+				if = {
+					limit = { 
+						has_economic_spaceport = yes					
+						owner = { has_policy_flag = sector_specialized_economic_module_construction }
+					}				
+					scrap_stardock_modules = yes
+					scrap_defensive_modules = yes
+					flag_modules = yes
+					check_module_flags = yes
+					flag_module_slots = yes
+					construct_module = yes
+					break = yes						
+				}	
+				if = {
+					limit = { 
+						has_economic_spaceport = yes					
+						owner = { has_policy_flag = sector_mixed_economic_emphasis_module_construction }
+					}				
+					scrap_stardock_modules = yes					
+					flag_modules = yes
+					check_module_flags = yes
+					flag_module_slots = yes
+					construct_module = yes
+					break = yes						
 				}
-				scrap_stardock_modules = yes
-				scrap_defensive_modules = yes
-				flag_modules = yes
-				check_module_flags = yes
-				clear_slot_flag = yes
-				flag_module_slots = yes
-				construct_module = yes
-				break = yes				
-				else = {
+				if = {
+					limit = { 
+						has_economic_spaceport = no					
+						owner = { has_policy_flag = sector_specialized_economic_module_construction }
+					}
 					check_base_weapon = yes
 					scrap_stardock_modules = yes
 					scrap_defensive_modules = yes
@@ -313,70 +336,69 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					flag_modules = yes
 					check_module_flags = yes				
 					construct_module = yes
-					break = yes				
+					break = yes		
 				}	
-			}
-		}	
-		if = {
-			limit = { 
-				has_planet_flag = spaceport_automation_stardock				
-			}	
-			if = {
-				limit = {	
-					OR = {
-						has_spaceport_module = stardock_spaceport_kinetic
-						has_spaceport_module = stardock_spaceport_energy
-						has_spaceport_module = stardock_spaceport_explosives								
+				if = {
+					limit = { 
+						has_economic_spaceport = no					
+						owner = { has_policy_flag = sector_mixed_economic_emphasis_module_construction }
 					}
-				}
-				scrap_economic_modules = yes
-				scrap_defensive_modules = yes
-				flag_modules = yes
-				check_module_flags = yes
-				clear_slot_flag = yes
-				flag_module_slots = yes				
-				construct_module = yes
-				break = yes				
-				else = {
 					check_base_weapon = yes
-					scrap_economic_modules = yes
-					scrap_defensive_modules = yes
+					scrap_stardock_modules = yes					
 					spaceport = { dismantle = yes }
 					clear_slot_flag = yes
-					rebuild_spaceport_stardock = yes
-					rebuild_stardock_modules = yes				
+					rebuild_spaceport_economic = yes
+					rebuild_economic_modules = yes
+					rebuild_defensive_modules = yes
 					flag_module_slots = yes					
 					flag_modules = yes
 					check_module_flags = yes				
 					construct_module = yes
 					break = yes		
-				}	
-			}	
-		}	
-		if = {
-			limit = { 
-				has_planet_flag = spaceport_automation_defensive				
-			}	
-			if = {
-				limit = {	
-					OR = {
-						has_spaceport_module = defensive_spaceport_kinetic
-						has_spaceport_module = defensive_spaceport_energy
-						has_spaceport_module = defensive_spaceport_explosives								
+				}					
+			}
+			if = { #### defensive spaceports
+				limit = {
+					owner = {
+						OR = {
+							has_policy_flag = sector_specialized_defensive_module_construction
+							has_policy_flag = sector_mixed_defensive_emphasis_module_construction
+						}
 					}
-				}
-				scrap_economic_modules = yes
-				scrap_stardock_modules = yes
-				flag_modules = yes
-				check_module_flags = yes
-				clear_slot_flag = yes
-				flag_module_slots = yes					
-				construct_module = yes
-				break = yes				
-				else = {
-					check_base_weapon = yes
-					scrap_economic_modules = yes
+				}	
+				if = {
+					limit = { 
+						has_defensive_spaceport = yes					
+						owner = { has_policy_flag = sector_specialized_defensive_module_construction }
+					}				
 					scrap_stardock_modules = yes
+					scrap_economic_modules = yes
+					flag_modules = yes
+					check_module_flags = yes
+					flag_module_slots = yes
+					construct_module = yes
+					break = yes						
+				}	
+				if = {
+					limit = { 
+						has_defensive_spaceport = yes					
+						owner = { has_policy_flag = sector_mixed_defensive_emphasis_module_construction }
+					}				
+					scrap_stardock_modules = yes					
+					flag_modules = yes
+					check_module_flags = yes
+					flag_module_slots = yes
+					construct_module = yes
+					break = yes						
+				}
+				if = {
+					limit = { 
+						has_defensive_spaceport = no					
+						owner = { has_policy_flag = sector_specialized_defensive_module_construction }
+					}
+					check_base_weapon = yes
+					scrap_stardock_modules = yes
+					scrap_economic_modules = yes
 					spaceport = { dismantle = yes }
 					clear_slot_flag = yes
 					rebuild_spaceport_defensive = yes
@@ -385,10 +407,256 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					flag_modules = yes
 					check_module_flags = yes				
 					construct_module = yes
-					break = yes	
+					break = yes		
 				}	
-			}	
-		}
+				if = {
+					limit = { 
+						has_defensive_spaceport = no					
+						owner = { has_policy_flag = sector_mixed_defensive_emphasis_module_construction }
+					}
+					check_base_weapon = yes
+					scrap_stardock_modules = yes					
+					spaceport = { dismantle = yes }
+					clear_slot_flag = yes
+					rebuild_spaceport_defensive = yes
+					rebuild_economic_modules = yes
+					rebuild_defensive_modules = yes
+					flag_module_slots = yes					
+					flag_modules = yes
+					check_module_flags = yes				
+					construct_module = yes
+					break = yes		
+				}					
+			}			
+		}	
+		if = { 
+			limit = { 
+				sector_controlled = no
+				owner = { 
+					OR = {
+						has_policy_flag = core_automation
+						has_policy_flag = core_edicts
+					}
+				}	
+			}
+			if = { #### economic spaceports
+				limit = {
+					OR = {
+						owner = {
+							OR = {
+								has_policy_flag = core_specialized_economic_module_construction
+								has_policy_flag = core_mixed_economic_emphasis_module_construction
+							}
+						}	
+						OR = {
+							has_planet_flag = spaceport_automation_economic_specialized	
+							has_planet_flag = spaceport_automation_economic_mixed
+						}	
+					}
+				}	
+				if = {
+					limit = { 
+						has_economic_spaceport = yes					
+						OR = {
+							owner = { has_policy_flag = core_specialized_economic_module_construction }
+							has_planet_flag = spaceport_automation_economic_specialized
+						}	
+					}				
+					scrap_stardock_modules = yes
+					scrap_defensive_modules = yes
+					flag_modules = yes
+					check_module_flags = yes
+					flag_module_slots = yes
+					construct_module = yes
+					break = yes						
+				}	
+				if = {
+					limit = { 
+						has_economic_spaceport = yes					
+						OR = {
+							owner = { has_policy_flag = core_mixed_economic_emphasis_module_construction }
+							has_planet_flag = spaceport_automation_economic_mixed
+						}	
+					}				
+					scrap_stardock_modules = yes					
+					flag_modules = yes
+					check_module_flags = yes
+					flag_module_slots = yes
+					construct_module = yes
+					break = yes						
+				}
+				if = {
+					limit = { 
+						has_economic_spaceport = no					
+						OR = {
+							owner = { has_policy_flag = core_specialized_economic_module_construction }
+							has_planet_flag = spaceport_automation_economic_specialized
+						}	
+					}
+					check_base_weapon = yes
+					scrap_stardock_modules = yes
+					scrap_defensive_modules = yes
+					spaceport = { dismantle = yes }
+					clear_slot_flag = yes
+					rebuild_spaceport_economic = yes
+					rebuild_economic_modules = yes
+					flag_module_slots = yes					
+					flag_modules = yes
+					check_module_flags = yes				
+					construct_module = yes
+					break = yes		
+				}	
+				if = {
+					limit = { 
+						has_economic_spaceport = no					
+						OR = {
+							owner = { has_policy_flag = core_mixed_economic_emphasis_module_construction }
+							has_planet_flag = spaceport_automation_economic_mixed
+						}	
+					}
+					check_base_weapon = yes
+					scrap_stardock_modules = yes					
+					spaceport = { dismantle = yes }
+					clear_slot_flag = yes
+					rebuild_spaceport_economic = yes
+					rebuild_economic_modules = yes
+					rebuild_defensive_modules = yes
+					flag_module_slots = yes					
+					flag_modules = yes
+					check_module_flags = yes				
+					construct_module = yes
+					break = yes		
+				}					
+			}
+			if = { #### defensive spaceports
+				limit = {
+					OR = {
+						owner = {
+							OR = {
+								has_policy_flag = core_specialized_defensive_module_construction
+								has_policy_flag = core_mixed_defensive_emphasis_module_construction
+							}
+						}	
+						OR = {
+							has_planet_flag = spaceport_automation_defensive_specialized	
+							has_planet_flag = spaceport_automation_defensive_mixed
+						}	
+					}
+				}	
+				if = {
+					limit = { 
+						has_defensive_spaceport = yes					
+						OR = {
+							owner = { has_policy_flag = core_specialized_defensive_module_construction }
+							has_planet_flag = spaceport_automation_defensive_specialized
+						}	
+					}				
+					scrap_stardock_modules = yes
+					scrap_economic_modules = yes
+					flag_modules = yes
+					check_module_flags = yes
+					flag_module_slots = yes
+					construct_module = yes
+					break = yes						
+				}	
+				if = {
+					limit = { 
+						has_defensive_spaceport = yes					
+						OR = {
+							owner = { has_policy_flag = core_mixed_defensive_emphasis_module_construction }
+							has_planet_flag = spaceport_automation_defensive_mixed
+						}	
+					}				
+					scrap_stardock_modules = yes					
+					flag_modules = yes
+					check_module_flags = yes
+					flag_module_slots = yes
+					construct_module = yes
+					break = yes						
+				}
+				if = {
+					limit = { 
+						has_defensive_spaceport = no					
+						OR = {
+							owner = { has_policy_flag = core_specialized_defensive_module_construction }
+							has_planet_flag = spaceport_automation_defensive_specialized
+						}	
+					}
+					check_base_weapon = yes
+					scrap_stardock_modules = yes
+					scrap_economic_modules = yes
+					spaceport = { dismantle = yes }
+					clear_slot_flag = yes
+					rebuild_spaceport_defensive = yes
+					rebuild_defensive_modules = yes
+					flag_module_slots = yes					
+					flag_modules = yes
+					check_module_flags = yes				
+					construct_module = yes
+					break = yes		
+				}	
+				if = {
+					limit = { 
+						has_defensive_spaceport = no					
+						OR = {
+							owner = { has_policy_flag = core_mixed_defensive_emphasis_module_construction }
+							has_planet_flag = spaceport_automation_defensive_mixed
+						}	
+					}
+					check_base_weapon = yes
+					scrap_stardock_modules = yes					
+					spaceport = { dismantle = yes }
+					clear_slot_flag = yes
+					rebuild_spaceport_defensive = yes
+					rebuild_economic_modules = yes
+					rebuild_defensive_modules = yes
+					flag_module_slots = yes					
+					flag_modules = yes
+					check_module_flags = yes				
+					construct_module = yes
+					break = yes		
+				}					
+			}								
+			if = { #### stardock spaceports
+				limit = {
+					OR = {
+						owner = {
+							has_policy_flag = core_specialized_stardock_module_construction
+						}	
+						has_planet_flag = spaceport_automation_stardock_specialized	
+					}
+				}	
+				if = {
+					limit = { 
+						has_stardock_spaceport = yes					
+					}				
+					scrap_defensive_modules = yes
+					scrap_economic_modules = yes
+					flag_modules = yes
+					check_module_flags = yes
+					flag_module_slots = yes
+					construct_module = yes
+					break = yes						
+				}	
+				if = {
+					limit = { 
+						has_stardock_spaceport = no					
+					}
+					check_base_weapon = yes
+					scrap_defensive_modules = yes
+					scrap_economic_modules = yes
+					spaceport = { dismantle = yes }
+					clear_slot_flag = yes
+					rebuild_spaceport_stardock = yes
+					rebuild_stardock_modules = yes
+					flag_module_slots = yes					
+					flag_modules = yes
+					check_module_flags = yes				
+					construct_module = yes
+					break = yes		
+				}	
+			}					
+		}				
 	}
 }
 
@@ -397,5 +665,238 @@ planet_event = { #this event is WIP HERE
 	hide_window = yes
 	is_triggered_only = yes
 	
-	immediate = { break = yes }
-}	
+	immediate = { 
+		if = {
+			limit = { sector_controlled = yes }
+			if = { 
+				limit = { owner = { has_policy_flag = sector_specialized_economic_module_construction } }
+				roll_economic_module = yes
+				if = {
+					limit = { has_free_spaceport_module_slot = yes }
+					clear_slot_flag = yes
+					flag_module_slots = yes
+					if = {
+						limit = {
+							NOR = {
+								has_planet_flag = spaceport_automation_disable_local			
+								owner = { has_policy_flag = spaceport_automation_disabled }
+							}
+						}	
+						planet_event = { id = ex_spaceport_events.100 }
+						else = { break = yes }		
+					}	
+					break = yes
+					else = { break = yes }	
+				}
+			}	
+			if = { 
+				limit = { owner = { has_policy_flag = sector_mixed_economic_emphasis_module_construction } }
+				random_list = {
+					75 = { roll_economic_module = yes }
+					25 = { roll_defensive_module = yes }
+				}	
+				if = {
+					limit = { has_free_spaceport_module_slot = yes }
+					clear_slot_flag = yes
+					flag_module_slots = yes
+					if = {
+						limit = {
+							NOR = {
+								has_planet_flag = spaceport_automation_disable_local			
+								owner = { has_policy_flag = spaceport_automation_disabled }
+							}
+						}	
+						planet_event = { id = ex_spaceport_events.100 }
+						else = { break = yes }		
+					}	
+					break = yes
+					else = { break = yes }	
+				}
+			}	
+			if = { 
+				limit = { owner = { has_policy_flag = sector_specialized_defensive_module_construction } }
+				roll_defensive_module = yes
+				if = {
+					limit = { has_free_spaceport_module_slot = yes }
+					clear_slot_flag = yes
+					flag_module_slots = yes
+					if = {
+						limit = {
+							NOR = {
+								has_planet_flag = spaceport_automation_disable_local			
+								owner = { has_policy_flag = spaceport_automation_disabled }
+							}
+						}	
+						planet_event = { id = ex_spaceport_events.100 }
+						else = { break = yes }		
+					}	
+					break = yes
+					else = { break = yes }	
+				}
+			}
+			if = { 
+				limit = { owner = { has_policy_flag = sector_mixed_defensive_emphasis_module_construction } }
+				random_list = {
+					25 = { roll_economic_module = yes }
+					75 = { roll_defensive_module = yes }
+				}	
+				if = {
+					limit = { has_free_spaceport_module_slot = yes }
+					clear_slot_flag = yes
+					flag_module_slots = yes
+					if = {
+						limit = {
+							NOR = {
+								has_planet_flag = spaceport_automation_disable_local			
+								owner = { has_policy_flag = spaceport_automation_disabled }
+							}
+						}	
+						planet_event = { id = ex_spaceport_events.100 }
+						else = { break = yes }		
+					}	
+					break = yes
+					else = { break = yes }	
+				}
+			}			
+		}
+		if = {
+			limit = { sector_controlled = no }
+			if = { 
+				limit = { 
+					OR = {
+						owner = { has_policy_flag = core_specialized_economic_module_construction }
+						has_planet_flag = spaceport_automation_economic_specialized
+					}	
+				}
+				roll_economic_module = yes
+				if = {
+					limit = { has_free_spaceport_module_slot = yes }
+					clear_slot_flag = yes
+					flag_module_slots = yes
+					if = {
+						limit = {
+							NOR = {
+								has_planet_flag = spaceport_automation_disable_local			
+								owner = { has_policy_flag = spaceport_automation_disabled }
+							}
+						}	
+						planet_event = { id = ex_spaceport_events.100 }
+						else = { break = yes }		
+					}	
+					break = yes
+					else = { break = yes }	
+				}
+			}	
+			if = { 
+				limit = { 
+					OR = {
+						owner = { has_policy_flag = core_mixed_economic_emphasis_module_construction }
+						has_planet_flag = spaceport_automation_economic_mixed
+					}	
+				}
+				random_list = {
+					75 = { roll_economic_module = yes }
+					25 = { roll_defensive_module = yes }
+				}	
+				if = {
+					limit = { has_free_spaceport_module_slot = yes }
+					clear_slot_flag = yes
+					flag_module_slots = yes
+					if = {
+						limit = {
+							NOR = {
+								has_planet_flag = spaceport_automation_disable_local			
+								owner = { has_policy_flag = spaceport_automation_disabled }
+							}
+						}	
+						planet_event = { id = ex_spaceport_events.100 }
+						else = { break = yes }		
+					}	
+					break = yes
+					else = { break = yes }	
+				}
+			}	
+			if = { 
+				limit = { 
+					OR = {
+						owner = { has_policy_flag = core_specialized_defensive_module_construction }
+						has_planet_flag = spaceport_automation_defensive_specialized
+					}	
+				}
+				roll_defensive_module = yes
+				if = {
+					limit = { has_free_spaceport_module_slot = yes }
+					clear_slot_flag = yes
+					flag_module_slots = yes
+					if = {
+						limit = {
+							NOR = {
+								has_planet_flag = spaceport_automation_disable_local			
+								owner = { has_policy_flag = spaceport_automation_disabled }
+							}
+						}	
+						planet_event = { id = ex_spaceport_events.100 }
+						else = { break = yes }		
+					}	
+					break = yes
+					else = { break = yes }	
+				}
+			}
+			if = { 
+				limit = { 
+					OR = {
+						owner = { has_policy_flag = core_mixed_defensive_emphasis_module_construction }
+						has_planet_flag = spaceport_automation_defensive_mixed
+					}	
+				}
+				random_list = {
+					25 = { roll_economic_module = yes }
+					75 = { roll_defensive_module = yes }
+				}	
+				if = {
+					limit = { has_free_spaceport_module_slot = yes }
+					clear_slot_flag = yes
+					flag_module_slots = yes
+					if = {
+						limit = {
+							NOR = {
+								has_planet_flag = spaceport_automation_disable_local			
+								owner = { has_policy_flag = spaceport_automation_disabled }
+							}
+						}	
+						planet_event = { id = ex_spaceport_events.100 }
+						else = { break = yes }		
+					}	
+					break = yes
+					else = { break = yes }	
+				}
+			}
+			if = { 
+				limit = { 
+					OR = {
+						owner = { has_policy_flag = core_specialized_stardock_module_construction }
+						has_planet_flag = spaceport_automation_stardock_specialized
+					}	
+				}
+				roll_stardock_module = yes
+				if = {
+					limit = { has_free_spaceport_module_slot = yes }
+					clear_slot_flag = yes
+					flag_module_slots = yes
+					if = {
+						limit = {
+							NOR = {
+								has_planet_flag = spaceport_automation_disable_local			
+								owner = { has_policy_flag = spaceport_automation_disabled }
+							}
+						}	
+						planet_event = { id = ex_spaceport_events.100 }
+						else = { break = yes }		
+					}	
+					break = yes
+					else = { break = yes }	
+				}
+			}
+		}	
+	}
+}
