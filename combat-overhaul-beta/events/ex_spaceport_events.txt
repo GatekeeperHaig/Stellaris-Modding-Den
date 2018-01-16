@@ -280,6 +280,30 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 	is_triggered_only = yes
 
 	trigger = {
+		NOR = {
+			has_planet_flag = spaceport_automation_disable_local			
+			owner = { has_policy_flag = spaceport_automation_disabled }
+		}		
+		if = { 
+			limit = { 
+				sector_controlled = no
+				OR = {
+					has_planet_flag = spaceport_automation_economic_specialized	
+					has_planet_flag = spaceport_automation_economic_mixed
+					has_planet_flag = spaceport_automation_stardock_specialized
+					has_planet_flag = spaceport_automation_defensive_specialized
+					has_planet_flag = spaceport_automation_defensive_mixed
+				}				
+				owner = { 
+					OR = {
+						has_policy_flag = core_automation
+						AND = {
+							has_policy_flag = core_edicts
+						}	
+					}
+				}	
+			}
+		}			
 		if = {
 			limit = { owner = { has_policy_flag = minimum_250_for_module_auto_construction } }
 			owner = { minerals > 250 }
@@ -723,7 +747,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 	}
 }
 
-planet_event = { #this event is WIP HERE
+planet_event = { #this event builds spaceport modules as necessary.
 	id = ex_spaceport_events.101
 	hide_window = yes
 	is_triggered_only = yes
@@ -963,3 +987,36 @@ planet_event = { #this event is WIP HERE
 		}	
 	}
 }
+
+#cleanup events fired using the on policy change on action trigger. 
+
+country_event = { #this event is WIP HERE
+	id = ex_spaceport_events.110
+	hide_window = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		last_changed_policy = spaceport_automation
+		NOT = { has_policy_flag = core_edicts }
+	}	
+	
+	immediate = {
+		every_owned_planet = {
+			limit = {
+				OR = {
+					has_planet_flag = spaceport_automation_economic_specialized	
+					has_planet_flag = spaceport_automation_economic_mixed
+					has_planet_flag = spaceport_automation_stardock_specialized
+					has_planet_flag = spaceport_automation_defensive_specialized
+					has_planet_flag = spaceport_automation_defensive_mixed
+				}		
+			}
+			remove_planet_flag = spaceport_automation_economic_specialized	
+			remove_planet_flag = spaceport_automation_economic_mixed
+			remove_planet_flag = spaceport_automation_stardock_specialized
+			remove_planet_flag = spaceport_automation_defensive_specialized
+			remove_planet_flag = spaceport_automation_defensive_mixed			
+		}
+	}
+}	
+	
