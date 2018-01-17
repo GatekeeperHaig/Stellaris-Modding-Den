@@ -53,7 +53,21 @@ country_event = { #this event is triggered when a spaceport is destroyed (not di
 	hide_window = yes
 	is_triggered_only = yes
 	trigger = {	fromfrom = { is_ship_size = orbital_station } }			
-    immediate = { fromfrom = { orbit = { planet = {	remove_spaceport_flags_and_modifiers = yes } } } }
+    immediate = { 
+		fromfrom = { 
+			orbit = { 
+				planet = { 
+					remove_planet_flag = spaceport_automation_economic_specialized	
+					remove_planet_flag = spaceport_automation_economic_mixed
+					remove_planet_flag = spaceport_automation_stardock_specialized
+					remove_planet_flag = spaceport_automation_defensive_specialized
+					remove_planet_flag = spaceport_automation_defensive_mixed	
+					remove_planet_flag = spaceport_automation_disable_local						
+					remove_spaceport_flags_and_modifiers = yes
+				}
+			}
+		}
+	}
 }
 				
 country_event = { #this event is triggered when a spaceport is dismantled.
@@ -61,7 +75,24 @@ country_event = { #this event is triggered when a spaceport is dismantled.
 	hide_window = yes
 	is_triggered_only = yes
 	trigger = { from = { is_ship_size = orbital_station } }	
-	immediate = { from = { orbit = { planet = {	remove_spaceport_flags_and_modifiers = yes } } } }
+	immediate = { 
+		from = { 
+			orbit = { 
+				planet = { 		
+					if = { 
+						limit = { NOT = { has_planet_flag = rebuild_process } }
+						remove_planet_flag = spaceport_automation_economic_specialized	
+						remove_planet_flag = spaceport_automation_economic_mixed
+						remove_planet_flag = spaceport_automation_stardock_specialized
+						remove_planet_flag = spaceport_automation_defensive_specialized
+						remove_planet_flag = spaceport_automation_defensive_mixed	
+						remove_planet_flag = spaceport_automation_disable_local			
+						remove_spaceport_flags_and_modifiers = yes
+					}	
+				}
+			}
+		}
+	}
 }	
 
 event = { #this event fires on a monthly pulse
@@ -110,6 +141,8 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 	}
 	
 	immediate = {
+		set_timed_planet_flag = { flag = flag_delay_0 days = 1 } #this delays the following event
+		set_timed_planet_flag = { flag = flag_delay_1 days = 2 } #this delays the second following event		
 		if = { limit = { has_planet_flag = spaceport_flags_removed } remove_planet_flag = spaceport_flags_removed }
 		clear_slot_flag = yes
 		switch = {
@@ -124,7 +157,6 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 			2 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 1 } } } set_variable = { which = "spaceport_level" value = 2 } update_spaceport_level = yes update_spaceport_modifiers = yes }	if = { limit = { NOT = { has_planet_flag = slot_2_free } } set_planet_flag = slot_2_free } }	
 			1 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 0 } } } set_variable = { which = "spaceport_level" value = 1 } update_spaceport_level = yes update_spaceport_modifiers = yes }	if = { limit = { NOT = { has_planet_flag = slot_1_free } } set_planet_flag = slot_1_free } }
 		}			
-		set_timed_planet_flag = { flag = flag_delay_1 days = 1 } 
 	}
 }	
 
@@ -134,7 +166,7 @@ planet_event = { # this event runs on every tick (day), checking whether automat
 	#is_triggered_only = yes
 
 	trigger = {		
-		NOT = { has_planet_flag = flag_delay_1 }
+		NOT = { has_planet_flag = flag_delay_0 }
 		has_spaceport = yes		
 		is_automation_enabled = yes		
 		OR = {
@@ -177,6 +209,7 @@ planet_event = { # this event runs on every tick (day), checking whether automat
 		}								
 	}			
 	immediate = { 
+		set_timed_planet_flag = { flag = flag_delay_2 days = 1 } #this is meant to gate the following event		
 		switch = {
 			trigger = has_planet_flag
 			slot_1_free = { set_spaceport_module = { slot = 1 module = "slot_unavailable_1" } }
@@ -188,8 +221,7 @@ planet_event = { # this event runs on every tick (day), checking whether automat
 			slot_7_free = { set_spaceport_module = { slot = 7 module = "slot_unavailable_7" } }
 			slot_8_free = { set_spaceport_module = { slot = 8 module = "slot_unavailable_8" } }
 			slot_9_free = { set_spaceport_module = { slot = 9 module = "slot_unavailable_9" } }
-		}				
-		set_timed_planet_flag = { flag = flag_delay_2 days = 1 } #this is meant to gate the following event		
+		}						
 	}
 }
 
@@ -199,7 +231,7 @@ planet_event = { # this event runs on every tick (day), checking whether automat
 	#is_triggered_only = yes
 
 	trigger = {		
-		NOT = { 
+		NOR = { 
 			has_planet_flag = flag_delay_1
 			has_planet_flag = flag_delay_2
 		}		
@@ -292,6 +324,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					check_base_weapon = yes
 					scrap_stardock_modules = yes
 					scrap_defensive_modules = yes
+					set_planet_flag = rebuild_process
 					spaceport = { dismantle = yes }
 					rebuild_spaceport_economic = yes					
 					rebuild_economic_modules = yes					
@@ -305,7 +338,8 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					}
 					clear_base_weapon_flags = yes
 					check_base_weapon = yes
-					scrap_stardock_modules = yes					
+					scrap_stardock_modules = yes	
+					set_planet_flag = rebuild_process					
 					spaceport = { dismantle = yes }
 					rebuild_spaceport_economic = yes
 					rebuild_economic_modules = yes
@@ -353,6 +387,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					check_base_weapon = yes
 					scrap_stardock_modules = yes
 					scrap_economic_modules = yes
+					set_planet_flag = rebuild_process
 					spaceport = { dismantle = yes }
 					rebuild_spaceport_defensive = yes
 					rebuild_defensive_modules = yes
@@ -366,7 +401,8 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					}
 					clear_base_weapon_flags = yes
 					check_base_weapon = yes
-					scrap_stardock_modules = yes					
+					scrap_stardock_modules = yes
+					set_planet_flag = rebuild_process					
 					spaceport = { dismantle = yes }
 					rebuild_spaceport_defensive = yes
 					rebuild_economic_modules = yes
@@ -440,6 +476,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					check_base_weapon = yes
 					scrap_stardock_modules = yes
 					scrap_defensive_modules = yes
+					set_planet_flag = rebuild_process
 					spaceport = { dismantle = yes }
 					rebuild_spaceport_economic = yes
 					rebuild_economic_modules = yes
@@ -456,7 +493,8 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					}
 					clear_base_weapon_flags = yes
 					check_base_weapon = yes
-					scrap_stardock_modules = yes					
+					scrap_stardock_modules = yes	
+					set_planet_flag = rebuild_process
 					spaceport = { dismantle = yes }
 					rebuild_spaceport_economic = yes
 					rebuild_economic_modules = yes
@@ -519,6 +557,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					check_base_weapon = yes
 					scrap_stardock_modules = yes
 					scrap_economic_modules = yes
+					set_planet_flag = rebuild_process
 					spaceport = { dismantle = yes }
 					rebuild_spaceport_defensive = yes
 					rebuild_defensive_modules = yes														
@@ -535,7 +574,8 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					}
 					clear_base_weapon_flags = yes
 					check_base_weapon = yes
-					scrap_stardock_modules = yes					
+					scrap_stardock_modules = yes
+					set_planet_flag = rebuild_process
 					spaceport = { dismantle = yes }
 					rebuild_spaceport_defensive = yes
 					rebuild_economic_modules = yes
@@ -571,6 +611,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 					check_base_weapon = yes
 					scrap_defensive_modules = yes
 					scrap_economic_modules = yes
+					set_planet_flag = rebuild_process
 					spaceport = { dismantle = yes }					
 					rebuild_spaceport_stardock = yes
 					rebuild_stardock_modules = yes
@@ -679,9 +720,9 @@ planet_event = { #this event builds spaceport modules if some form of automation
 	}
 }
 
-#cleanup events fired using the on policy change on action trigger. 
+#cleanup events 
 
-country_event = { #this event is WIP HERE
+country_event = { #fired using the on_policy_change on action trigger. This event removes redundant planetary flags from edicts.
 	id = ex_spaceport_events.110
 	hide_window = yes
 	is_triggered_only = yes
@@ -700,14 +741,92 @@ country_event = { #this event is WIP HERE
 					has_planet_flag = spaceport_automation_stardock_specialized
 					has_planet_flag = spaceport_automation_defensive_specialized
 					has_planet_flag = spaceport_automation_defensive_mixed
+					has_planet_flag = spaceport_automation_disable_local
 				}		
 			}
 			remove_planet_flag = spaceport_automation_economic_specialized	
 			remove_planet_flag = spaceport_automation_economic_mixed
 			remove_planet_flag = spaceport_automation_stardock_specialized
 			remove_planet_flag = spaceport_automation_defensive_specialized
-			remove_planet_flag = spaceport_automation_defensive_mixed			
+			remove_planet_flag = spaceport_automation_defensive_mixed	
+			remove_planet_flag = spaceport_automation_disable_local			
 		}
 	}
 }	
+
+country_event = { #fired using the on_policy_change on action trigger. This event removes the "unavailable" and "under construction" placeholder modules from any spaceport that has automation disabled. 
+	id = ex_spaceport_events.111
+	hide_window = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		last_changed_policy = spaceport_automation
+		has_policy_flag = spaceport_automation_disabled
+	}	
+	
+	immediate = {
+		every_owned_planet = {
+			limit = {
+				has_spaceport = yes	
+				OR = {
+					has_spaceport_module = slot_unavailable_9
+					has_spaceport_module = slot_unavailable_8
+					has_spaceport_module = slot_unavailable_7
+					has_spaceport_module = slot_unavailable_6
+					has_spaceport_module = slot_unavailable_5
+					has_spaceport_module = slot_unavailable_4
+					has_spaceport_module = slot_unavailable_3
+					has_spaceport_module = slot_unavailable_2
+					has_spaceport_module = slot_unavailable_1
+					has_spaceport_module = module_under_construction
+				}						
+			}
+			if = { limit = { has_spaceport_module = slot_unavailable_9 } remove_spaceport_module = slot_unavailable_9 }
+			if = { limit = { has_spaceport_module = slot_unavailable_8 } remove_spaceport_module = slot_unavailable_8 } 
+			if = { limit = { has_spaceport_module = slot_unavailable_7 } remove_spaceport_module = slot_unavailable_7 }
+			if = { limit = { has_spaceport_module = slot_unavailable_6 } remove_spaceport_module = slot_unavailable_6 }
+			if = { limit = { has_spaceport_module = slot_unavailable_5 } remove_spaceport_module = slot_unavailable_5 }
+			if = { limit = { has_spaceport_module = slot_unavailable_4 } remove_spaceport_module = slot_unavailable_4 }
+			if = { limit = { has_spaceport_module = slot_unavailable_3 } remove_spaceport_module = slot_unavailable_3 }
+			if = { limit = { has_spaceport_module = slot_unavailable_2 } remove_spaceport_module = slot_unavailable_2 }
+			if = { limit = { has_spaceport_module = slot_unavailable_1 } remove_spaceport_module = slot_unavailable_1 }
+			if = { limit = { has_spaceport_module = module_under_construction } remove_spaceport_module = module_under_construction }
+		}
+	}
+}
+
+planet_event = { #fired on a daily tick, removing the "unavailable" and "under construction" placeholder modules from any spaceport that has automation disabled local planet flag. 
+	id = ex_spaceport_events.112
+	hide_window = yes	
+	
+	trigger = {
+		has_planet_flag = spaceport_automation_disable_local
+		has_spaceport = yes
+		OR = {
+			has_spaceport_module = slot_unavailable_9
+			has_spaceport_module = slot_unavailable_8
+			has_spaceport_module = slot_unavailable_7
+			has_spaceport_module = slot_unavailable_6
+			has_spaceport_module = slot_unavailable_5
+			has_spaceport_module = slot_unavailable_4
+			has_spaceport_module = slot_unavailable_3
+			has_spaceport_module = slot_unavailable_2
+			has_spaceport_module = slot_unavailable_1
+			has_spaceport_module = module_under_construction
+		}				
+	}	
+	
+	immediate = {
+		if = { limit = { has_spaceport_module = slot_unavailable_9 } remove_spaceport_module = slot_unavailable_9 }
+		if = { limit = { has_spaceport_module = slot_unavailable_8 } remove_spaceport_module = slot_unavailable_8 } 
+		if = { limit = { has_spaceport_module = slot_unavailable_7 } remove_spaceport_module = slot_unavailable_7 }
+		if = { limit = { has_spaceport_module = slot_unavailable_6 } remove_spaceport_module = slot_unavailable_6 }
+		if = { limit = { has_spaceport_module = slot_unavailable_5 } remove_spaceport_module = slot_unavailable_5 }
+		if = { limit = { has_spaceport_module = slot_unavailable_4 } remove_spaceport_module = slot_unavailable_4 }
+		if = { limit = { has_spaceport_module = slot_unavailable_3 } remove_spaceport_module = slot_unavailable_3 }
+		if = { limit = { has_spaceport_module = slot_unavailable_2 } remove_spaceport_module = slot_unavailable_2 }
+		if = { limit = { has_spaceport_module = slot_unavailable_1 } remove_spaceport_module = slot_unavailable_1 }
+		if = { limit = { has_spaceport_module = module_under_construction } remove_spaceport_module = module_under_construction }
+	}
+}		
 	
