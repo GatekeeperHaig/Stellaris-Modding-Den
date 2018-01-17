@@ -263,7 +263,11 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       alreadyExists=0
     for i in range(len(magnitude)):
       if magnitude[i][0]=="@":
-        magnitude[i]=varsToValue.get(magnitude[i])
+        try:
+          magnitude[i]=varsToValue.get(magnitude[i])
+        except ValueError:
+          print("Warning: Missing variable: {!s}. Setting to zero!".format(magnitude[i]))
+          magnitude[i]=0
       magnitude[i]=float(magnitude[i])
     if inverse:
       finalVal=int((magnitude[1]-magnitude[0])/(1-discount)) #Making sure the the new t1 "direct build" will have the same costs as in the original version where t1 was also direct build. The t1 upgrade version on the other hand will be cheaper now!

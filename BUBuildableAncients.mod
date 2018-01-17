@@ -1,5 +1,5 @@
 name="!Build Upgraded - Ancient Buildings: Comp. Patch"
-path="mod/BUBuildableAncients/"
+path="mod/compatibility-patches-exoverhaul/BUBuildableAncients/"
 tags={
 	"buildings"
 }
