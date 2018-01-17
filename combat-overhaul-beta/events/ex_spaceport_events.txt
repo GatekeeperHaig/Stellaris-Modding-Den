@@ -126,25 +126,29 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 		has_owner = yes
 		has_spaceport = yes		
 		has_free_spaceport_module_slot = yes	
-		switch = {
-			trigger = is_spaceport_module_slot_free
-			9 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 8 } } NOT = { has_planet_flag = slot_9_free } } }
-			8 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 7 } } NOT = { has_planet_flag = slot_8_free } } }
-			7 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 6 } } NOT = { has_planet_flag = slot_7_free } } }
-			6 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 5 } } NOT = { has_planet_flag = slot_6_free } } }
-			5 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 4 } } NOT = { has_planet_flag = slot_5_free } } }
-			4 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 3 } } NOT = { has_planet_flag = slot_4_free } } }
-			3 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 2 } } NOT = { has_planet_flag = slot_3_free } } }
-			2 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 1 } } NOT = { has_planet_flag = slot_2_free } } }
-			1 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 0 } } NOT = { has_planet_flag = slot_1_free } } }
-		}			
+		OR = {
+			has_planet_flag = no_slot_available
+			switch = {
+				trigger = is_spaceport_module_slot_free
+				9 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 8 } } NOT = { has_planet_flag = slot_9_free } } }
+				8 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 7 } } NOT = { has_planet_flag = slot_8_free } } }
+				7 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 6 } } NOT = { has_planet_flag = slot_7_free } } }
+				6 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 5 } } NOT = { has_planet_flag = slot_6_free } } }
+				5 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 4 } } NOT = { has_planet_flag = slot_5_free } } }
+				4 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 3 } } NOT = { has_planet_flag = slot_4_free } } }
+				3 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 2 } } NOT = { has_planet_flag = slot_3_free } } }
+				2 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 1 } } NOT = { has_planet_flag = slot_2_free } } }
+				1 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 0 } } NOT = { has_planet_flag = slot_1_free } } }
+			}
+		}	
 	}
 	
 	immediate = {
 		set_timed_planet_flag = { flag = flag_delay_0 days = 1 } #this delays the following event
 		set_timed_planet_flag = { flag = flag_delay_1 days = 2 } #this delays the second following event		
 		if = { limit = { has_planet_flag = spaceport_flags_removed } remove_planet_flag = spaceport_flags_removed }
-		clear_slot_flag = yes
+		if = { limit = { has_planet_flag = no_slot_available } remove_planet_flag = no_slot_available }
+		check_module_slots = yes
 		switch = {
 			trigger = is_spaceport_module_slot_free
 			9 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 8 } } } set_variable = { which = "spaceport_level" value = 9 } update_spaceport_level = yes update_spaceport_modifiers = yes } if = { limit = { NOT = { has_planet_flag = slot_9_free } } set_planet_flag = slot_9_free } }					
@@ -166,64 +170,91 @@ planet_event = { # this event runs on every tick (day), checking whether automat
 	#is_triggered_only = yes
 
 	trigger = {		
-		NOT = { has_planet_flag = flag_delay_0 }
+		NOR = { 
+			has_planet_flag = flag_delay_0
+			has_planet_flag = no_slot_available
+		}
 		has_spaceport = yes		
 		is_automation_enabled = yes		
 		OR = {
 			AND = {
 				has_planet_flag = slot_1_free
-				NOT = { spaceport_module = slot_unavailable_1 }
+				NOT = { has_spaceport_module = slot_unavailable_1 }
 			}	
 			AND = {
 				has_planet_flag = slot_2_free
-				NOT = { spaceport_module = slot_unavailable_2 }
+				NOT = { has_spaceport_module = slot_unavailable_2 }
 			}				
 			AND = {
 				has_planet_flag = slot_3_free
-				NOT = { spaceport_module = slot_unavailable_3 }
+				NOT = { has_spaceport_module = slot_unavailable_3 }
 			}				
 			AND = {
 				has_planet_flag = slot_4_free
-				NOT = { spaceport_module = slot_unavailable_4 }
+				NOT = { has_spaceport_module = slot_unavailable_4 }
 			}				
 			AND = {
 				has_planet_flag = slot_5_free
-				NOT = { spaceport_module = slot_unavailable_5 }
+				NOT = { has_spaceport_module = slot_unavailable_5 }
 			}				
 			AND = {
 				has_planet_flag = slot_6_free
-				NOT = { spaceport_module = slot_unavailable_6 }
+				NOT = { has_spaceport_module = slot_unavailable_6 }
 			}				
 			AND = {
 				has_planet_flag = slot_7_free
-				NOT = { spaceport_module = slot_unavailable_7 }
+				NOT = { has_spaceport_module = slot_unavailable_7 }
 			}				
 			AND = {
 				has_planet_flag = slot_8_free
-				NOT = { spaceport_module = slot_unavailable_8 }
+				NOT = { has_spaceport_module = slot_unavailable_8 }
 			}				
 			AND = {
 				has_planet_flag = slot_9_free
-				NOT = { spaceport_module = slot_unavailable_9 }
+				NOT = { has_spaceport_module = slot_unavailable_9 }
 			}							
 		}								
 	}			
 	immediate = { 
 		set_timed_planet_flag = { flag = flag_delay_2 days = 1 } #this is meant to gate the following event		
-		switch = {
-			trigger = has_planet_flag
-			slot_1_free = { set_spaceport_module = { slot = 1 module = "slot_unavailable_1" } }
-			slot_2_free = { set_spaceport_module = { slot = 2 module = "slot_unavailable_2" } }
-			slot_3_free = { set_spaceport_module = { slot = 3 module = "slot_unavailable_3" } }
-			slot_4_free = { set_spaceport_module = { slot = 4 module = "slot_unavailable_4" } }
-			slot_5_free = { set_spaceport_module = { slot = 5 module = "slot_unavailable_5" } }
-			slot_6_free = { set_spaceport_module = { slot = 6 module = "slot_unavailable_6" } }
-			slot_7_free = { set_spaceport_module = { slot = 7 module = "slot_unavailable_7" } }
-			slot_8_free = { set_spaceport_module = { slot = 8 module = "slot_unavailable_8" } }
-			slot_9_free = { set_spaceport_module = { slot = 9 module = "slot_unavailable_9" } }
-		}						
-	}
-}
+		if = { 
+			limit = { has_planet_flag = slot_1_free}
+			set_spaceport_module = { slot = 1 module = "slot_unavailable_1" }
+			else = { 
+				if = {
+					limit = { has_planet_flag = slot_2_free}
+					set_spaceport_module = { slot = 2 module = "slot_unavailable_2" }
+					else = {
+						if = {
+							limit = { has_planet_flag = slot_3_free}
+							set_spaceport_module = { slot = 3 module = "slot_unavailable_3" }
+							else = {
+								if = {
+									limit = { has_planet_flag = slot_4_free}
+									set_spaceport_module = { slot = 4 module = "slot_unavailable_4" }
+									else = {							
+										if = {
+											limit = { has_planet_flag = slot_5_free}
+											set_spaceport_module = { slot = 5 module = "slot_unavailable_5" }
+											else = {
+												if = {
+													limit = { has_planet_flag = slot_6_free}
+													set_spaceport_module = { slot = 6 module = "slot_unavailable_6" }
+													else = {
+														if = {
+															limit = { has_planet_flag = slot_7_free}
+															set_spaceport_module = { slot = 7 module = "slot_unavailable_7" }
+															else = {													
+																if = {
+																	limit = { has_planet_flag = slot_8_free}
+																	set_spaceport_module = { slot = 8 module = "slot_unavailable_8" }
+																	else = {														
+																		if = {
+																			limit = { has_planet_flag = slot_9_free}
+																			set_spaceport_module = { slot = 9 module = "slot_unavailable_9" }
+																			else = { set_planet_flag = no_slot_available											
+}}}}}}}}}}}}}}}}}}}}
+
 
 planet_event = { # this event runs on every tick (day), checking whether automation is enabled, if it is and there is an empty slot flag + no "module under construction" module on the planet, it fires the automation event.
 	id = ex_spaceport_events.12
