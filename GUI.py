@@ -322,6 +322,7 @@ class TabClass:
           pickle.dump([],f)
         pickle.dump([line.txt.get() for line in self.lines], f)
         pickle.dump([line.subfolderTxt.get() for line in self.lines], f)
+        pickle.dump([line.helpFileCheckVar.get() for line in self.lines], f)
       # print("save")
   def load(self):
     fileName=filedialog.askopenfilename(initialdir = ".",title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
@@ -349,14 +350,23 @@ class TabClass:
         pickle.load(f)
         self.loadLines(f)
   def loadLines(self,f):
-    i=len(self.lines)
-    for entry in pickle.load(f):
-      self.addLine()
-      self.lines[-1].setTxt(entry)
-    for entry in pickle.load(f):
-      if self.subfolder:
-        self.lines[i].subfolderTxt.insert(0,entry)
-        i+=1
+    try:
+      i=len(self.lines)
+      for entry in pickle.load(f):
+        self.addLine()
+        self.lines[-1].setTxt(entry)
+      iLoc=i
+      for entry in pickle.load(f):
+        if self.subfolder:
+          self.lines[iLoc].subfolderTxt.insert(0,entry)
+          iLoc+=1
+      iLoc=i
+      for entry in pickle.load(f):
+        self.lines[iLoc].helpFileCheckVar.set(entry)
+        iLoc+=1
+    except EOFError:
+      print("Warning: File ended earlir than expected. File might be older version but still work perfectly or stuff is actually missing")
+
   def __init__(self,name,tab,root,command, fixedOptions, defaultFileFilter,options=[], optionWindow=0):
     self.name=name
     self.root=root
