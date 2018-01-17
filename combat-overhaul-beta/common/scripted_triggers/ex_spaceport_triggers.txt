@@ -122,9 +122,37 @@ no_spaceport_level_flag_9 = {
 }		
 
 is_automation_enabled = {
-	NOR = {
-		has_planet_flag = spaceport_automation_disable_local			
-		owner = { has_policy_flag = spaceport_automation_disabled }
+	AND = {
+		NOR = {
+			has_planet_flag = spaceport_automation_disable_local			
+			owner = { has_policy_flag = spaceport_automation_disabled }
+		}		
+		OR = {		
+			AND = {
+				sector_controlled = yes
+				owner = { has_policy_flag = sector_automation }
+			}	
+			AND = {
+				sector_controlled = no
+				OR = {
+					owner = { has_policy_flag = core_automation }
+					AND = {
+						owner = { has_policy_flag = core_edicts }
+						has_automation_edict_flag = yes
+					}	
+				}
+			}	
+		}		
+	}	
+}	
+
+has_automation_edict_flag = {
+	OR = {
+		has_planet_flag = spaceport_automation_economic_specialized				
+		has_planet_flag = spaceport_automation_economic_mixed
+		has_planet_flag = spaceport_automation_stardock_specialized
+		has_planet_flag = spaceport_automation_defensive_specialized
+		has_planet_flag = spaceport_automation_defensive_mixed
 	}
 }	
 
