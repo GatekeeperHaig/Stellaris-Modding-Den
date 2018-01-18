@@ -1,0 +1,440 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+country_edict = {
+	name = "call_the_houses"
+	
+	modifier = {
+		planet_army_build_speed_mult = 0.25
+		planet_army_build_cost_mult = -0.1
+		pop_ethic_militarist_attraction_mult = 0.1
+		spaceport_ship_build_speed_mult = 0.25
+		army_upkeep_mult = -0.15
+	}
+	influence_cost = 1
+	
+	potential = {
+		OR = {
+			has_ethic = ethic_militarist
+			has_ethic = ethic_fanatic_militarist
+		}
+	}
+	
+	allow = {
+		has_country_strategic_resource = {
+			type = sr_sacred_weapons
+			amount > 9
+		}
+		is_at_war = yes
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			is_at_war = no
+		}
+		modifier = {
+			factor = 0
+			influence < 300
+		}
+	}
+}
+
+country_edict = {
+	name = "mandatory_service"
+	
+	modifier = {
+		tile_resource_energy_mult = -0.1
+		species_leader_exp_gain = 0.1
+		planet_army_build_speed_mult = 0.25
+		pop_ethic_militarist_attraction_mult = 0.1
+		navy_size_mult = 0.2
+	}
+	influence_cost = 1
+	
+	potential = {
+		OR = {
+			has_ethic = ethic_militarist
+			has_ethic = ethic_fanatic_militarist
+			has_ethic = ethic_fanatic_xenophobe
+		}
+		NOR = {
+			has_ethic = ethic_egalitarian
+			has_ethic = ethic_pacifist
+			has_ethic = ethic_fanatic_egalitarian
+		}
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			is_at_war = no
+		}
+		modifier = {
+			factor = 0
+			influence < 300
+		}
+		modifier = {
+			factor = 0
+			energy < 500
+		}
+		modifier = {
+			factor = 0
+			NOR = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+				has_ethic = ethic_fanatic_xenophobe
+			}
+		}
+		modifier = {
+			factor = 2
+			has_ethic = ethic_fanatic_militarist
+		}
+	}
+	
+	prerequisites = {
+		"tech_alpha_military_service"
+	}
+}
+
+country_edict = {
+	name = "for_the_cause"
+	
+	modifier = {
+		pop_ethic_militarist_attraction_mult = 0.1
+		pop_ethic_pacifist_attraction_mult = -0.1
+		tile_resource_minerals_mult = 0.2
+		planet_migration_xeno_pull = -0.75
+		planet_army_build_speed_mult = 0.25
+		planet_army_build_cost_mult = -0.1
+		navy_size_mult = 0.25
+		all_technology_research_speed = -0.25
+		ship_reparation_speed_mult = 0.25
+		ship_upkeep_mult = -0.2
+		spaceport_ship_build_speed_mult = 0.5
+		spaceport_ship_build_cost_mult = -0.2
+	}
+	influence_cost = 2
+	
+	allow = {
+		OR = {
+			has_ethic = "ethic_militarist"
+			has_ethic = "ethic_fanatic_militarist"
+			has_ethic = "ethic_fanatic_xenophobe"
+		}
+		is_at_war = yes
+		has_country_strategic_resource = {
+			type = sr_brands_fealty
+			amount > 4
+		}
+	}
+	
+	prerequisites = {
+		"tech_alpha_military_service"
+	}
+	
+	ai_weight = {
+		weight = 0
+		modifier = {
+			weight = 1
+			is_at_war = yes
+			OR = {
+				has_ethic = "ethic_fanatic_militarist"
+				has_ethic = "ethic_fanatic_xenophobe"
+			}
+		}
+		modifier = {
+			weight = 0
+			not = { is_at_war = yes }
+		}
+	}
+}
+
+planet_edict = {
+	name = "sanctioned_militia"
+	influence_cost = 50
+	
+	modifier = {
+		planet_army_build_speed_mult = 0.25
+		army_upkeep_mult = -0.2
+		planet_unrest_add = -10
+		tile_resource_unity_mult = 0.1
+	}
+	length = 3600
+	
+	allow = {
+		or = {
+			has_building = "building_military_base"
+			has_building = "building_military_academy"
+			has_building = "building_security_center"
+			has_building_security_center_2 = yes
+		}
+		owner = {
+			has_policy_flag = alp_law_enforcement_localmilitias
+		}
+	}
+	
+	prerequisites = {
+		"tech_alpha_xenophobia"
+	}
+	
+	ai_weight = {
+		weight = 0
+		modifier = {
+			weight = 1
+			num_pops > 8
+			owner = {
+				OR = {
+					has_ethic = ethic_fanatic_militarist
+					has_ethic = ethic_fanatic_xenophobe
+				}
+				is_at_war = yes
+			}
+			happiness_planet < 0.60
+		}
+	}
+}
+
+planet_edict = {
+	name = "prison_of_war"
+	influence_cost = 150
+	length = 1800
+	
+	modifier = {
+		pop_growth_speed = -0.25
+		pop_ethic_militarist_attraction_mult = -0.25
+		planet_migration_all_pull = -0.75
+		tile_resource_energy_mult = -0.5
+		tile_resource_unity_mult = -0.5
+		tile_resource_engineering_research_mult = -0.25
+		tile_resource_physics_research_mult = -0.5
+		planet_unrest_add = -100
+	}
+	
+	potential = {
+		any_pop = {
+			has_modifier = "pop_recently_conquered"
+		}
+		owner = {
+			OR = {
+				has_ethic = "ethic_fanatic_authoritarian"
+				has_ethic = "ethic_fanatic_militarist"
+				has_ethic = "ethic_militarist"
+				has_ethic = "ethic_fanatic_xenophobe"
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			owner = {
+				influence < 400
+			}
+		}
+	}
+}
+
+planet_edict = {
+	name = "holo_network"
+	influence_cost = 100
+	
+	modifier = {
+		pop_happiness = 0.05
+		pop_government_ethic_attraction = 0.2
+		tile_resource_energy_mult = -0.05
+	}
+	
+	allow = {
+		has_building = "building_state_media"
+	}
+	length = 3600
+	
+	prerequisites = {
+		"tech_alpha_fanatic_xenophobia"
+	}
+	
+	ai_weight = {
+		weight = 2
+		modifier = {
+			factor = 0
+			num_pops < 10
+		}
+		modifier = {
+			factor = 0
+			happiness_planet > 0.60
+		}
+		modifier = {
+			factor = 2
+			happiness_planet < 0.40
+		}
+		modifier = {
+			factor = 0
+			owner = {
+				influence < 400
+			}
+		}
+	}
+}
+
+planet_edict = {
+	name = "alpha_breeding_program"
+	influence_cost = 100
+	
+	modifier = {
+		pop_growth_speed = 1.0
+		pop_happiness = -0.25
+	}
+	
+	potential = {
+		owner = {
+			or = {
+				has_ethic = ethic_fanatic_xenophobe
+				has_ethic = ethic_xenophobe
+			}
+		}
+	}
+	
+	allow = {
+		or = {
+			has_building = building_clinic
+			has_building_hospital = yes
+		}
+		has_building = "building_genetic_pairing"
+	}
+	length = 1800
+	
+	prerequisites = {
+		"tech_alpha_gene_analytics_2"
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			weight = 0
+			num_pops > 4
+		}
+		modifier = {
+			weight = 0
+			owner = {
+				influence < 300
+			}
+		}
+	}
+}
+
+planet_edict = {
+	name = "espionage_surveillance"
+	influence_cost = 25
+	
+	modifier = {
+		planet_sensor_range_mult = 2.0
+	}
+	length = 1800
+	
+	potential = {
+		is_planet_class = pc_habitat
+		or = {
+			has_building = building_surveillance_center
+			has_building = building_security_center
+			has_building_security_center_2 = yes
+		}
+		owner = {
+			has_country_strategic_resource = {
+				type = sr_intelligence
+				amount > 2
+			}
+		}
+	}
+	
+	allow = {
+		owner = {
+			has_country_strategic_resource = {
+				type = sr_intelligence
+				amount > 1
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			weight = 0
+			owner = {
+				influence < 200
+			}
+		}
+	}
+	
+	effect = {
+		hidden_effect = {
+			save_event_target_as = et_thisplanet
+			owner = {
+				save_event_target_as = et_mycountry
+				add_modifier = {
+					modifier = espionage_surveillance_modifier
+					days = 1800
+				}
+			}
+			random_planet = {
+				limit = {
+					distance = {
+						source = event_target:et_thisplanet
+						max_distance = 75
+						min_distance = 0
+					}
+					is_colony = yes
+					not = { has_modifier = under_surveillance }
+					not = { has_planet_flag = pf_surveillance_operative }
+					not = { is_owned_by = event_target:et_mycountry }
+					owner = {
+						is_subject = no
+					}
+				}
+				add_modifier = {
+					modifier = under_surveillance
+					days = 1800
+				}
+				set_timed_planet_flag = {
+					flag = pf_operative_inserted_here
+					days = 1800
+				}
+				surveyed = {
+					set_surveyed = yes
+					surveyor = event_target:et_mycountry
+				}
+				#create_point_of_interest = yes
+			}
+			every_planet = {
+				limit = {
+					distance = {
+						source = event_target:et_thisplanet
+						max_distance = 50
+						min_distance = 0
+					}
+					is_colony = yes
+					not = { has_modifier = under_surveillance }
+					not = { is_owned_by = event_target:et_mycountry }
+					owner = {
+						is_subject = no
+					}
+				}
+				add_modifier = {
+					modifier = under_surveillance
+					days = 1800
+				}
+				solar_system = {
+					every_system_planet = {
+						surveyed = {
+							set_surveyed = yes
+							surveyor = event_target:et_mycountry
+						}
+					}
+				}
+			}
+		}
+	}
+}

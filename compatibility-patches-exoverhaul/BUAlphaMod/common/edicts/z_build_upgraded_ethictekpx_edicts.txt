@@ -1,0 +1,545 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+country_edict = {
+	name = "alpha_promise_eden"
+	
+	modifier = {
+		pop_happiness = 0.1
+		planet_fortification_strength = -0.5
+		planet_migration_xeno_pull = 0.25
+		pop_ethic_militarist_attraction_mult = -0.2
+		pop_ethic_pacifist_attraction_mult = 0.2
+		pop_ethic_xenophobe_attraction_mult = -0.2
+		pop_ethic_xenophile_attraction_mult = 0.2
+		planet_border_mult = 0.25
+		planet_army_build_speed_mult = -0.5
+		country_border_friction_mult = -0.2
+	}
+	influence_cost = 2
+	
+	allow = {
+		is_at_war = no
+		has_policy_flag = no_wars
+		has_policy_flag = slavery_not_allowed
+		has_policy_flag = purge_not_allowed
+		has_policy_flag = resettlement_not_allowed
+		has_policy_flag = first_contact_attack_not_allowed
+		has_policy_flag = refugees_allowed
+		NOT = {
+			has_policy_flag = allow_orbital_bombardment_limited
+		}
+		NOT = {
+			has_policy_flag = allow_orbital_bombardment_full
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+		modifier = {
+			weight = 1
+			OR = {
+				has_ethic = ethic_fanatic_xenophile
+				has_ethic = ethic_fanatic_pacifist
+			}
+			any_neighbor_country = {
+				has_edict = alpha_promise_eden
+			}
+		}
+	}
+	
+	prerequisites = {
+		"tech_alpha_promise_eden"
+	}
+}
+
+country_edict = {
+	name = "create_neutral_zones"
+	
+	modifier = {
+		country_border_friction_mult = -0.1
+	}
+	influence_cost = 1
+	
+	potential = {
+		or = {
+			any_neighbor_country = {
+				or = {
+					is_country_type = neutral_zone
+					has_edict = create_neutral_zones
+				}
+			}
+			or = {
+				has_ethic = ethic_pacifist
+				has_ethic = ethic_fanatic_pacifist
+			}
+		}
+	}
+	
+	allow = {
+		not = { has_edict = dismantle_neutral_zones }
+		not = { has_modifier = cm_dismantling_neutral_zones }
+	}
+	
+	ai_weight = {
+		weight = 0
+		modifier = {
+			weight = 100
+			any_neighbor_country = {
+				or = {
+					is_country_type = neutral_zone
+					has_edict = create_neutral_zones
+				}
+			}
+		}
+	}
+}
+
+country_edict = {
+	name = "dismantle_neutral_zones"
+	influence_cost = 0
+	
+	potential = {
+		has_country_flag = cf_neutral_zones_created
+	}
+	
+	allow = {
+		not = { has_edict = create_neutral_zones }
+		not = { has_country_flag = cf_timed_neutral_zones }
+		not = { has_modifier = cm_dismantling_neutral_zones }
+	}
+	
+	ai_weight = {
+		weight = 0
+		modifier = {
+			weight = 100
+			any_neighbor_country = {
+				has_edict = dismantle_neutral_zones
+			}
+		}
+	}
+}
+
+planet_edict = {
+	name = "family_incentives_campaign"
+	influence_cost = 100
+	
+	modifier = {
+		pop_growth_speed = 0.5
+		tile_resource_energy_mult = -0.1
+		tile_resource_food_mult = -0.1
+	}
+	
+	potential = {
+		OR = {
+			has_building = building_clinic
+			has_building_hospital = yes
+		}
+		owner = {
+			NOT = { has_ethic = ethic_fanatic_egalitarian }
+			nor = {
+				has_ethic = ethic_xenophobe
+				has_ethic = ethic_fanatic_xenophobe
+			}
+			or = {
+				has_ethic = ethic_fanatic_xenophile
+				has_ethic = ethic_xenophile
+				has_ethic = ethic_fanatic_pacifist
+				has_ethic = ethic_pacifist
+			}
+		}
+	}
+	length = 3600
+	
+	ai_weight = {
+		weight = 0
+		modifier = {
+			weight = 2
+			num_pops < 4
+		}
+	}
+}
+
+planet_edict = {
+	name = "establish_trade_route_1"
+	influence_cost = 25
+	
+	modifier = {
+	}
+	
+	potential = {
+		not = { has_modifier = export_route_1 }
+		has_trade_building = yes
+		owner = {
+			any_planet_within_border = {
+				has_trade_building = yes
+				not = { has_modifier = import_route_1 }
+				not = { is_same_value = root }
+			}
+		}
+	}
+	length = 0
+	
+	effect = {
+		hidden_effect = {
+			add_domestic_export_route_1 = yes
+		}
+	}
+	
+	ai_weight = {
+		weight = 1
+	}
+}
+
+planet_edict = {
+	name = "establish_f_trade_route_1"
+	influence_cost = 50
+	
+	modifier = {
+	}
+	
+	potential = {
+		not = { has_modifier = f_export_route_1 }
+		has_trade_building = yes
+		owner = {
+			not = { has_policy_flag = foreign_trade_embargo }
+			any_neighbor_country = {
+				any_owned_planet = {
+					has_trade_building = yes
+					not = { has_modifier = f_import_route_1 }
+					not = { is_same_value = root }
+				}
+				not = { has_policy_flag = foreign_trade_embargo }
+			}
+		}
+	}
+	length = 0
+	
+	effect = {
+		hidden_effect = {
+			add_modifier = {
+				modifier = f_export_route_1
+				days = -1
+			}
+			set_planet_flag = pf_me
+			owner = {
+				random_neighbor_country = {
+					limit = {
+						not = { has_policy_flag = foreign_trade_embargo }
+						any_owned_planet = {
+							has_trade_building = yes
+							not = { has_modifier = f_import_route_1 }
+							not = { has_planet_flag = pf_me }
+						}
+					}
+					add_opinion_modifier = {
+						modifier = opinion_private_imports
+						who = root.owner
+					}
+					random_owned_planet = {
+						limit = {
+							has_trade_building = yes
+							not = { has_modifier = f_import_route_1 }
+							not = { has_planet_flag = pf_me }
+						}
+						add_modifier = {
+							modifier = f_import_route_1
+							days = -1
+						}
+					}
+				}
+			}
+			remove_planet_flag = pf_me
+		}
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			weight = 0
+			owner = {
+				any_neighbor_country = {
+					has_policy_flag = foreign_trade_embargo
+				}
+			}
+		}
+	}
+}
+
+planet_edict = {
+	name = "cancel_f_trade_route_1"
+	influence_cost = 0
+	
+	modifier = {
+	}
+	
+	potential = {
+		has_modifier = f_export_route_1
+	}
+	length = 0
+	
+	effect = {
+		hidden_effect = {
+			remove_modifier = f_export_route_1
+			set_planet_flag = pf_me
+			owner = {
+				random_neighbor_country = {
+					limit = {
+						any_owned_planet = {
+							has_modifier = f_import_route_1
+							not = { has_planet_flag = pf_me }
+						}
+					}
+					remove_opinion_modifier = {
+						modifier = opinion_private_imports
+						who = root.owner
+					}
+					random_owned_planet = {
+						limit = {
+							has_modifier = f_import_route_1
+							not = { has_planet_flag = pf_me }
+						}
+						remove_modifier = f_import_route_1
+					}
+				}
+			}
+			remove_planet_flag = pf_me
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+		modifier = {
+			weight = 100
+			owner = {
+				any_neighbor_country = {
+					has_policy_flag = foreign_trade_embargo
+				}
+			}
+		}
+	}
+}
+
+planet_edict = {
+	name = "cancel_f_trade_route_2"
+	influence_cost = 0
+	
+	modifier = {
+	}
+	
+	potential = {
+		has_modifier = f_export_route_2
+	}
+	length = 0
+	
+	effect = {
+		hidden_effect = {
+			remove_modifier = f_export_route_2
+			set_planet_flag = pf_me
+			owner = {
+				random_neighbor_country = {
+					limit = {
+						any_owned_planet = {
+							has_modifier = f_import_route_2
+							not = { has_planet_flag = pf_me }
+						}
+					}
+					remove_opinion_modifier = {
+						modifier = opinion_private_imports
+						who = root.owner
+					}
+					random_owned_planet = {
+						limit = {
+							has_modifier = f_import_route_2
+							not = { has_planet_flag = pf_me }
+						}
+						remove_modifier = f_import_route_2
+					}
+				}
+			}
+			remove_planet_flag = pf_me
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+		modifier = {
+			weight = 100
+			owner = {
+				any_neighbor_country = {
+					has_policy_flag = foreign_trade_embargo
+				}
+			}
+		}
+	}
+}
+
+planet_edict = {
+	name = "establish_trade_route_2"
+	influence_cost = 25
+	
+	modifier = {
+	}
+	
+	potential = {
+		not = { has_modifier = export_route_2 }
+		has_building_trade_company = yes
+		owner = {
+			any_planet_within_border = {
+				has_trade_building = yes
+				not = { has_modifier = import_route_2 }
+				not = { is_same_value = root }
+			}
+		}
+	}
+	length = 0
+	
+	effect = {
+		hidden_effect = {
+			add_domestic_export_route_2 = yes
+		}
+	}
+	
+	ai_weight = {
+		weight = 1
+	}
+}
+
+planet_edict = {
+	name = "establish_f_trade_route_2"
+	influence_cost = 50
+	
+	modifier = {
+	}
+	
+	potential = {
+		not = { has_modifier = f_export_route_2 }
+		has_building_trade_company = yes
+		owner = {
+			not = { has_policy_flag = foreign_trade_embargo }
+			any_neighbor_country = {
+				any_owned_planet = {
+					has_trade_building = yes
+					not = { has_modifier = f_import_route_2 }
+					not = { is_same_value = root }
+				}
+				not = { has_policy_flag = foreign_trade_embargo }
+			}
+		}
+	}
+	length = 0
+	
+	effect = {
+		hidden_effect = {
+			add_modifier = {
+				modifier = f_export_route_2
+				days = -1
+			}
+			set_planet_flag = pf_me
+			owner = {
+				random_neighbor_country = {
+					limit = {
+						not = { has_policy_flag = foreign_trade_embargo }
+						any_owned_planet = {
+							has_trade_building = yes
+							not = { has_modifier = f_import_route_2 }
+							not = { has_planet_flag = pf_me }
+						}
+					}
+					add_opinion_modifier = {
+						modifier = opinion_private_imports
+						who = root.owner
+					}
+					random_owned_planet = {
+						limit = {
+							has_trade_building = yes
+							not = { has_modifier = f_import_route_2 }
+							not = { has_planet_flag = pf_me }
+						}
+						add_modifier = {
+							modifier = f_import_route_2
+							days = -1
+						}
+					}
+				}
+			}
+			remove_planet_flag = pf_me
+		}
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			weight = 0
+			owner = {
+				any_neighbor_country = {
+					has_policy_flag = foreign_trade_embargo
+				}
+			}
+		}
+	}
+}
+
+planet_edict = {
+	name = "cancel_trade_route_1"
+	influence_cost = 0
+	
+	modifier = {
+	}
+	
+	potential = {
+		has_modifier = export_route_1
+	}
+	length = 0
+	
+	effect = {
+		hidden_effect = {
+			remove_modifier = export_route_1
+			owner = {
+				random_owned_planet = {
+					limit = {
+						has_modifier = import_route_1
+						not = { is_same_value = root }
+					}
+					remove_modifier = import_route_1
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}
+
+planet_edict = {
+	name = "cancel_trade_route_2"
+	influence_cost = 0
+	
+	modifier = {
+	}
+	
+	potential = {
+		has_modifier = export_route_2
+	}
+	length = 0
+	
+	effect = {
+		hidden_effect = {
+			remove_modifier = export_route_2
+			owner = {
+				random_owned_planet = {
+					limit = {
+						not = { is_same_value = root }
+						has_modifier = import_route_2
+					}
+					remove_modifier = import_route_2
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}

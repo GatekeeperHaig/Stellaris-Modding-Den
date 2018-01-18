@@ -1,0 +1,613 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+labourers_union = {
+	election_header = "GFX_faction_header_yellow"
+	guiding_ethic = ethic_egalitarian
+	unique = yes
+	support_multiplier = 1
+	
+	is_potential = {
+		NOT = { has_ethic = ethic_gestalt_consciousness }
+		NOT = { has_modifier = banned_egalitarian }
+		any_owned_pop = {
+			OR = {
+				has_ethic = ethic_egalitarian
+				has_ethic = ethic_fanatic_egalitarian
+				has_ethic = ethic_xenophile
+				has_ethic = ethic_fanatic_xenophile
+			}
+		}
+		NOR = {
+			has_ethic = ethic_fanatic_xenophile
+			has_ethic = ethic_fanatic_egalitarian
+		}
+		OR = {
+			has_technology = tech_hydroponics
+			has_technology = tech_mining_network_2
+		}
+	}
+	
+	parameters = {
+		empire = {
+			type = country
+			valid_objects = {
+				is_same_value = root
+			}
+		}
+	}
+	
+	can_join_faction = {
+		is_enslaved = no
+		is_being_purged = no
+		has_culture_shock = no
+		NOT = { has_trait = trait_nerve_stapled }
+		OR = {
+			has_ethic = ethic_pacifist
+			has_ethic = ethic_fanatic_pacifist
+			has_ethic = ethic_egalitarian
+			has_ethic = ethic_fanatic_egalitarian
+			has_ethic = ethic_xenophile
+			has_ethic = ethic_fanatic_xenophile
+		}
+		is_robot_pop = no
+		tile = {
+			nor = {
+				has_resource = {
+					type = physics_research
+					amount > 0
+				}
+				has_resource = {
+					type = society_research
+					amount > 0
+				}
+			}
+			OR = {
+				has_resource = {
+					type = food
+					amount > 0
+				}
+				has_resource = {
+					type = minerals
+					amount > 0
+				}
+			}
+		}
+	}
+	
+	attraction = {
+		base = 175
+		modifier = {
+			factor = 0.25
+			parameter:empire = {
+				has_modifier = banned_egalitarian
+			}
+		}
+		modifier = {
+			factor = 1.25
+			owner = {
+				has_ethic = ethic_egalitarian
+				has_ethic = ethic_fanatic_egalitarian
+			}
+		}
+		modifier = {
+			factor = 0
+			exists = from
+			from = {
+				has_modifier = prosecuted_faction
+			}
+		}
+		modifier = {
+			factor = 0.5
+			owner = {
+				has_policy_flag = alp_private_businesses_prohibited
+			}
+		}
+		modifier = {
+			factor = 0.75
+			owner = {
+				has_policy_flag = alp_private_businesses_regulated
+			}
+		}
+		modifier = {
+			factor = 1.25
+			owner = {
+				not = {
+					has_policy_flag = alp_unions_deregulated
+				}
+			}
+		}
+		modifier = {
+			factor = 1.25
+			owner = {
+				nor = {
+					has_policy_flag = alp_unions_deregulated
+					has_policy_flag = alp_unions_lightlyregulated
+				}
+			}
+		}
+		modifier = {
+			factor = 1.5
+			owner = {
+				has_policy_flag = alp_lowincome_hightax
+			}
+		}
+		modifier = {
+			factor = 1.25
+			OR = {
+				has_ethic = ethic_egalitarian
+				has_ethic = ethic_fanatic_egalitarian
+				has_ethic = ethic_pacifist
+				has_ethic = ethic_fanatic_pacifist
+			}
+		}
+		modifier = {
+			factor = 1.25
+			tile = {
+				has_resource = {
+					type = minerals
+					amount > 0
+				}
+			}
+		}
+		modifier = {
+			factor = 1.25
+			exists = from
+			from = {
+				exists = leader
+				leader = { leader_class = ruler }
+			}
+		}
+	}
+	
+	leader = {
+		base = 100
+		modifier = {
+			factor = 0
+			OR = {
+				has_trait = "trait_robotic_1"
+				has_trait = "trait_robotic_2"
+				has_trait = "trait_robotic_3"
+			}
+		}
+		modifier = {
+			factor = 0.0
+			is_event_leader = yes
+		}
+	}
+	
+	demand = {
+		title = "TOTALITARIAN_REGULATED_BUSINESS"
+		unfulfilled_title = "TOTALITARIAN_NOT_REGULATED_BUSINESS"
+		desc = "TOTALITARIAN_REGULATED_BUSINESS_DESC"
+		#fulfilled_effect = 0
+		unfulfilled_effect = -10
+		potential = {
+			exists = owner
+			owner = {
+				not = { has_policy_flag = alp_private_businesses_prohibited }
+			}
+		}
+		trigger = {
+			owner = {
+				OR = {
+					has_policy_flag = alp_private_businesses_regulated
+					AND = {
+						not = { has_policy_flag = alp_private_businesses_regulated }
+						OR = {
+							has_policy_flag = alp_unions_deregulated
+							has_policy_flag = alp_unions_lightlyregulated
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	demand = {
+		title = "LABOUR_UNION_DEREGULATED"
+		unfulfilled_title = "LABOUR_UNION_NO_DEREGULATION"
+		desc = "LABOUR_UNION_DEREGULATED_DESC"
+		fulfilled_effect = 5
+		potential = {
+			exists = owner
+			owner = {
+				has_policy_flag = alp_unions_deregulated
+			}
+		}
+		trigger = {
+			owner = {
+				has_policy_flag = alp_unions_deregulated
+			}
+		}
+	}
+	
+	demand = {
+		title = "LABOUR_UNION_NOT_BANNED"
+		unfulfilled_title = "LABOUR_UNION_BANNED"
+		desc = "LABOUR_UNION_NOT_BANNED_DESC"
+		unfulfilled_effect = -25
+		potential = {
+			exists = owner
+			owner = {
+				has_policy_flag = alp_unions_banned
+			}
+		}
+		trigger = {
+			owner = {
+				not = { has_policy_flag = alp_unions_banned }
+			}
+		}
+	}
+	
+	demand = {
+		title = "ISOLATIONIST_MOVEMENT_RESTRICTED"
+		unfulfilled_title = "ISOLATIONIST_MOVEMENT_UNRESTRICTED"
+		desc = "ISOLATIONIST_MOVEMENT_RESTRICTED_DESC"
+		fulfilled_effect = 10
+		#unfulfilled_effect = 0
+		potential = {
+			exists = owner
+			owner = {
+				num_communications > 2
+				pop_percentage = {
+					percentage > 0.15
+					limit = { pop_has_ethic = ethic_xenophile }
+				}
+			}
+		}
+		trigger = {
+			owner = {
+				NOR = {
+					any_relation = {
+						has_communications = root.owner
+						OR = {
+							has_diplo_migration_treaty = root.owner
+							root = {
+								owner = {
+									has_diplo_migration_treaty = prevprev
+								}
+							}
+						}
+					}
+					has_policy_flag = refugees_allowed
+				}
+			}
+		}
+	}
+	
+	demand = {
+		title = "PROSPERITY_PEACE"
+		unfulfilled_title = "PROSPERITY_NO_PEACE"
+		desc = "PROSPERITY_PEACE_DESC"
+		#fulfilled_effect = 0
+		unfulfilled_effect = -15
+		potential = {
+			exists = owner
+			owner = {
+				pop_percentage = {
+					percentage > 0.1
+					limit = { pop_has_ethic = ethic_pacifist }
+				}
+			}
+		}
+		trigger = {
+			owner = {
+				is_at_war = no
+			}
+		}
+	}
+	# demand = {
+	# title = "ISOLATIONIST_PEACE3"
+	# unfulfilled_title = "ISOLATIONIST_NO_PEACE3"
+	# desc = "ISOLATIONIST_PEACE_DESC3"
+	# fulfilled_effect = 5
+	# #unfulfilled_effect = 10
+	# potential = {
+	# exists = owner
+	# owner = {
+	# num_communications > 0
+	# years_of_peace > 24
+	# pop_percentage = {
+	# percentage > 0.1
+	# limit = { pop_has_ethic = ethic_pacifist }
+	# }
+	# }
+	# }
+	# trigger = {
+	# owner = {
+	# years_of_peace > 49
+	# }
+	# }
+	# }
+	
+	demand = {
+		title = "TECHNOLOGIST_EDUCATION_MATTERS"
+		unfulfilled_title = "TECHNOLOGIST_EDUCATION_DOESNOT_MATTER"
+		desc = "TECHNOLOGIST_EDUCATION_MATTERS_DESC"
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+		potential = {
+			exists = owner
+		}
+		trigger = {
+			owner = {
+				not = { has_policy_flag = state_education_none }
+			}
+		}
+	}
+	
+	demand = {
+		title = "XENOIST_NO_SLAVES"
+		unfulfilled_title = "XENOIST_SLAVES"
+		desc = "XENOIST_NO_SLAVES_DESC"
+		#fulfilled_effect = 0
+		unfulfilled_effect = -10
+		potential = {
+			exists = owner
+			owner = {
+				pop_percentage = {
+					percentage > 0.1
+					limit = { pop_has_ethic = ethic_xenophile }
+				}
+				any_owned_pop = {
+					NOT = {
+						is_same_species = root.owner
+					}
+				}
+			}
+		}
+		trigger = {
+			owner = {
+				OR = {
+					NOT = {
+						has_policy_flag = ai_full_rights
+						any_owned_pop = {
+							NOT = { is_same_species = root.owner }
+							is_sapient = yes
+							not = { is_robot_pop = yes }
+							species = {
+								has_citizenship_type = {
+									country = root.owner
+									type = citizenship_slavery
+								}
+							}
+						}
+					}
+					AND = {
+						has_policy_flag = ai_full_rights
+						NOT = {
+							any_owned_pop = {
+								NOT = { is_same_species = root.owner }
+								is_sapient = yes
+								not = { is_robot_pop = yes }
+								species = {
+									has_citizenship_type = {
+										country = root.owner
+										type = citizenship_slavery
+									}
+								}
+							}
+						}
+						NOT = {
+							any_owned_pop = {
+								is_sapient = yes
+								is_robot_pop = yes
+								species = {
+									has_citizenship_type = {
+										country = root.owner
+										type = citizenship_slavery
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	demand = {
+		title = "XENOIST_NO_PURGE"
+		unfulfilled_title = "XENOIST_PURGE"
+		desc = "XENOIST_NO_PURGE_DESC"
+		#fulfilled_effect = 0
+		unfulfilled_effect = -15
+		potential = {
+			exists = owner
+		}
+		trigger = {
+			owner = {
+				NOT = {
+					any_owned_pop = {
+						is_robot_pop = no
+						NOT = { has_trait = trait_hive_mind }
+						species = {
+							has_citizenship_type = {
+								country = root.owner
+								type = citizenship_purge
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	demand = {
+		title = "TRADITIONALIST_NO_ROBOTS"
+		unfulfilled_title = "TRADITIONALIST_ROBOTS"
+		desc = "TRADITIONALIST_NO_ROBOTS_DESC"
+		fulfilled_effect = 10
+		#unfulfilled_effect = 0
+		potential = {
+			exists = owner
+			owner = {
+				has_technology = tech_robotic_workers
+			}
+		}
+		trigger = {
+			owner = {
+				NOT = {
+					any_owned_pop = {
+						is_robot_pop = yes
+					}
+				}
+			}
+		}
+	}
+	
+	demand = {
+		title = "PROGRESSIVE_FREE_MOVEMENT"
+		unfulfilled_title = "PROGRESSIVE_NO_FREE_MOVEMENT"
+		desc = "PROGRESSIVE_FREE_MOVEMENT_DESC"
+		fulfilled_effect = 5
+		unfulfilled_effect = -10
+		potential = {
+			exists = owner
+			owner = { has_encountered_other_species = yes }
+		}
+		trigger = {
+			owner = {
+				OR = {
+					AND = {
+						has_encountered_other_species = yes
+						has_policy_flag = core_worlds_all
+					}
+					has_encountered_other_species = no
+				}
+				NOR = {
+					any_owned_pop = {
+						has_migration_control = yes
+						is_sapient = yes
+						is_enslaved = no
+						is_being_purged = no
+						is_robot_pop = no
+					}
+					has_policy_flag = resettlement_allowed
+				}
+			}
+		}
+	}
+	
+	demand = {
+		title = "PROSPERITY_LOW_TAXATION"
+		unfulfilled_title = "PROSPERITY_HIGH_TAXATION"
+		desc = "PROSPERITY_LOW_TAXATION_DESC"
+		fulfilled_effect = 10
+		unfulfilled_effect = -20
+		potential = {
+			exists = owner
+			owner = { energy > 2999 }
+		}
+		trigger = {
+			owner = {
+				not = { has_policy_flag = alp_lowincome_hightax }
+				not = { has_policy_flag = alp_highincome_averagetax }
+			}
+		}
+	}
+	
+	on_create = {
+		pop_faction_event = { id = factions.1 }
+	}
+	
+	on_destroy = {
+		if = {
+			limit = {
+				has_modifier = promoted_egalitarian
+			}
+			remove_modifier = promoted_egalitarian
+		}
+		if = {
+			limit = {
+				has_modifier = suppressed_egalitarian
+			}
+			remove_modifier = suppressed_egalitarian
+		}
+		if = {
+			limit = {
+				has_modifier = banned_egalitarian
+			}
+			remove_modifier = banned_egalitarian
+		}
+	}
+	
+	actions = {
+		prosecute_faction = {
+			title = "PROSECUTE_FACTION"
+			description = "PROSECUTE_FACTION_DESC"
+			potential = {
+				exists = owner
+				not = { has_modifier = prosecuted_faction }
+				parameter:empire = {
+					or = {
+						has_modifier = suppressed_egalitarian
+						has_modifier = banned_egalitarian
+					}
+				}
+			}
+			effect = {
+				add_modifier = { modifier = prosecuted_faction days = -1 }
+			}
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_prosecute_faction = {
+			title = "CANCEL_PROSECUTE_FACTION"
+			description = "PROSECUTE_FACTION_DESC"
+			potential = {
+				exists = owner
+				has_modifier = prosecuted_faction
+			}
+			effect = {
+				remove_modifier = prosecuted_faction
+			}
+			ai_weight = {
+				base = 0
+			}
+		}
+		suppress_faction = {
+			title = "SUPPRESS_FACTION"
+			description = "SUPPRESS_FACTION_DESC"
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_egalitarian
+						has_modifier = promoted_egalitarian
+					}
+				}
+			}
+			effect = {
+				add_modifier = { modifier = suppressed_faction days = -1 }
+				parameter:empire = {
+					add_modifier = { modifier = suppressed_egalitarian days = -1 }
+				}
+			}
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_suppress_faction = {
+			title = "CANCEL_SUPPRESS_FACTION"
+			description = "CANCEL_SUPPRESS_FACTION_DESC"
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = suppressed_egalitarian
+				}
+			}
+			effect = {
+				remove_modifier = suppressed_faction
+				parameter:empire = {
+					remove_modifier = suppressed_egalitarian
+				}
+			}
+			ai_weight = {
+				base = 0
+			}
+		}
+	}
+}
