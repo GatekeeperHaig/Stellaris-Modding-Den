@@ -1,4 +1,4 @@
-name="(-ExOverhaul: 1.9.* Tweaks-)"
+name="ExOverhaul: 1.9.* Tweaks"
 path="mod/exoverhaul/tweaks"
 tags={
 	"Overhaul"

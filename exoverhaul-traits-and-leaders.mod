@@ -1,4 +1,4 @@
-name="(--ExOverhaul: Traits and Leaders--)"
+name="ExOverhaul: Traits and Leaders"
 path="mod/exoverhaul/traits-and-leaders"
 tags={
 	"ExOverhaul"

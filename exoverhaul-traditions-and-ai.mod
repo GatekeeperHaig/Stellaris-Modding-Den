@@ -1,4 +1,4 @@
-name="((((--ExOverhaul: Traditions and AI--))))"
+name="ExOverhaul: Traditions and AI"
 path="mod/exoverhaul/traditions-and-ai"
 tags={
 	"ExOverhaul"

@@ -1,4 +1,4 @@
-name="(--ExOverhaul: Components and Weapons--)"
+name="ExOverhaul: Components and Weapons"
 path="mod/exoverhaul/components-and-weapons"
 tags={
 	"ExOverhaul"

@@ -1,4 +1,4 @@
-name="(--ExOvheraul: Planets Enhanced--)"
+name="ExOvheraul: Planets Enhanced"
 path="mod/exoverhaul/planets-enhanced"
 tags={
 	"ExOverhaul"

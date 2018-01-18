@@ -1,4 +1,4 @@
-name="((((--ExOverhaul: Technology and AI--))))"
+name="ExOverhaul: Technology and AI"
 path="mod/exoverhaul/technology-and-ai"
 tags={
 	"Fixes"

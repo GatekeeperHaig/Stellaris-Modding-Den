@@ -1,4 +1,4 @@
-name="(--ExOverhaul: FTL--)"
+name="ExOverhaul: FTL Overhaul"
 path="mod/exoverhaul/ftl"
 tags={
 	"ExOverhaul"

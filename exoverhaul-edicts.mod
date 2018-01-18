@@ -1,4 +1,4 @@
-name="((((--ExOverhaul: Edicts and AI--))))"
+name="ExOverhaul: Edicts and AI"
 path="mod/exoverhaul/edicts-and-ai"
 tags={
 	"ExOverhaul"

@@ -1,4 +1,4 @@
-name="((((--ExOverhaul: Ascension Perks and AI--))))"
+name="ExOverhaul: Ascension Perks and AI"
 path="mod/exoverhaul/ascension-perks_and_ai"
 tags={
 	"ExOverhaul"

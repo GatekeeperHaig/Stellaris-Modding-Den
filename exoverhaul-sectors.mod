@@ -1,4 +1,4 @@
-name="((((--ExOverhaul: Enhanced Sector AI & Game Difficulties--))))"
+name="ExOverhaul: Enhanced Sector AI & Game Difficulties"
 path="mod/exoverhaul/sectors_and_difficulties"
 tags={
 	"Overhaul"

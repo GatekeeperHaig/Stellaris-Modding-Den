@@ -1,4 +1,4 @@
-name="(--ExOverhaul: Armies--)"
+name="ExOverhaul: Army Overhaul"
 path="mod/exoverhaul/armies"
 tags={
 	"ExOverhaul"

@@ -1,4 +1,4 @@
-name="(--ExOverhaul: Ships and Stations--)"
+name="ExOverhaul: Ships and Stations"
 path="mod/exoverhaul/ships-and-stations"
 tags={
 	"ExOverhaul"

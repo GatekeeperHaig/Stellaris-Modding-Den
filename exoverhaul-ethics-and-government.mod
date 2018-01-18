@@ -1,4 +1,4 @@
-name="(--ExOverhaul: Ethics and Government--)"
+name="ExOverhaul: Ethics and Government"
 path="mod/exoverhaul/ethics-and-government"
 tags={
 	"ExOverhaul"

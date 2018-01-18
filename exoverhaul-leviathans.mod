@@ -1,4 +1,4 @@
-name="(--ExOverhaul: Leviathans--)"
+name="ExOverhaul: Leviathans Overhaul"
 path="mod/exoverhaul/leviathans"
 tags={
 	"Balance"

@@ -1,4 +1,4 @@
-name="(--ExOverhaul: Cybertronic Worlds--)"
+name="ExOverhaul: Cybertronic Worlds"
 path="mod/exoverhaul/cybertronic-worlds"
 tags={
 	"ExOverhaul"

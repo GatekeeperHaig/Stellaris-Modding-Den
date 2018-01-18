@@ -1,4 +1,4 @@
-name="(--ExOverhaul: Strategic Resources--)"
+name="ExOverhaul: Strategic Resources"
 path="mod/exoverhaul/strategic-resources"
 tags={
 	"ExOverhaul"

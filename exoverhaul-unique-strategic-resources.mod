@@ -1,4 +1,4 @@
-name="(--ExOverhaul: Unique Strategic Resources and Buildings--)"
+name="ExOverhaul: Unique Strategic Resources and Buildings"
 path="mod/exoverhaul/unique-strategic_resources"
 tags={
 	"ExOverhaul"
