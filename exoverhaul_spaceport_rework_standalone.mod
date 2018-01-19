@@ -1,4 +1,4 @@
-name=" ExOverhaul: Spaceport Automation"
+name="ExOverhaul: Spaceport Automation"
 path="mod/exoverhaul/spaceport_rework_standalone"
 tags={
 	"Balance"
