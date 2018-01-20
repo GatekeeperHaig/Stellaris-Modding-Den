@@ -661,92 +661,184 @@ planet_event = { #this event builds spaceport modules if some form of automation
 	
 	immediate = { 
 		if = {
-			limit = { sector_controlled = yes }
-			if = { 
-				limit = { owner = { has_policy_flag = sector_specialized_economic_module_construction } }
-				roll_economic_module = yes
-				break = yes
+			limit = {
+				AND = {
+					owner = {
+						OR = {
+							AND = {
+								has_policy_flag = minimum_250_for_module_auto_construction
+								minerals > 500
+							}	
+							AND = {
+								has_policy_flag = minimum_500_for_module_auto_construction
+								minerals > 750
+							}			
+							AND = {
+								has_policy_flag = minimum_500_for_module_auto_construction
+								minerals > 1000
+							}		
+							AND = {
+								has_policy_flag = minimum_500_for_module_auto_construction
+								minerals > 1500
+							}	
+						}							
+					}
+					OR = {
+						AND = {
+							sector_controlled = yes
+							OR = {
+								AND = {
+									owner = { has_policy_flag = sector_specialized_economic_module_construction }
+									can_build_economic_module = yes
+								}								
+								AND = {
+									owner = { has_policy_flag = sector_specialized_defensive_module_construction }
+									can_build_defensive_module = yes
+								}																
+								AND = {
+									owner = { 
+										OR = {
+											has_policy_flag = sector_mixed_economic_emphasis_module_construction
+											has_policy_flag = sector_mixed_defensive_emphasis_module_construction
+										}
+									}	
+									can_build_economic_module = yes
+									can_build_defensive_module = yes
+								}
+							}	
+						}
+						AND = {
+							sector_controlled = no
+							OR = {
+								AND = {
+									OR = {
+										owner = { has_policy_flag = core_specialized_stardock_module_construction }
+										has_planet_flag = spaceport_automation_stardock_specialized
+									}	
+									can_build_stardock_module = yes
+								}							
+								AND = {
+									OR = {
+										owner = { has_policy_flag = core_specialized_economic_module_construction }
+										has_planet_flag = spaceport_automation_economic_specialized
+									}	
+									can_build_economic_module = yes
+								}								
+								AND = {
+									OR = {
+										owner = { has_policy_flag = core_specialized_defensive_module_construction }
+										has_planet_flag = spaceport_automation_defensive_specialized
+									}	
+									can_build_defensive_module = yes
+								}																
+								AND = {
+									OR = {
+										owner = { 
+											OR = {
+												has_policy_flag = core_mixed_economic_emphasis_module_construction
+												has_policy_flag = core_mixed_defensive_emphasis_module_construction												
+											}
+										}	
+										has_planet_flag = spaceport_automation_economic_mixed
+										has_planet_flag = spaceport_automation_defensive_mixed
+									}	
+									can_build_economic_module = yes
+									can_build_defensive_module = yes
+								}
+							}	
+						}						
+					}	
+				}
 			}	
-			if = { 
-				limit = { owner = { has_policy_flag = sector_mixed_economic_emphasis_module_construction } }
-				random_list = {
-					75 = { roll_economic_module = yes }
-					25 = { roll_defensive_module = yes }
+			if = {
+				limit = { sector_controlled = yes }
+				if = { 
+					limit = { owner = { has_policy_flag = sector_specialized_economic_module_construction } }
+					roll_economic_module = yes
+					break = yes
 				}	
-				break = yes
-			}	
-			if = { 
-				limit = { owner = { has_policy_flag = sector_specialized_defensive_module_construction } }
-				roll_defensive_module = yes
-				break = yes
-			}
-			if = { 
-				limit = { owner = { has_policy_flag = sector_mixed_defensive_emphasis_module_construction } }
-				random_list = {
-					25 = { roll_economic_module = yes }
-					75 = { roll_defensive_module = yes }
+				if = { 
+					limit = { owner = { has_policy_flag = sector_mixed_economic_emphasis_module_construction } }
+					random_list = {
+						75 = { roll_economic_module = yes }
+						25 = { roll_defensive_module = yes }
+					}	
+					break = yes
 				}	
-				break = yes
-			}			
-		}
-		if = {
-			limit = { sector_controlled = no }
-			if = { 
-				limit = { 
-					OR = {
-						owner = { has_policy_flag = core_specialized_economic_module_construction }
-						has_planet_flag = spaceport_automation_economic_specialized
-					}	
+				if = { 
+					limit = { owner = { has_policy_flag = sector_specialized_defensive_module_construction } }
+					roll_defensive_module = yes
+					break = yes
 				}
-				roll_economic_module = yes
-				break = yes
-			}	
-			if = { 
-				limit = { 
-					OR = {
-						owner = { has_policy_flag = core_mixed_economic_emphasis_module_construction }
-						has_planet_flag = spaceport_automation_economic_mixed
+				if = { 
+					limit = { owner = { has_policy_flag = sector_mixed_defensive_emphasis_module_construction } }
+					random_list = {
+						25 = { roll_economic_module = yes }
+						75 = { roll_defensive_module = yes }
 					}	
-				}
-				random_list = {
-					75 = { roll_economic_module = yes }
-					25 = { roll_defensive_module = yes }
+					break = yes
+				}			
+			}
+			if = {
+				limit = { sector_controlled = no }
+				if = { 
+					limit = { 
+						OR = {
+							owner = { has_policy_flag = core_specialized_economic_module_construction }
+							has_planet_flag = spaceport_automation_economic_specialized
+						}	
+					}
+					roll_economic_module = yes
+					break = yes
 				}	
-				break = yes
-			}	
-			if = { 
-				limit = { 
-					OR = {
-						owner = { has_policy_flag = core_specialized_defensive_module_construction }
-						has_planet_flag = spaceport_automation_defensive_specialized
+				if = { 
+					limit = { 
+						OR = {
+							owner = { has_policy_flag = core_mixed_economic_emphasis_module_construction }
+							has_planet_flag = spaceport_automation_economic_mixed
+						}	
+					}
+					random_list = {
+						75 = { roll_economic_module = yes }
+						25 = { roll_defensive_module = yes }
 					}	
-				}
-				roll_defensive_module = yes
-				break = yes
-			}
-			if = { 
-				limit = { 
-					OR = {
-						owner = { has_policy_flag = core_mixed_defensive_emphasis_module_construction }
-						has_planet_flag = spaceport_automation_defensive_mixed
-					}	
-				}
-				random_list = {
-					25 = { roll_economic_module = yes }
-					75 = { roll_defensive_module = yes }
+					break = yes
 				}	
-				break = yes
-			}
-			if = { 
-				limit = { 
-					OR = {
-						owner = { has_policy_flag = core_specialized_stardock_module_construction }
-						has_planet_flag = spaceport_automation_stardock_specialized
-					}	
+				if = { 
+					limit = { 
+						OR = {
+							owner = { has_policy_flag = core_specialized_defensive_module_construction }
+							has_planet_flag = spaceport_automation_defensive_specialized
+						}	
+					}
+					roll_defensive_module = yes
+					break = yes
 				}
-				roll_stardock_module = yes
-				break = yes
+				if = { 
+					limit = { 
+						OR = {
+							owner = { has_policy_flag = core_mixed_defensive_emphasis_module_construction }
+							has_planet_flag = spaceport_automation_defensive_mixed
+						}	
+					}
+					random_list = {
+						25 = { roll_economic_module = yes }
+						75 = { roll_defensive_module = yes }
+					}	
+					break = yes
+				}
+				if = { 
+					limit = { 
+						OR = {
+							owner = { has_policy_flag = core_specialized_stardock_module_construction }
+							has_planet_flag = spaceport_automation_stardock_specialized
+						}	
+					}
+					roll_stardock_module = yes
+					break = yes
+				}				
 			}
+			else = { planet_event = { id = ex_spaceport_events.101 days = 30 }	## this in combination with the main limit field is a failsafe meant to assure modules will be constructed no matter what. 
 		}	
 	}
 }
