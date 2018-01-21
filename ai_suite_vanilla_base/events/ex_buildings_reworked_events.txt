@@ -1,69 +1,37 @@
-#This file was created by script!
-#Instead of editing it, you should change the origin files or the script and rerun the script!
-#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
-namespace = ex_buildings_reworked_events
-
-event = {
-	id = ex_buildings_reworked_events.1
-	hide_window = yes
-	is_triggered_only = yes
-	
-	immediate = {
-		every_country = {
-			if = {
-				limit = {
-					AND = {
-						has_country_flag = "is_food_starved"
-						food > 2
-					}
-				}
-				remove_country_flag = "is_food_starved"
-			}
-			if = {
-				limit = {
-					AND = {
-						energy > 2
-						has_country_flag = "is_energy_starved"
-					}
-				}
-				remove_country_flag = "is_energy_starved"
-			}
-			if = {
-				limit = {
-					AND = {
-						energy > 2
-						has_country_flag = "is_minerals_starved"
-					}
-				}
-				remove_country_flag = "is_minerals_starved"
-			}
-			country_event = { id = ex_buildings_reworked_events.2 }
-		}
-	}
-}
+namespace = ex_ai_events
 
 country_event = {
-	id = ex_buildings_reworked_events.2
+	id = ex_ai_events.1
 	hide_window = yes
-	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = resource_check_delay }
+		OR = {
+			energy < 1
+			minerals < 1
+			AND = {
+				NOT = { has_authority = auth_machine_intelligence }
+				food < 1
+			}
+		}		
+	}			
 	
 	immediate = {
 		if = {
 			limit = {
-				AND = {
-					NOT = { has_authority = auth_machine_intelligence }
-					food < 1
-				}
+				NOT = { has_authority = auth_machine_intelligence }
+				food < 1
 			}
-			set_country_flag = "is_food_starved"
+			set_timed_country_flag = { flag = is_food_starved days = 90 }
 		}
 		if = {
 			limit = { energy < 1 }
-			set_country_flag = "is_energy_starved"
+			set_timed_country_flag = { flag = is_energy_starved days = 90 }
 		}
 		if = {
 			limit = { minerals < 1 }
-			set_country_flag = "is_minerals_starved"
+			set_timed_country_flag = { flag = is_minerals_starved days = 90 }
 		}
+		set_timed_country_flag = { flag = resource_check_delay days = 90 }
 	}
 }
