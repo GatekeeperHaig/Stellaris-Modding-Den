@@ -1,0 +1,501 @@
+### ExOverhaul Costs and Weights ###
+
+@cost = 60
+
+@avoid = 0
+@standard = 10
+@important = 25
+@excellent = 50
+@strategic = 100
+@crucial_1 = 250
+@crucial_2 = 1000
+
+@reduce_interest_1 = 0.5
+@reduce_interest_2 = 0.25
+@reduce_interest_3 = 0.1
+@increase_interest_1 = 2
+@increase_interest_2 = 3
+@increase_interest_3 = 5
+
+####################################
+
+tr_harmony_adopt = {
+	cost = { unity = @cost }
+	modifier = { pop_growth_speed = 0.25 }
+	
+	tradition_swap = {
+		name = tr_synchronicity_hive_adopt
+		inherit_effects = no
+		inherit_icon = yes
+		inherit_name = no
+		trigger = { has_authority = auth_hive_mind }
+		modifier = { pop_growth_speed = 0.25 }
+		weight = { factor = 1 }	
+	}
+	
+	tradition_swap = {
+		name = tr_synchronicity_machine_adopt
+		inherit_effects = no
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {	has_authority = auth_machine_intelligence }
+		modifier = { pop_robot_build_speed_mult = 0.33 }
+		weight = { factor = 1 }
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @avoid
+			AND = {
+				years_passed < 10
+				OR = {
+					AND = {
+						is_machine_or_hive = no
+						OR = {						
+							NOT = { has_non_swapped_tradition = tr_discovery_to_boldly_go }				
+							AND = {
+								has_non_swapped_tradition = tr_prosperity_adopt
+								NOT = { has_non_swapped_tradition = tr_prosperity_pursuit_of_profit	}
+							}	
+							AND = {
+								has_non_swapped_tradition = tr_expansion_adopt
+								NOT = { has_non_swapped_tradition = tr_expansion_colonization_fever }
+							}	
+							AND = {
+								is_xenophile = yes
+								NOT = { has_non_swapped_tradition = tr_diplomacy_alien_tourism }
+							}
+							AND = {
+								OR = {
+									has_valid_civic = civic_fanatic_purifiers
+									has_valid_civic = civic_inwards_perfection
+								}
+								NOT = { has_swapped_tradition = tr_purity_symbol_purity }
+							}					
+						}
+					}
+					AND = {
+						has_authority = auth_machine_intelligence
+						OR = {
+							NOT = { has_swapped_tradition = tr_discovery_to_boldly_go_machine }
+							AND = {
+								has_swapped_tradition = tr_prosperity_adopt_machine
+								NOT = { has_swapped_tradition = tr_prosperity_pursuit_of_profit_machine }
+							}	
+							AND = {
+								has_swapped_tradition = tr_expansion_adopt_machine
+								NOT = { has_swapped_tradition = tr_expansion_colonization_fever_machine }
+							}
+						}
+					}	
+					AND = {
+						has_authority = auth_hive_mind
+						OR = {							
+							NOT = { has_swapped_tradition = tr_discovery_to_boldly_go_hive }
+							AND = {
+								has_swapped_tradition = tr_prosperity_adopt_hive
+								NOT = { has_swapped_tradition = tr_prosperity_hive_neural_signal_boosters }
+							}	
+							AND = {
+								has_swapped_tradition = tr_expansion_adopt_hive
+								NOT = { has_swapped_tradition = tr_expansion_colonization_fever_hive }
+							}
+						}
+					}				
+				}	
+			}	
+		}	
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				years_passed > 10
+				years_passed < 20
+			}	
+		}
+		modifier = {
+			factor = @increase_interest_2
+			AND = {
+				years_passed > 20
+				years_passed < 30
+			}	
+		}			
+		modifier = {
+			factor = @increase_interest_3
+			years_passed > 30
+		}
+		modifier = {
+			factor = @important
+			OR = {
+				is_xenophobe = yes
+				is_egalitarian = yes
+				is_pacifist = yes
+			}	
+		}	
+		modifier = {
+			factor = @reduce_interest_1
+			OR = {
+				AND = { 
+					has_authority = auth_machine_intelligence
+					NOT = { has_swapped_tradition = tr_prosperity_pursuit_of_profit_machine }
+				}
+				AND = {
+					has_valid_civic = civic_hive_devouring_swarm
+					NOT = { has_swapped_tradition = tr_purity_natural_order }
+				}					
+			}	
+		}		
+		modifier = {
+			factor = @increase_interest_3
+			OR = {
+				AND = {
+					is_machine_or_hive = no					
+					OR = {
+						has_non_swapped_tradition = tr_discovery_finish
+						has_non_swapped_tradition = tr_expansion_finish
+						has_non_swapped_tradition = tr_prosperity_finish
+					}
+				}
+				AND = {
+					has_authority = auth_machine_intelligence
+					OR = {	
+						has_swapped_tradition = tr_discovery_finish_machine
+						has_swapped_tradition = tr_expansion_finish_machine
+						has_swapped_tradition = tr_prosperity_finish_machine
+					}	
+				}
+				AND = {
+					has_authority = auth_hive_mind
+					OR = {	
+						has_swapped_tradition = tr_discovery_finish_hive
+						has_swapped_tradition = tr_expansion_finish_hive
+						has_swapped_tradition = tr_prosperity_finish_hive
+					}					
+				}
+				AND = {
+					is_purity_civics = yes
+					has_swapped_tradition = tr_purity_finish
+				}	
+			}	
+		}		
+	}
+}
+
+tr_harmony_finish = {
+	modifier = {
+		country_resource_influence_mult = 0.3
+		ascension_perks_add = 1
+	}
+	
+	tradition_swap = {
+		name = tr_synchronicity_finish
+		inherit_effects = no
+		inherit_icon = yes
+		inherit_name = yes
+		trigger = {	has_ethic = ethic_gestalt_consciousness	}
+		modifier = {
+			country_resource_influence_mult = 0.3
+			ascension_perks_add = 1
+		}
+		weight = { factor = 1 }
+	}
+}
+
+tr_harmony_the_greater_good = {
+	cost = { unity = @cost }
+	
+	modifier = {
+		edict_length_mult = 0.25
+		pop_government_ethic_attraction = 0.20
+	}
+
+	tradition_swap = {
+		name = tr_harmony_the_greater_good_purifiers
+		inherit_effects = no
+		inherit_icon = yes
+		inherit_name = yes
+		trigger = {	has_valid_civic = civic_fanatic_purifiers }
+		modifier = {
+			pop_government_ethic_attraction = 0.20
+			pop_resettlement_cost_mult = -0.25	
+		}	
+		weight = { factor = 1 }
+	}
+	
+	tradition_swap = {
+		name = tr_synchronicity_organic_intermediaries
+		inherit_effects = no
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {	has_authority = auth_hive_mind }
+		modifier = { edict_length_mult = 0.33 }
+		weight = { factor = 1 }
+	}
+	
+	tradition_swap = {
+		name = tr_synchronicity_organic_intermediaries_machine
+		inherit_effects = no
+		inherit_icon = no
+		inherit_name = no
+		trigger = { has_authority = auth_machine_intelligence }
+		modifier = { leader_skill_levels = 1 }
+		weight = { factor = 1 }
+	}
+	
+	ai_weight = { factor = @crucial_1 }
+}
+
+tr_harmony_kinship = {
+	cost = { unity = @cost }
+	
+	modifier = { mod_distance_to_capital_static_modifier_efficiency_mult = -0.5}	
+	
+	tradition_swap = {
+		name = tr_synchronicity_drone_network
+		inherit_effects = no
+		inherit_icon = no
+		inherit_name = no
+		trigger = { has_ethic = ethic_gestalt_consciousness }
+		modifier = { leader_influence_cost = -0.33 }
+		weight = { factor = 1 }
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @avoid
+			OR = {
+				AND = {
+					is_machine_or_hive = no
+					NOT = { has_non_swapped_tradition = tr_harmony_utopian_dream }
+				}
+				AND = {
+					has_authority = auth_hive_mind
+					NOT = { has_swapped_tradition = tr_synchronicity_hive_mind_synapse }
+				}	
+				AND = {
+					has_valid_civic = civic_machine_servitor
+					NOT = { has_swapped_tradition = tr_synchronicity_organic_paradise }
+				}		
+				AND = {
+					has_valid_civic = civic_machine_assimilator
+					NOT = { has_swapped_tradition = tr_synchronicity_cyber_comms }
+				}	
+				AND = {
+					has_authority = auth_machine_intelligence
+					NOR = {
+						has_valid_civic = civic_machine_assimilator
+						has_valid_civic = civic_machine_servitor
+						has_swapped_tradition = tr_synchronicity_machine_center
+					}
+				}							
+			}	
+		}	
+		modifier = {
+			factor = @increase_interest_3
+			OR = {
+				AND = {
+					is_machine_or_hive = no
+					OR = {
+						OR = {
+							has_non_swapped_tradition = tr_discovery_finish
+							has_non_swapped_tradition = tr_expansion_finish
+							has_non_swapped_tradition = tr_prosperity_finish
+						}				
+						OR = {
+							is_pacifist = yes
+							is_xenophobe = yes
+						}
+					}	
+				}	
+				AND = {
+					has_authority = auth_hive_mind
+					OR = {
+						has_swapped_tradition = tr_discovery_finish_hive
+						has_swapped_tradition = tr_expansion_finish_hive
+						has_swapped_tradition = tr_prosperity_finish_hive
+					}	
+				}	
+				AND = {
+					has_authority = auth_machine_intelligence
+					OR = {
+						has_swapped_tradition = tr_discovery_finish_machine
+						has_swapped_tradition = tr_expansion_finish_machine
+						has_swapped_tradition = tr_prosperity_finish_machine
+					}	
+				}					
+			}	
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			OR  = {
+				AND = {
+					has_authority = auth_hive_mind
+					NOT = { has_swapped_tradition = tr_prosperity_hive_neural_signal_boosters }
+				}
+				AND = {
+					is_machine_or_hive = no
+					NOT = { has_non_swapped_tradition = tr_prosperity_pursuit_of_profit }
+				}	
+			}	
+		}	
+	}
+}
+
+tr_harmony_utopian_dream = {
+	cost = { unity = @cost }	
+	possible = { has_tradition = tr_harmony_the_greater_good }
+	
+	tradition_swap = {
+		name = tr_synchronicity_machine_center
+		inherit_effects = no
+		inherit_icon = no
+		inherit_name = no
+		trigger = {
+			has_authority = auth_machine_intelligence
+			NOR = {
+				has_valid_civic = civic_machine_assimilator
+				has_valid_civic = civic_machine_servitor
+			}
+		}
+		weight = { factor = 1 }
+	}
+	
+	tradition_swap = {
+		name = tr_synchronicity_cyber_comms
+		inherit_effects = no
+		inherit_icon = no
+		inherit_name = no
+		trigger = { has_valid_civic = civic_machine_assimilator }
+		weight = { factor = 1 }
+	}
+	
+	tradition_swap = {
+		name = tr_synchronicity_organic_paradise
+		inherit_effects = no
+		inherit_icon = no
+		inherit_name = no
+		trigger = {	has_valid_civic = civic_machine_servitor }
+		modifier = { pop_happiness = 0.10 }		
+		on_enabled = { every_owned_planet = { upgrade_organic_sanctuaries = yes	} }		
+		weight = { factor = 1 }
+	}
+	
+	tradition_swap = {
+		name = tr_synchronicity_hive_mind_synapse
+		inherit_effects = no
+		inherit_icon = no
+		inherit_name = no
+		trigger = { has_authority = auth_hive_mind }
+		weight = { factor = 1 }
+	}
+	
+	ai_weight = { factor = @crucial_2 }
+}
+
+tr_harmony_mind_and_body = {
+	cost = { unity = @cost }
+	
+	modifier = { leader_age = 20 }
+	
+	tradition_swap = {
+		name = tr_synchronicity_self_preservation
+		inherit_effects = no
+		inherit_icon = no
+		inherit_name = no
+		trigger = {	has_authority = auth_machine_intelligence }
+		weight = { factor = 1 }
+	}
+	
+	ai_weight = {
+		factor = @strategic
+		modifier = {
+			factor = @avoid
+			OR = {
+				AND = {
+					is_machine_or_hive = no
+					NOT = { has_non_swapped_tradition = tr_harmony_utopian_dream }
+				}
+				AND = {
+					has_authority = auth_hive_mind
+					NOT = { has_swapped_tradition = tr_synchronicity_hive_mind_synapse }
+				}	
+				AND = {
+					has_valid_civic = civic_machine_servitor
+					NOT = { has_swapped_tradition = tr_synchronicity_organic_paradise }
+				}		
+				AND = {
+					has_valid_civic = civic_machine_assimilator
+					NOT = { has_swapped_tradition = tr_synchronicity_cyber_comms }
+				}	
+				AND = {
+					has_authority = auth_machine_intelligence
+					NOR = {
+						has_valid_civic = civic_machine_assimilator
+						has_valid_civic = civic_machine_servitor
+						has_swapped_tradition = tr_synchronicity_machine_center
+					}
+				}							
+			}	
+		}	
+		modifier = {
+			factor = @increase_interest_3
+			OR = {
+				AND = {
+					is_machine_or_hive = no
+					OR = {
+						OR = {
+							has_non_swapped_tradition = tr_discovery_finish
+							has_non_swapped_tradition = tr_expansion_finish
+							has_non_swapped_tradition = tr_prosperity_finish
+						}				
+						OR = {
+							is_pacifist = yes
+							is_xenophobe = yes
+						}
+					}	
+				}	
+				AND = {
+					has_authority = auth_hive_mind
+					OR = {
+						has_swapped_tradition = tr_discovery_finish_hive
+						has_swapped_tradition = tr_expansion_finish_hive
+						has_swapped_tradition = tr_prosperity_finish_hive
+					}	
+				}	
+				AND = {
+					has_authority = auth_machine_intelligence
+					OR = {
+						has_swapped_tradition = tr_discovery_finish_machine
+						has_swapped_tradition = tr_expansion_finish_machine
+						has_swapped_tradition = tr_prosperity_finish_machine
+					}	
+				}					
+			}	
+		}				
+	}
+}
+
+tr_harmony_bulwark_of_harmony = {
+	cost = { unity = @cost }
+	possible = {
+		has_tradition = tr_harmony_kinship
+		has_tradition = tr_harmony_mind_and_body
+	}
+	
+	modifier = {
+		spaceport_defensive_war_ship_build_speed_mult = 0.33
+		ship_home_territory_fire_rate_mult = 0.15
+	}
+
+	ai_weight = { 
+		factor = @strategic
+		modifier = {
+			factor = @crucial_2
+			OR = {
+				is_pacifist = yes
+				is_xenophobe = yes
+			}	
+		}
+	}
+}
