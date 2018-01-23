@@ -101,14 +101,9 @@ ap_engineered_evolution = {
 			factor = @important
 			OR = {
 				AND = {
-					has_global_flag = "ex_technologies_active"
 					has_technology = "tech_gene_banks"
 					has_technology = "tech_gene_expressions"					
 				}		
-				AND = {
-					NOT = { has_global_flag = "ex_technologies_active" }
-					has_technology = "tech_gene_expressions"					
-				}				
 			}
 		}						
 		modifier = {
@@ -144,8 +139,8 @@ ap_evolutionary_mastery = {
 	modifier = {
 		description = ap_evolutionary_mastery_modifier_desc
 		description_parameters = {
-			POINTS = @ap_evolutionary_mastery_POINTS
-			COST_MULT = @ap_evolutionary_mastery_COST_MULT
+			POINTS = 3
+			COST_MULT = -0.25
 		}
 		BIOLOGICAL_species_trait_points_add = 3
 		modify_species_cost_mult = -0.25
@@ -234,16 +229,10 @@ ap_the_flesh_is_weak = {
 					is_spiritualist = yes
 				}			
 				AND = {
-					has_global_flag = "ex_technologies_active"
 					has_technology = "tech_gene_banks"
 					has_technology = "tech_gene_expressions"					
 					is_materialist = no
-				}		
-				AND = {
-					NOT = { has_global_flag = "ex_technologies_active" }
-					has_technology = "tech_gene_expressions"
-					is_materialist = no					
-				}		
+				}			
 				count_owned_pops = {
 					limit = { is_robot_pop = yes }
 					count < 10
@@ -382,15 +371,9 @@ ap_mind_over_matter = {
 					is_materialist = yes
 				}			
 				AND = {
-					has_global_flag = "ex_technologies_active"
 					has_technology = "tech_gene_banks"
 					has_technology = "tech_gene_expressions"					
 					is_spiritualist = no
-				}		
-				AND = {
-					NOT = { has_global_flag = "ex_technologies_active" }
-					has_technology = "tech_gene_expressions"
-					is_spiritualist = no					
 				}				
 			}
 		}	
@@ -398,17 +381,8 @@ ap_mind_over_matter = {
 			factor = @important
 			NOR = {
 				has_ai_personality_behaviour = robot_liberator
-				OR = {
-					AND = {
-						has_global_flag = "ex_technologies_active"
-						has_technology = "tech_gene_banks"
-						has_technology = "tech_gene_expressions"					
-					}		
-					AND = {
-						NOT = { has_global_flag = "ex_technologies_active" }
-						has_technology = "tech_gene_expressions"
-					}				
-				}	
+				has_technology = "tech_gene_banks"
+				has_technology = "tech_gene_expressions"					
 			}
 		}			
 		modifier = {
@@ -516,10 +490,8 @@ ap_world_shaper = {
 			factor = @reduce_interest_1
 			NOT = {
 				OR = {
-					has_global_flag = "ex_terraforming_active"
-					has_global_flag = "has_guillis_planet_modifiers_mod"
-					has_technology = "tech_cofh_se_atmospheric_purification"
-					has_technology = "tech_cofh_se_atmosphere_creation"					
+					has_global_flag = "ex_planets_enhanced_active"
+					has_global_flag = "has_guillis_planet_modifiers_mod"					
 				}				
 			}		
 		}	
@@ -535,10 +507,8 @@ ap_world_shaper = {
 			factor = @increase_interest_3
 			OR = {
 				has_country_strategic_resource = { type = sr_terraform_gases amount = 1 }
-				has_global_flag = "ex_terraforming_active"
+				has_global_flag = "ex_planets_enhanced_active"
 				has_global_flag = "has_guillis_planet_modifiers_mod"
-				has_technology = "tech_cofh_se_atmospheric_purification"
-				has_technology = "tech_cofh_se_atmosphere_creation"
 			}		
 		}			
 		modifier = {
@@ -573,11 +543,7 @@ ap_galactic_force_projection = {
 		}	
 		modifier = {
 			factor = @increase_interest_1
-			OR = {
-				is_pacifist = yes
-				is_militarist = yes
-				has_federation = yes
-			}	
+			is_militarist = yes
 		}	
 		modifier = {
 			factor = @increase_interest_1
@@ -618,9 +584,9 @@ ap_defender_of_the_galaxy = {
 		weight = @standard
 		modifier = {
 			factor = @avoid
-			NOR = {
-				has_global_flag = galactic_crisis_happened
-				has_ai_personality_behaviour = crisis_fighter
+			OR = {
+				NOT = { has_ai_personality_behaviour = crisis_fighter }
+				has_global_flag = galactic_crisis_happened				
 				AND = {
 					has_global_flag = extradimensional_first_portal
 					has_global_flag = extradimensional_first_portal_destroyed
@@ -645,27 +611,30 @@ ap_defender_of_the_galaxy = {
 		}
 		modifier = {
 			factor = @crucial_2
-			OR = {
-				has_global_flag = ongoing_prethoryn_invasion
-				has_global_flag = ai_invasion_ongoing
-				AND = {
-					has_global_flag = extradimensional_invasion_happened
-					OR = {
-						AND = {
-							has_global_flag = extradimensional_first_portal
-							NOT = { has_global_flag = extradimensional_first_portal_destroyed }
-						}	
-						AND = {
-							has_global_flag = extradimensional_second_portal
-							NOT = { has_global_flag = extradimensional_second_portal_destroyed }					
-						}	
-						AND = {
-							has_global_flag = extradimensional_third_portal_destroyed
-							NOT = { has_global_flag = extradimensional_third_portal_destroyed }
-						}	
-					}			
-				}
-			}		
+			AND = {
+				has_ai_personality_behaviour = crisis_fighter
+				OR = {
+					has_global_flag = ongoing_prethoryn_invasion
+					has_global_flag = ai_invasion_ongoing
+					AND = {
+						has_global_flag = extradimensional_invasion_happened
+						OR = {
+							AND = {
+								has_global_flag = extradimensional_first_portal
+								NOT = { has_global_flag = extradimensional_first_portal_destroyed }
+							}	
+							AND = {
+								has_global_flag = extradimensional_second_portal
+								NOT = { has_global_flag = extradimensional_second_portal_destroyed }					
+							}	
+							AND = {
+								has_global_flag = extradimensional_third_portal_destroyed
+								NOT = { has_global_flag = extradimensional_third_portal_destroyed }
+							}	
+						}			
+					}
+				}		
+			}	
 		}	
 	}	
 }
@@ -1023,13 +992,10 @@ ap_consecrated_worlds = {
 		}	
 		if = {
 			limit = { 
-				AND = {
-					has_global_flag = ex_edicts_active
-					NOT = { 
-						has_authority = auth_machine_intelligence
-						has_authority = auth_hive_mind
-						has_country_flag = synthetic_age					
-					} 
+				NOR = { 
+					has_authority = auth_machine_intelligence
+					has_authority = auth_hive_mind
+					has_country_flag = synthetic_age					
 				}	
 			}			
 			custom_tooltip = "allow_edict_imperial_fulcrum"
@@ -1037,30 +1003,21 @@ ap_consecrated_worlds = {
 		}
 		if = {
 			limit = { 
-				AND = {
-					has_global_flag = ex_edicts_active
-					has_authority = auth_machine_intelligence
-				}			
+				has_authority = auth_machine_intelligence
 			}	
 			custom_tooltip = "allow_edict_imperial_fulcrum_machine"
 			custom_tooltip = "describe_edict_imperial_fulcrum_machine"			
 		}
 		if = {
 			limit = { 
-				AND = {
-					has_global_flag = ex_edicts_active
-					has_authority = auth_hive_mind
-				}			
+				has_authority = auth_hive_mind
 			}	
 			custom_tooltip = "allow_edict_imperial_fulcrum_hive_mind"
 			custom_tooltip = "describe_edict_imperial_fulcrum_hive_mind"			
 		}
 		if = {
 			limit = { 
-				AND = {
-					has_global_flag = ex_edicts_active
-					has_country_flag = synthetic_age
-				}			
+				has_country_flag = synthetic_age
 			}	
 			custom_tooltip = "allow_edict_imperial_fulcrum_synthetic_age"
 			custom_tooltip = "describe_edict_imperial_fulcrum_synthetic_age"			
@@ -1068,16 +1025,7 @@ ap_consecrated_worlds = {
 	}
 	
 	potential = { 
-		AND = {
-			OR = {
-				has_global_flag = "ex_edicts_active"
-				AND = {
-					NOT = { has_global_flag = "ex_edicts_active" }
-					is_spiritualist = yes
-				}
-			}			
-			NOT = { has_ascension_perk = ap_consecrated_worlds }
-		}	
+		NOT = { has_ascension_perk = ap_consecrated_worlds }
 	}
 	
 	ai_weight = {
@@ -1085,23 +1033,9 @@ ap_consecrated_worlds = {
 		modifier = {
 			factor = @avoid
 			OR = {
-				AND = {
-					NOT = { has_global_flag = "ex_edicts_active" }
-					OR = {
-						has_edict_bonus_tradition = no 	
-						has_edict_bonus_civic = no
-					}
-				}	
-				AND = {
-					has_global_flag = "ex_edicts_active"
-					OR = {
-						has_edict_bonus_tradition = no 	
-						has_edict_bonus_civic = no
-						AND = {
-							has_global_flag = "ex_ethics_active"
-							is_pacifist = no
-						}	
-					}	
+				OR = {
+					has_edict_bonus_tradition = no 	
+					has_edict_bonus_civic = no
 				}
 				has_monthly_income = {
 					resource = influence
@@ -1168,7 +1102,7 @@ ap_synthetic_age = {
 	}
 	
 	ai_weight = { 
-		factor = @important
+		factor = @strategic
 		modifier = {
 			factor = @increase_interest_3
 			has_global_flag = ex_tweaks_active
@@ -1181,10 +1115,6 @@ ap_synthetic_age = {
 			factor = @increase_interest_3
 			has_global_flag = ex_robots_active
 		}			
-		modifier = {
-			factor = @increase_interest_3
-			has_global_flag = ex_technology_active
-		}				
 	}
 }
 

@@ -1,0 +1,4909 @@
+@planet_unique_mineral_build_cost_1 = 60
+@planet_unique_energy_build_cost_1 = 60
+@planet_unique_mineral_build_cost_2 = 120
+@planet_unique_energy_build_cost_2 = 120
+@planet_unique_mineral_build_cost_3 = 180
+@planet_unique_energy_build_cost_3 = 180
+
+@planet_unique_output_1 = 2
+@planet_unique_output_2 = 4
+@planet_unique_output_3 = 6
+
+@planet_unique_upkeep_1 = 3
+@planet_unique_upkeep_2 = 3.5
+@planet_unique_upkeep_3 = 4
+
+@planet_unique_build_time_1 = 100
+@planet_unique_build_time_2 = 200
+@planet_unique_build_time_3 = 300
+
+### Weights
+@avoid = 0
+@redundant = 0.5
+@standard = 1
+@good = 10
+@important = 25
+@strategic = 100
+@crucial_1 = 1000
+@crucial_2 = 10000
+@reduce_interest_1 = 0.5
+@reduce_interest_2 = 0.25
+@reduce_interest_3 = 0.1
+@increase_interest_1 = 1.25
+@increase_interest_2 = 2.5
+@increase_interest_3 = 5
+@always_build_and_never_remove = 9001
+
+###
+
+building_akx_worm_1 = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	
+	potential = {
+		planet = {
+			OR = {
+				has_capital_1 = yes
+				has_capital_2 = yes
+				has_capital_3 = yes
+				has_building = "building_hab_capital"
+			}
+			NOR = {
+				has_building = "building_power_hub_1"
+				has_building_power_hub_2 = yes
+			}
+		}
+	}
+	allow = { }
+	
+	planet_modifier = {
+		tile_resource_energy_mult = 0.20
+		pop_happiness = -0.05
+	}
+	produced_resources = { energy = @planet_unique_output_3 }
+	prerequisites = { "tech_akx_worm_1"	}
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				AND = {
+					has_energy = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_vanilla_or_exoverhaul_strategic_resources = no
+					has_energy = no
+					has_minerals = no
+					has_research_resources = no
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = energy
+					amount > 2
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				OR = {
+					has_energy = no
+					AND = {
+						owner_is_not_machine_or_is_servitor = yes
+						has_high_food = yes
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = {
+				has_slave_pop = yes
+				has_prole_or_stapled_pop = yes
+				AND = {
+					has_non_sapient_robot = yes
+					exists = owner
+					owner = { NOT = { has_global_flag = "ex_robots_active" } }
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_energy_bonus_pop = yes	}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				owner = { has_global_flag = "ex_resources_active" }
+				tile = { any_neighboring_tile = { has_building = "building_sr_engos_2" } }
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_hyperstorage_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				OR = {
+					AND = {
+						has_robot_pop = yes
+						exists = owner
+						owner = { has_global_flag = "ex_robots_active" }
+					}
+					has_free_sapient_robot = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { owner = { has_authority = auth_machine_intelligence } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			planet = { has_modifier = "strong_magnetic_field" }
+		}
+		modifier = {
+			factor = @increase_interest_3
+			planet = { has_modifier = "hazardous_weather" }
+		}
+	}
+}
+building_akx_worm_2 = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	ai_replace = no
+	
+	potential = {
+		planet = {
+			OR = {
+				has_capital_1 = yes
+				has_capital_2 = yes
+				has_capital_3 = yes
+				has_building = "building_hab_capital"
+			}
+		}
+	}
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_1
+		energy = @planet_unique_energy_build_cost_1
+	}
+	produced_resources = { society_research = @planet_unique_output_2 }
+	
+	planet_modifier = {
+		pop_government_ethic_attraction = 0.05
+		pop_happiness = 0.05
+	}
+	required_resources = { energy = @planet_unique_upkeep_1	}
+	prerequisites = { "tech_akx_worm_2"	}
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				AND = {
+					has_society = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_vanilla_or_exoverhaul_strategic_resources = no
+					has_energy = no
+					has_minerals = no
+					has_research_resources = no
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @crucial_1
+			owner = { NOT = { has_ethic = ethic_gestalt_consciousness } }
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			owner = { has_ethic = ethic_gestalt_consciousness }
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				OR = {
+					has_society = no
+					AND = {
+						owner_is_not_machine_or_is_servitor = yes
+						has_high_food = yes
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = @avoid
+			tile = {
+				OR = {
+					has_slave_pop = yes
+					has_prole_or_stapled_pop = yes
+					has_non_sapient_robot = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_2
+			tile = { any_neighboring_tile = { has_polytechnic_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				OR = {
+					has_research_bonus_pop = yes
+					has_free_sapient_robot = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				AND = {
+					exists = pop
+					pop = {	has_trait = "trait_natural_sociologists" }
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_2
+			planet = {
+				OR = {
+					has_modifier = "dangerous_wildlife"
+					has_modifier = "titanic_life"
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			planet = {
+				OR = {
+					has_modifier = "atmospheric_hallucinogen"
+					has_modifier = "atmospheric_hallucinogen_good"
+				}
+			}
+		}
+	}
+}
+
+building_plurality = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_3
+		energy = @planet_unique_energy_build_cost_3
+	}
+	
+	potential = {
+		owner = {
+			AND = {
+				has_global_flag = "ex_traditions_active"
+				has_non_swapped_tradition = tr_diplomacy_alien_tourism
+				is_xenophile = yes
+			}
+		}
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building_capital_1 = yes
+				has_building_capital_2 = yes
+				has_building = "building_capital_3"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_authority = auth_machine_intelligence
+				NOT = { has_non_swapped_tradition = tr_diplomacy_alien_tourism }				
+				is_xenophile = no
+			}
+		}
+	}
+	
+	produced_resources = {
+		unity = @planet_unique_output_2
+		energy = @planet_unique_output_2
+		society_research = @planet_unique_output_2
+	}
+	
+	planet_modifier = {
+		planet_migration_xeno_pull = 0.65
+		pop_environment_tolerance = 0.1
+		pop_ethic_xenophile_attraction_mult = 0.2
+	}
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				AND = {
+					has_energy = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_society = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				has_deposit = no
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @reduce_interest_2
+			tile = {
+				has_slave_pop = yes
+				has_prole_or_stapled_pop = yes
+				has_non_sapient_robot = yes
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_energy_bonus_pop = yes	}
+		}
+	}
+}
+building_polytechnic_complex = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_3
+		energy = @planet_unique_energy_build_cost_3
+	}
+	required_resources = { energy = @planet_unique_upkeep_3 }
+	
+	produced_resources = {
+		engineering_research = 2
+		physics_research = 2
+		society_research = 2
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_physics_research_add = 1
+		tile_building_resource_society_research_add = 1
+		tile_building_resource_engineering_research_add = 1
+	}
+	
+	potential = {
+		owner = {
+			AND = {
+				has_global_flag = "ex_traditions_active"
+				has_non_swapped_tradition = tr_discovery_polytechnic_education
+			}
+		}
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building_capital_1 = yes
+				has_building_capital_2 = yes
+				has_building = "building_capital_3"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_non_swapped_tradition = tr_discovery_polytechnic_education } }
+	}
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				AND = {
+					has_research_resources = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				has_deposit = no
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @crucial_1
+		modifier = {
+			factor = @important
+			tile = { has_research_resources = yes }
+		}
+		modifier = {
+			factor = @strategic
+			tile = { has_high_research_resources = yes }
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = { has_research_resources = no }
+		}
+		modifier = {
+			factor = @avoid
+			tile = {
+				OR = {
+					has_slave_pop = yes
+					has_prole_or_stapled_pop = yes
+					has_non_sapient_robot = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = { any_neighboring_tile = { has_hyperstorage_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_2
+			tile = { any_neighboring_tile = { has_research_buildings = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				OR = {
+					has_research_bonus_pop = yes
+					has_free_sapient_robot = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				AND = {
+					exists = pop
+					pop = {
+						OR = {
+							has_trait = "trait_natural_engineers"
+							has_trait = "trait_natural_physicists"
+							has_trait = "trait_natural_sociologists"
+						}
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_2
+			planet = {
+				OR = {
+					has_modifier = "dangerous_wildlife" # society
+					has_modifier = "titanic_life" # society
+					has_modifier = "unstable_tectonics" # engineering
+					has_modifier = "wild_storms" # physics
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			planet = {
+				OR = {
+					has_modifier = "atmospheric_hallucinogen" # society
+					has_modifier = "atmospheric_hallucinogen_good" # society
+				}
+			}
+		}
+	}
+}
+building_deep_thought_node = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_3
+		energy = @planet_unique_energy_build_cost_3
+	}
+	required_resources = { energy = @planet_unique_upkeep_3 }
+	
+	produced_resources = {
+		engineering_research = 2
+		physics_research = 2
+		society_research = 2
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_physics_research_add = 1
+		tile_building_resource_society_research_add = 1
+		tile_building_resource_engineering_research_add = 1
+	}
+	
+	potential = {
+		owner = {
+			AND = {
+				has_global_flag = "ex_traditions_active"
+				has_swapped_tradition = tr_discovery_polytechnic_education_hive
+			}
+		}
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building_capital_1 = yes
+				has_building_capital_2 = yes
+				has_building = "building_capital_3"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_swapped_tradition = tr_discovery_polytechnic_education_hive } }
+	}
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				AND = {
+					has_research_resources = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				has_deposit = no
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @crucial_1
+		modifier = {
+			factor = @important
+			tile = { has_research_resources = yes }
+		}
+		modifier = {
+			factor = @strategic
+			tile = { has_high_research_resources = yes }
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = { has_research_resources = no }
+		}
+		modifier = {
+			factor = @avoid
+			tile = {
+				OR = {
+					has_slave_pop = yes
+					has_prole_or_stapled_pop = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = { any_neighboring_tile = { has_hyperstorage_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_2
+			tile = { any_neighboring_tile = { has_research_buildings = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_research_bonus_pop = yes }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				AND = {
+					exists = pop
+					pop = {
+						OR = {
+							has_trait = "trait_natural_engineers"
+							has_trait = "trait_natural_physicists"
+							has_trait = "trait_natural_sociologists"
+						}
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_2
+			planet = {
+				OR = {
+					has_modifier = "dangerous_wildlife" # society
+					has_modifier = "titanic_life" # society
+					has_modifier = "unstable_tectonics" # engineering
+					has_modifier = "wild_storms" # physics
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			planet = {
+				OR = {
+					has_modifier = "atmospheric_hallucinogen" # society
+					has_modifier = "atmospheric_hallucinogen_good" # society
+				}
+			}
+		}
+	}
+}
+building_iterative_ai_nexus = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_3
+		energy = @planet_unique_energy_build_cost_3
+	}
+	
+	required_resources = {
+		energy = @planet_unique_upkeep_3
+	}
+	
+	produced_resources = {
+		engineering_research = 2
+		physics_research = 2
+		society_research = 2
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_physics_research_add = 1
+		tile_building_resource_society_research_add = 1
+		tile_building_resource_engineering_research_add = 1
+	}
+	
+	potential = {
+		owner = {
+			AND = {
+				has_global_flag = "ex_traditions_active"
+				has_swapped_tradition = tr_discovery_polytechnic_education_machine
+			}
+		}
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building_machine_capital_1 = yes
+				has_building_machine_capital_2 = yes
+				has_building = "building_machine_capital_3"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			NOT = { has_swapped_tradition = tr_discovery_polytechnic_education_machine }
+		}
+	}
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				AND = {
+					has_research_resources = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_vanilla_or_exoverhaul_strategic_resources = no
+					has_energy = no
+					has_minerals = no
+					has_research_resources = no
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @crucial_1
+		modifier = {
+			factor = @important
+			tile = { has_research_resources = yes }
+		}
+		modifier = {
+			factor = @strategic
+			tile = { has_high_research_resources = yes }
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = { has_research_resources = no }
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = { any_neighboring_tile = { has_hyperstorage_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_2
+			tile = { any_neighboring_tile = { has_research_buildings = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_research_bonus_pop = yes }
+		}
+		modifier = {
+			factor = @increase_interest_2
+			planet = {
+				OR = {
+					has_modifier = "dangerous_wildlife" # society
+					has_modifier = "titanic_life" # society
+					has_modifier = "unstable_tectonics" # engineering
+					has_modifier = "wild_storms" # physics
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			planet = {
+				OR = {
+					has_modifier = "atmospheric_hallucinogen" # society
+					has_modifier = "atmospheric_hallucinogen_good" # society
+				}
+			}
+		}
+	}
+}
+building_clone_vats = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	produced_resources = { food = @planet_unique_output_2 }
+	required_resources = { energy = @planet_unique_upkeep_2	}
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+	
+	potential = {
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+		planet = {
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	prerequisites = { "tech_cloning" }
+	
+	ai_allow = {
+		owner = { NOT = { has_country_flag = synthetic_age } }
+		planet = { has_15_or_more_organic_pops = yes }
+		is_slave_tile_or_planet = no
+		is_robot_tile_or_planet = no
+		tile = {
+			OR = {
+				has_deposit = no
+				AND = {
+					has_food = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @avoid
+		modifier = {
+			weight = @good
+			owner = { has_global_flag = "ex_armies_active" }
+		}
+		modifier = {
+			factor = @important
+			owner = {
+				AND = {
+					has_global_flag = "ex_armies_active"
+					has_technology = "tech_morphogenetic_field_mastery"
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			owner = {
+				AND = {
+					has_global_flag = "ex_armies_active"
+					has_technology = "tech_gene_seed_purification"
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				AND = {
+					exists = pop
+					pop = { has_trait = "trait_strong" }
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_2
+			tile = {
+				AND = {
+					exists = pop
+					pop = { has_trait = "trait_very_strong" }
+				}
+			}
+		}
+	}
+}
+building_slave_processing = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	
+	produced_resources = {
+		minerals = @planet_unique_output_1
+		food = @planet_unique_output_1
+	}
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	
+	planet_modifier = {
+		slave_mineral_output = 0.10
+		slave_food_output = 0.10
+		country_unrest_unhappy_slave_effect_mult = -0.50
+	}
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+	
+	potential = {
+		owner = {
+			AND = {
+				NOT = { has_authority = auth_machine_intelligence }
+				has_policy_flag = slavery_allowed
+			}
+		}
+		planet = {
+			AND = {
+				any_pop = { is_enslaved = yes }
+				OR = {
+					has_capital_1 = yes
+					has_capital_2 = yes
+					has_capital_3 = yes
+				}
+			}
+		}
+	}
+	
+	destroy_if = {
+		AND = {
+			exists = owner
+			owner = {
+				OR = {
+					has_authority = auth_machine_intelligence
+					NOT = { has_policy_flag = slavery_allowed }
+				}
+			}
+		}
+	}
+	prerequisites = { "tech_neural_implants" }
+	
+	ai_allow = {
+		planet = {
+			count_pops = {
+				limit = { is_enslaved = yes }
+				count > 2
+			}
+		}
+		tile = {
+			OR = {
+				has_deposit = no
+				AND = {
+					has_food = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_minerals = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_minerals = yes
+					has_food = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+			}
+		}
+	}
+	ai_weight = { weight = @crucial_1 }
+}
+building_clinic_hidden_tree_root = {
+	potential = { always=no }
+	planet_unique = yes
+	icon = building_clinic
+}
+building_clinic = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_1
+		energy = @planet_unique_energy_build_cost_1
+	}
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+	
+	potential = {
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+		NAND = {
+			owner = { has_technology = "tech_frontier_hospital" }
+			owner = { NOT = { has_authority = auth_machine_intelligence } }
+			planet = {
+				OR = {
+					has_capital_2 = yes
+					has_capital_3 = yes
+				}
+			}
+		}
+	}
+	allow = { }
+	
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	required_resources = { energy = @planet_unique_upkeep_1 }
+	
+	produced_resources = {
+		society_research = 1
+		unity = 1
+	}
+	planet_modifier = { pop_growth_speed = 0.15 }
+	prerequisites = { "tech_frontier_health" }
+	
+	upgrades = {
+		building_hospital
+	}
+	
+	ai_allow = {
+		tile = {
+			AND = {
+				OR = {
+					has_deposit = no
+					AND = {
+						has_society = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}
+				}
+			}
+		}
+		planet = { has_growing_pop = yes }
+		is_slave_tile_or_planet = no
+		is_robot_tile_or_planet = no
+	}
+	ai_weight = { weight = @crucial_2 }
+}
+building_hospital_direct_build = {
+	base_buildtime = 200
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = 180
+		energy = 180
+	}
+	
+	potential = {
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+		planet = {
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+		NOT = { tile = { has_building = building_hospital } } #Prevent self replace
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	
+	produced_resources = {
+		society_research = 2
+		unity = 2
+	}
+	planet_modifier = {	pop_growth_speed = 0.3 }
+	
+	prerequisites = {
+		"tech_frontier_hospital"
+	}
+	
+	ai_allow = {
+		tile = {
+			AND = {
+				OR = {
+					has_deposit = no
+					AND = {
+						has_society = yes
+						has_vanilla_or_exoverhaul_strategic_resources = no
+					}
+				}
+			}
+		}
+		planet = { has_growing_pop = yes }
+		is_slave_tile_or_planet = no
+		is_robot_tile_or_planet = no
+	}
+	
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @avoid
+			OR = {
+				is_slave_tile_or_planet = yes
+				is_robot_tile_or_planet = yes
+			}
+		}
+	}
+	show_tech_unlock_if = { always = no }
+	icon = building_hospital
+	
+	upgrades = {
+		building_clinic_hidden_tree_root
+	}
+}
+building_hospital = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+	
+	potential = {
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+		planet = {
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	
+	produced_resources = {
+		society_research = 2
+		unity = 2
+	}
+	planet_modifier = {	pop_growth_speed = 0.3 }
+	prerequisites = { "tech_frontier_hospital" }
+	ai_allow = { always = yes }
+	
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @avoid
+			OR = {
+				is_slave_tile_or_planet = yes
+				is_robot_tile_or_planet = yes
+			}
+		}
+	}
+	is_listed = no
+	
+	upgrades = {
+		building_clinic_hidden_tree_root
+	}
+}
+building_spare_parts_depot_hidden_tree_root = {
+	potential = { always=no }
+	planet_unique = yes
+	icon = building_spare_parts_depot
+}
+building_spare_parts_depot = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_1
+		energy = @planet_unique_energy_build_cost_1
+	}
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+	
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		NAND = {
+			owner = { has_technology = "tech_intelligent_factories" }
+			owner = { has_authority = auth_machine_intelligence }
+			planet = {
+				OR = {
+					has_capital_2 = yes
+					has_capital_3 = yes
+				}
+			}
+		}
+	}
+	allow = {	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+	}
+	required_resources = { energy = @planet_unique_upkeep_1 }
+	produced_resources = { unity = 1 }
+	
+	planet_modifier = {
+		pop_robot_build_speed_mult = 0.15
+		pop_robot_build_cost_mult = -0.10
+		pop_consumer_goods_mult = -0.05
+	}
+	prerequisites = { "tech_modular_components" }
+	
+	upgrades = {
+		building_unit_assembly_plant
+	}
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				has_deposit = no
+				AND = {
+					has_society = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+			}
+		}
+	}
+	ai_weight = { weight = @crucial_2 }
+}
+building_unit_assembly_plant_direct_build = {
+	base_buildtime = 200
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = 180
+		energy = 180
+	}
+	
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = {
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+		NOT = { tile = { has_building = building_unit_assembly_plant } } #Prevent self replace
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+	}
+	required_resources = { energy = @planet_unique_upkeep_2	}
+	produced_resources = { unity = 2 }
+	
+	planet_modifier = {
+		pop_robot_build_speed_mult = 0.3
+		pop_robot_build_cost_mult = -0.20
+		pop_consumer_goods_mult = -0.1
+	}
+	
+	prerequisites = {
+		"tech_intelligent_factories"
+	}
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				has_deposit = no
+				AND = {
+					has_society = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+			}
+		}
+	}
+	ai_weight = { weight = @crucial_2 }
+	show_tech_unlock_if = { always = no }
+	icon = building_unit_assembly_plant
+	
+	upgrades = {
+		building_spare_parts_depot_hidden_tree_root
+	}
+}
+building_unit_assembly_plant = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+	
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = {
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+	}
+	required_resources = { energy = @planet_unique_upkeep_2	}
+	produced_resources = { unity = 2 }
+	
+	planet_modifier = {
+		pop_robot_build_speed_mult = 0.3
+		pop_robot_build_cost_mult = -0.20
+		pop_consumer_goods_mult = -0.1
+	}
+	prerequisites = { "tech_intelligent_factories" }
+	ai_allow = { always = yes }
+	ai_weight = { weight = @crucial_2 }
+	is_listed = no
+	
+	upgrades = {
+		building_spare_parts_depot_hidden_tree_root
+	}
+}
+building_military_academy = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	show_tech_unlock_if = { NOT = { has_ethic = ethic_gestalt_consciousness } }
+	
+	potential = {
+		owner = {
+			NOR = {
+				has_ethic = ethic_gestalt_consciousness
+				has_country_flag = synthetic_age
+			}
+		}
+		planet = {
+			OR = {
+				has_capital_1 = yes
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+	}
+	
+	destroy_if = {
+		AND = {
+			exists = owner
+			owner = {
+				OR = {
+					has_ethic = ethic_gestalt_consciousness
+					has_country_flag = synthetic_age
+				}
+			}
+		}
+	}
+	produced_resources = { unity = @planet_unique_output_1 }
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	
+	army_modifier = {
+		army_damage_mult = 0.25
+		army_health = 0.25
+		army_morale = 0.25
+	}
+	
+	planet_modifier = {
+		planet_army_build_speed_mult = 0.5
+		planet_fortification_strength = 1.0
+		pop_ethic_militarist_attraction_mult = 0.15
+	}
+	prerequisites = { "tech_centralized_command" }
+	
+	ai_allow = {
+		AND = {
+			is_slave_tile_or_planet = no
+			is_robot_tile_or_planet = no
+		}
+		tile = { has_deposit = no }
+		planet = { has_15_or_more_organic_pops = yes }
+	}
+	
+	ai_weight = {
+		weight = @redundant
+		modifier = {
+			weight = @good
+			owner = { has_global_flag = "ex_armies_active" }
+		}
+		modifier = {
+			factor = @important
+			owner = { is_militarist = yes }
+		}
+		modifier = {
+			factor = @important
+			owner = {
+				AND = {
+					has_global_flag = "ex_armies_active"
+					has_technology = "tech_combat_training"
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				AND = {
+					exists = pop
+					pop = { has_trait = "trait_strong" }
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_2
+			tile = {
+				AND = {
+					exists = pop
+					pop = { has_trait = "trait_very_strong" }
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			owner = { is_pacifist = yes }
+		}
+		modifier = {
+			weight = @avoid
+			from = { sector_controlled = yes }
+		}
+	}
+}
+building_military_academy_hive = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	icon = "building_military_academy"
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	show_tech_unlock_if = { has_authority = auth_hive_mind }
+	
+	potential = {
+		owner = { has_authority = auth_hive_mind }
+		planet = {
+			OR = {
+				has_capital_1 = yes
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_authority = auth_hive_mind } }
+	}
+	produced_resources = { unity = @planet_unique_output_1 }
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	
+	army_modifier = {
+		army_damage_mult = 0.25
+		army_health = 0.25
+		army_morale = 0.25
+	}
+	
+	planet_modifier = {
+		planet_army_build_speed_mult = 0.5
+		planet_fortification_strength = 1.0
+	}
+	prerequisites = { "tech_centralized_command" }
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		planet = { has_15_or_more_organic_pops = yes }
+	}
+	
+	ai_weight = {
+		weight = @redundant
+		modifier = {
+			weight = @good
+			owner = { has_global_flag = "ex_armies_active" }
+		}
+		modifier = {
+			factor = @important
+			owner = {
+				AND = {
+					has_global_flag = "ex_armies_active"
+					has_technology = "tech_combat_training"
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				AND = {
+					exists = pop
+					pop = { has_trait = "trait_strong" }
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_2
+			tile = {
+				AND = {
+					exists = pop
+					pop = { has_trait = "trait_very_strong" }
+				}
+			}
+		}
+		modifier = {
+			weight = @avoid
+			from = { sector_controlled = yes }
+		}
+	}
+}
+building_war_factory = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	
+	show_tech_unlock_if = {
+		OR = {
+			has_authority = auth_machine_intelligence
+			has_country_flag = synthetic_age
+		}
+	}
+	
+	potential = {
+		owner = {
+			OR = {
+				has_authority = auth_machine_intelligence
+				has_country_flag = synthetic_age
+			}
+		}
+		planet = {
+			OR = {
+				has_capital_1 = yes
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			NOR = {
+				has_authority = auth_machine_intelligence
+				has_country_flag = synthetic_age
+			}
+		}
+	}
+	produced_resources = { engineering_research = @planet_unique_output_2 }
+	
+	produced_resource_trigger = {
+		modifier = {
+			has_government = gov_machine_terminator
+			resources = { unity = 2 }
+		}
+	}
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	
+	army_modifier = {
+		army_damage_mult = 0.25
+		army_health = 0.25
+		army_morale = 0.25
+	}
+	
+	planet_modifier = {
+		planet_army_build_speed_mult = 0.5
+		planet_fortification_strength = 1.0
+		pop_ethic_militarist_attraction_mult = 0.15
+	}
+	prerequisites = { "tech_centralized_command" }
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				has_deposit = no
+				AND = {
+					has_engineering = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+			}
+		}
+		planet = { has_15_or_more_organic_pops = yes }
+	}
+	
+	ai_weight = {
+		weight = @redundant
+		modifier = {
+			weight = @good
+			owner = { has_global_flag = "ex_armies_active" }
+		}
+		modifier = {
+			factor = @important
+			owner = { is_militarist = yes }
+		}
+		modifier = {
+			factor = @good
+			owner = {
+				AND = {
+					has_global_flag = "ex_armies_active"
+					has_technology = "tech_combat_training"
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			owner = {
+				AND = {
+					has_global_flag = "ex_armies_active"
+					has_technology = "tech_adaptive_combat_algorithms"
+				}
+			}
+		}
+		modifier = {
+			factor = @crucial_1
+			owner = { has_government = gov_machine_terminator }
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			owner = { is_pacifist = yes }
+		}
+		modifier = {
+			weight = @avoid
+			from = { sector_controlled = yes }
+		}
+	}
+}
+building_planetary_shield_generator = {
+	icon = "building_shield_generator"
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_3
+		energy = @planet_unique_energy_build_cost_1
+	}
+	produced_resources = { unity = @planet_unique_output_1 }
+	required_resources = { energy = @planet_unique_upkeep_2	}
+	
+	planet_modifier = {
+		planet_fortification_strength = 4
+		pop_happiness = 0.05
+	}
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+	}
+	allow = { }
+	prerequisites = { "tech_planetary_shield_generator" }
+	
+	ai_allow = {
+		planet = { has_15_or_more_pops = yes}
+		tile = {
+			AND = {
+				has_deposit = no
+				any_neighboring_tile = {
+					NOR = {
+						has_capital_building = yes
+						has_hyperstorage_building = yes
+						has_polytechnic_building = yes
+					}
+				}
+			}
+		}
+		is_slave_tile_or_planet = no
+		is_robot_tile_or_planet = no
+	}
+	ai_weight = { weight = @strategic }
+}
+building_power_hub_1_hidden_tree_root = {
+	potential = { always=no }
+	planet_unique = yes
+	icon = building_power_hub_1
+}
+building_power_hub_1 = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_1
+		energy = @planet_unique_energy_build_cost_1
+	}
+	prerequisites = { "tech_power_hub_1" }
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_capital_1 = yes
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+		NAND = {
+			owner = { has_technology = "tech_power_hub_2" }
+			planet = {
+				NOT = { is_planet_class = pc_habitat }
+				OR = {
+					has_capital_2 = yes
+					has_capital_3 = yes
+				}
+			}
+		}
+	}
+	allow = { }
+	
+	produced_resource_trigger = {
+		modifier = {
+			OR = {
+				has_non_swapped_tradition = tr_prosperity_pursuit_of_profit
+				has_swapped_tradition = tr_prosperity_pursuit_of_profit_machine
+			}
+			resources = {
+				unity = 2
+			}
+		}
+	}
+	produced_resources = { energy = @planet_unique_output_1 }
+	planet_modifier = { tile_resource_energy_mult = 0.10 }
+	
+	upgrades = {
+		building_power_hub_2
+	}
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				AND = {
+					has_energy = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_vanilla_or_exoverhaul_strategic_resources = no
+					has_energy = no
+					has_minerals = no
+					has_research_resources = no
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @crucial_1
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = energy
+					amount > 2
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				AND = {
+					owner_is_not_machine_or_is_servitor = yes
+					has_high_food = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = {
+				has_slave_pop = yes
+				has_prole_or_stapled_pop = yes
+				AND = {
+					has_non_sapient_robot = yes
+					exists = owner
+					owner = { NOT = { has_global_flag = "ex_robots_active" } }
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_energy_bonus_pop = yes	}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				owner = { has_global_flag = "ex_resources_active" }
+				tile = { any_neighboring_tile = { has_building = "building_sr_engos_2" } }
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_hyperstorage_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				OR = {
+					AND = {
+						has_robot_pop = yes
+						exists = owner
+						owner = { has_global_flag = "ex_robots_active" }
+					}
+					has_free_sapient_robot = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { owner = { has_authority = auth_machine_intelligence } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			planet = { has_modifier = "strong_magnetic_field" }
+		}
+		modifier = {
+			factor = @increase_interest_3
+			planet = { has_modifier = "hazardous_weather" }
+		}
+		modifier = {
+			factor = @crucial_1
+			owner = { has_country_flag = is_energy_starved }
+		}
+	}
+}
+building_power_hub_2_direct_build = {
+	base_buildtime = 200
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = 180
+		energy = 180
+	}
+	
+	prerequisites = {
+		"tech_power_hub_2"
+	}
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+		NOT = { tile = { has_building = building_power_hub_2 } } #Prevent self replace
+	}
+	
+	allow = {
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			OR = {
+				has_non_swapped_tradition = tr_prosperity_pursuit_of_profit
+				has_swapped_tradition = tr_prosperity_pursuit_of_profit_machine
+			}
+			resources = {
+				unity = 2
+			}
+		}
+	}
+	produced_resources = { energy = @planet_unique_output_2 }
+	planet_modifier = { tile_resource_energy_mult = 0.20 }
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				AND = {
+					has_energy = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_vanilla_or_exoverhaul_strategic_resources = no
+					has_energy = no
+					has_minerals = no
+					has_research_resources = no
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @crucial_1
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = energy
+					amount > 2
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				AND = {
+					owner_is_not_machine_or_is_servitor = yes
+					has_high_food = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = {
+				has_slave_pop = yes
+				has_prole_or_stapled_pop = yes
+				AND = {
+					has_non_sapient_robot = yes
+					exists = owner
+					owner = { NOT = { has_global_flag = "ex_robots_active" } }
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_energy_bonus_pop = yes	}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				owner = { has_global_flag = "ex_resources_active" }
+				tile = { any_neighboring_tile = { has_building = "building_sr_engos_2" } }
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_hyperstorage_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				OR = {
+					AND = {
+						has_robot_pop = yes
+						exists = owner
+						owner = { has_global_flag = "ex_robots_active" }
+					}
+					has_free_sapient_robot = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { owner = { has_authority = auth_machine_intelligence } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			planet = { has_modifier = "strong_magnetic_field" }
+		}
+		modifier = {
+			factor = @increase_interest_3
+			planet = { has_modifier = "hazardous_weather" }
+		}
+		modifier = {
+			factor = @crucial_1
+			owner = { has_country_flag = is_energy_starved }
+		}
+	}
+	show_tech_unlock_if = { always = no }
+	icon = building_power_hub_2
+	
+	upgrades = {
+		building_power_hub_1_hidden_tree_root
+	}
+}
+building_power_hub_2 = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	prerequisites = { "tech_power_hub_2" }
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+	}
+	allow = { }
+	
+	produced_resource_trigger = {
+		modifier = {
+			OR = {
+				has_non_swapped_tradition = tr_prosperity_pursuit_of_profit
+				has_swapped_tradition = tr_prosperity_pursuit_of_profit_machine
+			}
+			resources = {
+				unity = 2
+			}
+		}
+	}
+	produced_resources = { energy = @planet_unique_output_2 }
+	planet_modifier = { tile_resource_energy_mult = 0.20 }
+	ai_allow = { always = yes }
+	
+	ai_weight = {
+		weight = @crucial_1
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = energy
+					amount > 2
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				AND = {
+					owner_is_not_machine_or_is_servitor = yes
+					has_high_food = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = {
+				has_slave_pop = yes
+				has_prole_or_stapled_pop = yes
+				AND = {
+					has_non_sapient_robot = yes
+					exists = owner
+					owner = { NOT = { has_global_flag = "ex_robots_active" } }
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_energy_bonus_pop = yes	}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				owner = { has_global_flag = "ex_resources_active" }
+				tile = { any_neighboring_tile = { has_building = "building_sr_engos_2" } }
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_hyperstorage_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				OR = {
+					AND = {
+						has_robot_pop = yes
+						exists = owner
+						owner = { has_global_flag = "ex_robots_active" }
+					}
+					has_free_sapient_robot = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { owner = { has_authority = auth_machine_intelligence } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			planet = { has_modifier = "strong_magnetic_field" }
+		}
+		modifier = {
+			factor = @increase_interest_3
+			planet = { has_modifier = "hazardous_weather" }
+		}
+		modifier = {
+			factor = @crucial_1
+			owner = { has_country_flag = is_energy_starved }
+		}
+	}
+	is_listed = no
+	
+	upgrades = {
+		building_power_hub_1_hidden_tree_root
+	}
+}
+building_mineral_processing_plant_1_hidden_tree_root = {
+	potential = { always=no }
+	planet_unique = yes
+	icon = building_mineral_processing_plant_1
+}
+building_mineral_processing_plant_1 = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_1
+		energy = @planet_unique_energy_build_cost_1
+	}
+	prerequisites = { "tech_mineral_processing_1" }
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_capital_1 = yes
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+		NAND = {
+			owner = { has_technology = "tech_mineral_processing_2" }
+			planet = {
+				NOT = { is_planet_class = pc_habitat }
+				OR = {
+					has_capital_2 = yes
+					has_capital_3 = yes
+				}
+			}
+		}
+	}
+	allow = { }
+	produced_resources = { minerals = @planet_unique_output_1 }
+	planet_modifier = { tile_resource_minerals_mult = 0.10 }
+	required_resources = { energy = 2 }
+	
+	upgrades = {
+		building_mineral_processing_plant_2
+	}
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				AND = {
+					has_minerals = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_vanilla_or_exoverhaul_strategic_resources = no
+					has_energy = no
+					has_minerals = no
+					has_research_resources = no
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = minerals
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = minerals
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = minerals
+					amount > 2
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				AND = {
+					owner_is_not_machine_or_is_servitor = yes
+					has_high_food = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			planet = { has_modifier = "mineral_poor" }
+		}
+		modifier = {
+			factor = @increase_interest_2
+			tile = {
+				OR = {
+					has_robot_pop = yes
+					has_slave_pop = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_prole_or_stapled_pop = yes }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_mineral_bonus_pop = yes }
+		}
+		modifier = {
+			factor = @increase_interest_2
+			planet = {
+				OR = {
+					has_modifier = "extensive_moon_system"
+					has_modifier = "carbon_world"
+					has_modifier = "mineral_rich"
+					has_modifier = "asteroid_belt"
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_3
+			planet = { has_modifier = "ultra_rich" }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				owner = { has_global_flag = "ex_resources_active" }
+				tile = {
+					any_neighboring_tile = {
+						OR = {
+							has_building = "building_sr_ex_planetary_1"
+							has_building = "building_sr_engos_2"
+						}
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_hyperstorage_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+	}
+}
+building_mineral_processing_plant_2_direct_build = {
+	base_buildtime = 200
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = 180
+		energy = 180
+	}
+	
+	prerequisites = {
+		"tech_mineral_processing_2"
+	}
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+		NOT = { tile = { has_building = building_mineral_processing_plant_2 } } #Prevent self replace
+	}
+	
+	allow = {
+	}
+	produced_resources = { minerals = @planet_unique_output_2 }
+	planet_modifier = { tile_resource_minerals_mult = 0.20 }
+	required_resources = { energy = 3 }
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				AND = {
+					has_minerals = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_vanilla_or_exoverhaul_strategic_resources = no
+					has_energy = no
+					has_minerals = no
+					has_research_resources = no
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = minerals
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = minerals
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = minerals
+					amount > 2
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				AND = {
+					owner_is_not_machine_or_is_servitor = yes
+					has_high_food = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_2
+			tile = {
+				OR = {
+					has_robot_pop = yes
+					has_slave_pop = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_prole_or_stapled_pop = yes }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_mineral_bonus_pop = yes }
+		}
+		modifier = {
+			factor = @increase_interest_2
+			planet = {
+				OR = {
+					has_modifier = "extensive_moon_system"
+					has_modifier = "carbon_world"
+					has_modifier = "mineral_rich"
+					has_modifier = "asteroid_belt"
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_3
+			planet = { has_modifier = "ultra_rich" }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				owner = { has_global_flag = "ex_resources_active" }
+				tile = {
+					any_neighboring_tile = {
+						OR = {
+							has_building = "building_sr_ex_planetary_1"
+							has_building = "building_sr_engos_2"
+						}
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_hyperstorage_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+	}
+	show_tech_unlock_if = { always = no }
+	icon = building_mineral_processing_plant_2
+	
+	upgrades = {
+		building_mineral_processing_plant_1_hidden_tree_root
+	}
+}
+building_mineral_processing_plant_2 = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	prerequisites = { "tech_mineral_processing_2" }
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+	}
+	allow = { }
+	produced_resources = { minerals = @planet_unique_output_2 }
+	planet_modifier = { tile_resource_minerals_mult = 0.20 }
+	required_resources = { energy = 3 }
+	ai_allow = { always = yes }
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = minerals
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = minerals
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = minerals
+					amount > 2
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				AND = {
+					owner_is_not_machine_or_is_servitor = yes
+					has_high_food = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_2
+			tile = {
+				OR = {
+					has_robot_pop = yes
+					has_slave_pop = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_prole_or_stapled_pop = yes }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_mineral_bonus_pop = yes }
+		}
+		modifier = {
+			factor = @increase_interest_2
+			planet = {
+				OR = {
+					has_modifier = "extensive_moon_system"
+					has_modifier = "carbon_world"
+					has_modifier = "mineral_rich"
+					has_modifier = "asteroid_belt"
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_3
+			planet = { has_modifier = "ultra_rich" }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			AND = {
+				owner = { has_global_flag = "ex_resources_active" }
+				tile = {
+					any_neighboring_tile = {
+						OR = {
+							has_building = "building_sr_ex_planetary_1"
+							has_building = "building_sr_engos_2"
+						}
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_hyperstorage_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+	}
+	is_listed = no
+	
+	upgrades = {
+		building_mineral_processing_plant_1_hidden_tree_root
+	}
+}
+building_mineral_silo_1_hidden_tree_root = {
+	potential = { always=no }
+	planet_unique = yes
+	icon = building_mineral_silo_1
+}
+building_mineral_silo_1 = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_1
+		energy = @planet_unique_energy_build_cost_1
+	}
+	allow = { }
+	
+	country_modifier = {
+		max_minerals = 1000
+		max_energy = 1000
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOT = {
+				has_country_flag = synthetic_age
+				has_authority = auth_machine_intelligence
+			}
+			resources = {
+				energy = 1
+				food = 1
+				minerals = 1
+			}
+		}
+		modifier = {
+			OR = {
+				has_country_flag = synthetic_age
+				has_authority = auth_machine_intelligence
+			}
+			resources = {
+				energy = 2
+				minerals = 1
+			}
+		}
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_minerals_add = 1
+		tile_building_resource_energy_add = 1
+		tile_building_resource_food_add = 1
+	}
+	prerequisites = { "tech_hyperstorage_1" }
+	
+	upgrades = {
+		building_mineral_silo_2
+	}
+	
+	ai_allow = {
+		tile = {
+			AND = {
+				OR = {
+					has_deposit = no
+					has_energy = yes
+					has_minerals = yes
+					has_food = yes
+				}
+				has_research_resources = no
+				any_neighboring_tile = {
+					NOR = {
+						has_capital_building = yes
+						has_polytechnic_building = yes
+					}
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @important
+			tile = { num_adjacent_tiles = 4  }
+		}
+		modifier = {
+			factor = @strategic
+			tile = { any_neighboring_tile = { has_resource_buildings = yes } }
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = { any_neighboring_tile = { has_research_buildings = yes } }
+		}
+		modifier = {
+			factor = @avoid
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+	}
+	
+	potential = {
+		NAND = {
+			owner = { has_technology = "tech_hyperstorage_2" }
+			planet = {
+				OR = {
+					has_capital_1 = yes
+					has_capital_2 = yes
+					has_capital_3 = yes
+					has_building = "building_hab_capital"
+				}
+			}
+		}
+	}
+}
+building_mineral_silo_2_direct_build = {
+	base_buildtime = 200
+	icon = "building_mineral_silo_1"
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = 180
+		energy = 180
+	}
+	
+	potential = {
+		planet = {
+			OR = {
+				has_capital_1 = yes
+				has_capital_2 = yes
+				has_capital_3 = yes
+				has_building = "building_hab_capital"
+			}
+		}
+		NOT = { tile = { has_building = building_mineral_silo_2 } } #Prevent self replace
+		NAND = {
+			owner = { has_technology = "tech_hyperstorage_3" }
+			planet = {
+				OR = {
+					has_capital_2 = yes
+					has_capital_3 = yes
+					has_building = "building_hab_capital"
+				}
+			}
+		}
+	}
+	
+	allow = {
+	}
+	
+	country_modifier = {
+		max_minerals = 1750
+		max_energy = 1750
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOT = {
+				has_country_flag = synthetic_age
+				has_authority = auth_machine_intelligence
+			}
+			resources = {
+				energy = 1
+				food = 1
+				minerals = 1
+			}
+		}
+		modifier = {
+			OR = {
+				has_country_flag = synthetic_age
+				has_authority = auth_machine_intelligence
+			}
+			resources = {
+				energy = 2
+				minerals = 1
+			}
+		}
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_minerals_add = 2
+		tile_building_resource_energy_add = 2
+		tile_building_resource_food_add = 2
+	}
+	
+	prerequisites = {
+		"tech_hyperstorage_2"
+	}
+	
+	upgrades = {
+		building_mineral_silo_3
+	}
+	
+	ai_allow = {
+		tile = {
+			AND = {
+				OR = {
+					has_deposit = no
+					has_energy = yes
+					has_minerals = yes
+					has_food = yes
+				}
+				has_research_resources = no
+				any_neighboring_tile = {
+					NOR = {
+						has_capital_building = yes
+						has_polytechnic_building = yes
+					}
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @important
+			tile = { num_adjacent_tiles = 4  }
+		}
+		modifier = {
+			factor = @strategic
+			tile = { any_neighboring_tile = { has_resource_buildings = yes } }
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = { any_neighboring_tile = { has_research_buildings = yes } }
+		}
+		modifier = {
+			factor = @avoid
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+	}
+	show_tech_unlock_if = { always = no }
+}
+building_mineral_silo_2 = {
+	base_buildtime = @planet_unique_build_time_2
+	icon = "building_mineral_silo_1"
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	
+	potential = {
+		planet = {
+			OR = {
+				has_capital_1 = yes
+				has_capital_2 = yes
+				has_capital_3 = yes
+				has_building = "building_hab_capital"
+			}
+		}
+	}
+	allow = { }
+	
+	country_modifier = {
+		max_minerals = 1750
+		max_energy = 1750
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOT = {
+				has_country_flag = synthetic_age
+				has_authority = auth_machine_intelligence
+			}
+			resources = {
+				energy = 1
+				food = 1
+				minerals = 1
+			}
+		}
+		modifier = {
+			OR = {
+				has_country_flag = synthetic_age
+				has_authority = auth_machine_intelligence
+			}
+			resources = {
+				energy = 2
+				minerals = 1
+			}
+		}
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_minerals_add = 2
+		tile_building_resource_energy_add = 2
+		tile_building_resource_food_add = 2
+	}
+	prerequisites = { "tech_hyperstorage_2" }
+	
+	upgrades = {
+		building_mineral_silo_3
+	}
+	ai_allow = { always = yes }
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @important
+			tile = { num_adjacent_tiles = 4  }
+		}
+		modifier = {
+			factor = @strategic
+			tile = { any_neighboring_tile = { has_resource_buildings = yes } }
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = { any_neighboring_tile = { has_research_buildings = yes } }
+		}
+		modifier = {
+			factor = @avoid
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+	}
+	is_listed = no
+}
+building_mineral_silo_3_direct_build = {
+	base_buildtime = 350
+	icon = "building_mineral_silo_1"
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = 360
+		energy = 360
+	}
+	
+	potential = {
+		planet = {
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+				has_building = "building_hab_capital"
+			}
+		}
+		NOT = { tile = { has_building = building_mineral_silo_3 } } #Prevent self replace
+	}
+	
+	allow = {
+	}
+	
+	country_modifier = {
+		max_minerals = 2500
+		max_energy = 2500
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOT = {
+				has_country_flag = synthetic_age
+				has_authority = auth_machine_intelligence
+			}
+			resources = {
+				energy = 1
+				food = 1
+				minerals = 1
+			}
+		}
+		modifier = {
+			OR = {
+				has_country_flag = synthetic_age
+				has_authority = auth_machine_intelligence
+			}
+			resources = {
+				energy = 2
+				minerals = 1
+			}
+		}
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_minerals_add = 2
+		tile_building_resource_energy_add = 2
+		tile_building_resource_food_add = 2
+	}
+	planet_modifier = { pop_consumer_goods_mult = -0.1 }
+	
+	prerequisites = {
+		"tech_hyperstorage_3"
+	}
+	
+	ai_allow = {
+		tile = {
+			AND = {
+				OR = {
+					has_deposit = no
+					has_energy = yes
+					has_minerals = yes
+					has_food = yes
+				}
+				has_research_resources = no
+				any_neighboring_tile = {
+					NOR = {
+						has_capital_building = yes
+						has_polytechnic_building = yes
+					}
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @important
+			tile = { num_adjacent_tiles = 4  }
+		}
+		modifier = {
+			factor = @strategic
+			tile = { any_neighboring_tile = { has_resource_buildings = yes } }
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = { any_neighboring_tile = { has_research_buildings = yes } }
+		}
+		modifier = {
+			factor = @avoid
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+	}
+	show_tech_unlock_if = { always = no }
+	
+	upgrades = {
+		building_mineral_silo_1_hidden_tree_root
+	}
+}
+building_mineral_silo_3 = {
+	base_buildtime = @planet_unique_build_time_3
+	icon = "building_mineral_silo_1"
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_3
+		energy = @planet_unique_energy_build_cost_3
+	}
+	
+	potential = {
+		planet = {
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+				has_building = "building_hab_capital"
+			}
+		}
+	}
+	allow = { }
+	
+	country_modifier = {
+		max_minerals = 2500
+		max_energy = 2500
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOT = {
+				has_country_flag = synthetic_age
+				has_authority = auth_machine_intelligence
+			}
+			resources = {
+				energy = 1
+				food = 1
+				minerals = 1
+			}
+		}
+		modifier = {
+			OR = {
+				has_country_flag = synthetic_age
+				has_authority = auth_machine_intelligence
+			}
+			resources = {
+				energy = 2
+				minerals = 1
+			}
+		}
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_minerals_add = 2
+		tile_building_resource_energy_add = 2
+		tile_building_resource_food_add = 2
+	}
+	planet_modifier = { pop_consumer_goods_mult = -0.1 }
+	prerequisites = { "tech_hyperstorage_3" }
+	ai_allow = { always = yes }
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @important
+			tile = { num_adjacent_tiles = 4  }
+		}
+		modifier = {
+			factor = @strategic
+			tile = { any_neighboring_tile = { has_resource_buildings = yes } }
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = { any_neighboring_tile = { has_research_buildings = yes } }
+		}
+		modifier = {
+			factor = @avoid
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+	}
+	is_listed = no
+	
+	upgrades = {
+		building_mineral_silo_1_hidden_tree_root
+	}
+}
+
+building_paradise_dome = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	required_resources = { energy = @planet_unique_upkeep_3	}
+	produced_resources = { unity = 3 }
+	
+	produced_resource_trigger = {
+		modifier = {
+			NOT = { has_country_flag = synthetic_age }
+			resources = { food = 3 }
+		}
+		modifier = {
+			has_country_flag = synthetic_age
+			resources = { energy = 3 }
+		}
+	}
+	planet_modifier = { pop_citizen_happiness = 0.05 }
+	
+	potential = {
+		owner = {	has_non_swapped_tradition = tr_harmony_utopian_dream }
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building_capital_1 = yes
+				has_building_capital_2 = yes
+				has_building = "building_capital_3"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_authority = auth_machine_intelligence
+				NOT = { has_non_swapped_tradition = tr_harmony_utopian_dream }
+			}
+		}
+	}
+	allow = { }
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				has_deposit = no
+				NOR = {
+					has_vanilla_or_exoverhaul_strategic_resources = yes
+					has_research_resources = yes
+					has_minerals = yes
+					has_energy = yes
+				}
+			}
+		}
+		planet = { NOT = { has_modifier = "irradiated_planet" } }
+		#owner = { NOT = { has_all_traditions = yes } }
+	}
+	
+	ai_weight = {
+		weight = @crucial_2
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = food
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = food
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = food
+					amount > 2
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_food_bonus_pop = yes }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_hyperstorage_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { any_neighboring_tile = { has_capital_building = yes } }
+		}
+		modifier = {
+			factor = @increase_interest_2
+			planet = { has_modifier = "lush_planet" }
+		}
+		modifier = {
+			factor = @increase_interest_3
+			planet = { has_modifier = "eat_the_titans" }
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			planet = { has_modifier = "bleak_planet" }
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = { has_food = no }
+		}
+		modifier = {
+			factor = @crucial_1
+			owner = { has_country_flag = is_food_starved }
+		}
+	}
+}
+building_visitor_center = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	potential = {
+		owner = {
+			AND = {
+				has_non_swapped_tradition = tr_diplomacy_alien_tourism
+				OR = {
+					NOT = { has_global_flag = "ex_traditions_active" }
+					is_xenophile = no
+				}
+			}
+		}
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building_capital_1 = yes
+				has_building_capital_2 = yes
+				has_building = "building_capital_3"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_authority = auth_machine_intelligence
+				NOT = { has_non_swapped_tradition = tr_diplomacy_alien_tourism }
+				#has_all_traditions = yes
+			}
+		}
+	}
+	
+	produced_resources = {
+		energy = 3
+		unity = 3
+	}
+	
+	planet_modifier = {
+		planet_migration_xeno_pull = 0.50
+		pop_environment_tolerance = 0.05
+	}
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				has_deposit = no
+				AND = {
+					has_energy = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_vanilla_or_exoverhaul_strategic_resources = no
+					has_energy = no
+					has_minerals = no
+					has_research_resources = no
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @standard
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = energy
+					amount > 2
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				OR = {
+					has_energy = no
+					has_high_food = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = {
+				has_slave_pop = yes
+				has_prole_or_stapled_pop = yes
+				AND = {
+					has_non_sapient_robot = yes
+					exists = owner
+					owner = { NOT = { has_global_flag = "ex_robots_active" } }
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_energy_bonus_pop = yes	}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = {
+				OR = {
+					AND = {
+						has_robot_pop = yes
+						exists = owner
+						owner = { has_global_flag = "ex_robots_active" }
+					}
+					has_free_sapient_robot = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			planet = { has_modifier = "strong_magnetic_field" }
+		}
+		modifier = {
+			factor = @increase_interest_3
+			planet = { has_modifier = "hazardous_weather" }
+		}
+	}
+}
+building_hive_synapse = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	potential = {
+		owner = { has_swapped_tradition = tr_synchronicity_hive_mind_synapse }
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building_capital_1 = yes
+				has_building_capital_2 = yes
+				has_building = "building_capital_3"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_swapped_tradition = tr_synchronicity_hive_mind_synapse } }
+	}
+	produced_resources = { energy = @planet_unique_output_3 }
+	planet_modifier = { pop_non_slave_resource_output = 0.05 }
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				has_deposit = no
+				AND = {
+					has_energy = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_vanilla_or_exoverhaul_strategic_resources = no
+					has_energy = no
+					has_minerals = no
+					has_research_resources = no
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @crucial_1
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = energy
+					amount > 2
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				OR = {
+					has_energy = no
+					has_high_food = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_2
+			tile = {
+				has_slave_pop = yes
+				has_prole_or_stapled_pop = yes
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_energy_bonus_pop = yes	}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			planet = { has_modifier = "strong_magnetic_field" }
+		}
+		modifier = {
+			factor = @increase_interest_3
+			planet = { has_modifier = "hazardous_weather" }
+		}
+	}
+}
+building_symbol_purity = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	potential = {
+		owner = { has_swapped_tradition = tr_purity_symbol_purity }
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building_capital_1 = yes
+				has_building_capital_2 = yes
+				has_building = "building_capital_3"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		OR = {
+			owner = {
+				OR = {
+					NOT = { has_swapped_tradition = tr_purity_symbol_purity }
+					has_authority = auth_machine_intelligence
+					#has_all_traditions = yes
+				}
+			}
+		}
+	}
+	produced_resources = { unity = 4 }
+	planet_modifier = {	pop_government_ethic_attraction = 0.20 }
+	allow = { }
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+}
+building_control_center = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	potential = {
+		owner = { has_swapped_tradition = tr_synchronicity_machine_center }
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building_machine_capital_1 = yes
+				has_building_machine_capital_2 = yes
+				has_building = "building_machine_capital_3"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_swapped_tradition = tr_synchronicity_machine_center } }
+	}
+	produced_resources = { energy = 4 }
+	planet_modifier = {	pop_robot_production_output = 0.05 }
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				has_deposit = no
+				AND = {
+					has_energy = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_vanilla_or_exoverhaul_strategic_resources = no
+					has_energy = no
+					has_minerals = no
+					has_research_resources = no
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = @crucial_1
+		modifier = {
+			factor = @good
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = @important
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = @strategic
+			tile = {
+				has_resource = {
+					type = energy
+					amount > 2
+				}
+			}
+		}
+		modifier = {
+			factor = @reduce_interest_1
+			tile = {
+				OR = {
+					has_energy = no
+					has_high_food = yes
+				}
+			}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			tile = { has_energy_bonus_pop = yes	}
+		}
+		modifier = {
+			factor = @increase_interest_1
+			planet = { has_modifier = "strong_magnetic_field" }
+		}
+		modifier = {
+			factor = @increase_interest_3
+			planet = { has_modifier = "hazardous_weather" }
+		}
+	}
+}
+building_neuro_electric_amplifier = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_cost_3
+		energy = @planet_unique_energy_cost_3
+	}
+	
+	produced_resources = {
+		minerals = 2
+		energy = 2
+	}
+	
+	planet_modifier_with_pop_trigger = {
+		key = building_neuro_electric_amplifier
+		potential = { has_trait = trait_cybernetic }
+		modifier = {
+			tile_resource_minerals_mult = 0.15
+			tile_resource_energy_mult = 0.15
+		}
+	}
+	
+	potential = {
+		owner = { has_swapped_tradition = tr_synchronicity_cyber_comms }
+		planet = {
+			OR = {
+				has_building = "building_hab_capital"
+				has_building_machine_capital_1 = yes
+				has_building_machine_capital_2 = yes
+				has_building = "building_machine_capital_3"
+			}
+		}
+	}
+	
+	destroy_if = {
+		owner = {
+			NOT = {
+				AND = {
+					has_authority = auth_machine_intelligence
+					has_government = gov_machine_assimilator
+					has_swapped_tradition = tr_synchronicity_cyber_comms
+				}
+			}
+		}
+	}
+	allow = { }
+	
+	ai_allow = {
+		tile = {
+			OR = {
+				has_deposit = no
+				AND = {
+					has_energy = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+				AND = {
+					has_minerals = yes
+					has_vanilla_or_exoverhaul_strategic_resources = no
+				}
+			}
+		}
+	}
+	ai_weight = { weight = @crucial_2 }
+}
+building_autochthon_monument = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_1
+		energy = @planet_unique_energy_build_cost_1
+	}
+	
+	show_tech_unlock_if = {
+		NOR = {
+			has_ethic = ethic_gestalt_consciousness
+			has_ethic = ethic_fanatic_spiritualist
+			has_ethic = ethic_spiritualist
+		}
+	}
+	
+	potential = {
+		owner = {
+			NOR = {
+				has_ethic = ethic_gestalt_consciousness
+				has_ethic = ethic_fanatic_spiritualist
+				has_ethic = ethic_spiritualist
+			}
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+		}
+		NAND = {
+			owner = { has_technology = "tech_heritage_site" }
+			owner = {
+				NOR = {
+					has_ethic = ethic_gestalt_consciousness
+					has_ethic = ethic_fanatic_spiritualist
+					has_ethic = ethic_spiritualist
+				}
+			}
+			planet = {
+				NOT = { is_planet_class = pc_habitat }
+				OR = {
+					has_capital_1 = yes
+					has_capital_2 = yes
+					has_capital_3 = yes
+				}
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_ethic = ethic_gestalt_consciousness
+				has_ethic = ethic_fanatic_spiritualist
+				has_ethic = ethic_spiritualist
+				#has_all_traditions = yes
+			}
+		}
+	}
+	allow = { }
+	produced_resources = { unity = 2 }
+	required_resources = { energy = @planet_unique_upkeep_1 }
+	prerequisites = { "tech_cultural_heritage" }
+	
+	upgrades = {
+		building_heritage_site
+	}
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+}
+building_heritage_site_direct_build = {
+	base_buildtime = 200
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = 180
+		energy = 180
+	}
+	
+	potential = {
+		owner = {
+			NOR = {
+				has_ethic = ethic_gestalt_consciousness
+				has_ethic = ethic_fanatic_spiritualist
+				has_ethic = ethic_spiritualist
+			}
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_capital_1 = yes
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+		NOT = { tile = { has_building = building_heritage_site } } #Prevent self replace
+		NAND = {
+			owner = { has_technology = "tech_hypercomms_forum" }
+			owner = {
+				NOR = {
+					has_ethic = ethic_gestalt_consciousness
+					has_ethic = ethic_fanatic_spiritualist
+					has_ethic = ethic_spiritualist
+				}
+			}
+			planet = {
+				NOT = { is_planet_class = pc_habitat }
+				OR = {
+					has_building_capital_2 = yes
+					has_building = "building_capital_3"
+				}
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_ethic = ethic_gestalt_consciousness
+				has_ethic = ethic_fanatic_spiritualist
+				has_ethic = ethic_spiritualist
+				#has_all_traditions = yes
+			}
+		}
+	}
+	
+	upgrades = {
+		building_hypercomms_forum
+	}
+	
+	allow = {
+	}
+	produced_resources = { unity = 4 }
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	
+	prerequisites = {
+		"tech_heritage_site"
+	}
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+	show_tech_unlock_if = { always = no }
+	icon = building_heritage_site
+}
+building_heritage_site = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	
+	show_tech_unlock_if = {
+		NOR = {
+			has_ethic = ethic_gestalt_consciousness
+			has_ethic = ethic_fanatic_spiritualist
+			has_ethic = ethic_spiritualist
+		}
+	}
+	
+	potential = {
+		owner = {
+			NOR = {
+				has_ethic = ethic_gestalt_consciousness
+				has_ethic = ethic_fanatic_spiritualist
+				has_ethic = ethic_spiritualist
+			}
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_capital_1 = yes
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_ethic = ethic_gestalt_consciousness
+				has_ethic = ethic_fanatic_spiritualist
+				has_ethic = ethic_spiritualist
+				#has_all_traditions = yes
+			}
+		}
+	}
+	
+	upgrades = {
+		building_hypercomms_forum
+	}
+	allow = { }
+	produced_resources = { unity = 4 }
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	prerequisites = { "tech_heritage_site" }
+	ai_allow = { always = yes }
+	ai_weight = { weight = @crucial_2 }
+	is_listed = no
+}
+building_hypercomms_forum_direct_build = {
+	base_buildtime = 350
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = 360
+		energy = 360
+	}
+	
+	potential = {
+		owner = {
+			NOR = {
+				has_ethic = ethic_gestalt_consciousness
+				has_ethic = ethic_fanatic_spiritualist
+				has_ethic = ethic_spiritualist
+			}
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_building_capital_2 = yes
+				has_building = "building_capital_3"
+			}
+		}
+		NOT = { tile = { has_building = building_hypercomms_forum } } #Prevent self replace
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_ethic = ethic_gestalt_consciousness
+				has_ethic = ethic_fanatic_spiritualist
+				has_ethic = ethic_spiritualist
+				#has_all_traditions = yes
+			}
+		}
+	}
+	
+	allow = {
+	}
+	produced_resources = { unity = 6 }
+	required_resources = { energy = @planet_unique_upkeep_3 }
+	planet_modifier = {	tile_resource_unity_mult = 0.10	}
+	
+	prerequisites = {
+		"tech_hypercomms_forum"
+	}
+	
+	upgrades = {
+		building_autocurating_vault
+	}
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+	show_tech_unlock_if = { always = no }
+	icon = building_hypercomms_forum
+}
+building_hypercomms_forum = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_3
+		energy = @planet_unique_energy_build_cost_3
+	}
+	
+	show_tech_unlock_if = {
+		NOR = {
+			has_ethic = ethic_gestalt_consciousness
+			has_ethic = ethic_fanatic_spiritualist
+			has_ethic = ethic_spiritualist
+		}
+	}
+	
+	potential = {
+		owner = {
+			NOR = {
+				has_ethic = ethic_gestalt_consciousness
+				has_ethic = ethic_fanatic_spiritualist
+				has_ethic = ethic_spiritualist
+			}
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_building_capital_2 = yes
+				has_building = "building_capital_3"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_ethic = ethic_gestalt_consciousness
+				has_ethic = ethic_fanatic_spiritualist
+				has_ethic = ethic_spiritualist
+				#has_all_traditions = yes
+			}
+		}
+	}
+	allow = { }
+	produced_resources = { unity = 6 }
+	required_resources = { energy = @planet_unique_upkeep_3 }
+	planet_modifier = {	tile_resource_unity_mult = 0.10	}
+	prerequisites = { "tech_hypercomms_forum" }
+	
+	upgrades = {
+		building_autocurating_vault
+	}
+	ai_allow = { always = yes }
+	ai_weight = { weight = @crucial_2 }
+	is_listed = no
+}
+building_temple = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_1
+		energy = @planet_unique_energy_build_cost_1
+	}
+	
+	show_tech_unlock_if = {
+		OR = {
+			has_ethic = ethic_fanatic_spiritualist
+			has_ethic = ethic_spiritualist
+		}
+	}
+	
+	potential = {
+		owner = { is_spiritualist = yes }
+		NAND = {
+			owner = { has_technology = "tech_holographic_rituals" }
+			owner = { is_spiritualist = yes }
+			planet = {
+				OR = {
+					has_building_capital_1 = yes
+					has_building_capital_2 = yes
+					has_building = "building_capital_3"
+					has_building = "building_hab_capital"
+				}
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				is_spiritualist = no
+				#has_all_traditions = yes
+			}
+		}
+	}
+	allow = { }
+	produced_resources = { unity = 3 }
+	planet_modifier = {	pop_ethic_spiritualist_attraction_mult = 0.2 }
+	prerequisites = { "tech_cultural_heritage" }
+	required_resources = { energy = @planet_unique_upkeep_1 }
+	
+	upgrades = {
+		building_holotemple
+	}
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+}
+building_holotemple_direct_build = {
+	base_buildtime = 200
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = 180
+		energy = 180
+	}
+	
+	potential = {
+		owner = { is_spiritualist = yes }
+		planet = {
+			OR = {
+				has_building_capital_1 = yes
+				has_building_capital_2 = yes
+				has_building = "building_capital_3"
+				has_building = "building_hab_capital"
+			}
+		}
+		NOT = { tile = { has_building = building_holotemple } } #Prevent self replace
+		NAND = {
+			owner = { has_technology = "tech_consecration_fields" }
+			owner = { is_spiritualist = yes }
+			planet = {
+				OR = {
+					has_capital_2 = yes
+					has_capital_3 = yes
+					has_building = "building_hab_capital"
+				}
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				is_spiritualist = no
+				#has_all_traditions = yes
+			}
+		}
+	}
+	
+	allow = {
+	}
+	produced_resources = { unity = 6 }
+	planet_modifier = {	pop_ethic_spiritualist_attraction_mult = 0.3 }
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	
+	upgrades = {
+		building_sacred_nexus
+	}
+	
+	prerequisites = {
+		"tech_holographic_rituals"
+	}
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+	show_tech_unlock_if = { always = no }
+	icon = building_holotemple
+}
+building_holotemple = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	
+	potential = {
+		owner = { is_spiritualist = yes }
+		planet = {
+			OR = {
+				has_building_capital_1 = yes
+				has_building_capital_2 = yes
+				has_building = "building_capital_3"
+				has_building = "building_hab_capital"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				is_spiritualist = no
+				#has_all_traditions = yes
+			}
+		}
+	}
+	allow = { }
+	produced_resources = { unity = 6 }
+	planet_modifier = {	pop_ethic_spiritualist_attraction_mult = 0.3 }
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	
+	upgrades = {
+		building_sacred_nexus
+	}
+	prerequisites = { "tech_holographic_rituals" }
+	ai_allow = { always = yes }
+	ai_weight = { weight = @crucial_2 }
+	is_listed = no
+}
+building_sacred_nexus_direct_build = {
+	base_buildtime = 350
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = 360
+		energy = 360
+	}
+	
+	potential = {
+		owner = { is_spiritualist = yes }
+		planet = {
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+				has_building = "building_hab_capital"
+			}
+		}
+		NOT = { tile = { has_building = building_sacred_nexus } } #Prevent self replace
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				is_spiritualist = no
+				#has_all_traditions = yes
+			}
+		}
+	}
+	
+	allow = {
+	}
+	produced_resources = { unity = 9 }
+	
+	planet_modifier = {
+		tile_resource_unity_mult = 0.10
+		pop_ethic_spiritualist_attraction_mult = 0.3
+	}
+	required_resources = { energy = @planet_unique_upkeep_3 }
+	
+	upgrades = {
+		building_citadel_of_faith
+	}
+	
+	prerequisites = {
+		"tech_consecration_fields"
+	}
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+	show_tech_unlock_if = { always = no }
+	icon = building_sacred_nexus
+}
+building_sacred_nexus = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_3
+		energy = @planet_unique_energy_build_cost_3
+	}
+	
+	potential = {
+		owner = { is_spiritualist = yes }
+		planet = {
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+				has_building = "building_hab_capital"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				is_spiritualist = no
+				#has_all_traditions = yes
+			}
+		}
+	}
+	allow = { }
+	produced_resources = { unity = 9 }
+	
+	planet_modifier = {
+		tile_resource_unity_mult = 0.10
+		pop_ethic_spiritualist_attraction_mult = 0.3
+	}
+	required_resources = { energy = @planet_unique_upkeep_3 }
+	
+	upgrades = {
+		building_citadel_of_faith
+	}
+	prerequisites = { "tech_consecration_fields" }
+	ai_allow = { always = yes }
+	ai_weight = { weight = @crucial_2 }
+	is_listed = no
+}
+building_uplink_node = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_1
+		energy = @planet_unique_energy_build_cost_1
+	}
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+	
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+		}
+		NAND = {
+			owner = { has_technology = "tech_heritage_site" }
+			owner = { has_authority = auth_machine_intelligence }
+			planet = {
+				NOT = { is_planet_class = pc_habitat }
+				OR = {
+					has_building_machine_capital_1 = yes
+					has_building_machine_capital_2 = yes
+					has_building = "building_machine_capital_3"
+				}
+			}
+		}
+	}
+	allow = { }
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				NOT = { has_authority = auth_machine_intelligence }
+				#has_all_traditions = yes
+			}
+		}
+	}
+	produced_resources = { unity = 2 }
+	required_resources = { energy = @planet_unique_upkeep_1 }
+	prerequisites = { "tech_cultural_heritage" }
+	
+	upgrades = {
+		building_network_junction
+	}
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+}
+building_network_junction_direct_build = {
+	base_buildtime = 200
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = 180
+		energy = 180
+	}
+	produced_resources = { unity = 4 }
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_building_machine_capital_1 = yes
+				has_building_machine_capital_2 = yes
+				has_building = "building_machine_capital_3"
+			}
+		}
+		NOT = { tile = { has_building = building_network_junction } } #Prevent self replace
+		NAND = {
+			owner = { has_technology = "tech_hypercomms_forum" }
+			owner = { has_authority = auth_machine_intelligence }
+			planet = {
+				NOT = { is_planet_class = pc_habitat }
+				OR = {
+					has_building_machine_capital_2 = yes
+					has_building = "building_machine_capital_3"
+				}
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				NOT = { has_authority = auth_machine_intelligence }
+				#has_all_traditions = yes
+			}
+		}
+	}
+	
+	allow = {
+	}
+	
+	prerequisites = {
+		"tech_heritage_site"
+	}
+	
+	upgrades = {
+		building_system_conflux
+	}
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+	show_tech_unlock_if = { always = no }
+	icon = building_network_junction
+}
+building_network_junction = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+	produced_resources = { unity = 4 }
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_building_machine_capital_1 = yes
+				has_building_machine_capital_2 = yes
+				has_building = "building_machine_capital_3"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				NOT = { has_authority = auth_machine_intelligence }
+				#has_all_traditions = yes
+			}
+		}
+	}
+	allow = { }
+	prerequisites = { "tech_heritage_site" }
+	
+	upgrades = {
+		building_system_conflux
+	}
+	ai_allow = { always = yes }
+	ai_weight = { weight = @crucial_2 }
+	is_listed = no
+}
+building_system_conflux_direct_build = {
+	base_buildtime = 350
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = 360
+		energy = 360
+	}
+	produced_resources = { unity = 6 }
+	required_resources = { energy = @planet_unique_upkeep_3 }
+	planet_modifier = { tile_resource_unity_mult = 0.10 }
+	
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_building_machine_capital_2 = yes
+				has_building = "building_machine_capital_3"
+			}
+		}
+		NOT = { tile = { has_building = building_system_conflux } } #Prevent self replace
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				NOT = { has_authority = auth_machine_intelligence }
+				#has_all_traditions = yes
+			}
+		}
+	}
+	
+	allow = {
+	}
+	
+	prerequisites = {
+		"tech_hypercomms_forum"
+	}
+	
+	upgrades = {
+		building_alpha_hub
+	}
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+	show_tech_unlock_if = { always = no }
+	icon = building_system_conflux
+}
+building_system_conflux = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_3
+		energy = @planet_unique_energy_build_cost_3
+	}
+	produced_resources = { unity = 6 }
+	required_resources = { energy = @planet_unique_upkeep_3 }
+	planet_modifier = { tile_resource_unity_mult = 0.10 }
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+	
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_building_machine_capital_2 = yes
+				has_building = "building_machine_capital_3"
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				NOT = { has_authority = auth_machine_intelligence }
+				#has_all_traditions = yes
+			}
+		}
+	}
+	allow = { }
+	prerequisites = { "tech_hypercomms_forum" }
+	
+	upgrades = {
+		building_alpha_hub
+	}
+	ai_allow = { always = yes }
+	ai_weight = { weight = @crucial_2 }
+	is_listed = no
+}
+building_hab_cultural_center = {
+	base_buildtime = @planet_unique_build_time_3
+	icon = "building_hab_cultural_center"
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_3
+		energy = @planet_unique_energy_build_cost_3
+	}
+	
+	potential = {
+		owner = {
+			NOR = {
+				has_ethic = ethic_gestalt_consciousness
+				has_ethic = ethic_fanatic_spiritualist
+				has_ethic = ethic_spiritualist
+			}
+		}
+		planet = {
+			AND = {
+				is_planet_class = pc_habitat
+				OR = {
+					has_building = "building_hab_capital"
+					has_capital_3 = yes
+				}
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_ethic = ethic_gestalt_consciousness
+				is_spiritualist = yes
+				#has_all_traditions = yes
+			}
+		}
+	}
+	allow = { }
+	
+	upgrades = {
+		building_autocurating_vault
+	}
+	produced_resources = { unity = 4 }
+	planet_modifier = { pop_citizen_happiness = 0.05 }
+	required_resources = { energy = @planet_unique_upkeep_3 }
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+}
+building_hab_cultural_center_machine_and_hive = {
+	base_buildtime = @planet_unique_build_time_3
+	icon = "building_hab_cultural_center"
+	planet_unique = yes
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_3
+		energy = @planet_unique_energy_build_cost_3
+	}
+	
+	potential = {
+		owner = { has_ethic = ethic_gestalt_consciousness }
+		planet = {
+			AND = {
+				is_planet_class = pc_habitat
+				OR = {
+					has_building = "building_hab_capital"
+					has_capital_3 = yes
+				}
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				NOT = { has_ethic = ethic_gestalt_consciousness }
+				#has_all_traditions = yes
+			}
+		}
+	}
+	allow = { }
+	produced_resources = { unity = 5 }
+	required_resources = { energy = @planet_unique_upkeep_3 }
+	
+	upgrades = {
+		building_alpha_hub
+		building_hive_nexus
+	}
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+}
+building_hive_node = {
+	base_buildtime = @planet_unique_build_time_1
+	planet_unique = yes
+	icon = "building_uplink_node"
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_1
+		energy = @planet_unique_energy_build_cost_1
+	}
+	show_tech_unlock_if = { has_authority = auth_hive_mind }
+	
+	potential = {
+		owner = { has_authority = auth_hive_mind }
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+		}
+		NAND = {
+			owner = { has_technology = "tech_heritage_site" }
+			owner = { has_authority = auth_hive_mind }
+			planet = {
+				NOT = { is_planet_class = pc_habitat }
+				OR = {
+					has_capital_1 = yes
+					has_capital_2 = yes
+					has_capital_3 = yes
+				}
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				NOT = { has_authority = auth_hive_mind }
+				#has_all_traditions = yes
+			}
+		}
+	}
+	allow = { }
+	produced_resources = { unity = 2 }
+	required_resources = { energy = @planet_unique_upkeep_1 }
+	prerequisites = { "tech_cultural_heritage" }
+	
+	upgrades = {
+		building_hive_junction
+	}
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+}
+building_hive_junction_direct_build = {
+	base_buildtime = 200
+	planet_unique = yes
+	icon = "building_network_junction"
+	ai_replace = no
+	
+	cost = {
+		minerals = 180
+		energy = 180
+	}
+	produced_resources = { unity = 4 }
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	
+	potential = {
+		owner = { has_authority = auth_hive_mind }
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_capital_1 = yes
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+		NOT = { tile = { has_building = building_hive_junction } } #Prevent self replace
+		NAND = {
+			owner = { has_technology = "tech_hypercomms_forum" }
+			owner = { has_authority = auth_hive_mind }
+			planet = {
+				NOT = { is_planet_class = pc_habitat }
+				OR = {
+					has_capital_2 = yes
+					has_capital_3 = yes
+				}
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				NOT = { has_authority = auth_hive_mind }
+				#has_all_traditions = yes
+			}
+		}
+	}
+	
+	allow = {
+	}
+	
+	prerequisites = {
+		"tech_heritage_site"
+	}
+	
+	upgrades = {
+		building_hive_conflux
+	}
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+	show_tech_unlock_if = { always = no }
+}
+building_hive_junction = {
+	base_buildtime = @planet_unique_build_time_2
+	planet_unique = yes
+	icon = "building_network_junction"
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_2
+		energy = @planet_unique_energy_build_cost_2
+	}
+	show_tech_unlock_if = { has_authority = auth_hive_mind }
+	produced_resources = { unity = 4 }
+	required_resources = { energy = @planet_unique_upkeep_2 }
+	
+	potential = {
+		owner = { has_authority = auth_hive_mind }
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_capital_1 = yes
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				NOT = { has_authority = auth_hive_mind }
+				#has_all_traditions = yes
+			}
+		}
+	}
+	allow = { }
+	prerequisites = { "tech_heritage_site" }
+	
+	upgrades = {
+		building_hive_conflux
+	}
+	ai_allow = { always = yes }
+	ai_weight = { weight = @crucial_2 }
+	is_listed = no
+}
+building_hive_conflux_direct_build = {
+	base_buildtime = 350
+	planet_unique = yes
+	icon = "building_system_conflux"
+	ai_replace = no
+	
+	cost = {
+		minerals = 360
+		energy = 360
+	}
+	produced_resources = { unity = 6 }
+	required_resources = { energy = @planet_unique_upkeep_3 }
+	planet_modifier = { tile_resource_unity_mult = 0.10 }
+	
+	potential = {
+		owner = { has_authority = auth_hive_mind }
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+		NOT = { tile = { has_building = building_hive_conflux } } #Prevent self replace
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				NOT = { has_authority = auth_hive_mind }
+				#has_all_traditions = yes
+			}
+		}
+	}
+	
+	allow = {
+	}
+	
+	prerequisites = {
+		"tech_hypercomms_forum"
+	}
+	
+	upgrades = {
+		building_hive_nexus
+	}
+	
+	ai_allow = {
+		tile = { has_deposit = no }
+		#owner = { has_all_traditions = no }
+	}
+	ai_weight = { weight = @crucial_2 }
+	show_tech_unlock_if = { always = no }
+}
+building_hive_conflux = {
+	base_buildtime = @planet_unique_build_time_3
+	planet_unique = yes
+	icon = "building_system_conflux"
+	ai_replace = no
+	
+	cost = {
+		minerals = @planet_unique_mineral_build_cost_3
+		energy = @planet_unique_energy_build_cost_3
+	}
+	produced_resources = { unity = 6 }
+	required_resources = { energy = @planet_unique_upkeep_3 }
+	planet_modifier = { tile_resource_unity_mult = 0.10 }
+	show_tech_unlock_if = { has_authority = auth_hive_mind }
+	
+	potential = {
+		owner = { has_authority = auth_hive_mind }
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			OR = {
+				has_capital_2 = yes
+				has_capital_3 = yes
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				NOT = { has_authority = auth_hive_mind }
+				#has_all_traditions = yes
+			}
+		}
+	}
+	allow = { }
+	prerequisites = { "tech_hypercomms_forum" }
+	
+	upgrades = {
+		building_hive_nexus
+	}
+	ai_allow = { always = yes }
+	ai_weight = { weight = @crucial_2 }
+	is_listed = no
+}
