@@ -1,0 +1,373 @@
+remove_negative_planet_modifiers = {
+	if = { limit = { has_modifier = atmospheric_hallucinogen } remove_modifier = atmospheric_hallucinogen }	
+	if = { limit = { has_modifier = atmospheric_aphrodisiac }	remove_modifier = atmospheric_aphrodisiac }		
+	if = { limit = { has_modifier = bleak_planet } remove_modifier = bleak_planet	}		
+	if = { limit = { has_modifier = wild_storms }	remove_modifier = wild_storms }				
+	if = { limit = { has_modifier = asteroid_impacts } remove_modifier = asteroid_impacts	}	
+	if = { limit = { has_modifier = unstable_tectonics } remove_modifier = unstable_tectonics	}	
+	if = { limit = { has_modifier = weak_magnetic_field }	remove_modifier = weak_magnetic_field }	
+	if = { limit = { has_modifier = hazardous_weather } remove_modifier = hazardous_weather }	
+	if = { limit = { has_modifier = dangerous_wildlife } remove_modifier = dangerous_wildlife }	
+	if = { limit = { has_modifier = irradiated_planet } remove_modifier = irradiated_planet }
+	if = { limit = { has_modifier = abandoned_terraforming } remove_modifier = abandoned_terraforming owner = { end_event_chain = "abandoned_terraforming_chain" } }
+}	
+
+add_positive_planet_modifier = {
+	if = { limit = { NOT = { has_modifier = ex_terraformed } } add_modifier = { modifier = ex_terraformed days = -1 } }	
+	if = { limit = { is_planet_class = pc_gaia NOT = { has_modifier = ex_gaia_world } }	add_modifier = { modifier = ex_gaia_world days = -1 } }					
+}	
+
+roll_size_increase = {
+	set_planet_flag = ex_size_increased
+	if = {
+		limit = { planet_size < 15 }												
+		random_list = {
+			20 = { change_planet_size = 3 }		
+			30 = { change_planet_size = 2 }		
+			50 = { change_planet_size = 1 }	
+		}	
+	}
+	if = {
+		limit = { 
+			planet_size > 15
+			planet_size < 20
+		}												
+		random_list = {
+			10 = { change_planet_size = 3 }		
+			30 = { change_planet_size = 2 }		
+			60 = { change_planet_size = 1 }	
+		}	
+	}	
+	if = {
+		limit = { 
+			planet_size > 20
+			planet_size < 23
+		}												
+		random_list = {
+			30 = { change_planet_size = 2 }		
+			70 = { change_planet_size = 1 }	
+		}	
+	}		
+	if = {
+		limit = { 
+			OR = {
+				planet_size = 23
+				planet_size = 24
+			}	
+		}												
+		random_list = {
+			50 = { change_planet_size = 1 }		
+			50 = { }	
+		}	
+	}			
+}	
+
+roll_unique_deposit_1 = {
+	random_planet = { 
+		limit = { has_owner = no is_colonizable = yes has_unique_deposit = no } 
+		random_tile = { 
+			limit = { has_blocker = no has_deposit = no }
+			random_list = { 80 = { add_deposit = d_sr_ex_unique_1_deposit } 20 = { } }
+		}
+	}
+}	
+
+roll_unique_deposit_2 = {
+	random_planet = { 
+		limit = { has_owner = no is_colonizable = yes has_unique_deposit = no } 
+		random_tile = { 
+			limit = { has_blocker = no has_deposit = no }
+			random_list = { 80 = { add_deposit = d_sr_ex_unique_2_deposit } 20 = { } }
+		}
+	}
+}
+
+roll_unique_deposit_3 = {
+	random_planet = { 
+		limit = { has_owner = no is_colonizable = yes has_unique_deposit = no } 
+		random_tile = { 
+			limit = { has_blocker = no has_deposit = no }
+			random_list = { 80 = { add_deposit = d_sr_ex_unique_3_deposit } 30 = { } }
+		}
+	}
+}
+
+roll_unique_deposit_4 = {
+	random_planet = { 
+		limit = { has_owner = no is_colonizable = yes has_unique_deposit = no } 
+		random_tile = { 
+			limit = { has_blocker = no has_deposit = no }
+			random_list = { 80 = { add_deposit = d_sr_ex_unique_4_deposit } 40 = { } }
+		}
+	}
+}
+
+roll_unique_deposit_5 = {
+	random_planet = { 
+		limit = { has_owner = no is_colonizable = yes has_unique_deposit = no } 
+		random_tile = { 
+			limit = { has_blocker = no has_deposit = no }
+			random_list = { 80 = { add_deposit = d_sr_ex_unique_5_deposit } 50 = { } }
+		}
+	}
+}
+
+roll_unique_deposit_6 = {
+	random_planet = { 
+		limit = { has_owner = no is_colonizable = yes has_unique_deposit = no } 
+		random_tile = { 
+			limit = { has_blocker = no has_deposit = no }
+			random_list = { 80 = { add_deposit = d_sr_ex_unique_6_deposit } 60 = { } }
+		}
+	}
+}
+
+check_and_roll_planetary_deposits = {
+	if = {
+		limit = { NOT = { has_planet_flag = deposit_roll_stop } }
+		if = { 
+			limit = { 
+				count_deposits = {
+					limit = { has_planetary_strategic_resource = no }				
+				}
+			}	
+			roll_strategic_resource_deposit = yes
+			else = { 
+				if = { 
+					limit = { 
+						count_deposits = {
+							limit = { has_planetary_strategic_resource = yes }
+							count = 0
+						}
+					}										
+					random_list = { 75 = { roll_strategic_resource_deposit = yes } 25 = { set_planet_flag = deposit_roll_stop } }
+					else = {
+						if = { 
+							limit = { 
+								count_deposits = {
+								limit = { has_planetary_strategic_resource = yes }
+								count = 2
+							}
+						}										
+						random_list = { 50 = { roll_strategic_resource_deposit = yes } 50 = { set_planet_flag = deposit_roll_stop } }								
+						else = { 
+							if = { 
+								limit = { 
+									count_deposits = {
+									limit = { has_planetary_strategic_resource = yes }
+									count = 3
+								}
+							}										
+							random_list = { 25 = { roll_strategic_resource_deposit = yes } 75 = { set_planet_flag = deposit_roll_stop } }																		
+							else = { random_list = { 1 = { roll_strategic_resource_deposit = yes } 99 = { set_planet_flag = deposit_roll_stop }	}							
+}}}}}}}}}}
+
+roll_strategic_resource_deposit = {
+	every_tile = { 
+		limit = { has_deposit = no has_pop = no has_building = no }  
+		random_list = {
+			1 = { 
+				add_deposit = d_engos_deposit 
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							is_planet_class = pc_tundra
+							is_planet_class = pc_arctic
+							is_planet_class = pc_alpine
+							is_planet_class = pc_gaia
+						}
+					}
+				}
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							has_planet_modifier = "pm_wild_storms"
+							has_planet_modifier = "pm_weak_magnetic_field"
+						}
+					}
+				}	
+			}	
+			1 = { 
+				add_deposit = d_pitharan_deposit 
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							is_planet_class = pc_continental
+							is_planet_class = pc_tropical
+							is_planet_class = pc_ocean
+							is_planet_class = pc_gaia
+						}
+					}
+				}
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							has_planet_modifier = "pm_lush"
+							has_planet_modifier = "pm_dangerous_wildlife"
+						}
+					}
+				}				
+			}
+			1 = { 
+				add_deposit = d_satramene_deposit
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							is_planet_class = pc_continental
+							is_planet_class = pc_tropical
+							is_planet_class = pc_ocean					
+							is_planet_class = pc_tundra
+							is_planet_class = pc_arctic
+							is_planet_class = pc_alpine	
+						}
+					}
+				}
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							has_planet_modifier = "pm_low_gravity"
+							has_planet_modifier = "pm_titanic_life"
+						}
+					}
+				}					
+			}
+			1 = { 
+				add_deposit = d_sr_ex_planetary_1_deposit
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							is_planet_class = pc_nuked
+							is_planet_class = pc_gaia
+							is_planet_class = pc_desert
+						}
+					}
+				}
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							has_planet_modifier = "pm_unstable_tectonics"
+							has_planet_modifier = "pm_high_gravity"
+						}
+					}
+				}								
+			}
+			1 = { 
+				add_deposit = d_sr_ex_planetary_2_deposit
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							is_planet_class = pc_nuked
+							is_planet_class = pc_gaia
+							is_planet_class = pc_alpine
+						}
+					}
+				}
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							has_planet_modifier = "pm_unstable_tectonics"
+							has_planet_modifier = "pm_high_gravity"
+							has_planet_modifier = "pm_strong_magnetic_field"
+						}
+					}
+				}								
+			}
+			1 = { 
+				add_deposit = d_sr_ex_planetary_3_deposit
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							is_planet_class = pc_arid
+							is_planet_class = pc_desert
+							is_planet_class = pc_savannah											
+							is_planet_class = pc_gaia
+						}
+					}
+				}
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							has_planet_modifier = "pm_asteroid_impacts"
+							has_planet_modifier = "pm_strong_magnetic_field"
+						}
+					}
+				}						
+			}
+			1 = { 
+				add_deposit = d_sr_ex_planetary_4_deposit
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							is_planet_class = pc_tundra
+							is_planet_class = pc_arctic
+							is_planet_class = pc_alpine										
+							is_planet_class = pc_gaia
+						}
+					}
+				}
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							has_planet_modifier = "pm_unstable_tectonics"
+							has_planet_modifier = "pm_strong_magnetic_field"
+						}
+					}
+				}				
+			}
+			1 = { 
+				add_deposit = d_sr_ex_planetary_5_deposit
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							is_planet_class = pc_continental
+							is_planet_class = pc_tropical
+							is_planet_class = pc_ocean										
+							is_planet_class = pc_gaia
+						}
+					}
+				}
+				modifier = { 
+					factor = 1.5
+					from = {
+						OR = { 
+							has_planet_modifier = "pm_dangerous_wildlife"
+							has_planet_modifier = "pm_titanic_life"
+						}
+					}
+				}				
+			}
+			1 = { 
+				add_deposit = d_archeological_remains_deposit
+				modifier = { 
+					factor = 3
+					from = { is_planet_class = pc_gaia }
+				}
+				modifier = { 
+					factor = 5
+					from = { is_planet_class = pc_nuked }
+				}					
+			}
+		91 = { }
+		}
+	}	
+	check_and_roll_planetary_deposits = yes
+}
+	
+
+
+			
