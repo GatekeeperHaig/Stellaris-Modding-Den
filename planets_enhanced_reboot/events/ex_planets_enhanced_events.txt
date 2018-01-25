@@ -37,18 +37,9 @@ event = { #this event fires only once, on a monthly pulse, adding/removing strat
 	
 	immediate = { 
 		if = { 			
-			limit = { NOT = { has_global_flag = ex_resources_and_modifiers_rolled } }
-			set_global_flag = ex_resources_and_modifiers_rolled
-			if = { #this rolls the 6 unique resources		
-				limit = { any_planet = { has_unique_deposit = no } }
-				roll_unique_deposit_1 = yes 
-				roll_unique_deposit_2 = yes 
-				roll_unique_deposit_3 = yes 
-				roll_unique_deposit_4 = yes 
-				roll_unique_deposit_5 = yes 
-				roll_unique_deposit_6 = yes 				
-			}	
-			every_planet = {
+			limit = { NOT = { has_global_flag = ex_resources_and_modifiers_rolled } }			
+			set_unique_deposits = yes			
+			every_planet = {				
 				if = { #this removes the vanilla resources that were changed into planetary resources and replaces them with regular deposits to make sure research/mining stations in orbit keep operating }
 					limit = { has_strategic_resource = yes }
 					if = { 
@@ -67,21 +58,16 @@ event = { #this event fires only once, on a monthly pulse, adding/removing strat
 						random_tile = { limit = { is_orbital_tile = yes } set_deposit = d_vast_energy_deposit }
 					}						
 				}	
-				if = { #this rolls the new strategic resources as well as the changed vanilla resources
+				if = { #this rolls the new planetary strategic resources as well as the changed vanilla resources
 					limit = { 
-						solar_system = {
-							NOR = {
-								has_star_flag = empire_home_system
-								has_star_flag = sol_system
-								has_star_flag = deneb_system
-							}
-						}
 						is_colonizable = yes 
 						is_homeworld = no 
 						is_capital = no 
-						any_tile = { is_orbital_tile = no has_pop = no has_building = no has_deposit = no } 
+						any_tile = { is_orbital_tile = no has_building = no has_deposit = no } 
 					}	
-					check_and_roll_planetary_deposits = yes 
+					set_variable = { which = sr_count value = 0 }
+					count_strategic_resources = yes
+					set_planetary_deposits = yes 
 				}	
 				if = { #this adds the special planet modifiers
 					limit = {
@@ -91,8 +77,7 @@ event = { #this event fires only once, on a monthly pulse, adding/removing strat
 							is_planet_class = pc_gaia
 						}	
 						NOT = { has_planet_flag = modifier_added }
-					}			
-					set_planet_flag = modifier_added
+					}								
 					if = {
 						limit = { is_planet_class = pc_ringworld_habitable }			
 						add_modifier = { modifier = "ex_ring_world" days = -1 } 													
@@ -110,9 +95,10 @@ event = { #this event fires only once, on a monthly pulse, adding/removing strat
 							20 = { } #this means no modifier will be applied
 						}	
 					}	
-				}	
-				
+					set_planet_flag = modifier_added
+				}					
 			}
+			set_global_flag = ex_resources_and_modifiers_rolled
 			else = { break = yes }	
 		}
 	}		
