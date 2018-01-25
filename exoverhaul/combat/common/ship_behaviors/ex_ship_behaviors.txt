@@ -1,0 +1,569 @@
+#this file ( and all files in this folder ) is reloadable with console command "reload behavior"
+#filewatcher is enabled for all files in this folder
+
+#Swarm behavior: The ship will charge at enemy ships at minimal weapons' range, prioritizing larger targets.
+@corvette_preferred_attack_range = 10
+@corvette_formation_distance = 10
+@corvette_return_to_formation_distance = 60
+@corvette_collision_awareness = 0.5
+@corvette_collision_strafe = 0.75
+@corvette_collision_radius = 1
+@corvette_attack_move_pattern = orbit
+@corvette_passive_move_pattern = charge
+@corvette_component_target_weight_mult = 2.0
+@corvette_keep_previous_target_bonus = 50
+@corvette_damage_value = -10
+@corvette_low_health_bonus = 200
+@corvette_shield_focus_value = 0
+@corvette_armor_focus_value = 0
+@corvette_already_incoming_damage_penalty = 10
+@corvette_distance_to_fleet_penalty = 2.5
+@corvette_size_difference_penalty = -100
+@corvette_transport_target_penalty = 50000
+@corvette_civilian_target_penalty = 100000
+
+#Interceptor behavior: The ship will intercept enemy ships at the median range of its weapons, prioritizing other corvettes and smaller ships.
+@corvette_alt_preferred_attack_range = median
+@corvette_alt_formation_distance = 20
+@corvette_alt_return_to_formation_distance = 80
+@corvette_alt_collision_awareness = 0.5
+@corvette_alt_collision_strafe = 0.75
+@corvette_alt_collision_radius = 1
+@corvette_alt_attack_move_pattern = orbit
+@corvette_alt_passive_move_pattern = orbit
+@corvette_alt_component_target_weight_mult = 2.0
+@corvette_alt_keep_previous_target_bonus = 50
+@corvette_alt_damage_value = 5
+@corvette_alt_low_health_bonus = 50
+@corvette_alt_shield_focus_value = 0
+@corvette_alt_armor_focus_value = 0
+@corvette_alt_already_incoming_damage_penalty = 5
+@corvette_alt_distance_to_fleet_penalty = 10
+@corvette_alt_size_difference_penalty = 100
+@corvette_alt_transport_target_penalty = 50000
+@corvette_alt_civilian_target_penalty = 100000
+
+#Escort: The ship will remain with the bulk of the fleet, attempting to intercept incoming ships, missiles and strike craft while preserving the max potential range of its weapons.
+@destroyer_preferred_attack_range = max
+@destroyer_formation_distance = 10
+@destroyer_return_to_formation_distance = 40
+@destroyer_collision_awareness = 0.75
+@destroyer_collision_strafe = 1
+@destroyer_collision_radius = 1
+@destroyer_attack_move_pattern = none
+@destroyer_passive_move_pattern = follow
+@destroyer_component_target_weight_mult = 2
+@destroyer_keep_previous_target_bonus = 50
+@destroyer_damage_value = 10
+@destroyer_low_health_bonus = 50
+@destroyer_shield_focus_value = 0
+@destroyer_armor_focus_value = 0
+@destroyer_already_incoming_damage_penalty = 20
+@destroyer_distance_to_fleet_penalty = 50
+@destroyer_size_difference_penalty = 100
+@destroyer_transport_target_penalty = 50000
+@destroyer_civilian_target_penalty = 100000
+
+#Gunship: The ship will engage enemy ships at the median range of its weapons, prioritizing damage output.
+@destroyer_alt_preferred_attack_range = min
+@destroyer_alt_formation_distance = 20
+@destroyer_alt_return_to_formation_distance = 80
+@destroyer_alt_collision_awareness = 0.75
+@destroyer_alt_collision_strafe = 1
+@destroyer_alt_collision_radius = 1
+@destroyer_alt_attack_move_pattern = orbit
+@destroyer_alt_passive_move_pattern = charge
+@destroyer_alt_component_target_weight_mult = 2
+@destroyer_alt_keep_previous_target_bonus = 25
+@destroyer_alt_damage_value = 25
+@destroyer_alt_low_health_bonus = 100
+@destroyer_alt_shield_focus_value = 0
+@destroyer_alt_armor_focus_value = 0
+@destroyer_alt_already_incoming_damage_penalty = 100
+@destroyer_alt_distance_to_fleet_penalty = 5
+@destroyer_alt_size_difference_penalty = 50
+@destroyer_alt_transport_target_penalty = 50000
+@destroyer_alt_civilian_target_penalty = 100000
+
+#Hunter-Killer: The ship will engage enemy ships at the median range of its weapons, prioritizing damage output and disregarding ship size differences.
+@cruiser_preferred_attack_range = min
+@cruiser_formation_distance = 30
+@cruiser_return_to_formation_distance = 120
+@cruiser_collision_awareness = 0.5
+@cruiser_collision_strafe = 1.5
+@cruiser_collision_radius = 1
+@cruiser_attack_move_pattern = charge
+@cruiser_passive_move_pattern = charge
+@cruiser_component_target_weight_mult = 2.0
+@cruiser_keep_previous_target_bonus = 25
+@cruiser_damage_value = 25
+@cruiser_low_health_bonus = 50
+@cruiser_shield_focus_value = 0
+@cruiser_armor_focus_value = 0
+@cruiser_already_incoming_damage_penalty = 100
+@cruiser_distance_to_fleet_penalty = 2.5
+@cruiser_size_difference_penalty = 0
+@cruiser_transport_target_penalty = 50000
+@cruiser_civilian_target_penalty = 100000
+
+#Support Sniper: The ship will remain at the maximal range of its weapons, prioritizing low health targets.
+@cruiser_alt_preferred_attack_range = max
+@cruiser_alt_formation_distance = 20
+@cruiser_alt_return_to_formation_distance = 80
+@cruiser_alt_collision_awareness = 0.5
+@cruiser_alt_collision_strafe = 1.5
+@cruiser_alt_collision_radius = 1
+@cruiser_alt_attack_move_pattern = stay_at_range
+@cruiser_alt_passive_move_pattern = orbit
+@cruiser_alt_component_target_weight_mult = 2.0
+@cruiser_alt_keep_previous_target_bonus = 100
+@cruiser_alt_damage_value = 5
+@cruiser_alt_low_health_bonus = 1000
+@cruiser_alt_shield_focus_value = 0
+@cruiser_alt_armor_focus_value = 0
+@cruiser_alt_already_incoming_damage_penalty = 75
+@cruiser_alt_distance_to_fleet_penalty = 10
+@cruiser_alt_size_difference_penalty = 0
+@cruiser_alt_transport_target_penalty = 50000
+@cruiser_alt_civilian_target_penalty = 100000
+
+#Artillery Sniper: The ship will remain at the maximal range of its weapons, prioritizing targets of an equal or greater size.
+@battleship_preferred_attack_range = max
+@battleship_formation_distance = 100
+@battleship_return_to_formation_distance = 60
+@battleship_collision_awareness = 0.25
+@battleship_collision_strafe = 2.5
+@battleship_collision_radius = 1
+@battleship_attack_move_pattern = stay_at_range
+@battleship_passive_move_pattern = charge
+@battleship_component_target_weight_mult = 2.0
+@battleship_keep_previous_target_bonus = 100
+@battleship_damage_value = 5
+@battleship_low_health_bonus = 0
+@battleship_shield_focus_value = 2.5
+@battleship_armor_focus_value = 2.5
+@battleship_already_incoming_damage_penalty = 100
+@battleship_distance_to_fleet_penalty = 0
+@battleship_size_difference_penalty = 200
+@battleship_transport_target_penalty = 50000
+@battleship_civilian_target_penalty = 100000
+
+#Broadside: The ship will engage at the median range of its weapons, priorizing maximal damage output.
+@battleship_alt_preferred_attack_range = median
+@battleship_alt_formation_distance = 50
+@battleship_alt_return_to_formation_distance = 100
+@battleship_alt_collision_awareness = 0.25
+@battleship_alt_collision_strafe = 2.5
+@battleship_alt_collision_radius = 1
+@battleship_alt_attack_move_pattern = orbit
+@battleship_alt_passive_move_pattern = charge
+@battleship_alt_component_target_weight_mult = 2.0
+@battleship_alt_keep_previous_target_bonus = 25
+@battleship_alt_damage_value = 25
+@battleship_alt_low_health_bonus = 0
+@battleship_alt_shield_focus_value = 0
+@battleship_alt_armor_focus_value = 0
+@battleship_alt_already_incoming_damage_penalty = 250
+@battleship_alt_distance_to_fleet_penalty = 2.5
+@battleship_alt_size_difference_penalty = 50
+@battleship_alt_transport_target_penalty = 50000
+@battleship_alt_civilian_target_penalty = 100000
+
+#Heavy Artillery: The ship will remain at the maximal range of its weapons, prioritizing larger ships and high armor/shield targets.
+@dreadnought_preferred_attack_range = max
+@dreadnought_formation_distance = 120
+@dreadnought_return_to_formation_distance = 60
+@dreadnought_collision_awareness = 0.25
+@dreadnought_collision_strafe = 3
+@dreadnought_collision_radius = 1
+@dreadnought_attack_move_pattern = stay_at_range
+@dreadnought_passive_move_pattern = charge
+@dreadnought_component_target_weight_mult = 2.0
+@dreadnought_keep_previous_target_bonus = 100
+@dreadnought_damage_value = 5
+@dreadnought_low_health_bonus = 0
+@dreadnought_shield_focus_value = 15
+@dreadnought_armor_focus_value = 15
+@dreadnought_already_incoming_damage_penalty = 250
+@dreadnought_distance_to_fleet_penalty = 0
+@dreadnought_size_difference_penalty = 500
+@dreadnought_transport_target_penalty = 50000
+@dreadnought_civilian_target_penalty = 100000
+
+#Heavy Broadside: The ship will engage at the median range of its weapons, prioritizing maximal damage output and disregarding ship size differences.
+@dreadnought_alt_preferred_attack_range = median
+@dreadnought_alt_formation_distance = 80
+@dreadnought_alt_return_to_formation_distance = 120
+@dreadnought_alt_collision_awareness = 0.25
+@dreadnought_alt_collision_strafe = 3
+@dreadnought_alt_collision_radius = 1
+@dreadnought_alt_attack_move_pattern = follow
+@dreadnought_alt_passive_move_pattern = charge
+@dreadnought_alt_component_target_weight_mult = 2.0
+@dreadnought_alt_keep_previous_target_bonus = 0
+@dreadnought_alt_damage_value = 10
+@dreadnought_alt_low_health_bonus = 0
+@dreadnought_alt_shield_focus_value = 0
+@dreadnought_alt_armor_focus_value = 0
+@dreadnought_alt_already_incoming_damage_penalty = 200
+@dreadnought_alt_distance_to_fleet_penalty = 0
+@dreadnought_alt_size_difference_penalty = 0
+@dreadnought_alt_transport_target_penalty = 50000
+@dreadnought_alt_civilian_target_penalty = 100000
+
+### station computers have only a single behavior
+
+#Military Station: Stations prefer to focus fire on the largest available targetsin, while prioritizing damage output and low health targets.
+@station_component_target_weight_mult = 2
+@station_keep_previous_target_bonus = 250
+@station_damage_value = 50
+@station_low_health_bonus = 250
+@station_shield_focus_value = 0
+@station_armor_focus_value = 0
+@station_already_incoming_damage_penalty = 0
+@station_size_difference_penalty = 1
+@station_transport_target_penalty = 50000
+@station_civilian_target_penalty = 100000
+
+### the template "ex_default" is used by crises and other non-player ai countries.
+
+@default_preferred_attack_range = median
+@default_formation_distance = 10
+@default_return_to_formation_distance = 60
+@default_collision_awareness = 0.275
+@default_collision_strafe = 2
+@default_collision_radius = 1
+@default_attack_move_pattern = none
+@default_passive_move_pattern = orbit
+@default_component_target_weight_mult = 2.0
+@default_keep_previous_target_bonus = 200
+@default_damage_value = 10
+@default_low_health_bonus = 750
+@default_shield_focus_value = 0
+@default_armor_focus_value = 0
+@default_already_incoming_damage_penalty = 0
+@default_distance_to_fleet_penalty = 0
+@default_size_difference_penalty = 100
+@default_transport_target_penalty = 50000
+@default_civilian_target_penalty = 100000
+
+ship_behavior = {
+	name = "ex_corvette"
+	preferred_attack_range = @corvette_preferred_attack_range
+	formation_distance = @corvette_formation_distance
+	return_to_formation_distance = @corvette_return_to_formation_distance
+	collision_awareness = @corvette_collision_awareness
+	collision_strafe = @corvette_collision_strafe
+	collision_radius = @corvette_collision_radius
+	attack_move_pattern = @corvette_attack_move_pattern
+	passive_move_pattern = @corvette_passive_move_pattern
+	desc = "ex_corvette_desc"
+	
+	targeting = {
+		component_target_weight_mult = @corvette_component_target_weight_mult
+		keep_previous_target_bonus = @corvette_keep_previous_target_bonus
+		damage_value = @corvette_damage_value
+		low_health_bonus = @corvette_low_health_bonus
+		shield_focus_value = @corvette_shield_focus_value
+		armor_focus_value = @corvette_armor_focus_value
+		already_incoming_damage_penalty = @corvette_already_incoming_damage_penalty
+		distance_to_fleet_penalty = @corvette_distance_to_fleet_penalty
+		size_difference_penalty = @corvette_size_difference_penalty
+		transport_target_penalty = @corvette_transport_target_penalty
+		civilian_target_penalty = @corvette_civilian_target_penalty
+	}
+}
+
+ship_behavior = {
+	name = "ex_corvette_alt"
+	preferred_attack_range = @corvette_alt_preferred_attack_range
+	formation_distance = @corvette_alt_formation_distance
+	return_to_formation_distance = @corvette_alt_return_to_formation_distance
+	collision_awareness = @corvette_alt_collision_awareness
+	collision_strafe = @corvette_alt_collision_strafe
+	collision_radius = @corvette_alt_collision_radius
+	attack_move_pattern = @corvette_alt_attack_move_pattern
+	passive_move_pattern = @corvette_alt_passive_move_pattern
+	desc = "ex_corvette_alt_desc"
+	
+	targeting = {
+		component_target_weight_mult = @corvette_alt_component_target_weight_mult
+		keep_previous_target_bonus = @corvette_alt_keep_previous_target_bonus
+		damage_value = @corvette_alt_damage_value
+		low_health_bonus = @corvette_alt_low_health_bonus
+		shield_focus_value = @corvette_alt_shield_focus_value
+		armor_focus_value = @corvette_alt_armor_focus_value
+		already_incoming_damage_penalty = @corvette_alt_already_incoming_damage_penalty
+		distance_to_fleet_penalty = @corvette_alt_distance_to_fleet_penalty
+		size_difference_penalty = @corvette_alt_size_difference_penalty
+		transport_target_penalty = @corvette_alt_transport_target_penalty
+		civilian_target_penalty = @corvette_alt_civilian_target_penalty
+	}
+}
+
+ship_behavior = {
+	name = "ex_destroyer"
+	preferred_attack_range = @destroyer_preferred_attack_range
+	formation_distance = @destroyer_formation_distance
+	return_to_formation_distance = @destroyer_return_to_formation_distance
+	collision_awareness = @destroyer_collision_awareness
+	collision_strafe = @destroyer_collision_strafe
+	collision_radius = @destroyer_collision_radius
+	attack_move_pattern = @destroyer_attack_move_pattern
+	passive_move_pattern = @destroyer_passive_move_pattern
+	desc = "ex_destroyer_desc"
+	
+	targeting = {
+		component_target_weight_mult = @destroyer_component_target_weight_mult
+		keep_previous_target_bonus = @destroyer_keep_previous_target_bonus
+		damage_value = @destroyer_damage_value
+		low_health_bonus = @destroyer_low_health_bonus
+		shield_focus_value = @destroyer_shield_focus_value
+		armor_focus_value = @destroyer_armor_focus_value
+		already_incoming_damage_penalty = @destroyer_already_incoming_damage_penalty
+		distance_to_fleet_penalty = @destroyer_distance_to_fleet_penalty
+		size_difference_penalty = @destroyer_size_difference_penalty
+		transport_target_penalty = @destroyer_transport_target_penalty
+		civilian_target_penalty = @destroyer_civilian_target_penalty
+	}
+}
+
+ship_behavior = {
+	name = "ex_destroyer_alt"
+	preferred_attack_range = @destroyer_alt_preferred_attack_range
+	formation_distance = @destroyer_alt_formation_distance
+	return_to_formation_distance = @destroyer_alt_return_to_formation_distance
+	collision_awareness = @destroyer_alt_collision_awareness
+	collision_strafe = @destroyer_alt_collision_strafe
+	collision_radius = @destroyer_alt_collision_radius
+	attack_move_pattern = @destroyer_alt_attack_move_pattern
+	passive_move_pattern = @destroyer_alt_passive_move_pattern
+	desc = "ex_destroyer_alt_desc"
+	
+	targeting = {
+		component_target_weight_mult = @destroyer_alt_component_target_weight_mult
+		keep_previous_target_bonus = @destroyer_alt_keep_previous_target_bonus
+		damage_value = @destroyer_alt_damage_value
+		low_health_bonus = @destroyer_alt_low_health_bonus
+		shield_focus_value = @destroyer_alt_shield_focus_value
+		armor_focus_value = @destroyer_alt_armor_focus_value
+		already_incoming_damage_penalty = @destroyer_alt_already_incoming_damage_penalty
+		distance_to_fleet_penalty = @destroyer_alt_distance_to_fleet_penalty
+		size_difference_penalty = @destroyer_alt_size_difference_penalty
+		transport_target_penalty = @destroyer_alt_transport_target_penalty
+		civilian_target_penalty = @destroyer_alt_civilian_target_penalty
+	}
+}
+
+ship_behavior = {
+	name = "ex_cruiser"
+	preferred_attack_range = @cruiser_preferred_attack_range
+	formation_distance = @cruiser_formation_distance
+	return_to_formation_distance = @cruiser_return_to_formation_distance
+	collision_awareness = @cruiser_collision_awareness
+	collision_strafe = @cruiser_collision_strafe
+	collision_radius = @cruiser_collision_radius
+	attack_move_pattern = @cruiser_attack_move_pattern
+	passive_move_pattern = @cruiser_passive_move_pattern
+	desc = "ex_cruiser_desc"
+	
+	targeting = {
+		component_target_weight_mult = @cruiser_component_target_weight_mult
+		keep_previous_target_bonus = @cruiser_keep_previous_target_bonus
+		damage_value = @cruiser_damage_value
+		low_health_bonus = @cruiser_low_health_bonus
+		shield_focus_value = @cruiser_shield_focus_value
+		armor_focus_value = @cruiser_armor_focus_value
+		already_incoming_damage_penalty = @cruiser_already_incoming_damage_penalty
+		distance_to_fleet_penalty = @cruiser_distance_to_fleet_penalty
+		size_difference_penalty = @cruiser_size_difference_penalty
+		transport_target_penalty = @cruiser_transport_target_penalty
+		civilian_target_penalty = @cruiser_civilian_target_penalty
+	}
+}
+
+ship_behavior = {
+	name = "ex_cruiser_alt"
+	preferred_attack_range = @cruiser_alt_preferred_attack_range
+	formation_distance = @cruiser_alt_formation_distance
+	return_to_formation_distance = @cruiser_alt_return_to_formation_distance
+	collision_awareness = @cruiser_alt_collision_awareness
+	collision_strafe = @cruiser_alt_collision_strafe
+	collision_radius = @cruiser_alt_collision_radius
+	attack_move_pattern = @cruiser_alt_attack_move_pattern
+	passive_move_pattern = @cruiser_alt_passive_move_pattern
+	desc = "ex_cruiser_alt_desc"
+	
+	targeting = {
+		component_target_weight_mult = @cruiser_alt_component_target_weight_mult
+		keep_previous_target_bonus = @cruiser_alt_keep_previous_target_bonus
+		damage_value = @cruiser_alt_damage_value
+		low_health_bonus = @cruiser_alt_low_health_bonus
+		shield_focus_value = @cruiser_alt_shield_focus_value
+		armor_focus_value = @cruiser_alt_armor_focus_value
+		already_incoming_damage_penalty = @cruiser_alt_already_incoming_damage_penalty
+		distance_to_fleet_penalty = @cruiser_alt_distance_to_fleet_penalty
+		size_difference_penalty = @cruiser_alt_size_difference_penalty
+		transport_target_penalty = @cruiser_alt_transport_target_penalty
+		civilian_target_penalty = @cruiser_alt_civilian_target_penalty
+	}
+}
+
+ship_behavior = {
+	name = "ex_battleship"
+	preferred_attack_range = @battleship_preferred_attack_range
+	formation_distance = @battleship_formation_distance
+	return_to_formation_distance = @battleship_return_to_formation_distance
+	collision_awareness = @battleship_collision_awareness
+	collision_strafe = @battleship_collision_strafe
+	collision_radius = @battleship_collision_radius
+	attack_move_pattern = @battleship_attack_move_pattern
+	passive_move_pattern = @battleship_passive_move_pattern
+	desc = "ex_battleship_desc"
+	
+	targeting = {
+		component_target_weight_mult = @battleship_component_target_weight_mult
+		keep_previous_target_bonus = @battleship_keep_previous_target_bonus
+		damage_value = @battleship_damage_value
+		low_health_bonus = @battleship_low_health_bonus
+		shield_focus_value = @battleship_shield_focus_value
+		armor_focus_value = @battleship_armor_focus_value
+		already_incoming_damage_penalty = @battleship_already_incoming_damage_penalty
+		distance_to_fleet_penalty = @battleship_distance_to_fleet_penalty
+		size_difference_penalty = @battleship_size_difference_penalty
+		transport_target_penalty = @battleship_transport_target_penalty
+		civilian_target_penalty = @battleship_civilian_target_penalty
+	}
+}
+
+ship_behavior = {
+	name = "ex_battleship_alt"
+	preferred_attack_range = @battleship_alt_preferred_attack_range
+	formation_distance = @battleship_alt_formation_distance
+	return_to_formation_distance = @battleship_alt_return_to_formation_distance
+	collision_awareness = @battleship_alt_collision_awareness
+	collision_strafe = @battleship_alt_collision_strafe
+	collision_radius = @battleship_alt_collision_radius
+	attack_move_pattern = @battleship_alt_attack_move_pattern
+	passive_move_pattern = @battleship_alt_passive_move_pattern
+	desc = "ex_battleship_alt_desc"
+	
+	targeting = {
+		component_target_weight_mult = @battleship_alt_component_target_weight_mult
+		keep_previous_target_bonus = @battleship_alt_keep_previous_target_bonus
+		damage_value = @battleship_alt_damage_value
+		low_health_bonus = @battleship_alt_low_health_bonus
+		shield_focus_value = @battleship_alt_shield_focus_value
+		armor_focus_value = @battleship_alt_armor_focus_value
+		already_incoming_damage_penalty = @battleship_alt_already_incoming_damage_penalty
+		distance_to_fleet_penalty = @battleship_alt_distance_to_fleet_penalty
+		size_difference_penalty = @battleship_alt_size_difference_penalty
+		transport_target_penalty = @battleship_alt_transport_target_penalty
+		civilian_target_penalty = @battleship_alt_civilian_target_penalty
+	}
+}
+
+ship_behavior = {
+	name = "ex_dreadnought"
+	preferred_attack_range = @dreadnought_preferred_attack_range
+	formation_distance = @dreadnought_formation_distance
+	return_to_formation_distance = @dreadnought_return_to_formation_distance
+	collision_awareness = @dreadnought_collision_awareness
+	collision_strafe = @dreadnought_collision_strafe
+	collision_radius = @dreadnought_collision_radius
+	attack_move_pattern = @dreadnought_attack_move_pattern
+	passive_move_pattern = @dreadnought_passive_move_pattern
+	desc = "ex_dreadnought_desc"
+	
+	targeting = {
+		component_target_weight_mult = @dreadnought_component_target_weight_mult
+		keep_previous_target_bonus = @dreadnought_keep_previous_target_bonus
+		damage_value = @dreadnought_damage_value
+		low_health_bonus = @dreadnought_low_health_bonus
+		shield_focus_value = @dreadnought_shield_focus_value
+		armor_focus_value = @dreadnought_armor_focus_value
+		already_incoming_damage_penalty = @dreadnought_already_incoming_damage_penalty
+		distance_to_fleet_penalty = @dreadnought_distance_to_fleet_penalty
+		size_difference_penalty = @dreadnought_size_difference_penalty
+		transport_target_penalty = @dreadnought_transport_target_penalty
+		civilian_target_penalty = @dreadnought_civilian_target_penalty
+	}
+}
+
+ship_behavior = {
+	name = "ex_dreadnought_alt"
+	preferred_attack_range = @dreadnought_alt_preferred_attack_range
+	formation_distance = @dreadnought_alt_formation_distance
+	return_to_formation_distance = @dreadnought_alt_return_to_formation_distance
+	collision_awareness = @dreadnought_alt_collision_awareness
+	collision_strafe = @dreadnought_alt_collision_strafe
+	collision_radius = @dreadnought_alt_collision_radius
+	attack_move_pattern = @dreadnought_alt_attack_move_pattern
+	passive_move_pattern = @dreadnought_alt_passive_move_pattern
+	desc = "ex_dreadnought_alt_desc"
+	
+	targeting = {
+		component_target_weight_mult = @dreadnought_alt_component_target_weight_mult
+		keep_previous_target_bonus = @dreadnought_alt_keep_previous_target_bonus
+		damage_value = @dreadnought_alt_damage_value
+		low_health_bonus = @dreadnought_alt_low_health_bonus
+		shield_focus_value = @dreadnought_alt_shield_focus_value
+		armor_focus_value = @dreadnought_alt_armor_focus_value
+		already_incoming_damage_penalty = @dreadnought_alt_already_incoming_damage_penalty
+		distance_to_fleet_penalty = @dreadnought_alt_distance_to_fleet_penalty
+		size_difference_penalty = @dreadnought_alt_size_difference_penalty
+		transport_target_penalty = @dreadnought_alt_transport_target_penalty
+		civilian_target_penalty = @dreadnought_alt_civilian_target_penalty
+	}
+}
+
+ship_behavior = {
+	name = "ex_station"
+	preferred_attack_range = max
+	collision_awareness = 0
+	collision_strafe = 0
+	collision_radius = 0
+	attack_move_pattern = none
+	passive_move_pattern = none
+	desc = "ex_station_desc"
+	
+	targeting = {
+		component_target_weight_mult = @station_component_target_weight_mult
+		keep_previous_target_bonus = @station_keep_previous_target_bonus
+		damage_value = @station_damage_value
+		low_health_bonus = @station_low_health_bonus
+		shield_focus_value = @station_shield_focus_value
+		armor_focus_value = @station_armor_focus_value
+		already_incoming_damage_penalty = @station_already_incoming_damage_penalty
+		size_difference_penalty = @station_size_difference_penalty
+		transport_target_penalty = @station_transport_target_penalty
+		civilian_target_penalty = @station_civilian_target_penalty
+	}
+}
+
+ship_behavior = {
+	name = "ex_default"
+	preferred_attack_range = @default_preferred_attack_range
+	formation_distance = @default_formation_distance
+	return_to_formation_distance = @default_return_to_formation_distance
+	collision_awareness = @default_collision_awareness
+	collision_strafe = @default_collision_strafe
+	collision_radius = @default_collision_radius
+	attack_move_pattern = @default_attack_move_pattern
+	passive_move_pattern = @default_passive_move_pattern
+	desc = "ex_default_desc"
+	
+	targeting = {
+		component_target_weight_mult = @default_component_target_weight_mult
+		keep_previous_target_bonus = @default_keep_previous_target_bonus
+		damage_value = @default_damage_value
+		low_health_bonus = @default_low_health_bonus
+		shield_focus_value = @default_shield_focus_value
+		armor_focus_value = @default_armor_focus_value
+		already_incoming_damage_penalty = @default_already_incoming_damage_penalty
+		distance_to_fleet_penalty = @default_distance_to_fleet_penalty
+		size_difference_penalty = @default_size_difference_penalty
+		transport_target_penalty = @default_transport_target_penalty
+		civilian_target_penalty = @default_civilian_target_penalty
+	}
+}
