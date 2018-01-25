@@ -50,9 +50,24 @@ targetLanguages = allLanguages - ignoreLanguages - set([sourceLanguage])
 
 sourceFolder='localisation/'+sourceLanguage[2:]+"/"
 for filename in os.listdir(sourceFolder)[:]:
+  sourceFile = open(sourceFolder + filename, 'r')
+  for target in targetLanguages:
+    targetFolder='localisation/'+target[2:]+"/"
+    if not os.path.exists(targetFolder):
+      os.mkdir(targetFolder)
+    newFilename = filename.replace(sourceLanguage, target)
+    if newFilename == filename: continue  #Only copy files that actually contained l_english
+    if os.path.isfile(targetFolder + newFilename) and not overwrite: continue
+    with open(targetFolder + newFilename,'w') as targetFile:
+      # targetFile.write(u'\ufeff')
+      for line in sourceFile:
+        targetFile.write(line.replace(sourceLanguage + ':', target + ':'))
+    sourceFile.seek(0)
+sourceFolder='localisation/replace/'
+for filename in os.listdir(sourceFolder)[:]:
 	sourceFile = open(sourceFolder + filename, 'r')
 	for target in targetLanguages:
-		targetFolder='localisation/'+target[2:]+"/"
+		targetFolder='localisation/replace/'
 		if not os.path.exists(targetFolder):
 			os.mkdir(targetFolder)
 		newFilename = filename.replace(sourceLanguage, target)
