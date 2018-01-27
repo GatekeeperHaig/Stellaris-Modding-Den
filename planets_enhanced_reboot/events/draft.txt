@@ -1,0 +1,87 @@
+namespace = spawn_engine
+
+event = { 
+	id = spawn_engine.1
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	#this event fires only once. It activates on a monthly pulse.
+	#it is a precondition for the following event - to ensure the planet classifer effect is performed
+		
+	immediate = {
+		planet_classifier = yes		
+		set_global_flag = planet_classifer_enabled
+	}
+}	
+	
+event = { 
+	id = spawn_engine.2
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	#this event fires only once. It activates on a monthly pulse.
+	#it spawns strategic resources
+	
+	trigger = { 
+		has_global_flag = planet_classifer_enabled
+	}
+	
+	immediate = {		
+		
+	### first resource cleanup is performed. 
+	### If you do not have cleanup resources defined, this will do nothing
+		
+		if = {
+			limit = { has_global_flag = ex_planets_enhanced_events }
+			ex_resource_cleanup_table = yes
+			custom_resource_cleanup_table = yes
+			else = { 
+				custom_resource_cleanup_table = yes
+			}
+		}
+		
+		
+		if = {
+			limit = { has_global_flag = ex_planets_enhanced_events }	
+			ex_unique_resource_spawn_table = yes
+			every_planet = { ex_resource_spawn_table = yes }
+			custom_unique_resource_spawn_table = yes
+			every_planet = { custom_resource_spawn_table = yes }
+			else = {
+				custom_unique_resource_spawn_table = yes
+				every_planet = { custom_resource_spawn_table = yes }
+			}	
+		}			
+		set_global_flag = resource_spawn_performed #this gates the next event in the chain to occur only after this event!
+	}	
+}		
+
+event = { 
+	id = spawn_engine.3
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	#this event fires only once. It activates on a monthly pulse.
+	#it spawns modifiers - always after strategic resources:
+	#this allows for the resources to be preconditions for modifiers
+	
+	trigger = { 
+		has_global_flag = resource_spawn_performed
+	}
+	
+	immediate = {
+		if = {
+			limit = { has_global_flag = ex_planets_enhanced_events }	
+			ex_modifier_spawn_table = yes
+			custom_unique_modifier_spawn_table = yes
+			custom_modifier_spawn_table = yes
+			else = { 
+				custom_unique_modifier_spawn_table = yes
+				custom_modifier_spawn_table = yes
+			}
+		}
+	}
+}	
