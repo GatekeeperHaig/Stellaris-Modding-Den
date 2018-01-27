@@ -30,6 +30,7 @@ ship_event = { #this event fires the moment a spaceport is built
 	immediate = { 
 		from = { 
 			remove_spaceport_flags_and_modifiers = yes	
+			remove_construction_active = yes
 			update_shield_modifiers = yes 
 			update_spaceport_weapon_modifiers = yes			
 			planet_event = { id = ex_spaceport_events.10 }							
@@ -163,49 +164,57 @@ event = { #this event fires on a monthly pulse
 	}
 }				
 
+planet_event = { # this event runs on every tick (day), applying a flag
+	id = ex_spaceport_events.9
+	hide_window = yes
+	
+	trigger = {
+		has_owner = yes
+		has_spaceport = yes
+		spaceport = { has_free_spaceport_module_slot = yes }
+	}
+
+	immediate = { 		
+		planet_event = { id = ex_spaceport_events.10 }
+		if = { limit = { is_automation_enabled = yes } planet_event = { id = ex_spaceport_events.11 days = 1 } }
+	}
+}	
+
 planet_event = { # this event runs on every tick (day), checking and adding/removing planet spaceport level flags/modifiers as needed. 
 	id = ex_spaceport_events.10
 	hide_window = yes
-	#is_triggered_only = yes
+	is_triggered_only = yes
 	
-	trigger = { 	
-		has_owner = yes
-		has_spaceport = yes				
-		has_free_spaceport_module_slot = yes	
-		OR = {
-			has_planet_flag = no_slot_available
+	trigger = { 		
+		OR = {			
 			switch = {
 				trigger = is_spaceport_module_slot_free
-				9 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 8 } } NOT = { has_planet_flag = slot_9_free } } }
-				8 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 7 } } NOT = { has_planet_flag = slot_8_free } } }
-				7 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 6 } } NOT = { has_planet_flag = slot_7_free } } }
-				6 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 5 } } NOT = { has_planet_flag = slot_6_free } } }
-				5 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 4 } } NOT = { has_planet_flag = slot_5_free } } }
-				4 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 3 } } NOT = { has_planet_flag = slot_4_free } } }
-				3 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 2 } } NOT = { has_planet_flag = slot_3_free } } }
-				2 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 1 } } NOT = { has_planet_flag = slot_2_free } } }
-				1 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 0 } } NOT = { has_planet_flag = slot_1_free } } }
+				9 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 8 } } } }
+				8 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 7 } } } }
+				7 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 6 } } } }
+				6 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 5 } } } }
+				5 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 4 } } } }
+				4 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 3 } } } }
+				3 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 2 } } } }
+				2 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 1 } } } }
+				1 = { OR = { NOT = { check_variable = { which = "spaceport_level" value > 0 } } } }
 			}
 		}	
 	}
 	
 	immediate = {
-		set_timed_planet_flag = { flag = flag_delay_0 days = 1 } #this delays the following event
-		set_timed_planet_flag = { flag = flag_delay_1 days = 2 } #this delays the second following event		
-		if = { limit = { has_planet_flag = spaceport_flags_removed } remove_planet_flag = spaceport_flags_removed }
-		if = { limit = { has_planet_flag = no_slot_available } remove_planet_flag = no_slot_available }
-		check_module_slots = yes
+		if = { limit = { has_planet_flag = spaceport_flags_removed } remove_planet_flag = spaceport_flags_removed }		
 		switch = {
 			trigger = is_spaceport_module_slot_free
-			9 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 8 } } } set_variable = { which = "spaceport_level" value = 9 } update_spaceport_level = yes update_spaceport_modifiers = yes } if = { limit = { NOT = { has_planet_flag = slot_9_free } } set_planet_flag = slot_9_free } }					
-			8 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 7 } } } set_variable = { which = "spaceport_level" value = 8 } update_spaceport_level = yes update_spaceport_modifiers = yes }	if = { limit = { NOT = { has_planet_flag = slot_8_free } } set_planet_flag = slot_8_free } }	
-			7 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 6 } } } set_variable = { which = "spaceport_level" value = 7 } update_spaceport_level = yes update_spaceport_modifiers = yes }	if = { limit = { NOT = { has_planet_flag = slot_7_free } } set_planet_flag = slot_7_free } }	
-			6 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 5 } } } set_variable = { which = "spaceport_level" value = 6 } update_spaceport_level = yes update_spaceport_modifiers = yes }	if = { limit = { NOT = { has_planet_flag = slot_6_free } } set_planet_flag = slot_6_free } }
-			5 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 4 } } } set_variable = { which = "spaceport_level" value = 5 } update_spaceport_level = yes update_spaceport_modifiers = yes }	if = { limit = { NOT = { has_planet_flag = slot_5_free } } set_planet_flag = slot_5_free } }	
-			4 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 3 } } } set_variable = { which = "spaceport_level" value = 4 } update_spaceport_level = yes update_spaceport_modifiers = yes }	if = { limit = { NOT = { has_planet_flag = slot_4_free } } set_planet_flag = slot_4_free } }	
-			3 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 2 } } } set_variable = { which = "spaceport_level" value = 3 } update_spaceport_level = yes update_spaceport_modifiers = yes }	if = { limit = { NOT = { has_planet_flag = slot_3_free } } set_planet_flag = slot_3_free } }	
-			2 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 1 } } } set_variable = { which = "spaceport_level" value = 2 } update_spaceport_level = yes update_spaceport_modifiers = yes }	if = { limit = { NOT = { has_planet_flag = slot_2_free } } set_planet_flag = slot_2_free } }	
-			1 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 0 } } } set_variable = { which = "spaceport_level" value = 1 } update_spaceport_level = yes update_spaceport_modifiers = yes }	if = { limit = { NOT = { has_planet_flag = slot_1_free } } set_planet_flag = slot_1_free } }
+			9 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 8 } } } set_variable = { which = "spaceport_level" value = 9 } update_spaceport_level = yes } }					
+			8 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 7 } } } set_variable = { which = "spaceport_level" value = 8 } update_spaceport_level = yes } }	
+			7 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 6 } } } set_variable = { which = "spaceport_level" value = 7 } update_spaceport_level = yes } }	
+			6 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 5 } } } set_variable = { which = "spaceport_level" value = 6 } update_spaceport_level = yes } }	
+			5 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 4 } } } set_variable = { which = "spaceport_level" value = 5 } update_spaceport_level = yes } }	
+			4 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 3 } } } set_variable = { which = "spaceport_level" value = 4 } update_spaceport_level = yes } }	
+			3 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 2 } } } set_variable = { which = "spaceport_level" value = 3 } update_spaceport_level = yes } }	
+			2 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 1 } } } set_variable = { which = "spaceport_level" value = 2 } update_spaceport_level = yes } }	
+			1 = { if = { limit = {  NOT = { check_variable = { which = "spaceport_level" value > 0 } } } set_variable = { which = "spaceport_level" value = 1 } update_spaceport_level = yes } }	
 		}			
 	}
 }	
@@ -213,133 +222,104 @@ planet_event = { # this event runs on every tick (day), checking and adding/remo
 planet_event = { # this event runs on every tick (day), checking whether automation is enabled, if it is and there is an empty slot flag + no "module under construction" module on the planet, it fires the automation event.
 	id = ex_spaceport_events.11
 	hide_window = yes
-	#is_triggered_only = yes
+	is_triggered_only = yes
 
-	trigger = {		
-		NOR = { 
-			has_planet_flag = flag_delay_0
-			has_planet_flag = no_slot_available
-		}
-		has_spaceport = yes		
-		is_automation_enabled = yes		
+	trigger = {					
 		OR = {
 			AND = {
-				has_planet_flag = slot_1_free
+				is_spaceport_module_slot_free = 1
 				NOT = { has_spaceport_module = slot_unavailable_1 }
 			}	
 			AND = {
-				has_planet_flag = slot_2_free
+				is_spaceport_module_slot_free = 2
 				NOT = { has_spaceport_module = slot_unavailable_2 }
 			}				
 			AND = {
-				has_planet_flag = slot_3_free
+				is_spaceport_module_slot_free = 3
 				NOT = { has_spaceport_module = slot_unavailable_3 }
 			}				
 			AND = {
-				has_planet_flag = slot_4_free
+				is_spaceport_module_slot_free = 4
 				NOT = { has_spaceport_module = slot_unavailable_4 }
 			}				
 			AND = {
-				has_planet_flag = slot_5_free
+				is_spaceport_module_slot_free = 5
 				NOT = { has_spaceport_module = slot_unavailable_5 }
 			}				
 			AND = {
-				has_planet_flag = slot_6_free
+				is_spaceport_module_slot_free = 6
 				NOT = { has_spaceport_module = slot_unavailable_6 }
 			}				
 			AND = {
-				has_planet_flag = slot_7_free
+				is_spaceport_module_slot_free = 7
 				NOT = { has_spaceport_module = slot_unavailable_7 }
 			}				
 			AND = {
-				has_planet_flag = slot_8_free
+				is_spaceport_module_slot_free = 8
 				NOT = { has_spaceport_module = slot_unavailable_8 }
 			}				
 			AND = {
-				has_planet_flag = slot_9_free
+				is_spaceport_module_slot_free = 9
 				NOT = { has_spaceport_module = slot_unavailable_9 }
 			}							
-		}								
-	}			
+		}				
+	}	
+	
 	immediate = { 
-		set_timed_planet_flag = { flag = flag_delay_2 days = 1 } #this is meant to gate the following event		
+		#set_timed_planet_flag = { flag = flag_delay_2 days = 1 } #this is meant to gate the following event		
 		if = { 
-			limit = { has_planet_flag = slot_1_free NOT = { has_spaceport_module = slot_unavailable_1 } }
-			set_spaceport_module = { slot = 1 module = "slot_unavailable_1" }
-			else = { 
-				if = {
-					limit = { has_planet_flag = slot_2_free NOT = { has_spaceport_module = slot_unavailable_2 } }
-					set_spaceport_module = { slot = 2 module = "slot_unavailable_2" }
-					else = {
-						if = {
-							limit = { has_planet_flag = slot_3_free NOT = { has_spaceport_module = slot_unavailable_3 } }
-							set_spaceport_module = { slot = 3 module = "slot_unavailable_3" }
-							else = {
-								if = {
-									limit = { has_planet_flag = slot_4_free NOT = { has_spaceport_module = slot_unavailable_4 } }
-									set_spaceport_module = { slot = 4 module = "slot_unavailable_4" }
-									else = {							
-										if = {
-											limit = { has_planet_flag = slot_5_free NOT = { has_spaceport_module = slot_unavailable_5 } }
-											set_spaceport_module = { slot = 5 module = "slot_unavailable_5" }
-											else = {
-												if = {
-													limit = { has_planet_flag = slot_6_free NOT = { has_spaceport_module = slot_unavailable_6 } }
-													set_spaceport_module = { slot = 6 module = "slot_unavailable_6" }
-													else = {
-														if = {
-															limit = { has_planet_flag = slot_7_free NOT = { has_spaceport_module = slot_unavailable_7 } }
-															set_spaceport_module = { slot = 7 module = "slot_unavailable_7" }
-															else = {													
-																if = {
-																	limit = { has_planet_flag = slot_8_free NOT = { has_spaceport_module = slot_unavailable_8 } }
-																	set_spaceport_module = { slot = 8 module = "slot_unavailable_8" }
-																	else = {														
-																		if = {
-																			limit = { has_planet_flag = slot_9_free NOT = { has_spaceport_module = slot_unavailable_9 } }
-																			set_spaceport_module = { slot = 9 module = "slot_unavailable_9" }
-																			else = { set_planet_flag = no_slot_available											
-}}}}}}}}}}}}}}}}}}}}
-
-
-planet_event = { # this event runs on every tick (day), checking whether automation is enabled, if it is and there is an empty slot flag + no "module under construction" module on the planet, it fires the automation event.
-	id = ex_spaceport_events.12
-	hide_window = yes
-	#is_triggered_only = yes
-
-	trigger = {		
-		NOR = { 
-			has_planet_flag = flag_delay_1
-			has_planet_flag = flag_delay_2
-		}		
-		has_spaceport = yes					
-		is_automation_enabled = yes		
-		NOT = { has_spaceport_module = module_under_construction }		
-		OR = {
-			has_spaceport_module = slot_unavailable_9
-			has_spaceport_module = slot_unavailable_8
-			has_spaceport_module = slot_unavailable_7
-			has_spaceport_module = slot_unavailable_6
-			has_spaceport_module = slot_unavailable_5
-			has_spaceport_module = slot_unavailable_4
-			has_spaceport_module = slot_unavailable_3
-			has_spaceport_module = slot_unavailable_2
-			has_spaceport_module = slot_unavailable_1
-		}								
-	}			
-	immediate = { planet_event = { id = ex_spaceport_events.100 days = 1 } }
-}
+			limit = { is_spaceport_module_slot_free = 1 NOR = { has_planet_flag = module_under_construction_slot_1 has_spaceport_module = slot_unavailable_1 } }
+			set_spaceport_module = { slot = 1 module = "slot_unavailable_1" }			
+		}	
+		if = {
+			limit = { is_spaceport_module_slot_free = 2 NOR = { has_planet_flag = module_under_construction_slot_2 has_spaceport_module = slot_unavailable_2 } }
+			set_spaceport_module = { slot = 2 module = "slot_unavailable_2" }			
+		}	
+		if = {
+			limit = { is_spaceport_module_slot_free = 3 NOR = { has_planet_flag = module_under_construction_slot_3 has_spaceport_module = slot_unavailable_3 } }
+			set_spaceport_module = { slot = 3 module = "slot_unavailable_3" }			
+		}	
+		if = {
+			limit = { is_spaceport_module_slot_free = 4 NOR = { has_planet_flag = module_under_construction_slot_4 has_spaceport_module = slot_unavailable_4 } }
+			set_spaceport_module = { slot = 4 module = "slot_unavailable_4" }			
+		}
+		if = {
+			limit = { is_spaceport_module_slot_free = 5 NOR = { has_planet_flag = module_under_construction_slot_5 has_spaceport_module = slot_unavailable_5 } }
+			set_spaceport_module = { slot = 5 module = "slot_unavailable_5" }			
+		}
+		if = {
+			limit = { is_spaceport_module_slot_free = 6 NOR = { has_planet_flag = module_under_construction_slot_6 has_spaceport_module = slot_unavailable_6 } }
+			set_spaceport_module = { slot = 6 module = "slot_unavailable_6" }			
+		}	
+		if = {
+			limit = { is_spaceport_module_slot_free = 7 NOR = { has_planet_flag = module_under_construction_slot_7 has_spaceport_module = slot_unavailable_7 } }
+			set_spaceport_module = { slot = 7 module = "slot_unavailable_7" }			
+		}	
+		if = {
+			limit = { is_spaceport_module_slot_free = 8 NOR = { has_planet_flag = module_under_construction_slot_8 has_spaceport_module = slot_unavailable_8 } }
+			set_spaceport_module = { slot = 8 module = "slot_unavailable_8" }			
+		}	
+		if = {
+			limit = { is_spaceport_module_slot_free = 9 NOR = { has_planet_flag = module_under_construction_slot_9 has_spaceport_module = slot_unavailable_9 } }
+			set_spaceport_module = { slot = 9 module = "slot_unavailable_9" }			
+		}							
+	}
+}	
 	
 #the events below are spaceport development automation events.
 
 planet_event = { #this event checks the spaceport type, compares to the edict and replaces the spaceport itself as needed. 
 	id = ex_spaceport_events.100
 	hide_window = yes
-	is_triggered_only = yes
+	#is_triggered_only = yes
 
-	trigger = {	
-		has_spaceport = yes
+	trigger = {			
+		has_owner = yes
+		has_spaceport = yes		
 		has_spaceport_construction = no
+		is_automation_enabled = yes
+		module_construction_active = no
+		has_slot_unavailable_module = yes		
 		if = {
 			limit = { owner = { has_policy_flag = minimum_250_for_module_auto_construction } }
 			owner = { minerals > 500 }
@@ -355,7 +335,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 		if = {
 			limit = { owner = { has_policy_flag = minimum_500_for_module_auto_construction } }
 			owner = { minerals > 1500 }
-		}
+		}		
 	}	
 	
 	immediate = {
@@ -421,7 +401,8 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 						rebuild_defensive_modules = yes
 						rebuild_stardock_modules = yes
 					}	
-					rebuild_cleanup = yes					
+					rebuild_cleanup = yes
+					remove_construction_active = yes					
 					construct_module = yes						
 				}	
 				if = {
@@ -442,6 +423,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 						rebuild_stardock_modules = yes
 					}					
 					rebuild_cleanup = yes					
+					remove_construction_active = yes
 					construct_module = yes			
 				}					
 			}
@@ -503,6 +485,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 						rebuild_economic_modules = yes
 					}
 					rebuild_cleanup = yes					
+					remove_construction_active = yes
 					construct_module = yes	
 				}	
 				if = {
@@ -526,6 +509,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 						rebuild_stardock_modules = yes
 					}	
 					rebuild_cleanup = yes					
+					remove_construction_active = yes
 					construct_module = yes	
 				}					
 			}			
@@ -611,7 +595,8 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 						limit = { owner = { has_policy_flag = only_build_new } }							
 						rebuild_stardock_modules = yes
 					}	
-					rebuild_cleanup = yes					
+					rebuild_cleanup = yes			
+					remove_construction_active = yes					
 					construct_module = yes	
 				}	
 				if = {
@@ -638,6 +623,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 						rebuild_stardock_modules = yes
 					}						
 					rebuild_cleanup = yes					
+					remove_construction_active = yes
 					construct_module = yes	
 				}					
 			}
@@ -713,6 +699,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 						rebuild_stardock_modules = yes
 					}	
 					rebuild_cleanup = yes					
+					remove_construction_active = yes
 					construct_module = yes	
 				}	
 				if = {
@@ -739,6 +726,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 						rebuild_stardock_modules = yes
 					}						
 					rebuild_cleanup = yes					
+					remove_construction_active = yes
 					construct_module = yes	
 				}					
 			}								
@@ -785,6 +773,7 @@ planet_event = { #this event checks the spaceport type, compares to the edict an
 						rebuild_economic_modules = yes
 					}						
 					rebuild_cleanup = yes					
+					remove_construction_active = yes
 					construct_module = yes						
 				}	
 			}					
@@ -801,26 +790,27 @@ planet_event = { #this event builds spaceport modules if some form of automation
 		if = {
 			limit = {
 				AND = {
-					owner = {
+					exists = owner
+					owner = { 
 						OR = {
 							AND = {
 								has_policy_flag = minimum_250_for_module_auto_construction
-								minerals > 500
-							}	
-							AND = {
-								has_policy_flag = minimum_500_for_module_auto_construction
-								minerals > 750
-							}			
+								minerals > 500				
+							}
 							AND = {
 								has_policy_flag = minimum_500_for_module_auto_construction
 								minerals > 1000
-							}		
+							}	
 							AND = {
-								has_policy_flag = minimum_500_for_module_auto_construction
+								has_policy_flag = minimum_750_for_module_auto_construction
 								minerals > 1500
 							}	
-						}							
-					}
+							AND = {
+								has_policy_flag = minimum_1000_for_module_auto_construction
+								minerals > 2000
+							}	
+						}
+					}								
 					OR = {
 						AND = {
 							sector_controlled = yes
@@ -863,7 +853,7 @@ planet_event = { #this event builds spaceport modules if some form of automation
 									can_build_economic_module = yes
 								}								
 								AND = {
-									OR = {
+										OR = {
 										owner = { has_policy_flag = core_specialized_defensive_module_construction }
 										has_planet_flag = spaceport_automation_defensive_specialized
 									}	
@@ -886,13 +876,14 @@ planet_event = { #this event builds spaceport modules if some form of automation
 							}	
 						}						
 					}	
-				}
-			}	
+				}					
+			}				
 			if = {
 				limit = { sector_controlled = yes }
 				if = { 
 					limit = { owner = { has_policy_flag = sector_specialized_economic_module_construction } }
 					roll_economic_module = yes
+					remove_construction_active = yes
 					break = yes
 				}	
 				if = { 
@@ -901,11 +892,13 @@ planet_event = { #this event builds spaceport modules if some form of automation
 						75 = { roll_economic_module = yes }
 						25 = { roll_defensive_module = yes }
 					}	
+					remove_construction_active = yes
 					break = yes
 				}	
 				if = { 
 					limit = { owner = { has_policy_flag = sector_specialized_defensive_module_construction } }
 					roll_defensive_module = yes
+					remove_construction_active = yes
 					break = yes
 				}
 				if = { 
@@ -914,6 +907,7 @@ planet_event = { #this event builds spaceport modules if some form of automation
 						25 = { roll_economic_module = yes }
 						75 = { roll_defensive_module = yes }
 					}	
+					remove_construction_active = yes
 					break = yes
 				}			
 			}
@@ -927,6 +921,7 @@ planet_event = { #this event builds spaceport modules if some form of automation
 						}	
 					}
 					roll_economic_module = yes
+					remove_construction_active = yes
 					break = yes
 				}	
 				if = { 
@@ -940,6 +935,7 @@ planet_event = { #this event builds spaceport modules if some form of automation
 						75 = { roll_economic_module = yes }
 						25 = { roll_defensive_module = yes }
 					}	
+					remove_construction_active = yes
 					break = yes
 				}	
 				if = { 
@@ -950,6 +946,7 @@ planet_event = { #this event builds spaceport modules if some form of automation
 						}	
 					}
 					roll_defensive_module = yes
+					remove_construction_active = yes
 					break = yes
 				}
 				if = { 
@@ -963,6 +960,7 @@ planet_event = { #this event builds spaceport modules if some form of automation
 						25 = { roll_economic_module = yes }
 						75 = { roll_defensive_module = yes }
 					}	
+					remove_construction_active = yes
 					break = yes
 				}
 				if = { 
@@ -973,12 +971,13 @@ planet_event = { #this event builds spaceport modules if some form of automation
 						}	
 					}
 					roll_stardock_module = yes
+					remove_construction_active = yes
 					break = yes
 				}				
 			}
 			else = { planet_event = { id = ex_spaceport_events.101 days = 30 } } ## this in combination with the main limit field is a failsafe meant to assure modules will be constructed no matter what. 
 		}	
-	}
+	}		
 }
 
 #cleanup events 
