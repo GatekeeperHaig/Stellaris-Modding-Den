@@ -126,9 +126,10 @@ def main(args,unused=0):
     with open(outFile,'w') as file:
       varsToValue.writeAll(file)
       targetEntries.writeAll(file)
-    with open(args.output_folder+"/missing.txt",'a+') as file:
-      for mis in missing:
-        file.write(mis+"\n")
+    if len(missing)>0:
+      with open(args.output_folder+"/missing",'a+') as file:
+        for mis in missing:
+          file.write(mis+"\n")
 
   return(lastOutFile)
   
