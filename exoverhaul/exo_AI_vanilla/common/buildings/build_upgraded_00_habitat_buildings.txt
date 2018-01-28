@@ -1,0 +1,435 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+# buildings for habitats
+
+building_hab_capital = {
+	base_buildtime = 1080
+	
+	cost = {
+	}
+	
+	produced_resources = {
+		energy = 5
+		unity = 2
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			has_non_swapped_tradition = tr_expansion_colonization_fever
+			has_swapped_tradition = tr_expansion_colonization_fever_machine
+			has_swapped_tradition = tr_expansion_colonization_fever_hive
+			resources = {
+				unity = 1
+			}
+		}
+	}
+	
+	planet_modifier = {
+		pop_government_ethic_attraction = 0.2
+	}
+	
+	potential = {
+		planet = {
+			is_planet_class = pc_habitat
+		}
+	}
+	planet_unique = yes
+	capital = yes
+	ai_replace = no
+	
+	ai_weight = {
+		weight = 10000
+		modifier = {
+			factor = 10
+			tile = {
+				any_neighboring_tile = {
+					has_resource_machine = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 100
+			tile = {
+				num_adjacent_tiles = 4
+			}
+		}
+	}
+}
+
+building_hab_astro_mining_facility = {
+	base_buildtime = 360
+	
+	cost = {
+		minerals = 200
+	}
+	
+	potential = {
+		planet = {
+			is_planet_class = pc_habitat
+			has_building = "building_hab_capital"
+		}
+	}
+	
+	produced_resources = {
+		minerals = 4
+	}
+	
+	required_resources = {
+		energy = 2
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 10
+			tile = {
+				has_resource = {
+					type = minerals
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = 25
+			tile = {
+				has_resource = {
+					type = minerals
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = 100
+			tile = {
+				has_resource = {
+					type = minerals
+					amount > 2
+				}
+			}
+		}
+		modifier = {
+			factor = 2.5
+			tile = {
+				OR = {
+					has_robot_pop = yes
+					has_slave_pop = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 1.25
+			tile = {
+				has_prole_or_stapled_pop = yes
+			}
+		}
+		modifier = {
+			factor = 1.25
+			tile = {
+				has_mineral_bonus_pop = yes
+			}
+		}
+		modifier = {
+			factor = 1.25
+			tile = {
+				any_neighboring_tile = {
+					has_hyperstorage_building = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 1.25
+			tile = {
+				any_neighboring_tile = {
+					has_capital_building = yes
+				}
+			}
+		}
+	}
+}
+
+building_hab_solar_power_processor = {
+	base_buildtime = 360
+	
+	cost = {
+		minerals = 250
+	}
+	
+	potential = {
+		planet = {
+			is_planet_class = pc_habitat
+			has_building = "building_hab_capital"
+			solar_system = {
+				custom_tooltip = {
+					fail_text = "requires_no_black_hole_or_dyson_sphere"
+					NOR = {
+						is_star_class = sc_black_hole
+						has_megastructure = dyson_sphere_3
+						has_megastructure = dyson_sphere_4
+						has_megastructure = dyson_sphere_5
+					}
+				}
+			}
+		}
+	}
+	
+	destroy_if = {
+		planet = {
+			solar_system = {
+				OR = {
+					is_star_class = sc_black_hole
+					has_megastructure = dyson_sphere_3
+					has_megastructure = dyson_sphere_4
+					has_megastructure = dyson_sphere_5
+				}
+			}
+		}
+	}
+	
+	produced_resources = {
+		energy = 6
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 10
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 1
+				}
+			}
+		}
+		modifier = {
+			factor = 25
+			tile = {
+				has_resource = {
+					type = energy
+					amount = 2
+				}
+			}
+		}
+		modifier = {
+			factor = 100
+			tile = {
+				has_resource = {
+					type = energy
+					amount > 2
+				}
+			}
+		}
+		modifier = {
+			factor = 0.25
+			tile = {
+				has_slave_pop = yes
+				has_prole_or_stapled_pop = yes
+				AND = {
+					has_non_sapient_robot = yes
+					exists = owner
+					owner = {
+						NOT = {
+							has_global_flag = "ex_robots_active"
+						}
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = 1.25
+			tile = {
+				has_energy_bonus_pop = yes
+			}
+		}
+		modifier = {
+			factor = 1.25
+			tile = {
+				any_neighboring_tile = {
+					has_hyperstorage_building = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 1.25
+			tile = {
+				any_neighboring_tile = {
+					has_capital_building = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 1.25
+			tile = {
+				OR = {
+					AND = {
+						has_robot_pop = yes
+						exists = owner
+						owner = {
+							has_global_flag = "ex_robots_active"
+						}
+					}
+					has_free_sapient_robot = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 1.25
+			tile = {
+				owner = {
+					has_authority = auth_machine_intelligence
+				}
+			}
+		}
+	}
+}
+
+building_hab_agri_bay = {
+	base_buildtime = 360
+	
+	cost = {
+		minerals = 200
+	}
+	
+	potential = {
+		NOT = { owner = { has_authority = auth_machine_intelligence } }
+		planet = {
+			is_planet_class = pc_habitat
+			has_building = "building_hab_capital"
+		}
+	}
+	
+	produced_resources = {
+		food = 4
+	}
+	
+	required_resources = {
+		energy = 2
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}
+
+building_hab_laboratory_module = {
+	base_buildtime = 360
+	
+	cost = {
+		minerals = 250
+	}
+	
+	potential = {
+		planet = {
+			is_planet_class = pc_habitat
+			has_building = "building_hab_capital"
+		}
+	}
+	
+	produced_resources = {
+		engineering_research = 3
+		physics_research = 3
+		society_research = 3
+	}
+	
+	required_resources = {
+		energy = 3
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 25
+			tile = {
+				has_research_resources = yes
+			}
+		}
+		modifier = {
+			factor = 100
+			tile = {
+				has_high_research_resources = yes
+			}
+		}
+		modifier = {
+			factor = 0
+			tile = {
+				OR = {
+					has_slave_pop = yes
+					has_prole_or_stapled_pop = yes
+					has_non_sapient_robot = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 2.5
+			tile = {
+				any_neighboring_tile = {
+					has_polytechnic_building = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 1.25
+			tile = {
+				OR = {
+					has_research_bonus_pop = yes
+					has_free_sapient_robot = yes
+				}
+			}
+		}
+		modifier = {
+			factor = 1.25
+			tile = {
+				AND = {
+					exists = pop
+					pop = {
+						OR = {
+							has_trait = "trait_natural_engineers"
+							has_trait = "trait_natural_physicists"
+							has_trait = "trait_natural_sociologists"
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+building_hab_cultural_center = {
+	base_buildtime = 730
+	planet_unique = yes
+	
+	cost = {
+		minerals = 400
+	}
+	
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			is_planet_class = pc_habitat
+			has_building = "building_hab_capital"
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	
+	produced_resources = {
+		unity = 4
+	}
+	
+	planet_modifier = {
+		pop_citizen_happiness = 0.05
+	}
+	
+	required_resources = {
+		energy = 4
+	}
+	
+	ai_weight = {
+		weight = 10000
+	}
+}

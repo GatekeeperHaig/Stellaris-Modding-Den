@@ -14,6 +14,7 @@ import webbrowser
 import platform
 import convertCSV_TXT
 import createUpgradedBuildings
+import copySubTag
 import pickle
 
 class Logger(object):
@@ -119,8 +120,8 @@ class Line:
     self.root=root
     #root.lines.append(line)
     line.pack(side=tk.TOP)
-    self.helpFileCheckVar = IntVar()
-    self.helpFileCheck=Checkbutton(line, text="Helper file", variable=self.helpFileCheckVar)
+    self.lineCheckVar = IntVar()
+    self.lineCheckButton=Checkbutton(line, text=root.singleEntryCheck, variable=self.lineCheckVar)
     #self.txt= tk.Text(line, bg="white",width=60, height=1)
     self.txt= tk.Entry(line, bg="white",width=85)
     
@@ -152,8 +153,8 @@ class Line:
     self.bEditR.pack(side=tk.LEFT)
 
 
-    if root.helperFileCheck:
-      self.helpFileCheck.pack(side=tk.LEFT)
+    if root.singleEntryCheck!="":
+      self.lineCheckButton.pack(side=tk.LEFT)
     self.bConvTooltip= CreateToolTip(self.bConv, "Init")
     self.bEditSTooltip= CreateToolTip(self.bEditS, "Init")
     self.bEditFTooltip= CreateToolTip(self.bEditF, "Init")
@@ -201,6 +202,11 @@ class TabClass:
       # for line in self.lines:
         # print(line.subfolderTxt.get())
         # line.subfolderTxt.lower()
+  def addMarkedFiles(self):
+    curLine=len(self.lines)
+    self.addFiles()
+    for line in self.lines[curLine:]:
+      line.lineCheckVar.set(1)
   def removeLineByIndex(self, index):
     self.lines[index].lineFrame.pack_forget()
     del self.lines[index]
@@ -236,6 +242,18 @@ class TabClass:
     if self.separateStart:
       for line in self.lines:
         line.bConv.invoke()
+    elif self.singleEntryCheck=="Source File":
+      argList=[]
+      self.addArguments(argList)
+      sourceFiles=[]
+      for line in self.lines:
+        if line.lineCheckVar.get():  #Source File check
+          sourceFiles.append(line.getTxt())
+      for line in self.lines:
+        if not line.lineCheckVar.get():  #Source File check
+          args=self.command.parse([line.getTxt()]+sourceFiles+argList)
+          line.result=self.command.main(args,[line.getTxt()]+sourceFiles+argList)
+
     else:
       argList=[]
       for line in self.lines:
@@ -250,11 +268,11 @@ class TabClass:
     for i in range(len(self.options)):
       if self.checkVars[i].get():
         argList+=self.options[i][1].split()
-    if self.helperFileCheck:
+    if self.singleEntryCheck=="Helper File":
       argList.append("--helper_file_list")
       argList.append("")
       for line in reversed(self.lines):
-        if line.helpFileCheckVar.get():
+        if line.lineCheckVar.get():
           argList[-1]+="1"
         else:
           argList[-1]+="0"
@@ -322,7 +340,7 @@ class TabClass:
           pickle.dump([],f)
         pickle.dump([line.txt.get() for line in self.lines], f)
         pickle.dump([line.subfolderTxt.get() for line in self.lines], f)
-        pickle.dump([line.helpFileCheckVar.get() for line in self.lines], f)
+        pickle.dump([line.lineCheckVar.get() for line in self.lines], f)
       # print("save")
   def load(self):
     fileName=filedialog.askopenfilename(initialdir = ".",title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
@@ -362,12 +380,12 @@ class TabClass:
           iLoc+=1
       iLoc=i
       for entry in pickle.load(f):
-        self.lines[iLoc].helpFileCheckVar.set(entry)
+        self.lines[iLoc].lineCheckVar.set(entry)
         iLoc+=1
     except EOFError:
       print("Warning: File ended earlir than expected. File might be older version but still work perfectly or stuff is actually missing")
 
-  def __init__(self,name,tab,root,command, fixedOptions, defaultFileFilter,options=[], optionWindow=0):
+  def __init__(self,name,tab,root,command, fixedOptions, defaultFileFilter,options=[], optionWindow=0,extraAddButton=""):
     self.name=name
     self.root=root
     self.tab=tab
@@ -381,10 +399,12 @@ class TabClass:
     self.lastPath="."
     self.separateStart=True
     self.subfolder=False
-    if name == "createUpgradedBuildings":
-      self.helperFileCheck=True
-    else:
-      self.helperFileCheck=False
+    self.singleEntryCheck=""
+    self.extraAddButton=extraAddButton
+    # if name == "createUpgradedBuildings":
+    #   self.helperFileCheck=True
+    # else:
+    #   self.helperFileCheck=False
     if os.path.exists(".GUI_last_path"):
       with open(".GUI_last_path") as file:
         self.lastPath=file.read().strip()
@@ -435,6 +455,9 @@ class TabClass:
       b.pack(side=tk.RIGHT)
     b = tk.Button(self.extraLineMain, text="Add file(s)", command=self.addFiles)
     b.pack(side=tk.RIGHT)
+    if self.extraAddButton!="":
+      b = tk.Button(self.extraLineMain, text=self.extraAddButton, command=self.addMarkedFiles)
+      b.pack(side=tk.RIGHT)
     b = tk.Button(self.extraLineMain, text="Convert All", command=self.invokeAll)
     b.pack(side=tk.LEFT)
 
@@ -485,7 +508,7 @@ class OptionWindow:
     # frameL.pack(side="left", fill="both", expand=True)
     # frameR=tk.Frame(self.window)
     # frameR.pack(side="right", fill="both", expand=True)
-    scriptArgs=vars(script.parse(""))
+    scriptArgs=vars(script.parse(" " " "))
     self.options=options
     for i,option in enumerate(options):
       l=Label(self.window, text=option.description)
@@ -537,6 +560,10 @@ class TabControlClass:
       Option("load_order_priority"),
       Option("join_files")
       ],createUpgradedBuildings)
+    optionWindowCST=OptionWindow(root,"Copy Subtag Options",[
+      Option("output_folder"), 
+      Option("tag_to_be_copied"), 
+      ],copySubTag)
     
     
     nb = ttk.Notebook(root)          # Create Tab Control
@@ -552,7 +579,7 @@ class TabControlClass:
     ["Keep inlines","--keep_inlines","With this option, the script will try not to split inlines into the long tag form."],
     ["Occurence Sheet","--occ_sheet","Activates the old occurence mode in a different sheet. I think this is no longer needed with the OCCNUM column (which is certainly able of doing things the occ sheet wasn't able to do)"]
     ], 
-    convertCSV_TXT,[],ttk.Frame(nb),0
+    convertCSV_TXT,[],ttk.Frame(nb),0,""
     ])
     tabs.append([
     "ods to txt", 
@@ -566,32 +593,44 @@ class TabControlClass:
 
     ], 
     convertCSV_TXT,["--to_txt"], 
-    ttk.Frame(nb),0
+    ttk.Frame(nb),0,""
     ])
     tabs.append([
     "createUpgradedBuildings", 
     ("text files","*.txt"),
     [], 
-    createUpgradedBuildings,[],ttk.Frame(nb),optionWindowUB
+    createUpgradedBuildings,[],ttk.Frame(nb),optionWindowUB,"Add Helper File(s)"
     ])    
     tabs.append([
     "createUpgradedBuildings - Trigger files", 
     ("text files","*.txt"),
     [], 
-    createUpgradedBuildings,["--just_copy_and_check"],ttk.Frame(nb),optionWindowUB
+    createUpgradedBuildings,["--just_copy_and_check"],ttk.Frame(nb),optionWindowUB,""
+    ])
+    tabs.append([
+    "Copy Subtag to other mod", 
+    ("text files","*.txt"),
+    [], 
+    copySubTag,[],ttk.Frame(nb),optionWindowCST,"Add Source File(s)"
     ])
     tabClasses=[]
     self.tabClasses=tabClasses
-    for name,defaultFileFilter,options,command,fixedOptions,tab,optionWindow in tabs:
+    for name,defaultFileFilter,options,command,fixedOptions,tab,optionWindow,extraAddButton in tabs:
       nb.add(tab, text=name)
-      tabClasses.append(TabClass(name,tab,root,command,fixedOptions, defaultFileFilter,options,optionWindow))
+      tabClasses.append(TabClass(name,tab,root,command,fixedOptions, defaultFileFilter,options,optionWindow,extraAddButton))
 
     tabClasses[0].helpText="Creates an ods file from a Stellaris .txt file. Currently works for txt files that are lists of same top-tag entries (for example all components and sections." #txt to ods
     tabClasses[1].helpText="Uses an ods file to changes the accordingly named .txt file: Entries that are in the ods file are written into the txt file at the right place (overwriting what was there before or written directly in the header instead of overwriting a variable. \nEmpty or missing entries in the ods file remain unchanged! \n To delete something from the txt file, write '#delete' in the according cell in the ods file. If all subtags of a supertag are deleted, the supertag will also be deleted. Never delete a 'key'! It suffices to delete all other tags to delete a top-level tag (e.g. a whole component)" #ods to txt
-    tabClasses[2].helpText="Not finished yet!" #createUpgradedBuildings
+    tabClasses[2].helpText='1. "Add file(s)": "Stellaris/common/buildings/00_buildings.txt" (unless you have no dependence on vanilla buildings at all, not even capital building requirements. Check "Helper file". Contents of such a file will be used, but the buildings wont be output.\n1b. If your buildings depend on any other buildings (other mods, other vanilla buildings): Add them the same way.\n2. Add all building files of the mod you want to make compatible. Do *not* check the "Helper file" checkbox\n3. In "Options", set a output folder, mod name and check "load order priority" and "join files".\n4. Convert All' #createUpgradedBuildings
     tabClasses[2].separateStart=False
+    tabClasses[2].singleEntryCheck="Helper File"
+    # tabClasses[2].extraAddButton="Add Helper File(s)"
     tabClasses[3].helpText="Not finished yet!" #createUpgradedBuildings - Trigger files
     tabClasses[3].subfolder=True
+    tabClasses[4].helpText="Not finished yet!" #createUpgradedBuildings - Trigger files
+    tabClasses[4].separateStart=False
+    tabClasses[4].singleEntryCheck="Source File"
+    # tabClasses[4].extraAddButton="Add Source File(s)"
     nb.pack(expand=1, fill="both")  # Pack to make visible
   def getActiveTabClass(self):
     return self.tabClasses[self.nb.index(self.nb.select())]
@@ -611,7 +650,7 @@ def repeatedChecks(tabClasses, root):
 
 def about():
   #window=tk.Toplevel(root)
-  print("Created by Gratak and Stellaris 1.8.*")
+  print("Created by Gratak for Stellaris")
   print("Feel free to use for your mod project but please mention me including the links to my mods ")
   print("http://steamcommunity.com/profiles/76561198087073498/myworkshopfiles")
   print("and our git repository:")
