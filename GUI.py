@@ -638,7 +638,7 @@ class TabControlClass:
     self.getActiveTabClass().save()
   def load(self):
     tab=self.getActiveTabClass()
-    if (len(tab.lines)==0) or  linesmessagebox.askquestion("Overwrite", "This will overwrite current content. Are you sure?", icon='warning') == 'yes':
+    if (len(tab.lines)==0) or messagebox.askquestion("Overwrite", "This will overwrite current content. Are you sure?", icon='warning') == 'yes':
       self.getActiveTabClass().load()  
   def loadAdd(self):
     self.getActiveTabClass().loadAdd()

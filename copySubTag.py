@@ -79,6 +79,7 @@ def main(args,unused=0):
   targetEntries=TagList(0)
   varsToValue=TagList(0)
   targetEntries.readFile(fileName,args,varsToValue,True)
+  missing=[]
 
   keyStrings=["key","name","id"]  
   for entry in targetEntries:
@@ -94,6 +95,7 @@ def main(args,unused=0):
           copyFrom=sourceEntries.get(entry.tagName)
         except ValueError:
           print("WARNING: Entry {} not found in source files".format(entry.tagName))
+          missing.append(entry.tagName)
           continue
       else:
         copyFrom=0
@@ -108,6 +110,7 @@ def main(args,unused=0):
               print("WARNING: Entry in source file that has a different key type")
         if copyFrom==0:
           print("WARNING: Entry with {}={} not found in source files".format(keyString,key))
+          missing.append(entry.tagName)
           continue
       entry.getOrCreate(args.tag_to_be_copied)
       entry.replace(args.tag_to_be_copied, copyFrom.getOrCreate(args.tag_to_be_copied))
@@ -123,6 +126,9 @@ def main(args,unused=0):
     with open(outFile,'w') as file:
       varsToValue.writeAll(file)
       targetEntries.writeAll(file)
+    with open(args.output_folder+"/missing.txt",'a+') as file:
+      for mis in missing:
+        file.write(mis+"\n")
 
   return(lastOutFile)
   
