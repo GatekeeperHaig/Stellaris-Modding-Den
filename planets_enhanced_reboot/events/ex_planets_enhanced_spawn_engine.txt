@@ -1,0 +1,78 @@
+namespace = spawn_engine
+
+event = { 
+	id = spawn_engine.1
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	#This event fires only once.
+		
+	immediate = {		
+		every_planet = { 
+			if = {
+				limit = { 
+					is_colonizable = yes
+					is_capital = no
+					is_homeworld = no					
+				}
+				planet_event = { id = spawn_engine.2 }
+			}	
+			if = {
+				limit = { 
+					is_colonizable = no
+				}
+				planet_event = { id = spawn_engine.3 }
+			}
+		}
+	}
+}
+
+planet_event = { 
+	id = spawn_engine.2
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = { 		
+		set_variable = { which = sr_count value = 0 }
+		unique_planetary_resource_spawn = yes
+		count_strategic_resources = yes
+		roll_planetary_resource_loop = yes
+		modifier_spawn_table = yes	
+		planet_event = { id = spawn_engine.4 days = 1 } 
+	}	
+}
+
+planet_event = { 
+	id = spawn_engine.3
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { has_orbital_strategic_resource = yes }
+			flag_resource_station_types = yes 			
+			resource_cleanup_table = yes
+			orbital_deposit_respawn = yes
+			remove_resource_station_types_flags = yes
+		}
+		orbital_resource_spawn = yes			
+	}	
+}		
+
+planet_event = { 
+	id = spawn_engine.4
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes 
+	
+	immediate = { 
+		remove_global_flag = sr_ex_unique_1
+		remove_global_flag = sr_ex_unique_2
+		remove_global_flag = sr_ex_unique_3
+		remove_global_flag = sr_ex_unique_4
+		remove_global_flag = sr_ex_unique_5
+		remove_global_flag = sr_ex_unique_6
+	}
+}	
+
