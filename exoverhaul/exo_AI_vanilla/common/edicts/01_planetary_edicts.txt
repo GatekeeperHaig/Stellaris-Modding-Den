@@ -1,0 +1,516 @@
+##########################################################################
+# Planet edicts
+##########################################################################
+
+# Variables:
+#  name, the name of the edict, also serves as localisation key.
+#  influence_cost, the base influence cost of activating the edict.
+#  potential, planet or country trigger to decide whether the edict should be shown.
+#  allow, planet or country trigger to decide if whether this edict can be activated.
+#  effect, an effect that is executed when this trigger activates.
+#  prerequisites, tech requirements for this trigger.
+#  ai_will_do, determines AI scoring for edict
+#  modifier, a list of modifiers
+#  length, number of days the trigger is active.
+
+# Sets the edict-cost for all edicts with this variable
+@standardEdictCost = 150
+@standardEdictDuration = 3600
+
+planet_edict = {
+	name = "reeducation_campaign"
+	influence_cost = @standardEdictCost
+	modifier = {
+		pop_government_ethic_attraction = 0.5
+	}
+	
+	potential = {	
+		owner = {
+			NOT = { 
+				has_authority = auth_hive_mind 
+				has_authority = auth_machine_intelligence 
+				has_ethic = ethic_fanatic_authoritarian
+			}
+		}
+	}
+	
+	length = @standardEdictDuration
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			num_pops < 10
+		}
+	}	
+}
+
+planet_edict = {
+	name = "propaganda"
+	influence_cost = @standardEdictCost
+	length = @standardEdictDuration
+	
+	show_tech_unlock_if = { NOT = { has_ethic = ethic_gestalt_consciousness } }
+	
+	modifier = {
+		pop_happiness = 0.10
+	}
+	
+	prerequisites = { 
+		"tech_planetary_unification"
+	}
+	
+	potential = {	
+		owner = {
+			NOT = { 
+				has_authority = auth_hive_mind 
+				has_authority = auth_machine_intelligence
+			}
+		}
+	}
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			num_pops < 10
+		}		
+	}	
+}
+
+planet_edict = {
+	name = "farming_subsidies"
+	influence_cost = @standardEdictCost
+	modifier = {
+		tile_resource_food_mult = 0.25
+	}
+	
+	length = @standardEdictDuration
+	
+	potential = {
+		owner = {
+			NOT = { has_authority = auth_machine_intelligence }
+		}
+	}
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			num_pops > 9
+		}
+		modifier = {
+			factor = 0
+			planet_size < 10
+		}		
+	}	
+	
+	prerequisites = { 
+		"tech_hydroponics"
+	}
+}
+
+planet_edict = {
+	name = "land_of_opportunity"
+	influence_cost = @standardEdictCost
+	modifier = {
+		planet_migration_all_pull = 1
+	}
+	
+	length = @standardEdictDuration
+	
+	potential = {	
+		owner = {
+			NOT = { 
+				has_authority = auth_hive_mind 
+				has_authority = auth_machine_intelligence 
+			}
+		}
+	}	
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 0
+	}	
+}
+
+planet_edict = {
+	name = "capacity_overload"
+	influence_cost = @standardEdictCost
+	modifier = {
+		tile_resource_energy_mult = 0.15
+	}
+	
+	potential = {
+		owner = {
+			NOT = {
+				has_ethic = ethic_fanatic_egalitarian
+			}
+		}
+	}
+	
+	length = @standardEdictDuration
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			num_pops < 10
+		}		
+	}	
+	
+	prerequisites = {
+		"tech_power_hub_1"		
+	}
+}
+
+planet_edict = {
+	name = "production_targets"
+	influence_cost = @standardEdictCost
+	modifier = {
+		tile_resource_minerals_mult = 0.15
+	}
+	
+	length = @standardEdictDuration
+	
+	prerequisites = {
+		"tech_colonial_centralization"
+	}
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			num_pops < 10
+		}
+	}	
+}
+
+planet_edict = {
+	name = "infrastructure_projects"
+	influence_cost = @standardEdictCost
+	modifier = {
+		planet_building_cost_mult = -0.25
+		planet_building_build_speed_mult = 0.33
+	}
+	
+	length = @standardEdictDuration
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			NOT = {
+				any_tile = {
+					has_blocker = no 
+					has_building = no
+				}
+			}
+		}
+	}	
+}
+
+
+##########################################################################
+# FANATIC ETHICS PLANETARY EDICTS
+##########################################################################
+
+# Social Engineering (Fanatic Authoritarian special power)
+planet_edict = {
+	name = "social_engineering"
+	influence_cost = @standardEdictCost
+	length = @standardEdictDuration
+	modifier = {
+		pop_government_ethic_attraction = 0.75
+	}
+	
+	potential = {
+		owner = {
+			has_ethic = ethic_fanatic_authoritarian
+		}
+	}
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			num_pops < 10
+		}		
+	}	
+}
+
+# Privatization Campaign (Fanatic Egalitarian special power)
+planet_edict = {
+	name = "privatization_campaign"
+	influence_cost = @standardEdictCost
+	length = @standardEdictDuration
+	modifier = {
+		tile_resource_energy_mult = 0.20
+	}
+	
+	potential = {
+		owner = {
+			has_ethic = ethic_fanatic_egalitarian
+		}
+	}
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			num_pops < 10
+		}		
+	}	
+}
+
+# Peace Festivals (Fanatic Pacifist special power)
+planet_edict = {
+	name = "peace_festivals"
+	influence_cost = @standardEdictCost
+	length = @standardEdictDuration
+	modifier = {
+		tile_resource_food_mult = 0.30
+	}
+	
+	potential = {
+		owner = {
+			has_ethic = ethic_fanatic_pacifist
+		}
+	}
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			num_pops < 10
+		}		
+	}	
+}
+
+# Arms Race (Fanatic Militarist special power)
+planet_edict = {
+	name = "arms_race"
+	influence_cost = @standardEdictCost
+	length = @standardEdictDuration
+	modifier = {
+		spaceport_module_cost_mult = -0.25
+		spaceport_ship_build_speed_mult = 0.33
+		planet_army_build_speed_mult = 0.33
+	}
+	
+	potential = {
+		owner = {
+			has_ethic = ethic_fanatic_militarist
+		}
+	}
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			has_spaceport = no
+		}			
+	}	
+}
+
+# Legal Aliens (Fanatic Xenophile special power)
+planet_edict = {
+	name = "legal_aliens"
+	influence_cost = @standardEdictCost
+	length = @standardEdictDuration
+	modifier = {
+		planet_migration_xeno_pull = 1
+	}
+	
+	potential = {
+		owner = {
+			has_ethic = ethic_fanatic_xenophile
+		}
+	}
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 0	
+	}	
+}
+
+# Purity Laws (Fanatic Xenophobe special power)
+planet_edict = {
+	name = "purity_laws"
+	influence_cost = @standardEdictCost
+	length = @standardEdictDuration
+	modifier = {
+		tile_resource_unity_mult = 0.20
+	}
+	
+	potential = {
+		owner = {
+			has_ethic = ethic_fanatic_xenophobe
+		}
+	}
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 0
+	}	
+}
+
+
+# Religious Unity (Fanatic Spiritualist special power)
+planet_edict = {
+	name = "religious_unity"
+	influence_cost = @standardEdictCost
+	length = @standardEdictDuration
+	modifier = {
+		tile_resource_unity_mult = 0.10
+		pop_government_ethic_attraction = 0.10
+	}
+	
+	potential = {
+		owner = {
+			has_ethic = ethic_fanatic_spiritualist
+		}
+	}
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			num_pops > 9
+		}
+		modifier = {
+			factor = 0
+			planet_size < 10
+		}			
+	}	
+}
+
+# Spirit of Science (Fanatic Materialist special power)
+planet_edict = {
+	name = "spirit_of_science"
+	influence_cost = @standardEdictCost
+	length = @standardEdictDuration
+	modifier = {
+		tile_resource_physics_research_mult = 0.20
+		tile_resource_society_research_mult = 0.20
+		tile_resource_engineering_research_mult = 0.20
+	}
+	
+	potential = {
+		owner = {
+			has_ethic = ethic_fanatic_materialist
+		}
+	}
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			num_pops < 10
+		}		
+	}	
+}
+
+# Consectrated worlds
+planet_edict = {
+	name = "consecrated_worlds"
+	influence_cost = 300
+	length = 36000
+	modifier = {
+		pop_happiness = 0.05
+		pop_ethic_spiritualist_attraction_mult = 0.25
+		pop_growth_speed = 0.15
+		tile_resource_unity_mult = 0.15
+	}
+	
+	potential = {
+		owner = {
+			has_ascension_perk = ap_consecrated_worlds
+		}
+	}
+	
+	allow = {
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			num_pops < 10
+		}
+	}
+}
+
+planet_edict = {
+	name = "patrol_drones"
+	influence_cost = @standardEdictCost
+	length = @standardEdictDuration
+
+	modifier = {
+		planet_unrest_mult = -0.50
+	}
+	
+	potential = {
+		owner = {
+			has_authority = auth_machine_intelligence
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+		modifier = {
+			unrest > 20
+			weight = 1
+		}
+		modifier = {
+			unrest > 50
+			weight = 2
+		}
+		modifier = {
+			unrest > 80
+			weight = 3
+		}
+	}
+}
