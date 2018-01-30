@@ -101,7 +101,10 @@ def main(args,unused=0):
       keepExtraLines=True
     else:
       keepExtraLines=False
-    nameToData.readFile(fileName,args, varsToValue, keepExtraLines) 
+    if not args.to_txt or os.path.exists(fileName):
+      nameToData.readFile(fileName,args, varsToValue, keepExtraLines) 
+    else:
+      print("Generating new txt file from {} file. First column in table must be {!s} or addKey depending on file (the unique identifiers)".format(tableFileEnding, keyStrings))
 
     if args.join_files:
       if fileIndex<len(globbedList)-1:
@@ -111,50 +114,51 @@ def main(args,unused=0):
       nameToData=nameToData.vals[0]
       nameToData.increaseLevelRec(-1)   
     keyString='addKey'
-    for k in keyStrings:
-      for v in nameToData.vals:
-        if isinstance(v,TagList) and len(v.names):
-          if k in v.names:
-            keyString=k
-          break
-    if keyString=="addKey":
-      for i in range(len(nameToData.vals)):
-        if (isinstance(nameToData.vals[i],TagList)):
-          nameToData.vals[i].addFront(keyString, nameToData.names[i])
-          nameToData.names[i]="keyAdded"
+    if not args.to_txt or len(nameToData.vals)>0: #skip all this if we create a completely new file. Also possible with empty file that existed
+      for k in keyStrings:
+        for v in nameToData.vals:
+          if isinstance(v,TagList) and len(v.names):
+            if k in v.names:
+              keyString=k
+            break
+      if keyString=="addKey":
+        for i in range(len(nameToData.vals)):
+          if (isinstance(nameToData.vals[i],TagList)):
+            nameToData.vals[i].addFront(keyString, nameToData.names[i])
+            nameToData.names[i]="keyAdded"
 
-    if args.manual_filter:
-      filterFile=args.manual_filter
-      if os.path.exists(filterFile):
-        with open(filterFile) as file:
-          args.filter=[word.strip() for line in file for word in line.split(",") ]
-        if not keyString in args.filter:
-          args.filter[0:0]=[keyString]#always need to be able to convert back to txt        
-      else:
-        print("No filter file for: "+fileName)
-        args.filter=0
-    elif args.filter:
-      filterFile=fileName.replace(".txt",".filter")
-      if os.path.exists(filterFile):
-        with open(filterFile) as file:
-          args.filter=[word.strip() for line in file for word in line.split(",") ]
-        if not keyString in args.filter:
-          args.filter[0:0]=[keyString]#always need to be able to convert back to txt        
-      else:
-        print("No filter file for: "+fileName)
-        args.filter=0
+      if args.manual_filter:
+        filterFile=args.manual_filter
+        if os.path.exists(filterFile):
+          with open(filterFile) as file:
+            args.filter=[word.strip() for line in file for word in line.split(",") ]
+          if not keyString in args.filter:
+            args.filter[0:0]=[keyString]#always need to be able to convert back to txt        
+        else:
+          print("No filter file for: "+fileName)
+          args.filter=0
+      elif args.filter:
+        filterFile=fileName.replace(".txt",".filter")
+        if os.path.exists(filterFile):
+          with open(filterFile) as file:
+            args.filter=[word.strip() for line in file for word in line.split(",") ]
+          if not keyString in args.filter:
+            args.filter[0:0]=[keyString]#always need to be able to convert back to txt        
+        else:
+          print("No filter file for: "+fileName)
+          args.filter=0
 
-    if not args.keep_inlines:
-      nameToData.applyOnLowestLevel( TxtReadHelperFunctions.splitIfSplitable,[], ["bracketLevel"])
-    # nameToData.printAll()
-    if args.remove_header:
-      nameToData.applyOnLowestLevel( TxtReadHelperFunctions.getVariableValue, [varsToValue])
-      varsToValue.clear()
-    varsToValue.changed=[0 for i in varsToValue.vals]
-
+      if not args.keep_inlines:
+        nameToData.applyOnLowestLevel( TxtReadHelperFunctions.splitIfSplitable,[], ["bracketLevel"])
       # nameToData.printAll()
-      # fullNameToData.printAll()
-    nameToData.addTags(tagList)
+      if args.remove_header:
+        nameToData.applyOnLowestLevel( TxtReadHelperFunctions.getVariableValue, [varsToValue])
+        varsToValue.clear()
+      varsToValue.changed=[0 for i in varsToValue.vals]
+
+        # nameToData.printAll()
+        # fullNameToData.printAll()
+      nameToData.addTags(tagList)
     
     if args.to_txt:
       if not os.path.exists(tableFileName):
@@ -214,12 +218,14 @@ def main(args,unused=0):
             lastI=i
         # print(occBodyNames)
         # print(occBody)
+      if len(nameToData.vals)==0:
+        keyString=header[1][0]
 
       try:
       	keyCSVIndex=header[1].index(keyString)
       except ValueError:
-        keyString=altkey
-        keyCSVIndex=header[1].index(keyString)
+        print("ERROR: Key not found in table! Expected {} in second row of the table!".format(keyString))
+        raise
       # nameToData[0].printAll()
       if foundOcc:
         for occName, occEntry in zip(occBodyNames,occBody):
@@ -228,7 +234,7 @@ def main(args,unused=0):
               continue;
             if val.get(keyString)==occName:
               break; #name,val should now have the correct value
-          val.prepareOccurences(occEntry,occHeader)
+            val.prepareOccurences(occEntry,occHeader)
 
 
 
@@ -252,7 +258,7 @@ def main(args,unused=0):
               if val.get(keyString)==bodyKey:
                 break; #name,val should now have the correct value
             repeatIndex=0
-            if val.get(keyString)!=bodyKey: #did not find correct one. probably a new one was added
+            if len(nameToData.vals)==0 or val.get(keyString)!=bodyKey: #did not find correct one. probably a new one was added
               if args.forbid_additions:
                 print("New key found. Additions where forbidden!")
                 continue
