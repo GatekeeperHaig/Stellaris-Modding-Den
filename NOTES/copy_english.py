@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 #####################################################################
 # copy_english.py
 # By Tim Carrell (LamilLerran)
