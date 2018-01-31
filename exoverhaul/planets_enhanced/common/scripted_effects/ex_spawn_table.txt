@@ -370,27 +370,31 @@ planetary_resource_spawn = {
 unique_planetary_resource_spawn = {
 	if = {
 		limit = { 
-				disable_spawn = no 			
-				has_owner = no		
-				NOT = { has_global_flag = sr_ex_unique_1 }
-			}		
-			random_tile = { 				
-				set_deposit = d_sr_ex_unique_1_deposit									
-				if = { limit = { has_building = yes } remove_building = yes }
-			}		
-			change_variable = { which = "sr_count" value = 1 }	
-			set_global_flag = sr_ex_unique_1
-			break = yes
+			disable_spawn = no 			
+			is_colony = no		
+			NOT = { has_global_flag = sr_ex_unique_1 }
+		}		
+		random_tile = { 				
+			if = { limit = { has_building = yes } remove_building = yes }
+			if = { limit = { has_blocker = yes } remove_blocker = yes }
+			if = { limit = { has_deposit = yes } clear_deposits = yes }
+			add_deposit = d_sr_ex_unique_1_deposit									
+		}		
+		change_variable = { which = "sr_count" value = 1 }	
+		set_global_flag = sr_ex_unique_1
+		break = yes
 	}			
 	if = {
 		limit = { 
 			disable_spawn = no 			
-			has_owner = no				
+			is_colony = no				
 			NOT = { has_global_flag = sr_ex_unique_2 }
 		}		
 		random_tile = { 				
-			set_deposit = d_sr_ex_unique_2_deposit
 			if = { limit = { has_building = yes } remove_building = yes }
+			if = { limit = { has_blocker = yes } remove_blocker = yes }
+			if = { limit = { has_deposit = yes } clear_deposits = yes }
+			add_deposit = d_sr_ex_unique_2_deposit
 		}		
 		change_variable = { which = "sr_count" value = 1 }	
 		set_global_flag = sr_ex_unique_2
@@ -399,12 +403,14 @@ unique_planetary_resource_spawn = {
 	if = {
 		limit = { 
 			disable_spawn = no 			
-			has_owner = no		
+			is_colony = no		
 			NOT = { has_global_flag = sr_ex_unique_3 }
 		}		
 		random_tile = { 				
-			set_deposit = d_sr_ex_unique_3_deposit
-			if = { limit = { has_building = yes } remove_building = yes }				
+			if = { limit = { has_building = yes } remove_building = yes }
+			if = { limit = { has_blocker = yes } remove_blocker = yes }
+			if = { limit = { has_deposit = yes } clear_deposits = yes }
+			add_deposit = d_sr_ex_unique_3_deposit				
 		}		
 		change_variable = { which = "sr_count" value = 1 }	
 		set_global_flag = sr_ex_unique_3
@@ -413,12 +419,14 @@ unique_planetary_resource_spawn = {
 	if = {
 		limit = { 
 			disable_spawn = no 			
-			has_owner = no		
+			is_colony = no		
 			NOT = { has_global_flag = sr_ex_unique_4 }
 		}		
 		random_tile = { 				
-			set_deposit = d_sr_ex_unique_4_deposit	
 			if = { limit = { has_building = yes } remove_building = yes }
+			if = { limit = { has_blocker = yes } remove_blocker = yes }
+			if = { limit = { has_deposit = yes } clear_deposits = yes }
+			add_deposit = d_sr_ex_unique_4_deposit				
 		}		
 		change_variable = { which = "sr_count" value = 1 }	
 		set_global_flag = sr_ex_unique_4
@@ -427,12 +435,14 @@ unique_planetary_resource_spawn = {
 	if = {
 		limit = { 
 			disable_spawn = no 			
-			has_owner = no		
+			is_colony = no		
 			NOT = { has_global_flag = sr_ex_unique_5 }
 		}		
 		random_tile = { 				
-			set_deposit = d_sr_ex_unique_5_deposit	
 			if = { limit = { has_building = yes } remove_building = yes }
+			if = { limit = { has_blocker = yes } remove_blocker = yes }
+			if = { limit = { has_deposit = yes } clear_deposits = yes }			
+			set_deposit = d_sr_ex_unique_5_deposit	
 		}		
 		change_variable = { which = "sr_count" value = 1 }	
 		set_global_flag = sr_ex_unique_5
@@ -441,12 +451,14 @@ unique_planetary_resource_spawn = {
 	if = {
 		limit = { 
 			disable_spawn = no 			
-			has_owner = no		
+			is_colony = no		
 			NOT = { has_global_flag = sr_ex_unique_6 }
 		}		
 		random_tile = { 				
-			set_deposit = d_sr_ex_unique_6_deposit		
 			if = { limit = { has_building = yes } remove_building = yes }
+			if = { limit = { has_blocker = yes } remove_blocker = yes }
+			if = { limit = { has_deposit = yes } clear_deposits = yes }			
+			set_deposit = d_sr_ex_unique_6_deposit		
 		}		
 		change_variable = { which = "sr_count" value = 1 }	
 		set_global_flag = sr_ex_unique_6
@@ -456,7 +468,13 @@ unique_planetary_resource_spawn = {
 
 modifier_spawn_table = {
 	if = {
-		limit = { is_planet_class = pc_nuked }		
+		limit = { 
+			is_planet_class = pc_nuked
+			NOR = {
+				has_modifier = ex_tw
+				has_modifier = ex_necropolis
+			}				
+		}		
 		random_list = {
 			25 = { add_modifier = { modifier = "ex_tw" days = -1 } }
 			25 = { add_modifier = { modifier = "ex_necropolis" days = -1 } }
@@ -465,11 +483,17 @@ modifier_spawn_table = {
 		}	
 	}
 	if = {
-		limit = { is_planet_class = pc_gaia	}		
+		limit = { 
+			is_planet_class = pc_gaia
+			NOT = {	has_modifier = ex_gaia_world }
+		}		
 		add_modifier = { modifier = "ex_gaia_world" days = -1 }
 	}
 	if = {
-		limit = { is_ringworld = yes }		
+		limit = { 
+			is_planet_class = pc_ringworld_habitable
+			NOT = {	has_modifier = ex_ring_world }
+		}		
 		add_modifier = { modifier = "ex_ring_world" days = -1 }
 	}		
 }	

@@ -1,5 +1,41 @@
 namespace = spawn_engine
 
+event = { #this event fires on game start - if the mod is loaded into a new game. 
+	id = spawn_engine.0
+	hide_window = yes
+	is_triggered_only = yes	
+	
+	immediate = { 
+		set_global_flag = ex_game_start_spawn_engine
+		every_planet = { 
+			if = {
+				limit = {
+					OR = {
+						is_planet_class = pc_nuked
+						is_planet_class = pc_gaia
+						is_ringworld = yes
+					}	
+				}	
+				modifier_spawn_table = yes					
+			}				
+			if = {
+				limit = { 
+					is_colonizable = yes
+					is_capital = no
+					is_homeworld = no					
+				}
+				planet_event = { id = spawn_engine.2 }
+			}	
+			if = {
+				limit = { 
+					is_colonizable = no
+				}
+				planet_event = { id = spawn_engine.3 }
+			}			
+		}		
+	}
+}	
+
 event = { 
 	id = spawn_engine.1
 	hide_window = yes
@@ -7,7 +43,9 @@ event = {
 	fire_only_once = yes
 	
 	#This event fires only once.
-		
+	
+	trigger = { NOT = { has_global_flag = ex_game_start_spawn_engine } }
+					
 	immediate = {		
 		every_planet = { 
 			if = {
