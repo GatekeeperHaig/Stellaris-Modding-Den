@@ -1,5 +1,5 @@
-name="(Real Space) New Worlds"
-path="mod/rs_newworlds"
+name="(Exo Real Space) New Worlds"
+path="mod/ex_new_worlds_rework/rs_newworlds"
 tags={
 	"Galaxy Generation"
 	"Graphics"

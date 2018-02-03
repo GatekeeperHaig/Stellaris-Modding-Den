@@ -1,0 +1,90 @@
+namespace = sol_terraforming
+
+event = { #game start event -- or you can have this run on a monthly pulse and add "fire_only_once = yes" (without the "") below the "is_triggered_only = yes"
+	id = sol_terraforming.1
+	hide_window = yes	
+	is_triggered_only = yes
+	
+	immediate = {
+		every_planet = {
+			if = {
+				limit = { has_planet_flag = scorched_earth is_planet_class = pc_continental }
+				change_pc = "pc_nuked"							
+				every_tile = { 
+					if = { limit = { has_blocker = yes } clear_blocker = yes } 
+					if = { limit = { has_building = yes } remove_building = yes }
+					if = { limit = { has_deposit = yes } clear_deposit = yes }
+				}	
+				random_tile = {	limit = { has_blocker = no } set_blocker = "tb_mountain_range" set_deposit = d_mineral_deposit }
+				random_tile = { limit = { has_blocker = no } set_blocker = "tb_mountain_range" set_deposit = d_mineral_deposit }
+				random_tile = { limit = { has_blocker = no } set_blocker = "tb_radioactive_wasteland"	set_deposit = d_rich_energy_deposit	}
+				random_tile = { limit = { has_blocker = no } set_blocker = "tb_water_mass" set_deposit = d_rich_farmland_deposit }
+				random_tile = {	limit = { has_blocker = no } set_blocker = "tb_water_mass" set_deposit = d_rich_farmland_deposit }
+				random_tile = {	limit = { has_blocker = no } set_blocker = "tb_active_volcano" set_deposit = d_rich_mineral_deposit }
+				random_tile = {	limit = { has_blocker = no } set_blocker = "tb_active_volcano" set_deposit = d_energy_deposit	}
+				random_tile = {	limit = { has_blocker = no } set_blocker = "tb_radioactive_wasteland"	set_deposit = d_rich_energy_deposit	}
+				random_tile = {	limit = { has_blocker = no } set_blocker = "tb_city_ruins" set_deposit = d_rich_engineering_deposit }
+				random_tile = {	limit = { has_blocker = no } set_blocker = "tb_city_ruins" set_deposit = d_rich_society_deposit }
+				random_tile = {	limit = { has_blocker = no } set_blocker = "tb_radioactive_wasteland" set_deposit = d_rich_mineral_deposit }
+				random_tile = {	limit = { has_blocker = no } set_blocker = "tb_city_ruins" set_deposit = d_mineral_deposit }
+				random_tile = { limit = { has_blocker = no } set_blocker = "tb_radioactive_wasteland" set_deposit = d_physics_deposit }
+				random_tile = {	limit = { has_blocker = no } set_deposit = d_rich_physics_deposit }									
+			}
+			if = {
+				limit = { has_planet_flag = terraformed_mars is_planet_class = pc_continental }		
+				change_pc = "pc_geocrystalline"
+				set_planet_entity = { entity = "inv_cambrian_mars_entity" }
+				every_tile = { 
+					if = { limit = { has_blocker = yes } clear_blocker = yes } 
+					if = { limit = { has_building = yes } remove_building = yes }
+					if = { limit = { has_deposit = yes } clear_deposit = yes }
+				}	
+				random_tile = {	limit = { has_blocker = no } set_blocker = "tb_mountain_range" set_deposit = d_mineral_deposit }
+				random_tile = { limit = { has_blocker = no } set_blocker = "tb_mountain_range" set_deposit = d_mineral_deposit }
+				random_tile = { limit = { has_blocker = no } set_blocker = "tb_crater" set_deposit = d_rich_energy_deposit	}				
+				random_tile = {	limit = { has_blocker = no } set_blocker = "tb_water_mass" set_deposit = d_rich_farmland_deposit }
+				random_tile = {	limit = { has_blocker = no } set_blocker = "tb_active_volcano" set_deposit = d_rich_mineral_deposit }
+				random_tile = {	limit = { has_blocker = no } set_blocker = "tb_active_volcano" set_deposit = d_energy_deposit	}				
+				random_tile = { limit = { has_blocker = no } set_blocker = "tb_crater" set_deposit = d_physics_deposit	}
+				random_tile = {	limit = { has_blocker = no } set_deposit = d_rich_physics_deposit }								
+			}
+		}
+	}
+}
+
+planet_event = { ## uses the terraforming complete on action
+	id = sol_terraforming.2
+	hide_window = yes	
+	is_triggered_only = yes
+	
+	immediate = {
+		if = { 
+			limit = { has_planet_flag = planet_earth is_planet_class = pc_lush }
+			set_planet_entity = { entity = "inv_lush_earth_entity" }
+		}
+		if = { 
+			limit = { has_planet_flag = planet_earth is_planet_class = pc_continental
+			set_planet_entity = { entity = "inv_continental_earth_entity" }				
+		}
+		if = { 
+			limit = { has_planet_flag = planet_mars OR = { is_planet_class = pc_lush is_planet_class = pc_continental } }
+			set_planet_entity = { entity = "green_mars_entity" }
+		}	
+		if = { 
+			limit = { has_planet_flag = planet_mars is_planet_class = pc_retinal }
+			set_planet_entity = { entity = "retinal_mars_entity" }
+		}			
+		if = { 
+			limit = { has_planet_flag = planet_mars is_planet_class = pc_geocrystalline }
+			set_planet_entity = { entity = "cambrian_mars_entity" }
+		}			
+		if = { 
+			limit = { has_planet_flag = planet_mars OR = { is_planet_class = pc_marginal is_planet_class = pc_marginal_dry is_planet_class = pc_arid } }
+			set_planet_entity = { entity = "marginal_mars_entity" }
+		}						
+		if = { 
+			limit = { has_planet_flag = planet_mars OR = { is_planet_class = pc_marginal_cold is_planet_class = pc_arctic } }
+			set_planet_entity = { entity = "frozen_mars_entity" }
+		}										
+	}
+}
