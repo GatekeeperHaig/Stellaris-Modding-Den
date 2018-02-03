@@ -21,6 +21,7 @@ event = { #this event fires on game start - if the mod is loaded into a new game
 			if = {
 				limit = { 
 					is_colonizable = yes
+					has_free_planetary_tile = yes
 					is_capital = no
 					is_homeworld = no					
 					solar_system = { 
@@ -82,6 +83,7 @@ event = {
 			if = {
 				limit = { 
 					is_colonizable = yes
+					has_free_planetary_tile = yes
 					is_capital = no
 					is_homeworld = no					
 					solar_system = { 
@@ -93,10 +95,24 @@ event = {
 					}						
 				}
 				planet_event = { id = spawn_engine.2 days = 1 }
-			}	
+			}				
+			if = {
+				limit = { 
+					OR = {
+						has_resource = { type = sr_pitharan amount > 0 } 
+						has_resource = { type = sr_engos amount > 0 }					
+						has_resource = { type = sr_satramene amount > 0 }
+					}	
+				}
+				flag_resource_station_types = yes 			
+				resource_cleanup_table = yes
+				orbital_deposit_respawn = yes
+				remove_resource_station_types_flags = yes
+			}
 			if = {
 				limit = { 
 					is_colonizable = no
+					has_vanilla_orbital_strategic_resource = no
 					solar_system = { 
 						NOR = {
 							has_star_flag = empire_home_system
@@ -112,7 +128,7 @@ event = {
 						has_deposit = "d_immense_engineering_deposit"	
 					}	
 				}
-				planet_event = { id = spawn_engine.3 days = 2 }
+				planet_event = { id = spawn_engine.3 days = 2 }				
 			}			
 		}
 	}
@@ -125,7 +141,10 @@ planet_event = {
 	
 	immediate = { 		
 		set_variable = { which = sr_count value = 0 }
-		unique_planetary_resource_spawn = yes
+		if = { 
+			limit = { has_owner = no } 
+			unique_planetary_resource_spawn = yes
+		}	
 		count_strategic_resources = yes
 		roll_planetary_resource_loop = yes		
 		planet_event = { id = spawn_engine.4 days = 3 } 
@@ -137,16 +156,7 @@ planet_event = {
 	hide_window = yes
 	is_triggered_only = yes
 
-	immediate = {
-		if = {
-			limit = { has_orbital_strategic_resource = yes }
-			flag_resource_station_types = yes 			
-			resource_cleanup_table = yes
-			orbital_deposit_respawn = yes
-			remove_resource_station_types_flags = yes
-		}
-		orbital_resource_spawn = yes			
-	}	
+	immediate = { orbital_resource_spawn = yes }	
 }		
 
 planet_event = { 
