@@ -1,4 +1,4 @@
-name="!ExOverhaul: Combat"
+name="!!ExOverhaul: Combat"
 path="mod/exoverhaul/combat"
 tags={
 	"overhaul"
