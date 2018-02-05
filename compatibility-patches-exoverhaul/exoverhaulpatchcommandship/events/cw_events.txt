@@ -1,0 +1,265 @@
+#################################
+#
+# Combat Width Events
+# by Saga
+#
+#################################
+
+namespace = cw
+
+country_event = { 
+	id = cw.1
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = { 
+		exists = this
+		is_country_type = default
+		exists = fromfrom
+		fromfrom = { is_ship_class = shipclass_military }
+		exists = fromfromfrom
+		not = { fromfrom = { has_fleet_flag = cw_in_combat } }
+	}
+
+	immediate = {
+		log = "CW.1 | [fromfrom.GetName] VS. [fromfromfrom.GetName]"
+		fromfrom = { 
+			set_fleet_flag = cw_in_combat
+			cw_select_ships = yes
+
+			
+
+			cw_deselect_ships = yes
+		}
+	}
+}
+
+event = {
+	id = cw.2
+	is_triggered_only = yes
+	hide_window = yes
+	
+	immediate = {
+		every_country = {
+			limit = { is_ai = no }
+			country_event = { id = cw.3 }
+		}
+	}
+}
+
+country_event = { 
+	id = cw.3
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+
+		if = {
+			limit = { not = { has_edict = reinforce_fleets } }
+			break = yes
+		}
+
+		save_event_target_as = TargetOwner
+
+		every_owned_fleet = {
+			limit = {
+				is_ship_class = shipclass_military
+				is_in_combat = no
+				count_fleet_ships = { limit = { is_ship_size = cw_command_ship } count > 0 }
+			}
+
+			save_event_target_as = TargetFleet
+
+			cw_count_ships = yes
+			cw_calculate_ship_counts = yes
+			
+			subtract_variable = { which = target_corvettes value = corvettes }
+			subtract_variable = { which = target_destroyers value = destroyers }
+			subtract_variable = { which = target_cruisers value = cruisers }
+			subtract_variable = { which = target_battleships value = battleships }
+
+			if = { 
+				limit = { cw_is_fully_reinforced = yes }
+				break = yes
+			}
+
+			while = {
+				limit = {
+					check_variable = { which = target_corvettes value > 0 }
+					root = { cw_can_pay_corvette = yes }
+				}
+
+				change_variable = { which = target_corvettes value = -1 }
+				
+				owner = {
+					random_owned_planet = {
+						limit = {
+							cw_is_construction_planet = yes
+							spaceport = { has_spaceport_module = corvette_assembly_yard }
+						}
+
+						log = "CW | Building corvette at ([This.GetName]) to reinforce ([event_target:TargetFleet.GetName])."
+
+						save_event_target_as = TargetPlanet
+						cw_create_corvette_reinforcement = yes
+						set_planet_flag = "ref@last_created_fleet"
+						set_planet_flag = cw_is_building_ship
+						root = { cw_pay_corvette = yes }
+					}
+				}
+			}
+
+			while = {
+				limit = {
+					check_variable = { which = target_destroyers value > 0 }
+					root = { cw_can_pay_destroyer = yes }
+				}
+
+				change_variable = { which = target_destroyers value = -1 }
+				
+				owner = {
+					random_owned_planet = {
+						limit = {
+							cw_is_construction_planet = yes
+							spaceport = { has_spaceport_module = destroyer_assembly_yard }
+						}
+
+						log = "CW | Building destroyer at ([This.GetName]) to reinforce ([event_target:TargetFleet.GetName])."
+
+						save_event_target_as = TargetPlanet
+						cw_create_destroyer_reinforcement = yes
+						set_planet_flag = "ref@last_created_fleet"
+						set_planet_flag = cw_is_building_ship
+						root = { cw_pay_destroyer = yes }
+					}
+				}
+			}
+
+			while = {
+				limit = {
+					check_variable = { which = target_cruisers value > 0 }
+					root = { cw_can_pay_cruiser = yes }
+				}
+
+				change_variable = { which = target_cruisers value = -1 }
+				
+				owner = {
+					random_owned_planet = {
+						limit = {
+							cw_is_construction_planet = yes
+							spaceport = { has_spaceport_module = cruiser_assembly_yard }
+						}
+
+						log = "CW | Building cruiser at ([This.GetName]) to reinforce ([event_target:TargetFleet.GetName])."
+
+						save_event_target_as = TargetPlanet
+						cw_create_cruiser_reinforcement = yes
+						set_planet_flag = "ref@last_created_fleet"
+						set_planet_flag = cw_is_building_ship
+						root = { cw_pay_cruiser = yes }
+					}
+				}
+			}
+
+			while = {
+				limit = {
+					check_variable = { which = target_battleships value > 0 }
+					root = { cw_can_pay_battleship = yes }
+				}
+
+				change_variable = { which = target_battleships value = -1 }
+				
+				owner = {
+					random_owned_planet = {
+						limit = {
+							cw_is_construction_planet = yes
+							spaceport = { has_spaceport_module = battleship_assembly_yard }
+						}
+
+						log = "CW | Building battleship at ([This.GetName]) to reinforce ([event_target:TargetFleet.GetName])."
+
+						save_event_target_as = TargetPlanet
+						cw_create_battleship_reinforcement = yes
+						set_planet_flag = "ref@last_created_fleet"
+						set_planet_flag = cw_is_building_ship
+						root = { cw_pay_battleship = yes }
+					}
+				}
+			}
+		}
+	}
+}
+
+fleet_event = { 
+	id = cw.4
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+
+		save_event_target_as = ReinforcementFleet
+
+		owner = {
+			random_owned_planet = { 
+				limit = { has_planet_flag = "ref@event_target:ReinforcementFleet" }
+				remove_planet_flag = "ref@event_target:ReinforcementFleet"
+				remove_planet_flag = cw_is_building_ship
+			}
+
+			random_owned_ship = {
+				limit = { event_target:ReinforcementFleet = { is_same_value = prev.fleet } }
+				save_event_target_as = Ship
+				log = "CW | ([this.GetName]) construction complete."
+				remove_ship_flag = cw_in_production
+			}
+		}
+
+		owner = {
+			random_owned_fleet = {
+				limit = { has_fleet_flag = "ref@event_target:ReinforcementFleet" }
+				save_event_target_as = TargetFleet
+			}
+		}
+
+		if = {
+			limit = { not = { exists = event_target:TargetFleet } }
+			log = "CW | Target fleet not found upon reinforcement construction."
+			save_event_target_as = MyFleet
+			set_event_locked = no
+
+			owner = {
+				every_owned_ship = {
+					limit = { event_target:MyFleet = { is_same_value = prev.fleet } }
+					remove_ship_flag = ref@event_target:TargetFleet
+				}
+			}
+
+			break = yes
+		}
+
+		event_target:TargetFleet = { 
+			if = { 
+				limit = { event_target:Ship = { is_ship_size = corvette } }
+				cw_create_corvette = yes
+				break = yes
+			}
+			if = { 
+				limit = { event_target:Ship = { is_ship_size = destroyer } }
+				cw_create_destroyer = yes
+				break = yes
+			}
+			if = { 
+				limit = { event_target:Ship = { is_ship_size = cruiser } }
+				cw_create_cruiser = yes
+				break = yes
+			}
+			if = { 
+				limit = { event_target:Ship = { is_ship_size = battleship } }
+				cw_create_battleship = yes
+				break = yes
+			}
+		}
+
+		delete_fleet = this
+	}
+}
