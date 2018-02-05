@@ -1,59 +1,150 @@
-ap_cybertronic_worlds = {
-	on_enabled = {
-		custom_tooltip = "allow_cybertronic_worlds"
-		custom_tooltip = "describe_cybertronic_worlds"
-	}
+### ExOverhaul Weights ###
 
-	potential = {
-		has_global_flag = ex_cybertronic_worlds_active
-		OR = {
-			has_authority = auth_machine_intelligence
-			has_ascension_perk = ap_synthetic_evolution
+@avoid = 0
+@standard = 10
+@important = 25
+@excellent = 50
+@strategic = 100
+@crucial_1 = 250
+@crucial_2 = 1000
+
+@reduce_interest_1 = 0.5
+@reduce_interest_2 = 0.25
+@reduce_interest_3 = 0.1
+@increase_interest_1 = 2
+@increase_interest_2 = 3
+@increase_interest_3 = 5
+
+ap_machine_worlds = {
+	on_enabled = {
+		if = {
+			limit = { NOT = { has_global_flag = ex_cybertronic_worlds_active } }
+			custom_tooltip = "allow_machine_worlds"
+			custom_tooltip = "describe_machine_worlds"
 		}	
-		NOR = {
-			has_ascension_perk = ap_machine_worlds
-			has_ascension_perk = ap_cybertronic_worlds
-		}
-	}
-	
-	possible = {
-		custom_tooltip = {
-			fail_text = "requires_mega_engineering"
-			has_technology = tech_mega_engineering
+		if = {
+			limit = { has_global_flag = ex_cybertronic_worlds_active }
+			custom_tooltip = "allow_cybertronic_worlds"
+			custom_tooltip = "describe_cybertronic_worlds"
 		}		
 	}
 	
-	ai_weight = {
-		factor = 100
-	}
-}
-### ap_machine_worlds is overwritten to make it unavailable for selection IF cybertronic worlds are active. 
-ap_machine_worlds = {
-	on_enabled = {
-		custom_tooltip = "allow_machine_worlds"
-		custom_tooltip = "describe_machine_worlds"
-	}
-
 	potential = {
-		has_authority = auth_machine_intelligence
-		NOT = {
-			has_ascension_perk = ap_machine_worlds
+		OR = {
+			AND = {
+				has_global_flag = ex_cybertronic_worlds_active
+				OR = {				
+					has_authority = auth_machine_intelligence
+					has_ascension_perk = ap_synthetic_evolution
+				}
+			}
+			AND = {
+				NOT = { has_global_flag = ex_cybertronic_worlds_active }
+				has_authority = auth_machine_intelligence
+			}
 		}
+		NOT = {	has_ascension_perk = ap_machine_worlds }
 	}
 	
 	possible = {
-		NOT = { has_global_flag = ex_cybertronic_worlds_active }
-		custom_tooltip = {
-			fail_text = "requires_technology_tech_climate_restoration"
-			has_technology = tech_climate_restoration
+		if = {
+			limit = { NOT = { has_global_flag = "ex_cybertronic_worlds_active" } }
+			custom_tooltip = {
+				fail_text = "requires_technology_tech_climate_restoration"
+				has_technology = "tech_climate_restoration"
+			}
+			custom_tooltip = {
+				fail_text = "requires_ascension_perks_2"
+				num_ascension_perks > 1
+			}			
 		}	
-		custom_tooltip = {
-			fail_text = "requires_ascension_perks_2"
-			num_ascension_perks > 1
-		}	
-	}
+		if = {
+			limit = { has_global_flag = "ex_cybertronic_worlds_active" }
+			custom_tooltip = {
+				fail_text = "requires_mega_engineering"
+				has_technology = tech_mega_engineering
+			}			
+		}
+	}	
 	
-	ai_weight = {
-		factor = 10
-	}
-}
+	ai_weight = { 
+		weight = @standard
+		modifier = {
+			factor = @avoid
+			OR = {
+				AND = {
+					NOT = { has_global_flag = "ex_cybertronic_worlds_active" }
+					has_monthly_income = {
+						resource = energy
+						value < 300
+					}				
+				}	
+				AND = {
+					has_global_flag = "ex_cybertronic_worlds_active"
+					has_monthly_income = {
+						resource = minerals
+						value < 400
+					}									
+					has_monthly_income = {
+						resource = energy
+						value < 200
+					}				
+				}				
+			}
+		}
+		modifier = {
+			factor = @increase_interest_3
+			OR = {
+				AND = {
+					NOT = { has_global_flag = "ex_cybertronic_worlds_active" }
+					has_country_strategic_resource = { type = sr_terraform_gases amount = 1 }
+				}	
+				AND = {
+					has_global_flag = "ex_cybertronic_worlds_active"
+					OR = {
+						AND = {
+							has_global_flag = "ex_combat_active"	
+							has_country_strategic_resource = { type = sr_living_metal amount = 1 }
+							has_sr_ex_7 = yes
+						}	
+						AND = {
+							NOT = { has_global_flag = "ex_combat_active"	}
+							has_country_strategic_resource = { type = sr_living_metal amount = 1 }									
+						}						
+					}	
+				}				
+			}
+		}
+		modifier = {
+			factor = @increase_interest_3
+			AND = {
+				has_global_flag = "ex_cybertronic_worlds_active"
+				has_ascension_perk = ap_master_builders
+			}
+		}			
+		modifier = {
+			factor = @crucial_2
+			OR = {
+				AND = {
+					NOT = { has_global_flag = "ex_cybertronic_worlds_active" }
+					has_monthly_income = {
+						resource = energy
+						value > 300
+					}
+					has_ascension_perk = ap_synthetic_age
+				}	
+				AND = {
+					has_global_flag = "ex_cybertronic_worlds_active"
+					has_monthly_income = {
+						resource = minerals
+						value > 500
+					}									
+					has_monthly_income = {
+						resource = energy
+						value > 250
+					}					
+				}				
+			}
+		}			
+	}	
+}	
