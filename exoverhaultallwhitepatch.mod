@@ -5,4 +5,4 @@ tags={
 }
 picture="exoverhaultallwhitepatch.png"
 remote_file_id="1292261500"
-supported_version="1.9.1"
+supported_version="1.9.*"

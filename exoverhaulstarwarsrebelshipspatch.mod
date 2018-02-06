@@ -6,4 +6,4 @@ tags={
 }
 picture="exoverhaulstarwarsrebelshipspatch.png"
 remote_file_id="1291233590"
-supported_version="1.9.1"
+supported_version="1.9.*"

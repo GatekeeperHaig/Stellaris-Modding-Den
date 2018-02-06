@@ -6,4 +6,4 @@ tags={
 }
 picture="exoverhaulstarwarsempireshipspatch.png"
 remote_file_id="1291490241"
-supported_version="1.9.1"
+supported_version="1.9.*"

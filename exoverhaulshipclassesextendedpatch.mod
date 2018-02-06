@@ -4,4 +4,5 @@ tags={
 	"Spaceships"
 }
 picture="exoverhaulshipclassesextendedpatch.png"
-supported_version="1.9.1"
+remote_file_id="1292812190"
+supported_version="1.9.*"
