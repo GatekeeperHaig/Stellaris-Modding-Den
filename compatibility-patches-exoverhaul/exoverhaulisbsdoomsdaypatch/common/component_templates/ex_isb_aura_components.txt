@@ -1,0 +1,401 @@
+@ex_Titan_power_usage_electronic_warfare_package_tier_1 = -120
+@ex_Titan_power_usage_electronic_warfare_package_tier_2 = -300
+@ex_Titan_cost_electronic_warfare_package_tier_1 = 120
+@ex_Titan_cost_electronic_warfare_package_tier_2 = 300
+@ex_Titan_power_usage_ship_networked_targeting_node_tier_1 = -120
+@ex_Titan_power_usage_ship_networked_targeting_node_tier_2 = -300
+@ex_Titan_cost_ship_networked_targeting_node_tier_1 = 120
+@ex_Titan_cost_ship_networked_targeting_node_tier_2 = 300
+@ex_Titan_power_usage_ship_logistical_support_grid_tier_1 = -120
+@ex_Titan_power_usage_ship_logistical_support_grid_tier_2 = -300
+@ex_Titan_cost_ship_logistical_support_grid_tier_1 = 120
+@ex_Titan_cost_ship_logistical_support_grid_tier_2 = 300
+@ex_Titan_power_usage_barrier_field_generator_tier_1 = -120
+@ex_Titan_power_usage_barrier_field_generator_tier_2 = -300
+@ex_Titan_cost_barrier_field_generator_tier_1 = 120
+@ex_Titan_cost_barrier_field_generator_tier_2 = 300
+
+# aura properties
+
+@ex_Titan_electronic_warfare_package_hostile_aura_ship_accuracy_add_tier_1 = -5
+@ex_Titan_electronic_warfare_package_hostile_aura_ship_accuracy_add_tier_2 = -10
+@ex_Titan_electronic_warfare_package_hostile_aura_ship_tracking_add_tier_1 = -5
+@ex_Titan_electronic_warfare_package_hostile_aura_ship_tracking_add_tier_2 = -10
+@ex_Titan_networked_targeting_node_friendly_aura_ship_accuracy_add_tier_1 = 5
+@ex_Titan_networked_targeting_node_friendly_aura_ship_accuracy_add_tier_2 = 10
+@ex_Titan_networked_targeting_node_friendly_aura_ship_tracking_add_tier_1 = 5
+@ex_Titan_networked_targeting_node_friendly_aura_ship_tracking_add_tier_2 = 10
+@ex_Titan_logistical_support_grid_friendly_aura_ship_auto_repair_add_tier_1 = 0.01
+@ex_Titan_logistical_support_grid_friendly_aura_ship_auto_repair_add_tier_2 = 0.02
+@ex_Titan_logistical_support_grid_friendly_aura_ship_upkeep_mult_tier_1 = -0.05
+@ex_Titan_logistical_support_grid_friendly_aura_ship_upkeep_mult_tier_2 = -0.1
+@ex_Titan_electronic_warfare_package_hostile_aura_range_tier_1 = 10
+@ex_Titan_electronic_warfare_package_hostile_aura_range_tier_2 = 20
+@ex_Titan_networked_targeting_node_friendly_aura_range_tier_1 = 10
+@ex_Titan_networked_targeting_node_friendly_aura_range_tier_2 = 20
+@ex_Titan_logistical_support_grid_friendly_aura_range_tier_1 = 10
+@ex_Titan_logistical_support_grid_friendly_aura_range_tier_2 = 20
+@ex_Titan_barrier_field_generator_hostile_aura_ship_evasion_add_tier_1 = -5
+@ex_Titan_barrier_field_generator_hostile_aura_ship_evasion_add_tier_2 = -10
+@ex_Titan_barrier_field_generator_hostile_aura_ship_combat_speed_mult_tier_1 = -0.2
+@ex_Titan_barrier_field_generator_hostile_aura_ship_combat_speed_mult_tier_2 = -0.4
+@ex_Titan_barrier_field_generator_hostile_aura_range_tier_1 = 10
+@ex_Titan_barrier_field_generator_hostile_aura_range_tier_2 = 20
+
+#Variables
+
+@weight_1 = 1
+@weight_2 = 2
+
+@priority_1 = 1
+@priority_2 = 10
+
+####
+
+utility_component_template = {
+	key = "EX_TITAN_SHIP_ELECTRONIC_WARFARE_PACKAGE_1"
+	size = aux
+	icon = "GFX_ship_part_electronic_warfare_package_1"
+	icon_frame = 1
+	power = @ex_Titan_power_usage_electronic_warfare_package_tier_1
+	cost = @ex_Titan_cost_electronic_warfare_package_tier_1
+	#armor_value = @ex_Titan_shield_regen_add_tier_1
+	component_set = "ex_aura_components"
+	upgrades_to = "EX_TITAN_SHIP_ELECTRONIC_WARFARE_PACKAGE_2"
+	size_restriction = { titan, leviathan }
+	class_restriction = { shipclass_military }
+	prerequisites = { "tech_electronic_warfare_package_1" }
+	#modifier = { ship_shield_regen_add = @ex_Titan_shield_regen_add_tier_1 }
+	
+	ai_weight = {
+		weight = @weight_1
+	}
+	
+	hostile_aura = {
+		name = "aura_electronic_warfare_package"
+		radius = @ex_Titan_electronic_warfare_package_hostile_aura_range_tier_1
+		apply_on = ships
+		stack_info = {
+			id = hostile_electronic_warfare_package_aura
+			priority = @priority_1
+		}
+		modifier = {
+			ship_accuracy_add = @ex_Titan_electronic_warfare_package_hostile_aura_ship_accuracy_add_tier_1
+			ship_tracking_add = @ex_Titan_electronic_warfare_package_hostile_aura_ship_tracking_add_tier_1
+		}
+		graphics = {
+			area_effect = {
+				entity = "circle_area_entity"
+				dynamic_scale = yes
+			}
+			ship_effect = {
+				entity = "ship_aura_negative_entity"
+				dynamic_scale = no
+			}
+		}
+	}
+}
+
+utility_component_template = {
+	key = "EX_TITAN_SHIP_ELECTRONIC_WARFARE_PACKAGE_2"
+	size = aux
+	icon = "GFX_ship_part_electronic_warfare_package_2"
+	icon_frame = 1
+	power = @ex_Titan_power_usage_electronic_warfare_package_tier_2
+	cost = @ex_Titan_cost_electronic_warfare_package_tier_2
+	#armor_value = @ex_Titan_shield_regen_add_tier_2
+	size_restriction = { titan, leviathan }
+	class_restriction = { shipclass_military }
+	prerequisites = { "tech_electronic_warfare_package_2" }
+	component_set = "ex_aura_components"
+	#modifier = { ship_shield_regen_add = @ex_Titan_shield_regen_add_tier_2 }
+	
+	ai_weight = {
+		weight = @weight_2
+	}
+	
+	hostile_aura = {
+		name = "aura_electronic_warfare_package"
+		radius = @ex_Titan_electronic_warfare_package_hostile_aura_range_tier_2
+		apply_on = ships
+		stack_info = {
+			id = hostile_electronic_warfare_package_aura
+			priority = @priority_2
+		}
+		modifier = {
+			ship_accuracy_add = @ex_Titan_electronic_warfare_package_hostile_aura_ship_accuracy_add_tier_2
+			ship_tracking_add = @ex_Titan_electronic_warfare_package_hostile_aura_ship_tracking_add_tier_2
+		}
+		graphics = {
+			area_effect = {
+				entity = "circle_area_entity"
+				dynamic_scale = yes
+			}
+			ship_effect = {
+				entity = "ship_aura_negative_entity"
+				dynamic_scale = no
+			}
+		}
+	}
+}
+
+utility_component_template = {
+	key = "EX_TITAN_SHIP_NETWORKED_TARGETING_NODE_1"
+	size = aux
+	icon = "GFX_ship_part_networked_targeting_node_1"
+	icon_frame = 1
+	power = @ex_Titan_power_usage_ship_networked_targeting_node_tier_1
+	cost = @ex_Titan_cost_ship_networked_targeting_node_tier_1
+	#armor_value = @ex_Titan_shield_regen_add_tier_1
+	component_set = "ex_aura_components"
+	upgrades_to = "EX_TITAN_SHIP_NETWORKED_TARGETING_NODE_2"
+	size_restriction = { titan, leviathan }
+	class_restriction = { shipclass_military }
+	prerequisites = { "tech_ship_networked_targeting_node_1" }
+	#modifier = { ship_shield_regen_add = @ex_Titan_shield_regen_add_tier_1 }
+	
+	ai_weight = {
+		weight = @weight_1
+	}
+	
+	friendly_aura = {
+		name = "aura_ship_networked_targeting_node"
+		radius = @ex_Titan_networked_targeting_node_friendly_aura_range_tier_1
+		apply_on = ships
+		stack_info = {
+			id = friendly_networked_targeting_node_aura
+			priority = @priority_1
+		}
+		modifier = {
+			ship_accuracy_add = @ex_Titan_networked_targeting_node_friendly_aura_ship_accuracy_add_tier_1
+			ship_tracking_add = @ex_Titan_networked_targeting_node_friendly_aura_ship_tracking_add_tier_1
+		}
+		graphics = {
+			area_effect = {
+				entity = "circle_area_entity"
+				dynamic_scale = yes
+			}
+			ship_effect = {
+				entity = "ship_aura_positive_entity"
+				dynamic_scale = no
+			}
+		}
+	}
+}
+
+utility_component_template = {
+	key = "EX_TITAN_SHIP_NETWORKED_TARGETING_NODE_2"
+	size = aux
+	icon = "GFX_ship_part_networked_targeting_node_2"
+	icon_frame = 1
+	power = @ex_Titan_power_usage_ship_networked_targeting_node_tier_2
+	cost = @ex_Titan_cost_ship_networked_targeting_node_tier_2
+	#armor_value = @ex_Titan_shield_regen_add_tier_2
+	size_restriction = { titan, leviathan }
+	class_restriction = { shipclass_military }
+	prerequisites = { "tech_ship_networked_targeting_node_2" }
+	component_set = "ex_aura_components"
+	#modifier = { ship_shield_regen_add = @ex_Titan_shield_regen_add_tier_2 }
+	
+	ai_weight = {
+		weight = @weight_2
+	}
+	
+	friendly_aura = {
+		name = "aura_ship_networked_targeting_node"
+		radius = @ex_Titan_networked_targeting_node_friendly_aura_range_tier_2
+		apply_on = ships
+		stack_info = {
+			id = friendly_networked_targeting_node_aura
+			priority = @priority_2
+		}
+		modifier = {
+			ship_accuracy_add = @ex_Titan_networked_targeting_node_friendly_aura_ship_accuracy_add_tier_2
+			ship_tracking_add = @ex_Titan_networked_targeting_node_friendly_aura_ship_tracking_add_tier_2
+		}
+		graphics = {
+			area_effect = {
+				entity = "circle_area_entity"
+				dynamic_scale = yes
+			}
+			ship_effect = {
+				entity = "ship_aura_positive_entity"
+				dynamic_scale = no
+			}
+		}
+	}
+}
+
+utility_component_template = {
+	key = "EX_TITAN_SHIP_LOGISTICAL_SUPPORT_GRID_1"
+	size = aux
+	icon = "GFX_ship_part_logistical_support_grid_1"
+	icon_frame = 1
+	power = @ex_Titan_power_usage_ship_logistical_support_grid_tier_1
+	cost = @ex_Titan_cost_ship_logistical_support_grid_tier_1
+	#armor_value = @ex_Titan_shield_regen_add_tier_1
+	component_set = "ex_aura_components"
+	upgrades_to = "EX_TITAN_SHIP_LOGISTICAL_SUPPORT_GRID_2"
+	size_restriction = { titan, leviathan }
+	class_restriction = { shipclass_military }
+	prerequisites = { "tech_logistical_support_grid_1" }
+	#modifier = { ship_shield_regen_add = @ex_Titan_shield_regen_add_tier_1 }
+	
+	ai_weight = {
+		weight = @weight_1
+	}
+	
+	friendly_aura = {
+		name = "aura_ship_logistical_support_grid"
+		radius = @ex_Titan_logistical_support_grid_friendly_aura_range_tier_1
+		apply_on = ships
+		stack_info = {
+			id = friendly_logistical_support_grid_aura
+			priority = @priority_1
+		}
+		modifier = {
+			ship_auto_repair_add = @ex_Titan_logistical_support_grid_friendly_aura_ship_auto_repair_add_tier_1
+			ship_upkeep_mult = @ex_Titan_logistical_support_grid_friendly_aura_ship_upkeep_mult_tier_1
+		}
+		graphics = {
+			area_effect = {
+				entity = "circle_area_entity"
+				dynamic_scale = yes
+			}
+			ship_effect = {
+				entity = "ship_aura_positive_entity"
+				dynamic_scale = no
+			}
+		}
+	}
+}
+
+utility_component_template = {
+	key = "EX_TITAN_SHIP_LOGISTICAL_SUPPORT_GRID_2"
+	size = aux
+	icon = "GFX_ship_part_logistical_support_grid_2"
+	icon_frame = 1
+	power = @ex_Titan_power_usage_ship_logistical_support_grid_tier_2
+	cost = @ex_Titan_cost_ship_logistical_support_grid_tier_2
+	#armor_value = @ex_Titan_shield_regen_add_tier_2
+	size_restriction = { titan, leviathan }
+	class_restriction = { shipclass_military }
+	prerequisites = { "tech_logistical_support_grid_2" }
+	component_set = "ex_aura_components"
+	#modifier = { ship_shield_regen_add = @ex_Titan_shield_regen_add_tier_2 }
+	
+	ai_weight = {
+		weight = @weight_2
+	}
+	
+	friendly_aura = {
+		name = "aura_ship_logistical_support_grid"
+		radius = @ex_Titan_logistical_support_grid_friendly_aura_range_tier_2
+		apply_on = ships
+		stack_info = {
+			id = friendly_logistical_support_grid_aura
+			priority = @priority_2
+		}
+		modifier = {
+			ship_auto_repair_add = @ex_Titan_logistical_support_grid_friendly_aura_ship_auto_repair_add_tier_2
+			ship_upkeep_mult = @ex_Titan_logistical_support_grid_friendly_aura_ship_upkeep_mult_tier_2
+		}
+		graphics = {
+			area_effect = {
+				entity = "circle_area_entity"
+				dynamic_scale = yes
+			}
+			ship_effect = {
+				entity = "ship_aura_positive_entity"
+				dynamic_scale = no
+			}
+		}
+	}
+}
+
+utility_component_template = {
+	key = "EX_TITAN_SHIP_BARRIER_FIELD_GENERATOR_1"
+	size = aux
+	icon = "GFX_ship_part_barrier_field_generator_1"
+	icon_frame = 1
+	power = @ex_Titan_power_usage_barrier_field_generator_tier_1
+	cost = @ex_Titan_cost_barrier_field_generator_tier_1
+	#armor_value = @ex_Titan_shield_regen_add_tier_1
+	component_set = "ex_aura_components"
+	upgrades_to = "EX_TITAN_SHIP_BARRIER_FIELD_GENERATOR_2"
+	size_restriction = { titan, leviathan }
+	class_restriction = { shipclass_military }
+	prerequisites = { "tech_barrier_field_generator_1" }
+	#modifier = { ship_shield_regen_add = @ex_Titan_shield_regen_add_tier_1 }
+	
+	ai_weight = {
+		weight = @weight_1
+	}
+	
+	hostile_aura = {
+		name = "aura_barrier_field_generator"
+		radius = @ex_Titan_barrier_field_generator_hostile_aura_range_tier_1
+		apply_on = ships
+		stack_info = {
+			id = hostile_barrier_field_generator_aura
+			priority = @priority_1
+		}
+		modifier = {
+			ship_evasion_add = @ex_Titan_barrier_field_generator_hostile_aura_ship_evasion_add_tier_1
+			ship_combat_speed_mult = @ex_Titan_barrier_field_generator_hostile_aura_ship_combat_speed_mult_tier_1
+		}
+		graphics = {
+			area_effect = {
+				entity = "circle_area_entity"
+				dynamic_scale = yes
+			}
+			ship_effect = {
+				entity = "ship_aura_negative_entity"
+				dynamic_scale = no
+			}
+		}
+	}
+}
+
+utility_component_template = {
+	key = "EX_TITAN_SHIP_BARRIER_FIELD_GENERATOR_2"
+	size = aux
+	icon = "GFX_ship_part_barrier_field_generator_2"
+	icon_frame = 1
+	power = @ex_Titan_power_usage_barrier_field_generator_tier_2
+	cost = @ex_Titan_cost_barrier_field_generator_tier_2
+	#armor_value = @ex_Titan_shield_regen_add_tier_2
+	size_restriction = { titan, leviathan }
+	class_restriction = { shipclass_military }
+	prerequisites = { "tech_barrier_field_generator_2" }
+	component_set = "ex_aura_components"
+	#modifier = { ship_shield_regen_add = @ex_Titan_shield_regen_add_tier_2 }
+	
+	ai_weight = {
+		weight = @weight_2
+	}
+	
+	hostile_aura = {
+		name = "aura_barrier_field_generator"
+		radius = @ex_Titan_barrier_field_generator_hostile_aura_range_tier_2
+		apply_on = ships
+		stack_info = {
+			id = hostile_barrier_field_generator_aura
+			priority = @priority_2
+		}
+		modifier = {
+			ship_evasion_add = @ex_Titan_barrier_field_generator_hostile_aura_ship_evasion_add_tier_2
+			ship_combat_speed_mult = @ex_Titan_barrier_field_generator_hostile_aura_ship_combat_speed_mult_tier_2
+		}
+		graphics = {
+			area_effect = {
+				entity = "circle_area_entity"
+				dynamic_scale = yes
+			}
+			ship_effect = {
+				entity = "ship_aura_negative_entity"
+				dynamic_scale = no
+			}
+		}
+	}
+}
