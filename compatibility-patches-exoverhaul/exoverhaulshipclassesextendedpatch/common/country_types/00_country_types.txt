@@ -1,4 +1,3 @@
-
 # Country types specify the rules by which a country plays the game.
 # Example:
 #name_of_country_type = {
@@ -153,6 +152,120 @@ default = {
 				}
 			}
 			
+			NSC_Flagship = {
+				min = 1
+				max = 1
+			}
+
+			NSC_Superdreadnought = {
+				fraction = {
+					modifier = {
+						add = 5
+						has_technology = tech_superdreadnought_1
+					}
+				}
+			}
+
+			NSC_Dreadnought = {
+				fraction = {
+					modifier = {
+						add = 10
+						has_technology = tech_dreadnought_1
+					}
+					modifier = {
+						add = 5 #15
+						has_technology = tech_superdreadnought_1
+					}
+				}
+			}
+
+			NSC_Carrier = {
+				fraction = {
+					modifier = {
+						add = 10
+						has_technology = tech_carrier_1
+					}
+					modifier = {
+						add = 5 #15
+						has_technology = tech_superdreadnought_1
+					}
+				}
+			}
+
+			NSC_LightCarrier = {
+				fraction = {
+					modifier = {
+						add = 10 
+						has_technology = tech_spaceport_4
+					}
+					modifier = {
+						add = -10 #0
+						has_technology = tech_carrier_1
+					}
+				}
+			}
+
+			NSC_Battlecruiser = {
+				fraction = {
+					modifier = {
+						add = 15
+						has_technology = tech_spaceport_5
+					}
+					modifier = {
+						add = 5 #20
+						has_technology = tech_spaceport_6
+					}
+					modifier = {
+						add = 5 #25
+						has_technology = tech_dreadnought_1
+					}
+					modifier = {
+						add = 5 #30
+						has_technology = tech_superdreadnought_1
+					}
+				}
+			}
+
+			NSC_StrikeCruiser = {
+				fraction = {
+					modifier = {
+						add = 5
+						has_technology = tech_spaceport_6
+					}
+				}
+			}
+			
+			erebus = {
+				fraction = {
+					modifier = {
+						add = 7
+						has_technology = tech_erebus
+					}
+				}
+			}
+
+			leviathan = {
+				fraction = {
+					modifier = {
+						add = 11
+						has_technology = tech_leviathan
+					}
+				}
+			}
+
+			titan = {
+				fraction = {
+					modifier = {
+						add = 8
+						has_technology = tech_titan
+					}
+					modifier = {
+						add = -3	# 5%
+						has_technology = tech_leviathan
+					}
+				}
+			}
+			
 			dreadnought = {
 				fraction = {
 					modifier = {
@@ -228,79 +341,177 @@ default = {
 		}
 		
 		army_data = {
+			#defensive armies
 			defense_army = {
 				fraction = {
 					factor = 50
-					modifier = {
-						factor = 0
-						has_authority = auth_machine_intelligence
-					}					
-					modifier = {
-						add = 10
-						OR = {
-							has_ethic = ethic_pacifist
-							has_ethic = ethic_fanatic_pacifist
+					modifier = { factor = 0	has_authority = auth_machine_intelligence }					
+					modifier = { factor = 0	has_technology = tech_combat_training }						
+				}
+			}
+			defense_army_2 = {
+				fraction = {
+					factor = 50
+					modifier = { factor = 0	has_authority = auth_machine_intelligence }					
+					modifier = { factor = 0	has_technology = tech_advanced_assault_armies }
+					modifier = { 
+						add = -20 
+						AND = {
+							OR = { 	
+								has_ai_personality_behaviour = robot_exploiter
+								has_ai_personality_behaviour = robot_liberator
+							}
+							has_technology = tech_droid_workers
 						}
 					}
 				}
 			}
-			
+			defense_army_3 = {
+				fraction = {
+					factor = 50
+					modifier = { factor = 0	has_authority = auth_machine_intelligence }										
+					modifier = { 
+						add = -20 
+						AND = {
+							OR = { 	
+								has_ai_personality_behaviour = robot_exploiter
+								has_ai_personality_behaviour = robot_liberator
+							}
+							has_technology = tech_synthetic_workers
+						}
+					}
+				}
+			}
+			robotic_defense_army = {
+				fraction = {
+					factor = 30
+					modifier = { factor = 0	has_authority = auth_machine_intelligence }										
+					modifier = { 
+						factor = 0  
+						OR = {
+							NOR = { 	
+								has_ai_personality_behaviour = robot_exploiter
+								has_ai_personality_behaviour = robot_liberator
+							}
+							has_technology = tech_synthetic_workers
+						}
+					}
+				}
+			}
+			android_defense_army = {
+				fraction = {
+					factor = 30
+					modifier = { factor = 0	has_authority = auth_machine_intelligence }										
+					modifier = { 
+						factor = 0  
+						NOR = { 	
+							has_ai_personality_behaviour = robot_exploiter
+							has_ai_personality_behaviour = robot_liberator							
+						}
+					}
+				}
+			}
+			machine_defense_1= {
+				fraction = {
+					factor = 50
+					modifier = { factor = 0	NOT = { has_authority = auth_machine_intelligence } }
+					modifier = { factor = 0	has_technology = tech_combat_training }
+				}
+			}		
+			machine_defense_2= {
+				fraction = {
+					factor = 50
+					modifier = { factor = 0	NOT = { has_authority = auth_machine_intelligence } }
+					modifier = { factor = 0	has_technology = tech_adaptive_combat_algorithms }
+				}
+			}
+			machine_defense_3= {
+				fraction = {
+					factor = 50
+					modifier = { factor = 0	NOT = { has_authority = auth_machine_intelligence } }
+				}
+			}			
+			#assault armies
 			assault_army = {
 				fraction = {
 					factor = 50
+					modifier = { factor = 0	has_authority = auth_machine_intelligence }					
+					modifier = { factor = 0	has_technology = tech_combat_training }
+					modifier = { factor = 0	has_technology = tech_cloning }
 					modifier = {
-						factor = 0
-						has_authority = auth_machine_intelligence
-					}					
-					modifier = {
-						add = -20
+						factor = 0 
 						OR = {
 							AND = {
 								has_ai_personality_behaviour = slaver
 								has_technology = tech_neural_implants
 							}
 							AND = {
-								has_ai_personality_behaviour = robot_exploiter
+								OR = {
+									has_ai_personality_behaviour = robot_exploiter
+									has_ai_personality_behaviour = robot_liberator
+								}
 								has_technology = tech_droid_workers
 							}
-						}
-					}
-					modifier = {
-						add = -10
-						OR = {
-							has_ethic = ethic_pacifist
-							has_ethic = ethic_fanatic_pacifist
-						}
-					}
-					modifier = {
-						factor = 0
-						OR = {
-							has_technology = tech_cloning
-							has_technology = tech_telepathy
-							has_technology = tech_synthetic_workers
-							has_technology = tech_gene_seed_purification
 							AND = {
-								exists = ruler
-								ruler = { 
-									has_leader_flag = has_elite_guard 
-								}
 								OR = {
 									has_government = gov_despotic_hegemony
 									has_government = gov_illuminated_autocracy
-								}
-							}
-						}
-					}
+								}							
+								exists = ruler
+								ruler = { has_leader_flag = has_elite_guard }	
+							}							
+						}								
+					}		
 				}
 			}
-			
+			assault_army_2 = {
+				fraction = {
+					factor = 50
+					modifier = { factor = 0	has_authority = auth_machine_intelligence }					
+					modifier = { factor = 0	has_technology = tech_advanced_assault_armies }
+					modifier = { factor = 0	has_technology = tech_cloning }
+					modifier = {
+						factor = 0 
+						OR = {
+							AND = {
+								has_ai_personality_behaviour = slaver
+								has_technology = tech_neural_implants
+							}
+							AND = {
+								OR = {
+									has_ai_personality_behaviour = robot_exploiter
+									has_ai_personality_behaviour = robot_liberator
+								}
+								has_technology = tech_droid_workers
+							}
+						}								
+					}		
+				}
+			}			
+			assault_army_3 = {
+				fraction = {
+					factor = 50
+					modifier = { factor = 0	has_authority = auth_machine_intelligence }					
+					modifier = { factor = 0.5	has_technology = tech_morphogenetic_field_mastery }
+					modifier = {
+						factor = 0 
+						OR = {
+							AND = {
+								OR = {
+									has_ai_personality_behaviour = robot_exploiter
+									has_ai_personality_behaviour = robot_liberator
+								}
+								has_technology = tech_synthetic_workers
+							}
+						}								
+					}		
+				}
+			}			
 			slave_army = {
 				fraction = {
 					factor = 20
-					modifier = {
-						factor = 0
-						has_authority = auth_machine_intelligence
-					}
+					modifier = { factor = 0 has_authority = auth_machine_intelligence }
+					modifier = { factor = 0	has_technology = tech_combat_training }
 					modifier = {
 						factor = 0
 						OR = {
@@ -311,45 +522,95 @@ default = {
 								}
 							}
 							AND = {
-								has_ai_personality_behaviour = robot_exploiter
+								OR = {
+									has_ai_personality_behaviour = robot_exploiter
+									has_ai_personality_behaviour = robot_liberator
+								}
 								has_technology = tech_droid_workers
 							}
-							NOT = {
-								any_owned_planet = {
-									has_building = building_slave_processing
-								}
-							}
+							NOT = { any_owned_planet = { has_building = building_slave_processing } }							
 						}
 					}
 				}
 			}
-			
+			slave_army_2 = {
+				fraction = {
+					factor = 20
+					modifier = { factor = 0 has_authority = auth_machine_intelligence }
+					modifier = { factor = 0.5	has_technology = tech_advanced_assault_armies }
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = {
+								AND = {
+									has_ai_personality_behaviour = slaver
+									has_technology = tech_neural_implants
+								}
+							}
+							AND = {
+								OR = {
+									has_ai_personality_behaviour = robot_exploiter
+									has_ai_personality_behaviour = robot_liberator
+								}
+								has_technology = tech_synthetic_workers
+							}
+							NOT = { any_owned_planet = { has_building = building_slave_processing } }							
+						}
+					}
+				}
+			}						
 			robotic_army = {
 				fraction = {
 					factor = 20
+					modifier = { factor = 0 has_authority = auth_machine_intelligence }					
 					modifier = {
 						factor = 0
-						has_authority = auth_machine_intelligence
-					}					
-					modifier = {
-						factor = 0
-						NOT = {
-							AND = {
+						OR = {
+							NOR = {
 								has_ai_personality_behaviour = robot_exploiter
-								has_technology = tech_droid_workers
+								has_ai_personality_behaviour = robot_liberator
 							}
+							has_technology = tech_droid_workers							
 						}
 					}
 				}
 			}
-			
+			android_army = {
+				fraction = {
+					factor = 20
+					modifier = { factor = 0 has_authority = auth_machine_intelligence }					
+					modifier = {
+						factor = 0
+						OR = {
+							NOR = {
+								has_ai_personality_behaviour = robot_exploiter
+								has_ai_personality_behaviour = robot_liberator
+							}
+							has_technology = tech_synthetic_commandos
+						}
+					}
+				}
+			}
+			synth_commandos = {
+				fraction = {
+					factor = 20
+					modifier = { factor = 0 has_authority = auth_machine_intelligence }					
+					modifier = {
+						factor = 0
+						NOR = {
+							has_ai_personality_behaviour = robot_exploiter
+							has_ai_personality_behaviour = robot_liberator
+							has_country_flag = synthetic_age
+						}
+					}
+				}
+			}			
 			clone_army = {
 				fraction = {
 					factor = 50
-					modifier = {
-						factor = 0
-						has_authority = auth_machine_intelligence
-					}					
+					modifier = { factor = 0 has_authority = auth_machine_intelligence }					
+					modifier = { factor = 0	has_technology = tech_morphogenetic_field_mastery }					
+					modifier = { factor = 0	NOT = { any_owned_planet = { has_building = building_clone_vats } } }
 					modifier = {
 						add = -20
 						OR = {
@@ -358,232 +619,116 @@ default = {
 								has_technology = tech_neural_implants
 							}
 							AND = {
-								has_ai_personality_behaviour = robot_exploiter
+								OR = {
+									has_ai_personality_behaviour = robot_exploiter
+									has_ai_personality_behaviour = robot_liberator
+								}	
 								has_technology = tech_droid_workers
 							}
+							has_technology = tech_advanced_assault_armies
 						}
-					}
-					modifier = {
-						add = -10
-						OR = {
-							has_ethic = ethic_pacifist
-							has_ethic = ethic_fanatic_pacifist
-						}
-					}
-					modifier = {
-						factor = 0
-						OR = {
-							NOT = {
-								has_technology = tech_cloning
-							}
-							has_technology = tech_telepathy
-							has_technology = tech_synthetic_workers
-							has_technology = tech_gene_seed_purification
-							AND = {
-								exists = ruler
-								ruler = { 
-									has_leader_flag = has_elite_guard
-								}
-								OR = {
-									has_government = gov_despotic_hegemony
-									has_government = gov_illuminated_autocracy
-								}
-							}
-						}
-					}
+					}		
 				}
 			}
-			
-			psionic_army = {			
+			xenomorph_army = {
 				fraction = {
 					factor = 50
-					modifier = {
-						factor = 0
-						has_authority = auth_machine_intelligence
-					}					
+					modifier = { factor = 0 has_authority = auth_machine_intelligence }					
+					modifier = { factor = 0	has_technology = tech_gene_seed_purification }					
+					modifier = { factor = 0	NOT = { any_owned_planet = { has_building = building_clone_vats } } }				
 					modifier = {
 						add = -20
 						OR = {
 							AND = {
 								has_ai_personality_behaviour = slaver
-								has_technology = tech_neural_implants
+								has_technology = tech_combat_training
 							}
 							AND = {
-								has_ai_personality_behaviour = robot_exploiter
-								has_technology = tech_droid_workers
-							}
-						}
-					}
-					modifier = {
-						add = -10
-						OR = {
-							has_ethic = ethic_pacifist
-							has_ethic = ethic_fanatic_pacifist
-						}
-					}
-					modifier = {
-						factor = 0
-						OR = {
-							NOT = {
-								has_technology = tech_telepathy
-							}
-							has_technology = tech_synthetic_workers
-							has_technology = tech_gene_seed_purification
-							AND = {
-								exists = ruler
-								ruler = { 
-									has_leader_flag = has_elite_guard
-								}
 								OR = {
-									has_government = gov_despotic_hegemony
-									has_government = gov_illuminated_autocracy
-								}
-							}
-						}
-					}
-				}
-			}
-			
-			android_army = {
-				fraction = {
-					factor = 50
-					modifier = {
-						factor = 0
-						has_authority = auth_machine_intelligence
-					}					
-					modifier = {
-						add = -20
-						OR = {
-							AND = {
-								has_ai_personality_behaviour = slaver
-								has_technology = tech_neural_implants
-							}
-							AND = {
-								has_ai_personality_behaviour = robot_exploiter
-								has_technology = tech_droid_workers
-							}
-						}
-					}
-					modifier = {
-						add = -10
-						OR = {
-							has_ethic = ethic_pacifist
-							has_ethic = ethic_fanatic_pacifist
-						}
-					}
-					modifier = {
-						factor = 0
-						OR = {
-							NOT = {
+									has_ai_personality_behaviour = robot_exploiter
+									has_ai_personality_behaviour = robot_liberator
+								}	
 								has_technology = tech_synthetic_workers
 							}
-							has_technology = tech_gene_seed_purification
-							AND = {
-								exists = ruler
-								ruler = {
-									has_leader_flag = has_elite_guard
-								}
-								OR = {
-									has_government = gov_despotic_hegemony
-									has_government = gov_illuminated_autocracy
-								}
-							}
+							has_technology = tech_advanced_assault_armies
 						}
 					}
+					
 				}
-			}
-			
+			}			
 			gene_warrior_army = {
 				fraction = {
 					factor = 50
-					modifier = {
-						factor = 0
-						has_authority = auth_machine_intelligence
-					}					
+					modifier = { factor = 0 has_authority = auth_machine_intelligence }										
+					modifier = { factor = 0	NOT = { any_owned_planet = { has_building = building_clone_vats } } }				
 					modifier = {
 						add = -20
 						OR = {
 							AND = {
-								has_ai_personality_behaviour = slaver
-								has_technology = tech_neural_implants
-							}
-							AND = {
-								has_ai_personality_behaviour = robot_exploiter
-								has_technology = tech_droid_workers
-							}
-						}
-					}
-					modifier = {
-						add = -10
-						OR = {
-							has_ethic = ethic_pacifist
-							has_ethic = ethic_fanatic_pacifist
-						}
-					}
-					modifier = {
-						factor = 0
-						OR = {
-							NOT = {
-								has_technology = tech_gene_seed_purification
-							}
-							AND = {
-								exists = ruler
-								ruler = { 
-									has_leader_flag = has_elite_guard
-								}
 								OR = {
-									has_government = gov_despotic_hegemony
-									has_government = gov_illuminated_autocracy
-								}
+									has_ai_personality_behaviour = robot_exploiter
+									has_ai_personality_behaviour = robot_liberator
+									has_country_flag = synthetic_age
+								}	
+								has_technology = tech_synthetic_commandos
 							}
+							has_technology = tech_telepathy
 						}
+					}
+					
+				}
+			}									
+			psionic_army = {			
+				fraction = {
+					factor = 50
+					modifier = { factor = 0 has_authority = auth_machine_intelligence }					
+					modifier = {
+						add = -20
+						AND = {
+							OR = {
+								has_ai_personality_behaviour = robot_exploiter
+								has_ai_personality_behaviour = robot_liberator
+								has_country_flag = synthetic_age
+							}	
+							has_technology = tech_synthetic_commandos
+						}						
 					}
 				}
 			}
-			
 			elite_guard_army = {
 				fraction = {
 					factor = 50
+					modifier = { factor = 0 has_authority = auth_machine_intelligence }					
+					modifier = { factor = 0 has_technology = tech_advanced_assault_armies }					
 					modifier = {
 						factor = 0
-						has_authority = auth_machine_intelligence
+						OR = {
+							NOR = {
+								has_government = gov_despotic_hegemony
+								has_government = gov_illuminated_autocracy								
+							}	
+							AND = {							
+								exists = ruler
+								ruler = { NOT = { has_leader_flag = has_elite_guard } } 					
+							}	
+						}
 					}					
 					modifier = {
 						add = -20
 						OR = {
 							AND = {
 								has_ai_personality_behaviour = slaver
-								has_technology = tech_neural_implants
+								has_technology = tech_combat_training
 							}
-							AND = {
-								has_ai_personality_behaviour = robot_exploiter
-								has_technology = tech_droid_workers
-							}
-						}
-					}
-					modifier = {
-						add = -10
-						OR = {
-							has_ethic = ethic_pacifist
-							has_ethic = ethic_fanatic_pacifist
-						}
-					}
-					modifier = {
-						factor = 0
-						exists = ruler
-						NOT = {
-							ruler = { 
-								has_leader_flag = has_elite_guard
-							} 
 							OR = {
-								has_government = gov_despotic_hegemony
-								has_government = gov_illuminated_autocracy
+								has_ai_personality_behaviour = robot_exploiter
+								has_ai_personality_behaviour = robot_liberator
+								has_technology = tech_droid_workers
 							}
 						}
 					}
 				}
 			}
-
 			machine_assault_1 = {
 				fraction = {
 					factor = 50
@@ -591,69 +736,45 @@ default = {
 						factor = 0
 						OR = {
 							NOT = { has_authority = auth_machine_intelligence }
-							has_technology = tech_adaptive_combat_algorithms
+							has_technology = tech_combat_training
 						}
 					}
 				}
 			}
-	
-			machine_defense_1 = {
-				fraction = {
-					factor = 50
-					modifier = {
-						factor = 0
-						OR = {
-							NOT = { has_authority = auth_machine_intelligence }
-							has_technology = tech_adaptive_combat_algorithms
-						}
-					}
-				}
-			}
-	
 			machine_assault_2 = {
 				fraction = {
 					factor = 50
 					modifier = {
-						factor = -20
-						has_technology = tech_biomechanics
-					}
-					modifier = {
 						factor = 0
 						OR = {
 							NOT = { has_authority = auth_machine_intelligence }
-							NOT = { has_technology = tech_adaptive_combat_algorithms }
+							has_technology = tech_adaptive_combat_algorithms
 						}
 					}
 				}
-			}
-	
-			machine_defense_2 = {
+			}			
+			machine_assault_3_alt = {
 				fraction = {
 					factor = 50
 					modifier = {
 						factor = 0
 						OR = {
 							NOT = { has_authority = auth_machine_intelligence }
-							NOT = { has_technology = tech_adaptive_combat_algorithms }
+							has_technology = tech_biomechanics
 						}
 					}
 				}
-			}
-	
+			}			
 			machine_assault_3 = {
 				fraction = {
-					factor = 25
+					factor = 50
 					modifier = {
 						factor = 0
-						OR = {
-							NOT = { has_authority = auth_machine_intelligence }
-							NOT = { has_technology = tech_biomechanics }
-						}
+						NOT = { has_authority = auth_machine_intelligence }			
 					}
 				}
-			}
+			}			
 		}
-
 	}
 	modules = {
 		standard_event_module = {}
@@ -1092,6 +1213,24 @@ awakened_fallen_empire = {
 			colonizer = {
 				min = 1
 				max = 1
+			}
+			
+			titan_ship_fallen_empire = {
+				fraction = {
+					base = 10
+				}
+			}
+
+			erebus = {
+				fraction = {
+					base = 5
+				}
+			}
+
+			leviathan = {
+				fraction = {
+					base = 5
+				}
 			}
 			
 			massive_ship_fallen_empire = {
