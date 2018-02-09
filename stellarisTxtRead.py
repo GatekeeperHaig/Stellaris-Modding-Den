@@ -301,49 +301,53 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       print("Start reading "+fileName)
       lineIndex=0
       for line in inputFile:
-        lineIndex+=1
-        line=line.strip()
-        if len(line)>0 and (line[0]!="#" or bracketLevel>0) :
-          if line[0]=="@":
-            varsToValue.addString(line)
-          elif line[0]!="#" or bracketLevel>0:
-            if line[0]=="#":
-              objectList[-1].add("","",line)
-              continue
-            currentlyInHeader=False
-            bracketOpen=line.count("{")
-            bracketClose=line.count("}")
-            if bracketLevel==0:
-              if (bracketOpen!=1 or bracketClose!=0):
-                #   print("Error in line {!s}:\n{}\nInvalid building start line".format(lineIndex,line))
-                #   sys.exit(1)
-                # else:
-                self.addString(line)
-                if args.just_copy_and_check:
-                  args.preventLinePrint.append(lineIndex)
-                  # print(line)
+        try:
+          lineIndex+=1
+          line=line.strip()
+          if len(line)>0 and (line[0]!="#" or bracketLevel>0) :
+            if line[0]=="@":
+              varsToValue.addString(line)
+            elif line[0]!="#" or bracketLevel>0:
+              if line[0]=="#":
+                objectList[-1].add("","",line)
+                continue
+              currentlyInHeader=False
+              bracketOpen=line.count("{")
+              bracketClose=line.count("}")
+              if bracketLevel==0:
+                if (bracketOpen!=1 or bracketClose!=0):
+                  #   print("Error in line {!s}:\n{}\nInvalid building start line".format(lineIndex,line))
+                  #   sys.exit(1)
+                  # else:
+                  self.addString(line)
+                  if args.just_copy_and_check:
+                    args.preventLinePrint.append(lineIndex)
+                    # print(line)
+                else:
+                  tagName=line.split("=")[0].strip()
+                  objectList.append(NamedTagList(lineIndex,tagName))
+                  self.add(tagName,objectList[-1])
               else:
-                tagName=line.split("=")[0].strip()
-                objectList.append(NamedTagList(lineIndex,tagName))
-                self.add(tagName,objectList[-1])
-            else:
-              if bracketOpen>bracketClose:
-                newObject=TagList(bracketLevel+1)
-                objectList[-1].addArray([line.split("=")[0],newObject])
-                objectList.append(newObject)
-              elif bracketOpen==bracketClose:
-                objectList[-1].addString(line)
-            bracketDiff=bracketOpen-bracketClose
-            bracketLevel+=bracketDiff
-            # print(line)
-            if bracketLevel==0 and bracketDiff<0:
-              self.vals[-1].lineEnd=lineIndex
-            objectList=objectList[0:bracketLevel]
-        elif keepEmptryLinesAndComments:
-          if currentlyInHeader:
-            varsToValue.addString(line)
-          elif bracketLevel==0:
-            self.addString(line)
+                if bracketOpen>bracketClose:
+                  newObject=TagList(bracketLevel+1)
+                  objectList[-1].addArray([line.split("=")[0],newObject])
+                  objectList.append(newObject)
+                elif bracketOpen==bracketClose:
+                  objectList[-1].addString(line)
+              bracketDiff=bracketOpen-bracketClose
+              bracketLevel+=bracketDiff
+              # print(line)
+              if bracketLevel==0 and bracketDiff<0:
+                self.vals[-1].lineEnd=lineIndex
+              objectList=objectList[0:bracketLevel]
+          elif keepEmptryLinesAndComments:
+            if currentlyInHeader:
+              varsToValue.addString(line)
+            elif bracketLevel==0:
+              self.addString(line)
+        except:
+          print("Error in line {!s}: ".format(lineIndex)+line)
+          raise
   def addTags(self, tagList):
     for name, entry in self.getAll():
       if name!="namespace" and entry!="":
