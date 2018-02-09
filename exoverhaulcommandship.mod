@@ -1,4 +1,4 @@
-name="!ExOverhaul: Combat Patch for Command Ship (Fleet Templates)"
+name="+!ExOverhaul: Combat Command Ship (Fleet Templates) Patch"
 path="mod/exoverhaulpatchcommandship"
 tags={
 	"Military"

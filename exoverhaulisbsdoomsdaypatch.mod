@@ -1,4 +1,4 @@
-name="!ExOverhaul: Combat ISBS: Doomsday Weapons & Ships Patch"
+name="(!ExOverhaul: Combat ISBS: Doomsday Weapons & Ships Patch)"
 path="mod/compatibility-patches-exoverhaul/exoverhaulisbsdoomsdaypatch"
 tags={
 	"Spaceships"

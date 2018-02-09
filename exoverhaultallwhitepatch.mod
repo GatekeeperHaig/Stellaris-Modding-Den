@@ -1,4 +1,4 @@
-name="!ExOverhaul: Combat TALL WHITE Patch"
+name="+!ExOverhaul: Combat TALL WHITE Patch"
 path="mod/compatibility-patches-exoverhaul/exoverhaultallwhitepatch"
 tags={
 	"Spaceships"

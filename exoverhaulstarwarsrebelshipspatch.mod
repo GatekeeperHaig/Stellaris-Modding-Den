@@ -1,4 +1,4 @@
-name="!ExOverhaul: Combat Star Wars Rebel Ships Patch"
+name="(!ExOverhaul: Combat Star Wars Rebel Ships Patch)"
 path="mod/compatibility-patches-exoverhaul/exoverhaulstarwarsrebelshipspatch"
 tags={
 	"Spaceships"
