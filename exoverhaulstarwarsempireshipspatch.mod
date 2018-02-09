@@ -1,4 +1,4 @@
-name="!ExOverhaul: Combat Star Wars Empire Ships Patch"
+name="(!ExOverhaul: Combat Star Wars Empire Ships Patch)"
 path="mod/compatibility-patches-exoverhaul/exoverhaulstarwarsempireshipspatch"
 tags={
 	"Spaceships"

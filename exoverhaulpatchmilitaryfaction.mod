@@ -1,4 +1,4 @@
-name="!ExOverhaul: Combat Patch for Military Faction"
+name="+!ExOverhaul: Combat Military Faction Patch"
 path="mod/compatibility-patches-exoverhaul/exoverhaulpatchmilitaryfaction"
 tags={
 	"Military"
