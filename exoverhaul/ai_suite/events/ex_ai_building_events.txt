@@ -53,6 +53,18 @@ event = { #this event adds variables into scopes, to be used by building ai_weig
 					is_country_type = awakened_fallen_empire
 				}	
 			}
+			every_owned_pop = {
+				limit = { NOT = { has_pop_flag = ai_weights_calculated } }
+				set_variable = { which = energy_weight value = 0 }
+				set_variable = { which = minerals_weight value = 0 }
+				set_variable = { which = food_weight value = 0 }
+				set_variable = { which = unity_weight value = 0 }
+				set_variable = { which = society_research_weight value = 0 }
+				set_variable = { which = physics_research_weight value = 0 }
+				set_variable = { which = engineering_research_weight value = 0 }									
+				calculate_pop_weights = yes
+				set_timed_pop_flag = { flag = ai_weights_calculated days = 3600 }
+			}				
 			every_owned_planet = {
 				limit = { 
 					is_colony = yes
@@ -60,7 +72,7 @@ event = { #this event adds variables into scopes, to be used by building ai_weig
 						owner = { is_ai = yes }
 						sector_controlled = yes
 					}	
-				}
+				}					
 				every_tile = {
 					set_variable = { which = energy_weight value = 0 }
 					set_variable = { which = minerals_weight value = 0 }
@@ -69,10 +81,22 @@ event = { #this event adds variables into scopes, to be used by building ai_weig
 					set_variable = { which = society_research_weight value = 0 }
 					set_variable = { which = physics_research_weight value = 0 }
 					set_variable = { which = engineering_research_weight value = 0 }
-					if = {
-						limit = { 	}	
-						calculate_blocker_weights = yes
-					}	
+				}
+				if = {
+					limit = { 
+						OR = {
+							has_bonus_planet_modifier = yes
+							has_planet_bonus_building = yes
+							AND = {
+								has_global_flag = ex_planets_enhanced_active
+								has_sr_adj_bonus_building = yes
+								has_planets_enhanced_planet_bonus_buildings = yes
+							}	
+						}
+					}
+					calculate_planet_weights = yes
+				}	
+				every_tile = {
 					if = {
 						limit = { 
 							OR = {
@@ -83,29 +107,26 @@ event = { #this event adds variables into scopes, to be used by building ai_weig
 										has_hyperstorage_building = yes 
 										has_polytechnic_building = yes
 										has_special_capital_resource_building = yes
-										has_sr_adj_bonus_building = yes
-									}
+										AND = {
+											has_global_flag = ex_planets_enhanced_active
+											has_sr_adj_bonus_building = yes
+										}	
+									}	
 								}
 								AND = {
 									has_blocker = yes
 									has_adj_bonus_blocker = yes
-								}
-							}		
-							calculate_adjcancy_weights = yes								
-						}						
-					}						
-					if = {
-						limit = { 
-							has_blocker = no						
-							AND = {
-								has_pop = yes
-								pop = { is_sapient = yes }
-							}
+								}		
+							}							
 						}
-						calculate_tile_weights = yes	
-					}								
-				}	
+						calculate_adjcancy_weights = yes
+					}
+					if = {
+						limit = { has_blocker = no }
+						calculate_tile_weights = yes
+					}	
+				}					
 			}		
-					
-		
-		
+		}
+	}
+}

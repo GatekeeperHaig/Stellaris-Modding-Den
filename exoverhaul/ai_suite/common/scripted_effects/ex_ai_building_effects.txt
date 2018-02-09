@@ -4,23 +4,37 @@ calculate_tile_weights = { #this runs on tile scope, and it saves the variables 
 	check_unity_deposit = yes
 	check_food_deposit = yes
 	check_society_research_deposit = yes
-	check_physics_research_deposit = yes		
-	check_adj_bonus_buildings = yes
+	check_physics_research_deposit = yes			
 }
+
+calculate_planet_weights = { #this runs on planet scope, and it saves the variables into every tile's or every pop's scope, depending on the building bonus.	
+	check_planet_bonus_buildings = yes
+	check_planet_modifiers = yes	
+	if = {
+		limit = { has_global_flag = ex_planets_enhanced_active }
+		if = { 
+			limit = { has_planets_enhanced_planet_bonus_buildings = yes }
+			check_planets_enhanced_planet_bonus_buildings = yes
+		}	
+		if = {
+			limit = { is_planet_class = pc_nuked }
+			check_planets_enhanced_planet_modifiers = yes
+		}	
+		if = {
+			limit = { has_planets_enhanced_pop_bonus_buildings = yes }
+			check_planets_enhanced_pop_bonus_buildings = yes
+		}	
+	}
+}	
 
 calculate_pop_weights = { #this runs on pop scope, and it saves the variables into the pop scope	
 	check_pop_traits = yes
 }	
 
-calculate_planet_weights = { #this runs on planet scope, and it saves the variables into the planet scope	
-	check_planet_bonus_buildings = yes
-	check_planet_modifiers = yes
-	check_planet_type = yes
-}	
-
 calculate_adjcancy_weights = { #this runs on tile scope, and it saves the variables into all the adj. tiles' scope
 	if = { limit = { has_building = yes } check_adj_bonus_buildings = yes }
-	if = { limit = { has_blocker = yes } check_adj_bonus_blockers = yes }
+	if = { limit = { has_blocker = yes } check_adj_bonus_blockers = yes }	
+	if = { limit = { has_global_flag = ex_planets_enhanced_active } check_planets_enhanced_sr_buildings = yes }		
 }
 	
 check_energy_deposit = {		
@@ -423,210 +437,155 @@ check_engineering_research_deposit = {
 }	
 
 check_pop_traits = {
-	if = {
-		limit = { has_pop = yes }
+	if = { 
+		limit = { is_robot_pop = yes }
 		if = { 
-			limit = { NOR = { has_trait = "trait_machine_unit" has_trait = "trait_mechanical" } }
-			if = { 
-				limit = { pop = { has_trait = "trait_nerve_stapled" } }
-				change_variable = { which = energy_weight value = -5 }
-				change_variable = { which = minerals_weight value = 1 }
-				change_variable = { which = food_weight value = 1 }
-				change_variable = { which = unity_weight value = -5 }
-				change_variable = { which = society_research_weight value = -7.5 }
-				change_variable = { which = physics_research_weight value = -7.5 }
-				change_variable = { which = engineering_research_weight value = -7.5 }
-			}
-			if = { 
-				limit = { pop = { has_trait = "trait_presapient_proles" } }
-				change_variable = { which = energy_weight value = -5 }
-				change_variable = { which = minerals_weight value = 1 }
-				change_variable = { which = food_weight value = 1 }			
-				change_variable = { which = society_research_weight value = -2.5 }
-				change_variable = { which = physics_research_weight value = -2.5 }
-				change_variable = { which = engineering_research_weight value = -2.5 }
-			}		
-			if = { 
-				limit = { pop = { has_trait = "trait_syncretic_proles" } }
-				change_variable = { which = minerals_weight value = 1 }
-				change_variable = { which = food_weight value = 1 }			
-				change_variable = { which = society_research_weight value = -1.5 }
-				change_variable = { which = physics_research_weight value = -1.5 }
-				change_variable = { which = engineering_research_weight value = -1.5 }
-			}			
-			if = { 
-				limit = { pop = { has_trait = "trait_agrarian" } }
-				change_variable = { which = food_weight value = 1.5 }
-			}	
-			if = { 
-				limit = { pop = { has_trait = "trait_thrifty" } }
-				change_variable = { which = energy_weight value = 1.5 }
-			}				
-			if = { 
-				limit = { pop = { has_trait = "trait_industrious" } }
-				change_variable = { which = minerals_weight value = 1.5 }
-			}			
-			if = { 
-				limit = { pop = { has_trait = "trait_intelligent" } }
-				change_variable = { which = society_research_weight value = 1 }
-				change_variable = { which = physics_research_weight value = 1 }
-				change_variable = { which = engineering_research_weight value = 1 }
-			}			
-			if = { 
-				limit = { pop = { has_trait = "trait_natural_engineers" } }
-				change_variable = { which = engineering_research_weight value = 1.5 }
-			}						
-			if = { 
-				limit = { pop = { has_trait = "trait_natural_physicists" } }
-				change_variable = { which = physics_research_weight value = 1.5 }
-			}						
-			if = { 
-				limit = { pop = { has_trait = "trait_natural_sociologists" } }
-				change_variable = { which = society_research_weight value = 1.5 }
-			}			
-			if = { 
-				limit = { pop = { has_trait = "trait_very_strong" } }
-				change_variable = { which = minerals_weight value = 1 }
-			}						
-			if = { 
-				limit = { pop = { has_trait = "trait_strong" } }
-				change_variable = { which = minerals_weight value = 0.5 }
-			}									
-			if = { 
-				limit = { pop = { has_trait = "trait_weak" } }
-				change_variable = { which = minerals_weight value = -0.5 }
-			}	
-			if = { 
-				limit = { pop = { has_trait = "trait_erudite" } }
-				change_variable = { which = society_research_weight value = 2 }
-				change_variable = { which = physics_research_weight value = 2 }
-				change_variable = { which = engineering_research_weight value = 2 }
-			}
-			if = { 				
-				limit = { pop = { has_trait = "trait_presapient_earthbound" } }			
-				change_variable = { which = energy_weight value = 1 }
-			}
-			if = { 				
-				limit = { pop = { has_trait = "trait_presapient_natural_intellectuals" } }			
-				change_variable = { which = society_research_weight value = 1 }
-				change_variable = { which = physics_research_weight value = 1 }
-				change_variable = { which = engineering_research_weight value = 1 }
-				change_variable = { which = minerals_weight value = 1 }
-			}				
-			break = yes	
+			limit = { has_trait = "trait_nerve_stapled" }
+			change_variable = { which = energy_weight value = -5 }
+			change_variable = { which = minerals_weight value = 1 }
+			change_variable = { which = food_weight value = 1 }
+			change_variable = { which = unity_weight value = -5 }
+			change_variable = { which = society_research_weight value = -7.5 }
+			change_variable = { which = physics_research_weight value = -7.5 }
+			change_variable = { which = engineering_research_weight value = -7.5 }
+		}
+		if = { 
+			limit = { has_trait = "trait_presapient_proles" }
+			change_variable = { which = energy_weight value = -5 }
+			change_variable = { which = minerals_weight value = 1 }
+			change_variable = { which = food_weight value = 1 }			
+			change_variable = { which = society_research_weight value = -2.5 }
+			change_variable = { which = physics_research_weight value = -2.5 }
+			change_variable = { which = engineering_research_weight value = -2.5 }
+		}		
+		if = { 
+			limit = { has_trait = "trait_syncretic_proles" }
+			change_variable = { which = minerals_weight value = 1 }
+			change_variable = { which = food_weight value = 1 }			
+			change_variable = { which = society_research_weight value = -1.5 }
+			change_variable = { which = physics_research_weight value = -1.5 }
+			change_variable = { which = engineering_research_weight value = -1.5 }
+		}			
+		if = { 
+			limit = { has_trait = "trait_agrarian" }
+			change_variable = { which = food_weight value = 1.5 }
 		}	
 		if = { 
-			limit = { OR = { has_trait = "trait_machine_unit" has_trait = "trait_mechanical" } }
-			if = { 
-				limit = { pop = { has_trait = "trait_robotic_1" } }
-				change_variable = { which = energy_weight value = -8 }
-				change_variable = { which = minerals_weight value = 1 }				
-				change_variable = { which = unity_weight value = -4 }
-				change_variable = { which = society_research_weight value = -8 }
-				change_variable = { which = physics_research_weight value = -8 }
-				change_variable = { which = engineering_research_weight value = -8 }
-			}						
-			if = { 
-				limit = { pop = { has_trait = "trait_robotic_2" } }
-				change_variable = { which = energy_weight value = -2 }
-				change_variable = { which = minerals_weight value = 1.5 }				
-				change_variable = { which = unity_weight value = -2 }
-				change_variable = { which = society_research_weight value = -4 }
-				change_variable = { which = physics_research_weight value = -4 }
-				change_variable = { which = engineering_research_weight value = -4 }
-			}
-			if = { 
-				limit = { pop = { has_trait = "trait_robotic_3" } }
-				change_variable = { which = energy_weight value = 2 }
-				change_variable = { which = minerals_weight value = 2 }				
-				change_variable = { which = unity_weight value = 2 }
-				change_variable = { which = society_research_weight value = 2 }
-				change_variable = { which = physics_research_weight value = 2 }
-				change_variable = { which = engineering_research_weight value = 2 }
-			}			
-			if = { 
-				limit = { pop = { has_trait = "trait_robot_power_drills" } }
-				change_variable = { which = minerals_weight value = 1 }				
-			}			
-			if = { 
-				limit = { pop = { has_trait = "trait_robot_harvesters" } }
-				change_variable = { which = food_weight value = 1 }				
-			}			
-			if = { 
-				limit = { pop = { has_trait = "trait_robot_logic_engines" } }
-				change_variable = { which = society_research_weight value = 1 }
-				change_variable = { which = physics_research_weight value = 1 }
-				change_variable = { which = engineering_research_weight value = 1 }
-			}
-			if = { 
-				limit = { pop = { has_trait = "trait_robot_superconductive" } }
-				change_variable = { which = energy_weight value = 1 }				
-			}
-			if = { 
-				limit = { pop = { has_trait = "trait_robot_propaganda_machines" } }
-				change_variable = { which = unity_weight value = 1 }				
-			}
-			else = { break = yes }				
-		}
-	}
-}						
-
-check_planet_bonus_buildings = {
-	if = { 
-		limit = {
-			planet = { has_building = building_mineral_processing_plant_1 }
+			limit = { has_trait = "trait_thrifty" }
+			change_variable = { which = energy_weight value = 1.5 }
+		}				
+		if = { 
+			limit = { has_trait = "trait_industrious" }
+			change_variable = { which = minerals_weight value = 1.5 }
+		}			
+		if = { 
+			limit = { has_trait = "trait_intelligent" }
+			change_variable = { which = society_research_weight value = 1 }
+			change_variable = { which = physics_research_weight value = 1 }
+			change_variable = { which = engineering_research_weight value = 1 }
+		}			
+		if = { 
+			limit = { has_trait = "trait_natural_engineers" }
+			change_variable = { which = engineering_research_weight value = 1.5 }
+		}						
+		if = { 
+			limit = { has_trait = "trait_natural_physicists" }
+			change_variable = { which = physics_research_weight value = 1.5 }
+		}						
+		if = { 
+			limit = { has_trait = "trait_natural_sociologists" }
+			change_variable = { which = society_research_weight value = 1.5 }
+		}			
+		if = { 
+			limit = { has_trait = "trait_very_strong" }
 			change_variable = { which = minerals_weight value = 1 }
+		}						
+		if = { 
+			limit = { has_trait = "trait_strong" }
+			change_variable = { which = minerals_weight value = 0.5 }
+		}									
+		if = { 
+			limit = { has_trait = "trait_weak" }
+			change_variable = { which = minerals_weight value = -0.5 }
+		}	
+		if = { 
+			limit = { has_trait = "trait_erudite" }
+			change_variable = { which = society_research_weight value = 2 }
+			change_variable = { which = physics_research_weight value = 2 }
+			change_variable = { which = engineering_research_weight value = 2 }
 		}
-	}	
-	if = { 
-		limit = {
-			planet = { has_building = building_mineral_processing_plant_2 }
-			change_variable = { which = minerals_weight value = 1 }
-		}
-	}	
-	if = { 
-		limit = {
-			planet = { has_building = building_power_hub_1 }
+		if = { 				
+			limit = { has_trait = "trait_presapient_earthbound" }			
 			change_variable = { which = energy_weight value = 1 }
 		}
+		if = { 				
+			limit = { has_trait = "trait_presapient_natural_intellectuals" }			
+			change_variable = { which = society_research_weight value = 1 }
+			change_variable = { which = physics_research_weight value = 1 }
+			change_variable = { which = engineering_research_weight value = 1 }
+			change_variable = { which = minerals_weight value = 1 }
+		}	
+		if = {
+			limit = { has_trait = "trait_cybernetic" planet = { has_building = building_neuro_electric_amplifier } }
+			change_variable = { which = minerals_weight value = 1.5 }
+			change_variable = { which = energy_weight value = 1.5 }
+		}	
+		break = yes	
 	}	
 	if = { 
-		limit = {
-			planet = { has_building = building_power_hub_2 }
+		limit = { is_robot_pop = yes }
+		if = { 
+			limit = { has_trait = "trait_robotic_1" }
+			change_variable = { which = energy_weight value = -8 }
+			change_variable = { which = minerals_weight value = 1 }				
+			change_variable = { which = unity_weight value = -4 }
+			change_variable = { which = society_research_weight value = -8 }
+			change_variable = { which = physics_research_weight value = -8 }
+			change_variable = { which = engineering_research_weight value = -8 }
+		}						
+		if = { 
+			limit = { has_trait = "trait_robotic_2" }
+			change_variable = { which = energy_weight value = -2 }
+			change_variable = { which = minerals_weight value = 1.5 }				
+			change_variable = { which = unity_weight value = -2 }
+			change_variable = { which = society_research_weight value = -4 }
+			change_variable = { which = physics_research_weight value = -4 }
+			change_variable = { which = engineering_research_weight value = -4 }
+		}
+		if = { 
+			limit = { has_trait = "trait_robotic_3" }
 			change_variable = { which = energy_weight value = 2 }
+			change_variable = { which = minerals_weight value = 2 }				
+			change_variable = { which = unity_weight value = 2 }
+			change_variable = { which = society_research_weight value = 2 }
+			change_variable = { which = physics_research_weight value = 2 }
+			change_variable = { which = engineering_research_weight value = 2 }
+		}			
+		if = { 
+			limit = { has_trait = "trait_robot_power_drills" }
+			change_variable = { which = minerals_weight value = 1 }				
+		}			
+		if = { 
+			limit = { has_trait = "trait_robot_harvesters" }
+			change_variable = { which = food_weight value = 1 }				
+		}			
+		if = { 
+			limit = { has_trait = "trait_robot_logic_engines" }
+			change_variable = { which = society_research_weight value = 1 }
+			change_variable = { which = physics_research_weight value = 1 }
+			change_variable = { which = engineering_research_weight value = 1 }
 		}
-	}		
-	if = { 
-		limit = {
-			planet = { has_building = building_akx_worm_1 }
-			change_variable = { which = energy_weight value = 2.5 }
+		if = { 
+			limit = { has_trait = "trait_robot_superconductive" }
+			change_variable = { which = energy_weight value = 1 }				
 		}
-	}			
-	if = { 
-		limit = {
-			planet = { has_building = building_hypercomms_forum }
-			change_variable = { which = unity_weight value = 1 }
+		if = { 
+			limit = { has_trait = "trait_robot_propaganda_machines" }
+			change_variable = { which = unity_weight value = 1 }				
 		}
-	}	
-	if = { 
-		limit = {
-			planet = { has_building = building_sacred_nexus }
-			change_variable = { which = unity_weight value = 1 }
-		}
+		else = { break = yes }				
 	}
-	if = { 
-		limit = {
-			planet = { has_building = building_sacred_nexus }
-			change_variable = { which = unity_weight value = 1 }
-		}
-	}	
-	if = { 
-		limit = {
-			planet = { has_building = building_galactic_stock_exchange }
-			change_variable = { which = energy_weight value = 1 }
-		}
-	}		
-}	
+}		
 
 check_adj_bonus_buildings = {
 	if = {
@@ -834,9 +793,167 @@ check_adj_bonus_buildings = {
 				break = yes
 			}				
 		}
+	}		
+}			
+
+check_adj_bonus_blockers = {
+	if = {
+		limit = { has_blocker = tb_wandering_forest_reserve }
+		every_neighboring_tile = { change_variable = { which = society_research_weight value = 3 } }
+		break = yes
+	}				
+	if = {
+		limit = { has_blocker = tb_tribal_settlement }
+		every_neighboring_tile = { change_variable = { which = society_research_weight value = 1 } }
+		break = yes
+	}	
+}		
+	
+check_planet_modifiers = {
+	if = {
+		limit = { has_modifier = hazardous_weather }
+		every_tile = { change_variable = { which = energy_weight value = 2 } }		
+	}
+	if = {
+		limit = { has_modifier = dangerous_wildlife }
+		every_tile = { change_variable = { which = society_research_weight value = 2 } }		
 	}	
 	if = {
-		limit = { has_global_flag = ex_planets_enhanced_active }
-		check_planets_enhanced_sr_buildings = yes 
+		limit = { has_modifier = strong_magnetic_field }
+		every_tile = { 
+			change_variable = { which = energy_weight value = 0.5 }
+			change_variable = { which = physics_research_weight value = 0.5 }		
+		}	
+	}		
+	if = {
+		limit = { has_modifier = unstable_tectonics }
+		every_tile = { change_variable = { which = engineering_research_weight value = 2 } }		
 	}	
-}			
+	if = {
+		limit = { has_modifier = asteroid_impacts }
+		every_tile = { change_variable = { which = minerals_weight value = 0.5 } }		
+	}
+	if = {
+		limit = { has_modifier = extensive_moon_system }
+		every_tile = { change_variable = { which = minerals_weight value = 1 } }		
+	}
+	if = {
+		limit = { has_modifier = wild_storms }
+		every_tile = { change_variable = { which = physics_research_weight value = 2 } }		
+	}
+	if = {
+		limit = { has_modifier = mineral_rich }
+		every_tile = { change_variable = { which = minerals_weight value = 1.5 } }		
+	}	
+	if = {
+		limit = { has_modifier = ultra_rich }
+		every_tile = { change_variable = { which = minerals_weight value = 2.5 } }		
+	}		
+	if = {
+		limit = { has_modifier = mineral_poor }
+		every_tile = { change_variable = { which = minerals_weight value = -2.5 } }		
+	}			
+	if = {
+		limit = { has_modifier = titanic_life }
+		every_tile = { change_variable = { which = society_research_weight value = 2.5 } }		
+	}	
+	if = {
+		limit = { has_modifier = eat_the_titans }
+		every_tile = { change_variable = { which = food_weight value = 5 } }		
+	}	
+	if = {
+		limit = { has_modifier = asteroid_belt }
+		every_tile = { change_variable = { which = minerals_weight value = 1 } }		
+	}		
+	if = {
+		limit = { has_modifier = atmospheric_hallucinogen }
+		every_tile = { change_variable = { which = society_research_weight value = 1 } }		
+	}		
+	if = {
+		limit = { has_modifier = atmospheric_hallucinogen_good }
+		every_tile = { change_variable = { which = society_research_weight value = 1 } }	
+	}	
+	if = {
+		limit = { has_modifier = lush_planet }
+		every_tile = { change_variable = { which = food_weight value = 2 } }		
+	}	
+	if = {
+		limit = { has_modifier = bleak_planet }
+		every_tile = { change_variable = { which = food_weight value = -1 }	}	
+	}		
+	if = {
+		limit = { has_modifier = irradiated_planet }
+		every_tile = { change_variable = { which = food_weight value = -5 }	}	
+	}			
+	if = {
+		limit = { has_modifier = subterranean_civilization }
+		every_tile = { change_variable = { which = society_research_weight value = 1 } }		
+	}		
+	if = {
+		limit = { has_modifier = abandoned_terraforming }
+		every_tile = { change_variable = { which = food_weight value = -2 }	}	
+	}		
+	if = {
+		limit = { has_modifier = assist_research }
+		every_tile = { 
+			change_variable = { which = society_research_weight value = 1 }
+			change_variable = { which = physics_research_weight value = 1 }
+			change_variable = { which = engineering_research_weight value = 1 }		
+		}	
+	}		
+	if = {
+		limit = { has_modifier = planet_uncertain_past }
+		every_tile = { 
+			change_variable = { which = society_research_weight value = 1 }
+			change_variable = { which = physics_research_weight value = 1 }
+			change_variable = { which = engineering_research_weight value = 1 }		
+		}	
+	}			
+	if = {
+		limit = { has_modifier = magnetic_research_boost }
+		every_tile = { 
+			change_variable = { which = society_research_weight value = 2 }
+			change_variable = { which = physics_research_weight value = 2 }
+			change_variable = { which = engineering_research_weight value = 2 }	
+		}	
+	}		
+}	
+
+check_planet_bonus_buildings = {
+	if = { 
+		limit = { has_building = building_mineral_processing_plant_1 }
+		every_tile = { change_variable = { which = minerals_weight value = 1 } }		
+	}	
+	if = { 
+		limit = { has_building = building_mineral_processing_plant_2 }
+		every_tile = { change_variable = { which = minerals_weight value = 1 } }		
+	}	
+	if = { 
+		limit = { has_building = building_power_hub_1 }
+		every_tile = { change_variable = { which = energy_weight value = 1 } }		
+	}	
+	if = { 
+		limit = { has_building = building_power_hub_2 }
+		every_tile = { change_variable = { which = energy_weight value = 2 } }		
+	}		
+	if = { 
+		limit = { has_building = building_akx_worm_1 }
+		every_tile = { change_variable = { which = energy_weight value = 2.5 } }		
+	}			
+	if = { 
+		limit = { has_building = building_hypercomms_forum }
+		every_tile = { change_variable = { which = unity_weight value = 1 }	}	
+	}	
+	if = { 
+		limit = { has_building = building_sacred_nexus }
+		every_tile = { change_variable = { which = unity_weight value = 1 }	}	
+	}
+	if = { 
+		limit = { has_building = building_sacred_nexus }
+		every_tile = { change_variable = { which = unity_weight value = 1 }	}	
+	}	
+	if = { 
+		limit = { has_building = building_galactic_stock_exchange }
+		every_tile = { change_variable = { which = energy_weight value = 1 } }		
+	}			
+}	
