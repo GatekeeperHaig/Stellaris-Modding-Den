@@ -7,34 +7,20 @@ event = {
 
 	immediate = {
 		every_country = {
-			limit = {
-				is_country_type = default
-				NOT = { has_country_flag = resource_check_delay }
+			limit = {				
 				OR = {
-					energy < 1
-					minerals < 1
-					AND = {
-						NOT = { has_authority = auth_machine_intelligence }
-						food < 1
-					}
-				}		
-			}
-			if = {
-				limit = {
-					NOT = { has_authority = auth_machine_intelligence }
-					food < 1
-				}				
-				set_timed_country_flag = { flag = is_food_starved days = 90 }
-			}
-			if = {
-				limit = { energy < 1 }
-				set_timed_country_flag = { flag = is_energy_starved days = 90 }
-			}		
-			if = {
-				limit = { minerals < 1 }
-				set_timed_country_flag = { flag = is_minerals_starved days = 90 }
-			}			
-			set_timed_country_flag = { flag = resource_check_delay days = 90 }
+					is_country_type = default
+					is_country_type = fallen_empire
+					is_country_type = awakened_fallen_empire
+				}
+				NOT = { has_country_flag = resource_check_delay } # this delays the check from running every month, to running every 180 days
+			}	
+			set_variable = { which = energy_mult value = 0 }
+			set_variable = { which = minerals_mult value = 0 }
+			set_variable = { which = food_mult value = 0 }
+			check_deficities = yes
+			check_income_level = yes
+			set_timed_country_flag = { flag = resource_check_delay days = 180 }
 		}		
 	}			
 }
