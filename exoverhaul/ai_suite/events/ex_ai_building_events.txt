@@ -52,18 +52,6 @@ event = { #this event adds variables into scopes, to be used by building ai_weig
 					is_country_type = fallen_empire
 					is_country_type = awakened_fallen_empire
 				}	
-			}
-			every_owned_pop = {
-				limit = { NOT = { has_pop_flag = ai_weights_calculated } }
-				set_variable = { which = energy_weight value = 0 }
-				set_variable = { which = minerals_weight value = 0 }
-				set_variable = { which = food_weight value = 0 }
-				set_variable = { which = unity_weight value = 0 }
-				set_variable = { which = society_research_weight value = 0 }
-				set_variable = { which = physics_research_weight value = 0 }
-				set_variable = { which = engineering_research_weight value = 0 }									
-				calculate_pop_weights = yes
-				set_timed_pop_flag = { flag = ai_weights_calculated days = 3600 }
 			}				
 			every_owned_planet = {
 				limit = { 
@@ -72,9 +60,39 @@ event = { #this event adds variables into scopes, to be used by building ai_weig
 						owner = { is_ai = yes }
 						sector_controlled = yes
 					}	
-				}					
+				}
+				set_variable = { which = energy_mult value = 0 }
+				set_variable = { which = minerals_mult value = 0 }
+				set_variable = { which = food_mult value = 0 }
+				set_variable = { which = unity_mult value = 0 }
+				set_variable = { which = society_research_mult value = 0 }
+				set_variable = { which = physics_research_mult value = 0 }
+				set_variable = { which = engineering_research_mult value = 0 }
+				every_owned_pop = {
+					limit = { OR = { is_robot_pop = yes is_sapient = yes } }
+					set_variable = { which = energy_mult value = 0 }
+					set_variable = { which = minerals_mult value = 0 }
+					set_variable = { which = food_mult value = 0 }
+					set_variable = { which = unity_mult value = 0 }
+					set_variable = { which = society_research_mult value = 0 }
+					set_variable = { which = physics_research_mult value = 0 }
+					set_variable = { which = engineering_research_mult value = 0 }									
+					calculate_pop_multipliers = yes
+				}				
 				every_tile = {
-					limit = { is_orbital_tile = no }
+					limit = { 
+						is_orbital_tile = no
+						has_blocker = no
+					}
+					#multiplier variables
+					set_variable = { which = energy_mult value = 1 }
+					set_variable = { which = minerals_mult value = 1 }
+					set_variable = { which = food_mult value = 1 }
+					set_variable = { which = unity_mult value = 1 }
+					set_variable = { which = society_research_mult value = 1 }
+					set_variable = { which = physics_research_mult value = 1 }
+					set_variable = { which = engineering_research_mult value = 1 }					
+					#deposit/adj. variables
 					set_variable = { which = energy_weight value = 0 }
 					set_variable = { which = minerals_weight value = 0 }
 					set_variable = { which = food_weight value = 0 }
@@ -82,6 +100,13 @@ event = { #this event adds variables into scopes, to be used by building ai_weig
 					set_variable = { which = society_research_weight value = 0 }
 					set_variable = { which = physics_research_weight value = 0 }
 					set_variable = { which = engineering_research_weight value = 0 }
+					#building weight variables
+					set_variable = { which = energy_building_tile value = 0 }
+					set_variable = { which = minerals_building_tile value = 0 }
+					set_variable = { which = food_building_tile value = 0 }
+					set_variable = { which = society_research_building_tile value = 0 }
+					set_variable = { which = physics_research_building_tile value = 0 }
+					set_variable = { which = engineering_research_building_tile value = 0 }
 				}
 				if = { 
 					limit = { 

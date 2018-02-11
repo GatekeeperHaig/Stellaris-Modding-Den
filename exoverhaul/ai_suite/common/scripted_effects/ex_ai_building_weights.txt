@@ -1,22 +1,32 @@
 set_tile_building_weight = { 
+	### add the planet scope multiplier variables into the tile multiplier variables.
+	change_variable = { which = energy_mult value = root }
+	change_variable = { which = minerals_mult value = root }
+	change_variable = { which = food_mult value = root }
+	change_variable = { which = society_research_mult value = root }
+	change_variable = { which = physics_research_mult value = root }
+	change_variable = { which = engineering_research_mult value = root }
 	if = {
 		limit = { 
 			exists = pop
 			pop = { has_owner = yes }
 		}		
-		change_variable = { which = energy_weight value = pop  }
-		change_variable = { which = minerals_weight value = pop  }
-		change_variable = { which = food_weight value = pop  }
-		change_variable = { which = society_research_weight value = pop  }
-		change_variable = { which = physics_research_weight value = pop  }
-		change_variable = { which = engineering_research_weight value = pop  }
-	}	
-	set_variable = { which = energy_building_tile value = 0 }
-	set_variable = { which = minerals_building_tile value = 0 }
-	set_variable = { which = food_building_tile value = 0 }
-	set_variable = { which = society_research_building_tile value = 0 }
-	set_variable = { which = physics_research_building_tile value = 0 }
-	set_variable = { which = engineering_research_building_tile value = 0 }
+		### add the pop scope multiplier variables into the tile multiplier variables.
+		change_variable = { which = energy_mult value = pop }
+		change_variable = { which = minerals_mult value = pop }
+		change_variable = { which = food_mult value = pop }
+		change_variable = { which = society_research_mult value = pop }
+		change_variable = { which = physics_research_mult value = pop }
+		change_variable = { which = engineering_research_mult value = pop }
+	}
+	### multiply the deposit weight variables by the multiplier variables added from planet and pop
+	multiply_variable = { which = energy_weight value = energy_mult }
+	multiply_variable = { which = minerals_weight value = minerals_mult }
+	multiply_variable = { which = food_weight value = food_mult }
+	multiply_variable = { which = society_research_weight value = society_research_mult }
+	multiply_variable = { which = physics_research_weight value = physics_research_mult }
+	multiply_variable = { which = engineering_research_weight value = engineering_research_mult }
+	### compare the variables and find the highest number
 	if = { 
 		limit = { 
 			check_variable = { which = "energy_weight" value > "minerals_weight" }
