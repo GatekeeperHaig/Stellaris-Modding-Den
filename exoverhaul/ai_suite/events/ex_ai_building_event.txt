@@ -1,0 +1,40 @@
+namespace = ex_ai_building_events
+
+event = {
+	id = ex_ai_building_events.1
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		every_country = {
+			limit = {
+				is_country_type = default
+				NOT = { has_country_flag = resource_check_delay }
+				OR = {
+					energy < 1
+					minerals < 1
+					AND = {
+						NOT = { has_authority = auth_machine_intelligence }
+						food < 1
+					}
+				}		
+			}
+			if = {
+				limit = {
+					NOT = { has_authority = auth_machine_intelligence }
+					food < 1
+				}				
+				set_timed_country_flag = { flag = is_food_starved days = 90 }
+			}
+			if = {
+				limit = { energy < 1 }
+				set_timed_country_flag = { flag = is_energy_starved days = 90 }
+			}		
+			if = {
+				limit = { minerals < 1 }
+				set_timed_country_flag = { flag = is_minerals_starved days = 90 }
+			}			
+			set_timed_country_flag = { flag = resource_check_delay days = 90 }
+		}		
+	}			
+}
