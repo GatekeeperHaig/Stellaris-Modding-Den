@@ -7,34 +7,20 @@ event = {
 
 	immediate = {
 		every_country = {
-			limit = {
-				is_country_type = default
-				NOT = { has_country_flag = resource_check_delay }
+			limit = {				
 				OR = {
-					energy < 1
-					minerals < 1
-					AND = {
-						NOT = { has_authority = auth_machine_intelligence }
-						food < 1
-					}
-				}		
-			}
-			if = {
-				limit = {
-					NOT = { has_authority = auth_machine_intelligence }
-					food < 1
-				}				
-				set_timed_country_flag = { flag = is_food_starved days = 90 }
-			}
-			if = {
-				limit = { energy < 1 }
-				set_timed_country_flag = { flag = is_energy_starved days = 90 }
-			}		
-			if = {
-				limit = { minerals < 1 }
-				set_timed_country_flag = { flag = is_minerals_starved days = 90 }
-			}			
-			set_timed_country_flag = { flag = resource_check_delay days = 90 }
+					is_country_type = default
+					is_country_type = fallen_empire
+					is_country_type = awakened_fallen_empire
+				}
+				NOT = { has_country_flag = resource_check_delay } # this delays the check from running every month, to running every 180 days
+			}	
+			set_variable = { which = energy_mult value = 0 }
+			set_variable = { which = minerals_mult value = 0 }
+			set_variable = { which = food_mult value = 0 }
+			check_deficities = yes
+			check_income_level = yes
+			set_timed_country_flag = { flag = resource_check_delay days = 180 }
 		}		
 	}			
 }
@@ -52,18 +38,6 @@ event = { #this event adds variables into scopes, to be used by building ai_weig
 					is_country_type = fallen_empire
 					is_country_type = awakened_fallen_empire
 				}	
-			}
-			every_owned_pop = {
-				limit = { NOT = { has_pop_flag = ai_weights_calculated } }
-				set_variable = { which = energy_weight value = 0 }
-				set_variable = { which = minerals_weight value = 0 }
-				set_variable = { which = food_weight value = 0 }
-				set_variable = { which = unity_weight value = 0 }
-				set_variable = { which = society_research_weight value = 0 }
-				set_variable = { which = physics_research_weight value = 0 }
-				set_variable = { which = engineering_research_weight value = 0 }									
-				calculate_pop_weights = yes
-				set_timed_pop_flag = { flag = ai_weights_calculated days = 3600 }
 			}				
 			every_owned_planet = {
 				limit = { 
@@ -72,9 +46,39 @@ event = { #this event adds variables into scopes, to be used by building ai_weig
 						owner = { is_ai = yes }
 						sector_controlled = yes
 					}	
-				}					
+				}
+				set_variable = { which = energy_mult value = 0 }
+				set_variable = { which = minerals_mult value = 0 }
+				set_variable = { which = food_mult value = 0 }
+				set_variable = { which = unity_mult value = 0 }
+				set_variable = { which = society_research_mult value = 0 }
+				set_variable = { which = physics_research_mult value = 0 }
+				set_variable = { which = engineering_research_mult value = 0 }
+				every_owned_pop = {
+					limit = { OR = { is_robot_pop = yes is_sapient = yes } }
+					set_variable = { which = energy_mult value = 0 }
+					set_variable = { which = minerals_mult value = 0 }
+					set_variable = { which = food_mult value = 0 }
+					set_variable = { which = unity_mult value = 0 }
+					set_variable = { which = society_research_mult value = 0 }
+					set_variable = { which = physics_research_mult value = 0 }
+					set_variable = { which = engineering_research_mult value = 0 }									
+					calculate_pop_multipliers = yes
+				}				
 				every_tile = {
-					limit = { is_orbital_tile = no }
+					limit = { 
+						is_orbital_tile = no
+						has_blocker = no
+					}
+					#multiplier variables
+					set_variable = { which = energy_mult value = 1 }
+					set_variable = { which = minerals_mult value = 1 }
+					set_variable = { which = food_mult value = 1 }
+					set_variable = { which = unity_mult value = 1 }
+					set_variable = { which = society_research_mult value = 1 }
+					set_variable = { which = physics_research_mult value = 1 }
+					set_variable = { which = engineering_research_mult value = 1 }					
+					#deposit/adj. variables
 					set_variable = { which = energy_weight value = 0 }
 					set_variable = { which = minerals_weight value = 0 }
 					set_variable = { which = food_weight value = 0 }
@@ -82,6 +86,13 @@ event = { #this event adds variables into scopes, to be used by building ai_weig
 					set_variable = { which = society_research_weight value = 0 }
 					set_variable = { which = physics_research_weight value = 0 }
 					set_variable = { which = engineering_research_weight value = 0 }
+					#building weight variables
+					set_variable = { which = energy_building_tile value = 0 }
+					set_variable = { which = minerals_building_tile value = 0 }
+					set_variable = { which = food_building_tile value = 0 }
+					set_variable = { which = society_research_building_tile value = 0 }
+					set_variable = { which = physics_research_building_tile value = 0 }
+					set_variable = { which = engineering_research_building_tile value = 0 }
 				}
 				if = { 
 					limit = { 
@@ -100,35 +111,37 @@ event = { #this event adds variables into scopes, to be used by building ai_weig
 					calculate_planet_weights = yes
 				}	
 				every_tile = {
-					limit = { is_orbital_tile = no }
+					limit = { 
+						is_orbital_tile = no
+						has_blocker = no
+					}
 					if = {
 						limit = { 
-							OR = {
-								AND = {
-									has_building = yes
-									OR = { 	
-										has_capital_building = yes
-										has_hyperstorage_building = yes 
-										has_polytechnic_building = yes
-										has_special_capital_resource_building = yes
-										AND = {
-											has_global_flag = ex_planets_enhanced_active
-											has_sr_adj_bonus_building = yes
+							any_neighboring_tile = { 
+								OR = {
+									AND = {
+										has_building = yes
+										OR = { 	
+											has_capital_building = yes
+											has_hyperstorage_building = yes 
+											has_polytechnic_building = yes
+											has_special_capital_resource_building = yes
+											AND = {
+												has_global_flag = ex_planets_enhanced_active
+												has_sr_adj_bonus_building = yes
+											}	
 										}	
-									}	
-								}
-								AND = {
-									has_blocker = yes
-									has_adj_bonus_blocker = yes
-								}		
+									}
+									AND = {
+										has_blocker = yes
+										has_adj_bonus_blocker = yes
+									}		
+								}							
 							}							
 						}
 						calculate_adjcancy_weights = yes
 					}
-					if = {
-						limit = { has_blocker = no }
-						calculate_tile_weights = yes
-					}	
+					calculate_tile_weights = yes
 				}					
 			}		
 		}
