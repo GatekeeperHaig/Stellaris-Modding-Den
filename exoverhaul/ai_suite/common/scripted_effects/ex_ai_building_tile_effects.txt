@@ -1,13 +1,25 @@
 calculate_tile_weights = { #this runs on tile scope, and it saves the variables into the tile scope
 	if = {
-		limit = { has_deposit = yes}
-		check_energy_deposit = yes
-		check_mineral_deposit = yes
-		check_unity_deposit = yes
-		check_food_deposit = yes
-		check_society_research_deposit = yes
-		check_physics_research_deposit = yes			
-		else = { 
+		limit = { has_deposit = yes }
+		if = {
+			limit = { has_vanilla_or_exoverhaul_strategic_resources = no } #the checks below are ran on tile with a deposit and no strategic resource only.
+			check_energy_deposit = yes
+			check_mineral_deposit = yes
+			check_unity_deposit = yes
+			check_food_deposit = yes
+			check_society_research_deposit = yes
+			check_physics_research_deposit = yes
+			else = { #these variables are set on tiles with strategic resources, gating the ai from building on them. 
+				change_variable = { which = energy_weight value = -1000 }
+				change_variable = { which = minerals_weight value = -1000 }
+				change_variable = { which = food_weight value = -1000 }
+				change_variable = { which = unity_weight value = -1000 }
+				change_variable = { which = society_research_weight value = -1000 }
+				change_variable = { which = physics_research_weight value = -1000 }
+				change_variable = { which = engineering_research_weight value = -1000 }			
+			}	
+		}	
+		else = { #these variables are set on any tile that does not have a deposit
 			change_variable = { which = energy_weight value = -1 }
 			change_variable = { which = minerals_weight value = -1 }
 			change_variable = { which = food_weight value = -1 }
