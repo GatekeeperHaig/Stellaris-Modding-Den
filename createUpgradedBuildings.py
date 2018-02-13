@@ -424,12 +424,19 @@ def readAndConvert(args, allowRestart=1):
       for building in buildingNameToData.vals:
         if not isinstance(building, NamedTagList):
           continue
+        if len(replaceClasses)==0:
+          for condition in allConditions[0]:
+            # print(condition)
+            if condition[0]=="EVAL":
+              # print(condition[1])
+              eval(condition[1])
+              continue
         for i in range(len(replaceClasses)):
           replace=1
           for condition in allConditions[i]:
             # print(condition)
             if condition[0]=="EVAL":
-              #print(condition[1])
+              print(condition[1])
               if eval(condition[1]):
                 replace=1
               else:
