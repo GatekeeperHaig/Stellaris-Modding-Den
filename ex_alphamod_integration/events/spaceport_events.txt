@@ -1,0 +1,119 @@
+namespace = spaceport_events
+
+planet_event = {
+	id = spaceport_events.1000
+	hide_window = yes
+
+	is_triggered_only = false
+
+	trigger = {
+		#exists = owner
+		has_planet_flag = pf_flcoord_applied2
+		not = { has_spaceport = yes }
+	}
+
+	immediate = {
+		remove_planet_flag = pf_flcoord_applied2
+		random_pop = {
+			owner = {
+				change_variable = {
+					which = "fleetcoordinators"
+					value = -1
+				}
+				determine_fleet_bonuses = yes
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = spaceport_events.2000
+	hide_window = yes
+
+	is_triggered_only = false
+
+	trigger = {
+		#exists = owner
+		has_spaceport = yes
+		has_spaceport_module = fleet_coordinator
+		NOT = { has_planet_flag = pf_flcoord_applied2 }
+	}
+
+	immediate = {
+		set_planet_flag = pf_flcoord_applied2
+		random_pop = {
+			owner = {
+				change_variable = {
+					which = "fleetcoordinators"
+					value = 1
+				}
+				determine_fleet_bonuses = yes
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = spaceport_events.3000
+	hide_window = yes
+
+	is_triggered_only = false
+
+	trigger = {
+		has_planet_flag = pf_flcoord_applied2
+		has_spaceport = yes
+		not = { has_spaceport_module = fleet_coordinator }
+	}
+
+	immediate = {
+		remove_planet_flag = pf_flcoord_applied2
+		random_pop = {
+			owner = {
+				change_variable = {
+					which = "fleetcoordinators"
+					value = -1
+				}
+				determine_fleet_bonuses = yes
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = spaceport_events.4000
+	hide_window = yes
+
+	is_triggered_only = false
+
+	trigger = {
+		has_spaceport = yes
+		has_spaceport_module = orbital_hospital
+		not = { has_modifier = spaceport_hospital }
+	}
+
+	immediate = {
+		add_modifier = {
+			modifier = spaceport_hospital
+			days = -1
+		}
+	}
+}
+
+planet_event = {
+	id = spaceport_events.5000
+	hide_window = yes
+
+	is_triggered_only = false
+
+	trigger = {
+		has_modifier = spaceport_hospital
+		or = {
+			has_spaceport = no
+			not = { has_spaceport_module = orbital_hospital }
+		}
+	}
+
+	immediate = {
+		remove_modifier = spaceport_hospital
+	}
+}

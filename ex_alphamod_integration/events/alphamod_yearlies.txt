@@ -1,0 +1,249 @@
+namespace = alphamod_yearlies
+
+event = {
+	id = alphamod_yearlies.1
+	is_triggered_only = yes
+	hide_window = yes
+	
+	immediate = {
+		every_country = {
+			limit = {
+				or = {
+					has_policy_flag = alp_private_businesses_freedom
+					has_policy_flag = alp_private_businesses_regulated
+				}
+				or = {
+					has_policy_flag = alp_unions_heavilyregulated
+					has_policy_flag = alp_unions_banned
+				}
+				has_faction = labourers_union
+			}
+			every_owned_pop = {
+				limit = {
+					has_modifier = being_exploited
+					not = { has_modifier = exploited_striking }
+					planet = {
+						not = { has_edict = legislate_worker_rights }
+					}
+				}
+				random_list = {
+					10 = {
+						remove_modifier = being_exploited
+						add_modifier = {
+							modifier = exploited_striking
+							days = 30
+						}
+					}
+					7 = {
+						remove_modifier = being_exploited
+						add_modifier = {
+							modifier = exploited_striking
+							days = 90
+						}
+					}
+					3 = {
+						remove_modifier = being_exploited
+						add_modifier = {
+							modifier = exploited_striking
+							days = 180
+						}
+					}
+					80 = {}
+				}
+			}
+			every_owned_pop = {
+				limit = {
+					member_of_faction = labourers_union
+					not = { has_modifier = being_exploited }
+					not = { has_modifier = exploited_striking }
+					planet = {
+						not = { has_edict = legislate_worker_rights }
+					}
+				}
+				random_list = {
+					5 = {
+						add_modifier = {
+							modifier = being_exploited
+							days = -1
+						}
+					}
+					95 = {}
+				}
+			}			
+		}
+		
+		every_country = {
+			limit = {
+				nor = {
+					has_policy_flag = alp_private_businesses_freedom
+					has_policy_flag = alp_private_businesses_regulated
+				}
+				nor = {
+					has_policy_flag = alp_unions_heavilyregulated
+					has_policy_flag = alp_unions_banned
+				}
+				any_owned_pop = {
+					or = {
+						has_modifier = being_exploited
+						has_modifier = exploited_striking
+					}
+				}				
+			}
+			every_owned_pop = {
+				limit = {
+					or = {
+						has_modifier = being_exploited
+						has_modifier = exploited_striking
+					}
+				}
+				remove_modifier = being_exploited
+				remove_modifier = exploited_striking
+			}				
+		}
+	}
+}
+
+event = {
+	id = alphamod_yearlies.2
+	is_triggered_only = yes
+	hide_window = yes
+	
+	immediate = {
+		every_country = {
+			limit = {
+				has_faction = preservationists
+			}
+			every_owned_planet = {
+				limit = {
+					not = { has_planet_flag = pf_fracking }
+					or = {
+						has_building = building_basic_mine
+						has_building = building_mining_network_1
+						has_building = building_mining_network_2
+						has_building = building_mining_network_3
+						has_building = building_mining_network_4					
+					}
+				}
+				if = {
+					limit = {
+						any_tile = {
+							not = { has_resource = minerals }
+							or = {
+								has_building = building_basic_mine
+								has_building = building_mining_network_1
+								has_building = building_mining_network_2
+								has_building = building_mining_network_3
+								has_building = building_mining_network_4	
+							}
+						}
+					}
+					set_planet_flag = pf_fracking
+				}
+			}
+		}
+	}
+}
+
+event = {
+	id = alphamod_yearlies.3
+	is_triggered_only = yes
+	hide_window = yes
+	
+	immediate = {
+		every_country = {
+			limit = {
+				has_faction = preservationists
+			}
+			every_owned_planet = {
+				limit = {
+					has_planet_flag = pf_fracking
+				}
+				if = {
+					limit = {
+						not = {
+							any_tile = {
+								not = { has_resource = minerals }
+								or = {
+									has_building = building_basic_mine
+									has_building = building_mining_network_1
+									has_building = building_mining_network_2
+									has_building = building_mining_network_3
+									has_building = building_mining_network_4	
+								}
+							}
+						}
+					}
+					remove_planet_flag = pf_fracking
+				}
+			}
+		}
+	}
+}
+
+event = {
+	id = alphamod_yearlies.4
+	is_triggered_only = yes
+	hide_window = yes
+	
+	immediate = {
+		every_country = {
+			limit = {
+				has_faction = preservationists
+			}
+			every_owned_planet = {
+				limit = {
+					not = { has_planet_flag = pf_non_traditional_farming_preference }
+					or = {
+						has_building = building_hydroponics_farm_1
+						has_building = building_hydroponics_farm_2
+						has_building = building_hydroponics_farm_3
+						has_building = building_hydroponics_farm_4					
+					}
+				}
+				if = {
+					limit = {
+						nor = {
+							has_building = building_traditional_farm
+							has_building = building_traditional_plantation
+							has_building = building_preservation
+							has_building = building_wet_farm
+							has_building = building_fishing_yard	
+						}
+					}
+					set_planet_flag = pf_non_traditional_farming_preference
+				}
+			}
+		}
+	}
+}
+
+event = {
+	id = alphamod_yearlies.5
+	is_triggered_only = yes
+	hide_window = yes
+	
+	immediate = {
+		every_country = {
+			limit = {
+				has_faction = preservationists
+			}
+			every_owned_planet = {
+				limit = {
+					has_planet_flag = pf_non_traditional_farming_preference
+				}
+				if = {
+					limit = {
+						or = {
+							has_building = building_traditional_farm
+							has_building = building_traditional_plantation
+							has_building = building_preservation
+							has_building = building_wet_farm
+							has_building = building_fishing_yard	
+						}
+					}
+					remove_planet_flag = pf_non_traditional_farming_preference
+				}
+			}
+		}
+	}
+}

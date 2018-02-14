@@ -1,0 +1,340 @@
+namespace = bannedevents
+
+country_event = {
+	id = bannedevents.1
+	hide_window = yes
+
+	is_triggered_only = false
+	
+	trigger = {
+		is_ai = no
+		not = { has_country_flag = cf_indefinitebans_on }
+		has_edict = indefinite_bans
+	}
+	
+	immediate = {
+		set_country_flag = cf_indefinitebans_on
+		if = {
+			limit = {
+				has_modifier = banned_militarist
+			}
+			remove_modifier = banned_militarist
+			add_modifier = {
+				modifier = banned_militarist
+				days = -1
+			}
+		}
+		if = {
+			limit = {
+				has_modifier = banned_pacifist
+			}
+			remove_modifier = banned_pacifist
+			add_modifier = {
+				modifier = banned_pacifist
+				days = -1
+			}
+		}
+		if = {
+			limit = {
+				has_modifier = banned_materialist
+			}
+			remove_modifier = banned_materialist
+			add_modifier = {
+				modifier = banned_materialist
+				days = -1
+			}
+		}
+		if = {
+			limit = {
+				has_modifier = banned_spiritualist
+			}
+			remove_modifier = banned_spiritualist
+			add_modifier = {
+				modifier = banned_spiritualist
+				days = -1
+			}
+		}
+		if = {
+			limit = {
+				has_modifier = banned_xenophile
+			}
+			remove_modifier = banned_xenophile
+			add_modifier = {
+				modifier = banned_xenophile
+				days = -1
+			}
+		}
+		if = {
+			limit = {
+				has_modifier = banned_xenophobe
+			}
+			remove_modifier = banned_xenophobe
+			add_modifier = {
+				modifier = banned_xenophobe
+				days = -1
+			}
+		}
+		if = {
+			limit = {
+				has_modifier = banned_xenophobe2
+			}
+			remove_modifier = banned_xenophobe2
+			add_modifier = {
+				modifier = banned_xenophobe2
+				days = -1
+			}
+		}
+		if = {
+			limit = {
+				has_modifier = banned_authoritarian
+			}
+			remove_modifier = banned_authoritarian
+			add_modifier = {
+				modifier = banned_authoritarian
+				days = -1
+			}
+		}
+		if = {
+			limit = {
+				has_modifier = banned_egalitarian
+			}
+			remove_modifier = banned_egalitarian
+			add_modifier = {
+				modifier = banned_egalitarian
+				days = -1
+			}
+		}		
+	}
+}
+
+country_event = {
+	id = bannedevents.2
+	hide_window = yes
+
+	is_triggered_only = false
+	
+	trigger = {
+		is_ai = no
+		has_country_flag = cf_indefinitebans_on
+		not = { has_edict = indefinite_bans }
+	}
+	
+	immediate = {
+		remove_country_flag = cf_indefinitebans_on
+		remove_modifier = banned_militarist
+		remove_modifier = banned_pacifist
+		remove_modifier = banned_xenophile
+		remove_modifier = banned_xenophobe
+		remove_modifier = banned_xenophobe2
+		remove_modifier = banned_materialist
+		remove_modifier = banned_spiritualist
+		remove_modifier = banned_authoritarian
+		remove_modifier = banned_egalitarian		
+	}
+}
+
+pop_event = {
+	id = bannedevents.3
+	hide_window = yes
+	
+	trigger = {
+		not = { has_pop_flag = popf_forcereeval }
+		has_modifier = pop_faction_banned
+	}
+	
+	mean_time_to_happen = {
+		months = 3
+	}
+	
+	immediate = {
+		set_timed_pop_flag = {
+			flag = popf_forcereeval
+			months = 24
+		}
+		
+		random_list = {
+			75 = {
+				if = {
+					limit = {
+						owner = {
+							or = {
+								has_ethic = ethic_fanatic_pacifist
+								has_ethic = ethic_fanatic_militarist
+								has_ethic = ethic_fanatic_xenophile
+								has_ethic = ethic_fanatic_xenophobe
+								has_ethic = ethic_fanatic_materialist
+								has_ethic = ethic_fanatic_spiritualist
+								has_ethic = ethic_fanatic_authoritarian
+								has_ethic = ethic_fanatic_egalitarian
+							}
+						}
+					}
+					wipe_pop_ethos = yes			
+					if = {
+						limit = {
+							owner = {
+								has_ethic = ethic_fanatic_pacifist
+							}
+						}
+						pop_change_ethic = ethic_pacifist
+					}
+					if = {
+						limit = {
+							owner = {
+								has_ethic = ethic_fanatic_militarist
+							}
+						}
+						pop_change_ethic = ethic_militarist
+					}
+					if = {
+						limit = {
+							owner = {
+								has_ethic = ethic_fanatic_materialist
+							}
+						}
+						pop_change_ethic = ethic_materialist
+					}
+					if = {
+						limit = {
+							owner = {
+								has_ethic = ethic_fanatic_spiritualist
+							}
+						}
+						pop_change_ethic = ethic_spiritualist
+					}
+					if = {
+						limit = {
+							owner = {
+								has_ethic = ethic_fanatic_xenophile
+							}
+						}
+						pop_change_ethic = ethic_xenophile
+					}
+					if = {
+						limit = {
+							owner = {
+								has_ethic = ethic_fanatic_xenophobe
+							}
+						}
+						pop_change_ethic = ethic_xenophobe
+					}
+					if = {
+						limit = {
+							owner = {
+								has_ethic = ethic_fanatic_authoritarian
+							}
+						}
+						pop_change_ethic = ethic_authoritarian
+					}
+					if = {
+						limit = {
+							owner = {
+								has_ethic = ethic_fanatic_egalitarian
+							}
+						}
+						pop_change_ethic = ethic_egalitarian
+					}
+					else = {
+						if = {
+							limit = {
+								or = {
+									has_ethic = ethic_authoritarian
+									has_ethic = ethic_fanatic_authoritarian
+								}
+							}
+							wipe_pop_ethos = yes
+							pop_change_ethic = ethic_egalitarian
+							set_timed_pop_flag = { flag = pop_changed_ethics days = 7 }
+						}
+						if = {
+							limit = {
+								not = { has_pop_flag = pop_changed_ethics }
+								or = {
+									has_ethic = ethic_egalitarian
+									has_ethic = ethic_fanatic_egalitarian
+								}
+							}
+							wipe_pop_ethos = yes
+							pop_change_ethic = ethic_authoritarian
+							set_timed_pop_flag = { flag = pop_changed_ethics days = 7 }
+						}
+						if = {
+							limit = {
+								not = { has_pop_flag = pop_changed_ethics }
+								or = {
+									has_ethic = ethic_militarist
+									has_ethic = ethic_fanatic_militarist
+								}
+							}
+							wipe_pop_ethos = yes
+							pop_change_ethic = ethic_pacifist
+							set_timed_pop_flag = { flag = pop_changed_ethics days = 7 }
+						}
+						if = {
+							limit = {
+								not = { has_pop_flag = pop_changed_ethics }
+								or = {
+									has_ethic = ethic_pacifist
+									has_ethic = ethic_fanatic_pacifist
+								}
+							}
+							wipe_pop_ethos = yes
+							pop_change_ethic = ethic_militarist
+							set_timed_pop_flag = { flag = pop_changed_ethics days = 7 }
+						}
+						if = {
+							limit = {
+								not = { has_pop_flag = pop_changed_ethics }
+								or = {
+									has_ethic = ethic_xenophile
+									has_ethic = ethic_fanatic_xenophile
+								}
+							}
+							wipe_pop_ethos = yes
+							pop_change_ethic = ethic_xenophobe
+							set_timed_pop_flag = { flag = pop_changed_ethics days = 7 }
+						}
+						if = {
+							limit = {
+								not = { has_pop_flag = pop_changed_ethics }
+								or = {
+									has_ethic = ethic_xenophobe
+									has_ethic = ethic_fanatic_xenophobe
+								}
+							}
+							wipe_pop_ethos = yes
+							pop_change_ethic = ethic_xenophile
+							set_timed_pop_flag = { flag = pop_changed_ethics days = 7 }
+						}
+						if = {
+							limit = {
+								not = { has_pop_flag = pop_changed_ethics }
+								or = {
+									has_ethic = ethic_materialist
+									has_ethic = ethic_fanatic_materialist
+								}
+							}
+							wipe_pop_ethos = yes
+							pop_change_ethic = ethic_spiritualist
+							set_timed_pop_flag = { flag = pop_changed_ethics days = 7 }
+						}
+						if = {
+							limit = {
+								not = { has_pop_flag = pop_changed_ethics }
+								or = {
+									has_ethic = ethic_spiritualist
+									has_ethic = ethic_fanatic_spiritualist
+								}
+							}
+							wipe_pop_ethos = yes
+							pop_change_ethic = ethic_militarist
+							set_timed_pop_flag = { flag = pop_changed_ethics days = 7 }
+						}
+					}
+				}				
+				force_faction_evaluation = yes
+			}
+			25 = {}
+		}
+	}
+}

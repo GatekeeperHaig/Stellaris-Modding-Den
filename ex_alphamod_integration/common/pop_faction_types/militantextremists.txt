@@ -1,0 +1,330 @@
+militant_extremists = {
+	election_header = "GFX_faction_header_yellow"
+	guiding_ethic = ethic_militarist
+	
+	unique = yes
+	support_multiplier = 1
+	
+	is_potential = {		
+		NOT = { has_ethic = ethic_gestalt_consciousness }
+		NOT = { has_modifier = banned_militarist }
+		any_owned_pop = { 
+			OR = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+				has_ethic = ethic_authoritarian
+				has_ethic = ethic_fanatic_authoritarian
+				has_ethic = ethic_xenophobe
+				has_ethic = ethic_fanatic_xenophobe
+			}
+		}
+		NOR = {
+			has_ethic = ethic_fanatic_militarist
+			has_ethic = ethic_fanatic_authoritarian
+		}
+		has_technology = tech_centralized_command
+	}
+	
+	parameters = {
+		empire = {
+			type = country
+			valid_objects = {
+				is_same_value = root
+			}
+		}
+	}
+	
+	can_join_faction = {
+		is_enslaved = no
+		is_shackled_robot = no
+		is_being_purged = no
+		has_culture_shock = no
+		NOT = { has_trait = trait_nerve_stapled }
+		OR = {
+			has_ethic = ethic_militarist
+			has_ethic = ethic_fanatic_militarist
+			has_ethic = ethic_authoritarian
+			has_ethic = ethic_fanatic_authoritarian
+			has_ethic = ethic_xenophobe
+			has_ethic = ethic_fanatic_xenophobe
+		}
+		is_robot_pop = no
+		tile = {
+			OR = {
+				has_building = no
+				has_building = building_clone_vats
+				has_building = building_planetary_shield_generator
+				has_building = building_military_academy			
+			}
+		}
+	}
+	
+	attraction = {
+		base = 175
+		
+		modifier = {
+			factor = 0
+			exists = from
+			from = {
+				has_modifier = prosecuted_faction
+			}
+		}
+		
+		modifier = {
+			factor = 0.5
+			parameter:empire = {
+				has_modifier = banned_militarist
+			}						
+		}
+		
+		modifier = {
+			factor = 1.25
+			owner = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist				
+			}
+		}
+		
+		modifier = {
+			factor = 1.75
+			owner = { is_at_war = no }
+			OR = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+			}
+		}
+		
+		modifier = {
+			factor = 1.25
+			exists = from
+			from = {
+				exists = leader
+				leader = { leader_class = ruler }
+			}
+		}
+	}
+	
+	leader = {
+		base = 100
+		modifier = {
+			factor = 0
+			OR = {
+				has_trait = "trait_robotic_1"
+				has_trait = "trait_robotic_2"
+				has_trait = "trait_robotic_3"
+			}			
+		}
+		modifier = {
+			factor = 0.0
+			is_event_leader = yes
+		}			
+	}
+
+	demand = {
+		title = "IMPERIALIST_PHILOSOPHY"
+		unfulfilled_title = "IMPERIALIST_NO_PHILOSOPHY"
+		desc = "IMPERIALIST_PHILOSOPHY_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -10
+
+		potential = {
+			exists = owner
+			owner = {
+				any_relation = {
+					has_communications = root.owner
+					is_country_type = default
+					NOT = { exists = overlord }
+				}
+			}
+		}
+
+		trigger = {
+			owner = { has_policy_flag = unrestricted_wars }
+		}
+	}
+	
+	demand = {
+		title = "MILEXTREME_WAR"
+		unfulfilled_title = "MILEXTREME_NO_WAR"
+		desc = "MILEXTREME_WAR_DESC"
+
+		fulfilled_effect = 15
+		unfulfilled_effect = -10
+
+		potential = {
+			exists = owner
+		}
+
+		trigger = {
+			owner = { is_at_war = yes }
+		}
+	}
+
+	demand = {
+		title = "IMPERIALIST_CONQUEST"
+		unfulfilled_title = "IMPERIALIST_NO_CONQUEST"
+		desc = "IMPERIALIST_CONQUEST_DESC"
+		
+		fulfilled_effect = 5
+		unfulfilled_effect = -10
+		
+		potential = {
+			exists = owner
+			owner = {
+				any_relation = {
+					has_communications = root.owner
+					is_country_type = default
+					NOT = { exists = overlord }
+				}
+			}
+		}
+		
+		trigger = {
+			owner = {
+				has_country_flag = imperialist_conquest_timed_flag
+			}
+		}
+	}
+	
+	demand = {
+		title = "IMPERIALIST_RIVALS1"
+		unfulfilled_title = "IMPERIALIST_FEW_RIVALS1"
+		desc = "IMPERIALIST_RIVALS_DESC1"
+		
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+		
+		potential = {
+			exists = owner
+			owner = {
+				num_communications > 2
+			}
+		}
+		
+		trigger = {
+			owner = {
+				any_neighbor_country = {
+					prev = { is_rival = prev }
+				}
+			}
+		}
+	}
+	
+	on_create = {
+		pop_faction_event = { id = factions.1 }
+	}
+
+	on_destroy = {
+		if = {
+			limit = {
+				has_modifier = promoted_militarist
+			}
+			remove_modifier = promoted_militarist
+		}
+		if = {
+			limit = {
+				has_modifier = suppressed_militarist
+			}
+			remove_modifier = suppressed_militarist
+		}
+		if = {
+			limit = {
+				has_modifier = banned_militarist
+			}
+			remove_modifier = banned_militarist
+		}
+	}
+	
+	actions = {
+		prosecute_faction = {
+			title = "PROSECUTE_FACTION"
+			description = "PROSECUTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				not = { has_modifier = prosecuted_faction }
+				parameter:empire = {
+					or = {
+						has_modifier = suppressed_militarist
+						has_modifier = banned_militarist
+					}
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = prosecuted_faction days = -1 }
+			}
+			
+			ai_weight = {
+				base = 0
+			}			
+		}
+		
+		cancel_prosecute_faction = {
+			title = "CANCEL_PROSECUTE_FACTION"
+			description = "PROSECUTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				has_modifier = prosecuted_faction
+			}	
+
+			effect = {
+				remove_modifier = prosecuted_faction
+			}
+			
+			ai_weight = {
+				base = 0
+			}			
+		}	
+		
+		suppress_faction = {
+			title = "SUPPRESS_FACTION"
+			description = "SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_militarist
+						has_modifier = promoted_militarist
+					}
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = suppressed_faction days = -1 }
+				parameter:empire = {
+					add_modifier = { modifier = suppressed_militarist days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_suppress_faction = {
+			title = "CANCEL_SUPPRESS_FACTION"
+			description = "CANCEL_SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = suppressed_militarist
+				}
+			}
+
+			effect = {
+				remove_modifier = suppressed_faction
+				parameter:empire = {
+					remove_modifier = suppressed_militarist
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+	}
+}

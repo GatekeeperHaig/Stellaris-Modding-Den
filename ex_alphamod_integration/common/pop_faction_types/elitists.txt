@@ -1,0 +1,470 @@
+elitists = {
+	election_header = "GFX_faction_header_yellow"
+	guiding_ethic = ethic_egalitarian
+	
+	unique = yes
+	support_multiplier = 1
+	
+	is_potential = {
+		any_owned_pop = { 
+			OR = {
+				has_ethic = ethic_egalitarian
+				has_ethic = ethic_fanatic_egalitarian
+			}
+		}
+		OR = {
+			has_technology = tech_colonial_administrations_alpha
+			has_technology = tech_colonial_councils_alpha
+		}
+		NOT = { has_ethic = ethic_gestalt_consciousness }
+		NOT = { has_modifier = banned_egalitarian }
+	}
+	
+	parameters = {
+		empire = {
+			type = country
+			valid_objects = {
+				is_same_value = root
+			}
+		}
+	}
+	
+	can_join_faction = {
+		is_enslaved = no
+		is_being_purged = no
+		has_culture_shock = no
+		NOT = { has_trait = trait_nerve_stapled }
+		OR = {
+			has_ethic = ethic_authoritarian
+			has_ethic = ethic_fanatic_authoritarian
+			has_ethic = ethic_egalitarian
+			has_ethic = ethic_fanatic_egalitarian
+			has_ethic = ethic_spiritualist
+			has_ethic = ethic_fanatic_spiritualist
+		}
+		owner = {
+			NOR = {
+				has_ethic = ethic_fanatic_militarist
+				has_ethic = ethic_fanatic_xenophobe
+				has_ethic = ethic_fanatic_pacifist
+			}
+			or = {
+				has_authority = auth_dictatorial
+				has_authority = auth_oligarchic
+				has_authority = auth_imperial
+			}
+		}
+		tile = {
+			or = {
+				has_resource = {
+					type = physics_research
+					amount > 0
+				}
+				has_resource = {
+					type = society_research
+					amount > 0
+				}
+				has_resource = {
+					type = energy
+					amount > 0
+				}
+				has_building = building_libraryofadministration
+				has_building = building_councilhall
+			}
+		}
+	}
+	
+	attraction = {
+		base = 200
+		
+		modifier = {
+			factor = 0.1
+			parameter:empire = {
+				has_modifier = banned_egalitarian
+			}						
+		}
+		
+		modifier = {
+			factor = 0
+			exists = from
+			from = {
+				has_modifier = prosecuted_faction
+			}
+		}
+		
+		modifier = {
+			factor = 1.5
+			exists = from
+			from = {
+				exists = leader
+				leader = { leader_class = ruler }
+			}
+		}
+		
+		modifier = {
+			factor = 0.8
+			exists = from
+			from = {
+				NOT = { exists = leader }
+			}
+		}
+	}
+	
+	leader = {
+		base = 100
+		
+		modifier = {
+			factor = 1.5
+			leader_class = scientist
+		}
+		
+		modifier = {
+			factor = 0
+			OR = {
+				has_trait = "trait_robotic_1"
+				has_trait = "trait_robotic_2"
+				has_trait = "trait_robotic_3"
+			}			
+		}
+
+		modifier = {
+			factor = 0.0
+			is_event_leader = yes
+		}
+	}
+	
+	demand = {
+		title = "TOTALITARIAN_ELITISM"
+		unfulfilled_title = "TOTALITARIAN_NO_ELITISM"
+		desc = "TOTALITARIAN_ELITISM_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+					has_technology = tech_selected_lineages
+					has_technology = tech_capacity_boosters
+				}
+			}
+		}
+
+		trigger = {
+			owner = {
+				OR = {
+					has_policy_flag = leader_enhancement_selected_lineages
+					has_policy_flag = leader_enhancement_capacity_boosters
+				}
+			}
+		}
+	}
+	
+	demand = {
+		title = "TOTALITARIAN_STRATIFICATION"
+		unfulfilled_title = "TOTALITARIAN_NO_STRATIFICATION"
+		desc = "TOTALITARIAN_STRATIFICATION_DESC"
+
+		unfulfilled_effect = -10
+
+		potential = {
+			exists = owner
+		}
+
+		trigger = {
+			owner = {
+				OR = {
+					any_owned_pop = {
+						OR = {
+							has_citizenship_type = {
+								country = root.owner
+								type = citizenship_caste_system
+							}
+							has_citizenship_type = {
+								country = root.owner
+								type = citizenship_caste_system_limited
+							}
+						}
+					}
+					AND = {
+						any_owned_pop = {
+							has_citizenship_type = {
+								country = root.owner
+								type = citizenship_full
+							}
+						}
+						any_owned_pop = {
+							NOT = {
+								has_citizenship_type = {
+									country = root.owner
+									type = citizenship_full
+								}
+							}
+						}
+					}
+					any_owned_pop = {
+						has_citizenship_type = {
+							country = root.owner
+							type = citizenship_slavery
+						}
+					}
+					any_owned_pop = {
+						has_citizenship_type = {
+							country = root.owner
+							type = citizenship_purge
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	demand = {
+		title = "PROSPERITY_BANNED_UNIONS"
+		unfulfilled_title = "PROSPERITY_ALLOWED_UNIONS"
+		desc = "PROSPERITY_BANNED_UNIONS_DESC"
+
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+		
+		potential = {
+			exists = owner
+			owner = {
+				has_policy_flag = alp_unions_banned
+			}
+		}
+		
+		trigger = {
+			owner = {
+				has_policy_flag = alp_unions_banned
+			}
+		}
+	}
+	
+	demand = {
+		title = "PROSPERITY_NO_OVERCOSTS"
+		unfulfilled_title = "PROSPERITY_OVERCOSTS"
+		desc = "PROSPERITY_NO_OVERCOSTS_DESC"
+
+		unfulfilled_effect = -10
+		
+		potential = {
+			exists = owner
+			owner = { energy > 2999 }
+		}
+		
+		trigger = {
+			owner = {
+				not = { has_policy_flag = alp_highincome_lowtax }
+				not = { has_policy_flag = alp_highincome_averagetax }
+			}
+		}
+	}
+	
+	demand = {
+		title = "PROSPERITY_COMMERCIAL_FREEDOM"
+		unfulfilled_title = "PROSPERITY_NO_COMMERCIAL_FREEDOM"
+		desc = "PROSPERITY_COMMERCIAL_FREEDOM_DESC"
+
+		unfulfilled_effect = -15
+		
+		potential = {
+			exists = owner
+		}
+		
+		trigger = {
+			owner = {
+				not = { has_policy_flag = alp_private_businesses_prohibited }
+				not = { has_policy_flag = alp_private_businesses_restricted }
+				OR = {
+					has_policy_flag = alp_land_ownership_freemarket
+					has_policy_flag = alp_land_ownership_pioneerrights
+				}
+			}
+		}
+	}
+
+	demand = {
+		title = "SUPREMACIST_NO_MIGRATION_TREATIES"
+		unfulfilled_title = "SUPREMACIST_MIGRATION_TREATIES"
+		desc = "SUPREMACIST_NO_MIGRATION_TREATIES_DESC"
+
+		fulfilled_effect = 5
+
+		potential = {
+			exists = owner
+			owner = {
+				NOT = { has_valid_civic = civic_fanatic_purifiers }
+				num_communications > 2
+			}
+		}
+
+		trigger = {
+			owner = {
+				NOT = {
+					any_country = {
+						is_country_type = default
+						has_communications = root.owner
+						OR = {
+							has_diplo_migration_treaty = root.owner
+							root = {
+								owner = {
+									has_diplo_migration_treaty = prevprev
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	demand = {
+		title = "SUPREMACIST_CORE_WORLD_EXCLUSIVITY"
+		unfulfilled_title = "SUPREMACIST_CORE_WORLD_NONEXCLUSIVITY"
+		desc = "SUPREMACIST_CORE_WORLD_EXCLUSIVITY_DESC"
+
+		fulfilled_effect = 5
+
+		potential = {
+			exists = owner
+			owner = {
+				NOT = { has_valid_civic = civic_fanatic_purifiers }
+				num_species > 1
+				any_owned_pop = {
+					NOR = {
+						is_same_species = root.owner
+						is_robot_pop = yes
+					}
+				}
+			}
+		}
+
+		trigger = {
+			owner = {
+				OR = {
+					has_policy_flag = core_worlds_citizens_and_slaves
+					has_policy_flag = core_worlds_citizens_only
+				}
+			}
+		}
+	}
+	
+	on_create = {
+		pop_faction_event = { id = factions.1 }
+	}
+
+	on_destroy = {
+		if = {
+			limit = {
+				has_modifier = promoted_egalitarian
+			}
+			remove_modifier = promoted_egalitarian
+		}
+		if = {
+			limit = {
+				has_modifier = suppressed_egalitarian
+			}
+			remove_modifier = suppressed_egalitarian
+		}
+		if = {
+			limit = {
+				has_modifier = banned_egalitarian
+			}
+			remove_modifier = banned_egalitarian
+		}
+	}
+	
+	actions = {
+		prosecute_faction = {
+			title = "PROSECUTE_FACTION"
+			description = "PROSECUTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				not = { has_modifier = prosecuted_faction }
+				parameter:empire = {
+					or = {
+						has_modifier = suppressed_egalitarian
+						has_modifier = banned_egalitarian
+					}
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = prosecuted_faction days = -1 }
+			}
+			
+			ai_weight = {
+				base = 0
+			}			
+		}
+		
+		cancel_prosecute_faction = {
+			title = "CANCEL_PROSECUTE_FACTION"
+			description = "PROSECUTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				has_modifier = prosecuted_faction
+			}	
+
+			effect = {
+				remove_modifier = prosecuted_faction
+			}
+			
+			ai_weight = {
+				base = 0
+			}			
+		}
+
+		suppress_faction = {
+			title = "SUPPRESS_FACTION"
+			description = "SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_egalitarian
+						has_modifier = promoted_egalitarian
+						has_modifier = banned_egalitarian
+					}
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = suppressed_faction days = -1 }
+				parameter:empire = {
+					add_modifier = { modifier = suppressed_egalitarian days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		
+		cancel_suppress_faction = {
+			title = "CANCEL_SUPPRESS_FACTION"
+			description = "CANCEL_SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = { has_modifier = suppressed_egalitarian }
+			}
+
+			effect = {
+				remove_modifier = suppressed_faction
+				parameter:empire = {
+					remove_modifier = suppressed_egalitarian
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+	}
+}

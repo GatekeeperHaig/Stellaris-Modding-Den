@@ -1,0 +1,329 @@
+trade_regulation = {
+	potential = {
+		has_technology = tech_trade_ports
+		or = {
+			has_ethic = ethic_fanatic_pacifist
+			has_ethic = ethic_pacifist
+			has_ethic = ethic_fanatic_xenophile
+			has_ethic = ethic_xenophile
+		}
+		any_owned_planet = {
+			or = {
+				has_building = building_tradestation
+				has_building = building_trade_company
+			}
+		}
+	}
+	
+	allow = {
+		always = yes
+	}
+	
+	option = {
+		name = "trade_regulation_lax"
+		
+		policy_flags = {
+			trade_regulation_lax
+		}
+		
+		valid = {
+			NOR = {
+				has_ethic = "ethic_xenophobe"
+				has_ethic = "ethic_fanatic_xenophobe"
+				has_ethic = "ethic_authoritarian"
+				has_ethic = "ethic_fanatic_authoritarian"
+			}
+		}
+		
+		modifier = {
+			pop_ethic_authoritarian_attraction_mult = -0.05
+			pop_ethic_xenophile_attraction_mult = 0.05
+			country_trade_attractiveness = 0.05
+		}
+		
+		AI_weight = {
+			modifier = {
+				factor = 10
+				OR = {
+					has_valid_ai_personality = no
+					is_ai = no
+				}
+				NOR = {
+					has_ethic = "ethic_xenophobe"
+					has_ethic = "ethic_fanatic_xenophobe"
+					has_ethic = "ethic_authoritarian"
+					has_ethic = "ethic_fanatic_authoritarian"
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = "trade_regulation_moderate"
+		
+		policy_flags = {
+			trade_regulation_moderate
+		}
+		
+		valid = {
+			NOR = {
+				has_ethic = "ethic_authoritarian"
+				has_ethic = "ethic_fanatic_authoritarian"
+				has_ethic = "ethic_fanatic_xenophobe"
+			}
+		}
+		
+		AI_weight = {
+			modifier = {
+				factor = 5
+				OR = {
+					has_valid_ai_personality = no
+					is_ai = no
+				}
+				NOR = {
+					has_ethic = "ethic_authoritarian"
+					has_ethic = "ethic_fanatic_authoritarian"
+					has_ethic = "ethic_fanatic_xenophobe"
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = "trade_regulation_restrictive"
+		
+		policy_flags = {
+			trade_regulation_restrictive
+		}
+		
+		valid = {
+			NOR = {
+				has_ethic = "ethic_fanatic_egalitarian"
+				has_ethic = "ethic_fanatic_pacifist"
+			}
+		}
+		
+		modifier = {
+			pop_ethic_egalitarian_attraction_mult = -0.05
+		}
+		
+		AI_weight = {
+			modifier = {
+				factor = 1
+				OR = {
+					has_valid_ai_personality = no
+					is_ai = no
+				}
+				NOR = {
+					has_ethic = "ethic_fanatic_egalitarian"
+					has_ethic = "ethic_fanatic_pacifist"
+				}
+			}
+		}
+	}
+}
+
+foreign_trade_restriction = {
+	potential = {
+		has_technology = tech_trade_ports
+		or = {
+			has_ethic = ethic_fanatic_pacifist
+			has_ethic = ethic_pacifist
+			has_ethic = ethic_fanatic_xenophile
+			has_ethic = ethic_xenophile
+		}
+		any_owned_planet = {
+			or = {
+				has_building = building_tradestation
+				has_building = building_trade_company
+			}
+		}
+		any_neighbor_country = {
+			any_owned_planet = {
+				or = {
+					has_building = building_tradestation
+					has_building = building_trade_company
+				}			
+			}
+		}
+	}
+	
+	allow = {
+		always = yes
+	}
+	
+	option = {
+		name = "foreign_trade_free"
+		
+		policy_flags = {
+			foreign_trade_free
+		}
+		
+		valid = {
+			NOR = {
+				has_ethic = "ethic_xenophobe"
+				has_ethic = "ethic_fanatic_xenophobe"
+				has_ethic = "ethic_authoritarian"
+				has_ethic = "ethic_fanatic_authoritarian"
+			}
+		}
+		
+		modifier = {
+			country_trade_attractiveness = 0.05
+			pop_ethic_xenophile_attraction_mult = 0.05
+			pop_ethic_xenophobe_attraction_mult = -0.05
+		}
+		
+		AI_weight = {
+			modifier = {
+				factor = 10
+				OR = {
+					has_valid_ai_personality = no
+					is_ai = no
+				}
+				NOR = {
+					has_ethic = "ethic_xenophobe"
+					has_ethic = "ethic_fanatic_xenophobe"
+					has_ethic = "ethic_authoritarian"
+					has_ethic = "ethic_fanatic_authoritarian"
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = "foreign_trade_customs"
+		
+		policy_flags = {
+			foreign_trade_customs
+		}
+		
+		valid = {
+			NOR = {
+				has_ethic = "ethic_fanatic_xenophobe"
+				has_ethic = "ethic_fanatic_authoritarian"
+			}
+		}
+		
+		AI_weight = {
+			modifier = {
+				factor = 5
+				OR = {
+					has_valid_ai_personality = no
+					is_ai = no
+				}
+				NOR = {
+					has_ethic = "ethic_fanatic_xenophobe"
+					has_ethic = "ethic_fanatic_authoritarian"
+				}
+			}
+		}		
+	}
+	
+	option = {
+		name = "foreign_trade_embargo"
+		
+		policy_flags = {
+			foreign_trade_embargo
+		}
+		
+		valid = {
+			or = {
+				is_at_war = yes
+				NOR = {
+					has_ethic = "ethic_fanatic_pacifist"
+					has_ethic = "ethic_fanatic_xenophile"
+					has_ethic = "ethic_fanatic_egalitarian"
+				}
+			}
+			not = {
+				any_owned_planet = {
+					or = {
+						has_modifier = f_export_route_1
+						has_modifier = f_export_route_2
+					}
+				}
+			}
+		}
+		
+		modifier = {
+			country_trade_attractiveness = -0.1
+			pop_ethic_xenophobe_attraction_mult = 0.1
+			pop_ethic_xenophile_attraction_mult = -0.1
+		}
+		
+		AI_weight = {
+			modifier = {
+				factor = 1
+				OR = {
+					has_valid_ai_personality = no
+					is_ai = no
+				}
+				or = {
+					is_at_war = yes
+					NOR = {
+						has_ethic = "ethic_fanatic_pacifist"
+						has_ethic = "ethic_fanatic_xenophile"
+						has_ethic = "ethic_fanatic_egalitarian"
+					}
+				}
+			}
+			modifier = {
+				factor = 1
+				is_ai = yes
+				NOR = {
+					has_ethic = "ethic_fanatic_pacifist"
+					has_ethic = "ethic_fanatic_xenophile"
+					has_ethic = "ethic_fanatic_egalitarian"
+					has_ethic = "ethic_pacifist"
+					has_ethic = "ethic_xenophile"
+					has_ethic = "ethic_egalitarian"
+				}
+				any_neighbor_country = {
+					has_policy_flag = foreign_trade_embargo
+				}
+			}
+			modifier = {
+				factor = 2
+				is_ai = yes
+				is_at_war = yes
+				NOR = {
+					has_ethic = "ethic_fanatic_pacifist"
+					has_ethic = "ethic_fanatic_xenophile"
+					has_ethic = "ethic_fanatic_egalitarian"
+				}
+				any_neighbor_country = {
+					has_policy_flag = foreign_trade_embargo
+					is_at_war = yes
+				}
+			}
+			modifier = {
+				factor = 0
+				is_ai = yes
+				is_at_war = no
+				OR = {
+					has_ethic = "ethic_fanatic_pacifist"
+					has_ethic = "ethic_fanatic_xenophile"
+					has_ethic = "ethic_fanatic_egalitarian"
+					has_ethic = "ethic_pacifist"
+					has_ethic = "ethic_xenophile"
+					has_ethic = "ethic_egalitarian"
+				}
+				not = {
+					any_neighbor_country = {
+						has_policy_flag = foreign_trade_embargo
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				any_owned_planet = {
+					or = {
+						has_modifier = f_export_route_1
+						has_modifier = f_export_route_2
+					}
+				}				
+			}
+		}	
+	}
+}
