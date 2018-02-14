@@ -1,12 +1,39 @@
-calculate_adjcancy_weights = { #this runs on tile scope, and it saves the variables into all the adj. tiles' scope
-	if = { limit = { has_building = yes } check_adj_bonus_buildings = yes }
-	if = { limit = { has_blocker = yes } check_adj_bonus_blockers = yes }	
-	if = { limit = { has_global_flag = ex_planets_enhanced_active } check_planets_enhanced_sr_buildings = yes }		
+calculate_adjcancy_weights = { #this runs on tile scope, and it saves the variables into each tile's scope.
+	if = { 
+		limit = { any_neighboring_tile = { has_building = yes } } 
+		check_neighboring_adj_bonus_buildings = yes 		
+		if = { limit = { has_global_flag = ex_planets_enhanced_active } check_planets_enhanced_sr_buildings = yes }
+	}		
+	if = { limit = { any_neighboring_tile = { has_blocker = yes } } check_adj_bonus_blockers = yes }		
 }
 
-check_adj_bonus_buildings = {
+calculate_adj_potential_weights = {
+	if = { 
+		limit = {
+			any_neighboring_tile = { 
+				OR = {
+					has_deposit = yes
+					has_resource_buildings = yes
+					has_research_buildings = yes					
+				}
+			}
+		}
+		check_adj_potential = yes
+		else = {
+			change_variable = { which = energy_building_adj_potential value = -1 }
+			change_variable = { which = minerals_building_adj_potential value = -1 }
+			change_variable = { which = food_building_adj_potential value = -1 }
+			change_variable = { which = society_research_building_adj_potential value = -1 }
+			change_variable = { which = physics_research_building_adj_potential value = -1 }
+			change_variable = { which = engineering_research_building_adj_potential value = -1 }
+		}	
+	}
+}	
+		
+
+check_neighboring_adj_bonus_buildings = {
 	if = {
-		limit = { has_capital_building = yes }
+		limit = { any_neighboring_tile = { has_capital_building = yes } }
 		if = { 
 			limit = { any_neighboring_tile = { has_capital_1 = yes } }
 			change_variable = { which = energy_weight value = 1 }
@@ -39,7 +66,7 @@ check_adj_bonus_buildings = {
 		}	
 	}	
 	if = { 
-		limit = { has_hyperstorage_building = yes }  
+		limit = { any_neighboring_tile = { has_hyperstorage_building = yes } } 
 		if = { 
 			limit = { any_neighboring_tile = { has_building = building_mineral_silo_1 } }
 			change_variable = { which = energy_weight value = 1 }
@@ -72,12 +99,12 @@ check_adj_bonus_buildings = {
 	if = { 
 		limit = { planet = { is_ringworld = yes } }	
 		if = {
-			limit = { every_neighboring_tile = { has_building_power_plant_rw = yes } }
+			limit = { any_neighboring_tile = { has_building_power_plant_rw = yes } }
 			change_variable = { which = energy_weight value = 1 } 
 			break = yes
 		}
 		if = {
-			limit = { every_neighboring_tile = { has_building_hydroponics_farm_rw = yes }
+			limit = { any_neighboring_tile = { has_building_hydroponics_farm_rw = yes } }
 			change_variable = { which = food_weight value = 1 } 
 			break = yes
 		}		
@@ -208,3 +235,89 @@ check_adj_bonus_blockers = {
 	}	
 }		
 	
+check_adj_potential = {
+	if = {
+		limit = {
+			any_neighboring_tile = { 
+				OR = {
+					has_resource = { type = energy amount > 0 }
+					has_energy_building = yes
+				}
+			}	
+		}	
+		change_variable = {
+			which = energy_building_adj_potential
+			value = 1			
+		}			
+	}	
+	if = {
+		limit = {
+			any_neighboring_tile = { 
+				OR = {
+					has_resource = { type = minerals amount > 0 }
+					has_mineral_building = yes
+				}
+			}	
+		}	
+		change_variable = {
+			which = minerals_building_adj_potential
+			value = 1			
+		}			
+	}		
+	if = {
+		limit = {
+			any_neighboring_tile = { 
+				OR = {
+					has_resource = { type = food amount > 0 }
+					has_food_building = yes
+				}
+			}	
+		}	
+		change_variable = {
+			which = food_building_adj_potential
+			value = 1						
+		}
+	}			
+	if = {
+		limit = {
+			any_neighboring_tile = { 
+				OR = {
+					has_resource = { type = engineering_research amount > 0 }
+					has_engineering_research_building = yes
+				}
+			}	
+		}	
+		change_variable = {
+			which = engineering_research_building_adj_potential
+			value = 1						
+		}
+	}				
+	if = {
+		limit = {
+			any_neighboring_tile = { 
+				OR = {
+					has_resource = { type = physics_research amount > 0 }
+					has_physics_research_building = yes
+				}
+			}	
+		}	
+		change_variable = {
+			which = physics_research_building_adj_potential
+			value = 1						
+		}
+	}	
+	if = {
+		limit = {
+			any_neighboring_tile = { 
+				OR = {
+					has_resource = { type = society_research amount > 0 }
+					has_society_research_building = yes
+				}
+			}	
+		}	
+		change_variable = {
+			which = society_research_building_adj_potential
+			value = 1						
+		}
+	}		
+}	
