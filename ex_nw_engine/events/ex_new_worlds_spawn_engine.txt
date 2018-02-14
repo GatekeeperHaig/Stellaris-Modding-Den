@@ -10,30 +10,38 @@ event = { #this event triggers on game start
 		
 	immediate = {		
 		set_global_flag = nw_game_start
+		every_country = {
+			every_planet = {
+				limit = {
+					OR = {
+						is_vanilla_habitable_planet = yes
+						is_vanilla_special_planet = yes
+					}
+				}	
+				every_owned_pop = {
+					limit = { is_robot_pop = no }
+					ex_new_worlds_replace_planet_pref_traits = yes
+				}
+			}
+		}		
 		every_planet = { 
 			if = {
-				limit = { 
-					is_colonizable = yes
-				}	
-				set_timed_planet_flag = { flag = ex_nw_game_start_flag days = 10 }
+				limit = { is_vanilla_habitable_planet = yes }						
+				set_timed_planet_flag = { flag = ex_check_gate_1 days = 10 }
 				planet_event = { id = ex_new_worlds_spawn_engine.2 days = 2 }					
 			}							
 			if = {
-				limit = {
-					is_colonizable = no
-					is_star = no
-					is_asteroid = no
-				}
+				limit = { is_vanilla_uninhabitable_planet = yes	}
+				planet_event = { id = ex_new_worlds_spawn_engine.3 days = 3 }
 				if = {
 					limit = {
 						is_planet_class = pc_gas_giant 
 						has_moon = yes
 					}
 					every_moon = { set_planet_flag = gas_giant_moon }
-				}	
-				planet_event = { id = ex_new_worlds_spawn_engine.3 days = 3 }					
+				}										
 			}				
-		}
+		}	
 	}
 }
 
@@ -48,29 +56,38 @@ event = { #this event fires on a monthly pulse, only if the gamestart event didn
 	trigger = { NOT = { has_global_flag = nw_game_start } } 	
 	
 	immediate = {		
+		every_country = {
+			every_planet = {
+				limit = {
+					OR = {
+						is_vanilla_habitable_planet = yes
+						is_vanilla_special_planet = yes
+					}
+				}	
+				every_owned_pop = {
+					limit = { is_robot_pop = no }
+					ex_new_worlds_replace_planet_pref_traits = yes
+				}
+			}
+		}		
 		every_planet = { 
 			if = {
-				limit = { 
-					is_colonizable = yes
-				}	
+				limit = { is_vanilla_habitable_planet = yes }						
+				set_timed_planet_flag = { flag = ex_check_gate_1 days = 10 }
 				planet_event = { id = ex_new_worlds_spawn_engine.2 days = 2 }					
 			}							
 			if = {
-				limit = {
-					is_colonizable = no
-					is_star = no
-					is_asteroid = no
-				}
+				limit = { is_vanilla_uninhabitable_planet = yes	}
+				planet_event = { id = ex_new_worlds_spawn_engine.3 days = 3 }
 				if = {
 					limit = {
 						is_planet_class = pc_gas_giant 
 						has_moon = yes
 					}
 					every_moon = { set_planet_flag = gas_giant_moon }
-				}	
-				planet_event = { id = ex_new_worlds_spawn_engine.3 days = 3 }					
-			}	
-		}
+				}										
+			}				
+		}	
 	}
 }
 
@@ -83,7 +100,7 @@ planet_event = {
 	immediate = { 
 		solar_system = { random_planet = { limit = { is_star = yes } save_event_target_as = system_star_1 } } 
 		if = { 
-			limit = { has_pop = no 	} 
+			limit = { NOT = { exists = pop } } 
 			ex_new_worlds_habitable_planets_spawn_table = yes
 		}		
 		if = { 
@@ -95,8 +112,9 @@ planet_event = {
 			ex_new_worlds_replace_planet_pref_traits = yes
 			if = {
 				limit = { 
-					has_planet_flag = ex_nw_game_start_flag
-					has_owner = no
+					has_planet_flag = ex_check_gate_1
+					exists = owner
+					owner = { is_ai = yes }					
 				}
 				ex_new_worlds_habitable_planets_spawn_table = yes
 				ex_new_worlds_update_planet_pref_traits = yes
@@ -105,7 +123,7 @@ planet_event = {
 			}	
 			if = {
 				limit = { 
-					NOT = { has_planet_flag = ex_nw_game_start_flag }
+					NOT = { has_planet_flag = ex_check_gate_1 }
 					OR = {
 						is_homeworld = no
 						is_capital = no
