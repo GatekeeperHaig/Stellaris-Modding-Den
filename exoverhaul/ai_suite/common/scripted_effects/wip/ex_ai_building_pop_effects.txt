@@ -2,6 +2,7 @@
 
 calculate_pop_multipliers = { #this runs on pop scope, and it saves the variables into the pop scope	
 	check_pop_traits = yes
+	check_pop_species_rights = yes
 }
 
 check_pop_traits = {
@@ -156,3 +157,90 @@ check_pop_traits = {
 		}      
 	}
 }   
+
+check_pop_species_rights = {
+	if = {
+		limit = { has_living_standard = { type = living_standard_chemical_bliss } }
+		change_variable = { which = energy_mult value = -0.6 }
+		change_variable = { which = minerals_mult value = -0.6 }       
+		change_variable = { which = food_mult value = -0.6 }
+		change_variable = { which = unity_mult value = -0.6 }
+		change_variable = { which = society_research_mult value = -0.6 }
+		change_variable = { which = physics_research_mult value = -0.6 }
+		change_variable = { which = engineering_research_mult value = -0.6 }		
+		break = yes
+	}	
+	if = {
+		limit = { has_living_standard = { type = living_standard_academic_privilege } }
+		change_variable = { which = society_research_mult value = 0.1 }
+		change_variable = { which = physics_research_mult value = 0.1 }
+		change_variable = { which = engineering_research_mult value = 0.1 }		
+		break = yes
+	}	
+	if = {
+		limit = {
+			OR = {
+				is_enslaved = yes
+				is_being_purged = yes
+			}
+		}
+		else = { break = yes }	
+		if = {
+			limit = { has_slavery_type = { type = slavery_normal } }
+			change_variable = { which = energy_mult value = -0.33 }
+			change_variable = { which = minerals_mult value = 0.1 }       
+			change_variable = { which = food_mult value = 0.1 }
+			change_variable = { which = unity_mult value = -0.75 }
+			change_variable = { which = society_research_mult value = -0.75 }
+			change_variable = { which = physics_research_mult value = -0.75 }
+			change_variable = { which = engineering_research_mult value = -0.75 }		
+			break = yes
+		}			
+		if = {
+			limit = { has_slavery_type = { type = slavery_domestic } }
+			change_variable = { which = energy_mult value = -0.33 }		
+			change_variable = { which = unity_mult value = -0.33 }
+			change_variable = { which = society_research_mult value = -0.75 }
+			change_variable = { which = physics_research_mult value = -0.75 }
+			change_variable = { which = engineering_research_mult value = -0.75 }		
+			break = yes
+		}				
+		if = {
+			limit = { has_slavery_type = { type = slavery_military } }
+			change_variable = { which = energy_mult value = -0.15 }		
+			change_variable = { which = unity_mult value = -0.5 }
+			change_variable = { which = society_research_mult value = -0.5 }
+			change_variable = { which = physics_research_mult value = -0.5 }
+			change_variable = { which = engineering_research_mult value = -0.5 }		
+			break = yes
+		}
+		if = {
+			limit = {
+				OR = { 
+					has_purge_type = { type = purge_normal }
+					has_purge_type = { type = purge_matrix }
+					has_purge_type = { type = purge_processing }
+					has_slavery_type = { type = slavery_livestock }
+					has_slavery_type = { type = slavery_matrix }
+				}
+			}
+			change_variable = { which = energy_mult value = -10 }		
+			change_variable = { which = minerals_mult value = -10 }		
+			change_variable = { which = food_mult value = -10 }		
+			change_variable = { which = unity_mult value = -10 }
+			change_variable = { which = society_research_mult value = -10 }
+			change_variable = { which = physics_research_mult value = -10 }
+			change_variable = { which = engineering_research_mult value = -10 }				
+			break = yes
+		}	
+		if = {
+			limit = { has_purge_type = { type = purge_labor_camps }	}
+			change_variable = { which = energy_mult value = -10 }		
+			change_variable = { which = unity_mult value = -10 }
+			change_variable = { which = society_research_mult value = -10 }
+			change_variable = { which = physics_research_mult value = -10 }
+			change_variable = { which = engineering_research_mult value = -10 }				
+			break = yes
+		}		
+	}	
+}	
