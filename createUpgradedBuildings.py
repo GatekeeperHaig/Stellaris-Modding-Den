@@ -220,6 +220,7 @@ def readAndConvert(args, allowRestart=1):
           
           #new building requirements to ensure that only the highest currently available is buildable. Keep the building list as short as possible. Done via "potential" to compeltely remove them from the list (not even greyed out)
           newRequirements=TagList(2)
+          newRequirements.addString("owner = { NOT = { has_country_flag = display_low_tier_flag } }")
           if len(upgrades.names)>0 and not args.keep_lower_tier and not buildingData.tagName in args.t0_buildings:
             buildingData.getOrCreate("potential")
             buildingData.splitToListIfString("potential").addArray(["NAND", newRequirements])
