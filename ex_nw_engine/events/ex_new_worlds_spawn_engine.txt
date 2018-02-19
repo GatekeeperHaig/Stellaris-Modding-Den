@@ -67,16 +67,63 @@ planet_event = {
 		if = { 
 			limit = { is_star = yes }
 			adjust_star_size = yes	
-		}	
-		solar_system = { #this extends support for mods that add binary and trinary systems
-			random_planet = { limit = { is_star = yes } set_planet_flag = star_1 save_event_target_as = system_star_1 } 
-			if = {
-				limit = { any_planet = { is_star = yes NOT = { has_planet_flag = star_1 } } }
-				random_planet = { limit = { is_star = yes NOT = { has_planet_flag = star_1 } } set_planet_flag = star_2 save_event_target_as = system_star_2 } 
+		}
+		if = {
+			limit = { 
+				is_vanilla_habitable_planet = yes
+				OR = {
+					any_tile = { has_pop = yes pop = { is_presapient_pop = yes } }
+					AND = {
+						has_owner = yes
+						OR = {
+							AND = {
+								is_colony = yes				
+								any_pop = {
+									has_regular_habitability_trait = yes
+									OR = {
+										NOT = { species = { is_same_value = owner.species }
+										is_subspecies = yes
+									}
+								}										
+							}	
+							owner = { is_country_type = primitive }
+						}	
+					}
+				}	
+				any_tile = {
+					has_pop = yes
+					pop = { has_regular_habitability_trait = yes }
+				}	
+			}
+			check_habitability_trait_correspondence = yes
+		}				
+		solar_system = { 
+			random_planet = { 
+				limit = { 
+					is_star = yes					
+				} 
+				set_planet_flag = star_1 
+				save_event_target_as = system_star_1
+			} 
+			if = { #this extends support for Real Space
+				limit = { 
+					any_planet = { is_star = yes NOT = { has_planet_flag = star_1 } }
+				} 
+				random_planet = { 
+					limit = { is_star = yes NOT = { has_planet_flag = star_1 } } 
+					set_planet_flag = star_2 
+					save_event_target_as = system_star_2
+				} 
 			}	
 			if = {
-				limit = { any_planet = { is_star = yes NOR = { has_planet_flag = star_1 has_planet_flag = star_2 } } }
-				random_planet = { limit = { is_star = yes NOR = { has_planet_flag = star_1 has_planet_flag = star_2 } } set_planet_flag = star_3 save_event_target_as = system_star_3 } 
+				limit = { 
+					any_planet = { is_star = yes NOR = { has_planet_flag = star_1 has_planet_flag = star_2 } } 
+				}
+				random_planet = { 
+					limit = { is_star = yes NOR = { has_planet_flag = star_1 has_planet_flag = star_2 } } 
+					set_planet_flag = star_3 
+					save_event_target_as = system_star_3 
+				} 
 			}	
 		}			
 		if = {
@@ -107,7 +154,7 @@ planet_event = {
 				}
 				remove_regular_planet_modifiers = yes 
 				planet_modifier_spawn_engine = yes
-			}					
+			}		
 			if = {
 				limit = { any_tile = { has_regular_blocker = yes } }
 				every_tile = {
@@ -122,7 +169,36 @@ planet_event = {
 					limit = { is_orbital_tile = no has_regular_vanilla_deposit = yes has_building = no }
 					resource_spawn_table = yes
 				}
-			}			
+			}
+			if = {
+				limit = { 
+					new_worlds_habitable_planet = yes
+					OR = {
+						any_tile = { has_pop = yes pop = { is_presapient_pop = yes } }
+						AND = {
+							has_owner = yes
+							OR = {
+								AND = {
+									is_colony = yes				
+									any_pop = {
+										has_regular_habitability_trait = yes
+										OR = {
+											NOT = { species = { is_same_value = owner.species }
+											is_subspecies = yes
+										}
+									}										
+								}	
+								owner = { is_country_type = primitive }
+							}	
+						}
+					}	
+					any_tile = {
+						has_pop = yes
+						pop = { has_regular_habitability_trait = yes }
+					}	
+				}
+				change_habitability_trait_correspondence = yes
+			}						
 			if = { #change presapient/primitive species
 				limit = { 
 					any_tile = { has_pop = yes }
