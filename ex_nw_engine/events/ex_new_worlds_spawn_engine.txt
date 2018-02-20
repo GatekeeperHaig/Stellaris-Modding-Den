@@ -9,22 +9,6 @@ event = { #this event triggers on game start and monthly pulse
 	#This event fires only once.
 		
 	immediate = {				
-		every_country = {
-			limit = {
-				OR = {
-					is_country_type = default
-					is_country_type = fallen_empire
-					is_country_type = awakened_fallen_empire
-				}
-			}
-			random_owned_planet = { 
-				limit = { is_homeworld = yes }
-				solar_system = { 
-					set_star_flag = homeworld_system
-					every_neighboring_system = { set_star_flag = homeworld_surrounding_system }
-				}
-			}
-		}				
 		every_planet = { 
 			limit = { 
 				is_star = no
@@ -42,12 +26,9 @@ event = { #this event triggers on game start and monthly pulse
 				solar_system = { 
 					starting_system = no
 					NOR = {
-						#has_star_flag = empire_home_system
 						has_star_flag = sol_system
 						has_star_flag = deneb_system
 						has_star_flag = custom_system
-						#has_star_flag = homeworld_system
-						#has_star_flag = homeworld_surrounding_system						
 					}					
 				}
 				is_capital = no
@@ -164,12 +145,20 @@ planet_event = {
 				}	
 			}	
 			if = {
-				any_tile = { is_orbital_tile = no has_regular_vanilla_deposit = yes has_building = no } 
+				limit = { any_tile = { is_orbital_tile = no has_regular_vanilla_deposit = yes has_building = no } 
 				every_tile = { 
 					limit = { is_orbital_tile = no has_regular_vanilla_deposit = yes has_building = no }
-					resource_spawn_table = yes
+					planetary_resource_spawn_table = yes
 				}
+				
 			}
+			if = {
+				limit = { any_tile = { is_orbital_tile = yes has_regular_vanilla_deposit = yes } 
+				random_tile = { 
+					limit = { is_orbital_tile = yes has_regular_vanilla_deposit = yes }
+					orbital_resource_spawn_table = yes
+				}				
+			}			
 			if = {
 				limit = { 
 					new_worlds_habitable_planet = yes
