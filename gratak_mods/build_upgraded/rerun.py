@@ -4,7 +4,7 @@ import subprocess
 import os
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 os.chdir('..')
-subprocess.call('python ./createUpgradedBuildings.py "D:/Program Files (x86)/Steam/steamapps/common/Stellaris/common/buildings/*" "--tags" "Builings,Utilities,Fixes" "--picture_file" "thumb_direct_build.png" "-o" "build_upgraded" "--custom_mod_name" "Build Upgraded - Direct construction of high tier buildings"', shell=True)
+subprocess.call('python ./createUpgradedBuildings.py "D:/Program Files (x86)/Steam/steamapps/common/Stellaris/common/buildings/00_buildings.txt" "D:/Program Files (x86)/Steam/steamapps/common/Stellaris/common/buildings/00_event_buildings.txt" "D:/Program Files (x86)/Steam/steamapps/common/Stellaris/common/buildings/00_guardian_buildings.txt" "D:/Program Files (x86)/Steam/steamapps/common/Stellaris/common/buildings/00_habitat_buildings.txt" "D:/Program Files (x86)/Steam/steamapps/common/Stellaris/common/buildings/00_horizonsignal_buildings.txt" "D:/Program Files (x86)/Steam/steamapps/common/Stellaris/common/buildings/00_syntheticdawn_buildings.txt" "--output_folder" "gratak_mods/build_upgraded" "--custom_mod_name" "Build Upgraded 2.0 - Direct construction of high tier buildings" "--gameVersion" "2.0.*" "--t0_buildings" "building_colony_shelter,building_deployment_post,building_basic_power_plant,building_basic_farm,building_basic_mine" "--languages" "braz_por,english,french,german,polish,russian,spanish" "--time_discount" "0.25" "--cost_discount" "0.0" "--helper_file_list" "000000"', shell=True)
 import fnmatch
 for root, dirnames, filenames in os.walk('.'):
 	for filename in fnmatch.filter(filenames,'rerun_just_copy_and_check.py'):
