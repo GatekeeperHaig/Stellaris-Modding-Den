@@ -1,124 +1,94 @@
-### Allow Triggers
+### Flag Triggers
 
-requires_any_empire_capital = {
-	custom_tooltip = {
-		text = "requires_any_empire_capital"
-		planet = {
-			has_capital_3 = yes			
-		}
-	}
-}	
+overhauled_building_content_enabled = { has_global_flag = ex_overhauled_building_content_enabled }
 
-requires_non_machine_empire_capital = {
-	custom_tooltip = {
-		text = "requires_building_capital_3"
-		planet = {
-			has_building = "building_capital_3"
-		}
-	}	
-}
-
-requires_capital_1 = {
-	custom_tooltip = {
-		fail_text = "requires_building_capital_1"
-		planet = {
-			OR = {
-				has_capital_1 = yes
-				has_capital_2 = yes
-				has_capital_3 = yes
-			}
-		}		
-	}
-}	
-
-requires_building_capital_1_or_hab = {
-	custom_tooltip = {
-		fail_text = "requires_building_capital_1_or_hab"
-		planet = {
-			OR = {
-				has_building = "building_hab_capital"
-				has_capital_1 = yes
-				has_capital_2 = yes
-				has_capital_3 = yes
-			}
-		}		
-	}
-}	
-
-requires_capital_2 = {
-	custom_tooltip = {
-		fail_text = "requires_building_capital_2"
-		planet = {
-			OR = {					
-				has_capital_2 = yes
-				has_capital_3 = yes
-			}
-		}		
-	}
-}	
-
-requires_no_worm_power_hub = {
-	custom_tooltip = {
-		fail_text = "requires_power_hub_absence"
-		planet = {
-			NOT = {
-				has_building = "building_akx_worm_1"
-			}
-		}
-	}
-}	
-	
-requires_5_pops = {
-	custom_tooltip = {
-		text = "requires_pops_5"
-		planet = {
-			count_pops = {
-				count > 4
-				limit = {
-					is_colony_pop = yes
-				}
-			}
-		}
-	}	
-}
-
-requires_10_pops = {
-	custom_tooltip = {
-		text = "requires_pops_10"
-		planet = {
-			count_pops = {
-				count > 9
-				limit = {
-					is_colony_pop = yes
-				}
-			}
-		}
-	}
-}
-	
-	
 ### Owner Triggers
 
-is_machine_empire = { has_authority = auth_machine_intelligence }
-is_hive_mind_empire = { has_authority = auth_hive_mind }
-is_gestalt_consciousness = { has_ethic = ethic_gestalt_consciousness }
+owner_is_machine_empire = { owner = { has_authority = auth_machine_intelligence } }
+owner_is_hive_mind_empire = { owner = { has_authority = auth_hive_mind } }
+owner_is_gestalt_consciousness = { owner = { has_ethic = ethic_gestalt_consciousness } }
+
+### Owner Technology Triggers
+
+owner_has_tech_power_planet_2 = { owner = { has_technology = "tech_power_plant_2" } }
+owner_has_tech_power_planet_3 = { owner = { has_technology = "tech_power_plant_3" } }
+owner_has_tech_power_planet_4 = { owner = { has_technology = "tech_power_plant_4" } }
+owner_has_tech_power_planet_5 = { owner = { has_technology = "tech_power_plant_5" } }
 
 ### Planet Triggers 
 
-is_habitat = { is_planet_class = pc_habitat }
-is_machine_world = { is_planet_class = pc_machine }
-is_gaia_world = { is_planet_class = pc_gaia }
-is_tomb_world = { is_planet_class = pc_tomb }
+planet_is_habitat = { planet = { is_planet_class = pc_habitat } }
+planet_is_machine_world = { planet = { is_planet_class = pc_machine } }
+planet_is_ringworld = { { planet = { is_ringworld = yes } }
+planet_is_gaia_world = { planet = { is_planet_class = pc_gaia } }
+planet_is_tomb_world = { planet = { is_planet_class = pc_tomb } }
+planet_is_homeworld = { planet = { is_homeworld = yes } }
+planet_is_capital = { planet = { is_capital = yes } }
 
-is_special_planet = {
-	OR = {
-		is_habitat = yes
-		is_ringworld = yes
-		is_gaia_world = yes
-		is_tomb_world = yes
-	}
+planet_is_special = {
+	planet = {
+		OR = {
+			is_planet_class = pc_habitat			
+			is_planet_class = pc_machine
+			is_planet_class = pc_gaia
+			is_planet_class = pc_tomb
+			is_ringworld = yes
+		}
+	}	
 }	
 
+### Resource Triggers
+#ai_allow scopes to trigger by default
 
-	
-	
+has_betharian = { tile = {	has_resource = { type = sr_betharian amount > 0	} } }	
+has_alien_pets = { tile = { has_resource = { type = sr_alien_pets amount > 0 } } }
+
+
+### Building Conditions
+
+conditions_power_planet_1 = {
+	planet_is_habitat = no
+	OR = {
+		owner_has_tech_power_planet_2 = no
+		planet = { 
+			OR = {
+				has_capital_1 = no
+				has_capital_2 = no
+				has_capital_3 = no
+			}	
+		}
+	}		
+}
+
+conditions_power_planet_2 = {
+	planet_is_habitat = no
+	OR = {
+		owner_has_tech_power_planet_3 = no
+		planet = { 
+			OR = {
+				has_capital_2 = no
+				has_capital_3 = no
+			}	
+		}
+	}	
+}
+
+conditions_power_planet_3 = {
+	planet_is_habitat = no
+	owner_has_tech_power_planet_4 = no
+}
+
+conditions_power_planet_4 = {	
+	planet_is_habitat = no	
+	planet = { 
+		OR = {
+			has_capital_3 = yes
+			is_capital = no
+		}
+	}	
+}
+
+conditions_power_planet_5 = {	
+	planet_is_habitat = no	
+	planet = { has_capital_3 = yes }	
+}	
