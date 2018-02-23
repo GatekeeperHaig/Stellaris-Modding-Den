@@ -134,15 +134,15 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         print("}",end="")
       print(self.comments[i],end="")
       print("\n",end="")
-  def writeAll(self,file,checkForHelpers=False): #formatted writing. Paradox style minus most whitespace tailing errors
+  def writeAll(self,file,args=0,checkForHelpers=False): #formatted writing. Paradox style minus most whitespace tailing errors
     for i in range(len(self.names)):
       try:
         if not checkForHelpers or self.vals[i].helper==False:
-          self.writeEntry(file, i)
+          self.writeEntry(file, i,args)
       except:
         self.printAll()
         raise
-  def writeEntry(self, file,i):
+  def writeEntry(self, file,i,args=0):
     for b in range(self.bracketLevel):
       file.write("\t")
     if not isinstance(self.vals[i],TagList):
@@ -154,13 +154,28 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         file.write("\n")
         for b in range(self.bracketLevel):
           file.write("\t")
-      file.write(self.names[i]+" = {\n")
-      self.vals[i].writeAll(file)
-      for b in range(self.bracketLevel):
-        file.write("\t")
-      file.write("}")
+      file.write(self.names[i]+" =")
+      if self.vals[i].oneLineWriteCheck():
+        self.vals[i].writeLine(file)
+      else:
+        file.write(" {\n")
+        self.vals[i].writeAll(file,args)
+        for b in range(self.bracketLevel):
+          file.write("\t")
+        file.write("}")
     file.write(self.comments[i])
     file.write("\n")
+  def writeLine(self, file):
+    file.write(" { ")
+    for name, val in self.getAll():
+      file.write("{} = {}".format(name,val))
+    file.write(" }")
+  def oneLineWriteCheck(self,args=0):
+    for val in self.vals:
+      if isinstance(val,TagList):
+        return False
+    return True
+
   def replaceAllHasBuildings(self, args): #"has_building=" fails working if different version of the same building exist (Paradox should have realised this on creation of machine empire capital buildings but they didn't... They simply created very lengthy conditions. Shame...). We replace them by scripted_triggers. Due to cross-reference in between files I do this for EVERY building, even the ones I did not copy.
   #beware that this function will not replace "has_building" hidden in the name (i.e. a longer name including it somewhere in the middle). This is WAD. This can only be added like this manually. This can be used to prevent a replace.
     for i in range(len(self.names)):
