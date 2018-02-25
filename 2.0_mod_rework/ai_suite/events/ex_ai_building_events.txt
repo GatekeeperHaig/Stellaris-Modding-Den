@@ -1,23 +1,27 @@
 namespace = ex_ai_building_events
 
-event = { #this event sets variables into scopes. It fires at game start or on a monthly pulse BUT only once. 
+event = { #this event sets variables into scopes. It fires on a monthly pulse and on game start. 
 	id = ex_ai_building_events.0
 	hide_window = yes
 	is_triggered_only = yes
-	fire_only_once = yes
-	
+		
 	immediate = {
 		every_country = {
-			limit = { 				
+			limit = { 
 				OR = {
 					is_country_type = default
 					is_country_type = fallen_empire
 					is_country_type = awakened_fallen_empire
 				}	
 			}	
-			set_variable = { which = energy_mult value = 0 }
-			set_variable = { which = minerals_mult value = 0 }
-			set_variable = { which = food_mult value = 0 }			
+			country_event = { id = ex_ai_building_events.1 days = 1 }
+			if = { 
+				limit = { NOT = { has_country_flag = ex_ai_variables_added_country } }				
+				set_variable = { which = energy_mult value = 0 }
+				set_variable = { which = minerals_mult value = 0 }
+				set_variable = { which = food_mult value = 0 }	
+				set_country_flag = ex_ai_variables_added_country
+			}	
 			every_owned_planet = {
 				limit = { 
 					is_colony = yes
@@ -26,103 +30,76 @@ event = { #this event sets variables into scopes. It fires at game start or on a
 						sector_controlled = yes
 					}	
 				}
-				set_variable = { which = energy_mult value = 0 }
-				set_variable = { which = minerals_mult value = 0 }
-				set_variable = { which = food_mult value = 0 }
-				set_variable = { which = unity_mult value = 0 }
-				set_variable = { which = society_research_mult value = 0 }
-				set_variable = { which = physics_research_mult value = 0 }
-				set_variable = { which = engineering_research_mult value = 0 }
 				every_owned_pop = {
-					limit = { OR = { is_robot_pop = yes is_sapient = yes } }
+					if = { 
+						limit = { NOT = { has_pop_flag = ex_ai_variables_added_pop } }					
+						set_variable = { which = energy_mult value = 0 }
+						set_variable = { which = minerals_mult value = 0 }
+						set_variable = { which = food_mult value = 0 }
+						set_variable = { which = unity_mult value = 0 }
+						set_variable = { which = society_research_mult value = 0 }
+						set_variable = { which = physics_research_mult value = 0 }
+						set_variable = { which = engineering_research_mult value = 0 }
+						set_pop_flag = ex_ai_variables_added_pop				
+					}		
+				}	
+				if = { 
+					limit = { NOT = { has_planet_flag = ex_ai_variables_added_planet } }					
 					set_variable = { which = energy_mult value = 0 }
 					set_variable = { which = minerals_mult value = 0 }
 					set_variable = { which = food_mult value = 0 }
 					set_variable = { which = unity_mult value = 0 }
 					set_variable = { which = society_research_mult value = 0 }
 					set_variable = { which = physics_research_mult value = 0 }
-					set_variable = { which = engineering_research_mult value = 0 }														
-				}				
-				every_tile = {
-					limit = { 
-						is_orbital_tile = no
-						has_blocker = no
+					set_variable = { which = engineering_research_mult value = 0 }
+					every_tile = {
+						limit = { is_orbital_tile = no }
+						#multiplier variables
+						set_variable = { which = energy_mult value = 1 }
+						set_variable = { which = minerals_mult value = 1 }
+						set_variable = { which = food_mult value = 1 }
+						set_variable = { which = unity_mult value = 1 }
+						set_variable = { which = society_research_mult value = 1 }
+						set_variable = { which = physics_research_mult value = 1 }
+						set_variable = { which = engineering_research_mult value = 1 }					
+						#deposit/adj. variables
+						set_variable = { which = energy_weight value = 0 }
+						set_variable = { which = minerals_weight value = 0 }
+						set_variable = { which = food_weight value = 0 }
+						set_variable = { which = unity_weight value = 0 }
+						set_variable = { which = society_research_weight value = 0 }
+						set_variable = { which = physics_research_weight value = 0 }
+						set_variable = { which = engineering_research_weight value = 0 }
+						#building weight variables
+						set_variable = { which = energy_building_tile value = 0 }
+						set_variable = { which = minerals_building_tile value = 0 }
+						set_variable = { which = food_building_tile value = 0 }
+						set_variable = { which = society_research_building_tile value = 0 }
+						set_variable = { which = physics_research_building_tile value = 0 }
+						set_variable = { which = engineering_research_building_tile value = 0 }
+						#building adj. weight variables
+						set_variable = { which = energy_building_adj_weight value = 0 }
+						set_variable = { which = minerals_building_adj_weight value = 0 }
+						set_variable = { which = food_building_adj_weight value = 0 }
+						set_variable = { which = society_research_building_adj_weight value = 0 }
+						set_variable = { which = physics_research_building_adj_weight value = 0 }
+						set_variable = { which = engineering_research_building_adj_weight value = 0 }															
 					}
-					#multiplier variables
-					set_variable = { which = energy_mult value = 1 }
-					set_variable = { which = minerals_mult value = 1 }
-					set_variable = { which = food_mult value = 1 }
-					set_variable = { which = unity_mult value = 1 }
-					set_variable = { which = society_research_mult value = 1 }
-					set_variable = { which = physics_research_mult value = 1 }
-					set_variable = { which = engineering_research_mult value = 1 }					
-					#deposit/adj. variables
-					set_variable = { which = energy_weight value = 0 }
-					set_variable = { which = minerals_weight value = 0 }
-					set_variable = { which = food_weight value = 0 }
-					set_variable = { which = unity_weight value = 0 }
-					set_variable = { which = society_research_weight value = 0 }
-					set_variable = { which = physics_research_weight value = 0 }
-					set_variable = { which = engineering_research_weight value = 0 }
-					#building weight variables
-					set_variable = { which = energy_building_tile value = 0 }
-					set_variable = { which = minerals_building_tile value = 0 }
-					set_variable = { which = food_building_tile value = 0 }
-					set_variable = { which = society_research_building_tile value = 0 }
-					set_variable = { which = physics_research_building_tile value = 0 }
-					set_variable = { which = engineering_research_building_tile value = 0 }
-					#building adj. weight variables
-					set_variable = { which = energy_building_adj_weight value = 0 }
-					set_variable = { which = minerals_building_adj_weight value = 0 }
-					set_variable = { which = food_building_adj_weight value = 0 }
-					set_variable = { which = society_research_building_adj_weight value = 0 }
-					set_variable = { which = physics_research_building_adj_weight value = 0 }
-					set_variable = { which = engineering_research_building_adj_weight value = 0 }															
-				}
-			}
+					set_planet_flag = ex_ai_variables_added_planet
+				}	
+			}			
 		}
 	}
 }	
 
-event = { #this event runs on a monthly scope, but it is gated to activate every 180 days. 
+country_event = { #this event runs on a monthly scope. 
 	id = ex_ai_building_events.1
 	hide_window = yes
 	is_triggered_only = yes
 
-	trigger = { NOT = { has_country_flag = resource_check_delay } } 
-	# this delays the check from running every month, to running every 180 days
-	
 	immediate = { 
-		every_country = {
-			limit = {				
-				OR = {
-					is_country_type = default
-					is_country_type = fallen_empire
-					is_country_type = awakened_fallen_empire
-				}				
-			}	
-			check_deficities = yes
-			check_income_level = yes
-			set_timed_country_flag = { flag = resource_check_delay days = 180 }
-		}		
-	}			
-}
-
-country_event = { #this event fires when the game starts at press begin
-	id = ex_ai_building_events.2
-	hide_window = yes
-	is_triggered_only = yes
-	
-	trigger = { 
-		OR = {
-			is_country_type = default
-			is_country_type = fallen_empire
-			is_country_type = awakened_fallen_empire
-		}
-		#NOT = { has_country_flag = xyz }
-	}	
-	
-	immediate = {
+		check_deficities = yes
+		check_income_level = yes
 		every_owned_planet = {
 			limit = { 
 				is_colony = yes
@@ -185,3 +162,76 @@ country_event = { #this event fires when the game starts at press begin
 		}		
 	}	
 }
+
+#this event runs on a monthly scope.
+#it places planet flags that are used by specific planet unique buildings
+
+event = {  
+	id = ex_ai_building_events.2
+	hide_window = yes
+	is_triggered_only = yes
+	
+	trigger = { years_passed > 25 }
+	
+	immediate = {
+		every_country = {
+			limit = { is_country_type = default	}	
+			every_owned_planet = {
+				limit = { is_colony = yes }
+				if = {
+					limit = { 								
+						NOR = { 
+							has_planet_flag = fortify_planet
+							AND = {
+								prev = { is_at_war = no }
+								count_tile = {
+									limit = {
+										OR = {
+											has_building = building_stronghold
+											has_building = building_fortress
+										}
+									}
+									count > 2
+								}	
+							}	
+						}
+						OR = {
+							unrest > 50
+							any_country = {
+								is_at_war_with = prevprev
+								any_owned_planet = {
+									is_colony = yes
+									distance = { source = prevprev min = 70 max = 100 }
+								}
+							}	
+									
+							AND = {
+								OR = {
+									has_capital_1 = yes
+									has_capital_2 = yes
+								}	
+								NOR = {
+									has_building = building_stronghold
+									has_building = building_fortress	
+								}
+							}	
+							AND = {
+								has_capital_3 = yes
+								count_tile = {
+									limit = {
+										OR = {
+											has_building = building_stronghold
+											has_building = building_fortress
+										}
+									}
+									count < 2
+								}	
+							}								
+						}
+					}
+					set_timed_planet_flag = { flag = fortify_planet days = 60 }
+				}
+			}					
+		}
+	}
+}	
