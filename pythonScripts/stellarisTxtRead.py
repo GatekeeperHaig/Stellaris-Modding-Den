@@ -171,6 +171,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       file.write("{} = {}".format(name,val))
     file.write(" }")
   def oneLineWriteCheck(self,args=0):
+    if args==0:
+      return False
     for val in self.vals:
       if isinstance(val,TagList):
         return False

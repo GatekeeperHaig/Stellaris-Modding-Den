@@ -220,7 +220,6 @@ def readAndConvert(args, allowRestart=1):
           
           #new building requirements to ensure that only the highest currently available is buildable. Keep the building list as short as possible. Done via "potential" to compeltely remove them from the list (not even greyed out)
           newRequirements=TagList(2)
-          newRequirements.addString("owner = { NOT = { has_country_flag = display_low_tier_flag } }")
           if len(upgrades.names)>0 and not args.keep_lower_tier and not buildingData.tagName in args.t0_buildings:
             buildingData.getOrCreate("potential")
             buildingData.splitToListIfString("potential").addArray(["NAND", newRequirements])
@@ -363,8 +362,10 @@ def readAndConvert(args, allowRestart=1):
               fakeIndex=buildingNameToData.names.index(baseBuildingData.tagName)
               buildingNameToData.insert([fakeBuilding.tagName,fakeBuilding],fakeIndex) #insert the fake before 'baseBuilding'. upgradeBuildingIndex is now shifted but shouldn't be used anymore
             
-          if isinstance(buildingData.splitToListIfString("potential").vals[-1], TagList) and len(buildingData.get("potential").vals[-1].names)==0:
+          if isinstance(buildingData.splitToListIfString("potential").vals[-1], TagList) and len(buildingData.get("potential").vals[-1].names)<=0:
             buildingData.get("potential").removeIndex(-1)   #remove potentially empty entry thanks to empire_unique buildings that cannot be copied.
+          elif len(newRequirements.vals)>0:
+            newRequirements.addString("owner = { NOT = { has_country_flag = display_low_tier_flag } }")
           newRequirements.increaseLevelRec() #push them to correct level. list will always exist, might be empty if unused.
     #END OF COPY AND MODIFY        
 
