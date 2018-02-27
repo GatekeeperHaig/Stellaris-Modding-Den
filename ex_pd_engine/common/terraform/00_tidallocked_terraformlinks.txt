@@ -1,0 +1,100 @@
+#Tidally Locked
+
+#Same Type
+terraform_link = {
+	to = "pc_tidallylocked"
+	from = "pc_tidallylocked"
+	
+	energy = 1000
+	duration = 900
+	
+	condition = {
+		has_technology = "tech_terrestrial_sculpting"
+	}
+
+			
+	effect = {
+		from = { remove_modifier = bleak_planet }
+		from = { remove_modifier = high_gravity }
+		from = { remove_modifier = irradiated_planet }
+		from = { remove_modifier = mineral_poor }
+		from = { remove_modifier = unstable_tectonics }
+		from = { remove_modifier = weak_magnetic_field }
+		from = { remove_modifier = hazardous_weather }
+		from = { remove_modifier = wild_storms }
+		from = { remove_modifier = dangerous_wildlife }
+		from = {
+			if = {
+				limit = { 
+					NOT = { has_modifier = engineered_environment }
+				}
+				add_modifier = { 
+					modifier = "engineered_environment" 
+					days = -1 
+				}
+			}
+		}
+
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}
+
+
+#Machine
+
+terraform_link = {
+	to = "pc_machine"
+	from = "pc_tidallylocked"
+	
+	energy = 10000
+	duration = 7200
+	
+	potential = {
+		has_ascension_perk = ap_machine_worlds
+	}
+	
+	condition = { 
+		from = {
+			OR = {
+				is_owned_by = root
+				NOT = { has_modifier = "holy_planet" }
+			}		
+		}
+	}
+	
+	effect = {
+		from = { remove_modifier = bleak_planet }
+		from = { remove_modifier = hazardous_weather }
+		from = { remove_modifier = wild_storms }
+		from = { remove_modifier = dangerous_wildlife }
+		from = { remove_modifier = atmospheric_aphrodisiac }
+		from = { remove_modifier = atmospheric_hallucinogen }
+		from = { remove_modifier = lush_planet }
+		from = { remove_modifier = natural_beauty }
+		from = { remove_modifier = engineered_environment }
+	}
+	
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 0
+			from = {
+				any_owned_pop = {
+					NOR = {
+						has_trait = trait_machine_unit
+						has_trait = trait_mechanical
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			from = {
+				is_colony = no
+			}
+		}
+	}
+}
