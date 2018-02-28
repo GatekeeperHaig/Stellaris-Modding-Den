@@ -171,15 +171,13 @@ event = {
 	hide_window = yes
 	is_triggered_only = yes
 	
-	trigger = { years_passed > 25 }
-	
 	immediate = {
 		every_country = {
 			limit = { is_country_type = default	}	
 			every_owned_planet = {
-				limit = { is_colony = yes }
-				if = {
-					limit = { 								
+				if = { #military buildings
+					limit = { 
+						years_passed > 25
 						NOR = { 
 							has_planet_flag = fortify_planet
 							AND = {
@@ -229,8 +227,69 @@ event = {
 							}								
 						}
 					}
-					set_timed_planet_flag = { flag = fortify_planet days = 60 }
+					set_timed_planet_flag = { flag = fortify_planet days = 30 }
 				}
+				if = { #pop growth buildings
+					limit = { 
+						prev = {
+							OR = { 
+								has_technology = "tech_frontier_health"
+								has_technology = "tech_frontier_hospital"
+							}
+						}
+						NOR = { 
+							has_building = building_clinic
+							has_building = building_building_hospital							
+							has_building = building_spare_parts_depot
+							has_building = building_unit_assembly_plant							
+						}	
+						free_pop_tiles > 2
+						OR = {
+							AND = {
+								any_owned_pop = {
+									is_robot_pop = no								
+									has_population_control = no
+								}								
+								prev = { 
+									OR = {
+										has_authority = auth_machine_intellgience
+										has_country_flag = synthethic_age
+									}
+									balance > 250
+								}	
+								any_owned_pop = { is_robot_pop = yes }
+							}
+						}
+					}
+					set_timed_planet_flag = { flag = build_pop_growth_building days = 30 }
+				}
+				if = {
+					limit = {
+						prev = { 
+							has_technology = "tech_neural_implants"
+							OR = {
+								AND = {
+									overhauled_building_content_enabled = no
+									is_machine_empire = no
+								}	
+								AND = {
+									overhauled_building_content_enabled = yes
+									is_gestalt_consciousness = no
+								}	
+							}
+							has_policy_flag = slavery_allowed
+						}
+						any_owned_pop = { is_enslaved = yes }
+						OR = {
+							count_pops = {
+								limit = { is_enslaved = yes }
+								count > 2
+							}	
+							unrest > 30
+						}	
+					}	
+					set_timed_planet_flag = { flag = build_slave_processing days = 30 }
+				}								
 			}					
 		}
 	}

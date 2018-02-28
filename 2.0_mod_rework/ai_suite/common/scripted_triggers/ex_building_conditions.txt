@@ -1174,24 +1174,205 @@ conditions_mineral_processing_plant_2_direct_build = {
 	}		
 }
 
+conditions_clinic = {
+	owner_is_machine_empire = no
+	OR = {
+		owner_has_tech_frontier_hospital = no
+		planet = { 			
+			OR = { 
+				has_capital_building = no					
+				has_capital_0 = yes
+				has_capital_1 = yes
+			}
+		}
+	}
+}
+
+conditions_hospital = {
+	owner_is_machine_empire = no
+	planet = { 
+		OR = {
+			has_capital_2 = yes
+			has_capital_3 = yes
+		}
+	}		
+}
+
+conditions_hospital_direct_build = {
+	owner_is_machine_empire = no
+	planet = { 
+		OR = {
+			has_capital_2 = yes
+			has_capital_3 = yes
+		}
+	}		
+}
+
+conditions_spare_parts_depot = {
+	owner_is_machine_empire = yes
+	OR = {
+		owner_has_tech_frontier_hospital = no
+		planet = { 			
+			OR = { 
+				has_capital_building = no					
+				has_capital_0 = yes
+				has_capital_1 = yes
+			}
+		}
+	}
+}
+
+conditions_unit_assembly_plant = {
+	owner_is_machine_empire = yes
+	planet = { 
+		OR = {
+			has_capital_2 = yes
+			has_capital_3 = yes
+		}
+	}		
+}
+
+conditions_unit_assembly_plant_direct_build = {
+	owner_is_machine_empire = yes
+	planet = { 
+		OR = {
+			has_capital_2 = yes
+			has_capital_3 = yes
+		}
+	}		
+}
+
+conditions_stronghold = {
+	OR = {
+		owner_has_tech_global_defense_grid = no
+		planet = { 			
+			OR = { 
+				has_capital_building = no					
+				has_capital_0 = yes
+				has_capital_1 = yes
+			}
+		}
+	}
+}
+
+conditions_fortress = {
+	planet = { 
+		OR = {
+			has_capital_2 = yes
+			has_capital_3 = yes
+		}
+	}	
+}	
+
+conditions_military_academy = {
+	planet_is_habitat = no
+	planet = { 
+		OR = {
+			has_capital_1 = yes
+			has_capital_2 = yes
+			has_capital_3 = yes
+		}
+	}		
+}	
+
+conditions_clone_vats = {
+	planet_is_habitat = no
+	planet = { 
+		OR = {
+			has_capital_2 = yes
+			has_capital_3 = yes
+		}
+		any_owned_pop = {			
+			is_robot_pop = no
+			is_growing = no
+			is_being_purged = no
+			OR = {
+				has_military_service_type = { type = military_service_full country = owner }
+				has_military_service_type = { type = military_service_limited country = owner }
+			}
+		}	
+	}		
+}	
+
+conditions_slave_processing = {
+	owner = {
+		OR = { 
+			NOT = { has_policy_flag = slavery_allowed } }
+			is_gestalt_consciousness = yes
+		}	
+	}	
+	planet = { 
+		is_habitat = no
+		OR = {
+			has_capital_1 = yes
+			has_capital_2 = yes
+			has_capital_3 = yes
+		}
+		any_owned_pop = {			
+			is_robot_pop = no
+			is_growing = no			
+			is_being_purged = no
+			is_enslaved = yes
+			OR = {
+				has_slavery_type = { country = from type = slavery_military }
+				has_slavery_type = { country = from type = slavery_normal }
+				has_slavery_type = { type = slavery_domestic }
+			}
+		}	
+	}		
+}	
+
 ### Destroy Conditions
 
 standard_unity_building_destroy_conditions = {
 	if = {
 		limit = { overhauled_building_content_enabled = no }
-		AND = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
+		owner_is_machine_empire = yes 		
 	}	
 	if = {
 		limit = { overhauled_building_content_enabled = yes }
-		AND = {
-			exists = owner
-			owner = { is_gestalt_consciousness = yes }
-		}
+		owner_is_gestalt_consciousness = yes
 	}	
 }				
+
+military_academy_destroy_conditions = {
+	if = {
+		limit = { overhauled_building_content_enabled = no }
+		owner_is_machine_empire = yes
+	}	
+	if = {
+		limit = { overhauled_building_content_enabled = yes }
+		owner_is_gestalt_consciousness = yes
+	}	
+}	
+
+
+slave_processing_destroy_conditions = {
+	OR = {
+		AND = {
+			exists = owner
+			owner = {
+				OR = { 
+					NOT = { has_policy_flag = slavery_allowed } }
+					is_gestalt_consciousness = yes
+				}	
+			}	
+		}	
+		NOT = { 
+			any_owned_pop = {			
+				is_robot_pop = no
+				is_growing = no			
+				is_being_purged = no
+				is_enslaved = yes
+				OR = {
+					has_slavery_type = { country = from type = slavery_military }
+					has_slavery_type = { country = from type = slavery_normal }
+					has_slavery_type = { type = slavery_domestic }
+				}
+			}
+		}	
+	}	
+}	
 
 ### Tech Unlock Conditions
 
@@ -1205,10 +1386,94 @@ standard_unity_building_tech_unlock_conditions = {
 	}			
 	if = {
 		limit = { overhauled_building_content_enabled = yes }
-		OR = {
+	OR = {
 			is_spiritualist = no
 			is_gestalt_consciousness = no
 		}	
 	}	
-}					
+}	
+
+military_academy_unlock_conditions = {
+	if = {
+		limit = { overhauled_building_content_enabled = no }
+		is_machine_empire = no
+	}	
+	if = {
+		limit = { overhauled_building_content_enabled = yes }
+		is_gestalt_consciousness = no
+	}			
+}	
+
+slave_processing_unlock_conditions = {
+	is_gestalt_consciousness = no
+	has_policy_flag = slavery_allowed
+}	
+
+### AI Allow Conditions
+
+military_academy_ai_allow_conditions = {
+	NOT = {
+		planet = {
+			owner = {
+				any_owned_planet = {
+					NOT = { is_same_value = from }
+					has_building = building_military_academy
+				}				
+			}
+		}
+	}
+	planet = { 
+		sector_controlled = no
+		any_owned_pop = { 
+			is_warrior_pop = yes
+			OR = {
+				has_military_service_type = { type = military_service_full country = owner }
+				has_military_service_type = { type = military_service_limited country = owner }
+			}				
+			OR = { 
+				is_enslaved = no
+				AND = {
+					is_enslaved = yes
+					planet = { has_building = building_slave_processing }
+				}
+			}
+		}
+	}
+}
+
+clone_vats_ai_allow_conditions = {
+	NOT = {
+		planet = {
+			owner = {
+				any_owned_planet = {
+					NOT = { is_same_value = from }
+					has_building = building_clone_vats
+				}				
+			}
+		}
+	}
+	planet = { 
+		sector_controlled = no
+		any_owned_pop = { 
+			is_robot_pop = no
+			is_warrior_pop = yes
+			OR = {
+				has_military_service_type = { type = military_service_full country = owner }
+				has_military_service_type = { type = military_service_limited country = owner }
+			}				
+		}
+	}
+}
+
+conditions_guardian_dragon_shrine = {
+	planet.owner = {
+		has_country_flag = dragon_slayer
+		OR = {
+			has_ethic = ethic_spiritualist
+			has_ethic = ethic_fanatic_spiritualist
+			has_ethic = ethic_xenophile
+			has_ethic = ethic_fanatic_xenophile
+		}
+	}	
+}	
 
