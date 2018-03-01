@@ -1,7 +1,12 @@
-namespace = ex_new_worlds_spawn_engine
+###### Written by ExNihil 
+#
+#	This mod uses a configurable spawn engine. If you'd like to integrate a version of this engine please join our discord server The Stellaris Modding Den
+#	Server invite: https://discord.gg/ZhvBXhh
+
+namespace = ex_spawn_engine_1
 
 event = { #this event triggers on game start and monthly pulse
-	id = ex_new_worlds_spawn_engine.0
+	id = ex_spawn_engine_1.0
 	hide_window = yes
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -10,10 +15,8 @@ event = { #this event triggers on game start and monthly pulse
 		
 	immediate = {				
 		every_planet = { 
-			limit = { 
-				is_star = no
-			}	
-			if = {
+			limit = { is_star = no }	
+			if = { #this adds a unique flag to gas giant moons, which is checked through a scripted trigger (see common/scripted_triggers/ex_engine_triggers.txt )
 				limit = {
 					is_planet_class = pc_gas_giant
 					has_moon = yes
@@ -35,8 +38,9 @@ event = { #this event triggers on game start and monthly pulse
 				is_capital = no
 				is_homeworld = no
 			}			
-			planet_event = { id = ex_new_worlds_spawn_engine.1 }
-			planet_event = { id = ex_new_worlds_spawn_engine.2 }
+			# these events occur one after the other. 
+			planet_event = { id = ex_spawn_engine_1.1 }
+			planet_event = { id = ex_spawn_engine_1.2 }
 		}
 	}
 }
@@ -44,14 +48,13 @@ event = { #this event triggers on game start and monthly pulse
 
 
 planet_event = { 
-	id = ex_new_worlds_spawn_engine.1
+	id = ex_spawn_engine_1.1
 	hide_window = yes
 	is_triggered_only = yes
 	
 	immediate = {
 		if = { 
-			limit = { is_star = yes }
-		#	ex_new_worlds_adjust_star_size = yes #this feature is currently not in use. It can be enabled at any time by uncommenting this part. 	
+			limit = { is_star = yes }		
 			if = { 
 				limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_1 } } } }
 				set_planet_flag = system_star_1				
@@ -68,6 +71,8 @@ planet_event = {
 					}
 				}				
 			}	
+			#the effect below is currently not in use. It can be enabled at any time by uncommenting it. 	
+			#	ex_new_worlds_adjust_star_size = yes 
 		}
 		if = {
 			limit = { 
@@ -169,7 +174,7 @@ planet_event = {
 }
 
 planet_event = { 
-	id = ex_new_worlds_spawn_engine.2
+	id = ex_spawn_engine_1.2
 	hide_window = yes
 	is_triggered_only = yes
 	
@@ -186,6 +191,10 @@ planet_event = {
 	}	
 	
 	immediate = {
+		if = { 
+			limit = { planet_size > 25 }
+			set_planet_size = 25
+		}	
 		ex_new_worlds_adjust_inhabitable_planet_size = yes
 		if = {
 			limit = { NOT = { any_tile = { has_deposit = yes } } }				

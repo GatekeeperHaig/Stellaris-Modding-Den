@@ -1,7 +1,12 @@
-namespace = ex_new_worlds_spawn_engine
+###### Written by ExNihil 
+#
+#	This mod uses a configurable spawn engine. If you'd like to integrate a version of this engine please join our discord server The Stellaris Modding Den
+#	Server invite: https://discord.gg/ZhvBXhh
+
+namespace = ex_spawn_engine_0
 
 event = { #this event triggers on game start and monthly pulse
-	id = ex_new_worlds_spawn_engine.0
+	id = ex_spawn_engine_0.0
 	hide_window = yes
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -10,17 +15,12 @@ event = { #this event triggers on game start and monthly pulse
 		
 	immediate = {				
 		every_planet = { 
-			limit = { 
-				is_star = no
-			}	
-			if = {
+			limit = { is_star = no }	
+			if = { #this adds a unique flag to gas giant moons, which is checked through a scripted trigger (see common/scripted_triggers/ex_engine_triggers.txt )
 				limit = {
-					OR = {
-						is_planet_class = pc_gas_giant
-						is_planet_class = pc_ice_giant
-						is_planet_class = pc_gas_giant_hot
-					}
+					is_planet_class = pc_gas_giant
 					has_moon = yes
+					any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
 				}
 				every_moon = { set_planet_flag = gas_giant_moon }
 			}	
@@ -39,24 +39,42 @@ event = { #this event triggers on game start and monthly pulse
 				is_capital = no
 				is_homeworld = no
 			}			
-			planet_event = { id = ex_new_worlds_spawn_engine.1 }
-			planet_event = { id = ex_new_worlds_spawn_engine.2 }
-		}	
+			# these events occur one after the other. 
+			planet_event = { id = ex_spawn_engine_0.1 }
+			planet_event = { id = ex_spawn_engine_0.2 }
+		}
 	}
 }
 
 
 
 planet_event = { 
-	id = ex_new_worlds_spawn_engine.1
+	id = ex_spawn_engine_0.1
 	hide_window = yes
 	is_triggered_only = yes
 	
 	immediate = {
-		#if = { 
-		#	limit = { is_star = yes }
-		#	adjust_star_size = yes	
-		#}
+		if = { 
+			limit = { is_star = yes }		
+			if = { 
+				limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_1 } } } }
+				set_planet_flag = system_star_1				
+				else = {
+					if = { 
+						limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_2 } } } }
+						set_planet_flag = system_star_2						
+						else = {
+							if = { 
+								limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_3 } } } }
+								set_planet_flag = system_star_3						
+							}
+						}
+					}
+				}				
+			}	
+			#the effect below is currently not in use. It can be enabled at any time by uncommenting it. 	
+			#	ex_planetary_diversity_adjust_star_size = yes 
+		}
 		if = {
 			limit = { 
 				is_vanilla_habitable_planet = yes
@@ -87,48 +105,33 @@ planet_event = {
 				check_habitability_trait_correspondence = yes
 			}	
 		}				
-		solar_system = { 
-			random_planet = { 
-				limit = { 
-					is_star = yes					
-				} 
-				set_planet_flag = star_1 
-				save_event_target_as = system_star_1
-			} 
-			if = { #this extends support for Real Space
-				limit = { 
-					any_planet = { is_star = yes NOT = { has_planet_flag = star_1 } }
-				} 
-				random_planet = { 
-					limit = { is_star = yes NOT = { has_planet_flag = star_1 } } 
-					set_planet_flag = star_2 
-					save_event_target_as = system_star_2
-				} 
-			}	
-			if = {
-				limit = { 
-					any_planet = { is_star = yes NOR = { has_planet_flag = star_1 has_planet_flag = star_2 } } 
-				}
-				random_planet = { 
-					limit = { is_star = yes NOR = { has_planet_flag = star_1 has_planet_flag = star_2 } } 
-					set_planet_flag = star_3 
-					save_event_target_as = system_star_3 
-				} 
-			}	
-		}			
 		if = {
 			limit = { is_vanilla_uninhabitable_planet = yes	}
-			ex_new_worlds_uninhabitable_planets_spawn_table = yes			
-			adjust_planet_size = yes
+			ex_planetary_diversity_uninhabitable_planets_spawn_table = yes			
+			ex_planetary_diversity_adjust_uninhabitable_planet_size = yes
 			if = {
 				limit = { has_regular_planet_modifier = yes	}
 				remove_regular_planet_modifiers = yes 
-				planet_modifier_spawn_engine = yes
-			}					
+				ex_planetary_diversity_planet_modifier_spawn_engine = yes
+			}		
+			if = {
+				limit = {
+					OR = {
+						is_planet_class = pc_gas_giant
+						is_planet_class = pc_ice_giant
+					}	
+					has_moon = yes
+					any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
+				}
+				every_moon = { 
+					limit = { NOT = { has_planet_flag = gas_giant_moon } }
+					set_planet_flag = gas_giant_moon
+				}
+			}				
 		}	
 		if = {
 			limit = { is_vanilla_habitable_planet = yes	}
-			ex_new_worlds_habitable_planets_spawn_table = yes
+			ex_planetary_diversity_habitable_planets_spawn_table = yes
 			if = {
 				limit = { any_tile = { has_blocker = yes has_regular_blocker = yes } }
 				every_tile = {
@@ -149,14 +152,14 @@ planet_event = {
 					}
 				}
 				remove_regular_planet_modifiers = yes 
-				planet_modifier_spawn_engine = yes
+				ex_planetary_diversity_planet_modifier_spawn_engine = yes
 			}			
 			if = {
 				limit = { any_tile = { is_orbital_tile = no has_deposit = yes has_regular_vanilla_deposit = yes has_building = no } }
 				every_tile = { 
 					limit = { has_deposit = yes has_regular_vanilla_deposit = yes has_building = no is_orbital_tile = no }
 					clear_deposits = yes
-					planetary_resource_spawn_table = yes
+					ex_planetary_diversity_planetary_resource_spawn_table = yes
 				}				
 			}
 		}	
@@ -172,7 +175,7 @@ planet_event = {
 }
 
 planet_event = { 
-	id = ex_new_worlds_spawn_engine.2
+	id = ex_spawn_engine_0.2
 	hide_window = yes
 	is_triggered_only = yes
 	
@@ -189,20 +192,21 @@ planet_event = {
 	}	
 	
 	immediate = {
+		ex_planetary_diversity_adjust_inhabitable_planet_size = yes
 		if = {
 			limit = { NOT = { any_tile = { has_deposit = yes } } }				
 			every_tile = {
 				limit = { is_orbital_tile = no has_deposit = no has_building = no } 
 				random_list = { 
-					70 = { planetary_resource_spawn_table = yes } 
-					30 = { } 
+					60 = { ex_planetary_diversity_planetary_resource_spawn_table = yes } 
+					40 = { } 
 				} 
 			}
 			else = {
 				every_tile = { 
 					limit = { has_deposit = yes has_regular_vanilla_deposit = yes has_building = no is_orbital_tile = no }
 					clear_deposits = yes
-					planetary_resource_spawn_table = yes
+					ex_planetary_diversity_planetary_resource_spawn_table = yes
 				}			
 			}					
 		}						 					
@@ -211,8 +215,8 @@ planet_event = {
 			every_tile = {
 				limit = { is_orbital_tile = no has_building = no has_pop = no }
 				random_list = { 
-					70 = { tile_blocker_spawn_table = yes } 
-					30 = { } 
+					55 = { tile_blocker_spawn_table = yes } 
+					45 = { } 
 				}
 			}
 			else = {
@@ -249,7 +253,7 @@ planet_event = {
 					pop = { has_regular_habitability_trait = yes }
 				}	
 			}
-			change_habitability_trait_correspondence = yes
+			ex_planetary_diversity_change_habitability_trait_correspondence = yes
 		}								
 		if = { #change presapient/primitive species
 			limit = { 
@@ -272,7 +276,7 @@ planet_event = {
 						}	
 					}
 				}	
-				species_change_table = yes
+				ex_planetary_diversity_species_change_table = yes
 			}					
 		}	
 	}	
