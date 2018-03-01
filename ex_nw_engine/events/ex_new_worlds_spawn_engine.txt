@@ -49,10 +49,32 @@ planet_event = {
 	is_triggered_only = yes
 	
 	immediate = {
-		#if = { #this feature is currently not in use. It can be enabled at any time by uncommenting this part. 
-		#	limit = { is_star = yes }
-		#	adjust_star_size = yes	
-		#}
+		if = { 
+			limit = { is_star = yes }
+		#	ex_new_worlds_adjust_star_size = yes #this feature is currently not in use. It can be enabled at any time by uncommenting this part. 	
+			if = { 
+				limit = {
+					solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_1 } } }
+					set_planet_flag = system_star_1
+				}
+				else = {
+					if = { 
+						limit = {
+							solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_2 } } }
+							set_planet_flag = system_star_2
+						}				
+						else = {
+							if = { 
+								limit = {
+									solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_3 } } }
+									set_planet_flag = system_star_3
+								}	
+							}
+						}
+					}
+				}				
+			}	
+		}
 		if = {
 			limit = { 
 				is_vanilla_habitable_planet = yes
@@ -86,11 +108,11 @@ planet_event = {
 		if = {
 			limit = { is_vanilla_uninhabitable_planet = yes	}
 			ex_new_worlds_uninhabitable_planets_spawn_table = yes			
-			adjust_uninhabitable_planet_size = yes
+			ex_new_worlds_adjust_uninhabitable_planet_size = yes
 			if = {
 				limit = { has_regular_planet_modifier = yes	}
 				remove_regular_planet_modifiers = yes 
-				planet_modifier_spawn_engine = yes
+				ex_new_worlds_planet_modifier_spawn_engine = yes
 			}					
 		}	
 		if = {
@@ -116,14 +138,14 @@ planet_event = {
 					}
 				}
 				remove_regular_planet_modifiers = yes 
-				planet_modifier_spawn_engine = yes
+				ex_new_worlds_planet_modifier_spawn_engine = yes
 			}			
 			if = {
 				limit = { any_tile = { is_orbital_tile = no has_deposit = yes has_regular_vanilla_deposit = yes has_building = no } }
 				every_tile = { 
 					limit = { has_deposit = yes has_regular_vanilla_deposit = yes has_building = no is_orbital_tile = no }
 					clear_deposits = yes
-					planetary_resource_spawn_table = yes
+					ex_new_worlds_planetary_resource_spawn_table = yes
 				}				
 			}
 		}	
@@ -156,13 +178,13 @@ planet_event = {
 	}	
 	
 	immediate = {
-		adjust_inhabitable_planet_size = yes
+		ex_new_worlds_adjust_inhabitable_planet_size = yes
 		if = {
 			limit = { NOT = { any_tile = { has_deposit = yes } } }				
 			every_tile = {
 				limit = { is_orbital_tile = no has_deposit = no has_building = no } 
 				random_list = { 
-					60 = { planetary_resource_spawn_table = yes } 
+					60 = { ex_new_worlds_planetary_resource_spawn_table = yes } 
 					40 = { } 
 				} 
 			}
@@ -170,7 +192,7 @@ planet_event = {
 				every_tile = { 
 					limit = { has_deposit = yes has_regular_vanilla_deposit = yes has_building = no is_orbital_tile = no }
 					clear_deposits = yes
-					planetary_resource_spawn_table = yes
+					ex_new_worlds_planetary_resource_spawn_table = yes
 				}			
 			}					
 		}						 					
@@ -217,7 +239,7 @@ planet_event = {
 					pop = { has_regular_habitability_trait = yes }
 				}	
 			}
-			change_habitability_trait_correspondence = yes
+			ex_nw_change_habitability_trait_correspondence = yes
 		}								
 		if = { #change presapient/primitive species
 			limit = { 
@@ -240,7 +262,7 @@ planet_event = {
 						}	
 					}
 				}	
-				species_change_table = yes
+				ex_new_worlds_species_change_table = yes
 			}					
 		}	
 	}	
