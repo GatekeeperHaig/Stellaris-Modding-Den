@@ -1,7 +1,7 @@
 name="!!!ex_nw_engine_test"
-path="mod/ex_nw_engine"
+path="mod/ex_planet_engine_mods/ex_nw_engine"
 tags={
-	"Balance"
+	"Galaxy Generation"
+	"Gameplay"
 }
-remote_file_id="1304759610"
 supported_version="2.0.*"
