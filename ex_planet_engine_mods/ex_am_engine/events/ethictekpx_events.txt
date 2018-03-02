@@ -1,0 +1,625 @@
+namespace = ethictekpxevents
+
+# Enabling edict
+# country_event = {
+	# id = ethictekpxevents.1
+	# hide_window = yes
+
+	# is_triggered_only = false
+	
+	# trigger = {
+		# not = { has_country_flag = cf_neutral_zones }
+		# has_edict = create_neutral_zones	
+	# }
+
+	# immediate = {
+		# set_country_flag = cf_neutral_zones
+		# set_country_flag = cf_neutral_zones_created
+		# set_timed_country_flag = {
+			# flag = cf_timed_neutral_zones
+			# days = 3600
+		# }
+		# add_modifier = {
+			# modifier = cm_neutral_zones_created
+			# days = 3600
+		# }
+		# if = {
+			# limit = {
+				# not = {
+					# any_country = {
+						# is_country_type = neutral_zone
+					# }
+				# }
+			# }			
+			# create_country = {
+				# name = NAME_neutral_zone
+				# type = neutral_zone
+				# flag = random
+				# ignore_initial_colony_error = yes
+			# }
+			# last_created_country = {
+				# save_event_target_as = newneutralzone
+				# add_modifier = {
+					# modifier = cm_neutral_zone
+					# days = -1
+				# }
+			# }
+			# else = {
+				# random_country = {
+					# limit = {
+						# is_country_type = neutral_zone
+					# }
+					# save_event_target_as = newneutralzone
+				# }
+			# }
+		# }
+		# every_owned_ship = {
+			# limit = {
+				# is_ship_class = shipclass_outpost_station
+				# is_inside_border = root
+				# solar_system = {
+					# any_neighbor_system = {
+						# exists = space_owner
+						# space_owner = {
+							# not = { is_country = root }
+							# or = {
+								# is_country_type = neutral_zone
+								# is_country_type = default
+								# is_country_type = fallen_empire
+								# is_country_type = awakened_fallen_empire						
+							# }							
+						# }
+					# }
+				# }
+			# }
+			# solar_system = {
+				# every_system_planet = {
+					# set_owner = event_target:newneutralzone
+					# set_controller = event_target:newneutralzone
+				# }
+			# }
+			# fleet = {
+				# set_controller = event_target:newneutralzone
+				# set_owner = event_target:newneutralzone
+			# }
+		# }
+		# every_country = {
+			# limit = {
+				# is_neighbor_of = root
+				# or = {
+					# is_country_type = default
+					# is_country_type = fallen_empire
+					# is_country_type = awakened_fallen_empire						
+				# }	
+				# not = {
+					# has_opinion_modifier = {
+						# modifier = opinion_neutral_zone
+						# who = root
+					# }				
+				# }
+			# }
+			# add_opinion_modifier = {
+				# modifier = opinion_neutral_zone
+				# who = root
+			# }
+		# }
+		# every_country = {
+			# establish_communications_no_message = event_target:newneutralzone
+		# }
+	# }
+# }
+
+# # Disabling edict
+# country_event = {
+	# id = ethictekpxevents.2
+	# hide_window = yes
+
+	# is_triggered_only = false
+	
+	# trigger = {
+		# has_country_flag = cf_neutral_zones
+		# not = { has_edict = create_neutral_zones }
+	# }
+	
+	# immediate = {
+		# remove_country_flag = cf_neutral_zones
+	# }
+# }
+
+# # Dismantling
+# country_event = {
+	# id = ethictekpxevents.3
+	# hide_window = yes
+
+	# is_triggered_only = false
+	
+	# trigger = {
+		# not = { has_country_flag = cf_dismantle_zones }
+		# has_edict = dismantle_neutral_zones	
+	# }
+	
+	# immediate = {
+		# set_timed_country_flag = {
+			# flag = cf_dismantle_zones
+			# days = 1800
+		# }
+		# add_modifier = {
+			# modifier = cm_dismantling_neutral_zones
+			# days = 1800
+		# }
+		# every_country = {
+			# limit = {
+				# is_country_type = neutral_zone
+			# }
+			# every_planet_within_border = {
+				# limit = {
+					# is_neighbor_of = root
+				# }
+				# set_owner = root
+				# set_controller = root
+			# }
+			# every_owned_planet = {
+				# limit = {
+					# is_neighbor_of = root
+				# }
+				# set_owner = root
+				# set_controller = root
+			# }
+		# }
+		# every_country = {
+			# limit = {
+				# has_opinion_modifier = {
+					# modifier = opinion_neutral_zone
+					# who = root
+				# }
+			# }
+			# remove_opinion_modifier = {
+				# modifier = opinion_neutral_zone
+				# who = root			
+			# }
+		# }
+	# }
+# }
+
+# ship_event = {
+	# id = ethictekpxevents.6
+	# hide_window = yes
+	# is_triggered_only = yes
+	
+	# immediate = {
+		# owner = {
+			# save_event_target_as = shipowner
+		# }
+		# if = {
+			# limit = {
+				# owner = {
+					# has_edict = create_neutral_zones					
+					# any_country = {
+						# is_country_type = neutral_zone
+						# is_neighbor_of = event_target:shipowner
+					# }
+				# }
+			# }
+
+			# owner = {
+				# random_country = {
+					# limit = {
+						# is_country_type = neutral_zone
+						# is_neighbor_of = event_target:shipowner
+					# }
+					# save_event_target_as = currneutralzone
+				# }
+			# }
+
+			# if = {
+				# limit = {
+					# from = {
+						# solar_system = {
+							# any_neighbor_system = {
+								# exists = space_owner
+								# space_owner = {
+									# is_country_type = neutral_zone						
+								# }
+							# }
+						# }
+					# }
+				# }
+				# from = {
+					# solar_system = {
+						# every_system_planet = {
+							# set_owner = event_target:currneutralzone
+							# set_controller = event_target:currneutralzone
+						# }
+					# }		
+				# }
+				# fleet = {
+					# set_controller = event_target:currneutralzone
+					# set_owner = event_target:currneutralzone
+				# }
+			# }
+		# }
+	# }	
+# }
+
+country_event = {
+	id = ethictekpxevents.10
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		remove_modifier = subspacearrays_3
+		remove_modifier = subspacearrays_6
+		remove_modifier = subspacearrays_9
+		remove_modifier = subspacearrays_12
+		if = {
+			limit = {
+				 check_variable = {
+					which = "cv_subspace_commsarrays" 
+					value > 2
+				}
+				 check_variable = {
+					which = "cv_subspace_commsarrays" 
+					value < 6
+				}
+			}
+			add_modifier = {
+				modifier = subspacearrays_3
+				days = -1
+			}
+		}
+		if = {
+			limit = {
+				 check_variable = {
+					which = "cv_subspace_commsarrays" 
+					value > 5
+				}
+				 check_variable = {
+					which = "cv_subspace_commsarrays" 
+					value < 9
+				}
+			}
+			add_modifier = {
+				modifier = subspacearrays_6
+				days = -1
+			}
+		}
+		if = {
+			limit = {
+				 check_variable = {
+					which = "cv_subspace_commsarrays" 
+					value > 8
+				}
+				 check_variable = {
+					which = "cv_subspace_commsarrays" 
+					value < 12
+				}
+			}
+			add_modifier = {
+				modifier = subspacearrays_9
+				days = -1
+			}
+		}
+		if = {
+			limit = {
+				 check_variable = {
+					which = "cv_subspace_commsarrays" 
+					value > 11
+				}
+			}
+			add_modifier = {
+				modifier = subspacearrays_12
+				days = -1
+			}
+		}
+	}
+}
+
+event = {
+	id = ethictekpxevents.40
+
+	is_triggered_only = yes
+	hide_window = yes
+	
+	location = root
+	
+	trigger = {
+		from = {
+			has_prev_building = "building_subspace_comms_array"
+		}
+	}
+	
+	immediate = {
+		this = {
+			owner = {
+				change_variable = {
+					which = "cv_subspace_commsarrays"
+					value = -1
+				}
+				country_event = { id = ethictekpxevents.10 }
+			}
+		}
+	}
+}
+
+event = {
+	id = ethictekpxevents.50
+
+	is_triggered_only = yes
+	hide_window = yes
+	
+	location = root
+	
+	trigger = {
+		from = {
+			has_prev_building = "building_open_embassy"
+		}
+	}
+	
+	immediate = {
+		this = {
+			owner = {
+				if = {
+					limit = {
+						has_country_flag = cf_openembassies_1
+					}
+					remove_country_flag = cf_openembassies_1
+				}
+				if = {
+					limit = {
+						has_country_flag = cf_openembassies_2
+					}
+					set_country_flag = cf_openembassies_1
+					remove_country_flag = cf_openembassies_2
+				}
+				if = {
+					limit = {
+						has_country_flag = cf_openembassies_3
+					}
+					set_country_flag = cf_openembassies_2
+					remove_country_flag = cf_openembassies_3
+				}
+				if = {
+					limit = {
+						has_country_flag = cf_openembassies_4
+					}
+					set_country_flag = cf_openembassies_3
+					remove_country_flag = cf_openembassies_4
+				}
+				if = {
+					limit = {
+						has_country_flag = cf_openembassies_5
+					}
+					set_country_flag = cf_openembassies_4
+					remove_country_flag = cf_openembassies_5
+				}
+			}
+		}
+	}
+}
+
+event = {
+	id = ethictekpxevents.60
+
+	is_triggered_only = yes
+	hide_window = yes
+	
+	location = root
+	
+	trigger = {
+		from = {
+			or = {
+				has_prev_building = "building_tradestation"
+				has_prev_building = "building_trade_company"
+			}
+		}
+	}
+	
+	immediate = {
+		this = {
+			save_event_target_as = thisplanet
+			if = {
+				limit = {
+					has_modifier = export_route_1
+				}
+				remove_modifier = export_route_1
+				owner = {
+					random_owned_planet = {
+						limit = {
+							has_modifier = import_route_1	
+							not = { is_same_value = event_target:thisplanet }						
+						}
+						remove_modifier = import_route_1
+					}
+				}				
+			}
+			if = {
+				limit = {
+					has_modifier = export_route_2
+				}
+				remove_modifier = export_route_2
+				owner = {
+					random_owned_planet = {
+						limit = {
+							has_modifier = import_route_2	
+							not = { is_same_value = event_target:thisplanet }						
+						}
+						remove_modifier = import_route_2
+					}
+				}				
+			}
+			if = {
+				limit = {
+					has_modifier = import_route_1
+				}
+				remove_modifier = import_route_1
+				owner = {
+					random_owned_planet = {
+						limit = {
+							has_modifier = export_route_1	
+							not = { is_same_value = event_target:thisplanet }						
+						}
+						remove_modifier = export_route_1
+					}
+				}				
+			}
+			if = {
+				limit = {
+					has_modifier = import_route_2
+				}
+				remove_modifier = import_route_2
+				owner = {
+					random_owned_planet = {
+						limit = {
+							has_modifier = export_route_2	
+							not = { is_same_value = event_target:thisplanet }						
+						}
+						remove_modifier = export_route_2
+					}
+				}				
+			}
+			if = {
+				limit = {
+					has_modifier = f_export_route_1
+				}
+				remove_modifier = f_export_route_1
+				owner = {
+					random_neighbor_country = {
+						limit = {
+							has_opinion_modifier = {
+								modifier = opinion_private_imports
+								who = root.owner							
+							}
+						}
+						remove_opinion_modifier = {
+							modifier = opinion_private_imports
+							who = root.owner					
+						}
+						random_owned_planet = {
+							limit = {
+								has_modifier = f_import_route_1
+								not = { is_same_value = event_target:thisplanet }
+							}					
+							remove_modifier = f_import_route_1
+						}
+					}
+				}				
+			}
+			if = {
+				limit = {
+					has_modifier = f_export_route_2
+				}
+				remove_modifier = f_export_route_2
+				owner = {
+					random_neighbor_country = {
+						limit = {
+							has_opinion_modifier = {
+								modifier = opinion_private_imports
+								who = root.owner							
+							}
+						}
+						remove_opinion_modifier = {
+							modifier = opinion_private_imports
+							who = root.owner					
+						}
+						random_owned_planet = {
+							limit = {
+								has_modifier = f_import_route_2
+								not = { is_same_value = event_target:thisplanet }
+							}					
+							remove_modifier = f_import_route_2
+						}
+					}
+				}				
+			}
+		}
+	}
+}
+
+country_event = {
+	id = ethictekpxevents.70
+	hide_window = yes
+
+	is_triggered_only = false
+	
+	trigger = {
+		not = { has_country_flag = cf_embargoing }
+		has_policy_flag = foreign_trade_embargo	
+	}
+	
+	immediate = {
+		set_country_flag = cf_embargoing
+		
+		every_country = {
+			limit = {
+				not = { is_same_value = root }
+				has_technology = tech_trade_ports
+				is_neighbor_of = root
+				not = { has_policy_flag = foreign_trade_embargo }
+			}
+			add_opinion_modifier = {
+				modifier = opinion_trade_embargo
+				who = root
+			}
+		}
+		
+		every_owned_planet = {
+			limit = {
+				or = {
+					has_modifier = f_import_route_1
+					has_modifier = f_import_route_2
+				}			
+			}
+			remove_modifier = f_import_route_1
+			remove_modifier = f_import_route_2
+		}			
+		
+		every_country = {
+			limit = {
+				has_opinion_modifier = {
+					modifier = opinion_private_imports
+					who = root
+				}
+			}
+			while = {
+				limit = {
+					has_opinion_modifier = {
+						modifier = opinion_private_imports
+						who = root
+					}				
+				}			
+				remove_opinion_modifier = {
+					modifier = opinion_private_imports
+					who = root					
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = ethictekpxevents.80
+	hide_window = yes
+
+	is_triggered_only = false
+	
+	trigger = {
+		has_country_flag = cf_embargoing
+		not = { has_policy_flag = foreign_trade_embargo	}
+	}
+	
+	immediate = {
+		remove_country_flag = cf_embargoing
+		every_country = {
+			limit = {
+				has_opinion_modifier = {
+					modifier = opinion_trade_embargo
+					who = root
+				}
+			}
+			remove_opinion_modifier = {
+				modifier = opinion_trade_embargo
+				who = root			
+			}
+		}
+	}
+}	

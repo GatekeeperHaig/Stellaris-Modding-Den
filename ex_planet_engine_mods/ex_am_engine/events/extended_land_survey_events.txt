@@ -1,0 +1,264 @@
+namespace = extended_land_survey
+
+planet_event = {
+	id = extended_land_survey.1
+
+	is_triggered_only = yes
+	location = ROOT
+	
+	title = "extended_land_survey.1.name"
+	desc = "extended_land_survey.1.desc"
+	picture = GFX_evt_physics_research
+	show_sound = event_alien_nature
+	
+	immediate = {
+		planet_event = {
+			id = extended_land_survey.2
+			days = 360
+		}
+	}
+	
+	option = {
+		name = OK
+	}
+}
+
+planet_event = {
+	id = extended_land_survey.2
+	is_triggered_only = yes
+	location = ROOT
+	
+	title = "extended_land_survey.2.name"
+	desc = "extended_land_survey.2.desc"
+	picture = GFX_evt_physics_research
+	show_sound = event_alien_nature
+
+	immediate = { change_planet_size = 1 }
+	
+	option = {
+		name = OK
+	}
+}
+
+event = {
+	id = extended_land_survey.35
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		every_country = {
+			limit = {
+				has_country_edict = followup_surveys
+				not = { has_country_flag = cf_no_followupsurveyspam2 }
+				check_variable = {
+					which = "cv_activefollowups" 
+					value < 4
+				}
+			}
+			this = { save_event_target_as = country_of_interest }
+			random_system = {
+				limit = {
+					is_inside_border = event_target:country_of_interest
+				}
+				random_system_planet = {
+					limit = {
+						is_inside_border = event_target:country_of_interest
+						is_surveyed = {
+							who = event_target:country_of_interest
+							status = yes
+						}
+						OR = {
+							is_planet_class = pc_barren
+							is_planet_class = pc_barren_cold
+							is_planet_class = pc_asteroid
+						}
+						not = { has_modifier = terraforming_candidate }
+						not = { has_planet_flag = pf_marked_uncolonisable }
+						not = { has_planet_flag = pf_already_selected }
+					}
+						
+					event_target:country_of_interest = {
+						set_timed_country_flag = {
+							flag = cf_no_followupsurveyspam2
+							days = 185
+						}
+					}
+						
+					random_list = {
+						10 = {
+							set_planet_flag = pf_marked_uncolonisable
+						}
+						15 = {
+							event_target:country_of_interest = {
+								set_timed_country_flag = {
+									flag = cf_no_followupsurveyspam2
+									days = 725
+								}
+								change_variable = {
+									which = "cv_activefollowups" 
+									value = 1
+								}	
+								country_event = {
+									id = extended_land_survey.6
+								}
+							}
+							set_planet_flag = pf_already_selected
+							enable_special_project = {
+								name = "FOLLOW_UP_SURVEY_PROJECT"
+								owner = event_target:country_of_interest
+								location = this
+							}					
+						}
+						75 = { }
+					}
+				}
+			}
+		}
+	}
+}
+
+event = {
+	id = extended_land_survey.3
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		every_country = {
+			limit = {
+				has_country_edict = followup_surveys
+				not = { has_country_flag = cf_no_followupsurveyspam }
+			}
+			this = { save_event_target_as = country_of_interest }
+			random_system = {
+				limit = {
+					is_inside_border = event_target:country_of_interest
+				}
+				random_system_planet = {
+					limit = {
+						has_moon = yes
+						is_inside_border = event_target:country_of_interest
+					}
+					random_moon = {
+						limit = {
+							is_surveyed = {
+								who = event_target:country_of_interest
+								status = yes
+							}
+							OR = {
+								is_planet_class = pc_barren
+								is_planet_class = pc_barren_cold
+								is_planet_class = pc_asteroid
+							}
+							not = { has_modifier = terraforming_candidate }
+							not = { has_planet_flag = pf_marked_uncolonisable }
+						}
+						
+						prevprevprev = {
+							set_timed_country_flag = {
+								flag = cf_no_followupsurveyspam
+								days = 190
+							}
+						}
+						
+						random_list = {
+							5 = {
+								set_planet_flag = pf_marked_uncolonisable
+							}
+							10 = {
+								prevprevprev = {
+									set_timed_country_flag = {
+										flag = cf_no_followupsurveyspam
+										days = 730
+									}
+									country_event = {
+										id = extended_land_survey.6
+									}
+								}
+								enable_special_project = {
+									name = "FOLLOW_UP_SURVEY_PROJECT"
+									owner = event_target:country_of_interest
+									location = this
+								}					
+							}
+							85 = { }
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = extended_land_survey.6
+	title = "extended_land_survey.6.title"
+	desc = "extended_land_survey.6.desc"
+	picture = GFX_evt_mining_station
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = OK
+	}
+}
+
+country_event = {
+	id = extended_land_survey.7
+	title = PROJECT_COMPLETE
+	desc = "extended_land_survey.7.desc"
+	picture = GFX_evt_mining_station
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = OK
+	}
+}
+
+planet_event = {
+	id = extended_land_survey.9
+	is_triggered_only = yes
+	location = ROOT	
+	hide_window = yes
+
+	immediate = {
+		add_modifier = {
+			modifier = underground_caverns
+			days = -1
+		}
+		if = {
+			limit = { planet_size < 6 }
+			change_planet_size = 2
+			break = yes
+		}		
+		if = {
+			limit = { planet_size < 8 }
+			change_planet_size = 3
+			break = yes
+		}
+		if = {
+			limit = { planet_size < 10 }
+			change_planet_size = 4
+			break = yes
+		}
+		if = {
+			limit = { planet_size < 12 }
+			change_planet_size = 5
+			break = yes
+		}
+		if = {
+			limit = { planet_size < 14 }
+			change_planet_size = 6
+			break = yes
+		}
+		if = {
+			limit = { planet_size < 16 }
+			change_planet_size = 7
+			else = {
+				change_planet_size = 8			
+			}
+		}	
+	}
+}

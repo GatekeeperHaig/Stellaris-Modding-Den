@@ -1,0 +1,562 @@
+ @lots = 10
+@lotsandlots = 20
+
+@infcosthigh = 50
+@infcostmed = 25
+@infcostlow = 10
+
+@engcostcheap = 40
+@engcostlow = 80
+@engcostmed = 175
+@engcosthigh = 250
+
+@mincostcheap = 25
+@mincostlow = 50
+@mincostmed = 125
+@mincosthigh = 250
+
+@srlow = 1
+@srmed = 2
+@srhigh = 4
+
+@buildquick = 90
+@buildnormal = 150
+@buildlong = 240
+@buildhuge = 360
+
+@weightnormal = 2
+@weightuseful = 8
+@weightimportant = 14
+@weightcritical = 30
+
+@b0effect = 1
+@b1effect = 1.5
+@b2effect = 2
+@b3effect = 3
+@b4effect = 4
+@b5effect = 5
+
+@b1upkeep = 1
+@b2upkeep = 1.5
+@b3upkeep = 2
+@b4upkeep = 3
+@b5upkeep = 5
+
+building_ice_processor = {
+	base_buildtime = 270
+	
+	cost = {
+		minerals = 50
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	produced_resources = {
+		minerals = 1
+		food = 1
+	}
+	
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			any_tile = { has_ice_deposit = yes }
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_ice_deposit"
+			tile = { has_ice_deposit = yes }
+		}	
+	}
+	
+	upgrades = {
+		building_ice_processor_2
+	}
+
+	ai_replace = no
+	
+	ai_weight = {
+		weight = 2
+	}
+}
+
+building_ice_processor_2 = {
+	base_buildtime = 180
+	is_listed = no
+	
+	cost = {
+		minerals = 75
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	produced_resources = {
+		minerals = 2
+		food = 1.5
+	}
+	
+	prerequisites = {
+		"tech_mineral_processing_1"
+	}
+	
+	upgrades = {
+		building_ice_processor_3
+	}
+
+	ai_replace = no
+	
+	ai_weight = {
+		weight = 2
+	}
+}
+
+building_ice_processor_3 = {
+	base_buildtime = 180
+	is_listed = no
+	
+	cost = {
+		minerals = 100
+	}
+	
+	required_resources = {
+		energy = 1.5
+	}
+	
+	produced_resources = {
+		minerals = 3
+		food = 2
+	}
+	
+	prerequisites = {
+		"tech_mineral_processing_2"	
+	}
+
+	ai_replace = no
+	
+	ai_weight = {
+		weight = 2
+	}
+}
+
+building_reservoir = {
+	base_buildtime = 180
+	
+	cost = {
+		minerals = 90
+	}
+	
+	upgrades = {
+		building_reservoir_2
+	}
+	
+	produced_resources = {
+		food = 1
+	}
+	
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			NOT = { is_planet_class = pc_ocean }
+			any_tile = { has_water_deposit = yes }			
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requirement_has_water"
+			tile = { has_water_deposit = yes }	
+		}		
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_food_add = 1
+	}
+	
+	planet_modifier = {
+		pop_happiness = 0.01
+		pop_growth_speed = 0.05
+	}
+	
+	ai_weight = {
+		weight = 2
+	}
+	
+	ai_replace = no
+}
+
+building_reservoir_2 = {
+	base_buildtime = 210
+	is_listed = no
+	
+	cost = {
+		minerals = 120
+	}
+	
+	produced_resources = {
+		food = 1.5
+	}
+	
+	prerequisites = {
+		"tech_alpha_adv_renewable"
+	}
+	
+	upgrades = {
+		building_reservoir_3
+	}
+
+	adjacency_bonus = {
+		tile_building_resource_food_add = 1
+	}
+	
+	planet_modifier = {
+		pop_happiness = 0.03
+		pop_growth_speed = 0.05
+		tile_resource_food_mult = 0.05
+	}
+	
+	ai_replace = no
+}
+
+building_reservoir_3 = {
+	base_buildtime = 240
+	is_listed = no
+	
+	cost = {
+		minerals = 150
+	}
+	
+	produced_resources = {
+		food = 2
+	}
+	
+	prerequisites = {
+		"tech_alpha_adv_hydration"
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_food_add = 1.5
+	}
+	
+	planet_modifier = {
+		pop_happiness = 0.05
+		pop_growth_speed = 0.1
+		tile_resource_food_mult = 0.1
+	}
+	
+	ai_replace = no
+}
+
+building_water_excavator = {
+	base_buildtime = 180
+	
+	cost = {
+		minerals = 50
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	produced_resources = {
+		minerals = 2
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_food_add = 1
+	}
+	
+	upgrades = {
+		building_water_excavator_2	
+	}
+	
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = { 
+			any_tile = {
+				AND = {
+					has_water_deposit = yes
+					has_minerals_deposit = yes
+				}
+			} 
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requirement_has_water_and_minerals"
+			tile = {
+				AND = {
+					has_water_deposit = yes
+					has_minerals_deposit = yes
+				}
+			}
+		}		
+	}
+	
+	ai_weight = {
+		weight = 2
+	}
+	
+	ai_replace = no
+}
+
+building_water_excavator_2 = {
+	base_buildtime = 270
+	is_listed = no
+	
+	cost = {
+		minerals = 70
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	produced_resources = {
+		minerals = 3
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_food_add = 1
+	}
+	
+	prerequisites = {
+		"tech_alpha_adv_hydration"
+	}
+	
+	ai_weight = {
+		weight = 2
+	}
+	
+	ai_replace = no
+}
+
+
+building_wet_farm = {
+	tags = { hydroponics_farm }
+	base_buildtime = @buildquick
+	
+	cost = {
+		minerals = @mincostcheap
+		energy = @engcostcheap
+	}
+	
+	required_resources = {
+		minerals = 1
+	}
+	
+	produced_resources = {
+		food = 2
+		unity = 1
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_food_add = 1
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			has_civic = civic_agrarian_idyll
+			resources = {
+				unity = 1
+			}
+		}
+	}
+	
+	planet_modifier = {
+		pop_environment_tolerance = 0.02
+	}
+	
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			NOT = { is_planet_class = pc_ocean }
+			any_tile = {
+				AND = {
+					has_food_deposit = yes 
+					has_water_deposit = yes
+				}
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requirement_wet_farmland"			
+			tile = { 
+				AND = {
+					has_food_deposit = yes 
+					has_water_deposit = yes
+				}
+			}
+		}
+	}
+	
+	prerequisites = {
+	}
+	
+	ai_weight = {
+		weight = 2
+	}
+	
+	ai_replace = no
+}
+
+building_fishing_yard = {
+	tags = { hydroponics_farm }
+	base_buildtime = @buildquick
+	
+	cost = {
+		minerals = @mincostcheap
+		energy = @engcostcheap
+	}
+	
+	required_resources = {
+		minerals = 1
+	}
+	
+	produced_resources = {
+		food = 3
+		unity = 1
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			has_civic = civic_agrarian_idyll
+			resources = {
+				unity = 1
+			}
+		}
+	}
+	
+	planet_modifier = {
+		pop_environment_tolerance = 0.02
+	}
+	
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			is_planet_class = pc_ocean
+			any_tile = {
+				AND = {
+					has_food_deposit = yes 
+					has_water_deposit = yes
+				}
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requirement_wet_farmland"			
+			tile = { 
+				AND = {
+					has_food_deposit = yes 
+					has_water_deposit = yes
+				}
+			}
+		}
+	}
+	
+	prerequisites = {
+	}
+	
+	ai_weight = {
+		weight = 2
+	}
+	
+	ai_replace = no
+}
+
+building_hydro_plant = {
+	base_buildtime = 360
+	
+	cost = {
+		minerals = 90
+		energy = 25
+	}
+	
+	produced_resources = {
+		energy = 4
+	}
+	
+	planet_modifier = {
+		pop_environment_tolerance = 0.01
+	}
+	
+	potential = {
+		planet = { 
+			any_tile = { 
+				AND = {
+					has_water_deposit = yes
+					has_energy_deposit = yes
+				}
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requirement_water_and_energy"
+			tile = {
+				AND = {
+					has_water_deposit = yes
+					has_energy_deposit = yes
+				}
+			}
+		}
+	}
+	
+	upgrades = {
+		building_hydro_plant_2
+	}
+	
+	ai_weight = {
+		weight = 2
+	}
+	
+	ai_replace = no
+}
+
+building_hydro_plant_2 = {
+	base_buildtime = 360
+	is_listed = no
+	
+	cost = {
+		minerals = 120
+		energy = 50
+	}
+	
+	produced_resources = {
+		energy = 5
+	}
+	
+	planet_modifier = {
+		pop_environment_tolerance = 0.02
+	}
+	
+	prerequisites = {
+		"tech_alpha_adv_renewable"
+	}
+	
+	ai_weight = {
+		weight = 2
+	}
+	
+	ai_replace = no
+}

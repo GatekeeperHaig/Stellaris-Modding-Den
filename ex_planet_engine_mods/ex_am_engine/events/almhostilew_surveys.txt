@@ -1,0 +1,2185 @@
+namespace = alphamod_hostileworlds_test
+
+planet_event = {
+	id = alphamod_hostileworlds_test.5000
+	location = root
+	
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = { 
+					is_planet_class = pc_asteroid 
+				}
+				change_pc = pc_asteroid_habitable
+				if = {
+					limit = { 
+						planet_size < 8 
+					}
+					random_list = {
+						50 = { change_planet_size = 1 }
+						40 = { change_planet_size = 2 }
+						10 = { change_planet_size = 3 }
+					}
+				}
+				else = {
+					change_pc = pc_barren_habitable
+					if = {
+						limit = { 
+							planet_size < 10
+						}
+						random_list = {
+							40 = { change_planet_size = 1 }
+							30 = { change_planet_size = 2 }
+							20 = { change_planet_size = 3 }
+							10 = { change_planet_size = 4 }
+						}
+					}
+					while = {
+						limit = { planet_size > 25 }
+						change_planet_size = -1
+					}
+				}
+			}
+
+			every_tile = {
+				limit = {
+					not = { has_building = yes }
+					not = { has_blocker = yes }
+				}
+				clear_deposits = yes
+				random_list = {
+					60 = {}
+					10 = { set_deposit = d_energy_deposit }
+					10 = { set_deposit = d_rich_engineering_deposit }
+					10 = { set_deposit = d_mineral_deposit }
+					10 = { set_deposit = d_physics_deposit }
+				}
+			}
+			
+			every_tile = {
+				limit = {
+					not = { has_building = yes }
+					not = { has_blocker = yes }
+				}
+				random_list = {
+					70 = {}
+					5 = {
+						set_blocker = tb_massive_glacier
+					}
+					10 = {
+						set_blocker = tb_rocky_cliffs
+					}
+					15 = {
+						set_blocker = tb_craggy_rocks
+					}
+				}
+			}
+			
+			random_tile = {
+				remove_blocker = yes
+				set_building = building_planet_surveyors_corp
+			}
+			random_tile = {
+				limit = {
+					has_blocker = yes
+				}
+				remove_blocker = yes
+			}
+			
+			random_list = {
+				5 = {
+					add_modifier = {
+						modifier = "asteroid_impacts"
+						days = -1
+					}
+				}
+				95 = {}
+			}
+			
+			random_list = {
+				15 = {
+					add_modifier = {
+						modifier = "mineral_rich"
+						days = -1
+					}
+				}
+				1 = {
+					add_modifier = {
+						modifier = "mineral_poor"
+						days = -1
+					}
+				}
+				84 = {}
+			}
+				
+			random_list = {
+				1 = {
+					add_modifier = {
+						modifier = "high_gravity"
+						days = -1
+					}
+				}
+				40 = {
+					add_modifier = {
+						modifier = "low_gravity"
+						days = -1
+					}
+				}
+				50 = {
+					add_modifier = {
+						modifier = "zero_gravity"
+						days = -1
+					}
+				}
+				9 = { }
+			}
+			
+			random_list = {
+				10 = {
+					add_modifier = {
+						modifier = underground_caverns
+						days = -1
+					}
+				}
+				90 = {}
+			}
+			
+			random_list = {
+				20 = {
+					add_modifier = {
+						modifier = physicists_paradise
+						days = -1
+					}
+				}
+				30 = { 
+					add_modifier = {
+						modifier = engineers_paradise
+						days = -1 
+					}				
+				}
+				50 = {}
+			}
+			
+			if = {
+				limit = {
+					has_planet_flag = pf_pioneer_world
+				}
+				add_modifier = {
+					modifier = "pioneer_world"
+					days = -1
+				}
+				random_tile = {
+					limit = {
+						has_blocker = yes
+					}
+					remove_blocker = yes
+				}				
+			}
+			
+			event_target:planet_owner = {
+				country_event = {
+					id = extended_land_survey.7
+				}
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.4000
+	title = PROJECT_COMPLETE
+	desc = "extended_land_survey.4.desc"
+	picture = GFX_evt_warm_barren
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+	
+	option = {
+		name = extended_land_survey.4.contractout
+		owner = {
+			add_energy = -500
+		}
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+		trigger = {
+			owner = {
+				or = {
+					has_ethic = ethic_materialist
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_egalitarian
+					has_ethic = ethic_fanatic_egalitarian
+				}
+				energy > 499
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.labourforce
+		owner = {
+			add_minerals = -250
+		}
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+		trigger = {
+			owner = {
+				or = {
+					has_ethic = ethic_authoritarian
+					has_ethic = ethic_fanatic_authoritarian
+					has_ethic = ethic_xenophobe
+					has_ethic = ethic_fanatic_xenophobe
+				}
+				minerals > 249
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.pioneersetup
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+			event_target:planet_of_interest = {
+				set_planet_flag = pf_pioneer_world
+			}
+		}
+		trigger = {
+			owner = {
+				has_policy_flag = alp_land_ownership_pioneerrights
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.surveycorps
+		owner = {
+			add_modifier = {
+				modifier = hostileworld_colonyprep
+				days = 360
+			}
+		}
+		hidden_effect = {
+			owner = {				
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.notnow
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.4100
+	title = PROJECT_COMPLETE
+	desc = "extended_land_survey.41.desc"
+	picture = GFX_evt_warm_barren
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+	
+	option = {
+		name = extended_land_survey.41.alright
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			enable_special_project = {
+				name = "FOLLOW_UP_SURVEY_PROJECT"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.41.notnow
+		hidden_effect = {
+			event_target:planet_of_interest = {
+				set_planet_flag = pf_marked_uncolonisable
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.4200
+	title = PROJECT_COMPLETE
+	desc = "extended_land_survey.42.desc"
+	picture = GFX_evt_warm_barren
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+	
+	option = {
+		name = extended_land_survey.42.notnow
+		owner = {
+			add_engineering_research = 250
+		}
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			event_target:planet_of_interest = {
+				set_planet_flag = pf_marked_uncolonisable
+			}
+		}
+	}
+}
+
+event = {
+	id = alphamod_hostileworlds_test.3
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		every_country = {
+			limit = {
+				has_country_edict = followup_surveys_gas
+				not = { has_country_flag = cf_no_followupsurveyspam_gas }
+				check_variable = {
+					which = "cv_activefollowups" 
+					value < 4
+				}
+			}
+			this = { save_event_target_as = country_of_interest }
+			random_system = {
+				limit = {
+					is_inside_border = event_target:country_of_interest
+				}
+				random_system_planet = {
+					limit = {
+						is_planet_class = pc_gas_giant
+						is_inside_border = event_target:country_of_interest
+						is_surveyed = {
+							who = event_target:country_of_interest
+							status = yes
+						}
+						not = { has_planet_flag = pf_marked_uncolonisable }
+						not = { has_planet_flag = pf_already_selected }
+					}	
+					event_target:country_of_interest = {
+						set_timed_country_flag = {
+							flag = cf_no_followupsurveyspam_gas
+							days = 185
+						}
+					}						
+					random_list = {
+						75 = { }
+						20 = {
+							set_planet_flag = pf_marked_uncolonisable
+						}
+						5 = {
+							event_target:country_of_interest = {
+								set_timed_country_flag = {
+									flag = cf_no_followupsurveyspam_gas
+									days = 1800
+								}
+								change_variable = {
+									which = "cv_activefollowups" 
+									value = 1
+								}								
+								country_event = {
+									id = alphamod_hostileworlds_test.6
+								}
+							}
+							set_planet_flag = pf_already_selected
+							enable_special_project = {
+								name = "FOLLOW_UP_SURVEY_GAS_PROJECT"
+								owner = event_target:country_of_interest
+								location = this
+							}					
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+event = {
+	id = alphamod_hostileworlds_test.13
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		every_country = {
+			limit = {
+				has_country_edict = followup_surveys_molten
+				not = { has_country_flag = cf_no_followupsurveyspam_molten }
+				check_variable = {
+					which = "cv_activefollowups" 
+					value < 4
+				}
+			}
+			this = { save_event_target_as = country_of_interest }
+			random_system = {
+				limit = {
+					is_inside_border = event_target:country_of_interest
+				}
+				random_system_planet = {
+					limit = {
+						is_planet_class = pc_molten
+						is_inside_border = event_target:country_of_interest
+						is_surveyed = {
+							who = event_target:country_of_interest
+							status = yes
+						}
+						not = { has_planet_flag = pf_marked_uncolonisable }
+						not = { has_planet_flag = pf_already_selected }
+					}	
+					event_target:country_of_interest = {
+						set_timed_country_flag = {
+							flag = cf_no_followupsurveyspam_molten
+							days = 365
+						}
+					}						
+					random_list = {
+						85 = { }
+						5 = {
+							set_planet_flag = pf_marked_uncolonisable
+						}
+						10 = {
+							event_target:country_of_interest = {
+								set_timed_country_flag = {
+									flag = cf_no_followupsurveyspam_molten
+									days = 1800
+								}
+								change_variable = {
+									which = "cv_activefollowups" 
+									value = 1
+								}	
+								country_event = {
+									id = alphamod_hostileworlds_test.16
+								}
+							}
+							set_planet_flag = pf_already_selected
+							enable_special_project = {
+								name = "FOLLOW_UP_SURVEY_MOLTEN_PROJECT"
+								owner = event_target:country_of_interest
+								location = this
+							}					
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+event = {
+	id = alphamod_hostileworlds_test.23
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		every_country = {
+			limit = {
+				has_country_edict = followup_surveys_toxic
+				not = { has_country_flag = cf_no_followupsurveyspam_toxic }
+				check_variable = {
+					which = "cv_activefollowups" 
+					value < 4
+				}
+			}
+			this = { save_event_target_as = country_of_interest }
+			random_system = {
+				limit = {
+					is_inside_border = event_target:country_of_interest
+				}
+				random_system_planet = {
+					limit = {
+						is_planet_class = pc_toxic
+						is_inside_border = event_target:country_of_interest
+						is_surveyed = {
+							who = event_target:country_of_interest
+							status = yes
+						}
+						not = { has_planet_flag = pf_marked_uncolonisable }
+						not = { has_planet_flag = pf_already_selected }
+					}	
+					event_target:country_of_interest = {
+						set_timed_country_flag = {
+							flag = cf_no_followupsurveyspam_toxic
+							days = 365
+						}
+					}						
+					random_list = {
+						85 = { }
+						5 = {
+							set_planet_flag = pf_marked_uncolonisable
+						}
+						10 = {
+							event_target:country_of_interest = {
+								set_timed_country_flag = {
+									flag = cf_no_followupsurveyspam_toxic
+									days = 1200
+								}
+								change_variable = {
+									which = "cv_activefollowups" 
+									value = 1
+								}	
+								country_event = {
+									id = alphamod_hostileworlds_test.26
+								}
+							}
+							set_planet_flag = pf_already_selected
+							enable_special_project = {
+								name = "FOLLOW_UP_SURVEY_TOXIC_PROJECT"
+								owner = event_target:country_of_interest
+								location = this
+							}					
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+event = {
+	id = alphamod_hostileworlds_test.33
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		every_country = {
+			limit = {
+				has_country_edict = followup_surveys_frozen
+				not = { has_country_flag = cf_no_followupsurveyspam_frozen }
+				check_variable = {
+					which = "cv_activefollowups" 
+					value < 4
+				}
+			}
+			this = { save_event_target_as = country_of_interest }
+			random_system = {
+				limit = {
+					is_inside_border = event_target:country_of_interest
+				}
+				random_system_planet = {
+					limit = {
+						is_planet_class = pc_frozen
+						is_inside_border = event_target:country_of_interest
+						is_surveyed = {
+							who = event_target:country_of_interest
+							status = yes
+						}
+						not = { has_planet_flag = pf_marked_uncolonisable }
+						not = { has_planet_flag = pf_already_selected }
+					}	
+					event_target:country_of_interest = {
+						set_timed_country_flag = {
+							flag = cf_no_followupsurveyspam_frozen
+							days = 190
+						}
+					}						
+					random_list = {
+						80 = { }
+						10 = {
+							set_planet_flag = pf_marked_uncolonisable
+						}
+						10 = {
+							event_target:country_of_interest = {
+								set_timed_country_flag = {
+									flag = cf_no_followupsurveyspam_frozen
+									days = 750
+								}
+								change_variable = {
+									which = "cv_activefollowups" 
+									value = 1
+								}	
+								country_event = {
+									id = alphamod_hostileworlds_test.36
+								}
+							}
+							set_planet_flag = pf_already_selected
+							enable_special_project = {
+								name = "FOLLOW_UP_SURVEY_FROZEN_PROJECT"
+								owner = event_target:country_of_interest
+								location = this
+							}					
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.4
+	title = PROJECT_COMPLETE
+	desc = "alphamod_hostileworlds_test.4.desc"
+	picture = GFX_evt_gas_giant
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+	
+	option = {
+		name = extended_land_survey.4.contractout
+		owner = {
+			add_energy = -2000
+		}
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			enable_special_project = {
+				name = "PREP_GAS_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+		trigger = {
+			owner = {
+				or = {
+					has_ethic = ethic_materialist
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_egalitarian
+					has_ethic = ethic_fanatic_egalitarian
+				}
+				energy > 1999
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.labourforce
+		owner = {
+			add_minerals = -1000
+		}
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_GAS_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+		trigger = {
+			owner = {
+				or = {
+					has_ethic = ethic_authoritarian
+					has_ethic = ethic_fanatic_authoritarian
+					has_ethic = ethic_xenophobe
+					has_ethic = ethic_fanatic_xenophobe
+				}
+				minerals > 999
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.surveycorps
+		owner = {
+			add_modifier = {
+				modifier = hostileworld_colonyprep
+				days = 360
+			}
+		}
+		hidden_effect = {
+			owner = {				
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			enable_special_project = {
+				name = "PREP_GAS_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+	}
+	option = {
+		name = alphamod_hostileworlds_test.4.notnow
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.400
+	title = PROJECT_COMPLETE
+	desc = "alphamod_hostileworlds_test.400.desc"
+	picture = GFX_evt_gas_giant
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+	
+	option = {
+		name = OK
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			enable_special_project = {
+				name = "FOLLOW_UP_SURVEY_GAS_PROJECT"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+	}
+	option = {
+		name = alphamod_hostileworlds_test.400.notnow
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.401
+	title = PROJECT_COMPLETE
+	desc = "alphamod_hostileworlds_test.401.desc"
+	picture = GFX_evt_gas_giant
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+
+	option = {
+		name = alphamod_hostileworlds_test.401.notnow
+		owner = {
+			add_engineering_research = 250
+		}
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			event_target:planet_of_interest = {
+				set_planet_flag = pf_marked_uncolonisable
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.14
+	title = PROJECT_COMPLETE
+	desc = "alphamod_hostileworlds_test.14.desc"
+	picture = GFX_evt_molten
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+	
+	option = {
+		name = extended_land_survey.4.contractout
+		owner = {
+			add_energy = -1500
+		}
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			enable_special_project = {
+				name = "PREP_MOLTEN_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+		trigger = {
+			owner = {
+				or = {
+					has_ethic = ethic_materialist
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_egalitarian
+					has_ethic = ethic_fanatic_egalitarian
+				}
+				energy > 1499
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.labourforce
+		owner = {
+			add_minerals = -500
+		}
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_MOLTEN_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+		trigger = {
+			owner = {
+				or = {
+					has_ethic = ethic_authoritarian
+					has_ethic = ethic_fanatic_authoritarian
+					has_ethic = ethic_xenophobe
+					has_ethic = ethic_fanatic_xenophobe
+				}
+				minerals > 499
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.pioneersetup
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_MOLTEN_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+			event_target:planet_of_interest = {
+				set_planet_flag = pf_pioneer_world
+			}
+		}
+		trigger = {
+			owner = {
+				has_policy_flag = alp_land_ownership_pioneerrights
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.surveycorps
+		owner = {
+			add_modifier = {
+				modifier = hostileworld_colonyprep
+				days = 360
+			}
+		}
+		hidden_effect = {
+			owner = {				
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_MOLTEN_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+	}
+	option = {
+		name = alphamod_hostileworlds_test.14.notnow
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.140
+	title = PROJECT_COMPLETE
+	desc = "alphamod_hostileworlds_test.140.desc"
+	picture = GFX_evt_molten
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+	
+	option = {
+		name = OK
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			enable_special_project = {
+				name = "FOLLOW_UP_SURVEY_MOLTEN_PROJECT"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+	}
+	option = {
+		name = alphamod_hostileworlds_test.140.notnow
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.141
+	title = PROJECT_COMPLETE
+	desc = "alphamod_hostileworlds_test.141.desc"
+	picture = GFX_evt_molten
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+
+	option = {
+		name = alphamod_hostileworlds_test.141.notnow
+		owner = {
+			add_engineering_research = 250
+		}
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			event_target:planet_of_interest = {
+				set_planet_flag = pf_marked_uncolonisable
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.24
+	title = PROJECT_COMPLETE
+	desc = "alphamod_hostileworlds_test.24.desc"
+	picture = GFX_evt_toxic
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+	
+	option = {
+		name = extended_land_survey.4.contractout
+		owner = {
+			add_energy = -1000
+		}
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			enable_special_project = {
+				name = "PREP_TOXIC_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+		trigger = {
+			owner = {
+				or = {
+					has_ethic = ethic_materialist
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_egalitarian
+					has_ethic = ethic_fanatic_egalitarian
+				}
+				energy > 999
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.labourforce
+		owner = {
+			add_minerals = -200
+		}
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_TOXIC_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+		trigger = {
+			owner = {
+				or = {
+					has_ethic = ethic_authoritarian
+					has_ethic = ethic_fanatic_authoritarian
+					has_ethic = ethic_xenophobe
+					has_ethic = ethic_fanatic_xenophobe
+				}
+				minerals > 199
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.pioneersetup
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_TOXIC_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+			event_target:planet_of_interest = {
+				set_planet_flag = pf_pioneer_world
+			}
+		}
+		trigger = {
+			owner = {
+				has_policy_flag = alp_land_ownership_pioneerrights
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.surveycorps
+		owner = {
+			add_modifier = {
+				modifier = hostileworld_colonyprep
+				days = 360
+			}
+		}
+		hidden_effect = {
+			owner = {				
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_TOXIC_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+	}
+	option = {
+		name = alphamod_hostileworlds_test.24.notnow
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.240
+	title = PROJECT_COMPLETE
+	desc = "alphamod_hostileworlds_test.240.desc"
+	picture = GFX_evt_toxic
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+	
+	option = {
+		name = OK
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			enable_special_project = {
+				name = "FOLLOW_UP_SURVEY_TOXIC_PROJECT"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+	}
+	option = {
+		name = alphamod_hostileworlds_test.240.notnow
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.241
+	title = PROJECT_COMPLETE
+	desc = "alphamod_hostileworlds_test.241.desc"
+	picture = GFX_evt_toxic
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+
+	option = {
+		name = alphamod_hostileworlds_test.241.notnow
+		owner = {
+			add_engineering_research = 250
+		}
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			event_target:planet_of_interest = {
+				set_planet_flag = pf_marked_uncolonisable
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.34
+	title = PROJECT_COMPLETE
+	desc = "alphamod_hostileworlds_test.34.desc"
+	picture = GFX_evt_frozen
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+	
+	option = {
+		name = extended_land_survey.4.contractout
+		owner = {
+			add_energy = -1000
+		}
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			enable_special_project = {
+				name = "PREP_FROZEN_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+		trigger = {
+			owner = {
+				or = {
+					has_ethic = ethic_materialist
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_egalitarian
+					has_ethic = ethic_fanatic_egalitarian
+				}
+				energy > 999
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.labourforce
+		owner = {
+			add_minerals = -150
+		}
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_FROZEN_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+		trigger = {
+			owner = {
+				or = {
+					has_ethic = ethic_authoritarian
+					has_ethic = ethic_fanatic_authoritarian
+					has_ethic = ethic_xenophobe
+					has_ethic = ethic_fanatic_xenophobe
+				}
+				minerals > 149
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.pioneersetup
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_FROZEN_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+			event_target:planet_of_interest = {
+				set_planet_flag = pf_pioneer_world
+			}
+		}
+		trigger = {
+			owner = {
+				has_policy_flag = alp_land_ownership_pioneerrights
+			}
+		}
+	}
+	option = {
+		name = extended_land_survey.4.surveycorps
+		owner = {
+			add_modifier = {
+				modifier = hostileworld_colonyprep
+				days = 360
+			}
+		}
+		hidden_effect = {
+			owner = {				
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}	
+			}
+			enable_special_project = {
+				name = "PREP_FROZEN_PLANETOID_FOR_COLONY"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+	}
+	option = {
+		name = alphamod_hostileworlds_test.34.notnow
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.340
+	title = PROJECT_COMPLETE
+	desc = "alphamod_hostileworlds_test.340.desc"
+	picture = GFX_evt_frozen
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+	
+	option = {
+		name = OK
+		hidden_effect = {
+			owner = {
+				save_event_target_as = planet_owner
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			enable_special_project = {
+				name = "FOLLOW_UP_SURVEY_FROZEN_PROJECT"
+				owner = event_target:planet_owner
+				location = event_target:planet_of_interest
+			}
+		}
+	}
+	option = {
+		name = alphamod_hostileworlds_test.340.notnow
+	}
+}
+
+ship_event = {
+	id = alphamod_hostileworlds_test.341
+	title = PROJECT_COMPLETE
+	desc = "alphamod_hostileworlds_test.341.desc"
+	picture = GFX_evt_frozen
+	show_sound = event_scanner
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		fromfrom = { save_event_target_as = planet_of_interest }
+	}
+
+	option = {
+		name = alphamod_hostileworlds_test.341.notnow
+		owner = {
+			add_engineering_research = 250
+		}
+		hidden_effect = {
+			owner = {
+				change_variable = {
+					which = "cv_activefollowups" 
+					value = -1
+				}
+			}
+			event_target:planet_of_interest = {
+				set_planet_flag = pf_marked_uncolonisable
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = alphamod_hostileworlds_test.5
+	location = root
+	
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+			change_pc = pc_gas_giant_habitable
+			random_list = {
+				10 = { change_planet_size = -5 }
+				15 = { change_planet_size = -5 }
+				15 = { change_planet_size = -6 }
+				15 = { change_planet_size = -7 }
+				20 = { change_planet_size = -7 }
+				25 = { change_planet_size = -8 }
+			}
+			if = {
+				limit = {
+					not = { has_ring = yes }
+				}
+				add_modifier = {
+					modifier = "gas_isnot_minerals"
+					days = -1
+				}
+			}
+			if = {
+				limit = {
+					has_ring = yes
+				}
+				random_list = {
+					25 = {
+						add_modifier = {
+							modifier = "hard_ring_mining"
+							days = -1
+						}
+					}
+					25 = {
+						add_modifier = {
+							modifier = "some_ring_mining"
+							days = -1
+						}
+					}
+					25 = {
+						add_modifier = {
+							modifier = "easy_ring_mining"
+							days = -1
+						}
+					}
+					25 = {
+						add_modifier = {
+							modifier = "no_ring_mining"
+							days = -1
+						}
+					}
+				}
+			}
+			random_list = {
+				25 = {}
+				75 = {
+					add_modifier = {
+						modifier = "high_gravity"
+						days = -1
+					}
+				}
+			}
+			random_list = {
+				10 = {
+					add_modifier = {
+						modifier = "bioscience_paradise"
+						days = -1
+					}
+				}
+				90 = {}
+			}			
+			random_list = {
+				25 = {
+					add_modifier = {
+						modifier = "dangerous_environmental_factors"
+						days = -1
+					}				
+				}
+				75 = {}
+			}
+			random_list = {
+				33 = {
+					add_modifier = {
+						modifier = "toxic_atmosphere"
+						days = -1
+					}				
+				}
+				67 = {}
+			}
+			random_list = {
+				25 = {
+					add_modifier = {
+						modifier = "very_hot"
+						days = -1
+					}				
+				}
+				25 = {
+					add_modifier = {
+						modifier = "very_cold"
+						days = -1
+					}				
+				}
+				50 = {}
+			}
+			random_tile = {
+				clear_deposits = yes
+				set_deposit = d_energy_deposit
+			}
+			every_tile = {
+				limit = {
+					not = {
+						has_resource = {
+							type = energy
+							amount > 0
+						}
+					}
+				}
+				random_list = {
+					30 = {}
+					25 = {
+						set_blocker = "tb_skyplatform_constructionsite"
+					}
+					10 = {
+						set_blocker = "tb_gas_storm"
+					}
+					20 = {
+						set_blocker = "tb_extreme_pressure"
+					}
+					5 = {
+						set_blocker = "tb_atmospheric_vortex"
+					}
+					10 = {
+						set_blocker = "tb_concentrated_acids"
+					}
+				}
+			}
+			every_tile = {
+				limit = {
+					not = {
+						has_blocker = yes
+					}
+				}
+				random_list = {
+					65 = {}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_energy_2						
+					}
+					10 = {
+						clear_deposits = yes
+						set_deposit = d_host_energy_1					
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_engineering_2						
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_physics_1						
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_society_1							
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_engineering_and_physics								
+					}
+				}
+			}				
+			every_tile = {
+				limit = {
+					has_blocker = "tb_skyplatform_constructionsite"
+				}
+				random_list = {
+					83 = {}				
+					6 = {
+						clear_deposits = yes
+						set_deposit = d_host_energy_1					
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_engineering_2					
+					}
+					2 = {
+						clear_deposits = yes
+						set_deposit = d_host_energy_and_physics					
+					}
+					2 = {
+						clear_deposits = yes
+						set_deposit = d_host_society_1					
+					}
+					2 = {
+						clear_deposits = yes
+						set_deposit = d_host_energy_and_physics_and_engineering						
+					}
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = alphamod_hostileworlds_test.15
+	location = root
+	
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+			change_pc = pc_molten_habitable
+			if = {
+				limit = {
+					has_planet_flag = pf_pioneer_world
+				}
+				add_modifier = {
+					modifier = "pioneer_world"
+					days = -1
+				}				
+			}
+			if = {
+				limit = {
+					not = { is_moon = yes }
+				}
+				random_list = {
+					55 = { change_planet_size = -5 }
+					15 = { change_planet_size = -6 }
+					15 = { change_planet_size = -7 }
+					15 = { change_planet_size = -8 }
+				}
+			}
+			random_list = {
+				45 = {}
+				5 = {
+					add_modifier = {
+						modifier = "asteroid_impacts"
+						days = -1
+					}
+				}
+				10 = {
+					add_modifier = {
+						modifier = "unstable_tectonics"
+						days = -1
+					}
+				}
+				5 = {
+					add_modifier = {
+						modifier = "mineral_rich"
+						days = -1
+					}
+				}
+				5 = {
+					add_modifier = {
+						modifier = "mineral_poor"
+						days = -1
+					}
+				}
+				15 = {
+					add_modifier = {
+						modifier = "high_gravity"
+						days = -1
+					}
+				}
+				15 = {
+					add_modifier = {
+						modifier = "low_gravity"
+						days = -1
+					}
+				}
+			}
+			random_list = {
+				50 = {
+					add_modifier = {
+						modifier = "natural_refinery"
+						days = -1
+					}
+				}
+				50 = {}
+			}
+			random_list = {
+				75 = {
+					add_modifier = {
+						modifier = "dangerous_environmental_factors"
+						days = -1
+					}
+					add_modifier = {
+						modifier = "what_doesnotkillyou"
+						days = -1
+					}					
+				}
+				25 = {}
+			}
+			add_modifier = {
+				modifier = "volcanic_atmosphere"
+				days = -1
+			}
+			add_modifier = {
+				modifier = "very_hot"
+				days = -1
+			}				
+			random_tile = {
+				clear_deposits = yes
+				set_deposit = d_host_energy_1
+			}
+			random_tile = {
+				clear_deposits = yes
+				set_deposit = d_host_minerals_1
+			}
+			every_tile = {
+				limit = {
+					not = {
+						has_resource = {
+							type = energy
+							amount > 0
+						}
+					}
+				}
+				random_list = {
+					50 = {}
+					10 = {
+						set_blocker = "tb_molten_plains"
+					}
+					10 = {
+						set_blocker = "tb_molten_sea"
+					}
+					10 = {
+						set_blocker = "tb_molten_rivers"
+					}
+					20 = {
+						set_blocker = "tb_active_volcano"
+					}
+				}
+			}
+			every_tile = {
+				limit = {
+					has_blocker = "tb_molten_sea"
+				}
+				random_list = {
+					65 = {}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_minerals_2				
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_energy_2						
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_energy_and_minerals					
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_engineering_2						
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_physics_1				
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_society_and_minerals						
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_engineering_and_physics						
+					}
+				}
+			}				
+			every_tile = {
+				limit = {
+					or = {
+						has_blocker = "tb_active_volcano"
+						has_blocker = "tb_molten_plains"
+						has_blocker = "tb_molten_rivers"
+					}
+				}
+				random_list = {
+					83 = {}
+					3 = {
+						clear_deposits = yes
+						set_deposit = d_host_energy_2				
+					}
+					3 = {
+						clear_deposits = yes
+						set_deposit = d_host_energy_1				
+					}
+					3 = {
+						clear_deposits = yes
+						set_deposit = d_host_energy_and_minerals					
+					}
+					2 = {
+						clear_deposits = yes
+						set_deposit = d_host_engineering_2					
+					}
+					2 = {
+						clear_deposits = yes
+						set_deposit = d_host_energy_and_physics					
+					}
+					2 = {
+						clear_deposits = yes
+						set_deposit = d_host_society_and_minerals						
+					}
+					2 = {
+						clear_deposits = yes
+						set_deposit = d_host_energy_and_physics_and_engineering					
+					}
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = alphamod_hostileworlds_test.25
+	location = root
+	
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+			change_pc = pc_toxic_habitable
+			if = {
+				limit = {
+					has_planet_flag = pf_pioneer_world
+				}
+				add_modifier = {
+					modifier = "pioneer_world"
+					days = -1
+				}				
+			}
+			if = {
+				limit = {
+					not = { is_moon = yes }
+				}
+				random_list = {
+					25 = { change_planet_size = -2 }
+					25 = { change_planet_size = -3 }
+					25 = { change_planet_size = -4 }
+					25 = { change_planet_size = -5 }
+				}
+			}
+			random_list = {
+				60 = {}
+				5 = {
+					add_modifier = {
+						modifier = "mineral_rich"
+						days = -1
+					}
+				}
+				5 = {
+					add_modifier = {
+						modifier = "mineral_poor"
+						days = -1
+					}
+				}
+				15 = {
+					add_modifier = {
+						modifier = "high_gravity"
+						days = -1
+					}
+				}
+				15 = {
+					add_modifier = {
+						modifier = "low_gravity"
+						days = -1
+					}
+				}
+			}
+			random_list = {
+				40 = {
+					add_modifier = {
+						modifier = "bioscience_paradise"
+						days = -1
+					}
+				}
+				60 = {}
+			}
+			random_list = {
+				80 = {
+					add_modifier = {
+						modifier = "dangerous_environmental_factors"
+						days = -1
+					}
+					add_modifier = {
+						modifier = "what_doesnotkillyou"
+						days = -1
+					}					
+				}
+				20 = {}
+			}
+			add_modifier = {
+				modifier = "toxic_atmosphere"
+				days = -1
+			}
+			every_tile = {
+				limit = {
+					not = {
+						has_resource = {
+							type = minerals
+							amount > 0
+						}
+					}
+				}
+				random_list = {
+					50 = {}
+					5 = {
+						set_blocker = "tb_mountain_range"
+					}
+					5 = {
+						set_blocker = "tb_dense_jungle"
+					}
+					15 = {
+						set_blocker = "tb_noxious_swamp"
+					}
+					10 = {
+						set_blocker = "tb_toxic_kelp"
+					}
+					10 = {
+						set_blocker = "tb_radioactive_wasteland"
+					}
+					5 = {
+						set_blocker = "tb_active_volcano"
+					}
+				}
+			}
+			every_tile = {
+				limit = {
+					nor = {
+						has_blocker = "tb_mountain_range"
+						has_blocker = "tb_active_volcano"
+					}
+				}
+				random_list = {
+					65 = {}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_minerals_2						
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_society_2						
+					}
+					10 = {
+						clear_deposits = yes
+						set_deposit = d_host_engineering_1					
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_physics_1					
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_society_1							
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_engineering_and_physics					
+					}
+				}
+			}				
+		}
+	}
+}
+
+planet_event = {
+	id = alphamod_hostileworlds_test.35
+	location = root
+	
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+			change_pc = pc_frozen_habitable
+			if = {
+				limit = {
+					has_planet_flag = pf_pioneer_world
+				}
+				add_modifier = {
+					modifier = "pioneer_world"
+					days = -1
+				}				
+			}
+			if = {
+				limit = {
+					not = { is_moon = yes }
+				}
+				random_list = {
+					25 = { change_planet_size = -1 }
+					25 = { change_planet_size = -2 }
+					25 = { change_planet_size = -3 }
+					25 = { change_planet_size = -4 }
+				}
+			}
+			random_list = {
+				45 = {}
+				5 = {
+					add_modifier = {
+						modifier = "asteroid_impacts"
+						days = -1
+					}
+				}
+				5 = {
+					add_modifier = {
+						modifier = "mineral_rich"
+						days = -1
+					}
+				}
+				15 = {
+					add_modifier = {
+						modifier = "mineral_poor"
+						days = -1
+					}
+				}
+				5 = {
+					add_modifier = {
+						modifier = "high_gravity"
+						days = -1
+					}
+				}
+				25 = {
+					add_modifier = {
+						modifier = "low_gravity"
+						days = -1
+					}
+				}
+			}
+			random_list = {
+				20 = {
+					add_modifier = {
+						modifier = "dangerous_environmental_factors"
+						days = -1
+					}
+					add_modifier = {
+						modifier = "what_doesnotkillyou"
+						days = -1
+					}					
+				}
+				80 = {}
+			}
+			add_modifier = {
+				modifier = "very_cold"
+				days = -1
+			}
+			every_tile = {
+				limit = {
+					not = {
+						has_resource = {
+							type = minerals
+							amount > 0
+						}
+					}
+				}
+				random_list = {
+					60 = {}
+					10 = {
+						set_blocker = "tb_mountain_range"
+					}
+					30 = {
+						set_blocker = "tb_massive_glacier"
+					}
+				}
+			}
+			every_tile = {
+				limit = {
+					not = {
+						has_blocker = "tb_mountain_range"
+					}
+				}
+				random_list = {
+					60 = {}
+					15 = {
+						clear_deposits = yes
+						set_deposit = d_host_minerals_1						
+					}
+					10 = {
+						clear_deposits = yes
+						set_deposit = d_host_engineering_1						
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_physics_1					
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_society_1						
+					}
+					5 = {
+						clear_deposits = yes
+						set_deposit = d_host_engineering_and_physics					
+					}
+				}
+			}				
+		}
+	}
+}
+
+country_event = {
+	id = alphamod_hostileworlds_test.6
+	title = "alphamod_hostileworlds_test.6.title"
+	desc = "alphamod_hostileworlds_test.6.desc"
+	picture = GFX_evt_star_chart
+	show_sound = event_laboratory_sound
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = OK
+	}
+}
+
+country_event = {
+	id = alphamod_hostileworlds_test.16
+	title = "alphamod_hostileworlds_test.16.title"
+	desc = "alphamod_hostileworlds_test.16.desc"
+	picture = GFX_evt_star_chart
+	show_sound = event_laboratory_sound
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = OK
+	}
+}
+
+country_event = {
+	id = alphamod_hostileworlds_test.26
+	title = "alphamod_hostileworlds_test.26.title"
+	desc = "alphamod_hostileworlds_test.26.desc"
+	picture = GFX_evt_star_chart
+	show_sound = event_laboratory_sound
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = OK
+	}
+}
+
+country_event = {
+	id = alphamod_hostileworlds_test.36
+	title = "alphamod_hostileworlds_test.36.title"
+	desc = "alphamod_hostileworlds_test.36.desc"
+	picture = GFX_evt_star_chart
+	show_sound = event_laboratory_sound
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = OK
+	}
+}
