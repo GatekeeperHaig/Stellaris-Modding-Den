@@ -1,27 +1,33 @@
-
 eludium_refinery = {
+	tags = { special_resource_building }
 	base_buildtime = 240
-	icon = "building_eludiumrefinery"
-	
-	cost = {
-		minerals = 150
-	}
-	
-	potential = {
-		planet = {
-			NOT = { is_planet_class = pc_habitat }	
-		}
-	}
-	
-	produced_resources = {
-		physics_research = 6
+	icon = "building_eludiumrefinery"	
+	cost = { minerals = 150 }	
+	potential = { planet = { NOT = { is_planet_class = pc_habitat } } }	
+	produced_resources = { 
+		physics_research = 6	
 		energy = 2
-	}
-	
-	prerequisites = {
-		"tech_mine_eludium"
-	}
-	
+	}	
+	prerequisites = { "tech_mine_eludium" }
+	ai_weight = { weight = 100 }	
+	on_queued = { 
+		if = { 	
+			limit = { ex_core_game_mechanics_enabled = yes }
+			planet = {
+				if = {
+					limit = { check_variable = { which = special_resource_buildings_built value < 1 } }
+					set_variable = { which = special_resource_buildings_built value = 1 }
+					else = { change_variable = { which = special_resource_buildings_built value = 1 } }
+				}
+			}
+		}
+	}			
+	on_unqueued = { 
+		if = { 	
+			limit = { ex_core_game_mechanics_enabled = yes }
+			planet = { change_variable = { which = special_resource_buildings_built value = -1 } }				
+		}
+	}		
 	allow = {
 		if = {
 			limit = {
@@ -41,7 +47,7 @@ eludium_refinery = {
 					}
 				}
 				custom_tooltip = {
-					fail_text = "requires_eludium_stone"
+					fail_text = "requires_eludium"
 					tile = {
 						has_resource = {
 							type = sr_eludium
@@ -77,43 +83,37 @@ eludium_refinery = {
 				}
 			}
 		}
-	}
-	
-	ai_allow = {
-		always = yes
-	}
-	
-	ai_weight = {
-		weight = 10	
-	}
+	}	
 }
 
 crystal_pillar = {
-	base_buildtime = 240
-	icon = "building_crystalpillar"
-	
-	cost = {
-		minerals = 150
-	}
-	
-	potential = {
-		planet = {
-			NOT = { is_planet_class = pc_habitat }	
+	tags = { special_resource_building }
+	base_buildtime = 240	
+	icon = "building_crystalpillar"	
+	cost = { minerals = 150 }	
+	potential = { planet = { NOT = { is_planet_class = pc_habitat }	} }	
+	produced_resources = { food = 8 }	
+	planet_modifier = { pop_growth_speed = 0.02 }	
+	prerequisites = { "tech_crystal_pillar" }
+	ai_weight = { weight = 100 }
+	on_queued = { 
+		if = { 	
+			limit = { ex_core_game_mechanics_enabled = yes }
+			planet = {
+				if = {
+					limit = { check_variable = { which = special_resource_buildings_built value < 1 } }
+					set_variable = { which = special_resource_buildings_built value = 1 }
+					else = { change_variable = { which = special_resource_buildings_built value = 1 } }
+				}
+			}
 		}
-	}
-	
-	produced_resources = {
-		food = 8
-	}
-	
-	planet_modifier = {
-		pop_growth_speed = 0.02
-	}
-	
-	prerequisites = {
-		"tech_crystal_pillar"
-	}
-	
+	}			
+	on_unqueued = { 
+		if = { 	
+			limit = { ex_core_game_mechanics_enabled = yes }
+			planet = { change_variable = { which = special_resource_buildings_built value = -1 } }				
+		}
+	}		
 	allow = {
 		if = {
 			limit = {
@@ -169,34 +169,19 @@ crystal_pillar = {
 				}
 			}
 		}
-	}
-	
-	ai_allow = {
-		always = yes
-	}
-	
-	ai_weight = {
-		weight = 10	
-	}
+	}		
 }
 
 building_crystaltemple = {
 	is_listed = no
 	icon = "building_crystaltemple"
-
-	cost = {}
-	required_resources = {}
-	produced_resources = {
-		unity = 10
-	}
-	
+	produced_resources = { unity = 10 }
 	country_modifier = {	
 		planet_unrest_mult = -0.2
 		pop_government_ethic_attraction = 0.10
 		pop_citizen_happiness = 0.05
 		country_unrest_unhappy_slave_effect_mult = -0.05
-	}
-	
+	}	
 	ai_replace = no
 	event_building = yes
 }
