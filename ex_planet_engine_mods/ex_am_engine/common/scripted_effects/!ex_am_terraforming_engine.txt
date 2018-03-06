@@ -1,0 +1,99 @@
+ex_am_terraforming_engine = {
+	set_planet_flag = pf_has_been_terraformed
+	if = {
+		limit = { is_colony = yes }
+		owner = {
+			set_country_flag = cf_is_terraformer
+			set_timed_country_flag = {
+				flag = cf_recent_terraforming
+				days = 3600
+			}
+		}
+	}
+	if = { 
+		limit = { is_planet_class = pc_habitat }
+		add_modifier = {
+			modifier = light_population
+			days = -1
+		}
+		add_modifier = {
+			modifier = ex_asteroid
+			days = -1
+		}
+		if = { limit = { has_modifier = underground_caverns } remove_modifier = underground_caverns }
+		if = { limit = { has_modifier = alpha_doming } remove_modifier = alpha_doming }
+		if = { limit = { has_modifier = zero_gravity } remove_modifier = zero_gravity }
+		if = { limit = { has_modifier = mineral_rich } remove_modifier = mineral_rich }
+		if = { limit = { has_modifier = mineral_poor } remove_modifier = mineral_poor }
+		if = { limit = { has_modifier = low_gravity	} remove_modifier = low_gravity }
+	}
+	if = { 
+		limit = { not = { is_planet_class = pc_frozen_habitable } }
+		if = { limit = { has_modifier = very_cold } remove_modifier = very_cold }	
+	}
+	if = {
+		limit = { has_building = building_ice_rig }
+		every_tile = {
+			limit = {
+				has_building = building_ice_rig
+				any_neighboring_tile = {
+					has_building = no
+					has_building_construction = no
+					has_grown_pop = no
+					has_growing_pop = no
+				}				
+			}
+			random_neighboring_tile = {
+				limit = {
+					has_building = no
+					has_building_construction = no
+					has_grown_pop = no
+					has_growing_pop = no				
+				}
+				set_blocker = tb_massive_glacier_locked
+			}
+		}
+	}
+	if = { 
+		limit = {
+			nor = {
+				is_planet_class = pc_asteroid_habitable
+				is_planet_class = pc_barren_habitable
+			}
+		}
+		if = { limit = { has_modifier = zero_gravity } remove_modifier = zero_gravity }
+	}
+	if = {
+		limit = { not = { is_planet_class = pc_molten_habitable	}
+		if = { limit = { has_modifier = volcanic_atmosphere } remove_modifier = volcanic_atmosphere }
+		if = { limit = { has_modifier = natural_refinery } remove_modifier = natural_refinery }
+		if = { limit = { has_modifier = very_hot } remove_modifier = very_hot }	
+	}
+	if = {
+		limit = { not = { is_planet_class = pc_toxic_habitable }
+		if = { limit = { has_modifier = toxic_atmosphere } remove_modifier = toxic_atmosphere }	
+	}
+	if = {
+		limit = { has_building = building_geothermal_tap }
+		every_tile = {
+			limit = {
+				has_building = building_geothermal_tap
+				any_neighboring_tile = {
+					has_building = no
+					has_building_construction = no
+					has_grown_pop = no
+					has_growing_pop = no
+				}				
+			}
+			random_neighboring_tile = {
+				limit = {
+					has_building = no
+					has_building_construction = no
+					has_grown_pop = no
+					has_growing_pop = no				
+				}
+				set_blocker = tb_active_volcano_locked
+			}
+		}
+	}
+}	
