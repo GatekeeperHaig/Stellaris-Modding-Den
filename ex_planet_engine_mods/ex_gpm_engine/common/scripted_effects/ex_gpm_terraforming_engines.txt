@@ -1,0 +1,159 @@
+ex_gpm_terraforming_engine = {
+	c_spawn_special_blockers = yes # if special unique blockers were removed, put them back somewhere.
+	c_planet_graphics = yes # if this world has a specific modifier, apply matching planet graphics
+	c_remove_negative_modifiers = yes # Remove bad modifiers where is makes sense
+	c_remove_neutral_modifiers = yes # Remove neutral modifiers where it makes sense
+	c_remove_positive_modifiers = yes # Remove good modifiers where it makes sense
+	if = { # Remove valuable world modifier backup (this gets removed trough the terraform links, but in some edge cases it doesn't, so this way it does get removed).
+		limit = { has_modifier = terraforming_candidate_precursor }
+		remove_modifier = terraforming_candidate_precursor
+	}
+	if = { # If world was a wondrous world, remove modifier and replace with ruins modifier
+		limit = { has_modifier = Planet_Wonder_Discovered }
+		remove_modifier = Planet_Wonder_Discovered
+		add_modifier = { modifier = Planet_Wonder_Ruined days = -1 } 
+	}
+	if = { # For safety we check with flag instead of modifier to reset colour
+		limit = { 
+			OR = {
+				has_planet_flag = "pm_is_wondrous_world" 
+				has_planet_flag = "pm_is_wondrous_world_colour" 
+			}
+		}
+		set_name = "color_default_white_col"
+		remove_planet_flag = "pm_is_wondrous_world_colour"
+		remove_planet_flag = "pm_is_wondrous_world"
+	}	
+	# Planetary Computer/AI worlds interaction	
+	if = { # Wipe everything from worlds that isn't a planet trait (like gravity or rotation or magnetic field)	
+		limit = { c_is_planet_computer = yes }
+		c_crisis_purge_modifiers = yes
+		remove_modifier = chthonian_planet
+		remove_modifier = carbon_world
+	}			
+	if = { # We try to apply a unique terraform bonus modifier (not always). But not if the world is a computer planet or AI planet or anything like that
+		limit = { 
+			NOR = { 
+				num_modifiers < 4 
+				c_is_planet_computer = yes
+			}						
+		}
+		c_random_modifier_terraform_chance = yes
+	}
+	if = { # Guaranteed reroll if less than 4 modifiers are found. Still chance based for ringworlds and computer/AI worlds to keep them from being too "the same"
+		limit = { num_modifiers < 4 }
+		if = {
+			limit = { c_is_planet_water = yes }
+			c_random_modifier_water = yes
+		}
+		if = {
+			limit = { c_is_planet_deep_water = yes }
+			c_random_modifier_deep_water = yes
+		}
+		if = {
+			limit = { c_is_planet_life = yes }
+			c_random_modifier_life = yes
+		}
+		if = {
+			limit = { c_is_planet_cold = yes }
+			c_random_modifier_cold = yes
+		}
+		if = {
+			limit = { c_is_planet_dry = yes }
+			c_random_modifier_dry = yes
+		}
+		if = {
+			limit = { c_is_planet_ringworld = yes }
+			c_random_modifier_ringworld_construction_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_computer = yes }
+			c_random_modifier_computer_chance = yes
+		}
+	}
+	if = { # chance for extra modifiers if less than 2 modifiers
+		limit = { num_modifiers < 2 }
+		if = {
+			limit = { c_is_planet_water = yes }
+			c_random_modifier_water_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_deep_water = yes }
+			c_random_modifier_deep_water_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_life = yes }
+			c_random_modifier_life_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_cold = yes }
+			c_random_modifier_cold_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_dry = yes }
+			c_random_modifier_dry_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_ringworld = yes }
+			c_random_modifier_ringworld_chance = yes
+		}		
+		if = { # we only allow up to two machine world modifiers
+			limit = { c_is_planet_computer = yes }
+			c_random_modifier_computer_chance = yes
+		}
+	}
+	if = { # chance for extra modifiers if less than 3 modifiers
+		limit = { num_modifiers < 3 }
+		if = {
+			limit = { c_is_planet_water = yes }
+			c_random_modifier_water_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_deep_water = yes }
+			c_random_modifier_deep_water_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_life = yes }
+			c_random_modifier_life_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_cold = yes }
+			c_random_modifier_cold_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_dry = yes }
+			c_random_modifier_dry_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_ringworld = yes }
+			c_random_modifier_ringworld_chance = yes
+		}
+	}			
+	if = { # chance for extra modifiers if less than 4 modifiers
+		limit = { num_modifiers < 4 }
+		if = {
+			limit = { c_is_planet_water = yes }
+			c_random_modifier_water_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_deep_water = yes }
+			c_random_modifier_deep_water_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_life = yes }
+			c_random_modifier_life_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_cold = yes }
+			c_random_modifier_cold_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_dry = yes }
+			c_random_modifier_dry_chance = yes
+		}
+		if = {
+			limit = { c_is_planet_ringworld = yes }
+			c_random_modifier_ringworld_chance = yes
+		}
+	}	
+}

@@ -1,105 +1,33 @@
-
 namespace = ringworld
 
 ### Ringworld Finish
 event = {
 	id = ringworld.78870
-	hide_window = yes
-	
+	hide_window = yes	
 	is_triggered_only = yes
 	
+	trigger = { from = { is_ringworld = yes } } #to make sure this fires only when ringworlds are constructed
+	
 	immediate = {
-		FROMFROM = {
+		fromfrom = {
 			every_system_planet = {
 				if = {
 					limit = {
-						AND = {
-							NOT = {
-								has_planet_flag = new_ringworld_flag
-							}
-							OR = {
-								is_planet_class = pc_ringworld_habitable
-							}
-						}
+						NOT = {	has_planet_flag = new_ringworld_flag }
+						is_planet_class = pc_ringworld_habitable
 					}
-					log = "---- Fired Event ringworld.78870 ----"
-					log = "---- On Ringworld: [This.GetName] ----"
-					log = "---- rolling modifiers on ringworld ----"
-					
-					# First we try to apply a construction bonus modifier (low chance trough list)
-					if = {
-						limit = { num_modifiers < 4 }
-						c_random_modifier_ringworld_construction_chance = yes
-					}
-					
-					#  Bonus additional modifier
-					if = {
-						limit = { num_modifiers < 4 }
-						c_random_modifier_ringworld_chance = yes
-					}
-					if = {
-						limit = { num_modifiers < 3 }
-						c_random_modifier_ringworld_chance = yes
-					}
-					if = {
-						limit = { num_modifiers < 2 }
-						c_random_modifier_ringworld_chance = yes
-					}
+					else = { set_planet_flag = is_constructed_ringworld_part }
+					remove_planet_flag = is_constructed_ringworld_part		
 					set_planet_flag = new_ringworld_flag
+					ex_gpm_spawn_engine = yes
 				}
-				if = {
-					limit = {
-						OR = {
-							is_planet_class = pc_ringworld_seam
-							is_planet_class = pc_ringworld_tech
-						}
-					}
-					set_planet_flag = is_constructed_ringworld_part
-				}
-			}
-		}
-	}
-}
-
-### Cybrex Ringworld Finish
-event = {
-	id = ringworld.78871
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	trigger = {
-		FROMFROM = { has_star_flag = cybrex }
-	}
-	
-	immediate = {
-		FROMFROM = {
-			every_system_planet = {
-				if = {
-					limit = {
-						AND = {
-							NOT = {
-								has_planet_flag = new_ringworld_flag
-							}
-							OR = {
-								is_planet_class = pc_ringworld_habitable
-							}
-						}
-					}
-					# Colour the ringworld section
+				if = { 
+					limit = { prev = { has_star_flag = cybrex } } #this checks fromfrom, i.e. solar system
 					if = { 
-						limit = { 
-							NOT = { has_planet_flag = "pm_is_precursor_world_colour" }
-						}
+						limit = { NOT = { has_planet_flag = "pm_is_precursor_world_colour" } }
 						set_name = "color_precursor"
 					}
-					
-					# First we try to apply a construction bonus modifier (low chance trough list)
-					c_random_modifier_precursor = yes
-					c_random_modifier_precursor = yes
-					c_random_modifier_precursor = yes
-					set_planet_flag = new_ringworld_flag
-				}
+				}					
 			}
 		}
 	}
