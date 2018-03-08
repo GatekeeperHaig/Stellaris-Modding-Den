@@ -10,38 +10,39 @@ import ntpath
 import codecs
 import glob
 from shutil import copyfile
-from stellarisTxtRead import TagList
-from stellarisTxtRead import NamedTagList
-from stellarisTxtRead import TxtReadHelperFunctions
+from stellarisTxtRead import *
 import re
 from collections import OrderedDict
 
-def parse(argv):
+def parse(argv, returnParser=False):
   # print(argv)
   parser = argparse.ArgumentParser(description="", formatter_class=RawTextHelpFormatter)
   parser.add_argument('fileNameTarget', help='For every entry in this file, tries to overwrite tag_to_be_copied by tag_to_be_copied from a same "key" entry from fileNamesSources')
 
   if not "--test_run" in argv:
     parser.add_argument('fileNamesSources', nargs = '*', help='File(s)/Path(s) to file(s) to be searched as source. Globbing star(*) can be used (even under windows :P)')
-  parser.add_argument('--tag_to_be_copied', default="ai_weight")
-  parser.add_argument('--output_folder', default="")
+  parser.add_argument('--tag_to_be_copied', default="ai_weight", help="The tag to be overwritten")
+  parser.add_argument('--output_folder', default="", help="Pretty obvious I hope")
   # parser.add_argument('-j','--join_files', action="store_true", help="Do not mix different top level tags!")
   # parser.add_argument('--filter', action="store_true", help="Use a comma separated file to determine with tags that are to be outputted. Everything below that key will be used. Filter file that will we tried to use is <filename(no .txt)>_filter.txt")
   # parser.add_argument('--manual_filter', default="", help="filter file used for all input files")
   # parser.add_argument('-t','--to_txt', action="store_true", help="The csv file(s) previously created (<filename(no .txt)>.csv) will be used to try and find tags in the opened txt files whos value will be replaced by the entry in the txt files. If the txt file value is a variable, the value will we written in the header (possibly overwriting something else!")
   # parser.add_argument('-a','--forbid_additions', action="store_true", help="Check that you do not accidentally add tags to entries. Will only allow value changed in this mode")
   # parser.add_argument('--create_new_file', default='', help="Instead of overwriting the input txt file (or the default output csv file) the script creates a new one. Useful if you are not in a repository environment. Be careful to not leave two txt file for the game to load! '@orig' will be replaced by the original file name")
-  parser.add_argument('--test_run', action="store_true", help="No Output.")
+  # parser.add_argument('--test_run', action="store_true", help="No Output.")
   # parser.add_argument('--use_csv', action="store_true", help="Due to problems with quotation marks going missing on opening a file in Excel or OpenOffice I have changed to storing and opening ods files. You can revert to csv using this option")
   # parser.add_argument('--changes_to_body', action="store_true", help="Every change is written to body, even if it was previously a header variable ('@')")
   # parser.add_argument('--clean_header', action="store_true", help="Header ('@' variables) will be cleaned of unused variables (after the ods file is applied)")
   # parser.add_argument('--remove_header', action="store_true", help="Header ('@' variables) will be converted into values inside the tags. Allows easier changes in ods.")
   # parser.add_argument('--keep_inlines', action="store_true", help="With this option, the script will try not to split inlines into the long tag form.")
   # parser.add_argument('--occ_sheet',action="store_true",help="Create occ sheet. Depricated")
+  addCommonArgs(parser)
   
 
   # if isinstance(argv, str):
     # argv=argv.split()
+  if returnParser:
+    return parser
   args=parser.parse_args(argv)
   # args.t0_buildings=args.t0_buildings.split(",")
 
@@ -125,7 +126,7 @@ def main(args,unused=0):
     lastOutFile=outFile
     with open(outFile,'w') as file:
       varsToValue.writeAll(file)
-      targetEntries.writeAll(file)
+      targetEntries.writeAll(file,args)
     if len(missing)>0:
       with open(args.output_folder+"/missing",'a+') as file:
         for mis in missing:

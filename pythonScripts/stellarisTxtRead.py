@@ -2,7 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import argparse
 # import shlex
+
+def addCommonArgs(parser):
+  parser.add_argument("--one_line_level", type= float, default=.0, help="How much the script tries to create one-liners on output: 0 - never, only keeping some existing one-liners. 1 - whenever only one text subtag exists. 2 - whenever only text subtags exist")
+  parser.add_argument('--test_run', action="store_true", help="No Output.")
+
 
 class TagList: #Basically everything is stored recursively in objects of this class. Each file is one such object. Each tag within is one such object. The variables defined in a file are one such object. Only out-of-building comments are ignored and simply copied file to file.
   def __init__(self,level):
@@ -155,7 +161,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         for b in range(self.bracketLevel):
           file.write("\t")
       file.write(self.names[i]+" =")
-      if self.vals[i].oneLineWriteCheck():
+      if self.vals[i].oneLineWriteCheck(args):
         self.vals[i].writeLine(file)
       else:
         file.write(" {\n")
@@ -168,10 +174,12 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def writeLine(self, file):
     file.write(" { ")
     for name, val in self.getAll():
-      file.write("{} = {}".format(name,val))
+      file.write("{} = {} ".format(name,val))
     file.write(" }")
   def oneLineWriteCheck(self,args=0):
-    if args==0:
+    if args==0 or args.one_line_level<0.5:
+      return False
+    if args.one_line_level<=1.5 and len(self.vals)>1:
       return False
     for val in self.vals:
       if isinstance(val,TagList):

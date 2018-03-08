@@ -510,12 +510,30 @@ class OptionWindow:
     # frameR.pack(side="right", fill="both", expand=True)
     scriptArgs=vars(script.parse(" " " "))
     self.options=options
+
+    parser=script.parse([],True)
+    # parser=0
+    # if script==createUpgradedBuildings:
+    #   print("printing help")
+    #   for option in options:
+    #     for a in parser._actions:
+    #       v=vars(a)
+    #       if "--"+option.name in v['option_strings']:
+    #         print(v["help"].replace("(default: %(default)s)",""))
+
     for i,option in enumerate(options):
       l=Label(self.window, text=option.description)
+      # if parser:
+      for a in parser._actions:
+        v=vars(a)
+        if "--"+option.name in v['option_strings']:
+          # print()
+          if v["help"]:
+            CreateToolTip(l, v["help"].replace("(default: %(default)s)",""))
       # l.pack(side=tk.TOP)
       l.grid(row=i,column=0)
       option.defaultVal=scriptArgs[option.name]
-      if isinstance(option.defaultVal, str) or isinstance(option.defaultVal, float):
+      if isinstance(option.defaultVal, str) or isinstance(option.defaultVal, float):# or (isinstance(option.defaultVal, int) and option.defaultVal!=False and option.defaultVal!=True):
         self.vals.append(StringVar())
         self.vals[-1].set(str(option.defaultVal))
         e=Entry(self.window, bg="white",textvariable=self.vals[-1],width=40)
@@ -558,12 +576,30 @@ class TabControlClass:
       Option("custom_direct_build_AI_allow"), 
       Option("simplify_upgrade_AI_allow"),
       Option("load_order_priority"),
-      Option("join_files")
+      Option("join_files"),
+      Option("one_line_level")
       ],createUpgradedBuildings)
     optionWindowCST=OptionWindow(root,"Copy Subtag Options",[
       Option("output_folder"), 
       Option("tag_to_be_copied"), 
+      Option("one_line_level")
       ],copySubTag)
+    optionWindowTxtToOds=OptionWindow(root,"Txt to ods Options",[
+      Option("filter"), 
+      Option("manual_filter"), 
+      Option("create_new_file"), 
+      Option("keep_inlines"),
+      Option("occ_sheet"),
+      Option("use_csv"),
+      # Option("one_line_level")
+      ],convertCSV_TXT)
+    optionWindowOdsToTxt=OptionWindow(root,"Ods to txt Options",[
+      Option("clean_header"), 
+      Option("changes_to_body"), 
+      Option("remove_header"),
+      Option("forbid_additions"),
+      Option("one_line_level")
+      ],convertCSV_TXT)
     
     
     nb = ttk.Notebook(root)          # Create Tab Control
@@ -574,26 +610,26 @@ class TabControlClass:
      ("text files",'*.txt;*.gfx'),
     #("text files",'*.[tg][xf][tx]'),
     [
-    ["Apply filter","--filter","Will only create tags from the filter file (including all subtags of those and the key tag). Only these will be changed when converting back"],
-    ["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.ods'. Beware that this file can only be used for back-conversion if such a txt file also exists!"],
-    ["Keep inlines","--keep_inlines","With this option, the script will try not to split inlines into the long tag form."],
-    ["Occurence Sheet","--occ_sheet","Activates the old occurence mode in a different sheet. I think this is no longer needed with the OCCNUM column (which is certainly able of doing things the occ sheet wasn't able to do)"]
+    # ["Apply filter","--filter","Will only create tags from the filter file (including all subtags of those and the key tag). Only these will be changed when converting back"],
+    # ["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.ods'. Beware that this file can only be used for back-conversion if such a txt file also exists!"],
+    # ["Keep inlines","--keep_inlines","With this option, the script will try not to split inlines into the long tag form."],
+    # ["Occurence Sheet","--occ_sheet","Activates the old occurence mode in a different sheet. I think this is no longer needed with the OCCNUM column (which is certainly able of doing things the occ sheet wasn't able to do)"]
     ], 
-    convertCSV_TXT,[],ttk.Frame(nb),0,""
+    convertCSV_TXT,[],ttk.Frame(nb),optionWindowTxtToOds,""
     ])
     tabs.append([
     "ods to txt", 
     ("table documents","*.ods"),
     [
-      ["Clean Header","--clean_header","Header ('@' variables) will be cleaned of unused variables (after the ods file is applied)"],
-      ["Changes to body","--changes_to_body","Every change is written to body, even if it was previously a header variable ('@')"],
-      ["Remove Header","--remove_header","Header ('@' variables) will be converted into values inside the tags. Allows easier changes in ods. Changes to body does similar things but only to prevent conflicts."],
-      ["Forbid additions","--forbid_additions","Gives an error if you try to add new tags"],
-      ["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.txt'. Be careful: The game will load both files!"]
+      # ["Clean Header","--clean_header","Header ('@' variables) will be cleaned of unused variables (after the ods file is applied)"],
+      # ["Changes to body","--changes_to_body","Every change is written to body, even if it was previously a header variable ('@')"],
+      # ["Remove Header","--remove_header","Header ('@' variables) will be converted into values inside the tags. Allows easier changes in ods. Changes to body does similar things but only to prevent conflicts."],
+      # ["Forbid additions","--forbid_additions","Gives an error if you try to add new tags"],
+      # ["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.txt'. Be careful: The game will load both files!"]
 
     ], 
     convertCSV_TXT,["--to_txt"], 
-    ttk.Frame(nb),0,""
+    ttk.Frame(nb),optionWindowOdsToTxt,""
     ])
     tabs.append([
     "createUpgradedBuildings", 
@@ -662,6 +698,15 @@ def help(tabControl):
   print(tabControl.getActiveTabClass().helpText)
   print("For more help, visit:")
   print("https://discord.gg/mVerKF5")
+  parser=tabControl.getActiveTabClass().command.parse([],True)
+  for a in parser._actions:
+    v=vars(a)
+    if "--cost_discount" in v['option_strings']:
+      print(v["help"])
+  # try:
+  #   tabControl.getActiveTabClass().command.parse(["-h"])
+  # except:
+  #   pass
   
 def main():
   root = Tk()

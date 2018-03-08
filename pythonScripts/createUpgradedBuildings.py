@@ -10,11 +10,11 @@ import ntpath
 import codecs
 import glob
 from shutil import copyfile
-from stellarisTxtRead import TagList
-from stellarisTxtRead import NamedTagList
+from stellarisTxtRead import *
+# from stellarisTxtRead import NamedTagList
 
 
-def parse(argv):
+def parse(argv, returnParser=False):
   parser = argparse.ArgumentParser(description="From any file containing buildings, creates a new file that allow the direct construction of upgraded buildings while keeping costs correct and ensuring uniquness of unique buildings.\n\nIMPORTANT: If you apply this script to one building file, you need to also apply it to all building file with buildings you depend on (e.g. via 'has_building').\nBuildings need to be sorted by tier!\n\nLower tier versions will be removed if higher tier is available (unless specified otherwise).\nCosts and building times will be added up (with optional discount).\nFurthermore copies icons and descriptions if according folder and file is given.\nThis mod will slightly increase the costs for every building that has a 'tier0' version as those costs are now added to the 'direct construction tier1' version as for every other building. This means those 'tier0' are no waste of resources anymore!\n\nImportant info regarding building file formatting: No 'xyz= newline {'. Open new blocks via 'xyz={ newline' as Paradox seems to have always done in their files. Limitation: Empire unique buildings will never get a direct_build copy (otherwise they would lose uniqueness)!", formatter_class=RawTextHelpFormatter)
   parser.add_argument('buildingFileNames', nargs = '*', help='File(s)/Path(s) to file(s) to be parsed or .mod file (see "--create_standalone_mod_from_mod). Output is named according to each file name with some extras. Globbing star(*) can be used (even under windows :P)')
   parser.add_argument('-l','--languages', default="braz_por,english,french,german,polish,russian,spanish", help="Languages for which files should be created. Comma separated list. Only creates links to existing titles/descriptions (but needs to do so for every language)(default: %(default)s)")
@@ -34,14 +34,20 @@ def parse(argv):
   parser.add_argument('--load_order_priority', action="store_true", help="If enabled, mod will be placed first in mod priority by adding '!' to the mod name and a 'z' to building building and trigger file names. This allows the construction of mod extensions. Alternatively, you can create a standalone version , see '--create_standalone_mod_from_mod'.")
   parser.add_argument('-m','--create_standalone_mod_from_mod', action="store_true", help="If this flag is set, the script will create a copy of a mod folder, changing the building files and has_building triggers. Main input of the script should now be the .mod file.")
   parser.add_argument('--custom_mod_name', default='', help="If set, this will be the name of the new mod")
-  parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help=argparse.SUPPRESS)
+  parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help="ExOverhaul specific. If there are upgrade shortcuts (i.e. tn->tn+2 upgrades) they will be removed here (as this contratics with my pricing policy). This does not apply to tree branches that later join again!")
   parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)
-  parser.add_argument('--test_run', action="store_true", help="No Output.")
+  # parser.add_argument('--test_run', action="store_true", help="No Output.")
   parser.add_argument('--helper_file_list', default="", help="Non-separated list of zeros and ones. N-th number defines whether file number n is a helper file (1 helperfile, 0 standard file)")
+  addCommonArgs(parser)
 
   
   # if isinstance(argv, str):
     # argv=argv.split()
+  # for a in parser._actions:
+  #   print(vars(a))
+  # print(vars(parser._actions[0]))#.output_folder.help)
+  if returnParser:
+    return parser
   args=parser.parse_args(argv)
 
   # if args.test_run:
@@ -514,7 +520,7 @@ def readAndConvert(args, allowRestart=1):
         #scripted_triggers OUTPUT
         triggerFile=open(args.output_folder+"/common/scripted_triggers/{}build_upgraded_".format(prioFile)+outfileBaseName.replace(".txt","")+"_triggers.txt",'w')
         triggerFile.write(args.scriptDescription)
-        triggers.writeAll(triggerFile)
+        triggers.writeAll(triggerFile,args)
       
       #BUILDING OUTPUT
       if len(args.copiedBuildings)>0:
@@ -536,7 +542,7 @@ def readAndConvert(args, allowRestart=1):
         if args.join_files or isHelperFileItList:
           varsToValue.writeAll(outputFile)
           outputFile.write("\n")
-          buildingNameToData.writeAll(outputFile,len(isHelperFileItList))
+          buildingNameToData.writeAll(outputFile,args,len(isHelperFileItList))
         else:
           for line in inputFile:          
             lineIndex+=1
@@ -547,7 +553,7 @@ def readAndConvert(args, allowRestart=1):
               # outputFile.write(buildingNameToData.names[curBuilding]+" = {\n")
               # buildingNameToData.vals[curBuilding].writeAll(outputFile)
               # outputFile.write("}\n")
-              buildingNameToData.writeEntry(outputFile, curBuilding)
+              buildingNameToData.writeEntry(outputFile, curBuilding,args)
               curBuilding+=1
     if isHelperFileItList and not args.join_files:  #reset after doing a file
       varsToValue=TagList(0)
