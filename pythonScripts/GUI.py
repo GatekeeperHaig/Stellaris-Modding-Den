@@ -146,10 +146,12 @@ class Line:
     self.bDel.pack(side=tk.LEFT)
     self.bEditS.pack(side=tk.LEFT)
     # if ["Apply filter","--filter"] in root.options:
-    for option in root.options:
-      if option[1]=="--filter":
-        self.bEditF.pack(side=tk.LEFT)
-        break
+    if "filter" in [opt.name for opt in root.optionWindow.options]:
+      self.bEditF.pack(side=tk.LEFT)
+    # for option in root.options:
+    #   if option[1]=="--filter":
+    #     self.bEditF.pack(side=tk.LEFT)
+    #     break
     self.bEditR.pack(side=tk.LEFT)
 
 
