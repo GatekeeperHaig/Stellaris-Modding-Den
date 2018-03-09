@@ -581,7 +581,7 @@ def main(args, argv):
   args.t0_buildings=args.t0_buildings.split(",")
   
   args.output_folder=os.path.normpath(args.output_folder.strip('"'))
-  if args.output_folder[0]==".":
+  if args.output_folder[0]=="." and not args.output_folder[1]==".":
     args.output_folder=args.output_folder[1:].lstrip(os.sep)
   args.output_folder+="/"
   
@@ -589,6 +589,7 @@ def main(args, argv):
     os.makedirs(args.output_folder)
     
   copiedBuildingsFileFolder=args.output_folder
+  print(copiedBuildingsFileFolder)
   args.copiedBuildingsFileName="/copiedBuildings.txt"
   levelsToCheck=4
   if not args.just_copy_and_check:
@@ -600,7 +601,7 @@ def main(args, argv):
       if level==levelsToCheck:
         if args.just_copy_and_check:
           print("No copiedBuildings.txt file found! This file is created by the main script and is mandatory for the --just_copy_and_check variant! Exiting!")
-          sys.exit(1)
+          return ""
         break
       try: 
         with open(copiedBuildingsFileFolder+args.copiedBuildingsFileName) as file:
