@@ -41,7 +41,7 @@ planet_event = {
 		set_variable = { which = other_pm_points value = 0 } 
 		#this variable stores the number of planet modifiers that will be rolled on the planet. 
 		set_variable = { which = pm_points value = 0 } 
-		#these variables are used to determine modifier distribution
+		#these variables are used to record the number of modifiers that will spawn on planets. 
 		set_variable = { which = positive_pm_points value = 0 }
 		set_variable = { which = neutal_pm_points value = 0 }
 		set_variable = { which = mixed_pm_points value = 0 }
@@ -52,11 +52,51 @@ planet_event = {
 		}						
 		roll_pm_points = yes #second step - roll "pm_points" for each planet
 		subtract_variable = { which = pm_points value = other_pm_points } #third step - subtracts other_pm_points from pm_points
-		if = { 
-			limit = { check_variable = { which = pm_points value > 0 } }			
-			calculate_pm_points = yes #fourth step - divides pm_points into positive/neutral/mixed/negative_pm_points
+		if = { #third step - spawn modifiers
+			limit = { check_variable = { which = pm_points value > 0 } }	
 			else = { break = yes } #if the number of pm_points is 0 or lower, terminate at this juncture - no new planet modifiers will spawn, otherwise continue.
-		}		
+			while = { 
+				limit = { check_variable = { which = pm_points value > 0 } } #this effect will roll planet modifiers until pm_points reaches zero				
+				if = {
+					limit = { is_star = yes }
+					gpm_star_modifiers = yes
+				}
+				if = {
+					limit = { is_star = no is_colonizable = no }
+					gpm_uninhabitable_modifiers = yes
+				}	
+				if = { #this runs on habitats and ringworlds only
+					limit = { is_colonizable = yes is_megastructure = yes }
+					gpm_megastructure_modifeirs = yes
+				}				
+				if = { #this will run on all non-megastructure colonizable planets. So exclude from this list the dead world, machine world and gaia world modifiers
+					limit = { is_colonizable = yes is_megastructure = no }
+					if = {
+						limit = { is_special_planet = no is_dead_planet = no is_machine_planet = no }
+						gpm_habitable_planet_modifiers = yes
+						else = {
+							if = { #gaia-like planets
+								limit = { is_special_planet = yes }
+								random_list = { 
+									70 = { gpm_ideal_planet_modifiers = yes }
+									30 = { gpm_habitable_planet_modifiers = yes }
+								}	
+								if = { #dead-planets
+									limit = { is_dead_planet = yes }						
+									gpm_dead_planet_modifiers = yes
+								}	
+								if = {
+									limit = { is_machine_planet = yes }
+									gpm_machine_planet_modifiers = yes
+								}	
+							}
+						}	
+					}		
+				}	
+				change_variable = { which = pm_points value = -1 } #subtracts one point from pm_points
+			}			
+		}	
+		record_modifier_types = yes #final step - record the modifier types and amounts and store for later use
 	}
 }	
 
