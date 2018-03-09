@@ -36,122 +36,27 @@ planet_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		remove_regular_planet_modifiers = yes
+		remove_regular_planet_modifiers = yes		
+		#this variable stores the number of vanilla special modifiers (not removed) and modifiers from other mods - if present.	 
+		set_variable = { which = other_pm_points value = 0 } 
+		#this variable stores the number of planet modifiers that will be rolled on the planet. 
+		set_variable = { which = pm_points value = 0 } 
+		#these variables are used to determine modifier distribution
+		set_variable = { which = positive_pm_points value = 0 }
+		set_variable = { which = neutal_pm_points value = 0 }
+		set_variable = { which = mixed_pm_points value = 0 }
+		set_variable = { which = negative_pm_points value = 0 }
 		if = { #if after the removal some modifiers are still present, these either come from other mods or are special vanilla modifiers. We will record their numbers in variable = other_pm_points.
-			limit = { num_modifiers > 0 } 
-			set_variable = { which = other_pm_points value = 0 }	
-			check_modifier_numbers = yes #first step - store the number of non-vanilla modifiers in a variable (variable = other_pm_points )
-		}				
-		set_variable = { which = pm_points value = 0 } #we are adding a variable for each planet that will be used to determine the number of planet modifiers
-		if = { #stars only 					
-			limit = { is_star = yes	} 
-			random_list = { #0.33 = x*1 + x/3 *2	
-				73.33 = { break = yes } #keep the value at 0
-				20 = { change_variable = { which = pm_points value = 1 } }
-				6.66 = { change_variable = { which = pm_points value = 2 } }
-			}	
-		}
+			limit = { num_modifiers > 0 } 			
+			check_other_modifiers = yes #first step - store the number of non-vanilla modifiers in the "other_pm_points"
+		}						
+		roll_pm_points = yes #second step - roll "pm_points" for each planet
+		subtract_variable = { which = pm_points value = other_pm_points } #third step - subtracts other_pm_points from pm_points
 		if = { 
-			limit = { #regular habitable planets only
-				is_colonizable = yes
-				NOR = {
-					is_special_planet = yes
-					is_unusual_planet = yes
-					is_artificial_habitable_planet = yes
-					is_machine_planet = yes
-				}	
-			} 
-			random_list = { #1.5 = x*1 + x/2*2+x/4*3
-				21.25 = { break = yes } #keep the value at 0
-				45 = { change_variable = { which = pm_points value = 1 } }
-				22.5 = { change_variable = { which = pm_points value = 2 } }
-				11.25 = { change_variable = { which = pm_points value = 3 } }
-			}	
-		}	
-		if = { 
-			limit = { #uninhabitable planets and irregular habitable planets
-				OR = {
-					AND = {
-						is_colonizable = no
-						is_star = no
-						is_megastructure = no
-					}	
-					is_special_planet = yes
-					is_unusual_planet = yes
-					is_artificial_planet = yes
-				}	
-			} 
-			random_list = { #1.2 = x*1 + x/2*2+x/4*3
-				37 = { break = yes } #keep the value at 0
-				36 = { change_variable = { which = pm_points value = 1 } }
-				18 = { change_variable = { which = pm_points value = 2 } }
-				9 = { change_variable = { which = pm_points value = 3 } }
-			}	
-		}				
-		if = { 
-			limit = { is_machine_planet = yes } 
-			random_list = { 
-				75 = { break = yes } #keep the value at 0
-				25 = { change_variable = { which = pm_points value = 1 } }
-			}	
-		}							
-		#other_pm_points - recording non-vanilla and special modifiers is subtracted from pm_points to make sure we are not spawning too many modifiers anywhere.
-		subtract_variable = { which = pm_points value = other_pm_points }
-		if = { 
-			limit = { check_variable = { which = pm_points value > 0 } }
-			else = { break = yes } #if the number of pm_points is 0 or lower, terminate the effect otherwise continue
-			#now we are setting variables into the planet's scope, to be used to determine variable distribution
-			set_variable = { which = positive_pm_points value = 0 }
-			set_variable = { which = neutal_pm_points value = 0 }
-			set_variable = { which = mixed_pm_points value = 0 }
-			set_variable = { which = negative_pm_points value = 0 }
-			while = { #we are going to assign pm_points to the planet, according to the above scheme - positive, neutral, mixed, negative. 
-				limit = { check_variable = { which = pm_points value > 0 } }	
-				random_list = { #please use the modifier field to make sure stuff is properly balanced
-					25 = { 
-						change_variable = { which = positive_pm_points value = 1 }
-						modifier = { factor = 1 is_star = yes }							
-						modifier = { factor = 1 is_regular_uninhabitable_planet = yes }
-						modifier = { factor = 1 is_regular_habitable_planet = yes }
-						modifier = { factor = 1 is_special_planet = yes }
-						modifier = { factor = 1 is_unusual_planet = yes }
-						modifier = { factor = 1 is_artificial_planet = yes }
-						modifier = { factor = 1 is_machine_planet = yes }					
-					}
-					25 = { 
-						change_variable = { which = neutal_pm_points value = 1 }
-						modifier = { factor = 1 is_star = yes }							
-						modifier = { factor = 1 is_regular_uninhabitable_planet = yes }
-						modifier = { factor = 1 is_regular_habitable_planet = yes }
-						modifier = { factor = 1 is_special_planet = yes }
-						modifier = { factor = 1 is_unusual_planet = yes }
-						modifier = { factor = 1 is_artificial_planet = yes }
-						modifier = { factor = 1 is_machine_planet = yes }							
-					}
-					25 = { 
-						change_variable = { which = mixed_pm_points value = 1 }
-						modifier = { factor = 1 is_star = yes }							
-						modifier = { factor = 1 is_regular_uninhabitable_planet = yes }
-						modifier = { factor = 1 is_regular_habitable_planet = yes }
-						modifier = { factor = 1 is_special_planet = yes }
-						modifier = { factor = 1 is_unusual_planet = yes }
-						modifier = { factor = 1 is_artificial_planet = yes }
-						modifier = { factor = 1 is_machine_planet = yes }							
-					}
-					25 = { 
-						change_variable = { which = negative_pm_points value = 1 }
-						modifier = { factor = 1 is_star = yes }							
-						modifier = { factor = 1 is_regular_uninhabitable_planet = yes }
-						modifier = { factor = 1 is_regular_habitable_planet = yes }
-						modifier = { factor = 1 is_special_planet = yes }
-						modifier = { factor = 1 is_unusual_planet = yes }
-						modifier = { factor = 1 is_artificial_planet = yes }
-						modifier = { factor = 1 is_machine_planet = yes }							
-					}
-				}	
-				change_variable = { which = pm_points value = -1 }
-			}	
-		}
+			limit = { check_variable = { which = pm_points value > 0 } }			
+			calculate_pm_points = yes #fourth step - divides pm_points into positive/neutral/mixed/negative_pm_points
+			else = { break = yes } #if the number of pm_points is 0 or lower, terminate at this juncture - no new planet modifiers will spawn, otherwise continue.
+		}		
 	}
 }	
 
