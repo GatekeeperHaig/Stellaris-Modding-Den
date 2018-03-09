@@ -29,7 +29,7 @@ def main(args):
   args.preventLinePrint=[]
   varsToValue=TagList(0)
   taglist=TagList(0)
-  taglist.readFileNew(args.inputfileName,args, varsToValue)
+  taglist.readFileNew(args.inputfileName,args, varsToValue,True)
   # taglist.printAll()
   with open(args.outputfileName,'w') as file:
     taglist.writeAll(file,args)

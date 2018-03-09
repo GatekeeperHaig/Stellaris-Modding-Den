@@ -11,7 +11,6 @@ import codecs
 import glob
 from shutil import copyfile
 from stellarisTxtRead import *
-# from stellarisTxtRead import NamedTagList
 
 
 def parse(argv, returnParser=False):
@@ -40,18 +39,10 @@ def parse(argv, returnParser=False):
   parser.add_argument('--helper_file_list', default="", help="Non-separated list of zeros and ones. N-th number defines whether file number n is a helper file (1 helperfile, 0 standard file)")
   addCommonArgs(parser)
 
-  
-  # if isinstance(argv, str):
-    # argv=argv.split()
-  # for a in parser._actions:
-  #   print(vars(a))
-  # print(vars(parser._actions[0]))#.output_folder.help)
   if returnParser:
     return parser
   args=parser.parse_args(argv)
 
-  # if args.test_run:
-    # args.just_copy_and_check=True
 
   
   args.scriptDescription='#This file was created by script!\n#Instead of editing it, you should change the origin files or the script and rerun the script!\n#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory\n'
@@ -132,7 +123,7 @@ def readAndConvert(args, allowRestart=1):
       buildingNameToData=TagList(0)
       args.preventLinePrint=[]
     prevLen=len(buildingNameToData.vals)
-    buildingNameToData.readFile(buildingFileName,args, varsToValue)
+    buildingNameToData.readFileNew(buildingFileName,args, varsToValue,True)
     if isHelperFileItList: #mark helper buildings
       if thisFileIsAHelper:
         for b in buildingNameToData[prevLen:]:
@@ -160,15 +151,12 @@ def readAndConvert(args, allowRestart=1):
     if args.join_files:
       if fileIndex<len(globbedList)-1:
         continue  #read all Files before processing
-      else:
-        varsToValue.removeDuplicateNames()  #Duplicate names in the header variables will give errors in Stellaris. Thus we remove all duplicates, even if values differ!
-        if isHelperFileItList:
+      elif isHelperFileItList:
           buildingNameToData.removeDuplicateNames(True) #remove duplicate buildings. Last file that has been read has highest priority (won't be deleted). Thus lowest priority for the helper files.
     elif isHelperFileItList:
       if thisFileIsAHelper:
         continue
       else:
-        varsToValue.removeDuplicateNames()  #Duplicate names in the header variables will give errors in Stellaris. Thus we remove all duplicates, even if values differ!
         buildingNameToData.removeDuplicateNames(True) #remove duplicate buildings. Last file that has been read has highest priority (won't be deleted). Thus lowest priority for the helper files.
         
     if args.remove_reduntant_upgrades: #ExOverhaul specific. If there are upgrade shortcuts (i.e. tn->tn+2 upgrades) they will be removed here (as this contratics with my pricing policy). This does not apply to tree branches that later join again!
@@ -356,8 +344,7 @@ def readAndConvert(args, allowRestart=1):
               
             #MAKE UNIQUE VIA INTRODUCING A FAKE MAX TIER BUILDING
             if not "upgrades" in upgradeData.names and "planet_unique" in upgradeData.names and upgradeData.get("planet_unique")=="yes": #Max tier unique
-              fakeBuilding=NamedTagList(baseBuildingData.lineStart, baseBuildingData.tagName+"_hidden_tree_root")
-              fakeBuilding.lineEnd=baseBuildingData.lineEnd
+              fakeBuilding=NamedTagList(baseBuildingData.tagName+"_hidden_tree_root")
               fakeBuilding.add("potential", "{ always=no }")
               fakeBuilding.add("planet_unique", "yes")
               fakeBuilding.add("icon",baseBuildingData.tagName)
@@ -537,24 +524,7 @@ def readAndConvert(args, allowRestart=1):
         continue
       with open(outputFileName,'w') as outputFile:
         outputFile.write(args.scriptDescription)
-        lineIndex=0
-        curBuilding=0
-        if args.join_files or isHelperFileItList:
-          varsToValue.writeAll(outputFile)
-          outputFile.write("\n")
-          buildingNameToData.writeAll(outputFile,args,len(isHelperFileItList))
-        else:
-          for line in inputFile:          
-            lineIndex+=1
-            if curBuilding>=len(buildingNameToData.vals) or isinstance(buildingNameToData.vals[curBuilding], NamedTagList) and lineIndex<buildingNameToData.vals[curBuilding].lineStart:
-              if not lineIndex in args.preventLinePrint:
-                outputFile.write(line)
-            while curBuilding<len(buildingNameToData.vals) and (not isinstance(buildingNameToData.vals[curBuilding], NamedTagList) or lineIndex==buildingNameToData.vals[curBuilding].lineEnd):
-              # outputFile.write(buildingNameToData.names[curBuilding]+" = {\n")
-              # buildingNameToData.vals[curBuilding].writeAll(outputFile)
-              # outputFile.write("}\n")
-              buildingNameToData.writeEntry(outputFile, curBuilding,args)
-              curBuilding+=1
+        buildingNameToData.writeAll(outputFile,args,len(isHelperFileItList))
     if isHelperFileItList and not args.join_files:  #reset after doing a file
       varsToValue=TagList(0)
       buildingNameToData=TagList(0)

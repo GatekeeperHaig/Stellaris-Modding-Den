@@ -17,6 +17,9 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     self.vals=[]
     self.comments=[]
     self.bracketLevel=level
+
+
+
   def __getitem__(self, index):
     return self.vals[index]
   def count(self,name):
@@ -232,13 +235,14 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         if j in duplicates:
           continue
         if self.names[i]==self.names[j]:
-          if isinstance(self.vals[i],TagList):
+          if self.names[i][0]=="@": #header variables must be unique!
+            duplicates.append(j)
+          elif isinstance(self.vals[i],TagList):
             if isinstance(self.vals[j],TagList):
               if self.vals[i].compare(self.vals[j]):
                 duplicates.append(j)
-          else:
-            if self.vals[i]==self.vals[j]: #string compare (or string vs object which gives correct 0)
-              duplicates.append(j)
+          elif self.vals[i]==self.vals[j]: #string compare (or string vs object which gives correct 0)
+            duplicates.append(j)
     self.removeIndexList(duplicates)
     for i in range(len(self.names)): #recurively through remaining elements
       if isinstance(self.vals[i], TagList):
@@ -322,7 +326,9 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       i+=1
       if i==len(self.vals):
         break
-  def readFileNew(self, fileName, args, varsToValue,splitSigns=[">=","<=","#"," ","\t","{","}","=",">","<"]):#,"@"]):
+  def readFileNew(self, fileName, args, varsToValue,useNamedTagList=False):#,"@"]):
+
+    splitSigns=[">=","<=","#"," ","\t","{","}","=",">","<"]
     splitPattern="("
     for sign in splitSigns:
       splitPattern+=sign+"|"
@@ -355,7 +361,10 @@ class TagList: #Basically everything is stored recursively in objects of this cl
               if not expectingVal:
                 raise ParseError("ERROR: Unexpected '{'")
               bracketLevel+=1
-              newTag=TagList(bracketLevel)
+              if useNamedTagList and bracketLevel==1:
+                newTag=NamedTagList(objectList[-1].names[-1])
+              else:
+                newTag=TagList(bracketLevel)
               objectList[-1].vals[-1]=newTag
               objectList.append(newTag)
               expectingVal=False
@@ -436,7 +445,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
                     # print(line)
                 else:
                   tagName=line.split("=")[0].strip()
-                  objectList.append(NamedTagList(lineIndex,tagName))
+                  objectList.append(NamedTagList(tagName))
                   self.add(tagName,objectList[-1])
               else:
                 if bracketOpen>bracketClose:
@@ -739,13 +748,11 @@ class TagList: #Basically everything is stored recursively in objects of this cl
 
           
 class NamedTagList(TagList): #derived from TagList with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
-  def __init__(self, lineNbr,tagName):
+  def __init__(self, tagName):
     self.names=[]
     self.vals=[]
     self.comments=[]
     self.bracketLevel=1
-    self.lineStart=lineNbr#line start in original file
-    self.lineEnd=lineNbr #line end in original file
     self.lowerTier=0
     self.tagName=tagName
     self.wasVisited=0

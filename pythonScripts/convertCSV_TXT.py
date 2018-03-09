@@ -11,8 +11,6 @@ import codecs
 import glob
 from shutil import copyfile
 from stellarisTxtRead import *
-# from stellarisTxtRead import NamedTagList
-# from stellarisTxtRead import TxtReadHelperFunctions
 import re
 from collections import OrderedDict
 
@@ -264,7 +262,7 @@ def main(args,unused=0):
               if args.forbid_additions:
                 print("New key found. Additions where forbidden!")
                 continue
-              nameToData.add(header[0][0],NamedTagList(0,header[0][0]))
+              nameToData.add(header[0][0],NamedTagList(header[0][0]))
               val=nameToData.vals[-1]
               val.add(keyString, bodyKey)
               for name, val in nameToData.getAll():
