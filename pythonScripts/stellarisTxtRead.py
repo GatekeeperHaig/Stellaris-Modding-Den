@@ -3,6 +3,7 @@
 
 import sys
 import argparse
+import re
 # import shlex
 
 def addCommonArgs(parser):
@@ -59,7 +60,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     else:
       comment=""
     self.comments.append(comment)
-  def add(self,name,val, comment=''): #add via two separate pre-formated variables
+  def add(self,name,val='', comment=''): #add via two separate pre-formated variables
     self.names.append(name)
     self.vals.append(val)
     self.comments.append(comment)
@@ -174,7 +175,10 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def writeLine(self, file):
     file.write(" { ")
     for name, val in self.getAll():
-      file.write("{} = {} ".format(name,val))
+      if len(val.strip())>0:
+        file.write("{} = {} ".format(name,val))
+      else:
+        file.write(name+" ")
     file.write(" }")
   def oneLineWriteCheck(self,args=0):
     if args==0 or args.one_line_level<0.5:
@@ -318,6 +322,88 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       i+=1
       if i==len(self.vals):
         break
+  def readFileNew(self, fileName, args, varsToValue,splitSigns=[">=","<=","#"," ","\t","{","}","=",">","<"]):#,"@"]):
+    splitPattern="("
+    for sign in splitSigns:
+      splitPattern+=sign+"|"
+    splitPattern=splitPattern[:-1]+")"
+    bracketLevel=0
+    objectList=[self] #objects currently open objectList[0] would be lowest bracket object (a building), etc
+    # currentlyInHeader=True
+    # writeToList=self
+    # writeTo=False
+    expectingVal=False
+    expectingNameAddition=False
+    with open(fileName,'r') as inputFile:
+      print("Start reading "+fileName)
+      for lineI,line in enumerate(inputFile):
+        lineSplit=re.split(splitPattern,line) #'(>=|<=|<#=" "{}])')
+        countEmpty=0
+        for wordI, word in enumerate(lineSplit):
+          try:
+            word=word.strip()
+            #empty
+            if len(word)==0:
+              countEmpty+=1
+              continue
+            # #header variable
+            # elif word=="@":
+            #   # writeToList=varsToValue
+            #   objectList.append(varsToValue)
+            #bracket level increase
+            elif word=="{":
+              if not expectingVal:
+                raise ParseError("ERROR: Unexpected '{'")
+              bracketLevel+=1
+              newTag=TagList(bracketLevel)
+              objectList[-1].vals[-1]=newTag
+              objectList.append(newTag)
+              expectingVal=False
+            #bracket level decrease
+            elif word=="}":
+              if expectingVal or bracketLevel==0:
+                raise ParseError("ERROR: Too many '}' found. Beware that the one that triggered this error is most likely not the incorrect one!")
+              bracketLevel-=1
+              objectList.pop()
+            #equal
+            elif word=="=":
+              expectingVal=True
+            #comment 
+            elif word=='#': 
+              comment="".join(lineSplit[wordI:]).strip()
+              #comment without anything else in line
+              if countEmpty==wordI:
+                objectList[-1].add("","",comment) #will print comment only line at right place later
+              else:
+                objectList[-1].comments[-1]=" "+comment
+              break #rest of line is comment. Was already added, not being parsed to avoid special characters to have an impact in the comment
+            #signs that should be equivalt to "=" but are currently not supported. Thus simply saved as plain text in "name"
+            elif word in [">=","<=",">","<"]:
+              objectList[-1].names[-1]+=" "+word+" "
+              expectingNameAddition=True
+            elif expectingVal:
+              objectList[-1].vals[-1]+=word
+              expectingVal=False
+              # if objectList[-1]==varsToValue:
+              #   objectList.pop
+            elif expectingNameAddition:
+              objectList[-1].names[-1]+=word
+              expectingNameAddition=False
+            else:
+              objectList[-1].add(word)
+          except:
+            print("Error readling line {}, word {}".format(lineI,wordI))
+            print("Line content: {}".format(line),end='')
+            print("Word: {}".format(word))
+            raise
+
+    for name,val in self.getAll():
+      if name and name[0]=="@":
+        if isinstance(name,TagList):
+          print("Invalid header variable")
+        varsToValue.add(name,val)
+
+
   def readFile(self,fileName,args, varsToValue,keepEmptryLinesAndComments=False):#stores content of buildingFileName in self and varsToValue
     bracketLevel=0
     objectList=[] #objects currently open objectList[0] would be lowest bracket object (a building), etc
@@ -763,3 +849,8 @@ class TxtReadHelperFunctions:
       print("Missing closing bracket in "+string)
       return -1
     return i
+
+class ParseError(Exception):
+  def __init__(self, message):
+    # self.expression = expression
+    self.message = message
