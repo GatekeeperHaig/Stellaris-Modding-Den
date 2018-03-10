@@ -63,14 +63,17 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     else:
       comment=""
     self.comments.append(comment)
+    return self
   def add(self,name,val='', comment=''): #add via two separate pre-formated variables
     self.names.append(name)
     self.vals.append(val)
     self.comments.append(comment)
+    return self
   def addFront(self,name,val,comment=''):
     self.names.insert(0,name)
     self.vals.insert(0,val)
     self.comments.insert(0,comment)
+    return self
   def addString(self, string): #add via raw data. Only works for lines that are bracketClosed within
     array=string.split("=")
     array[1:]=["=".join(array[1:]).strip()]
@@ -82,19 +85,24 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     # print(array[0])
     # print("'"+array[1]+"'")
     self.addArray(array)
+    return self
   def remove(self, name): #remove via name
     i=self.names.index(name)
     self.removeIndex(i)
+    return self
   def removeIndex(self, i): #remove via name
     del self.names[i]
     del self.vals[i]
     del self.comments[i]
+    return self
   def removeIndexList(self, indexList):
     for i in reversed(sorted(indexList)):      #delete last first to make sure indices stay valid
       self.removeIndex(i)
+      return self
   def clear(self):
     self.names=[]
     self.vals=[]
+    return self
   def replace(self, name,val,comment=''): #replace via name
     try:
       i=self.names.index(name)
@@ -102,6 +110,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       self.comments[i]=comment
     except ValueError:
       self.add(name,val,comment)
+      return self
   def splitToListIfString(self,name,n=0): #I do not generally split lines that open and close brackets within the line (to prevent enlarging the file). Yet sometimes it's necessary...
     try:
       if n==0:
@@ -160,10 +169,10 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       if len(str(self.vals[i]))>0:
         file.write(" = "+str(self.vals[i]))
     else:
-      if self.bracketLevel==1:
-        file.write("\n")
-        for b in range(self.bracketLevel):
-          file.write("\t")
+      # if self.bracketLevel==1:
+      #   file.write("\n")
+      #   for b in range(self.bracketLevel):
+      #     file.write("\t")
       file.write(self.names[i]+" =")
       if self.vals[i].oneLineWriteCheck(args):
         self.vals[i].writeLine(file)
