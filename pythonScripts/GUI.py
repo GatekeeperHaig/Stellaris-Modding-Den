@@ -600,6 +600,7 @@ class TabControlClass:
       Option("changes_to_body"), 
       Option("remove_header"),
       Option("forbid_additions"),
+      Option("create_new_file"), 
       Option("one_line_level")
       ],convertCSV_TXT)
     

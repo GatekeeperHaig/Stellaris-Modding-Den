@@ -102,17 +102,17 @@ def main(args,unused=0):
     else:
       keepExtraLines=False
     if not args.to_txt or os.path.exists(fileName):
-      nameToData.readFile(fileName,args, varsToValue, keepExtraLines) 
+      nameToData.readFileNew(fileName,args, varsToValue) 
     else:
+      # print(fileName)
       print("Generating new txt file from {} file. First column in table must be {!s} or addKey depending on file (the unique identifiers)".format(tableFileEnding, keyStrings))
 
     if args.join_files:
       if fileIndex<len(globbedList)-1:
         continue
-    fullNameToData=nameToData
-    if fileName[-4:]==".gfx":
-      nameToData=nameToData.vals[0]
-      nameToData.increaseLevelRec(-1)   
+    # if fileName[-4:]==".gfx":
+    #   nameToData=nameToData.vals[0]
+    #   nameToData.increaseLevelRec(-1)   
     keyString='addKey'
     if not args.to_txt or len(nameToData.vals)>0: #skip all this if we create a completely new file. Also possible with empty file that existed
       for k in keyStrings:
@@ -148,16 +148,17 @@ def main(args,unused=0):
           print("No filter file for: "+fileName)
           args.filter=0
 
-      if not args.keep_inlines:
-        nameToData.applyOnLowestLevel( TxtReadHelperFunctions.splitIfSplitable,[], ["bracketLevel"])
+      # if not args.keep_inlines:
+      #   nameToData.applyOnLowestLevel( TxtReadHelperFunctions.splitIfSplitable,[], ["bracketLevel"])
       # nameToData.printAll()
       if args.remove_header:
         nameToData.applyOnLowestLevel( TxtReadHelperFunctions.getVariableValue, [varsToValue])
+        for name in nameToData.names:
+          if name[0]=="@":
+            nameToData.remove(name) #removing by name should work while iterating over the list where stuff is removed. I tested this
         varsToValue.clear()
       varsToValue.changed=[0 for i in varsToValue.vals]
 
-        # nameToData.printAll()
-        # fullNameToData.printAll()
       nameToData.addTags(tagList)
     
     if args.to_txt:
@@ -165,7 +166,6 @@ def main(args,unused=0):
         print("No "+tableFileEnding+" file for: "+fileName)
         continue
       foundData=False
-      foundOcc=False
       if args.use_csv:
         with open(tableFileName) as file:
           csvContent=[re.split(",|;",line.strip()) for line in file]
@@ -179,19 +179,13 @@ def main(args,unused=0):
               csvContent=sheet[1] #0 is the sheetname
               csvContent=[[str(e) for e in line] for line in csvContent]
               foundData=True
-            elif sheet[0]=="OccurenceNumbers":
-              csvOccurences=sheet[1]
-              foundOcc=True
-            if foundData and foundOcc:
+            if foundData:
               break
           except KeyError:
             break
         if not foundData:
           print("ERROR: Invalid ods file. DataSheet missing! Exiting!")
-          sys.exit(1)
-        if not foundOcc and args.occ_sheet:
-          print("Warning: No OccurenceNumbers sheet found. Downward compatibility allows using the file but it might lead to problems (if non-unique occurence numbers exist)")
-        #print(csvContent)
+          return ""
       for i in range(len(csvContent)):
         # print("".join(csvContent[i]))
         if "".join(csvContent[i])=="":
@@ -202,82 +196,71 @@ def main(args,unused=0):
         print("Error: No end of header found. There needs to be an empty line!")
         return("")
 
-      occHeader=[]
-      if foundOcc:
-        occBodyNames=[]
-        occBody=[]
-        lastI=0
-        for i in range(len(csvOccurences)):
-          # print("".join(csvContent[i]))
-          if not csvOccurences[i]:
-            if lastI:
-              occBodyNames.append(csvOccurences[lastI+1][0])
-              occBody.append(csvOccurences[lastI+2:i])
-            else:
-              occHeader=csvOccurences[:i+1]
-            lastI=i
-        # print(occBodyNames)
-        # print(occBody)
       if len(nameToData.vals)==0:
         keyString=header[1][0]
-
       try:
-      	keyCSVIndex=header[1].index(keyString)
+        # keyCSVIndex=header[1].index(keyString)
+      	keyCSVIndices=[i for i,x in enumerate(header[1]) if x==keyString]
       except ValueError:
         print("ERROR: Key not found in table! Expected {} in second row of the table!".format(keyString))
         raise
-      # nameToData[0].printAll()
-      if foundOcc:
-        for occName, occEntry in zip(occBodyNames,occBody):
-          for name, val in nameToData.getAll():
-            if name!=occHeader[0][0]:
-              continue;
-            if val.get(keyString)==occName:
-              break; #name,val should now have the correct value
-            val.prepareOccurences(occEntry,occHeader)
+      topHeaderEntries=[]
+      for i,entry in enumerate(header[0]):
+        if entry!="":
+          topHeaderEntries.append([i,entry])
+      # print(topHeaderEntries)
 
 
 
       repeatIndex=0
       for bodyEntry in body:
         if "".join(bodyEntry):
+          topHeaderIndex=0
+
+          #check in which part of the file the very first entry is: Assign that "topHeaderIndex". Does basically nothing if there is only on topHeaderEntry
+          for i,entry in enumerate(bodyEntry):
+            if entry!="":
+              for topHeaderEntriesI in range(len(topHeaderEntries)-1):
+                if i>=topHeaderEntries[topHeaderEntriesI+1][0]:
+                  topHeaderIndex+=1
+                else:
+                  break
+              break
+          # print("topheaderIndex")
+          # print(topHeaderIndex)
+          newEntry=False
+          keyCSVIndex=keyCSVIndices[topHeaderIndex]
           if len(bodyEntry)>keyCSVIndex and bodyEntry[keyCSVIndex].strip():
+            newEntry=True
+            indexLine=keyCSVIndex
             bodyKey=bodyEntry[keyCSVIndex].strip()
-            occIndex=-1
-            if foundOcc:
-              try:
-                occIndex=occBodyNames.index(bodyKey)
-              except ValueError:
-                print("Warning: Entry not found in occurence list")
-            occEntry=[]
-            if occIndex>0:
-              occEntry=occBody[occIndex]
+          if newEntry:
             for name, val in nameToData.getAll():
-              if name!=header[0][0]:
+              if name!=topHeaderEntries[topHeaderIndex][1]:
                 continue;
               if val.get(keyString)==bodyKey:
                 break; #name,val should now have the correct value
             repeatIndex=0
-            if len(nameToData.vals)==0 or val.get(keyString)!=bodyKey: #did not find correct one. probably a new one was added
+            if len(nameToData.vals)==0 or not isinstance(val,TagList) or val.get(keyString)!=bodyKey: #did not find correct one. probably a new one was added
               if args.forbid_additions:
                 print("New key found. Additions where forbidden!")
                 continue
-              nameToData.add(header[0][0],NamedTagList(header[0][0]))
+              nameToData.add(topHeaderEntries[topHeaderIndex][1],TagList(1))
               val=nameToData.vals[-1]
               val.add(keyString, bodyKey)
-              for name, val in nameToData.getAll():
-                if name!=header[0][0]:
-                  continue;
           else:
             repeatIndex+=1
           try:
             # nameToData[0].printAll()
-            val.setValFromCSV(header, bodyEntry,varsToValue,args, 0,-1,repeatIndex,occHeader,occEntry)
+            # print(topHeaderEntries[topHeaderIndex][0])
+            # if topHeaderEntries[topHeaderIndex][0]>0:
+            #   val.printAll()
+            val.setValFromCSV([h[topHeaderEntries[topHeaderIndex][0]:] for h in header], bodyEntry[topHeaderEntries[topHeaderIndex][0]:],varsToValue,args, 0,-1,repeatIndex)
             # nameToData[0].printAll()
             # sys.exit(0)
           except:
             print("Error trying to write into {}, occurence {!s}".format(bodyKey, repeatIndex))
-            print(bodyEntry)
+            print(bodyEntry[topHeaderEntries[topHeaderIndex][0]:])
             raise
       # nameToData[0].printAll()
       if args.create_new_file:
@@ -289,6 +272,10 @@ def main(args,unused=0):
       lastOutFile=outFileName
       if not args.test_run:
         nameToData.deleteMarked()
+        for i in range(len(varsToValue.changed)):
+          if varsToValue.names[i] and varsToValue.names[i][0]=="@":
+            if varsToValue.changed[i]==1:
+              nameToData.replace(varsToValue.names[i], varsToValue.vals[i]) #write variable changes into nameToData as only that is output later
         if args.clean_header:
           varsToValue.changed=[0 for i in varsToValue.vals]
           nameToData.applyOnLowestLevel( TxtReadHelperFunctions.checkVariableUsage, [varsToValue])
@@ -296,6 +283,7 @@ def main(args,unused=0):
           for i in range(len(varsToValue.changed)):
             if varsToValue.changed[i]==0 and varsToValue.names[i] and varsToValue.names[i][0]=="@":
               delList.append(i)
+              nameToData.remove(varsToValue.names[i])
           varsToValue.removeIndexList(delList)
         if keyString=="addKey":
           for i in range(len(nameToData.vals)):
@@ -303,10 +291,10 @@ def main(args,unused=0):
               nameToData.names[i]=nameToData.vals[i].get(keyString)
               nameToData.vals[i].remove(keyString)
         with open(outFileName,'w') as file:       
-          varsToValue.writeAll(file)
-          if fileName[-4:]==".gfx":
-            nameToData.increaseLevelRec(1)
-          fullNameToData.writeAll(file,args)
+          # varsToValue.writeAll(file)
+          # if fileName[-4:]==".gfx":
+          #   nameToData.increaseLevelRec(1)
+          nameToData.writeAll(file,args)
       continue
       
 
@@ -341,8 +329,14 @@ def main(args,unused=0):
         for name, val in nameToData.getAll():
           lineArray=[copy.deepcopy(lineArrayT)]
           if isinstance(val,TagList) and len(val.names):
+            indexOfNameInTagList=tagList.names.index(name)
+            shiftInOutPut=0
+            for i in range(indexOfNameInTagList):
+              shiftInOutPut+=tagList.vals[i].countDeepestLevelEntries(args)
+            # tagList.get(name).printAll()
+
             occurenceList=copy.deepcopy(tagList.get(name))
-            val.toCSV(lineArray, tagList.get(name),occurenceList,varsToValue,args)
+            val.toCSV(lineArray, tagList.get(name),occurenceList,varsToValue,args,shiftInOutPut)
             occurenceEntry=copy.deepcopy(headerArray)
             occurenceList.toCSVHeader(occurenceEntry,args)
             try:

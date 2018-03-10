@@ -67,19 +67,19 @@ def main(args,unused=0):
       #   tagList=TagList(0)
         
       oldEnd=len(sourceEntries.vals)
-      sourceEntries.readFile(fileName,args, varsToValue) 
+      sourceEntries.readFileNew(fileName,args, varsToValue) 
       # sourceEntries.printAll()
       for entry in sourceEntries[oldEnd:]:
         try:
-          toBeCopied=entry.splitToListIfString(args.tag_to_be_copied)
-          toBeCopied.applyOnLowestLevel( TxtReadHelperFunctions.splitIfSplitable,[], ["bracketLevel"])
+          toBeCopied=entry.get(args.tag_to_be_copied)
+          # toBeCopied.applyOnLowestLevel( TxtReadHelperFunctions.splitIfSplitable,[], ["bracketLevel"])
           toBeCopied.applyOnLowestLevel( TxtReadHelperFunctions.getVariableValue, [varsToValue]) #remove header variables
         except ValueError:
           pass
   fileName=args.fileNameTarget
   targetEntries=TagList(0)
   varsToValue=TagList(0)
-  targetEntries.readFile(fileName,args,varsToValue,True)
+  targetEntries.readFileNew(fileName,args,varsToValue)
   missing=[]
 
   keyStrings=["key","name","id"]  
@@ -125,7 +125,6 @@ def main(args,unused=0):
     outFile=args.output_folder+"/"+os.path.basename(fileName)
     lastOutFile=outFile
     with open(outFile,'w') as file:
-      varsToValue.writeAll(file)
       targetEntries.writeAll(file,args)
     if len(missing)>0:
       with open(args.output_folder+"/missing",'a+') as file:

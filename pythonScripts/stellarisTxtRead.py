@@ -98,7 +98,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def removeIndexList(self, indexList):
     for i in reversed(sorted(indexList)):      #delete last first to make sure indices stay valid
       self.removeIndex(i)
-      return self
+    return self
   def clear(self):
     self.names=[]
     self.vals=[]
@@ -479,7 +479,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           raise
   def addTags(self, tagList):
     for name, entry in self.getAll():
-      if name!="namespace" and entry!="":
+      if name and name!="namespace" and name[0]!="@" and entry!="":
         tagEntry=tagList.getOrCreate(name)
         # print (name)
         # print(entry)
@@ -746,6 +746,9 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           delete.append(i)
     if len(self.names)>0 and (len(delete)==len(self.names) or len(delete)==len(self.names)-1 and ("key" in self.names or "name" in self.names)):
       return True #fully deleted. Delete head tag
+    # print(delete)
+    # if len(delete)>1:
+    #   self.printAll()
     self.removeIndexList(delete)
     return False
   def addLines(self, headerName, bodyEntry, headerIndex,n_th_occurence):
