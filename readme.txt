@@ -1,0 +1,1 @@
+This repository hosts mod development for mods associated with the Stellaris Modding Den discord community and the ExO-EPRS Dev Team.
