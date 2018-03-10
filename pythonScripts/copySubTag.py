@@ -67,7 +67,7 @@ def main(args,unused=0):
       #   tagList=TagList(0)
         
       oldEnd=len(sourceEntries.vals)
-      sourceEntries.readFileNew(fileName,args, varsToValue) 
+      sourceEntries.readFile(fileName,args, varsToValue) 
       # sourceEntries.printAll()
       for entry in sourceEntries[oldEnd:]:
         try:
@@ -79,7 +79,7 @@ def main(args,unused=0):
   fileName=args.fileNameTarget
   targetEntries=TagList(0)
   varsToValue=TagList(0)
-  targetEntries.readFileNew(fileName,args,varsToValue)
+  targetEntries.readFile(fileName,args,varsToValue)
   missing=[]
 
   keyStrings=["key","name","id"]  

@@ -28,7 +28,7 @@ def parse(argv):
 def main(args):
   varsToValue=TagList(0)
   inputTagList=TagList(0)
-  inputTagList.readFileNew(args.inputfileName,args, varsToValue)
+  inputTagList.readFile(args.inputfileName,args, varsToValue)
   outTagList=TagList(0)
   outTagList.add("check_planet_modifiers", TagList(1))
   # outTagTemplate=TagList(2)

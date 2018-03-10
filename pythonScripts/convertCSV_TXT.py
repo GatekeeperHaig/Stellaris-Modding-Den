@@ -102,7 +102,7 @@ def main(args,unused=0):
     else:
       keepExtraLines=False
     if not args.to_txt or os.path.exists(fileName):
-      nameToData.readFileNew(fileName,args, varsToValue) 
+      nameToData.readFile(fileName,args, varsToValue) 
     else:
       # print(fileName)
       print("Generating new txt file from {} file. First column in table must be {!s} or addKey depending on file (the unique identifiers)".format(tableFileEnding, keyStrings))

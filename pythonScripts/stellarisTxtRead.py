@@ -335,8 +335,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       i+=1
       if i==len(self.vals):
         break
-  def readFileNew(self, fileName, args, varsToValue,useNamedTagList=False):#,"@"]):
-
+  def readFile(self, fileName, args, varsToValue=0,useNamedTagList=False): #the varsToValue is mostly still in due to me being to lazy to remove it atm. Try to avoid using it as it will be removed at some point in the future.
     splitSigns=[">=","<=","#"," ","\t","{","}","=",">","<"]
     splitPattern="("
     for sign in splitSigns:
@@ -361,11 +360,6 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             if len(word)==0:
               countEmpty+=1
               continue
-            # #header variable
-            # elif word=="@":
-            #   # writeToList=varsToValue
-            #   objectList.append(varsToValue)
-            #bracket level increase
             elif word=="{":
               if not expectingVal:
                 raise ParseError("ERROR: Unexpected '{'")
@@ -402,8 +396,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             elif expectingVal:
               objectList[-1].vals[-1]+=word
               expectingVal=False
-              # if objectList[-1]==varsToValue:
-              #   objectList.pop
+
             elif expectingNameAddition:
               objectList[-1].names[-1]+=word
               expectingNameAddition=False
@@ -415,68 +408,12 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             print("Word: {}".format(word))
             raise
 
-    for name,val in self.getAll():
-      if name and name[0]=="@":
-        if isinstance(name,TagList):
-          print("Invalid header variable")
-        varsToValue.add(name,val)
-
-
-  def readFile(self,fileName,args, varsToValue,keepEmptryLinesAndComments=False):#stores content of buildingFileName in self and varsToValue
-    bracketLevel=0
-    objectList=[] #objects currently open objectList[0] would be lowest bracket object (a building), etc
-    currentlyInHeader=True
-    with open(fileName,'r') as inputFile:
-      print("Start reading "+fileName)
-      lineIndex=0
-      for line in inputFile:
-        try:
-          lineIndex+=1
-          line=line.strip()
-          if len(line)>0 and (line[0]!="#" or bracketLevel>0) :
-            if line[0]=="@":
-              varsToValue.addString(line)
-            elif line[0]!="#" or bracketLevel>0:
-              if line[0]=="#":
-                objectList[-1].add("","",line)
-                continue
-              currentlyInHeader=False
-              bracketOpen=line.count("{")
-              bracketClose=line.count("}")
-              if bracketLevel==0:
-                if (bracketOpen!=1 or bracketClose!=0):
-                  #   print("Error in line {!s}:\n{}\nInvalid building start line".format(lineIndex,line))
-                  #   sys.exit(1)
-                  # else:
-                  self.addString(line)
-                  if args.just_copy_and_check:
-                    args.preventLinePrint.append(lineIndex)
-                    # print(line)
-                else:
-                  tagName=line.split("=")[0].strip()
-                  objectList.append(NamedTagList(tagName))
-                  self.add(tagName,objectList[-1])
-              else:
-                if bracketOpen>bracketClose:
-                  newObject=TagList(bracketLevel+1)
-                  objectList[-1].addArray([line.split("=")[0],newObject])
-                  objectList.append(newObject)
-                elif bracketOpen==bracketClose:
-                  objectList[-1].addString(line)
-              bracketDiff=bracketOpen-bracketClose
-              bracketLevel+=bracketDiff
-              # print(line)
-              if bracketLevel==0 and bracketDiff<0:
-                self.vals[-1].lineEnd=lineIndex
-              objectList=objectList[0:bracketLevel]
-          elif keepEmptryLinesAndComments:
-            if currentlyInHeader:
-              varsToValue.addString(line)
-            elif bracketLevel==0:
-              self.addString(line)
-        except:
-          print("Error in line {!s}: ".format(lineIndex)+line)
-          raise
+    if varsToValue:
+      for name,val in self.getAll():
+        if name and name[0]=="@":
+          if isinstance(name,TagList):
+            print("Invalid header variable")
+          varsToValue.add(name,val)
   def addTags(self, tagList):
     for name, entry in self.getAll():
       if name and name!="namespace" and name[0]!="@" and entry!="":

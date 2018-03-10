@@ -123,7 +123,7 @@ def readAndConvert(args, allowRestart=1):
       buildingNameToData=TagList(0)
       args.preventLinePrint=[]
     prevLen=len(buildingNameToData.vals)
-    buildingNameToData.readFileNew(buildingFileName,args, varsToValue,True)
+    buildingNameToData.readFile(buildingFileName,args, varsToValue,True)
     if isHelperFileItList: #mark helper buildings
       if thisFileIsAHelper:
         for b in buildingNameToData[prevLen:]:
