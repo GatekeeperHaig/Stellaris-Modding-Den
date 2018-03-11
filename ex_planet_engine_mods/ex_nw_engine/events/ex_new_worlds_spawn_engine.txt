@@ -41,7 +41,6 @@ event = { #this event triggers on game start and monthly pulse
 			}			
 			# these events occur one after the other. 
 			planet_event = { id = ex_spawn_engine_1.1 }
-			planet_event = { id = ex_spawn_engine_1.2 }
 		}
 	}
 }
@@ -106,71 +105,15 @@ planet_event = {
 			}	
 		}				
 		if = {
-			limit = { is_vanilla_uninhabitable_planet = yes	}
+			limit = { is_colonizable = no is_star = no }
 			ex_new_worlds_adjust_uninhabitable_planet_size = yes
 			ex_new_worlds_uninhabitable_planets_spawn_table = yes			
-			if = {
-				limit = { has_regular_planet_modifier = yes	}
-				remove_regular_planet_modifiers = yes 
-				ex_planet_modifier_spawn_engine = yes
-			}		
-			if = {
-				limit = {
-					OR = {
-						is_planet_class = pc_gas_giant
-						is_planet_class = pc_ice_giant
-					}	
-					has_moon = yes
-					any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
-				}
-				every_moon = { 
-					limit = { NOT = { has_planet_flag = gas_giant_moon } }
-					set_planet_flag = gas_giant_moon
-				}
-			}				
 		}	
 		if = {
-			limit = { is_vanilla_habitable_planet = yes	}
+			limit = { is_colonizable = yes }
 			ex_new_worlds_habitable_planets_spawn_table = yes
-			if = {
-				limit = { any_tile = { has_blocker = yes has_regular_blocker = yes } }
-				every_tile = {
-					limit = { has_blocker = yes has_regular_blocker = yes }
-					remove_blocker = yes
-					tile_blocker_spawn_table = yes
-				}	
-			}			
-			if = {
-				limit = { 
-					has_regular_planet_modifier = yes
-					OR = {
-						has_owner = no
-						AND = {
-							has_owner = yes
-							owner = { is_ai = yes }
-						}
-					}
-				}
-				remove_regular_planet_modifiers = yes 
-				ex_planet_modifier_spawn_engine = yes
-			}			
-			if = {
-				limit = { any_tile = { is_orbital_tile = no has_deposit = yes has_regular_vanilla_deposit = yes has_building = no } }
-				every_tile = { 
-					limit = { has_deposit = yes has_regular_vanilla_deposit = yes has_building = no is_orbital_tile = no }
-					clear_deposits = yes
-					ex_new_worlds_planetary_resource_spawn_table = yes
-				}				
-			}
-		}	
-		if = {
-			limit = { any_tile = { is_orbital_tile = yes has_deposit = yes has_regular_vanilla_deposit = yes } }
-			random_tile = { 
-				limit = { is_orbital_tile = yes has_deposit = yes has_regular_vanilla_deposit = yes }
-				clear_deposits = yes
-				orbital_resource_spawn_table = yes
-			}				
-		}						
+		}
+		planet_event = { id = ex_spawn_engine_1.2 }
 	}
 }
 
@@ -179,140 +122,226 @@ planet_event = {
 	hide_window = yes
 	is_triggered_only = yes
 	
-	trigger = {
-		OR = {
-			is_planet_class = pc_geocrystalline
-			is_planet_class = pc_marginal
-			is_planet_class = pc_marginal_dry
-			is_planet_class = pc_marginal_cold
-			is_planet_class = pc_greenhouse_cold
-			is_planet_class = pc_retinal
-			is_planet_class = pc_lush
-		}
-	}	
-	
 	immediate = {
-		while = { 
-			limit = { planet_size > 25 }
-			change_planet_size = -1
-		}	
-		ex_new_worlds_adjust_inhabitable_planet_size = yes
-		every_tile = { 
-			limit = { has_deposit = yes has_regular_vanilla_deposit = yes has_building = no is_orbital_tile = no }
-			clear_deposits = yes
-			ex_new_worlds_planetary_resource_spawn_table = yes		
-		}	
-		while = {
-			limit = { 	
-				OR = {
-					AND = {					
-						planet_size > 20		
-						count_tile = { 
-							limit = { has_deposit = no } 
-							count > 5
-						}	
-					}
-					AND = {					
-						planet_size < 21		
-						planet_size > 15
-						count_tile = { 
-							limit = { has_deposit = no } 
-							count > 4
-						}	
-					}
-					AND = {					
-						planet_size < 16		
-						planet_size > 10
-						count_tile = { 
-							limit = { has_deposit = no } 
-							count > 3
-						}	
-					}
-					AND = {					
-						planet_size < 10		
-						count_tile = { 
-							limit = { has_deposit = no } 
-							count > 2
-						}	
-					}
-				}	
-			}			
-			every_tile = {
-				limit = { is_orbital_tile = no has_deposit = no has_building = no } 
-				random_list = { 
-					50 = { ex_new_worlds_planetary_resource_spawn_table = yes } 
-					50 = { } 
-				} 
-			}
-		}						 					
 		if = {
-			limit = { NOT = { any_tile = { has_blocker = yes } } }
-			every_tile = {
-				limit = { is_orbital_tile = no has_building = no has_pop = no }
-				random_list = { 
-					55 = { tile_blocker_spawn_table = yes } 
-					45 = { } 
-				}
-			}
-			else = {
-				every_tile = {
-					limit = { has_blocker = yes has_regular_blocker = yes }
-					remove_blocker = yes
-					tile_blocker_spawn_table = yes
-				}				
-			}					
-		}				
+			limit = { has_regular_planet_modifier = yes	}
+			remove_regular_planet_modifiers = yes 
+			ex_planet_modifier_spawn_engine = yes
+		}		
 		if = {
 			limit = {
 				OR = {
-					any_tile = { has_pop = yes pop = { is_presapient_pop = yes } }
-					AND = {
-						has_owner = yes
-						OR = {
-							AND = {
-								is_colony = yes				
-								any_pop = {
-									has_regular_habitability_trait = yes
-									OR = {
-										NOT = { species = { is_same_value = owner.species } }
-										is_subspecies = yes
-									}
-								}										
-							}	
-							owner = { is_country_type = primitive }
-						}	
-					}
+					is_planet_class = pc_gas_giant
+					is_planet_class = pc_ice_giant
 				}	
-				any_tile = {
-					has_pop = yes
-					pop = { has_regular_habitability_trait = yes }
-				}	
+				has_moon = yes
+				any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
 			}
-			ex_change_habitability_trait_correspondence = yes
-		}								
-		if = { #change presapient/primitive species
-			limit = { 
-				any_tile = { has_pop = yes }
+			every_moon = { 
+				limit = { NOT = { has_planet_flag = gas_giant_moon } }
+				set_planet_flag = gas_giant_moon
+			}
+		}					
+		if = {
+			limit = { any_tile = { is_orbital_tile = yes has_deposit = yes has_regular_vanilla_deposit = yes } }
+			random_tile = { 
+				limit = { is_orbital_tile = yes has_deposit = yes has_regular_vanilla_deposit = yes }
+				clear_deposits = yes
+				orbital_resource_spawn_table = yes
+			}				
+		}		
+		if = {
+			limit = { is_colonizable = yes }
+			while = {
+				limit = { planet_size > 25 }
+				change_planet_size = -1 
+			}
+			if = { 
+				limit = { NOT = { any_tile = { is_orbital_tile = no has_deposit = yes } } }
+				every_tile = {
+					random_list = {
+						75 = { }
+						25 = { ex_new_worlds_planetary_resource_spawn_table = yes }
+					}
+				}
+			}	
+			if = {
+				limit = {
+					planet_size > 20		
+					count_tile = { 
+						limit = { is_orbital_tile = no has_deposit = yes } 
+						count < 10					
+					}
+				}
+				while = {
+					count = 10
+					random_tile = { 
+						limit = { is_orbital_tile = no has_deposit = no } 
+						random_list = {
+							75 = { }
+							25 = { add_deposit = d_mineral_deposit }
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					planet_size < 21		
+					planet_size > 15
+					count_tile = { 
+						limit = { is_orbital_tile = no has_deposit = yes } 
+						count < 8
+					}
+				}
+				while = {
+					count = 8
+					random_tile = { 
+						limit = { is_orbital_tile = no has_deposit = no }
+						random_list = {
+							75 = { }
+							25 = { add_deposit = d_mineral_deposit }
+						}
+					}
+				}				
+			}
+			if = {
+					limit = {
+					planet_size < 16		
+					planet_size > 10
+					count_tile = { 
+						limit = { is_orbital_tile = no has_deposit = yes } 
+						count < 6
+					}
+				}
+				while = {
+					count = 6
+					random_tile = { 
+						limit = { is_orbital_tile = no has_deposit = no }
+						random_list = {
+							75 = { }
+							25 = { add_deposit = d_mineral_deposit }
+						}
+					}
+				}
+				}	
+			if = {
+				limit = {
+					planet_size < 11		
+					count_tile = { 
+						limit = { is_orbital_tile = no has_deposit = yes } 
+						count < 4
+					}
+				}
+				while = {
+					count = 4
+					random_tile = { 
+						limit = { is_orbital_tile = no has_deposit = no }
+						random_list = {
+							75 = { }
+							25 = { add_deposit = d_mineral_deposit }
+						}
+					}
+				}
+			}							
+			if = {
+				limit = { NOT = { any_tile = { has_blocker = yes } } }
+				every_tile = {
+					limit = { is_orbital_tile = no has_building = no has_pop = no }
+					random_list = { 
+						55 = { tile_blocker_spawn_table = yes } 
+						45 = { } 
+					}
+				}
+				else = {
+					every_tile = {
+						limit = { has_blocker = yes has_regular_blocker = yes }
+						remove_blocker = yes
+						tile_blocker_spawn_table = yes
+					}				
+				}					
+			}					
+			planet_event = { id = ex_spawn_engine_1.3 }				
+		}	
+	}
+}			
+
+planet_event = { 
+	id = ex_spawn_engine_1.3
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		ex_new_worlds_adjust_inhabitable_planet_size = yes
+		every_tile = { 
+			limit = { is_orbital_tile = no has_deposit = yes has_regular_vanilla_deposit = yes has_building = no }
+			clear_deposits = yes
+			ex_new_worlds_planetary_resource_spawn_table = yes			
+		}		
+		if = {
+			limit = {
 				OR = {
-					any_pop = { is_presapient_pop = yes } 
-					AND = {
-						exists = owner
-						owner = { is_country_type = primitive }
-					}
-				}	
-			}
-			random_pop = {
+					is_planet_class = pc_geocrystalline
+					is_planet_class = pc_marginal
+					is_planet_class = pc_marginal_dry
+					is_planet_class = pc_marginal_cold
+					is_planet_class = pc_greenhouse_cold
+					is_planet_class = pc_greenhouse_hot
+					is_planet_class = pc_retinal
+					is_planet_class = pc_lush
+				}
+			}	
+			if = {
 				limit = {
 					OR = {
-						is_presapient_pop = yes 
+						any_tile = { has_pop = yes pop = { is_presapient_pop = yes } }
+						AND = {
+							has_owner = yes
+							OR = {
+								AND = {
+									is_colony = yes				
+									any_pop = {
+										has_regular_habitability_trait = yes
+										OR = {
+											NOT = { species = { is_same_value = owner.species } }
+											is_subspecies = yes
+										}
+									}										
+								}	
+								owner = { is_country_type = primitive }
+							}	
+						}
+					}	
+					any_tile = {
+						has_pop = yes
+						pop = { has_regular_habitability_trait = yes }
+					}	
+				}
+				ex_change_habitability_trait_correspondence = yes
+			}								
+			if = { #change presapient/primitive species
+				limit = { 
+					any_tile = { has_pop = yes }
+					OR = {
+						any_pop = { is_presapient_pop = yes } 
 						AND = {
 							exists = owner
 							owner = { is_country_type = primitive }
-						}	
-					}
-				}	
-				ex_new_worlds_species_change_table = yes
-			}					
+						}
+					}	
+				}
+				random_pop = {
+					limit = {
+						OR = {
+							is_presapient_pop = yes 
+							AND = {
+								exists = owner
+								owner = { is_country_type = primitive }
+							}	
+						}
+					}	
+					ex_new_worlds_species_change_table = yes
+				}					
+			}	
 		}	
-	}	
-}
+	}
+}	
