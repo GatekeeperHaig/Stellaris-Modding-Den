@@ -518,6 +518,8 @@ def readAndConvert(args, allowRestart=1):
       if args.create_standalone_mod_from_mod and args.just_copy_and_check:
         outputFileName=args.outPath+prioFile+outfileBaseName
       else:
+        if args.load_order_priority and "events" in args.outPath: #events prefers low ascii. might be more for which this is true. Triggers prefer high ascii
+          prioFile="!_"
         outputFileName=args.outPath+prioFile+"build_upgraded_"+outfileBaseName
       lastOutPutFileName=outputFileName
       if args.test_run:
