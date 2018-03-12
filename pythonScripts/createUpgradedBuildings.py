@@ -27,7 +27,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('-o','--output_folder', default="BU", help="Main output folder name. Specific subfolder needs to be included for '--just_copy_and_check' (default: %(default)s)")
   parser.add_argument('--replacement_file', default="", help="Executes a very basic conditional replace on buildings. Example: 'IF unique in tagName and is_listed==no newline	ai_weight = { weight = @crucial_2 }': For all buildings that have 'unique' in their name and are not listed, set ai_weight to given value. Any number of such replaces can be in the file. An 'IF' at the very start of a line starts a replace. the next xyz = will be the tag used for replacing. You can also start a line with 'EVAL' instead of 'IF' to write an arbitrary condition. You need to know the class structure for this though.")
   parser.add_argument('-j','--join_files', action="store_true", help="Output from all input files goes into a single file. Has to be activated if you have upgrades distributed over different files. Will not copy comments!")
-  parser.add_argument('-g','--gameVersion', default="1.9.*", help="Game version of the newly created .mod file to avoid launcher warning. Ignored for standalone mod creation. (default: %(default)s)")
+  parser.add_argument('-g','--game_version', default="1.9.*", help="Game version of the newly created .mod file to avoid launcher warning. Ignored for standalone mod creation. (default: %(default)s)")
   parser.add_argument('--tags', default="buildings", help="Comma separated list of tags. Ignored for standalone mod creation.")
   parser.add_argument('--picture_file', default="", help="Picture file set in the mod file. Ignored for standalone mod creation. This file must be manually added to the mod folder!")
   parser.add_argument('--load_order_priority', action="store_true", help="If enabled, mod will be placed first in mod priority by adding '!' to the mod name and a 'z' to building building and trigger file names. This allows the construction of mod extensions. Alternatively, you can create a standalone version , see '--create_standalone_mod_from_mod'.")
@@ -482,7 +482,7 @@ def readAndConvert(args, allowRestart=1):
         for tag in args.tags.split(","):
           modfile.write('\t"'+tag+'"\n')
         modfile.write('}\n')
-        modfile.write('supported_version="{}"\n'.format(args.gameVersion))
+        modfile.write('supported_version="{}"\n'.format(args.game_version))
         if args.picture_file:
           modfile.write('picture="{}"'.format(args.picture_file))
     with open(buildingFileName,'r') as inputFile:

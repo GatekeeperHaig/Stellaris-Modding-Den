@@ -15,6 +15,7 @@ import platform
 import convertCSV_TXT
 import createUpgradedBuildings
 import copySubTag
+import createAIVarsFromModifiers
 import pickle
 
 class Logger(object):
@@ -387,7 +388,7 @@ class TabClass:
     except EOFError:
       print("Warning: File ended earlir than expected. File might be older version but still work perfectly or stuff is actually missing")
 
-  def __init__(self,name,tab,root,command, fixedOptions, defaultFileFilter,options=[], optionWindow=0,extraAddButton=""):
+  def __init__(self,name,tab,root,command, fixedOptions, defaultFileFilter,optionWindow=0,extraAddButton=""):
     self.name=name
     self.root=root
     self.tab=tab
@@ -411,7 +412,7 @@ class TabClass:
       with open(".GUI_last_path") as file:
         self.lastPath=file.read().strip()
         #print(self.lastPath)
-    self.options=options
+    self.options=[]#options
     self.command=command
     if platform.system()=="Linux":
       if ";" in defaultFileFilter[1]:
@@ -443,11 +444,11 @@ class TabClass:
     #self.mainFrame.bind( '<Configure>', maxsize )
     self.extraLineMain=tk.Frame(self.mainFrame)
     self.extraLineMain.pack(side=tk.TOP)
-    for option in options:
-      self.checkVars.append(IntVar())
-      check=Checkbutton(self.extraLineMain, text=option[0], variable=self.checkVars[-1])
-      check.pack(side=tk.RIGHT)
-      CreateToolTip(check, option[2])
+    # for option in options:
+    #   self.checkVars.append(IntVar())
+    #   check=Checkbutton(self.extraLineMain, text=option[0], variable=self.checkVars[-1])
+    #   check.pack(side=tk.RIGHT)
+    #   CreateToolTip(check, option[2])
     #b = tk.Button(self.extraLineMain, text="(Un-)check all", command=self.checkAll)
     #b.pack(side=tk.RIGHT)
     #b = tk.Button(self.extraLineMain, text="Add line", command=self.addLine)
@@ -562,115 +563,56 @@ class OptionWindow:
     #self.check=Checkbutton(line, text="filter", variable=self.checkvar)
 
 class TabControlClass:
-  def __init__(self,root):
-    
-    optionWindowUB=OptionWindow(root,"Create Upgraded buildings options",[
-      Option("output_folder"), 
-      Option("custom_mod_name"), 
-      Option("gameVersion","version"),
-      Option("t0_buildings"), 
-      Option("languages"),
-      Option("replacement_file"), 
-      Option("time_discount"), 
-      Option("cost_discount"),
-      Option("remove_reduntant_upgrades"), 
-      Option("keep_lower_tier"),
-      Option("custom_direct_build_AI_allow"), 
-      Option("simplify_upgrade_AI_allow"),
-      Option("load_order_priority"),
-      Option("join_files"),
-      Option("one_line_level")
-      ],createUpgradedBuildings)
-    optionWindowCST=OptionWindow(root,"Copy Subtag Options",[
-      Option("output_folder"), 
-      Option("tag_to_be_copied"), 
-      Option("one_line_level")
-      ],copySubTag)
-    optionWindowTxtToOds=OptionWindow(root,"Txt to ods Options",[
-      Option("filter"), 
-      Option("manual_filter"), 
-      Option("create_new_file"), 
-      Option("keep_inlines"),
-      Option("occ_sheet"),
-      Option("use_csv"),
-      # Option("one_line_level")
-      ],convertCSV_TXT)
-    optionWindowOdsToTxt=OptionWindow(root,"Ods to txt Options",[
-      Option("clean_header"), 
-      Option("changes_to_body"), 
-      Option("remove_header"),
-      Option("forbid_additions"),
-      Option("create_new_file"), 
-      Option("one_line_level")
-      ],convertCSV_TXT)
-    
-    
+  def __init__(self,root):   
     nb = ttk.Notebook(root)          # Create Tab Control
     self.nb=nb
-    tabs=[]
-    tabs.append([
-    "txt to ods", 
-     ("text files",'*.txt;*.gfx'),
-    #("text files",'*.[tg][xf][tx]'),
-    [
-    # ["Apply filter","--filter","Will only create tags from the filter file (including all subtags of those and the key tag). Only these will be changed when converting back"],
-    # ["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.ods'. Beware that this file can only be used for back-conversion if such a txt file also exists!"],
-    # ["Keep inlines","--keep_inlines","With this option, the script will try not to split inlines into the long tag form."],
-    # ["Occurence Sheet","--occ_sheet","Activates the old occurence mode in a different sheet. I think this is no longer needed with the OCCNUM column (which is certainly able of doing things the occ sheet wasn't able to do)"]
-    ], 
-    convertCSV_TXT,[],ttk.Frame(nb),optionWindowTxtToOds,""
-    ])
-    tabs.append([
-    "ods to txt", 
-    ("table documents","*.ods"),
-    [
-      # ["Clean Header","--clean_header","Header ('@' variables) will be cleaned of unused variables (after the ods file is applied)"],
-      # ["Changes to body","--changes_to_body","Every change is written to body, even if it was previously a header variable ('@')"],
-      # ["Remove Header","--remove_header","Header ('@' variables) will be converted into values inside the tags. Allows easier changes in ods. Changes to body does similar things but only to prevent conflicts."],
-      # ["Forbid additions","--forbid_additions","Gives an error if you try to add new tags"],
-      # ["Write to alternative file","--create_new_file @orig_modified","Saves to '<filename>_modified.txt'. Be careful: The game will load both files!"]
+    self.root=root
+    self.tabClasses=[]
 
-    ], 
-    convertCSV_TXT,["--to_txt"], 
-    ttk.Frame(nb),optionWindowOdsToTxt,""
-    ])
-    tabs.append([
-    "createUpgradedBuildings", 
-    ("text files","*.txt"),
-    [], 
-    createUpgradedBuildings,[],ttk.Frame(nb),optionWindowUB,"Add Helper File(s)"
-    ])    
-    tabs.append([
-    "createUpgradedBuildings - Trigger files", 
-    ("text files","*.txt"),
-    [], 
-    createUpgradedBuildings,["--just_copy_and_check"],ttk.Frame(nb),optionWindowUB,""
-    ])
-    tabs.append([
-    "Copy Subtag to other mod", 
-    ("text files","*.txt"),
-    [], 
-    copySubTag,[],ttk.Frame(nb),optionWindowCST,"Add Source File(s)"
-    ])
-    tabClasses=[]
-    self.tabClasses=tabClasses
-    for name,defaultFileFilter,options,command,fixedOptions,tab,optionWindow,extraAddButton in tabs:
-      nb.add(tab, text=name)
-      tabClasses.append(TabClass(name,tab,root,command,fixedOptions, defaultFileFilter,options,optionWindow,extraAddButton))
+    #def newTab(name, command, fileFilter, fixedOptions, options, extraAddButton, frame):
 
-    tabClasses[0].helpText="Creates an ods file from a Stellaris .txt file. Currently works for txt files that are lists of same top-tag entries (for example all components and sections." #txt to ods
-    tabClasses[1].helpText="Uses an ods file to changes the accordingly named .txt file: Entries that are in the ods file are written into the txt file at the right place (overwriting what was there before or written directly in the header instead of overwriting a variable. \nEmpty or missing entries in the ods file remain unchanged! \n To delete something from the txt file, write '#delete' in the according cell in the ods file. If all subtags of a supertag are deleted, the supertag will also be deleted. Never delete a 'key'! It suffices to delete all other tags to delete a top-level tag (e.g. a whole component)" #ods to txt
-    tabClasses[2].helpText='1. "Add file(s)": "Stellaris/common/buildings/00_buildings.txt" (unless you have no dependence on vanilla buildings at all, not even capital building requirements. Check "Helper file". Contents of such a file will be used, but the buildings wont be output.\n1b. If your buildings depend on any other buildings (other mods, other vanilla buildings): Add them the same way.\n2. Add all building files of the mod you want to make compatible. Do *not* check the "Helper file" checkbox\n3. In "Options", set a output folder, mod name and check "load order priority" and "join files".\n4. Convert All' #createUpgradedBuildings
-    tabClasses[2].separateStart=False
-    tabClasses[2].singleEntryCheck="Helper File"
-    # tabClasses[2].extraAddButton="Add Helper File(s)"
-    tabClasses[3].helpText="Not finished yet!" #createUpgradedBuildings - Trigger files
-    tabClasses[3].subfolder=True
-    tabClasses[4].helpText="Not finished yet!" #createUpgradedBuildings - Trigger files
-    tabClasses[4].separateStart=False
-    tabClasses[4].singleEntryCheck="Source File"
-    # tabClasses[4].extraAddButton="Add Source File(s)"
+    of="output_folder"
+    oll="one_line_level"
+    jf="join_files"
+
+    self.newTab("Txt To Ods",convertCSV_TXT,("text files",'*.txt;*.gfx'),[],["filter","manual_filter","create_new_file","use_csv"],"")
+    self.tabClasses[-1].helpText="Creates an ods file from a Stellaris .txt file. Currently works for txt files that are lists of same top-tag entries (for example all components and sections."
+
+    self.newTab("Ods To Txt",convertCSV_TXT,("table documents","*.ods"),["--to_txt"]
+      ,["clean_header","changes_to_body","remove_header","forbid_additions","create_new_file",oll],"")
+    self.tabClasses[-1].helpText="Uses an ods file to changes the accordingly named .txt file: Entries that are in the ods file are written into the txt file at the right place (overwriting what was there before or written directly in the header instead of overwriting a variable. \nEmpty or missing entries in the ods file remain unchanged! \n To delete something from the txt file, write '#delete' in the according cell in the ods file. If all subtags of a supertag are deleted, the supertag will also be deleted. Never delete a 'key'! It suffices to delete all other tags to delete a top-level tag (e.g. a whole component)"
+
+
+    BUOptions=[of,"custom_mod_name","game_version","t0_buildings","languages","replacement_file","time_discount","cost_discount","remove_reduntant_upgrades","keep_lower_tier","custom_direct_build_AI_allow","simplify_upgrade_AI_allow","load_order_priority",jf,oll]
+    self.newTab("Create Upgraded Buildings",createUpgradedBuildings,("text files","*.txt"),[]
+      ,BUOptions,"Add Helper File(s)")
+    self.tabClasses[-1].helpText='1. "Add file(s)": "Stellaris/common/buildings/00_buildings.txt" (unless you have no dependence on vanilla buildings at all, not even capital building requirements. Check "Helper file". Contents of such a file will be used, but the buildings wont be output.\n1b. If your buildings depend on any other buildings (other mods, other vanilla buildings): Add them the same way.\n2. Add all building files of the mod you want to make compatible. Do *not* check the "Helper file" checkbox\n3. In "Options", set a output folder, mod name and check "load order priority" and "join files".\n4. Convert All'
+    self.tabClasses[-1].separateStart=False
+
+    self.newTab("Create Upgraded Buildings - Trigger files",createUpgradedBuildings,("text files","*.txt"),["--just_copy_and_check"]
+      ,BUOptions,"")
+    self.tabClasses[-1].helpText='Add any files that have "has_building" in your mod here. Give them each the right path to go to. And convert. This has to be done AFTER the main BU and into the same folder!'
+    self.tabClasses[-1].subfolder=True
+
+    self.newTab("Copy Subtag To Other Mod",copySubTag,("text files","*.txt"),[],[of,"tag_to_be_copied",oll],"Add Source File(s)")
+    self.tabClasses[-1].helpText="Not finished yet!" #createUpgradedBuildings - Trigger files
+    self.tabClasses[-1].separateStart=False
+    self.tabClasses[-1].singleEntryCheck="Source File"
+
+    self.newTab("Create AI Vars",createAIVarsFromModifiers,("text files","*.txt"),[],[of,"effect_name","type",oll],"")
+    self.tabClasses[-1].helpText="Creates weight files to be used in AI buiding weights. Since options are global, it's best to create one 'project' for different tpyes, e.g. one for planet modifiers, one for buildings, one for blocker"
+
+
     nb.pack(expand=1, fill="both")  # Pack to make visible
+  def newTab(self,name, command, fileFilter, fixedOptions, options, extraAddButton):
+    frame=ttk.Frame(self.root)
+    self.nb.add(frame,text=name)
+    optionClasses=[]
+    for option in options:
+      optionClasses.append(Option(option))
+    optionWindow=OptionWindow(self.root,name+" Options",optionClasses,command)
+    self.tabClasses.append(TabClass(name,frame,self.root,command,fixedOptions, fileFilter,optionWindow,extraAddButton))
+
   def getActiveTabClass(self):
     return self.tabClasses[self.nb.index(self.nb.select())]
   def save(self):
