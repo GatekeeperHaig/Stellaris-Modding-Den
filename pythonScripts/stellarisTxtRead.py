@@ -384,7 +384,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             elif word=='#': 
               comment="".join(lineSplit[wordI:]).strip()
               #comment without anything else in line
-              if countEmpty==wordI:
+              if countEmpty==wordI or len(objectList[-1].names)==0:
                 objectList[-1].add("","",comment) #will print comment only line at right place later
               else:
                 objectList[-1].comments[-1]=" "+comment
