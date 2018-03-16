@@ -1,0 +1,503 @@
+############################
+#
+# Colony Events
+#
+# Written by Henrik Eklund
+#
+############################
+
+namespace = colony
+
+@tier1influencecontact = 7
+@tier1influencecontactxenophile = 8
+@tier1influencecontactmin = 20
+@tier1influencecontactmax = 80
+
+@tier2influencecontact = 10
+@tier2influencecontactxenophile = 12
+@tier2influencecontactmin = 40
+@tier2influencecontactmax = 100
+
+@tier1materialreward = 6
+@tier1materialmin = 100
+@tier1materialmax = 500
+@tier2materialreward = 12
+@tier2materialmin = 150
+@tier2materialmax = 1000
+@tier3materialreward = 18
+@tier3materialmin = 250
+@tier3materialmax = 1500
+@tier4materialreward = 24
+@tier4materialmin = 350
+@tier4materialmax = 2000
+@tier5materialreward = 48
+@tier5materialmin = 700
+@tier5materialmax = 4000
+
+@tier1influencereward = 6
+@tier1influencemin = 40
+@tier1influencemax = 100
+@tier2influencereward = 12
+@tier2influencemin = 80
+@tier2influencemax = 175
+@tier3influencereward = 18
+@tier3influencemin = 125
+@tier3influencemax = 250
+@tier4influencereward = 24
+@tier4influencemin = 150
+@tier4influencemax = 300
+@tier5influencereward = 36
+@tier5influencemin = 250
+@tier5influencemax = 500
+@tier6influencereward = 48
+@tier6influencemin = 300
+@tier6influencemax = 600
+
+@tier1researchreward = 6
+@tier1researchmin = 60
+@tier1researchmax = 150
+@tier2researchreward = 12
+@tier2researchmin = 90
+@tier2researchmax = 250
+@tier3researchreward = 18
+@tier3researchmin = 120
+@tier3researchmax = 350
+@tier4researchreward = 24
+@tier4researchmin = 150
+@tier4researchmax = 500
+@tier5researchreward = 48
+@tier5researchmin = 300
+@tier5researchmax = 1000
+
+
+### Migrating Forests
+planet_event = {
+	id = colony.1
+	title = "colony.1.name"
+	desc = "colony.1.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_alien_nature
+	location = ROOT
+	
+	trigger = {
+		has_owner = yes
+		original_owner = yes
+		is_homeworld = no
+		owner = { 
+			is_ai = no
+			NOT = { has_authority = auth_machine_intelligence }
+		}
+		has_ground_combat = no
+		is_occupied_flag = no
+		num_pops > 0
+		is_capital = no
+		OR = {
+			planetary_diversity_wet_category = yes 
+			planetary_diversity_dry_category = yes
+		}
+		NOT = { 
+			has_global_flag = migrating_forests_global
+			has_planet_flag = colony_event
+		}
+	}
+
+	is_triggered_only = yes
+	#mean_time_to_happen = {
+	#	months = 640
+	#}
+	
+	immediate = {
+		set_global_flag = migrating_forests_global
+		set_planet_flag = colony_event
+		random_tile = {
+			limit = { 
+				has_blocker = no
+				has_grown_pop = no
+				has_building = no
+				has_building_construction = no
+			}
+			set_blocker = "tb_wandering_forests"
+		}
+		random_tile = {
+			limit = { 
+				has_blocker = no
+				has_grown_pop = no
+				has_building = no
+				has_building_construction = no
+			}
+			set_blocker = "tb_wandering_forests"
+		}
+		random_tile = {
+			limit = { 
+				has_blocker = no
+				has_grown_pop = no
+				has_building = no
+				has_building_construction = no
+			}
+			set_blocker = "tb_wandering_forests"
+		}
+		add_modifier = {
+			modifier = "migrating_forests"
+			days = -1
+		}
+	}
+	
+	option = {
+		name = colony.1.a
+		begin_event_chain = {
+			event_chain = "migrating_forests_chain"
+			target = ROOT
+		}
+		enable_special_project = {
+			name = "MIGRATING_FORESTS_1_PROJECT"
+			location = this
+			owner = root
+		}
+		enable_special_project = {
+			name = "MIGRATING_FORESTS_2_PROJECT"
+			location = this
+			owner = root
+		}
+	}
+}
+
+### Abandoned Terraforming Equipment
+planet_event = {
+	id = colony.100
+	title = "colony.100.name"
+	desc = "colony.100.desc"
+	picture = GFX_evt_underground_civilization
+	show_sound = event_mystic_reveal
+	location = ROOT
+	
+	trigger = {
+		has_owner = yes
+		original_owner = yes
+		is_homeworld = no
+		owner = { is_ai = no }
+		has_ground_combat = no
+		is_occupied_flag = no
+		num_pops > 0
+		is_capital = no
+		NOR = {
+			has_planet_flag = abandoned_terraforming_planet
+			has_planet_flag = colony_event
+			is_planet_class = pc_nuked
+			is_planet_class = pc_gaia
+			is_planet_class = pc_ringworld_habitable
+			is_planet_class = pc_habitat
+			owner = { has_country_flag = abandoned_terraforming_country }
+			owner = { has_authority = auth_machine_intelligence }
+			is_ideal_planet_class = { who = owner status = yes }			
+		}
+	}
+	
+	is_triggered_only = yes
+	#mean_time_to_happen = {
+	#	months = 640
+	#}
+	
+	immediate = {
+		set_planet_flag = abandoned_terraforming_planet
+		set_planet_flag = colony_event
+		owner = { set_country_flag = abandoned_terraforming_country }
+	}
+	
+	option = {
+		name = colony.100.a
+		hidden_effect = {
+			add_modifier = {
+				modifier = "abandoned_terraforming"
+				days = -1
+			}
+		}
+		begin_event_chain = {
+			event_chain = "abandoned_terraforming_chain"
+			target = ROOT
+		}
+		enable_special_project = {
+			name = "ABANDONED_TERRAFORMING_1_PROJECT"
+			location = this
+			owner = root
+		}
+		enable_special_project = {
+			name = "ABANDONED_TERRAFORMING_2_PROJECT"
+			location = this
+			owner = root
+		}
+	}
+}
+
+# Special Project Completed 1
+planet_event = {
+	id = colony.104
+	title = "PROJECT_COMPLETE"
+	desc = "colony.104.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_activating_unknown_technology
+	location = ROOT
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = colony.104.a
+		custom_tooltip = abandoned_terraforming_completed
+		hidden_effect = {
+			remove_modifier = "abandoned_terraforming"
+			if = {
+				limit = { 
+					planets_enhanced_enabled = yes
+					new_worlds_enabled = no
+				}
+				random_list = {
+					3.703 = { change_pc = pc_tidallylocked }
+					3.703 = { change_pc = pc_mangrove }
+					3.703 = { change_pc = pc_desertislands }
+					3.703 = { change_pc = pc_hajungle }
+					3.703 = { change_pc = pc_cascadian }
+					3.703 = { change_pc = pc_swamp }
+					3.703 = { change_pc = pc_subarctic }
+					3.703 = { change_pc = pc_glacial }
+					3.703 = { change_pc = pc_geothermal }
+					3.703 = { change_pc = pc_sandsea }
+					3.703 = { change_pc = pc_mesa }
+					3.703 = { change_pc = pc_oasis }
+					3.703 = { change_pc = pc_hadesert }
+					3.703 = { change_pc = pc_steppe }
+					3.703 = { change_pc = pc_frozen_desert }
+					3.703 = { change_pc = pc_antarctic }
+					3.703 = { change_pc = pc_ammonia }
+					3.703 = { change_pc = pc_methane }
+					3.703 = { change_pc = pc_desert }
+					3.703 = { change_pc = pc_tropical }
+					3.703 = { change_pc = pc_arid }
+					3.703 = { change_pc = pc_continental }
+					3.703 = { change_pc = pc_ocean }
+					3.703 = { change_pc = pc_tundra }
+					3.703 = { change_pc = pc_arctic }
+					3.703 = { change_pc = pc_alpine }
+					3.703 = { change_pc = pc_savannah }				
+				}
+			}
+			if = {
+				limit = {
+					planets_enhanced_enabled = no
+					new_worlds_enabled = yes
+				}
+				random_list = {
+					5.55 = { change_pc = pc_geocrystalline }
+					5.55 = { change_pc = pc_marginal }
+					5.55 = { change_pc = pc_marginal_dry }
+					5.55 = { change_pc = pc_marginal_cold }
+					5.55 = { change_pc = pc_greenhouse_cold }
+					5.55 = { change_pc = pc_greenhouse_hot	}
+					5.55 = { change_pc = pc_retinal }
+					5.55 = { change_pc = pc_lush }
+					5.55 = { change_pc = pc_terraformed }
+					5.55 = { change_pc = pc_desert }
+					5.55 = { change_pc = pc_tropical }
+					5.55 = { change_pc = pc_arid }
+					5.55 = { change_pc = pc_continental }
+					5.55 = { change_pc = pc_ocean }
+					5.55 = { change_pc = pc_tundra }
+					5.55 = { change_pc = pc_arctic }
+					5.55 = { change_pc = pc_alpine }
+					5.55 = { change_pc = pc_savannah }							
+				}			
+			}
+			if = {
+				limit = {
+					planets_enhanced_enabled = yes
+					new_worlds_enabled = yes
+				}	
+				random_list = {
+					2.777 = { change_pc = pc_geocrystalline }
+					2.777 = { change_pc = pc_marginal }
+					2.777 = { change_pc = pc_marginal_dry }
+					2.777 = { change_pc = pc_marginal_cold }
+					2.777 = { change_pc = pc_greenhouse_cold }
+					2.777 = { change_pc = pc_greenhouse_hot	}
+					2.777 = { change_pc = pc_retinal }
+					2.777 = { change_pc = pc_lush }
+					2.777 = { change_pc = pc_terraformed }
+					2.777 = { change_pc = pc_tidallylocked }
+					2.777 = { change_pc = pc_mangrove }
+					2.777 = { change_pc = pc_desertislands }
+					2.777 = { change_pc = pc_hajungle }
+					2.777 = { change_pc = pc_cascadian }
+					2.777 = { change_pc = pc_swamp }
+					2.777 = { change_pc = pc_subarctic }
+					2.777 = { change_pc = pc_glacial }
+					2.777 = { change_pc = pc_geothermal }
+					2.777 = { change_pc = pc_sandsea }
+					2.777 = { change_pc = pc_mesa }
+					2.777 = { change_pc = pc_oasis }
+					2.777 = { change_pc = pc_hadesert }
+					2.777 = { change_pc = pc_steppe }
+					2.777 = { change_pc = pc_frozen_desert }
+					2.777 = { change_pc = pc_antarctic }
+					2.777 = { change_pc = pc_ammonia }
+					2.777 = { change_pc = pc_methane }
+					2.777 = { change_pc = pc_desert }
+					2.777 = { change_pc = pc_tropical }
+					2.777 = { change_pc = pc_arid }
+					2.777 = { change_pc = pc_continental }
+					2.777 = { change_pc = pc_ocean }
+					2.777 = { change_pc = pc_tundra }
+					2.777 = { change_pc = pc_arctic }
+					2.777 = { change_pc = pc_alpine }
+					2.777 = { change_pc = pc_savannah }						
+				}	
+			}	
+		}
+	}
+}
+
+# Special Project Completed 2 (Mutated Creatures)
+planet_event = {
+	id = colony.105
+	title = "PROJECT_COMPLETE"
+	desc = "colony.105.desc"
+	picture = GFX_evt_ground_combat
+	show_sound = event_ground_battle
+	location = ROOT
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = { 
+					planets_enhanced_enabled = yes
+					new_worlds_enabled = no
+				}
+				random_list = {
+					3.703 = { change_pc = pc_tidallylocked }
+					3.703 = { change_pc = pc_mangrove }
+					3.703 = { change_pc = pc_desertislands }
+					3.703 = { change_pc = pc_hajungle }
+					3.703 = { change_pc = pc_cascadian }
+					3.703 = { change_pc = pc_swamp }
+					3.703 = { change_pc = pc_subarctic }
+					3.703 = { change_pc = pc_glacial }
+					3.703 = { change_pc = pc_geothermal }
+					3.703 = { change_pc = pc_sandsea }
+					3.703 = { change_pc = pc_mesa }
+					3.703 = { change_pc = pc_oasis }
+					3.703 = { change_pc = pc_hadesert }
+					3.703 = { change_pc = pc_steppe }
+					3.703 = { change_pc = pc_frozen_desert }
+					3.703 = { change_pc = pc_antarctic }
+					3.703 = { change_pc = pc_ammonia }
+					3.703 = { change_pc = pc_methane }
+					3.703 = { change_pc = pc_desert }
+					3.703 = { change_pc = pc_tropical }
+					3.703 = { change_pc = pc_arid }
+					3.703 = { change_pc = pc_continental }
+					3.703 = { change_pc = pc_ocean }
+					3.703 = { change_pc = pc_tundra }
+					3.703 = { change_pc = pc_arctic }
+					3.703 = { change_pc = pc_alpine }
+					3.703 = { change_pc = pc_savannah }				
+				}
+			}
+			if = {
+				limit = {
+					planets_enhanced_enabled = no
+					new_worlds_enabled = yes
+				}
+				random_list = {
+					5.55 = { change_pc = pc_geocrystalline }
+					5.55 = { change_pc = pc_marginal }
+					5.55 = { change_pc = pc_marginal_dry }
+					5.55 = { change_pc = pc_marginal_cold }
+					5.55 = { change_pc = pc_greenhouse_cold }
+					5.55 = { change_pc = pc_greenhouse_hot	}
+					5.55 = { change_pc = pc_retinal }
+					5.55 = { change_pc = pc_lush }
+					5.55 = { change_pc = pc_terraformed }
+					5.55 = { change_pc = pc_desert }
+					5.55 = { change_pc = pc_tropical }
+					5.55 = { change_pc = pc_arid }
+					5.55 = { change_pc = pc_continental }
+					5.55 = { change_pc = pc_ocean }
+					5.55 = { change_pc = pc_tundra }
+					5.55 = { change_pc = pc_arctic }
+					5.55 = { change_pc = pc_alpine }
+					5.55 = { change_pc = pc_savannah }							
+				}			
+			}
+			if = {
+				limit = {
+					planets_enhanced_enabled = yes
+					new_worlds_enabled = yes
+				}	
+				random_list = {
+					2.777 = { change_pc = pc_geocrystalline }
+					2.777 = { change_pc = pc_marginal }
+					2.777 = { change_pc = pc_marginal_dry }
+					2.777 = { change_pc = pc_marginal_cold }
+					2.777 = { change_pc = pc_greenhouse_cold }
+					2.777 = { change_pc = pc_greenhouse_hot	}
+					2.777 = { change_pc = pc_retinal }
+					2.777 = { change_pc = pc_lush }
+					2.777 = { change_pc = pc_terraformed }
+					2.777 = { change_pc = pc_tidallylocked }
+					2.777 = { change_pc = pc_mangrove }
+					2.777 = { change_pc = pc_desertislands }
+					2.777 = { change_pc = pc_hajungle }
+					2.777 = { change_pc = pc_cascadian }
+					2.777 = { change_pc = pc_swamp }
+					2.777 = { change_pc = pc_subarctic }
+					2.777 = { change_pc = pc_glacial }
+					2.777 = { change_pc = pc_geothermal }
+					2.777 = { change_pc = pc_sandsea }
+					2.777 = { change_pc = pc_mesa }
+					2.777 = { change_pc = pc_oasis }
+					2.777 = { change_pc = pc_hadesert }
+					2.777 = { change_pc = pc_steppe }
+					2.777 = { change_pc = pc_frozen_desert }
+					2.777 = { change_pc = pc_antarctic }
+					2.777 = { change_pc = pc_ammonia }
+					2.777 = { change_pc = pc_methane }
+					2.777 = { change_pc = pc_desert }
+					2.777 = { change_pc = pc_tropical }
+					2.777 = { change_pc = pc_arid }
+					2.777 = { change_pc = pc_continental }
+					2.777 = { change_pc = pc_ocean }
+					2.777 = { change_pc = pc_tundra }
+					2.777 = { change_pc = pc_arctic }
+					2.777 = { change_pc = pc_alpine }
+					2.777 = { change_pc = pc_savannah }						
+				}	
+			}	
+			remove_modifier = "abandoned_terraforming"
+			owner = { set_country_flag = terraforming_mutants_invade_country }
+			set_planet_flag = terraforming_mutants_invade_planet
+			create_country = {
+				name = "NAME_Deformed_Creatures"
+				type = faction
+			}
+			create_army = {
+				name = "NAME_Deformed_Creatures"
+				owner = last_created
+				type = "mutant_army"
+			}
+			create_army = {
+				name = "NAME_Twisted_Beasts"
+				owner = last_created
+				type = "mutant_army"
+			}
+			create_army = {
+				name = "NAME_Mutated_Horrors"
+				owner = last_created
+				type = "mutant_army"
+			}
+		}
+	}
+	
+	option = {
+		name = colony.105.a
+		custom_tooltip = terraforming_mutants_attack
+	}
+}
