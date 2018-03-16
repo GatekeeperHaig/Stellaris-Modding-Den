@@ -3,10 +3,10 @@
 #	This mod uses a configurable spawn engine. If you'd like to integrate a version of this engine please join our discord server The Stellaris Modding Den
 #	Server invite: https://discord.gg/ZhvBXhh
 
-namespace = ex_spawn_engine_0
+namespace = ex_spawn_engine_1
 
 event = { #this event triggers on game start and monthly pulse
-	id = ex_spawn_engine_0.0
+	id = ex_spawn_engine_1.0
 	hide_window = yes
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -16,42 +16,45 @@ event = { #this event triggers on game start and monthly pulse
 	immediate = {	
 		set_global_flag = planetary_diversity_active #this sets a global flag for this mod, to be used by other mods and the engine
 		#spawn_unique_planets = yes
-		every_planet = { 
-			limit = { is_star = no }	
-			if = { #this adds a unique flag to gas giant moons, which is checked through a scripted trigger (see common/scripted_triggers/ex_engine_triggers.txt )
-				limit = {
-					is_planet_class = pc_gas_giant
-					has_moon = yes
-					any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
-				}
-				every_moon = { set_planet_flag = gas_giant_moon }
+		if = {
+			limit = { new_worlds_enabled = no } #if New Worlds is enabled, all Planetary Diversity planets are seeded through it's engine instead.
+			every_planet = { 
+				limit = { is_star = no }	
+				if = { #this adds a unique flag to gas giant moons, which is checked through a scripted trigger (see common/scripted_triggers/ex_engine_triggers.txt )
+					limit = {
+						is_planet_class = pc_gas_giant
+						has_moon = yes
+						any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
+					}
+					every_moon = { set_planet_flag = gas_giant_moon }
+				}	
 			}	
+			every_planet = {
+				limit = {				
+					solar_system = { 
+						starting_system = no
+						NOR = {
+							has_star_flag = sol_system
+							has_star_flag = sol
+							has_star_flag = deneb_system
+							has_star_flag = custom_system
+						}					
+					}
+					is_capital = no
+					is_homeworld = no
+				}			
+				# these events occur one after the other. 
+				planet_event = { id = ex_spawn_engine_1.1 }
+				planet_event = { id = ex_spawn_engine_1.2 }
+			}				
 		}	
-		every_planet = {
-			limit = {				
-				solar_system = { 
-					starting_system = no
-					NOR = {
-						has_star_flag = sol_system
-						has_star_flag = sol
-						has_star_flag = deneb_system
-						has_star_flag = custom_system
-					}					
-				}
-				is_capital = no
-				is_homeworld = no
-			}			
-			# these events occur one after the other. 
-			planet_event = { id = ex_spawn_engine_0.1 }
-			planet_event = { id = ex_spawn_engine_0.2 }
-		}
 	}
 }
 
 
 
 planet_event = { 
-	id = ex_spawn_engine_0.1
+	id = ex_spawn_engine_1.1
 	hide_window = yes
 	is_triggered_only = yes
 	
@@ -176,7 +179,7 @@ planet_event = {
 }
 
 planet_event = { 
-	id = ex_spawn_engine_0.2
+	id = ex_spawn_engine_1.2
 	hide_window = yes
 	is_triggered_only = yes
 	

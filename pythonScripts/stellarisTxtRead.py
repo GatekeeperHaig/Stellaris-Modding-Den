@@ -22,6 +22,10 @@ class TagList: #Basically everything is stored recursively in objects of this cl
 
   def __getitem__(self, index):
     return self.vals[index]
+  def __len__(self):
+    return len(self.names)
+  def __eq__(self,other):
+    return self.compare(other)
   def count(self,name):
     return self.names.count(name)
   def get(self,name): #allows changing of content if vals[i] is an object
@@ -86,6 +90,9 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     # print("'"+array[1]+"'")
     self.addArray(array)
     return self
+  def addTagList(self, tagList):
+    for name,val, comment in zip(tagList.names,tagList.vals,tagList.comments):
+      self.add(name,val,comment)
   def remove(self, name): #remove via name
     i=self.names.index(name)
     self.removeIndex(i)

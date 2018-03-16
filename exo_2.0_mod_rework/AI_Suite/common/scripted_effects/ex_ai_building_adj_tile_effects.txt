@@ -1,13 +1,50 @@
 calculate_adjcancy_weights = { #this runs on tile scope, and it saves the variables into each tile's scope.
 	if = { 
 		limit = { any_neighboring_tile = { has_building = yes } } 
-		check_neighboring_adj_bonus_buildings = yes 		
-		if = { limit = { has_global_flag = ex_planets_enhanced_active } check_planets_enhanced_sr_buildings = yes }
+		check_neighboring_adj_bonus_buildings = yes 
+		if = { 
+			limit = { planets_enhanced_enabled = yes } 
+			check_planets_enhanced_sr_buildings = yes 
+		}		
+		if = {
+			limit = { alpha_mod_enabled = yes }
+			check_neighboring_adj_bonus_buildings_am = yes
+		}				
 	}		
-	if = { limit = { any_neighboring_tile = { has_blocker = yes } } check_adj_bonus_blockers = yes }		
-}
+	if = { 
+		limit = { any_neighboring_tile = { has_blocker = yes } } 
+		check_adj_bonus_blockers = yes
+		if = {
+			limit = { alpha_mod_enabled = yes }
+			check_adj_bonus_blockers_am = yes
+		}
+		if = {
+			limit = { guillis_planet_modifiers_enabled = yes }
+			check_adj_bonus_blockers_gpm = yes
+		}	
+	}		
+}		
 
 calculate_adj_potential_weights = {
+	if = {
+		limit = { num_adjacent_tiles = 1 }
+			change_variable = { which = tile_adj_potential value = -10 }
+		}	
+	if = {
+		limit = { num_adjacent_tiles = 2 }
+			change_variable = { which = tile_adj_potential value = -5 }
+		}	
+	}	
+	if = {
+		limit = { num_adjacent_tiles = 3 }
+			change_variable = { which = tile_adj_potential value = 0 }
+		}	
+	}		
+	if = {
+		limit = { num_adjacent_tiles = 4 }
+			change_variable = { which = tile_adj_potential value = 5 }
+		}	
+	}	
 	if = { 
 		limit = {
 			any_neighboring_tile = { 
@@ -27,9 +64,8 @@ calculate_adj_potential_weights = {
 			change_variable = { which = physics_research_building_adj_potential value = -1 }
 			change_variable = { which = engineering_research_building_adj_potential value = -1 }
 		}	
-	}
-}	
-		
+	}	
+}		
 
 check_neighboring_adj_bonus_buildings = {
 	if = {
@@ -96,295 +132,23 @@ check_neighboring_adj_bonus_buildings = {
 		change_variable = { which = engineering_research_weight value = 1 }
 		break = yes			
 	}	
-	if = { 
-		limit = { planet = { is_ringworld = yes } }	
-		if = {
-			limit = { any_neighboring_tile = { has_building_power_plant_rw = yes } }
-			change_variable = { which = energy_weight value = 1 } 
-			break = yes
-		}
-		if = {
-			limit = { any_neighboring_tile = { has_building_hydroponics_farm_rw = yes } }
-			change_variable = { which = food_weight value = 1 } 
-			break = yes
-		}		
-		if = {
-			limit = { any_neighboring_tile = { has_building_mining_network_rw = yes } }
-			change_variable = { which = minerals_weight value = 1 }
-			break = yes
-		}				
-		if = {
-			limit = { any_neighboring_tile = { has_building_engineering_facility_rw = yes } }
-			change_variable = { which = engineering_research_weight value = 1 }
-			break = yes
-		}					
-		if = {
-			limit = { any_neighboring_tile = { has_building_physics_lab_rw = yes } }
-			change_variable = { which = physics_research_weight value = 1 }
-			break = yes
-		}							
-		if = {
-			limit = { any_neighboring_tile = { has_building_biolab_rw = yes } }
-			change_variable = { which = society_research_weight value = 1 }
-			break = yes
-		}									
-		if = { 
-			limit = { is_capital = yes } 
-			if = {
-				limit = { any_neighboring_tile = { has_building_power_plant_5_rw = yes } }
-				change_variable = { which = energy_weight value = 4 }
-				break = yes
-			}
-			if = {
-				limit = { any_neighboring_tile = { has_building_hydroponics_farm_5_rw = yes } }
-				change_variable = { which = food_weight value = 4 }
-				break = yes
-			}		
-			if = {
-				limit = { any_neighboring_tile = { has_building_mining_network_5_rw = yes } }
-				change_variable = { which = minerals_weight value = 4 }
-				break = yes
-			}				
-			if = {
-				limit = { any_neighboring_tile = { has_building_engineering_facility_4_rw = yes } }
-				change_variable = { which = engineering_research_weight value = 4 }
-				break = yes
-			}					
-			if = {
-				limit = { any_neighboring_tile = { has_building_physics_lab_4_rw = yes } }
-				change_variable = { which = physics_research_weight value = 4 }
-				break = yes
-			}							
-			if = {
-				limit = { any_neighboring_tile = { has_building_biolab_4_rw = yes } }
-				change_variable = { which = society_research_weight value = 4 }
-				break = yes
-			}							
-		}
-	}	
-	if = { 
-		limit = { planet = { is_capital = yes is_habitat = yes } } 
-		if = {
-			limit = { any_neighboring_tile = { has_building_hab_solar_power_processor_2 = yes } }
-			change_variable = { which = energy_weight value = 1 }
-			break = yes
-		}
-		if = {
-			limit = { any_neighboring_tile = { has_building_hab_agri_bay_2 = yes } }
-			change_variable = { which = food_weight value = 1 }
-			break = yes
-		}		
-		if = {
-			limit = { any_neighboring_tile = { has_building_hab_astro_mining_facility_2 = yes } }
-			change_variable = { which = minerals_weight value = 1 }
-			break = yes
-		}				
-		if = {
-			limit = { any_neighboring_tile = { has_building_hab_laboratory_module_2 = yes } }
-			change_variable = { which = engineering_research_weight value = 1 } 
-			change_variable = { which = society_research_weight value = 1 }
-			change_variable = { which = physics_research_weight value = 1 }
-			break = yes								
-		}
-	}					
-	if = { 
-		limit = { planet = { is_capital = yes is_ringworld = no is_habitat = no }
-		if = {
-			limit = { any_neighboring_tile = { has_building_power_plant_5 = yes } }
-			change_variable = { which = energy_weight value = 1 }
-			break = yes
-		}
-		if = {
-			limit = { any_neighboring_tile = { has_building_hydroponics_farm_5 = yes } }
-			change_variable = { which = food_weight value = 1 }
-			break = yes
-		}		
-		if = {
-			limit = { any_neighboring_tile = { has_building_mining_network_5 = yes } }
-			change_variable = { which = minerals_weight value = 1 }
-			break = yes
-		}				
-		if = {
-			limit = { any_neighboring_tile = { has_building_engineering_facility_4 = yes } }
-			change_variable = { which = engineering_research_weight value = 1 }
-			break = yes
-		}					
-		if = {
-			limit = { any_neighboring_tile = { has_building_physics_lab_4 = yes } }
-			change_variable = { which = physics_research_weight value = 1 }
-			break = yes
-		}							
-		if = {
-			limit = { any_neighboring_tile = { has_building_biolab_4 = yes } }
-			change_variable = { which = society_research_weight value = 1 }
-			break = yes
-		}				
-	}		
 }			
 
 check_adj_bonus_blockers = {
-	if = {
-		limit = { any_neighboring_tile = { has_blocker = tb_wandering_forest_reserve }
-		change_variable = { which = society_research_weight value = 9 }
-		break = yes
-	}				
-	if = {
-		limit = { any_neighboring_tile = { has_blocker = tb_tribal_settlement }
-		change_variable = { which = society_research_weight value = 1 }
-		break = yes
-	}	
+	every_neighboring_tile = {
+		limit = {
+			has_blocker = tb_wandering_forest_reserve
+		}
+		prev = {
+			change_variable = { which = society_research_weight value = 9 }
+		}	
+	}		
+	every_neighboring_tile = {
+		limit = {
+			has_blocker = tb_tribal_settlement
+		}
+		prev = {
+			change_variable = { which = society_research_weight value = 1 }
+		}	
+	}			
 }		
-	
-check_adj_potential = {
-	if = {
-		limit = { num_adjacent_tiles = 1 }
-			change_variable = { which = tile_adj_potential value = -1000 }
-		}	
-	if = {
-		limit = { num_adjacent_tiles = 2 }
-			change_variable = { which = tile_adj_potential value = -5 }
-		}	
-	}	
-	if = {
-		limit = { num_adjacent_tiles = 3 }
-			change_variable = { which = tile_adj_potential value = 0 }
-		}	
-	}		
-	if = {
-		limit = { num_adjacent_tiles = 4 }
-			change_variable = { which = tile_adj_potential value = 5 }
-		}	
-	}			
-	if = {
-		limit = {
-			any_neighboring_tile = { 
-				has_resource = { type = energy amount > 0 }
-			}	
-		}	
-		change_variable = {
-			which = energy_building_adj_potential
-			value = 1			
-		}			
-	}	
-	if = {
-		limit = {
-			any_neighboring_tile = { 
-				has_resource = { type = minerals amount > 0 }
-			}	
-		}	
-		change_variable = {
-			which = minerals_building_adj_potential
-			value = 1			
-		}			
-	}		
-	if = {
-		limit = {
-			any_neighboring_tile = { 
-				has_resource = { type = food amount > 0 }
-			}	
-		}	
-		change_variable = {
-			which = food_building_adj_potential
-			value = 1						
-		}
-	}			
-	if = {
-		limit = {
-			any_neighboring_tile = { 
-				has_resource = { type = engineering_research amount > 0 }
-			}	
-		}	
-		change_variable = {
-			which = engineering_research_building_adj_potential
-			value = 1						
-		}
-	}				
-	if = {
-		limit = {
-			any_neighboring_tile = { 
-				has_resource = { type = physics_research amount > 0 }
-			}	
-		}	
-		change_variable = {
-			which = physics_research_building_adj_potential
-			value = 1						
-		}
-	}	
-	if = {
-		limit = {
-			any_neighboring_tile = { 
-				has_resource = { type = society_research amount > 0 }
-			}	
-		}	
-		change_variable = {
-			which = society_research_building_adj_potential
-			value = 1						
-		}
-	}		
-	if = {
-		limit = {
-			any_neighboring_tile = { 
-				has_energy_building = yes
-			}	
-		}	
-		change_variable = {
-			which = energy_building_adj_potential
-			value = 1			
-		}			
-	}	
-	if = {
-		limit = {
-			any_neighboring_tile = { 
-				has_mineral_building = yes
-			}	
-		}	
-		change_variable = {
-			which = minerals_building_adj_potential
-			value = 1			
-		}			
-	}		
-	if = {
-		limit = {
-			any_neighboring_tile = { 
-				has_food_building = yes
-			}	
-		}	
-		change_variable = {
-			which = food_building_adj_potential
-			value = 1						
-		}
-	}			
-	if = {
-		limit = {
-			any_neighboring_tile = { 
-				has_engineering_research_building = yes
-			}	
-		}	
-		change_variable = {
-			which = engineering_research_building_adj_potential
-			value = 1						
-		}
-	}				
-	if = {
-		limit = {
-			any_neighboring_tile = { 
-				has_physics_research_building = yes
-			}	
-		}	
-		change_variable = {
-			which = physics_research_building_adj_potential
-			value = 1						
-		}
-	}	
-	if = {
-		limit = {
-			any_neighboring_tile = { 
-				has_society_research_building = yes
-			}	
-		}	
-		change_variable = {
-			which = society_research_building_adj_potential
-			value = 1						
-		}
-	}		
-}	
