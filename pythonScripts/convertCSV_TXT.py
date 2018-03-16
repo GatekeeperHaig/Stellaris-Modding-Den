@@ -174,14 +174,14 @@ def main(args,unused=0):
         sheets=pyexcel_ods.get_data(tableFileName)
         while 1:
           try:
-            sheet=sheets.popitem() #should be the first sheet. Others are ignored!
+            sheet=sheets.popitem()
             if sheet[0]=="DataSheet":
               csvContent=sheet[1] #0 is the sheetname
               csvContent=[[str(e) for e in line] for line in csvContent]
               foundData=True
             if foundData:
               break
-          except KeyError:
+          except KeyError:#KeyError: 'dictionary is empty'
             break
         if not foundData:
           print("ERROR: Invalid ods file. DataSheet missing! Exiting!")
