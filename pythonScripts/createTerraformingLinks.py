@@ -134,6 +134,9 @@ def main(args):
           newEntry.add("potential",potentialList)
 
         newEntry.add("effect",TagList(2).add("ex_terraforming_switch",yes))
+        if fromName==toName:
+          newEntry.get("effect").add("ex_terraforming_menu",yes)
+
         newEntry.add("ai_weights",TagList(2).add("weight","0"))
 
         outList.add("terraform_link",newEntry)
