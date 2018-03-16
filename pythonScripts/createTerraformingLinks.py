@@ -93,13 +93,17 @@ def main(args):
         newEntry.add("from",fromName)
         newEntry.add("to",toName)
         if fromName==toName:
-          newEntry.add("energy","@terraforming_costs_level_0")
+          newEntry.add("energy","@terraforming_cost_level_0")
           newEntry.add("duration","@terraforming_duration_level_0")
           # newEntry.add("condition","{ has_technology = "+techs[fromName,toName]+" }")
         else:
-          newEntry.add("energy","@terraforming_costs_level_"+costs[fromName,toCat])
+          newEntry.add("energy","@terraforming_cost_level_"+costs[fromName,toCat])
           newEntry.add("duration","@terraforming_duration_level_"+costs[fromName,toCat])
-        newEntry.add("condition","{ has_technology = "+techs[fromName,toCat]+" }")
+        techOrPerk=techs[fromName,toCat]
+        if techOrPerk[:2]=="ap":
+          newEntry.add("condition","{ has_ascension_perk = "+techOrPerk+" }")
+        else:
+          newEntry.add("condition","{ has_technology = "+techOrPerk+" }")
 
         potentialList=TagList(2)
         if properties[fromName,"habitable"]!=yes:
@@ -137,7 +141,7 @@ def main(args):
         if fromName==toName:
           newEntry.get("effect").add("ex_terraforming_menu",yes)
 
-        newEntry.add("ai_weights",TagList(2).add("weight","0"))
+        newEntry.add("ai_weight",TagList(2).add("weight","0"))
 
         outList.add("terraform_link",newEntry)
   with open(args.outputFileName,'w') as file:
