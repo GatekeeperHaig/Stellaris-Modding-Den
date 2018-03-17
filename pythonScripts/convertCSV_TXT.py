@@ -117,7 +117,7 @@ def main(args,unused=0):
     if not args.to_txt or len(nameToData.vals)>0: #skip all this if we create a completely new file. Also possible with empty file that existed
       for k in keyStrings:
         for v in nameToData.vals:
-          if isinstance(v,TagList) and len(v.names):
+          if isinstance(v,TagList) and len(v):
             if k in v.names:
               keyString=k
             break
@@ -125,7 +125,7 @@ def main(args,unused=0):
         for i in range(len(nameToData.vals)):
           if (isinstance(nameToData.vals[i],TagList)):
             nameToData.vals[i].addFront(keyString, nameToData.names[i])
-            nameToData.names[i]="keyAdded"
+            nameToData.names[i]="keyAdded" #name overwrite!
 
       if args.manual_filter:
         filterFile=args.manual_filter
@@ -235,7 +235,7 @@ def main(args,unused=0):
             indexLine=keyCSVIndex
             bodyKey=bodyEntry[keyCSVIndex].strip()
           if newEntry:
-            for name, val in nameToData.getAll():
+            for name, val in nameToData.getNameVal():
               if name!=topHeaderEntries[topHeaderIndex][1]:
                 continue;
               if val.get(keyString)==bodyKey:
@@ -326,7 +326,7 @@ def main(args,unused=0):
         if os.path.exists(tableFileNameName):
           os.remove(tableFileNameName) #hopyfully fixing the strange bug for ExNihil that he can't overwrite the file...
         bodyArray=[]
-        for name, val in nameToData.getAll():
+        for name, val in nameToData.getNameVal():
           lineArray=[copy.deepcopy(lineArrayT)]
           if isinstance(val,TagList) and len(val.names):
             indexOfNameInTagList=tagList.names.index(name)
@@ -366,9 +366,9 @@ def main(args,unused=0):
           pyexcel_ods.save_data(tableFileNameName, data)
       except PermissionError:
         print("PermissionError on file write. You must close "+tableFileNameName+" before running the script")
-    # for compName, component in nameToData.getAll():
+    # for compName, component in nameToData.getNameVal():
       # print(compName)
-      # for name,val in component.getAll():
+      # for name,val in component.getNameVal():
         
         # print(name)
         # print(val)

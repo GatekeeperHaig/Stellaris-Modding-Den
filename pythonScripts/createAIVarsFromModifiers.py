@@ -33,7 +33,7 @@ def main(args,*unused):
     outTagList=TagList(0)
     outTagList.add(args.effect_name, TagList(1))
 
-    for name,val in inputTagList.getAll():
+    for name,val in inputTagList.getNameVal():
       if not isinstance(val, TagList):
         continue
       # val.printAll()
@@ -41,17 +41,17 @@ def main(args,*unused):
       newCheckBuildingModifier=TagList(2).add("limit", TagList(3).add("has_"+args.type,name))
       newCheckAdjModifier=TagList(2).add("limit", TagList(3).add("has_"+args.type,name)).add("prev",TagList(3))
 
-      for possibleModifierName, pmVal in val.getAll():
+      for possibleModifierName, pmVal in val.getNameVal():
         if "tile_resource_" in possibleModifierName:
           newCheck.add("change_variable", TagList(3).add("which",possibleModifierName.replace("tile_resource_","")).add("value",pmVal))
       if "planet_modifier" in val.names:
         # print("NAME"+name)
         # val.printAll()
-        for possPlanetModName, ppmVal in val.get("planet_modifier").getAll():
+        for possPlanetModName, ppmVal in val.get("planet_modifier").getNameVal():
          if "tile_resource_" in possPlanetModName:
            newCheckBuildingModifier.add("change_variable", TagList(3).add("which",possPlanetModName.replace("tile_resource_","").replace("_add","_weight")).add("value",ppmVal))
       if "adjacency_bonus" in val.names:
-        for possPlanetModName, ppmVal in val.get("adjacency_bonus").getAll():
+        for possPlanetModName, ppmVal in val.get("adjacency_bonus").getNameVal():
           if "tile_building_resource_" in possPlanetModName:
             newCheckAdjModifier.get("prev").add("change_variable", TagList(4).add("which",possPlanetModName.replace("tile_building_resource_","").replace("_add","_weight")).add("value",ppmVal))
 

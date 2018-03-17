@@ -12,10 +12,11 @@ def addCommonArgs(parser):
 
 
 class TagList: #Basically everything is stored recursively in objects of this class. Each file is one such object. Each tag within is one such object. The variables defined in a file are one such object. Only out-of-building comments are ignored and simply copied file to file.
-  def __init__(self,level):
+  def __init__(self,level=0):
     self.names=[]
     self.vals=[]
     self.comments=[]
+    self.seperators=[] #"=" by default
     self.bracketLevel=level
 
 
@@ -47,52 +48,28 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       return self.get(name)
     except ValueError:
       return TagList(0) #empty list
-  def getAll(self):
+  def getNameVal(self):
     return [[self.names[i],self.vals[i]] for i in range(len(self.names))]
-  def insert(self,array,index): #insert via index
-    self.names[index:index]=[array[0].strip()]
-    val=array[1]
-    self.vals[index:index]=[val]
-    if len(array)>2:
-      comment=array[2]
-    else:
-      comment=""
-    self.comments[index:index]=[comment]
-  def addArray(self,array): #add a 2-size array
-    self.names.append(array[0].strip())
-    val=array[1]
-    self.vals.append(val)
-    if len(array)>2:
-      comment=array[2]
-    else:
-      comment=""
-    self.comments.append(comment)
+  def getAll(self):
+    return zip(self.names, self.vals, self.comments, self.seperators)
+  def add(self,name,val='', comment='', seperator="="): #add via two separate pre-formated variables
+    self._apply(lambda x,y:x.append(y),name,val,comment,seperator)
     return self
-  def add(self,name,val='', comment=''): #add via two separate pre-formated variables
-    self.names.append(name)
-    self.vals.append(val)
-    self.comments.append(comment)
+  def insert(self,index,name,val='',comment='', seperator="="):
+    self._apply(lambda x,y:x.insert(index,y),name,val,comment,seperator)
+  def addFront(self,name,val='',comment='', seperator="="):
+    self._apply(lambda x,y:x.insert(0,y),name,val,comment,seperator)
     return self
-  def addFront(self,name,val,comment=''):
-    self.names.insert(0,name)
-    self.vals.insert(0,val)
-    self.comments.insert(0,comment)
-    return self
-  def addString(self, string): #add via raw data. Only works for lines that are bracketClosed within
-    array=string.split("=")
-    array[1:]=["=".join(array[1:]).strip()]
-    indexComment=array[1].find("#")
-    if indexComment>0:
-      comment=array[1][indexComment:]
-      array[1]=array[1][:indexComment]
-      array.append(comment)
-    # print(array[0])
-    # print("'"+array[1]+"'")
-    self.addArray(array)
-    return self
-  def addTagList(self, tagList):
-    for name,val, comment in zip(tagList.names,tagList.vals,tagList.comments):
-      self.add(name,val,comment)
+  def _apply(self, lam_method, name, val, comment, seperator):
+    lam_method(self.names,name)
+    if isinstance(val,TagList):
+      val.giveCorrectLevel(self)
+    lam_method(self.vals,val)
+    lam_method(self.comments,comment)
+    lam_method(self.seperators,seperator)
+  def addTagList(self, tagList): #adding up the two taglists. You can add a subtag with the standard add!
+    for name,val, comment,seperator in zip(tagList.names,tagList.vals,tagList.comments,tagList.seperators):
+      self.add(name,val,comment,seperator)
   def remove(self, name): #remove via name
     i=self.names.index(name)
     self.removeIndex(i)
@@ -101,6 +78,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     del self.names[i]
     del self.vals[i]
     del self.comments[i]
+    del self.seperators[i]
     return self
   def removeIndexList(self, indexList):
     for i in reversed(sorted(indexList)):      #delete last first to make sure indices stay valid
@@ -109,16 +87,19 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def clear(self):
     self.names=[]
     self.vals=[]
+    self.comments=[]
+    self.seperators=[]
     return self
-  def replace(self, name,val,comment=''): #replace via name
+  def replace(self, name,val,comment='',seperator='='): #replace via name
     try:
       i=self.names.index(name)
       self.vals[i]=val
       self.comments[i]=comment
+      self.seperators[i]=seperator
     except ValueError:
-      self.add(name,val,comment)
-      return self
-  def splitToListIfString(self,name,n=0): #I do not generally split lines that open and close brackets within the line (to prevent enlarging the file). Yet sometimes it's necessary...
+      self.add(name,val,comment,seperator)
+    return self
+  def splitToListIfString(self,name,n=0): #deprecated
     try:
       if n==0:
         i=self.names.index(name)
@@ -127,6 +108,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     except ValueError:
       return TagList(0)
     if not isinstance(self.vals[i],TagList):
+      print("USING deprecated function splitToListIfString! Splitting does not work anymore! Everything should be split on read!")
       self.vals[i]=TxtReadHelperFunctions.splitAlways(self.vals[i], self, self.bracketLevel)
     #   string=self.vals[i].strip()
     #   if string[0]=="{":
@@ -135,31 +117,42 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     #   if len(string)>0:
     #     self.vals[i].addString(string)
     return self.vals[i]
-  def increaseLevelRec(self, amount=1): #increase the bracket level for this object and every object below. Beware that as the head name of this object is stored one level higher, the head name of the object is not shifted
-    self.bracketLevel+=amount
+  def giveCorrectLevel(self,parent):
+    self.bracketLevel=parent.bracketLevel+1
     for val in self.vals:
-      if isinstance(val, TagList,):
-        val.increaseLevelRec(amount)
-  def printAll(self): #primitive print. Just for testing
-    for i in range(len(self.names)):
-      for b in range(self.bracketLevel):
-        print("\t",end="")
-      if not isinstance(self.vals[i],TagList):
-        print(self.names[i],end="")
-        if len(self.vals[i])>0:
-          print(" = "+self.vals[i],end="")
-      else:
-        if self.bracketLevel==1:
-          print("\n",end="")
-          for b in range(self.bracketLevel):
-            print("\t",end="")
-        print(self.names[i]+" = {\n",end="")
-        self.vals[i].printAll()
-        for b in range(self.bracketLevel):
-          print("\t",end="")
-        print("}",end="")
-      print(self.comments[i],end="")
-      print("\n",end="")
+      if isinstance(val,TagList):
+        val.giveCorrectLevel(self)
+  def _printTabs(self):
+    out=""
+    for b in range(self.bracketLevel):
+      out+="\t"
+    return out
+  def printAll(self):
+    print(self)
+    # if self.bracketLevel!=0:
+    #   print("") #newline
+    #   self._printTabs()
+    #   print("{")
+    # for name, val, comment, seperator in self.getAll():
+    #   self._printTabs()
+    #   print(name,end="")
+    #   if val:
+    #     print(" {!s} {!s} {!s}").format(seperator, val, comment)
+    # if self.bracketLevel!=0:
+    #   self._printTabs()
+    #   print("}")
+    # self.writeAll(sys.stdout)
+  def __str__(self):
+    out=""
+    if self.bracketLevel!=0:
+      out+="\n"+self._printTabs()+"{"
+    for name, val, comment, seperator in self.getAll():
+      out+="\n"+self._printTabs()+name
+      if val or isinstance(val,TagList):
+        out+=" {!s} {!s} {!s}".format(seperator, val, comment)
+    if self.bracketLevel!=0:
+      out+="\n"+self._printTabs()+"}"
+    return out
   def writeAll(self,file,args=0,checkForHelpers=False): #formatted writing. Paradox style minus most whitespace tailing errors
     for i in range(len(self.names)):
       try:
@@ -168,40 +161,40 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       except:
         self.printAll()
         raise
-  def writeEntry(self, file,i,args=0):
+  def _writeTabs(self, file):
     for b in range(self.bracketLevel):
       file.write("\t")
+  def writeEntry(self, file,i,args=0):
+    self._writeTabs(file)
+    file.write(self.names[i])
     if not isinstance(self.vals[i],TagList):
-      file.write(self.names[i])
       if len(str(self.vals[i]))>0:
-        file.write(" = "+str(self.vals[i]))
+        file.write(" {!s} {!s}".format(self.seperators[i],self.vals[i]))
     else:
-      # if self.bracketLevel==1:
-      #   file.write("\n")
-      #   for b in range(self.bracketLevel):
-      #     file.write("\t")
-      file.write(self.names[i]+" =")
+      file.write(" {!s} ".format(self.seperators[i]))
       if self.vals[i].oneLineWriteCheck(args):
         self.vals[i].writeLine(file)
       else:
-        file.write(" {\n")
+        file.write("{\n")
         self.vals[i].writeAll(file,args)
-        for b in range(self.bracketLevel):
-          file.write("\t")
+        self._writeTabs(file)
         file.write("}")
     file.write(self.comments[i])
     file.write("\n")
   def writeLine(self, file):
-    file.write(" { ")
-    for name, val in self.getAll():
+    file.write("{ ")
+    for name, val,comment, seperator in self.getAll():
       if len(val.strip())>0:
-        file.write("{} = {} ".format(name,val))
+        file.write("{} {} {} ".format(name,seperator,val))
       else:
         file.write(name+" ")
-    file.write(" }")
+    file.write("}")
   def oneLineWriteCheck(self,args=0):
     if args==0 or args.one_line_level<0.5:
       return False
+    for comment in self.comments:
+      if comment!="":
+        return False
     if args.one_line_level<=1.5 and len(self.vals)>1:
       return False
     for val in self.vals:
@@ -250,20 +243,22 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       for j in range(i+1, len(self.names)):
         if j in duplicates:
           continue
-        if self.names[i]==self.names[j]:
+        if self.names[i]==self.names[j] and self.names[i]:
           if self.names[i][0]=="@": #header variables must be unique!
             duplicates.append(j)
-          elif isinstance(self.vals[i],TagList):
-            if isinstance(self.vals[j],TagList):
-              if self.vals[i].compare(self.vals[j]):
-                duplicates.append(j)
-          elif self.vals[i]==self.vals[j]: #string compare (or string vs object which gives correct 0)
+          # elif isinstance(self.vals[i],TagList):
+          #   if isinstance(self.vals[j],TagList):
+          #     if self.vals[i].compare(self.vals[j]):
+          #       duplicates.append(j)
+          elif self.vals[i]==self.vals[j]: 
             duplicates.append(j)
     self.removeIndexList(duplicates)
     for i in range(len(self.names)): #recurively through remaining elements
       if isinstance(self.vals[i], TagList):
         self.vals[i].removeDuplicatesRec()
   def compare(self, other):
+    if not isinstance(other, TagList):
+      return 0
     if len(self.names)!=len(other.names):
       return 0
     for i in range(len(self.names)):
@@ -329,7 +324,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     if alreadyExists:
       self.replace(tag,finalVal)
     else:
-      self.addArray([tag, finalVal])
+      self.add(tag, finalVal)
   def applyOnLowestLevel(self, func, argList=[],attributeList=[]):
     i=0
     while self.vals: #loop that allows size changes of the array and actually includes those new entries!
@@ -342,6 +337,9 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       i+=1
       if i==len(self.vals):
         break
+  # def readString(self, input):
+
+
   def readFile(self, fileName, args, varsToValue=0,useNamedTagList=False): #the varsToValue is mostly still in due to me being to lazy to remove it atm. Try to avoid using it as it will be removed at some point in the future.
     splitSigns=[">=","<=","#"," ","\t","{","}","=",">","<"]
     splitPattern="("
@@ -358,7 +356,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     with open(fileName,'r') as inputFile:
       print("Start reading "+fileName)
       for lineI,line in enumerate(inputFile):
-        lineSplit=re.split(splitPattern,line) #'(>=|<=|<#=" "{}])')
+        lineSplit=re.split(splitPattern,line)
         countEmpty=0
         for wordI, word in enumerate(lineSplit):
           try:
@@ -385,8 +383,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
               bracketLevel-=1
               objectList.pop()
             #equal
-            elif word=="=":
-              expectingVal=True
+            # elif word=="=":
+            #   expectingVal=True
             #comment 
             elif word=='#': 
               comment="".join(lineSplit[wordI:]).strip()
@@ -397,16 +395,21 @@ class TagList: #Basically everything is stored recursively in objects of this cl
                 objectList[-1].comments[-1]=" "+comment
               break #rest of line is comment. Was already added, not being parsed to avoid special characters to have an impact in the comment
             #signs that should be equivalt to "=" but are currently not supported. Thus simply saved as plain text in "name"
-            elif word in [">=","<=",">","<"]:
-              objectList[-1].names[-1]+=" "+word+" "
-              expectingNameAddition=True
+            elif word in [">=","<=",">","<","="]:
+              objectList[-1].seperators[-1]=word
+              expectingVal=True
+              # objectList[-1].names[-1]+=" "+word+" "
+              # expectingNameAddition=True
+            elif word=="log":
+              objectList[-1].add("","","".join(lineSplit[wordI:]).strip())
+              break
             elif expectingVal:
               objectList[-1].vals[-1]+=word
               expectingVal=False
 
-            elif expectingNameAddition:
-              objectList[-1].names[-1]+=word
-              expectingNameAddition=False
+            # elif expectingNameAddition:
+            #   objectList[-1].names[-1]+=word
+            #   expectingNameAddition=False
             else:
               objectList[-1].add(word)
           except:
@@ -415,14 +418,14 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             print("Word: {}".format(word))
             raise
 
-    if varsToValue:
-      for name,val in self.getAll():
+    if isinstance(varsToValue,TagList):
+      for name,val in self.getNameVal():
         if name and name[0]=="@":
           if isinstance(name,TagList):
             print("Invalid header variable")
           varsToValue.add(name,val)
   def addTags(self, tagList):
-    for name, entry in self.getAll():
+    for name, entry in self.getNameVal():
       if name and name!="namespace" and name[0]!="@" and entry!="":
         tagEntry=tagList.getOrCreate(name)
         # print (name)
@@ -437,7 +440,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     if len(self.names)==0:
       return 1
     count=0
-    for name,val in self.getAll():
+    for name,val in self.getNameVal():
       if active or not args.filter or name in args.filter:
         count+=val.countDeepestLevelEntries(args,True)
       elif len(val.vals)>0:
@@ -454,7 +457,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       curIndex+=1
       #for i in range(self.bracketLevel,len(outStrings)):
         #outStrings[i]+=";"
-    for name,val in self.getAll():
+    for name,val in self.getNameVal():
       # print(val.countDeepestLevelEntries(args))
       if active or not args.filter or name in args.filter or (len(val.vals)>0 and val.countDeepestLevelEntries(args)>0):
         # print(len(val.vals))
@@ -475,7 +478,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def toCSV(self, lineArray, tagList,occurenceList,varsToValue,args,curIndex=0, curLineIndex=0):
     i=-1
     maxExtraLines=0
-    for name,val in tagList.getAll():
+    for name,val in tagList.getNameVal():
       i+=1
       # print(name)
       occurences=self.names.count(name)
@@ -708,6 +711,7 @@ class NamedTagList(TagList): #derived from TagList with four extra variables and
     self.names=[]
     self.vals=[]
     self.comments=[]
+    self.seperators=[] #"=" by default
     self.bracketLevel=1
     self.lowerTier=0
     self.tagName=tagName
@@ -734,70 +738,72 @@ class TxtReadHelperFunctions:
     if variable and variable[0]=="@":
       varsToValue.changed[varsToValue.names.index(variable)]+=1
     return variable
-  def splitIfSplitable(variable,caller, bracketLevel):
-    if not "=" in variable:# and not "{" in variable:
-      return variable
-    try:
-      varSplit=variable.split()
-      if len(varSplit) >1 and variable.find("{")==-1: #no further subtags but a list of tags
-        i=1#first element is value
-        while i <len(varSplit):
-          if varSplit[i][-1]!="=" and varSplit[i].find("=")!=-1: #equal somewhere in the middle
-            caller.addString(varSplit[i])
-          elif i<len(varSplit)+1 and varSplit[i][-1]=="=":
-            caller.names.append(varSplit[i][:-1])
-            caller.vals.append(varSplit[i+1])
-            caller.comments.append("")
-            i+=1 #extra index increase
-          elif  i<len(varSplit)+1 and varSplit[i+1][0]=="=":
-            caller.names.append(varSplit[i])
-            caller.comments.append("")
-            if len(varSplit[i+1])>1:
-              caller.vals.append(varSplit[i+1][1:])
-            elif i<len(varSplit)+2:
-              caller.vals.append(varSplit[i+2])
-              i+=1 #extra extra index increase
-            else:
-              print("Invalid splitting of string "+variable)
-              caller.vals.append('')
-            i+=1 #extra index increase
-          else:
-            print("Invalid splitting of string "+variable)
-          i+=1
-        return varSplit[0]
-    except ValueError:
-      print("Error while splitting {}".format(variable))
-      print("Caller:")
-      caller.printAll()
-    #print(varSplit)
+  def splitIfSplitable(variable,caller, bracketLevel): #deprecated, deactivated!
+    return variable
+    # if not "=" in variable:# and not "{" in variable:
+    #   return variable
+    # try:
+    #   varSplit=variable.split()
+    #   if len(varSplit) >1 and variable.find("{")==-1: #no further subtags but a list of tags
+    #     i=1#first element is value
+    #     while i <len(varSplit):
+    #       if varSplit[i][-1]!="=" and varSplit[i].find("=")!=-1: #equal somewhere in the middle
+    #         caller.addString(varSplit[i])
+    #       elif i<len(varSplit)+1 and varSplit[i][-1]=="=":
+    #         caller.names.append(varSplit[i][:-1])
+    #         caller.vals.append(varSplit[i+1])
+    #         caller.comments.append("")
+    #         i+=1 #extra index increase
+    #       elif  i<len(varSplit)+1 and varSplit[i+1][0]=="=":
+    #         caller.names.append(varSplit[i])
+    #         caller.comments.append("")
+    #         if len(varSplit[i+1])>1:
+    #           caller.vals.append(varSplit[i+1][1:])
+    #         elif i<len(varSplit)+2:
+    #           caller.vals.append(varSplit[i+2])
+    #           i+=1 #extra extra index increase
+    #         else:
+    #           print("Invalid splitting of string "+variable)
+    #           caller.vals.append('')
+    #         i+=1 #extra index increase
+    #       else:
+    #         print("Invalid splitting of string "+variable)
+    #       i+=1
+    #     return varSplit[0]
+    # except ValueError:
+    #   print("Error while splitting {}".format(variable))
+    #   print("Caller:")
+    #   caller.printAll()
+    # #print(varSplit)
 
 
-    return TxtReadHelperFunctions.splitAlways(variable,caller, bracketLevel)
-  def splitAlways(variable, caller,bracketLevel):
-    string=variable.strip()
+    # return TxtReadHelperFunctions.splitAlways(variable,caller, bracketLevel)
+  def splitAlways(variable, caller,bracketLevel): #deprecated, deactivated!
+    return variable
+    # string=variable.strip()
       
-    if string[0]=="{":
-      endOfStringPart=TxtReadHelperFunctions.findClosingBracked(string)
-      excessString=string[endOfStringPart+1:].strip()
-      if excessString!="":
-        # print("excess")
-        # print(excessString)
-        varSplit=excessString.split()
-        # print(varSplit)
-        # caller.printAll()
-        caller.names.append(varSplit[0])
-        caller.comments.append("")
-        caller.vals.append(" ".join(varSplit[2:]))
-        string=string[:endOfStringPart+1]
-        # caller.printAll()
-      # print("removing bracket layer")
-      # print(string)
-      string=string[1:-1].strip() #remove one bracket layer
-      # print(string)
-    out=TagList(bracketLevel+1)
-    if len(string)>0:
-      out.addString(string)
-    return out
+    # if string[0]=="{":
+    #   endOfStringPart=TxtReadHelperFunctions.findClosingBracked(string)
+    #   excessString=string[endOfStringPart+1:].strip()
+    #   if excessString!="":
+    #     # print("excess")
+    #     # print(excessString)
+    #     varSplit=excessString.split()
+    #     # print(varSplit)
+    #     # caller.printAll()
+    #     caller.names.append(varSplit[0])
+    #     caller.comments.append("")
+    #     caller.vals.append(" ".join(varSplit[2:]))
+    #     string=string[:endOfStringPart+1]
+    #     # caller.printAll()
+    #   # print("removing bracket layer")
+    #   # print(string)
+    #   string=string[1:-1].strip() #remove one bracket layer
+    #   # print(string)
+    # out=TagList(bracketLevel+1)
+    # if len(string)>0:
+    #   out.addString(string)
+    # return out
 
   def findClosingBracked(string):
     bracketCounter=0

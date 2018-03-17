@@ -27,7 +27,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('-o','--output_folder', default="BU", help="Main output folder name. Specific subfolder needs to be included for '--just_copy_and_check' (default: %(default)s)")
   parser.add_argument('--replacement_file', default="", help="Executes a very basic conditional replace on buildings. Example: 'IF unique in tagName and is_listed==no newline	ai_weight = { weight = @crucial_2 }': For all buildings that have 'unique' in their name and are not listed, set ai_weight to given value. Any number of such replaces can be in the file. An 'IF' at the very start of a line starts a replace. the next xyz = will be the tag used for replacing. You can also start a line with 'EVAL' instead of 'IF' to write an arbitrary condition. You need to know the class structure for this though.")
   parser.add_argument('-j','--join_files', action="store_true", help="Output from all input files goes into a single file. Has to be activated if you have upgrades distributed over different files. Will not copy comments!")
-  parser.add_argument('-g','--game_version', default="1.9.*", help="Game version of the newly created .mod file to avoid launcher warning. Ignored for standalone mod creation. (default: %(default)s)")
+  parser.add_argument('-g','--game_version', default="2.0.*", help="Game version of the newly created .mod file to avoid launcher warning. Ignored for standalone mod creation. (default: %(default)s)")
   parser.add_argument('--tags', default="buildings", help="Comma separated list of tags. Ignored for standalone mod creation.")
   parser.add_argument('--picture_file', default="", help="Picture file set in the mod file. Ignored for standalone mod creation. This file must be manually added to the mod folder!")
   parser.add_argument('--load_order_priority', action="store_true", help="If enabled, mod will be placed first in mod priority by adding '!' to the mod name and a 'z' to building building and trigger file names. This allows the construction of mod extensions. Alternatively, you can create a standalone version , see '--create_standalone_mod_from_mod'.")
@@ -194,6 +194,8 @@ def readAndConvert(args, allowRestart=1):
       locData=[] #list of localisation links later to be saved in a file. One of the few times TagList class is NOT used
       for origBuildI in range(len(buildingNameToDataOrigVals)): #iterate through lowest tier buildings. Higher tier buildings will be ignored (via "is_listed = no",which is even set for tier 1 if tier 0 exists)
         baseBuildingData=buildingNameToDataOrigVals[origBuildI] #data of the lowest tier building
+        if not isinstance(baseBuildingData,NamedTagList):
+          continue
         if "is_listed" in baseBuildingData.names and baseBuildingData.get("is_listed")=="no":
           continue
         #triggers.add("has_"+baseBuildingData.tagName,"{ has_building = "+baseBuildingData.tagName+" }")   #redundant but simplifies later replaces
@@ -206,17 +208,13 @@ def readAndConvert(args, allowRestart=1):
           buildingData=buildingDataList[0]
           buildingDataList=buildingDataList[1:]
           upgrades=buildingData.splitToListIfString("upgrades")
-          # upgrades=buildingData.get("upgrades")
-          # if not isinstance(upgrades,TagList):
-            # buildingData.replace("upgrades",TagList(buildingData.bracketLevel+1))
-            # buildingData.get("upgrades").addString(upgrades.replace("{","").replace("}","").strip())
-            # upgrades=buildingData.get("upgrades")
+
           
           #new building requirements to ensure that only the highest currently available is buildable. Keep the building list as short as possible. Done via "potential" to compeltely remove them from the list (not even greyed out)
           newRequirements=TagList(2)
           if len(upgrades.names)>0 and not args.keep_lower_tier and not buildingData.tagName in args.t0_buildings:
             buildingData.getOrCreate("potential")
-            buildingData.splitToListIfString("potential").addArray(["NAND", newRequirements])
+            buildingData.splitToListIfString("potential").add("NAND", newRequirements)
            
           #iterate through all upgrades: Create a copy of each upgrade, compute costs. Finish requirements for current building and add the copies to the todo-list
           for upgradeName in upgrades.names:
@@ -260,32 +258,32 @@ def readAndConvert(args, allowRestart=1):
               poss[0].vals[eI]='{ has_technology ='+' {} '.format(poss[0].names[eI])+'}'
               poss[0].names[eI]='owner'
             for p in poss:
-              for e in p.getAll():
-                newRequirements.addArray(e)
+              for name,val in p.getNameVal():
+                newRequirements.add(name,val)
             
             
             
             upgradeBuildingIndex=buildingNameToData.names.index(upgradeName) #index of 'upgradeData' building in the list of all buildings (including already copied buildings)
-            buildingNameToData.insert([upgradeName,upgradeData],upgradeBuildingIndex) #insert the copy before 'upgradeData'. upgradeBuildingIndex is now the index of the copy!
+            buildingNameToData.insert(upgradeBuildingIndex,upgradeName,upgradeData) #insert the copy before 'upgradeData'. upgradeBuildingIndex is now the index of the copy!
             buildingNameToData.vals[upgradeBuildingIndex].remove("is_listed") #removing "is_listed = no"
             if args.create_tier5_enhanced and buildingData.tagName.replace("_direct_build","")[-3:]=="_rw":
               rw_upgrade_building=copy.deepcopy(buildingNameToData.get(upgradeName))
               rw_upgrade_building.tagName+="_rw"
               adjacency_bonus=rw_upgrade_building.splitToListIfString("adjacency_bonus")
               potential_rw=rw_upgrade_building.splitToListIfString("potential")
-              potential_rw.addString("planet = { is_ringworld_or_machine_world = yes }")
+              potential_rw.add("planet", TagList(0).add("is_ringworld_or_machine_world","yes"))
               for adI in range(len(adjacency_bonus.vals)):
                 adjacency_bonus.vals[adI]=str(int(adjacency_bonus.vals[adI])+1)
               buildingData.splitToListIfString("upgrades").remove(upgradeName)
-              buildingData.splitToListIfString("upgrades").addString(rw_upgrade_building.tagName)
+              buildingData.splitToListIfString("upgrades").add(rw_upgrade_building.tagName)
               buildingData_no_direct_build=buildingNameToData.get(buildingData.tagName.replace("_direct_build",""))
               buildingData_no_direct_build.splitToListIfString("upgrades").remove(upgradeName)
-              buildingData_no_direct_build.splitToListIfString("upgrades").addString(rw_upgrade_building.tagName)
+              buildingData_no_direct_build.splitToListIfString("upgrades").add(rw_upgrade_building.tagName)
               
               buildingNameToData.names[upgradeBuildingIndex]+="_rw"
               adjacency_bonus=buildingNameToData.vals[upgradeBuildingIndex].splitToListIfString("adjacency_bonus")
               potential_rw=buildingNameToData.vals[upgradeBuildingIndex].splitToListIfString("potential")
-              potential_rw.addString("planet = { is_ringworld_or_machine_world = yes }")
+              potential_rw.add("planet", TagList(0).add("is_ringworld_or_machine_world","yes"))
               
               newList=TagList(1)
               newList.getOrCreate("OR").add("has_building",upgradeName+"_rw") #creates the "OR" and fills it with the first entry
@@ -296,7 +294,7 @@ def readAndConvert(args, allowRestart=1):
               for adI in range(len(adjacency_bonus.vals)):
                 adjacency_bonus.vals[adI]=str(int(adjacency_bonus.vals[adI])+1)
                 
-              buildingNameToData.insert([rw_upgrade_building.tagName, rw_upgrade_building], upgradeBuildingIndex+1) #insert after _direct_build_rw version
+              buildingNameToData.insert(upgradeBuildingIndex+1,rw_upgrade_building.tagName, rw_upgrade_building) #insert after _direct_build_rw version
               
             buildingNameToData.names[upgradeBuildingIndex]+="_direct_build" #renaming (as internal name needs to be unique. Not visible in-game
             buildingNameToData.vals[upgradeBuildingIndex].tagName=buildingNameToData.names[upgradeBuildingIndex]
@@ -314,7 +312,7 @@ def readAndConvert(args, allowRestart=1):
             #REMOVE COPY FROM TECH TREE. Seems to remove the copy completely :( Pretty useless trigger...
             if "show_tech_unlock_if" in buildingNameToData.vals[upgradeBuildingIndex].names:
               buildingNameToData.vals[upgradeBuildingIndex].remove("show_tech_unlock_if")
-            buildingNameToData.vals[upgradeBuildingIndex].addArray(["show_tech_unlock_if","{ always = no }"])
+            buildingNameToData.vals[upgradeBuildingIndex].add("show_tech_unlock_if","{ always = no }")
             
             upgradeData.costChangeUpgradeToDirectBuild(buildingData,args, varsToValue)
 
@@ -333,12 +331,12 @@ def readAndConvert(args, allowRestart=1):
               nameExtra+="_rw"
               nameStringExtra=" Enhanced"
               if not "icon" in buildingNameToData.vals[upgradeBuildingIndex+1].names: #if icon was already a link in the original building, we can leave it
-                buildingNameToData.vals[upgradeBuildingIndex+1].addArray(["icon",upgradeName]) #otherwise create an icon link to the original building
+                buildingNameToData.vals[upgradeBuildingIndex+1].add("icon",upgradeName) #otherwise create an icon link to the original building
               locData.append(upgradeName+'_rw:0 "$'+upgradeName+'$'+nameStringExtra+'"') #localisation link. If anyone knows what the number behind the colon means, please PN me (@Gratak in Paradox forum)
               locData.append(upgradeName+'_rw_desc:0 "$'+upgradeName+'_desc$"') #localisation link
               
             if not "icon" in buildingNameToData.vals[upgradeBuildingIndex].names: #if icon was already a link in the original building, we can leave it
-              buildingNameToData.vals[upgradeBuildingIndex].addArray(["icon",upgradeName]) #otherwise create an icon link to the original building
+              buildingNameToData.vals[upgradeBuildingIndex].add("icon",upgradeName) #otherwise create an icon link to the original building
             locData.append(upgradeName+nameExtra+':0 "$'+upgradeName+'$'+nameStringExtra+'"') #localisation link. If anyone knows what the number behind the colon means, please PN me (@Gratak in Paradox forum)
             locData.append(upgradeName+nameExtra+'_desc:0 "$'+upgradeName+'_desc$"') #localisation link
               
@@ -353,13 +351,13 @@ def readAndConvert(args, allowRestart=1):
               upgradeData.getOrCreate("upgrades").add(fakeBuilding.tagName,"")
               origUpgradeData.getOrCreate("upgrades").add(fakeBuilding.tagName,"")
               fakeIndex=buildingNameToData.names.index(baseBuildingData.tagName)
-              buildingNameToData.insert([fakeBuilding.tagName,fakeBuilding],fakeIndex) #insert the fake before 'baseBuilding'. upgradeBuildingIndex is now shifted but shouldn't be used anymore
+              buildingNameToData.insert(fakeIndex,fakeBuilding.tagName,fakeBuilding) #insert the fake before 'baseBuilding'. upgradeBuildingIndex is now shifted but shouldn't be used anymore
             
           if isinstance(buildingData.splitToListIfString("potential").vals[-1], TagList) and len(buildingData.get("potential").vals[-1].names)<=0:
             buildingData.get("potential").removeIndex(-1)   #remove potentially empty entry thanks to empire_unique buildings that cannot be copied.
           elif len(newRequirements.vals)>0:
-            newRequirements.addString("owner = { NOT = { has_country_flag = display_low_tier_flag } }")
-          newRequirements.increaseLevelRec() #push them to correct level. list will always exist, might be empty if unused.
+            newRequirements.add("owner",TagList().add("NOT", TagList().add("has_country_flag","display_low_tier_flag ")))
+          # newRequirements.increaseLevelRec() #push them to correct level. list will always exist, might be empty if unused.
     #END OF COPY AND MODIFY        
 
     if args.simplify_upgrade_AI_allow:
@@ -370,94 +368,95 @@ def readAndConvert(args, allowRestart=1):
         
     #buildingNameToData.printAll()
         
-    if args.replacement_file!='':
-      equalConditions=[]
-      inConditions=[]
-      allConditions=[] #allConditions[i][j] will be an array consisting of: negation bool, condition type, keyword 1, keyword 2, 
-      replaceClasses=[]
-      searchingForReplaceKeyword=0
-      activeReplace=0
-      with open(args.replacement_file, 'r') as replacement_file:
-        for line in replacement_file:
-          if line[:2]=="IF":
-            searchingForReplaceKeyword=1
-            activeReplace=0
-            allConditions.append([])
-            conditions=line[2:].split("and")
-            for condition in conditions:
-              allConditions[-1].append([])
-              if condition.split()[0]=="not":
-                allConditions[-1][-1].append(True)
-                condition=" ".join(condition.split()[1:])
-              else:
-                allConditions[-1][-1].append(False)
-              if len(condition.strip().split("=="))==2: #len(condition.strip().split(" "))==1 and 
-                allConditions[-1][-1].append("==")
-                # allConditions[-1][-1].append(e.strip() for e in condition.strip().split("=="))
-              elif len(condition.strip().split(" in "))==2:
-                allConditions[-1][-1].append(" in ")
-                # allConditions[-1][-1].append(e.strip() for e in condition.strip().split(" in "))
-              else:
-                print("Invalid condition in replacement file! Exiting!")
-                print(line)
-                print(condition.strip().split("in"))
-                sys.exit(1)
-              for e in condition.strip().split(allConditions[-1][-1][-1]):
-                allConditions[-1][-1].append(e.strip())
-          elif line[:4]=="EVAL":
-            searchingForReplaceKeyword=1
-            activeReplace=0
-            allConditions.append([[line[:4],line[4:].strip()]])
-          elif searchingForReplaceKeyword and len(line.strip())>0 and line.strip()[0]!='#':
-            replaceClasses.append(TagList(1))
-            replaceClasses[-1].addString(line)
-            replaceClasses[-1].vals[0]+="\n"
-            searchingForReplaceKeyword=0
-            activeReplace=1
-          elif activeReplace:
-            replaceClasses[-1].vals[0]+=line
-      for building in buildingNameToData.vals:
-        if not isinstance(building, NamedTagList):
-          continue
-        if len(replaceClasses)==0:
-          for condition in allConditions[0]:
-            # print(condition)
-            if condition[0]=="EVAL":
-              # print(condition[1])
-              eval(condition[1])
-              continue
-        for i in range(len(replaceClasses)):
-          replace=1
-          for condition in allConditions[i]:
-            # print(condition)
-            if condition[0]=="EVAL":
-              print(condition[1])
-              if eval(condition[1]):
-                replace=1
-              else:
-                replace=0
-            elif condition[1]=="==":
-              if condition[0]:  #negated
-                if (condition[2] in building.names) and (building.get(condition[2])==equalCondition[3]):
-                  replace=0
-              else:
-                if (not condition[2] in building.names) or (building.get(condition[2])!=condition[3]):
-                  # print(building.tagName+" failed "+" ".join(condition[1:]))
-                  replace=0
-            elif condition[1]==" in ":
-              if condition[3]=="tagName":
-                if (condition[0]) != (building.tagName.find(condition[2])==-1):
-                  # print(building.tagName+" failed tagName "+" ".join(condition[1:]))
-                  replace=0
-              else:
-                if (condition[0]) != (not condition[2] in building.get(condition[3])):
-                  # print(building.tagName+" failed "+" ".join(condition[1:]))
-                  replace=0
-          if replace:
-            if replaceClasses[i].names[0] in building.names:
-              #print(building.tagName)
-              #replaceClasses[i].printAll()
-              building.replace(replaceClasses[i].names[0], replaceClasses[i].vals[0])
+    if args.replacement_file!='': #todo rework!
+      print("CURRENTLY NOT WORKING!")
+      # equalConditions=[]
+      # inConditions=[]
+      # allConditions=[] #allConditions[i][j] will be an array consisting of: negation bool, condition type, keyword 1, keyword 2, 
+      # replaceClasses=[]
+      # searchingForReplaceKeyword=0
+      # activeReplace=0
+      # with open(args.replacement_file, 'r') as replacement_file:
+      #   for line in replacement_file:
+      #     if line[:2]=="IF":
+      #       searchingForReplaceKeyword=1
+      #       activeReplace=0
+      #       allConditions.append([])
+      #       conditions=line[2:].split("and")
+      #       for condition in conditions:
+      #         allConditions[-1].append([])
+      #         if condition.split()[0]=="not":
+      #           allConditions[-1][-1].append(True)
+      #           condition=" ".join(condition.split()[1:])
+      #         else:
+      #           allConditions[-1][-1].append(False)
+      #         if len(condition.strip().split("=="))==2: #len(condition.strip().split(" "))==1 and 
+      #           allConditions[-1][-1].append("==")
+      #           # allConditions[-1][-1].append(e.strip() for e in condition.strip().split("=="))
+      #         elif len(condition.strip().split(" in "))==2:
+      #           allConditions[-1][-1].append(" in ")
+      #           # allConditions[-1][-1].append(e.strip() for e in condition.strip().split(" in "))
+      #         else:
+      #           print("Invalid condition in replacement file! Exiting!")
+      #           print(line)
+      #           print(condition.strip().split("in"))
+      #           sys.exit(1)
+      #         for e in condition.strip().split(allConditions[-1][-1][-1]):
+      #           allConditions[-1][-1].append(e.strip())
+      #     elif line[:4]=="EVAL":
+      #       searchingForReplaceKeyword=1
+      #       activeReplace=0
+      #       allConditions.append([[line[:4],line[4:].strip()]])
+      #     elif searchingForReplaceKeyword and len(line.strip())>0 and line.strip()[0]!='#':
+      #       replaceClasses.append(TagList(1))
+      #       replaceClasses[-1].addString(line)
+      #       replaceClasses[-1].vals[0]+="\n"
+      #       searchingForReplaceKeyword=0
+      #       activeReplace=1
+      #     elif activeReplace:
+      #       replaceClasses[-1].vals[0]+=line
+      # for building in buildingNameToData.vals:
+      #   if not isinstance(building, NamedTagList):
+      #     continue
+      #   if len(replaceClasses)==0:
+      #     for condition in allConditions[0]:
+      #       # print(condition)
+      #       if condition[0]=="EVAL":
+      #         # print(condition[1])
+      #         eval(condition[1])
+      #         continue
+      #   for i in range(len(replaceClasses)):
+      #     replace=1
+      #     for condition in allConditions[i]:
+      #       # print(condition)
+      #       if condition[0]=="EVAL":
+      #         print(condition[1])
+      #         if eval(condition[1]):
+      #           replace=1
+      #         else:
+      #           replace=0
+      #       elif condition[1]=="==":
+      #         if condition[0]:  #negated
+      #           if (condition[2] in building.names) and (building.get(condition[2])==equalCondition[3]):
+      #             replace=0
+      #         else:
+      #           if (not condition[2] in building.names) or (building.get(condition[2])!=condition[3]):
+      #             # print(building.tagName+" failed "+" ".join(condition[1:]))
+      #             replace=0
+      #       elif condition[1]==" in ":
+      #         if condition[3]=="tagName":
+      #           if (condition[0]) != (building.tagName.find(condition[2])==-1):
+      #             # print(building.tagName+" failed tagName "+" ".join(condition[1:]))
+      #             replace=0
+      #         else:
+      #           if (condition[0]) != (not condition[2] in building.get(condition[3])):
+      #             # print(building.tagName+" failed "+" ".join(condition[1:]))
+      #             replace=0
+      #     if replace:
+      #       if replaceClasses[i].names[0] in building.names:
+      #         #print(building.tagName)
+      #         #replaceClasses[i].printAll()
+      #         building.replace(replaceClasses[i].names[0], replaceClasses[i].vals[0])
      
     if not args.just_copy_and_check:
       buildingNameToData.removeDuplicatesRec()
