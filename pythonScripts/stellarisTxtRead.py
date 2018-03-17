@@ -109,6 +109,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       return TagList(0)
     if not isinstance(self.vals[i],TagList):
       print("USING deprecated function splitToListIfString! Splitting does not work anymore! Everything should be split on read!")
+      print(self)
       self.vals[i]=TxtReadHelperFunctions.splitAlways(self.vals[i], self, self.bracketLevel)
     #   string=self.vals[i].strip()
     #   if string[0]=="{":
@@ -156,7 +157,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def writeAll(self,file,args=0,checkForHelpers=False): #formatted writing. Paradox style minus most whitespace tailing errors
     for i in range(len(self.names)):
       try:
-        if not checkForHelpers or self.vals[i].helper==False:
+        if not checkForHelpers or ( isinstance(self.vals[i],NamedTagList) and self.vals[i].helper==False ):
           self.writeEntry(file, i,args)
       except:
         self.printAll()
@@ -424,6 +425,12 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           if isinstance(name,TagList):
             print("Invalid header variable")
           varsToValue.add(name,val)
+  def nonEqualToValue(self): #move "<",">","<=",">=" to value and make the whole value a string to be able to store it in ods
+    for i in range(len(self)):
+      if self.seperators[i]!="=":
+        self.vals[i]=self.seperators[i]+" "+str(self.vals[i]).replace("\t","").replace("\n"," ")
+      elif isinstance(self.vals[i],TagList):
+        self.vals[i].nonEqualToValue()
   def addTags(self, tagList):
     for name, entry in self.getNameVal():
       if name and name!="namespace" and name[0]!="@" and entry!="":
@@ -475,14 +482,14 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       else:
         self.remove(name)
     return curIndex
-  def toCSV(self, lineArray, tagList,occurenceList,varsToValue,args,curIndex=0, curLineIndex=0):
+  def toCSV(self, lineArray, tagList,varsToValue,args,curIndex=0, curLineIndex=0):
     i=-1
     maxExtraLines=0
-    for name,val in tagList.getNameVal():
+    for name,val,comment,seperator in tagList.getAll():
       i+=1
       # print(name)
       occurences=self.names.count(name)
-      occurenceList.names[i]=str(occurences)
+      # occurenceList.names[i]=str(occurences)
       # if name in self.names:
       curIndexTmp=curIndex
       sumExtraLines=0
@@ -497,7 +504,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           # print(name)
           # print(occurences)
           # print(self.get(name))
-          curIndex,extraLines=self.splitToListIfString(name,occurenceIndex).toCSV(lineArray, val,occurenceList.vals[i],varsToValue,args,curIndex, curLineIndex+occurenceIndex)
+          curIndex,extraLines=self.splitToListIfString(name,occurenceIndex).toCSV(lineArray, val,varsToValue,args,curIndex, curLineIndex+occurenceIndex)
           if occurences>1:
             for extraLine in range(extraLines+1):
               # print(occurenceIndex)
@@ -660,9 +667,23 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       else:
         # print(entry)         
         entry=bodyEntry[headerIndex]
+        if isinstance(entry,str):
+          entry=entry.strip()
         if entry!="" and headerName!="OCCNUM":
           # print(entry)
           # self.printAll()
+          #moving unequal operators back to separators
+          if ">="==entry[:2] or "<="==entry[:2]:
+            self.seperators[valIndex]=entry[:2]
+            entry=entry[2:]
+            while entry and entry[:1].strip()=="":
+              entry=entry[1:]
+          elif ">"==entry[0] or "<"==entry[0]:
+            self.seperators[valIndex]=entry[0]
+            entry=entry[1:]
+            while entry and entry[:1].strip()=="":
+              entry=entry[1:]
+
           if self.vals[valIndex] and self.vals[valIndex][0]=="@" and entry!="#delete" and entry[0]!="@":
             try:
               varsToValueIndex=varsToValue.names.index(self.vals[valIndex])

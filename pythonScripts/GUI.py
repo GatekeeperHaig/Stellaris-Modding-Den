@@ -588,6 +588,7 @@ class TabControlClass:
       ,BUOptions,"Add Helper File(s)")
     self.tabClasses[-1].helpText='1. "Add file(s)": "Stellaris/common/buildings/00_buildings.txt" (unless you have no dependence on vanilla buildings at all, not even capital building requirements. Check "Helper file". Contents of such a file will be used, but the buildings wont be output.\n1b. If your buildings depend on any other buildings (other mods, other vanilla buildings): Add them the same way.\n2. Add all building files of the mod you want to make compatible. Do *not* check the "Helper file" checkbox\n3. In "Options", set a output folder, mod name and check "load order priority" and "join files".\n4. Convert All'
     self.tabClasses[-1].separateStart=False
+    self.tabClasses[-1].singleEntryCheck="Helper File"
 
     self.newTab("Create Upgraded Buildings - Trigger files",createUpgradedBuildings,("text files","*.txt"),["--just_copy_and_check"]
       ,BUOptions,"")
@@ -599,8 +600,8 @@ class TabControlClass:
     self.tabClasses[-1].separateStart=False
     self.tabClasses[-1].singleEntryCheck="Source File"
 
-    self.newTab("Create AI Vars",createAIVarsFromModifiers,("text files","*.txt"),[],[of,"effect_name","type",oll],"")
-    self.tabClasses[-1].helpText="Creates weight files to be used in AI buiding weights. Since options are global, it's best to create one 'project' for different tpyes, e.g. one for planet modifiers, one for buildings, one for blocker"
+    #self.newTab("Create AI Vars",createAIVarsFromModifiers,("text files","*.txt"),[],[of,"effect_name","type",oll],"")
+    #self.tabClasses[-1].helpText="Creates weight files to be used in AI buiding weights. Since options are global, it's best to create one 'project' for different tpyes, e.g. one for planet modifiers, one for buildings, one for blocker"
 
 
     nb.pack(expand=1, fill="both")  # Pack to make visible
