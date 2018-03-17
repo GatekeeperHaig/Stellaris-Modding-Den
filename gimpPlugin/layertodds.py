@@ -2,10 +2,15 @@
 
 from gimpfu import pdb, PF_STRING, register, main,PF_FILE ,PF_BOOL,PF_INT
 import shlex
+import os
 
 def layerToDDS(timg, tdrawable,file,argumentFile, outFolder, byName,scaleBool,scaleTo):#, argumentFile,hmm,blub):
     # num_layers, layer_ids = pdb.gimp_image_get_layers(image)
-    #with open("E:/out.txt",'w') as outTxt:
+    # with open("E:/out.txt",'w') as outTxt:
+      # outTxt.write(str(os.getcwd()))
+      outFolder=os.path.dirname(argumentFile)+"/"+outFolder
+      if not os.path.exists(outFolder):
+        os.makedirs(outFolder)
       with open(argumentFile,'r') as argfile:
         for l in argfile:
           image = pdb.gimp_file_load(file, file)
@@ -43,10 +48,14 @@ def layerToDDS(timg, tdrawable,file,argumentFile, outFolder, byName,scaleBool,sc
             #outTxt.write(word+"\n")
             #layers.append(pdb.gimp_layer_copy(image.layers[int(word)],False))
             #pdb.gimp_image_insert_layer(image, layer,image.layers[int(word)], 0)
-            if byName:
-              pdb.gimp_item_set_visible(pdb.gimp_image_get_layer_by_name(image, word),True)
-            else:
-              pdb.gimp_item_set_visible(image.layers[int(word)], True)
+            try:
+              if byName:
+                pdb.gimp_item_set_visible(pdb.gimp_image_get_layer_by_name(image, word),True)
+              else:
+                pdb.gimp_item_set_visible(image.layers[int(word)], True)
+            except:
+              pdb.gimp_message("Error parsing line "+" ".join(line)+". Probably a missing/invalid item")
+              raise
           if scaleBool and scaleTo:
             for word in line[2:]:
               if byName:
@@ -67,7 +76,10 @@ def layerToDDS(timg, tdrawable,file,argumentFile, outFolder, byName,scaleBool,sc
           for layerIt in image.layers:
             if layerIt!=layer or not scaleTo:
               pdb.gimp_layer_resize_to_image_size(layerIt)
-          pdb.file_dds_save(image, drawable, outFile,outFile,0,0,0,0,0,0,0)
+          try:
+            pdb.file_dds_save(image, drawable, outFile,outFile,0,0,0,0,0,0,0)
+          except:
+            pdb.file_dds_save(image, drawable, outFile,outFile,0,0,0,0,0,0,0,0,0,0,0,0,0)
           # pdb.gimp_image_remove_layer(image, layer)
     #pdb.file_dds_save(image, drawable, "E:/test.dds","E:/test.dds")
     #pdb.gimp_file_save(image, drawable, "E:/test.xcf","E:/test.xcf")
