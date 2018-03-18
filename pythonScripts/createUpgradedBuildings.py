@@ -221,7 +221,7 @@ def readAndConvert(args, allowRestart=1):
             try:
               upgradeData=buildingNameToData.get(upgradeName) #allow editing
             except ValueError:
-              print("WARNING: Upgrade building not found for {}. Either missing or in different file. Cannot apply script to this! In different file will work with '--join_files' option.".format(buildingData.tagName))
+              print("WARNING: Upgrade building {} not found for {}. Either missing or in different file. Cannot apply script to this! In different file will work with '--join_files' option.".format(upgradeName, buildingData.tagName))
               if "planet_unique" in buildingData.names:
                 print("EXTRA WARNING: The problematic building is planet_unique. This error might destroy uniqueness!")
               continue
@@ -312,12 +312,12 @@ def readAndConvert(args, allowRestart=1):
             #REMOVE COPY FROM TECH TREE. Seems to remove the copy completely :( Pretty useless trigger...
             if "show_tech_unlock_if" in buildingNameToData.vals[upgradeBuildingIndex].names:
               buildingNameToData.vals[upgradeBuildingIndex].remove("show_tech_unlock_if")
-            buildingNameToData.vals[upgradeBuildingIndex].add("show_tech_unlock_if","{ always = no }")
+            buildingNameToData.vals[upgradeBuildingIndex].add("show_tech_unlock_if", TagList().add("always","no"))
             
             upgradeData.costChangeUpgradeToDirectBuild(buildingData,args, varsToValue)
 
             #Make sure you cannot replace a building by itself (i.e. upgraded version by same tier direct build)
-            upgradeData.getOrCreate("potential").add("NOT = { tile = { has_building = "+origUpgradeData.tagName+" } }",""," #Prevent self replace") #Since has_building is hidden in the name of the data, no replace of has_building will take place. Should be a minimal performance improvement.
+            upgradeData.getOrCreate("potential").add("NOT",TagList().add("tile",TagList().add("has_building",origUpgradeData.tagName))) #Prevent self replace") #Since has_building is hidden in the name of the data, no replace of has_building will take place. Should be a minimal performance improvement.
               
             if "upgrades" in upgradeData.names:
               buildingDataList.append(upgradeData)
@@ -343,7 +343,7 @@ def readAndConvert(args, allowRestart=1):
             #MAKE UNIQUE VIA INTRODUCING A FAKE MAX TIER BUILDING
             if not "upgrades" in upgradeData.names and "planet_unique" in upgradeData.names and upgradeData.get("planet_unique")=="yes": #Max tier unique
               fakeBuilding=NamedTagList(baseBuildingData.tagName+"_hidden_tree_root")
-              fakeBuilding.add("potential", "{ always=no }")
+              fakeBuilding.add("potential", TagList().add("always","no"))
               fakeBuilding.add("planet_unique", "yes")
               fakeBuilding.add("icon",baseBuildingData.tagName)
               locData.append(fakeBuilding.tagName+':0 "$'+baseBuildingData.tagName+'$"')
@@ -364,7 +364,7 @@ def readAndConvert(args, allowRestart=1):
       for building in buildingNameToData.vals: #Allow all upgrades to AI.
         if isinstance(building, NamedTagList):
           if "is_listed" in building.names and building.get("is_listed")=="no" and "ai_allow" in building.names:
-            building.replace("ai_allow", "{ always = yes }")
+            building.replace("ai_allow", TagList().add("always","yes"))
         
     #buildingNameToData.printAll()
         

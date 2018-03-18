@@ -103,6 +103,8 @@ def main(args,unused=0):
       keepExtraLines=False
     if not args.to_txt or os.path.exists(fileName):
       nameToData.readFile(fileName,args, varsToValue) 
+      if not args.to_txt:
+        nameToData.nonEqualToValue()
     else:
       # print(fileName)
       print("Generating new txt file from {} file. First column in table must be {!s} or addKey depending on file (the unique identifiers)".format(tableFileEnding, keyStrings))
@@ -157,9 +159,9 @@ def main(args,unused=0):
           if name[0]=="@":
             nameToData.remove(name) #removing by name should work while iterating over the list where stuff is removed. I tested this
         varsToValue.clear()
-      varsToValue.changed=[0 for i in varsToValue.vals]
 
       nameToData.addTags(tagList)
+    varsToValue.changed=[0 for i in varsToValue.vals]
     
     if args.to_txt:
       if not os.path.exists(tableFileName):
@@ -335,19 +337,19 @@ def main(args,unused=0):
               shiftInOutPut+=tagList.vals[i].countDeepestLevelEntries(args)
             # tagList.get(name).printAll()
 
-            occurenceList=copy.deepcopy(tagList.get(name))
-            val.toCSV(lineArray, tagList.get(name),occurenceList,varsToValue,args,shiftInOutPut)
-            occurenceEntry=copy.deepcopy(headerArray)
-            occurenceList.toCSVHeader(occurenceEntry,args)
+            # occurenceList=copy.deepcopy(tagList.get(name))
+            val.toCSV(lineArray, tagList.get(name),varsToValue,args,shiftInOutPut)
+            # occurenceEntry=copy.deepcopy(headerArray)
+            # occurenceList.toCSVHeader(occurenceEntry,args)
             try:
               keyValue=val.vals[val.names.index(keyString)]
             except:
               val.printAll()
               raise
             # keyIndex=tagList.vals.index(keyString)
-            occurenceEntry[0][0]=keyValue
+            # occurenceEntry[0][0]=keyValue
             # print(occurenceEntry)
-            occurenceArray+=occurenceEntry
+            # occurenceArray+=occurenceEntry
             # occurenceList.printAll()
             bodyArray+=lineArray
         if args.use_csv:
@@ -360,8 +362,8 @@ def main(args,unused=0):
         else:
           data=OrderedDict()
           data.update({"DataSheet": headerArray+bodyArray})
-          if args.occ_sheet:
-            data.update({"OccurenceNumbers": headerArray+occurenceArray})
+          # if args.occ_sheet:
+          #   data.update({"OccurenceNumbers": headerArray+occurenceArray})
           import pyexcel_ods
           pyexcel_ods.save_data(tableFileNameName, data)
       except PermissionError:
