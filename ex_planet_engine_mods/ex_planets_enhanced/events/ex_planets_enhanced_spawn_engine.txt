@@ -1,64 +1,109 @@
 namespace = ex_spawn_engine_10
 
-planet_event = { 
+event = { 
 	id = ex_spawn_engine_10.1
 	hide_window = yes
 	is_triggered_only = yes		
 	
 	immediate = { 
-		if = {
-			limit = { is_colonizable = no }
-			if = { 
-				limit = { has_vanilla_orbital_strategic_resource = yes }				
+		set_global_flag = planets_enhanced_active
+		every_planet = {
+			limit = { 
+				soloar_system = {
+					NOR = {
+						has_star_flag = sol_system
+						has_star_flag = sol
+						has_star_flag = deneb_system
+						has_star_flag = custom_system
+						has_star_flag = crystal_system
+						has_star_flag = floating_system					
+					}	
+				}
+			}	
+			if = {
+				limit = { is_colonizable = no }
 				if = { 
-					limit = { has_deposit_for = shipclass_mining_station } 
-					orbital_deposit_tile = { 
-						random_list = { 
-							50 = { set_deposit = d_vast_mineral_deposit }
-							50 = { set_deposit = d_vast_energy_deposit }
-						}						
-					}
-					else = { 
+					limit = { is_star = yes }		
+					if = { 
+						limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_1 } } } }
+						set_planet_flag = system_star_1				
+						else = {
+							if = { 
+								limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_2 } } } }
+								set_planet_flag = system_star_2						
+								else = {
+									if = { 
+										limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_3 } } } }
+										set_planet_flag = system_star_3						
+									}
+								}
+							}
+						}				
+					}	
+				}			
+				if = {
+					limit = { 
+						is_gas_giant = yes
+						has_moon = yes
+						any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
+					}				
+					every_moon = { 
+						limit = { NOT = { has_planet_flag = gas_giant_moon } }
+						set_planet_flag = gas_giant_moon
+					}	
+				}									
+				if = { 
+					limit = { has_vanilla_orbital_strategic_resource = yes }				
+					if = { 
+						limit = { has_deposit_for = shipclass_mining_station } 
 						orbital_deposit_tile = { 
 							random_list = { 
-								33.3 = { set_deposit = d_vast_society_deposit } 
-								33.3 = { set_deposit = d_vast_physics_deposit } 
-								33.3 = { set_deposit = d_vast_engineering_deposit } 		
+								50 = { set_deposit = d_vast_mineral_deposit }
+								50 = { set_deposit = d_vast_energy_deposit }
 							}						
-						}	
-					}			
-				}	
-			}	
-			orbital_resource_spawn_table = yes #uninhabitable planets only	
-		}			 
-		if = {
-			limit = { is_colonizable = yes }			
-			if = {
-				limit = { has_owner = no }
-				random_list = { 
-					70 = { set_variable = { which = sr_points value = 0 } }
-					20 = { set_variable = { which = sr_points value = 1 } }
-					5 = { set_variable = { which = sr_points value = 2 } }
-					3 = { set_variable = { which = sr_points value = 3 } }
-					1.8 = { set_variable = { which = sr_points value = 4 } }
-					0.2 = { set_variable = { which = sr_points value = 5 } }
-				}					
-				while = {
-					limit = { check_variable = { which = sr_points value > 0 } } 
-					if = {
-						limit = { any_tile = { has_deposit = no } }
-						random_tile = { 
-							limit = { has_deposit = no }
-							planetary_resource_spawn_table = yes						
 						}
 						else = { 
-							random_tile = { has_vanilla_regular_deposit = yes }
-							planetary_resource_spawn_table = yes
-						}	
-					}						
-					change_variable = { which = sr_points value = -1 }
+							orbital_deposit_tile = { 
+								random_list = { 
+									33.3 = { set_deposit = d_vast_society_deposit } 
+									33.3 = { set_deposit = d_vast_physics_deposit } 
+									33.3 = { set_deposit = d_vast_engineering_deposit } 		
+								}						
+							}	
+						}			
+					}	
 				}	
-			}	
-		}
+				#orbital_resource_spawn_table = yes #uninhabitable planets only	
+			}			 			
+			if = {
+				limit = { is_colonizable = yes }			
+				if = {
+					limit = { has_owner = no }
+					random_list = { 
+						70 = { set_variable = { which = sr_points value = 0 } }
+						20 = { set_variable = { which = sr_points value = 1 } }
+						5 = { set_variable = { which = sr_points value = 2 } }
+						3 = { set_variable = { which = sr_points value = 3 } }
+						1.8 = { set_variable = { which = sr_points value = 4 } }
+						0.2 = { set_variable = { which = sr_points value = 5 } }
+					}					
+					while = {
+						limit = { check_variable = { which = sr_points value > 0 } } 
+						if = {
+							limit = { any_tile = { has_deposit = no } }
+							random_tile = { 
+								limit = { has_deposit = no }
+								planetary_resource_spawn_table = yes						
+							}
+							else = { 
+								random_tile = { has_vanilla_regular_deposit = yes }
+								planetary_resource_spawn_table = yes
+							}	
+						}						
+						change_variable = { which = sr_points value = -1 }
+					}	
+				}	
+			}
+		}	
 	}	
 }	
