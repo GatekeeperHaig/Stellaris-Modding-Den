@@ -1,13 +1,13 @@
 ###global flag checks
-#
+
 #flags used by mods using the engine
-alpha_mod_enabled = { has_global_flag = alpha_mod_active }
+alphamod_enabled = { has_global_flag = alpha_mod_active }
 core_game_mechanics_enabled = { has_global_flag = core_game_mechanics_active }
 guillis_planet_modifiers_enabled = { has_global_flag = guillis_planet_modifiers_active }
 new_worlds_enabled = { has_global_flag = new_worlds_active }
 planets_enhanced_enabled = { has_global_flag = planets_enhanced_active }
 planetary_diversity_enabled = { has_global_flag = planetary_diversity_active }
-#function flags
+###function flags
 same_class_terraforming_enabled = { has_global_flag = same_class_terraforming_enabled }
 exo_terraforming_overhaul_enabled = { has_global_flag = ex_terraforming_overhaul_enabled }
 exo_terraforming_rework_enabled = { has_global_flag = ex_terraforming_rework_enabled }
@@ -16,8 +16,17 @@ exo_cybertronic_worlds_enabled = { has_global_flag = ex_cybertronic_worlds_enabl
 real_space_enabled = { has_global_flag = has_real_space_mod }
 STNH_enabled = { has_global_flag = star_trek_new_horizons }
 
-####
-has_regular_habitability_trait = {
+###Terraforming triggers
+is_cybertronic_candidate = { has_planet_flag = cybertronic_candidate }
+is_terraforming_candidate = {
+	OR = {
+		has_modifier = terraforming_candidate
+		has_planet_flag = terraforming_candidate_precursor
+	}
+}	
+
+###Vanilla Triggers
+has_regular_vanilla_habitability_trait = {
 	OR = {
 		has_trait = "trait_pc_continental_preference"
 		has_trait = "trait_pc_savannah_preference"
@@ -31,7 +40,7 @@ has_regular_habitability_trait = {
 	}
 }
 
-has_regular_planet_modifier = {
+has_regular_vanilla_planet_modifier = {
 	OR = {
 		has_modifier = hazardous_weather
 		has_modifier = dangerous_wildlife
@@ -60,7 +69,7 @@ has_regular_planet_modifier = {
 	}
 }	
 
-has_regular_blocker = {
+has_regular_vanilla_blocker = {
 	OR = {		  
 		has_blocker = tb_mountain_range
 		has_blocker = tb_active_volcano
@@ -107,43 +116,59 @@ has_regular_vanilla_deposit = {
 	}
 }
 
-is_gas_giant_moon = { has_planet_flag = gas_giant_moon }
-
-is_vanilla_habitable_planet = {
+has_vanilla_orbital_special_resource_deposit = {
 	OR = {
-		is_planet_class = pc_desert
-		is_planet_class = pc_tropical
-		is_planet_class = pc_arid
-		is_planet_class = pc_continental
-		is_planet_class = pc_ocean
-		is_planet_class = pc_tundra
-		is_planet_class = pc_arctic
-		is_planet_class = pc_alpine
-		is_planet_class = pc_savannah		
+		has_deposit = d_garanthium_deposit
+		has_deposit = d_lythuric_gas_deposit
+		has_deposit = d_engos_deposit
+		has_deposit = d_teldar_deposit
+		has_deposit = d_yuranic_deposit
+		has_deposit = d_orillium_deposit
+		has_deposit = d_pitharan_deposit
+		has_deposit = d_neutronium_deposit
+		has_deposit = d_living_metal_deposit
+		has_deposit = d_dark_matter_deposit
+		has_deposit = d_satramene_deposit
+		has_deposit = d_zro_deposit
 	}
-}
-
-is_vanilla_special_planet = {
+}	
+		
+has_vanilla_planetary_special_resource_deposit = {		
 	OR = {
-		is_planet_class = pc_gaia
-		is_planet_class = pc_nuked
-		is_planet_class = pc_ringworld_habitable
-		is_planet_class = pc_habitat
-		is_planet_class = pc_machine
+		has_deposit = d_betharian_deposit
+		has_deposit = d_alien_pets_deposit
+	}
+}		
+
+has_vanilla_orbital_strategic_resource = {
+	OR = {
+		has_resource = { type = sr_pitharan amount > 0 }
+		has_resource = { type = sr_engos amount > 0 }
+		has_resource = { type = sr_satramene amount > 0 }
+		has_resource = { type = sr_terraform_gases amount > 0 }
+		has_resource = { type = sr_terraform_liquids amount > 0 }
+		has_resource = { type = sr_garanthium amount > 0 }
+		has_resource = { type = sr_lythuric amount > 0 }
+		has_resource = { type = sr_teldar amount > 0 }
+		has_resource = { type = sr_yuranic amount > 0 }
+		has_resource = { type = sr_orillium amount > 0 }
+		has_resource = { type = sr_neutronium amount > 0 }
+		has_resource = { type = sr_living_metal amount > 0 }
+		has_resource = { type = sr_zro amount > 0 }
+		has_resource = { type = sr_dark_matter amount > 0 }
 	}
 }	
 
-is_vanilla_uninhabitable_planet = {
+has_vanilla_planetary_strategic_resource = {
 	OR = {
-		is_planet_class = pc_molten
-		is_planet_class = pc_barren
-		is_planet_class = pc_barren_cold
-		is_planet_class = pc_toxic
-		is_planet_class = pc_frozen
-		is_planet_class = pc_asteroid
-		is_planet_class = pc_gas_giant		
+		has_resource = { type = sr_betharian amount > 0 }
+		has_resource = { type = sr_alien_pets amount > 0 }
 	}
 }
+
+### General Triggers
+
+is_gas_giant_moon = { has_planet_flag = gas_giant_moon }
 
 is_presapient_pop = {
 	OR = {
@@ -203,6 +228,12 @@ is_humanoid = {
 
 is_plantoid = {
 	is_species_class = PLANT	
+}
+
+is_free_planetary_tile = {
+	has_building = no	
+	has_deposit = no
+	has_blocker = no
 }
 
 ### solar system and planet triggers
@@ -267,6 +298,115 @@ is_sol_system_planet = {
 	}
 }	
 
+is_broken_megastructure = {
+	OR = {
+		is_planet_class = pc_ringworld_habitable_damaged
+		is_planet_class = pc_ringworld_tech_damaged
+		is_planet_class = pc_ringworld_seam_damaged
+		has_planet_flag = has_ruined_megastructure			 
+	}
+}
+
+###Star and Solar System triggers
+
+orbits_cold_star = {
+    OR = {
+        solar_system = { any_planet = { is_planet_class = pc_m_star } }
+        AND = {
+            real_space_enabled = yes
+            OR = {
+                solar_system = { any_planet = { is_planet_class_pc_l_star = yes } }
+                solar_system = { any_planet = { is_planet_class_pc_d_star = yes } }
+            }    
+        }    
+    }
+}
+
+orbits_ideal_star = {
+    OR = {
+		solar_system = { any_planet = { is_planet_class = pc_k_star } }
+		solar_system = { any_planet = { is_planet_class = pc_g_star } }
+		solar_system = { any_planet = { is_planet_class = pc_f_star } }
+		AND = {
+			real_space_enabled = yes
+			solar_system = { any_planet = { is_planet_class_pc_gm_star = yes } }
+		}
+	}
+}
+
+orbits_hot_star = {
+    OR = {
+        solar_system = { any_planet = { is_planet_class = pc_a_star } }
+        AND = {
+            real_space_enabled = yes
+            OR = {
+                solar_system = { any_planet = { is_planet_class_pc_g_giant_star = yes } }
+                solar_system = { any_planet = { is_planet_class_pc_k_giant_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_m_giant_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_c_giant_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_s_giant_star = yes } }
+            }    
+        }    
+    }
+}
+
+orbits_nonideal_star = {
+    OR = {
+		solar_system = { any_planet = { is_planet_class = pc_b_star } }
+		solar_system = { any_planet = { is_planet_class = pc_black_hole } }
+		solar_system = { any_planet = { is_planet_class = pc_neutron_star } }
+		solar_system = { any_planet = { is_planet_class = pc_pulsar } }
+		AND = {
+			real_space_enabled = yes
+			OR = {
+				solar_system = { any_planet = { is_planet_class_pc_o_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_o_super_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_o_hyper_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_b_super_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_a_super_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_f_super_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_g_super_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_k_super_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_m_super_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_m_hyper_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_w_azure_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_w_red_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_w_green_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_w_purple_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_nova_1 = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_nova_2 = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_collapsar = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_protostar = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_lbv_blue_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_lbv_green_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_lbv_red_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_tt_red_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_tt_orange_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_tt_white_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_ae_star = yes } }
+				solar_system = { any_planet = { is_planet_class_pc_magnetar = yes } }
+			}    
+		}
+	}	
+}
+
+### Vanilla Star Classes and Star Planet Classes - these triggers will always have an effect
+
+is_collapsed_star = {
+	OR = {
+		is_planet_class = pc_black_hole
+		is_planet_class = pc_neutron_star
+		is_planet_class = pc_pulsar
+		AND = {
+			real_space_enabled = yes
+			OR = {
+				system_star_is_pc_collapsar = yes
+				system_star_is_pc_magnetar = yes
+			}
+		}
+	}
+}
+
 is_star_class_sc_a = { is_star_class = sc_a }
 is_star_class_sc_b = { is_star_class = sc_b }
 is_star_class_sc_f = { is_star_class = sc_f }
@@ -287,7 +427,6 @@ is_planet_class_pc_black_hole ={ is_planet_class = pc_black_hole }
 is_planet_class_pc_neutron_star ={ is_planet_class = pc_neutron_star }
 is_planet_class_pc_pulsar ={ is_planet_class = pc_pulsar }
 
-### Vanilla Star Classes - these triggers will always have an effect
 orbits_star_class_sc_a = { solar_system = { is_star_class_sc_a = yes } }
 orbits_star_class_sc_b = { solar_system = { is_star_class_sc_b = yes } }
 orbits_star_class_sc_f = { solar_system = { is_star_class_sc_f = yes } }
@@ -298,110 +437,84 @@ orbits_star_class_sc_black_hole = { solar_system = { is_star_class_sc_black_hole
 orbits_star_class_sc_neutron_star = { solar_system = { is_star_class_sc_neutron_star = yes } }
 orbits_star_class_sc_pulsar = { solar_system = { is_star_class_sc_pulsar = yes } }
 
+system_star_is_pc_b_star = { solar_system = { any_planet = { is_planet_class_pc_b_star = yes } } }
+system_star_is_pc_a_star = { solar_system = { any_planet = { is_planet_class_pc_a_star = yes } } }
+system_star_is_pc_f_star = { solar_system = { any_planet = { is_planet_class_pc_f_star = yes } } }
+system_star_is_pc_g_star = { solar_system = { any_planet = { is_planet_class_pc_g_star = yes } } }
+system_star_is_pc_k_star = { solar_system = { any_planet = { is_planet_class_pc_k_star = yes } } }
+system_star_is_pc_m_star = { solar_system = { any_planet = { is_planet_class_pc_m_star = yes } } }
+system_star_is_pc_black_hole = { solar_system = { any_planet = { is_planet_class_pc_black_hole = yes } } }
+system_star_is_pc_neutron_star = { solar_system = { any_planet = { is_planet_class_pc_neutron_star = yes } } }
+system_star_is_pc_pulsar = { solar_system = { any_planet = { is_planet_class_pc_pulsar = yes } } }
+
 ### Real Space Star Classes - these triggers will have an effect only when Real Space is present
-orbits_star_class_sc_o = { solar_system = { is_star_class_sc_o = yes } }
-orbits_star_class_sc_o_super = { solar_system = { is_star_class_sc_o_super = yes } }
-orbits_star_class_sc_o_hyper = { solar_system = { is_star_class_sc_o_hyper = yes } }
-orbits_star_class_sc_b_super = { solar_system = { is_star_class_sc_b_super = yes } }
-orbits_star_class_sc_a_super = { solar_system = { is_star_class_sc_a_super = yes } }
-orbits_star_class_sc_f_super = { solar_system = { is_star_class_sc_f_super = yes } }
-orbits_star_class_sc_g_giant = { solar_system = { is_star_class_sc_g_giant = yes } }
-orbits_star_class_sc_g_super = { solar_system = { is_star_class_sc_g_super = yes } }
-orbits_star_class_sc_k_giant = { solar_system = { is_star_class_sc_k_giant = yes } }
-orbits_star_class_sc_k_super = { solar_system = { is_star_class_sc_k_super = yes } }
-orbits_star_class_sc_m_giant = { solar_system = { is_star_class_sc_m_giant = yes } }
-orbits_star_class_sc_m_super = { solar_system = { is_star_class_sc_m_super = yes } }
-orbits_star_class_sc_m_hyper = { solar_system = { is_star_class_sc_m_hyper = yes } }
-orbits_star_class_sc_l = { solar_system = { is_star_class_sc_l = yes } }
-orbits_star_class_sc_d = { solar_system = { is_star_class_sc_d = yes } }
-orbits_star_class_sc_gm = { solar_system = { is_star_class_sc_gm = yes } }
-orbits_star_class_sc_c_giant = { solar_system = { is_star_class_sc_c_giant = yes } }
-orbits_star_class_sc_s_giant = { solar_system = { is_star_class_sc_s_giant = yes } }
-orbits_star_class_sc_w_azure = { solar_system = { is_star_class_sc_w_azure = yes } }
-orbits_star_class_sc_w_red = { solar_system = { is_star_class_sc_w_red = yes } }
-orbits_star_class_sc_w_green = { solar_system = { is_star_class_sc_w_green = yes } }
-orbits_star_class_sc_w_purple = { solar_system = { is_star_class_sc_w_purple = yes } }
-orbits_star_class_sc_nova_1 = { solar_system = { is_star_class_sc_nova_1 = yes } }
-orbits_star_class_sc_nova_2 = { solar_system = { is_star_class_sc_nova_2 = yes } }
-orbits_star_class_sc_collapsar = { solar_system = { is_star_class_sc_collapsar = yes } }
-orbits_star_class_sc_protostar = { solar_system = { is_star_class_sc_protostar = yes } }
-orbits_star_class_sc_lbv_blue = { solar_system = { is_star_class_sc_lbv_blue = yes } }
-orbits_star_class_sc_lbv_green = { solar_system = { is_star_class_sc_lbv_green = yes } }
-orbits_star_class_sc_lbv_red = { solar_system = { is_star_class_sc_lbv_red = yes } }
-orbits_star_class_sc_tt_red = { solar_system = { is_star_class_sc_tt_red = yes } }
-orbits_star_class_sc_tt_orange = { solar_system = { is_star_class_sc_tt_orange = yes } }
-orbits_star_class_sc_tt_white = { solar_system = { is_star_class_sc_tt_white = yes } }
-orbits_star_class_sc_ae = { solar_system = { is_star_class_sc_ae = yes } }
-orbits_star_class_sc_magnetar = { solar_system = { is_star_class_sc_magnetar = yes } }
 
-### The triggers below are for real space compatibility - they are overwritten by the RS version
+orbits_star_class_sc_o = { real_space_enabled = yes solar_system = { is_star_class_sc_o = yes } }
+orbits_star_class_sc_o_super = { real_space_enabled = yes solar_system = { is_star_class_sc_o_super = yes } }
+orbits_star_class_sc_o_hyper = { real_space_enabled = yes solar_system = { is_star_class_sc_o_hyper = yes } }
+orbits_star_class_sc_b_super = { real_space_enabled = yes solar_system = { is_star_class_sc_b_super = yes } }
+orbits_star_class_sc_a_super = { real_space_enabled = yes solar_system = { is_star_class_sc_a_super = yes } }
+orbits_star_class_sc_f_super = { real_space_enabled = yes solar_system = { is_star_class_sc_f_super = yes } }
+orbits_star_class_sc_g_giant = { real_space_enabled = yes solar_system = { is_star_class_sc_g_giant = yes } }
+orbits_star_class_sc_g_super = { real_space_enabled = yes solar_system = { is_star_class_sc_g_super = yes } }
+orbits_star_class_sc_k_giant = { real_space_enabled = yes solar_system = { is_star_class_sc_k_giant = yes } }
+orbits_star_class_sc_k_super = { real_space_enabled = yes solar_system = { is_star_class_sc_k_super = yes } }
+orbits_star_class_sc_m_giant = { real_space_enabled = yes solar_system = { is_star_class_sc_m_giant = yes } }
+orbits_star_class_sc_m_super = { real_space_enabled = yes solar_system = { is_star_class_sc_m_super = yes } }
+orbits_star_class_sc_m_hyper = { real_space_enabled = yes solar_system = { is_star_class_sc_m_hyper = yes } }
+orbits_star_class_sc_l = { real_space_enabled = yes solar_system = { is_star_class_sc_l = yes } }
+orbits_star_class_sc_d = { real_space_enabled = yes solar_system = { is_star_class_sc_d = yes } }
+orbits_star_class_sc_gm = { real_space_enabled = yes solar_system = { is_star_class_sc_gm = yes } }
+orbits_star_class_sc_c_giant = { real_space_enabled = yes solar_system = { is_star_class_sc_c_giant = yes } }
+orbits_star_class_sc_s_giant = { real_space_enabled = yes solar_system = { is_star_class_sc_s_giant = yes } }
+orbits_star_class_sc_w_azure = { real_space_enabled = yes solar_system = { is_star_class_sc_w_azure = yes } }
+orbits_star_class_sc_w_red = { real_space_enabled = yes solar_system = { is_star_class_sc_w_red = yes } }
+orbits_star_class_sc_w_green = { real_space_enabled = yes solar_system = { is_star_class_sc_w_green = yes } }
+orbits_star_class_sc_w_purple = { real_space_enabled = yes solar_system = { is_star_class_sc_w_purple = yes } }
+orbits_star_class_sc_nova_1 = { real_space_enabled = yes solar_system = { is_star_class_sc_nova_1 = yes } }
+orbits_star_class_sc_nova_2 = { real_space_enabled = yes solar_system = { is_star_class_sc_nova_2 = yes } }
+orbits_star_class_sc_collapsar = { real_space_enabled = yes solar_system = { is_star_class_sc_collapsar = yes } }
+orbits_star_class_sc_protostar = { real_space_enabled = yes solar_system = { is_star_class_sc_protostar = yes } }
+orbits_star_class_sc_lbv_blue = { real_space_enabled = yes solar_system = { is_star_class_sc_lbv_blue = yes } }
+orbits_star_class_sc_lbv_green = { real_space_enabled = yes solar_system = { is_star_class_sc_lbv_green = yes } }
+orbits_star_class_sc_lbv_red = { real_space_enabled = yes solar_system = { is_star_class_sc_lbv_red = yes } }
+orbits_star_class_sc_tt_red = { real_space_enabled = yes solar_system = { is_star_class_sc_tt_red = yes } }
+orbits_star_class_sc_tt_orange = { real_space_enabled = yes solar_system = { is_star_class_sc_tt_orange = yes } }
+orbits_star_class_sc_tt_white = { real_space_enabled = yes solar_system = { is_star_class_sc_tt_white = yes } }
+orbits_star_class_sc_ae = { real_space_enabled = yes solar_system = { is_star_class_sc_ae = yes } }
+orbits_star_class_sc_magnetar = { real_space_enabled = yes solar_system = { is_star_class_sc_magnetar = yes } }
 
-is_planet_class_pc_o_star ={ }
-is_planet_class_pc_o_super_star ={ }
-is_planet_class_pc_o_hyper_star ={ }
-is_planet_class_pc_b_super_star ={ }
-is_planet_class_pc_a_super_star ={ }
-is_planet_class_pc_f_super_star ={ }
-is_planet_class_pc_g_giant_star ={ }
-is_planet_class_pc_g_super_star ={ }
-is_planet_class_pc_k_giant_star ={ }
-is_planet_class_pc_k_super_star ={ }
-is_planet_class_pc_m_giant_star ={ }
-is_planet_class_pc_m_super_star ={ }
-is_planet_class_pc_m_hyper_star ={ }
-is_planet_class_pc_l_star ={ }
-is_planet_class_pc_d_star ={ }
-is_planet_class_pc_gm_star ={ }
-is_planet_class_pc_c_giant_star ={ }
-is_planet_class_pc_s_giant_star ={ }
-is_planet_class_pc_w_azure_star ={ }
-is_planet_class_pc_w_red_star ={ }
-is_planet_class_pc_w_green_star ={ }
-is_planet_class_pc_w_purple_star ={ }
-is_planet_class_pc_nova_1 ={ }
-is_planet_class_pc_nova_2 ={ }
-is_planet_class_pc_collapsar ={ }
-is_planet_class_pc_protostar ={ }
-is_planet_class_pc_lbv_blue_star ={ }
-is_planet_class_pc_lbv_green_star ={ }
-is_planet_class_pc_lbv_red_star ={ }
-is_planet_class_pc_tt_red_star ={ }
-is_planet_class_pc_tt_orange_star ={ }
-is_planet_class_pc_tt_white_star ={ }
-is_planet_class_pc_ae_star ={ }
-is_planet_class_pc_magnetar ={ }
-
-is_star_class_sc_o = { }
-is_star_class_sc_o_super = { }
-is_star_class_sc_o_hyper = { }
-is_star_class_sc_b_super = { }
-is_star_class_sc_a_super = { }
-is_star_class_sc_f_super = { }
-is_star_class_sc_g_giant = { }
-is_star_class_sc_g_super = { }
-is_star_class_sc_k_giant = { }
-is_star_class_sc_k_super = { }
-is_star_class_sc_m_giant = { }
-is_star_class_sc_m_super = { }
-is_star_class_sc_m_hyper = { }
-is_star_class_sc_l = { }
-is_star_class_sc_d = { }
-is_star_class_sc_gm = { }
-is_star_class_sc_c_giant = { }
-is_star_class_sc_s_giant = { }
-is_star_class_sc_w_azure = { }
-is_star_class_sc_w_red = { }
-is_star_class_sc_w_green = { }
-is_star_class_sc_w_purple = { }
-is_star_class_sc_nova_1 = { }
-is_star_class_sc_nova_2 = { }
-is_star_class_sc_collapsar = { }
-is_star_class_sc_protostar = { }
-is_star_class_sc_lbv_blue = { }
-is_star_class_sc_lbv_green = { }
-is_star_class_sc_lbv_red = { }
-is_star_class_sc_tt_red = { }
-is_star_class_sc_tt_orange = { }
-is_star_class_sc_tt_white = { }
-is_star_class_sc_ae = { }
-is_star_class_sc_magnetar = { }
+system_star_is_pc_o_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_o_star = yes	} } }
+system_star_is_pc_o_super_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_o_super_star = yes	} } }
+system_star_is_pc_o_hyper_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_o_hyper_star = yes	} } }
+system_star_is_pc_b_super_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_b_super_star = yes	} } }
+system_star_is_pc_a_super_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_a_super_star = yes	} } }
+system_star_is_pc_f_super_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_f_super_star = yes	} } }
+system_star_is_pc_g_giant_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_g_giant_star = yes	} } }
+system_star_is_pc_g_super_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_g_super_star = yes	} } }
+system_star_is_pc_k_giant_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_k_giant_star = yes	} } }
+system_star_is_pc_k_super_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_k_super_star = yes	} } }
+system_star_is_pc_m_giant_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_m_giant_star = yes	} } }
+system_star_is_pc_m_super_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_m_super_star = yes	} } }
+system_star_is_pc_m_hyper_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_m_hyper_star = yes	} } }
+system_star_is_pc_l_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_l_star = yes	} } }
+system_star_is_pc_d_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_d_star = yes	} } }
+system_star_is_pc_gm_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_gm_star = yes	} } }
+system_star_is_pc_c_giant_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_c_giant_star = yes	} } }
+system_star_is_pc_s_giant_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_s_giant_star = yes	} } }
+system_star_is_pc_w_azure_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_w_azure_star = yes	} } }
+system_star_is_pc_w_red_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_w_red_star = yes	} } }
+system_star_is_pc_w_green_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_w_green_star = yes	} } }
+system_star_is_pc_w_purple_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_w_purple_star = yes	} } }
+system_star_is_pc_nova_1 = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_nova_1 = yes	} } }
+system_star_is_pc_nova_2 = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_nova_2 = yes	} } }
+system_star_is_pc_collapsar = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_collapsar = yes	} } }
+system_star_is_pc_protostar = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_protostar = yes	} } }
+system_star_is_pc_lbv_blue_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_lbv_blue_star = yes	} } }
+system_star_is_pc_lbv_green_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_lbv_green_star = yes	} } }
+system_star_is_pc_lbv_red_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_lbv_red_star = yes	} } }
+system_star_is_pc_tt_red_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_tt_red_star = yes	} } }
+system_star_is_pc_tt_orange_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_tt_orange_star = yes	} } }
+system_star_is_pc_tt_white_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_tt_white_star = yes	} } }
+system_star_is_pc_ae_star = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_ae_star = yes	} } }
+system_star_is_pc_magnetar = { real_space_enabled = yes solar_system = { any_planet = { is_planet_class_pc_magnetar = yes	} } }
