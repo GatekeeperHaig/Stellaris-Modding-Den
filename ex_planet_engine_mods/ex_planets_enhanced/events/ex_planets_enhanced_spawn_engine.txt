@@ -3,13 +3,236 @@ namespace = ex_spawn_engine_10
 event = { 
 	id = ex_spawn_engine_10.1
 	hide_window = yes
-	is_triggered_only = yes		
+	is_triggered_only = yes	
+	fire_only_once = yes	
 	
 	immediate = { 
 		set_global_flag = planets_enhanced_active
+		every_megastructure = {
+			limit = { 
+				OR = {
+					is_megastructure_type = dyson_sphere_ruined
+					is_megastructure_type = think_tank_ruined
+					is_megastructure_type = spy_orb_ruined
+					is_megastructure_type = gateway_ruined
+				}
+				exists = orbit				
+			}
+			orbit.planet = { set_planet_flag = has_ruined_megastructure } 
+		}
+		every_planet = {
+			if = { 
+				limit = { is_star = yes }		
+				if = { 
+					limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_1 } } } }
+					set_planet_flag = system_star_1				
+					else = {
+						if = { 
+							limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_2 } } } }
+							set_planet_flag = system_star_2						
+							else = {
+								if = { 
+									limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_3 } } } }
+									set_planet_flag = system_star_3						
+								}
+							}
+						}
+					}				
+				}	
+			}			
+			if = {
+				limit = { 
+					is_gas_giant = yes
+					has_moon = yes
+					any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
+				}				
+				every_moon = { 
+					limit = { NOT = { has_planet_flag = gas_giant_moon } }
+					set_planet_flag = gas_giant_moon
+				}	
+			}	
+			if = {
+				limit = { has_strategic_resource = yes }
+				while = { 
+					limit = { 
+						any_tile = { 
+							OR = { 
+								AND = {
+									is_orbital_tile = yes
+									OR = {
+										has_resource = { type = sr_pitharan amount > 0 }
+										has_resource = { type = sr_engos amount > 0 }
+										has_resource = { type = sr_satramene amount > 0 }
+										has_resource = { type = sr_terraform_gases amount > 0 }
+										has_resource = { type = sr_terraform_liquids amount > 0 }
+										has_resource = { type = sr_garanthium amount > 0 }
+										has_resource = { type = sr_lythuric amount > 0 }
+										has_resource = { type = sr_teldar amount > 0 }
+										has_resource = { type = sr_yuranic amount > 0 }
+										has_resource = { type = sr_orillium amount > 0 }
+										has_resource = { type = sr_neutronium amount > 0 }
+										has_resource = { type = sr_living_metal amount > 0 }
+										has_resource = { type = sr_zro amount > 0 }
+										has_resource = { type = sr_dark_matter amount > 0 }
+									}
+								}		
+								AND = {
+									is_orbital_tile = no
+									OR = {
+										has_resource = { type = sr_betharian amount > 0 }
+										has_resource = { type = sr_alien_pets amount > 0 }					
+									}	
+								}	
+							}
+						}
+					}
+					random_tile = { 
+						limit = { 
+							OR = { 
+								AND = {
+									is_orbital_tile = yes
+									OR = {
+										has_resource = { type = sr_pitharan amount > 0 }
+										has_resource = { type = sr_engos amount > 0 }
+										has_resource = { type = sr_satramene amount > 0 }
+										has_resource = { type = sr_terraform_gases amount > 0 }
+										has_resource = { type = sr_terraform_liquids amount > 0 }
+										has_resource = { type = sr_garanthium amount > 0 }
+										has_resource = { type = sr_lythuric amount > 0 }
+										has_resource = { type = sr_teldar amount > 0 }
+										has_resource = { type = sr_yuranic amount > 0 }
+										has_resource = { type = sr_orillium amount > 0 }
+										has_resource = { type = sr_neutronium amount > 0 }
+										has_resource = { type = sr_living_metal amount > 0 }
+										has_resource = { type = sr_zro amount > 0 }
+										has_resource = { type = sr_dark_matter amount > 0 }
+									}
+								}		
+								AND = {
+									is_orbital_tile = no
+									OR = {
+										has_resource = { type = sr_betharian amount > 0 }
+										has_resource = { type = sr_alien_pets amount > 0 }					
+									}	
+								}	
+							}
+						}
+						clear_deposits = yes
+					}
+				}
+				if = { 
+					limit = { 
+						solar_system = {
+							NOR = {
+								has_star_flag = sol_system
+								has_star_flag = sol
+								has_star_flag = deneb_system
+								has_star_flag = custom_system
+								has_star_flag = crystal_system
+								has_star_flag = floating_system					
+							}
+						}	
+					}
+					planet_event = { id = ex_spawn_engine_10.2 }
+				}
+			}
+		}
+	}
+}	
+
+planet_event = { 
+	id = ex_spawn_engine_10.2
+	hide_window = yes
+	is_triggered_only = yes	
+	
+	immediate = {
+		if = {
+			limit = { is_colonizable = no }
+			random_list = {
+				95 = { }
+				5 = { ex_pe_orbital_sr_spawn_table = yes } #uninhabitable planets only	
+			}	
+		}			 			
+		if = {
+			limit = { 
+				is_colonizable = yes
+				OR = { 
+					has_owner = no
+					AND = {
+						has_owner = yes
+						owner = {
+							OR = {
+								is_fallen_empire = yes
+								is_primitive = yes
+							}
+						}
+					}
+				}		
+			}			
+			random_list = { 
+				70 = { set_variable = { which = sr_points value = 0 } }
+				20 = { set_variable = { which = sr_points value = 1 } }
+				5 = { set_variable = { which = sr_points value = 2 } }
+				3 = { set_variable = { which = sr_points value = 3 } }
+				1.8 = { set_variable = { which = sr_points value = 4 } }
+				0.2 = { set_variable = { which = sr_points value = 5 } }
+			}					
+			if = {
+				limit = { has_owner = no }
+				random_list = {
+					90 = { }
+					10 = { 
+						ex_pe_unique_sr_spawn_table = yes
+						change_variable = { which = sr_points value = -1 }
+						modifier = { 
+							factor = 0 
+							solar_system = { 
+								any_planet = {
+									has_planet_flag = unique_sr1
+									has_planet_flag = unique_sr2
+									has_planet_flag = unique_sr3
+									has_planet_flag = unique_sr4
+									has_planet_flag = unique_sr5
+									has_planet_flag = unique_sr6
+									has_planet_flag = unique_sr7
+								 }
+							}
+						}
+					}
+				}	
+			}
+			while = {
+				limit = { check_variable = { which = sr_points value > 0 } } 
+				if = {
+					limit = { any_tile = { has_deposit = no } }
+					random_tile = { 
+						limit = { has_deposit = no }
+						ex_pe_planetary_sr_spawn_table = yes						
+					}
+					else = { 
+						random_tile = { 
+							limit = { has_vanilla_regular_deposit = yes }
+							ex_pe_planetary_sr_spawn_table = yes
+						}	
+					}	
+				}						
+				change_variable = { which = sr_points value = -1 }
+			}					
+		}
+	}	
+}	
+
+planet_event = { 
+	id = ex_spawn_engine_10.3
+	hide_window = yes
+	is_triggered_only = yes	
+
+	immediate = {
 		every_planet = {
 			limit = { 
-				soloar_system = {
+				is_colonizable = yes
+				is_colony = no
+				solar_system = {
 					NOR = {
 						has_star_flag = sol_system
 						has_star_flag = sol
@@ -17,93 +240,30 @@ event = {
 						has_star_flag = custom_system
 						has_star_flag = crystal_system
 						has_star_flag = floating_system					
-					}	
-				}
-			}	
-			if = {
-				limit = { is_colonizable = no }
-				if = { 
-					limit = { is_star = yes }		
-					if = { 
-						limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_1 } } } }
-						set_planet_flag = system_star_1				
-						else = {
-							if = { 
-								limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_2 } } } }
-								set_planet_flag = system_star_2						
-								else = {
-									if = { 
-										limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_3 } } } }
-										set_planet_flag = system_star_3						
-									}
-								}
-							}
-						}				
-					}	
-				}			
-				if = {
-					limit = { 
-						is_gas_giant = yes
-						has_moon = yes
-						any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
-					}				
-					every_moon = { 
-						limit = { NOT = { has_planet_flag = gas_giant_moon } }
-						set_planet_flag = gas_giant_moon
-					}	
-				}									
-				if = { 
-					limit = { has_vanilla_orbital_strategic_resource = yes }				
-					if = { 
-						limit = { has_deposit_for = shipclass_mining_station } 
-						orbital_deposit_tile = { 
-							random_list = { 
-								50 = { set_deposit = d_vast_mineral_deposit }
-								50 = { set_deposit = d_vast_energy_deposit }
-							}						
-						}
-						else = { 
-							orbital_deposit_tile = { 
-								random_list = { 
-									33.3 = { set_deposit = d_vast_society_deposit } 
-									33.3 = { set_deposit = d_vast_physics_deposit } 
-									33.3 = { set_deposit = d_vast_engineering_deposit } 		
-								}						
-							}	
-						}			
-					}	
-				}	
-				ex_pe_orbital_sr_spawn_table = yes #uninhabitable planets only	
-			}			 			
-			if = {
-				limit = { is_colonizable = yes }			
-				if = {
-					limit = { has_owner = no }
-					random_list = { 
-						70 = { set_variable = { which = sr_points value = 0 } }
-						20 = { set_variable = { which = sr_points value = 1 } }
-						5 = { set_variable = { which = sr_points value = 2 } }
-						3 = { set_variable = { which = sr_points value = 3 } }
-						1.8 = { set_variable = { which = sr_points value = 4 } }
-						0.2 = { set_variable = { which = sr_points value = 5 } }
-					}					
-					while = {
-						limit = { check_variable = { which = sr_points value > 0 } } 
-						if = {
-							limit = { any_tile = { has_deposit = no } }
-							random_tile = { 
-								limit = { has_deposit = no }
-								ex_pe_planetary_sr_spawn_table = yes						
-							}
-							else = { 
-								random_tile = { has_vanilla_regular_deposit = yes }
-								ex_pe_planetary_sr_spawn_table = yes
-							}	
-						}						
-						change_variable = { which = sr_points value = -1 }
-					}	
+					}
 				}	
 			}
-		}	
-	}	
+			if = {
+				limit = { has_global_flag = reduce_habitable_planets_by_25_percent }
+				random_list = {
+					75 = { }
+					25 = { habitable_to_uninhabitable_conversion_table = yes }
+				}
+			}
+			if = {
+				limit = { has_global_flag = reduce_habitable_planets_by_50_percent }
+				random_list = {
+					50 = { }
+					50 = { habitable_to_uninhabitable_conversion_table = yes }
+				}
+			}			
+			if = {
+				limit = { has_global_flag = reduce_habitable_planets_by_75_percent }
+				random_list = {
+					25 = { }
+					75 = { habitable_to_uninhabitable_conversion_table = yes }
+				}
+			}						
+		}
+	}
 }	
