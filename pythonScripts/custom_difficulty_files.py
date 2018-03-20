@@ -13,14 +13,14 @@ possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_a
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult","country_resource_influence_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["country_ship_upkeep_mult","country_building_upkeep_mult","country_starbase_upkeep_mult","country_army_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","","",""]
 possibleBoniColor=["P","Y","G","L","E","B","W","M","G","H","B","T","G"]
-boniListNames=["Vanilla Custom Empire", "All ship bonuses"]
-boniListEntries=[[0,1,2,3,4,6], [7,8,9,10]]
-boniListPictures=["GFX_evt_alien_city","GFX_evt_federation_fleet"]
-cats=["ai","fe","leviathan","player"]
-catNames=["AI Custom Empire", "Fallen and Awakened Empires", "Leviathans", "Player"]
-catPictures=["GFX_evt_throne_room","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel"]
+boniListNames=["All","Vanilla Custom Empire", "All ship bonuses"]
+boniListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
+boniListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
+cats=["ai","ai_yearly","fe","leviathan","player"]
+catNames=["AI Custom Empire", "AI Yearly Change", "Fallen and Awakened Empires", "Leviathans", "Player"]
+catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel"]
 locList=[]
-locList.append(["custom_difficulty.current_bonuses", "Current Bonuses"])
+locList.append(["custom_difficulty.current_bonuses", "Current Bonuses:"])
 locList.append(["custom_difficulty.back", "Back"])
 locList.append(["custom_difficulty.cancel", "Cancel and Back"])
 locList.append(["close_custom_difficulty.name", "Close Custom Difficulty menu"])
@@ -84,8 +84,8 @@ for cat in cats:
     locList.append(["custom_difficulty_{}_{}_desc".format(cat,bonusR),"{} §{}{} : [root.custom_difficulty_{}_{}_value]% ".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonusR)])
 
     #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before the loop)
-    option=TagList().add("name", "custom_difficulty_{}_change_{}.name".format(cat,bonusR))
-    locList.append(["custom_difficulty_{}_change_{}.name".format(cat,bonusR), "Change {} bonus".format(bonus)])
+    option=TagList().add("name", "custom_difficulty_{}_change_{}_button.name".format(cat,bonusR))
+    locList.append(["custom_difficulty_{}_change_{}_button.name".format(cat,bonusR), "Change {} bonus".format(bonus)])
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.{:01d}{:02d}0".format(mainIndex,optionIndex))))
     choiceEvent.add("option",option)
 
@@ -106,7 +106,8 @@ for cat in cats:
     tagList.add("country_event", changeEvent)
     changeEvent.add("id","custom_difficulty.{:01d}{:02d}0".format(mainIndex,bonusIndex))
     changeEvent.add("is_triggered_only", yes)
-    changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonusR)) #loc same as on the button
+    changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonusR))
+    locList.append(["custom_difficulty_{}_change_{}.name".format(cat,bonusR), "Change {} bonus ({})".format(bonus,catNames[mainIndex-1])])
     changeEvent.add("desc", TagList().add("trigger",trigger)) #same desc trigger as above?
     changeEvent.add("picture",'"'+(boniListPictures+possibleBoniPictures)[bonusIndex-1]+'"')
 
@@ -116,11 +117,11 @@ for cat in cats:
       if changeStep>0:
         option=TagList().add("name","custom_difficulty_{}_increase_{!s}".format(bonusR, changeStep))
         if mainIndex==1:
-          locList.append(["custom_difficulty_{}_increase_{!s}".format(bonusR, changeStep), "Increase {} by {}%".format(bonus, changeStep)])
+          locList.append(["custom_difficulty_{}_increase_{!s}".format(bonusR, changeStep), "Increase {} bonuses by {}%".format(bonus, changeStep)])
       else:
         option=TagList().add("name","custom_difficulty_{}_decrease_{!s}".format(bonusR, -changeStep))
         if mainIndex==1:
-          locList.append(["custom_difficulty_{}_decrease_{!s}".format(bonusR, -changeStep), "Decrease {} by {}%".format(bonus, -changeStep)])
+          locList.append(["custom_difficulty_{}_decrease_{!s}".format(bonusR, -changeStep), "Decrease {} bonuses by {}%".format(bonus, -changeStep)])
 
       hidden_effect=TagList()
       if bonusIndex>len(boniListNames):
