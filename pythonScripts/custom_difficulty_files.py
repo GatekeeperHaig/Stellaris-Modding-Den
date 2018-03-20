@@ -10,15 +10,20 @@ for s in reversed(changeSteps):
 possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep"]
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult","country_resource_influence_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["country_ship_upkeep_mult","country_building_upkeep_mult","country_starbase_upkeep_mult","country_army_upkeep_mult"]]
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","",""]
-possibleBoniColor=["P","Y","G","L","E","B","W","T","G","H","B","T"]
-boniListNames=["Vanilla Custom Empire Bonuses", "All ship bonuses"]
+possibleBoniColor=["P","Y","G","L","E","B","W","M","G","H","B","T"]
+boniListNames=["Vanilla Custom Empire", "All ship bonuses"]
 boniListEntries=[[0,1,2,3,4,6], [7,8,9,10]]
 cats=["ai","fe","leviathan","player"]
 catNames=["AI Custom Empire", "Fallen and Awakened Empires", "Leviathans", "Player"]
 locList=[]
 locList.append(["custom_difficulty.current_bonuses", "Current Bonuses"])
 locList.append(["custom_difficulty.back", "Back"])
+locList.append(["custom_difficulty.cancel", "Cancel and Back"])
 locList.append(["close_custom_difficulty.name", "Close Custom Difficulty menu"])
+locList.append(["custom_difficulty.0.lock.name", "Lock settings for the rest of the game"])
+locList.append(["custom_difficulty.0.lock.desc", "Can only be unlocked via installing the unlock mod, editing save game or starting a new game. Use with care!"])
+locList.append(["custom_difficulty.0.unlock.name", "Unlock settings"])
+locList.append(["custom_difficulty.0.lock.desc", "Todo: Move to separate mod!"])
 
 yes="yes"
 
@@ -74,29 +79,29 @@ for cat in cats:
   bonusIndex=0
   for bonus in boniListNames+possibleBoniNames:
     bonusIndex+=1
-    bonus=bonus.lower().replace(" ","_")
+    bonusR=bonus.lower().replace(" ","_")
     changeEvent=TagList()
     tagList.add("country_event", changeEvent)
     changeEvent.add("id","custom_difficulty.{:01d}{:02d}0".format(mainIndex,bonusIndex))
     changeEvent.add("is_triggered_only", yes)
-    changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonus)) #loc same as on the button
+    changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonusR)) #loc same as on the button
     changeEvent.add("desc", TagList().add("trigger",trigger)) #same desc trigger as above?
 
     for changeStep in changeSteps:
       if cat=="player" and (abs(changeStep)==1 or abs(changeStep)==5 or abs(changeStep)==25):
         continue
       if changeStep>0:
-        option=TagList().add("name","custom_difficulty_{}_increase_{!s}".format(bonus, changeStep))
+        option=TagList().add("name","custom_difficulty_{}_increase_{!s}".format(bonusR, changeStep))
         if mainIndex==1:
-          locList.append(["custom_difficulty_{}_increase_{!s}".format(bonus, changeStep), "Increase {} by {}%".format(bonus, changeStep)])
+          locList.append(["custom_difficulty_{}_increase_{!s}".format(bonusR, changeStep), "Increase {} by {}%".format(bonus, changeStep)])
       else:
-        option=TagList().add("name","custom_difficulty_{}_decrease_{!s}".format(bonus, -changeStep))
+        option=TagList().add("name","custom_difficulty_{}_decrease_{!s}".format(bonusR, -changeStep))
         if mainIndex==1:
-          locList.append(["custom_difficulty_{}_decrease_{!s}".format(bonus, -changeStep), "Decrease {} by {}%".format(bonus, -changeStep)])
+          locList.append(["custom_difficulty_{}_decrease_{!s}".format(bonusR, -changeStep), "Decrease {} by {}%".format(bonus, -changeStep)])
 
       hidden_effect=TagList()
       if bonusIndex>len(boniListNames):
-        hidden_effect.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value",str(changeStep)))
+        hidden_effect.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value",str(changeStep)))
       else:
         for bonusListIndex in boniListEntries[bonusIndex-1]:
           bonusListValue=possibleBoniNames[bonusListIndex].lower().replace(" ","_")
