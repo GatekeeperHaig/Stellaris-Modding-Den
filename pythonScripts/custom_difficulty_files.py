@@ -9,8 +9,8 @@ for s in reversed(changeSteps):
   changeSteps.append(-s)
 possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep"]
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult","country_resource_influence_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["country_ship_upkeep_mult","country_building_upkeep_mult","country_starbase_upkeep_mult","country_army_upkeep_mult"]]
-possibleBoniIcons=["£minerals","£energy", "£food", "£physics£society£engineering","£unity", "£influence","","","","","",""]
-possibleBoniColor=["P","Y","G","L","B","E","W","T","G","H","B","T"]
+possibleBoniIcons=["£minerals","£energy", "£food", "£physics££society££engineering","£unity", "£influence","","","","","",""]
+possibleBoniColor=["P","Y","G","L","E","B","W","T","G","H","B","T"]
 boniListNames=["General income", "All ship bonuses"]
 boniListEntries=[[0,1,2,3,4], [6,7,8,9]]
 cats=["ai","fe","leviathan","player"]
@@ -56,7 +56,7 @@ for cat in cats:
     checkVar=TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value","0")
     trigger.add("fail_text",TagList().add("text","custom_difficulty_{}_{}_desc".format(cat,bonusR)).add("check_variable", checkVar))
     locList.append(["custom_difficulty_{}_{}_desc".format(cat,bonusR),"{} §{}{} : [root.custom_difficulty_{}_{}_value]% ".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonusR)])
-    
+
     #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before the loop)
     option=TagList().add("name", "custom_difficulty_{}_change_{}.name".format(cat,bonusR))
     locList.append(["custom_difficulty_{}_change_{}.name".format(cat,bonusR), "Change {} bonus".format(bonus)])
@@ -96,7 +96,12 @@ for cat in cats:
           locList.append(["custom_difficulty_{}_decrease_{!s}".format(bonus, -changeStep), "Decrease {} by {}%".format(bonus, -changeStep)])
 
       hidden_effect=TagList()
-      hidden_effect.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value",str(changeStep)))
+      if bonusIndex>len(boniListNames):
+        hidden_effect.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value",str(changeStep)))
+      else:
+        for bonusListIndex in boniListEntries[bonusIndex-1]:
+          bonusListValue=possibleBoniNames[bonusListIndex].lower().replace(" ","_")
+          hidden_effect.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusListValue)).add("value",str(changeStep)))
       hidden_effect.add("country_event", TagList().add("id","custom_difficulty.{:01d}{:02d}0".format(mainIndex,bonusIndex)))
       option.add("hidden_effect",hidden_effect)
       changeEvent.add("option",option)
