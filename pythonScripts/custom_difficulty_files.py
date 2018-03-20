@@ -1,20 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys, os
+import sys, os, io
 from stellarisTxtRead import *
 
 changeSteps = [50, 25, 10, 5, 1]
 for s in reversed(changeSteps):
   changeSteps.append(-s)
 possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep"]
+possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_animal_wildlife", "GFX_evt_think_tank", "GFX_evt_ancient_alien_temple","GFX_evt_arguing_senate","GFX_evt_hangar_bay", "GFX_evt_debris", "GFX_evt_sabotaged_ship","GFX_evt_pirate_armada","GFX_evt_fleet_neutral","GFX_evt_city_ruins"]
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult","country_resource_influence_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["country_ship_upkeep_mult","country_building_upkeep_mult","country_starbase_upkeep_mult","country_army_upkeep_mult"]]
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","",""]
 possibleBoniColor=["P","Y","G","L","E","B","W","M","G","H","B","T"]
 boniListNames=["Vanilla Custom Empire", "All ship bonuses"]
 boniListEntries=[[0,1,2,3,4,6], [7,8,9,10]]
+boniListPictures=["GFX_evt_alien_city","GFX_evt_federation_fleet"]
 cats=["ai","fe","leviathan","player"]
 catNames=["AI Custom Empire", "Fallen and Awakened Empires", "Leviathans", "Player"]
+catPictures=["GFX_evt_throne_room","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel"]
 locList=[]
 locList.append(["custom_difficulty.current_bonuses", "Current Bonuses"])
 locList.append(["custom_difficulty.back", "Back"])
@@ -24,6 +27,8 @@ locList.append(["custom_difficulty.0.lock.name", "Lock settings for the rest of 
 locList.append(["custom_difficulty.0.lock.desc", "Can only be unlocked via installing the unlock mod, editing save game or starting a new game. Use with care!"])
 locList.append(["custom_difficulty.0.unlock.name", "Unlock settings"])
 locList.append(["custom_difficulty.0.lock.desc", "Todo: Move to separate mod!"])
+locList.append(["custom_difficulty.0.name", "Ultimate Custom Difficulty main menu"])
+locList.append(["custom_difficulty.0.desc", "Choose category to change or show"])
 
 yes="yes"
 
@@ -39,6 +44,7 @@ for cat in cats:
   choiceEvent.add("id","custom_difficulty.{!s}000".format(mainIndex))
   choiceEvent.add("is_triggered_only", yes)
   choiceEvent.add("title","custom_difficulty_{}.name".format(cat))
+  choiceEvent.add("picture",'"'+catPictures[mainIndex-1]+'"')
   locList.append(["custom_difficulty_{}.name".format(cat),"Change {} bonuses".format(catNames[mainIndex-1])])
   trigger=TagList()
   choiceEvent.add("desc", TagList().add("trigger",trigger))
@@ -86,6 +92,7 @@ for cat in cats:
     changeEvent.add("is_triggered_only", yes)
     changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonusR)) #loc same as on the button
     changeEvent.add("desc", TagList().add("trigger",trigger)) #same desc trigger as above?
+    changeEvent.add("picture",'"'+(boniListPictures+possibleBoniPictures)[bonusIndex-1]+'"')
 
     for changeStep in changeSteps:
       if cat=="player" and (abs(changeStep)==1 or abs(changeStep)==5 or abs(changeStep)==25):
@@ -136,7 +143,8 @@ for cat, eventFileCont in zip(cats, difficultyChangeWindows):
 outFolder="../gratak_mods/custom_difficulty/localisation/english"
 if not os.path.exists(outFolder):
   os.makedirs(outFolder)
-with open(outFolder+"/custom_difficulty_l_english.yml",'w') as file:
+
+with io.open(outFolder+"/custom_difficulty_l_english.yml",'w', encoding="utf-8") as file:
   file.write(u'\ufeff')
   file.write("l_english:\n")
   for locEntry in locList:
