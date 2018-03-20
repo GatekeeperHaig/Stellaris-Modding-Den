@@ -31,8 +31,8 @@ for cat in cats:
   tagList.add("country_event", choiceEvent)
   choiceEvent.add("id","custom_difficulty.{!s}000".format(mainIndex))
   choiceEvent.add("is_triggered_only", yes)
-  choiceEvent.add("title","custom_difficulty.{}.name".format(cat))
-  locList.append(["custom_difficulty.{}.name".format(cat),"Change {} bonuses".format(catNames[mainIndex-1])])
+  choiceEvent.add("title","custom_difficulty_{}.name".format(cat))
+  locList.append(["custom_difficulty_{}.name".format(cat),"Change {} bonuses".format(catNames[mainIndex-1])])
   trigger=TagList()
   choiceEvent.add("desc", TagList().add("trigger",trigger))
   trigger.add("text", "custom_difficulty.current_bonuses") #loc global
@@ -43,21 +43,21 @@ for cat in cats:
   for boniListName in boniListNames:
     optionIndex+=1
     boniListNameR=boniListName.lower().replace(" ","_")
-    option=TagList().add("name", "custom_difficulty.{}.change.{}.name".format(cat,boniListNameR))
-    locList.append(["custom_difficulty.{}.change.{}.name".format(cat,boniListNameR), "Change {} bonuses".format(boniListName)])
+    option=TagList().add("name", "custom_difficulty_{}_change_{}_name".format(cat,boniListNameR))
+    locList.append(["custom_difficulty_{}_change_{}_name".format(cat,boniListNameR), "Change {} bonuses".format(boniListName)])
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.{:01d}{:02d}0".format(mainIndex,optionIndex))))
     choiceEvent.add("option",option)
 
   for bonus in possibleBoniNames:
     optionIndex+=1
     bonusR=bonus.lower().replace(" ","_")
-    checkVar=TagList().add("which", "custom_difficulty.{}.{}.value".format(cat,bonusR)).add("value","0")
-    trigger.add("fail_text",TagList().add("text","custom_difficulty.{}.{}.desc".format(cat,bonusR)).add("check_variable", checkVar))
-    locList.append(["custom_difficulty.{}.{}.desc".format(cat,bonusR),"{} §G[root.custom_difficulty.{}.{}.value]%§!".format(bonus, cat,bonusR)]) #todo: right color!
+    checkVar=TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value","0")
+    trigger.add("fail_text",TagList().add("text","custom_difficulty_{}_{}_desc".format(cat,bonusR)).add("check_variable", checkVar))
+    locList.append(["custom_difficulty_{}_{}_desc".format(cat,bonusR),"{} §G[root.custom_difficulty_{}_{}_value]%§".format(bonus, cat,bonusR)]) #todo: right color!
 
     #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before the loop)
-    option=TagList().add("name", "custom_difficulty.{}.change.{}.name".format(cat,bonusR))
-    locList.append(["custom_difficulty.{}.change.{}.name".format(cat,bonusR), "Change {} bonus".format(bonus)])
+    option=TagList().add("name", "custom_difficulty_{}_change_{}.name".format(cat,bonusR))
+    locList.append(["custom_difficulty_{}_change_{}.name".format(cat,bonusR), "Change {} bonus".format(bonus)])
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.{:01d}{:02d}0".format(mainIndex,optionIndex))))
     choiceEvent.add("option",option)
 
@@ -78,23 +78,23 @@ for cat in cats:
     tagList.add("country_event", changeEvent)
     changeEvent.add("id","custom_difficulty.{:01d}{:02d}0".format(mainIndex,bonusIndex))
     changeEvent.add("is_triggered_only", yes)
-    changeEvent.add("title","custom_difficulty.{}.change.{}.name".format(cat,bonus)) #loc same as on the button
+    changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonus)) #loc same as on the button
     changeEvent.add("desc", TagList().add("trigger",trigger)) #same desc trigger as above?
 
     for changeStep in changeSteps:
       if cat=="player" and (abs(changeStep)==1 or abs(changeStep)==5 or abs(changeStep)==25):
         continue
       if changeStep>0:
-        option=TagList().add("name","custom_difficulty.{}.increase.{!s}".format(bonus, changeStep))
+        option=TagList().add("name","custom_difficulty_{}_increase_{!s}".format(bonus, changeStep))
         if mainIndex==1:
-          locList.append(["custom_difficulty.{}.increase.{!s}".format(bonus, changeStep), "Increase {} by {}%".format(bonus, changeStep)])
+          locList.append(["custom_difficulty_{}_increase_{!s}".format(bonus, changeStep), "Increase {} by {}%".format(bonus, changeStep)])
       else:
-        option=TagList().add("name","custom_difficulty.{}.decrease.{!s}".format(bonus, -changeStep))
+        option=TagList().add("name","custom_difficulty_{}_decrease_{!s}".format(bonus, -changeStep))
         if mainIndex==1:
-          locList.append(["custom_difficulty.{}.decrease.{!s}".format(bonus, -changeStep), "Decrease {} by {}%".format(bonus, -changeStep)])
+          locList.append(["custom_difficulty_{}_decrease_{!s}".format(bonus, -changeStep), "Decrease {} by {}%".format(bonus, -changeStep)])
 
       hidden_effect=TagList()
-      hidden_effect.add("change_variable", TagList().add("which", "custom_difficulty.{}.{}.value".format(cat,bonus)).add("value",str(changeStep)))
+      hidden_effect.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value",str(changeStep)))
       hidden_effect.add("country_event", TagList().add("id","custom_difficulty.{:01d}{:02d}0".format(mainIndex,bonusIndex)))
       option.add("hidden_effect",hidden_effect)
       changeEvent.add("option",option)
