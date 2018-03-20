@@ -8,7 +8,7 @@ changeSteps = [50, 25, 10, 5, 1]
 for s in reversed(changeSteps):
   changeSteps.append(-s)
 possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep"]
-possibleBoniModifier=["tile_resource_minerals_mult", "tile_resource_energy_mult","country_resource_influence_mult", "tile_resource_food_mult", "tile_resource_all_research_mult", "tile_resource_unity_mult","","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["country_ship_upkeep_mult","country_building_upkeep_mult","country_starbase_upkeep_mult","country_army_upkeep_mult"]]
+possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult","country_resource_influence_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["country_ship_upkeep_mult","country_building_upkeep_mult","country_starbase_upkeep_mult","country_army_upkeep_mult"]]
 boniListNames=["General income", "All ship bonuses"]
 boniListEntries=[[0,1,2,3,4], [6,7,8,9]]
 cats=["ai","fe","leviathan","player"]
@@ -125,7 +125,7 @@ for cat, eventFileCont in zip(cats, difficultyChangeWindows):
 outFolder="../gratak_mods/custom_difficulty/localisation/english"
 if not os.path.exists(outFolder):
   os.makedirs(outFolder)
-with open(outFolder+"/custom_difficulty_l_english",'w') as file:
+with open(outFolder+"/custom_difficulty_l_english.yml",'w') as file:
   file.write(u'\ufeff')
   file.write("l_english:\n")
   for locEntry in locList:
