@@ -53,7 +53,7 @@ for cat in cats:
     bonusR=bonus.lower().replace(" ","_")
     checkVar=TagList().add("which", "custom_difficulty.{}.{}.value".format(cat,bonusR)).add("value","0")
     trigger.add("fail_text",TagList().add("text","custom_difficulty.{}.{}.desc".format(cat,bonusR)).add("check_variable", checkVar))
-    locList.append(["custom_difficulty.{}.{}.desc".format(cat,bonusR),"{} : §G[root.custom_difficulty.{}.{}.value]§".format(bonus, cat,bonusR)]) #todo: right color!
+    locList.append(["custom_difficulty.{}.{}.desc".format(cat,bonusR),"{} §G[root.custom_difficulty.{}.{}.value]§".format(bonus, cat,bonusR)]) #todo: right color!
 
     #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before the loop)
     option=TagList().add("name", "custom_difficulty.{}.change.{}.name".format(cat,bonusR))
