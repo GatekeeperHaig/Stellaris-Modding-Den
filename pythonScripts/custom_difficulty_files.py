@@ -9,10 +9,10 @@ for s in reversed(changeSteps):
   changeSteps.append(-s)
 possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep"]
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult","country_resource_influence_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["country_ship_upkeep_mult","country_building_upkeep_mult","country_starbase_upkeep_mult","country_army_upkeep_mult"]]
-possibleBoniIcons=["£minerals","£energy", "£food", "£physics££society££engineering","£unity", "£influence","","","","","",""]
+possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","",""]
 possibleBoniColor=["P","Y","G","L","E","B","W","T","G","H","B","T"]
-boniListNames=["General income", "All ship bonuses"]
-boniListEntries=[[0,1,2,3,4], [6,7,8,9]]
+boniListNames=["Vanilla Custom Empire Bonuses", "All ship bonuses"]
+boniListEntries=[[0,1,2,3,4,6], [7,8,9,10]]
 cats=["ai","fe","leviathan","player"]
 catNames=["AI Custom Empire", "Fallen and Awakened Empires", "Leviathans", "Player"]
 locList=[]
@@ -38,7 +38,6 @@ for cat in cats:
   trigger=TagList()
   choiceEvent.add("desc", TagList().add("trigger",trigger))
   trigger.add("text", "custom_difficulty.current_bonuses") #loc global
-  trigger.add("text", "newline")
 
   #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before)
   optionIndex=0
