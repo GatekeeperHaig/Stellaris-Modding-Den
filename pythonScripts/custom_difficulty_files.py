@@ -143,9 +143,9 @@ for cat in cats:
           et.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusListValue)).add("value",str(changeStep)))
       hidden_effect.add("country_event", TagList().add("id","custom_difficulty.{:01d}{:02d}0".format(mainIndex,bonusIndex)))
       if cat!="player":
-        hidden_effect.add("country_event", TagList().add("id","custom_difficulty.97".format(mainIndex,bonusIndex))) #remove flags
-      else:
         hidden_effect.add("country_event", TagList().add("id","custom_difficulty.98".format(mainIndex,bonusIndex))) #remove flags
+      else:
+        hidden_effect.add("country_event", TagList().add("id","custom_difficulty.97".format(mainIndex,bonusIndex))) #remove flags
       hidden_effect.add("set_global_flag", "custom_difficulty_advanced_configuration")
       option.add("hidden_effect",hidden_effect)
       changeEvent.add("option",option)
@@ -214,7 +214,7 @@ eventIndex+=1
 defaultEvents.add("country_event", newEvent)
 newEvent.replace("id","custom_difficulty.{:02d}".format(eventIndex))
 immediate=newEvent.get("immediate")
-immediate.add("country_event",TagList().add("id","custom_difficulty.98"))
+immediate.add("country_event",TagList().add("id","custom_difficulty.97"))
 immediate.add("set_global_flag","custom_difficulty_easy")
 et=TagList()
 immediate.add(ET,et)
@@ -235,7 +235,7 @@ for name, values in zip(vanillaDefaultNames, vanillaDefault):
   newEvent.replace("id","custom_difficulty.{:02d}".format(eventIndex))
   immediate=newEvent.get("immediate")
   immediate.add("set_global_flag","custom_difficulty_"+name)
-  immediate.add("country_event",TagList().add("id","custom_difficulty.97"))
+  immediate.add("country_event",TagList().add("id","custom_difficulty.98"))
   et=TagList()
   immediate.add(ET,et)
   for cat in cats:
