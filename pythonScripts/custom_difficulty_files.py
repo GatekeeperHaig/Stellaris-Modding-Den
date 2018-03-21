@@ -69,7 +69,9 @@ for cat in cats:
   locList.append(["custom_difficulty_{}.name".format(cat),"Change {} bonuses".format(catNames[mainIndex-1])])
   trigger=TagList()
   choiceEvent.add("desc", TagList().add("trigger",trigger))
-  trigger.add("text", "custom_difficulty.current_bonuses") #loc global
+  triggerET=TagList()
+  trigger.add(ET,triggerET)
+  triggerET.add("text", "custom_difficulty.current_bonuses") #loc global
 
   #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before)
   optionIndex=0
@@ -85,7 +87,7 @@ for cat in cats:
     optionIndex+=1
     bonusR=bonus.lower().replace(" ","_")
     checkVar=TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value","0")
-    trigger.add("fail_text",TagList().add("text","custom_difficulty_{}_{}_desc".format(cat,bonusR)).add(ET,TagList().add("check_variable", checkVar)))
+    triggerET.add("fail_text",TagList().add("text","custom_difficulty_{}_{}_desc".format(cat,bonusR)).add("check_variable", checkVar))
     locList.append(["custom_difficulty_{}_{}_desc".format(cat,bonusR),"{} §{}{} : [root.custom_difficulty_{}_{}_value]% ".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonusR)])
 
     #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before the loop)
