@@ -25,7 +25,7 @@ locList.append(["custom_difficulty.back", "Back"])
 locList.append(["custom_difficulty.cancel", "Cancel and Back"])
 locList.append(["close_custom_difficulty.name", "Close Custom Difficulty menu"])
 locList.append(["custom_difficulty.0.lock.name", "Lock settings for the rest of the game"])
-locList.append(["custom_difficulty.0.lock.desc", "Can only be unlocked via installing the unlock mod, editing save game or starting a new game. Use with care!"])
+locList.append(["custom_difficulty.0.lock.desc", "Yearly changes will continue up to the maximum/minimum. Can only be unlocked via installing the unlock mod, editing save game or starting a new game. Use with care!"])
 locList.append(["custom_difficulty.0.unlock.name", "Unlock settings"])
 locList.append(["custom_difficulty.0.lock.desc", "Todo: Move to separate mod!"])
 locList.append(["custom_difficulty.0.name", "Ultimate Custom Difficulty Advanced Configuration"])
@@ -33,7 +33,7 @@ locList.append(["custom_difficulty.0.desc", "Choose category to change or show"]
 locList.append(["custom_difficulty.1.name", "Ultimate Custom Difficulty Main Menu"])
 locList.append(["custom_difficulty_currently_active", "Currently active:"])
 locList.append(["custom_difficulty_choose", "Choose vanilla setting or customize yourself."])
-locList.append(["custom_difficulty_easy.name", "Easy - 25% Bonus in all categories for player"])
+locList.append(["custom_difficulty_easy.name", "Easy - 20% Bonus in all categories for player"])
 locList.append(["custom_difficulty_ensign.name", "Ensign - No Bonus for empires. 33% for NPCs"])
 locList.append(["custom_difficulty_captain.name", "Captain - 15-25% Bonus for AI. 50% fo NPCs"])
 locList.append(["custom_difficulty_commodore.name", "Commodore - 30-50% Bonus for AI. 66% fo NPCs"])
@@ -206,7 +206,7 @@ for cat in cats:
   for bonus in possibleBoniNames:
     bonusR=bonus.lower().replace(" ","_")
     if cat=="player":
-      immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "25"))
+      immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "20"))
     else:
       immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "0"))
 
