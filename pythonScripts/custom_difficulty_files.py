@@ -304,14 +304,14 @@ for catI,cat in enumerate(cats):
       # afterIfTaglist.add("switch",switchTL)
       for sign in [1,-1]:
         if sign==1:
-          compSign=">="
+          compSign=">"
         else:
-          compSign="<="
+          compSign="<"
         for i in reversed(range(20)):
           ifGT=TagList()
           afterIfTaglist.add("if",ifGT)
-          changeVal=sign*10*(i+1)
-          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(changeVal),"",compSign)))
+          changeVal=10*(i+1)
+          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(sign*(changeVal-0.1)),"",compSign)))
           if sign>0:
             modifierName="custom_difficulty_{}_{}_pos_player_value".format(i,bonusR)
           else:
@@ -320,23 +320,23 @@ for catI,cat in enumerate(cats):
           if not isinstance(bonusModifier,list):
             bonusModifier=[bonusModifier]
           for modifierEntry in bonusModifier:
-            modifier.add(modifierEntry,str(changeVal/100))
+            modifier.add(modifierEntry,str(sign*changeVal/100))
           staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           immediate.add("remove_modifier", modifierName)
-          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*changeVal)))
+          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*sign*changeVal)))
           # ifGT.add("break","yes")
     else:
       for sign in [1,-1]:
         if sign==1:
-          compSign=">="
+          compSign=">"
         else:
-          compSign="<="
+          compSign="<"
         for i in reversed(range(10)):
           ifGT=TagList()
           afterIfTaglist.add("if",ifGT)
-          changeVal=sign*pow(2,i)
-          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(changeVal),"",compSign)))
+          changeVal=pow(2,i)
+          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(sign*(changeVal-0.1)),"",compSign)))
           if sign>0:
             modifierName="custom_difficulty_{}_{}_pos_value".format(i,bonusR)
           else:
@@ -345,12 +345,12 @@ for catI,cat in enumerate(cats):
           if not isinstance(bonusModifier,list):
             bonusModifier=[bonusModifier]
           for modifierEntry in bonusModifier:
-            modifier.add(modifierEntry,str(changeVal/100))
+            modifier.add(modifierEntry,str(sign*changeVal/100))
           staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           if cat=="ai": #only add onces as they all have the same name
             immediate.add("remove_modifier", modifierName)
-          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*changeVal)))
+          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*sign*changeVal)))
 immediate.addTagList(after)
 
 
