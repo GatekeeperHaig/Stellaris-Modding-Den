@@ -254,6 +254,7 @@ with open(outFolder+"/"+"custom_difficulty_defaults.txt",'w') as file:
   defaultEvents.writeAll(file, args())
 
 
+staticModifiers=TagList()
 
 updateFile=TagList()
 updateFile.add("namespace","custom_difficulty")
@@ -293,7 +294,7 @@ for catI,cat in enumerate(cats):
   afterIfTaglist=deepcopy(ifTagList)
   after.add("if",afterIfTaglist)
 
-  for bonus in possibleBoniNames:
+  for bonus, bonusModifier in zip(possibleBoniNames,possibleBoniModifier):
     bonusR=bonus.lower().replace(" ","_")
     ifTagList.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", ET))
     if cat=="player":
@@ -307,14 +308,21 @@ for catI,cat in enumerate(cats):
         for i in reversed(range(20)):
           ifGT=TagList()
           afterIfTaglist.add("if",ifGT)
-          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(sign*10*(i+1)),"",compSign)))
+          changeVal=sign*10*(i+1)
+          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(changeVal),"",compSign)))
           if sign>0:
             modifierName="custom_difficulty_{}_{}_pos_player_value".format(i,bonusR)
           else:
             modifierName="custom_difficulty_{}_{}_neg_player_value".format(i,bonusR)
+          modifier=TagList()
+          if not isinstance(bonusModifier,list):
+            bonusModifier=[bonusModifier]
+          for modifierEntry in bonusModifier:
+            modifier.add(modifierEntry,str(changeVal/100))
+          staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           immediate.add("remove_modifier", modifierName)
-          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*sign*10*(i+1))))
+          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*changeVal)))
           # ifGT.add("break","yes")
     else:
       for sign in [1,-1]:
@@ -325,16 +333,29 @@ for catI,cat in enumerate(cats):
         for i in reversed(range(10)):
           ifGT=TagList()
           afterIfTaglist.add("if",ifGT)
-          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(sign*pow(2,i)),"",compSign)))
+          changeVal=sign*pow(2,i)
+          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(changeVal),"",compSign)))
           if sign>0:
             modifierName="custom_difficulty_{}_{}_pos_value".format(i,bonusR)
           else:
             modifierName="custom_difficulty_{}_{}_neg_value".format(i,bonusR)
+          modifier=TagList()
+          if not isinstance(bonusModifier,list):
+            bonusModifier=[bonusModifier]
+          for modifierEntry in bonusModifier:
+            modifier.add(modifierEntry,str(changeVal/100))
+          staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           if cat=="ai": #only add onces as they all have the same name
             immediate.add("remove_modifier", modifierName)
-          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*sign*pow(2,i))))
+          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*changeVal)))
 
 
 with open(outFolder+"/"+"custom_difficulty_update.txt",'w') as file:
   updateFile.writeAll(file, args())
+
+outputFolderStaticModifiers="../gratak_mods/custom_difficulty/common/static_modifiers"
+if not os.path.exists(outputFolderStaticModifiers):
+  os.makedirs(outputFolderStaticModifiers)
+with open(outputFolderStaticModifiers+"/"+"custom_difficulty_static_modifiers.txt",'w') as file:
+  staticModifiers.writeAll(file, args())
