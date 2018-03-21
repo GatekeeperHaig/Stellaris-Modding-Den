@@ -34,7 +34,7 @@ locList.append(["custom_difficulty.0.desc", "Choose category to change or show"]
 # locList.append(["custom_difficulty.1.name", "Ultimate Custom Difficulty Main Menu"])
 locList.append(["custom_difficulty.1.name", "Ultimate Custom Difficulty Predefined Difficulty"])
 locList.append(["custom_difficulty_currently_active", "Currently active:"])
-locList.append(["custom_difficulty_choose", "Choose vanilla setting.§R Deletes previously made settings!§! Easy and vanilla can be combined. Easy does not overwrite non-player bonuses and vanilla does not overwrite player bonuses."])
+locList.append(["custom_difficulty_choose", "Choose predefined setting.§R Deletes previously made settings!§! Easy and vanilla can be combined. Easy does not overwrite non-player bonuses and Vanilla does not overwrite player bonuses."])
 locList.append(["custom_difficulty_easy.name", "Easy - 20% Bonus in all categories for player"])
 locList.append(["custom_difficulty_ensign.name", "Ensign - No Bonus for empires. 33% for NPCs"])
 locList.append(["custom_difficulty_captain.name", "Captain - 15-25% Bonus for AI. 50% fo NPCs"])
@@ -48,6 +48,8 @@ locList.append(["custom_difficulty_reset.name", "Reset all settings"])
 locList.append(["custom_difficulty_reset_conf.name", "Reset settings - Confirmation"])
 locList.append(["custom_difficulty_reset.desc", "Undo all changes and reset to difficulty set before game start"])
 locList.append(["custom_difficulty.predefined_difficulties", "§GPredefined Difficulties"])
+
+ET = "event_target:custom_difficulty_var_storage"
 
 yes="yes"
 
@@ -83,7 +85,7 @@ for cat in cats:
     optionIndex+=1
     bonusR=bonus.lower().replace(" ","_")
     checkVar=TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value","0")
-    trigger.add("fail_text",TagList().add("text","custom_difficulty_{}_{}_desc".format(cat,bonusR)).add("check_variable", checkVar))
+    trigger.add("fail_text",TagList().add("text","custom_difficulty_{}_{}_desc".format(cat,bonusR)).add(ET,TagList().add("check_variable", checkVar)))
     locList.append(["custom_difficulty_{}_{}_desc".format(cat,bonusR),"{} §{}{} : [root.custom_difficulty_{}_{}_value]% ".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonusR)])
 
     #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before the loop)
@@ -128,13 +130,18 @@ for cat in cats:
 
       hidden_effect=TagList()
       if bonusIndex>len(boniListNames):
-        hidden_effect.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value",str(changeStep)))
+        hidden_effect.add(ET,TagList().add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value",str(changeStep))))
       else:
+        et=TagList()
+        hidden_effect.add(ET,et)
         for bonusListIndex in boniListEntries[bonusIndex-1]:
           bonusListValue=possibleBoniNames[bonusListIndex].lower().replace(" ","_")
-          hidden_effect.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusListValue)).add("value",str(changeStep)))
+          et.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusListValue)).add("value",str(changeStep)))
       hidden_effect.add("country_event", TagList().add("id","custom_difficulty.{:01d}{:02d}0".format(mainIndex,bonusIndex)))
-      hidden_effect.add("country_event", TagList().add("id","custom_difficulty.99".format(mainIndex,bonusIndex))) #remove flags
+      if cat!="player":
+        hidden_effect.add("country_event", TagList().add("id","custom_difficulty.98".format(mainIndex,bonusIndex))) #remove flags
+      else:
+        hidden_effect.add("country_event", TagList().add("id","custom_difficulty.97".format(mainIndex,bonusIndex))) #remove flags
       hidden_effect.add("set_global_flag", "custom_difficulty_advanced_configuration")
       option.add("hidden_effect",hidden_effect)
       changeEvent.add("option",option)
@@ -179,7 +186,6 @@ defaultEventTemplate.add("is_triggered_only",yes)
 defaultEventTemplate.add("hide_window",yes)
 immediate=TagList()
 defaultEventTemplate.add("immediate",immediate)
-immediate.add("country_event",TagList().add("id","custom_difficulty.99"))
 
 defaultEvents=TagList()
 defaultEvents.add("namespace", "custom_difficulty")
@@ -204,12 +210,15 @@ eventIndex+=1
 defaultEvents.add("country_event", newEvent)
 newEvent.replace("id","custom_difficulty.{:02d}".format(eventIndex))
 immediate=newEvent.get("immediate")
+immediate.add("country_event",TagList().add("id","custom_difficulty.97"))
 immediate.add("set_global_flag","custom_difficulty_easy")
+et=TagList()
+immediate.add(ET,et)
 for cat in cats:
   for bonus in possibleBoniNames:
     bonusR=bonus.lower().replace(" ","_")
     if cat=="player":
-      immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "20"))
+      et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "20"))
     # else:
     #   immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "0"))
 
@@ -222,17 +231,20 @@ for name, values in zip(vanillaDefaultNames, vanillaDefault):
   newEvent.replace("id","custom_difficulty.{:02d}".format(eventIndex))
   immediate=newEvent.get("immediate")
   immediate.add("set_global_flag","custom_difficulty_"+name)
+  immediate.add("country_event",TagList().add("id","custom_difficulty.98"))
+  et=TagList()
+  immediate.add(ET,et)
   for cat in cats:
     for i,bonus in enumerate(possibleBoniNames):
       bonusR=bonus.lower().replace(" ","_")
       if cat=="ai" and i<vanillaAItoNPCIndex:
-        immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(values[i])))
+        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(values[i])))
       elif cat=="leviathan" and i>=vanillaAItoNPCIndex:
-        immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(values[i])))
+        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(values[i])))
       elif cat=="fe" and i>=vanillaAItoNPCIndex:
-        immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(values[i])))
+        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(values[i])))
       elif cat!="player":
-        immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "0"))
+        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "0"))
 
 with open(outFolder+"/"+"custom_difficulty_defaults.txt",'w') as file:
   defaultEvents.writeAll(file, args())
