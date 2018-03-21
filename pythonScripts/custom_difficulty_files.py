@@ -175,15 +175,6 @@ for cat, eventFileCont in zip(cats, difficultyChangeWindows):
   with open(outFolder+"/"+"custom_difficulty_"+cat+".txt",'w') as file:
     eventFileCont.writeAll(file,args())
 
-outFolderLoc="../gratak_mods/custom_difficulty/localisation/english"
-if not os.path.exists(outFolderLoc):
-  os.makedirs(outFolderLoc)
-
-with io.open(outFolderLoc+"/custom_difficulty_l_english.yml",'w', encoding="utf-8") as file:
-  file.write(u'\ufeff')
-  file.write("l_english:\n")
-  for locEntry in locList:
-    file.write(" "+locEntry[0]+":0 "+'"'+locEntry[1]+'"\n')
 
 
 defaultEventTemplate=TagList()
@@ -321,6 +312,7 @@ for catI,cat in enumerate(cats):
             bonusModifier=[bonusModifier]
           for modifierEntry in bonusModifier:
             modifier.add(modifierEntry,str(sign*changeVal/100))
+            locList.append([modifierEntry,"Difficulty"])
           staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           immediate.add("remove_modifier", modifierName)
@@ -346,6 +338,7 @@ for catI,cat in enumerate(cats):
             bonusModifier=[bonusModifier]
           for modifierEntry in bonusModifier:
             modifier.add(modifierEntry,str(sign*changeVal/100))
+            locList.append([modifierEntry,"Difficulty"])
           staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           if cat=="ai": #only add onces as they all have the same name
@@ -362,3 +355,15 @@ if not os.path.exists(outputFolderStaticModifiers):
   os.makedirs(outputFolderStaticModifiers)
 with open(outputFolderStaticModifiers+"/"+"custom_difficulty_static_modifiers.txt",'w') as file:
   staticModifiers.writeAll(file, args())
+
+
+
+outFolderLoc="../gratak_mods/custom_difficulty/localisation/english"
+if not os.path.exists(outFolderLoc):
+  os.makedirs(outFolderLoc)
+
+with io.open(outFolderLoc+"/custom_difficulty_l_english.yml",'w', encoding="utf-8") as file:
+  file.write(u'\ufeff')
+  file.write("l_english:\n")
+  for locEntry in locList:
+    file.write(" "+locEntry[0]+":0 "+'"'+locEntry[1]+'"\n')
