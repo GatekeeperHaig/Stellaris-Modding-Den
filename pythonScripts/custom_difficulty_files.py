@@ -10,7 +10,7 @@ for s in reversed(changeSteps):
   changeSteps.append(-s)
 possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep", "Any Pop growth speed"]
 possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_animal_wildlife", "GFX_evt_think_tank", "GFX_evt_ancient_alien_temple","GFX_evt_arguing_senate","GFX_evt_hangar_bay", "GFX_evt_debris", "GFX_evt_sabotaged_ship","GFX_evt_pirate_armada","GFX_evt_fleet_neutral","GFX_evt_city_ruins","GFX_evt_metropolis"]
-possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult","country_resource_influence_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","country_naval_cap_mult","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["ship_upkeep_mult","building_upkeep_mult","starbase_upkeep_mult","army_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
+possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult","country_resource_influence_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","country_naval_cap_mult","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["ship_upkeep_mult","country_building_upkeep_mult","country_starbase_upkeep_mult","army_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","","",""]
 possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
 boniListNames=["All","Vanilla Default Empire", "All ship bonuses"]
@@ -234,8 +234,8 @@ for name, values in zip(vanillaDefaultNames, vanillaDefault):
   defaultEvents.add("country_event", newEvent)
   newEvent.replace("id","custom_difficulty.{:02d}".format(eventIndex))
   immediate=newEvent.get("immediate")
-  immediate.add("set_global_flag","custom_difficulty_"+name)
   immediate.add("country_event",TagList().add("id","custom_difficulty.98"))
+  immediate.add("set_global_flag","custom_difficulty_"+name)
   et=TagList()
   immediate.add(ET,et)
   for cat in cats:
