@@ -5,9 +5,12 @@ import sys, os, io
 from stellarisTxtRead import *
 from copy import deepcopy
 
+changeStepYears=[5,4,3,2,1]
 changeSteps = [50, 25, 10, 5, 1]
 for s in reversed(changeSteps):
   changeSteps.append(-s)
+for s in reversed(changeStepYears):
+  changeStepYears.append(-s)
 possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep", "Any Pop growth speed"]
 possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_animal_wildlife", "GFX_evt_think_tank", "GFX_evt_ancient_alien_temple","GFX_evt_arguing_senate","GFX_evt_hangar_bay", "GFX_evt_debris", "GFX_evt_sabotaged_ship","GFX_evt_pirate_armada","GFX_evt_fleet_neutral","GFX_evt_city_ruins","GFX_evt_metropolis"]
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult","country_resource_influence_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","country_naval_cap_mult","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["ship_upkeep_mult",
@@ -19,12 +22,13 @@ boniListNames=["All","Vanilla Default Empire", "All ship bonuses"]
 boniListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
 boniListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
 cats=["ai","ai_yearly","fe","leviathan","player"]
-catNames=["AI Default Empire", "AI Yearly Change", "Fallen and Awakened Empires", "Leviathans", "Player"]
+catNames=["AI Default Empire", "AI Yearly Change", "Fallen and Awakened Empires", "Leviathans and other NPCs", "Player"]
 catCountryType=["default", "default","awakened_fallen_empire","",""]
 catNotCountryType=["", "","",["default","awakened_fallen_empire"],""]
 catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel"]
 locList=[]
 locList.append(["custom_difficulty.current_bonuses", "Current Bonuses:"])
+locList.append(["custom_difficulty.current_yearly_desc", "Positive year count gives increase, negative year count decrease. Every year is fastest possible. Zero (not displayed) means no change:"])
 locList.append(["custom_difficulty.back", "Back"])
 locList.append(["custom_difficulty.cancel", "Cancel and Back"])
 locList.append(["close_custom_difficulty.name", "Close Custom Difficulty menu"])
@@ -75,7 +79,13 @@ for cat in cats:
   locList.append(["custom_difficulty_{}.name".format(cat),"Change {} bonuses".format(catNames[mainIndex-1])])
   trigger=TagList()
   choiceEvent.add("desc", TagList().add("trigger",trigger))
-  trigger.add("text", "custom_difficulty.current_bonuses") #loc global
+  if cat=="ai_yearly":
+    immediate=TagList()
+    choiceEvent.add("immediate",immediate)
+  if cat=="ai_yearly":
+    trigger.add("text", "custom_difficulty.current_yearly_desc") #loc global
+  else:
+    trigger.add("text", "custom_difficulty.current_bonuses") #loc global
 
   #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before)
   optionIndex=0
@@ -90,9 +100,23 @@ for cat in cats:
   for bonusI, bonus in enumerate(possibleBoniNames):
     optionIndex+=1
     bonusR=bonus.lower().replace(" ","_")
-    checkVar=TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value","0")
-    trigger.add("fail_text",TagList().add("text","custom_difficulty_{}_{}_desc".format(cat,bonusR)).add(ET,TagList().add("check_variable", checkVar)))
-    locList.append(["custom_difficulty_{}_{}_desc".format(cat,bonusR),"{} §{}{} : [{}.custom_difficulty_{}_{}_value]% ".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, ET, cat,bonusR)])
+    localVarName="custom_difficulty_{}_{}_value".format(cat,bonusR)
+    if cat=="ai_yearly":
+      checkVar=TagList().add("which", localVarName).add("value","0","",">")
+      trigger.add("success_text",TagList().add("text","custom_difficulty_{}_{}_inc_desc".format(cat,bonusR)).add(ET,TagList().add("check_variable", checkVar)))
+      checkVar=TagList().add("which", localVarName).add("value","0","","<")
+      trigger.add("success_text",TagList().add("text","custom_difficulty_{}_{}_dec_desc".format(cat,bonusR)).add(ET,TagList().add("check_variable", checkVar)))
+      locList.append(["custom_difficulty_{}_{}_inc_desc".format(cat,bonusR),"{} §{}{} : 1% increase every [this.custom_difficulty_{}_{}_value] year(s)".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonusR)]) #local tmp var
+      locList.append(["custom_difficulty_{}_{}_dec_desc".format(cat,bonusR),"{} §{}{} : 1% decrease every [this.custom_difficulty_{}_{}_value] year(s)".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonusR)]) #local tmp var
+      #create a local variable and make sure it is positive!
+      immediate.add("set_variable", TagList().add("which", localVarName).add("value",ET))
+      immediateIf=TagList().add("limit",TagList().add("check_variable",checkVar)) #<0
+      immediateIf.add("multiply_variable", TagList().add("which", localVarName).add("value","-1"))
+      immediate.add("if",immediateIf)
+    else:
+      checkVar=TagList().add("which", localVarName).add("value","0")
+      trigger.add("fail_text",TagList().add("text","custom_difficulty_{}_{}_desc".format(cat,bonusR)).add(ET,TagList().add("check_variable", checkVar)))
+      locList.append(["custom_difficulty_{}_{}_desc".format(cat,bonusR),"{} §{}{} : [{}.custom_difficulty_{}_{}_value]% ".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, ET, cat,bonusR)])
 
     #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before the loop)
     option=TagList().add("name", "custom_difficulty_{}_change_{}_button.name".format(cat,bonusR))
@@ -121,18 +145,28 @@ for cat in cats:
     locList.append(["custom_difficulty_{}_change_{}.name".format(cat,bonusR), "Change {} bonus ({})".format(bonus,catNames[mainIndex-1])])
     changeEvent.add("desc", TagList().add("trigger",trigger)) #same desc trigger as above?
     changeEvent.add("picture",'"'+(boniListPictures+possibleBoniPictures)[bonusIndex-1]+'"')
+    if cat=="ai_yearly":
+      changeEvent.add("immediate",immediate)
 
-    for changeStep in changeSteps:
+    if cat=="ai_yearly":
+      changeStepListUsed=changeStepYears
+    else:
+      changeStepListUsed=changeSteps
+    for changeStep in changeStepListUsed:
       if cat=="player" and (abs(changeStep)==1 or abs(changeStep)==5 or abs(changeStep)==25):
         continue
       if changeStep>0:
-        option=TagList().add("name","custom_difficulty_{}_increase_{!s}".format(bonusR, changeStep))
-        if mainIndex==1:
-          locList.append(["custom_difficulty_{}_increase_{!s}".format(bonusR, changeStep), "Increase {} bonuses by {}%".format(bonus, changeStep)])
+        option=TagList().add("name","custom_difficulty_{}_{}_increase_{!s}".format(cat,bonusR, changeStep))
+        if cat=="ai_yearly":
+          locList.append(["custom_difficulty_{}_{}_increase_{!s}".format(cat,bonusR, changeStep), "Increase {} years by {}".format(bonus, changeStep)])
+        else:
+          locList.append(["custom_difficulty_{}_{}_increase_{!s}".format(cat,bonusR, changeStep), "Increase {} bonuses by {}%".format(bonus, changeStep)])
       else:
-        option=TagList().add("name","custom_difficulty_{}_decrease_{!s}".format(bonusR, -changeStep))
-        if mainIndex==1:
-          locList.append(["custom_difficulty_{}_decrease_{!s}".format(bonusR, -changeStep), "Decrease {} bonuses by {}%".format(bonus, -changeStep)])
+        option=TagList().add("name","custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonusR, -changeStep))
+        if cat=="ai_yearly":
+          locList.append(["custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonusR, -changeStep), "Decrease {} years by {}".format(bonus, -changeStep)])
+        else:
+          locList.append(["custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonusR, -changeStep), "Decrease {} bonuses by {}%".format(bonus, -changeStep)])
 
       hidden_effect=TagList()
       if bonusIndex>len(boniListNames):
@@ -312,7 +346,7 @@ for catI,cat in enumerate(cats):
             bonusModifier=[bonusModifier]
           for modifierEntry in bonusModifier:
             modifier.add(modifierEntry,str(sign*changeVal/100))
-            locList.append([modifierEntry,"Difficulty"])
+            locList.append([modifierName,"Difficulty"])
           staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           immediate.add("remove_modifier", modifierName)
@@ -338,7 +372,7 @@ for catI,cat in enumerate(cats):
             bonusModifier=[bonusModifier]
           for modifierEntry in bonusModifier:
             modifier.add(modifierEntry,str(sign*changeVal/100))
-            locList.append([modifierEntry,"Difficulty"])
+            locList.append([modifierName,"Difficulty"])
           staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           if cat=="ai": #only add onces as they all have the same name
