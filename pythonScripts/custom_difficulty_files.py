@@ -13,11 +13,13 @@ possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_a
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult","country_resource_influence_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["country_ship_upkeep_mult","country_building_upkeep_mult","country_starbase_upkeep_mult","country_army_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","","",""]
 possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
-boniListNames=["All","Vanilla Custom Empire", "All ship bonuses"]
+boniListNames=["All","Vanilla Default Empire", "All ship bonuses"]
 boniListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
 boniListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
 cats=["ai","ai_yearly","fe","leviathan","player"]
-catNames=["AI Custom Empire", "AI Yearly Change", "Fallen and Awakened Empires", "Leviathans", "Player"]
+catNames=["AI Default Empire", "AI Yearly Change", "Fallen and Awakened Empires", "Leviathans", "Player"]
+catCountryType=["default", "default","awakened_fallen_empire","",""]
+catNotCountryType=["", "","",["default","awakened_fallen_empire"],""]
 catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel"]
 locList=[]
 locList.append(["custom_difficulty.current_bonuses", "Current Bonuses:"])
@@ -203,7 +205,7 @@ vanillaDefault.append([50,50,50,30,30,0,30,66,66,66,66,0,0])
 vanillaDefault.append([75,75,75,45,45,0,45,75,75,75,75,0,0])
 vanillaDefault.append([100,100,100,60,60,0,60,100,100,100,100,0,0])
 vanillaDefault.append([0,0,0,0,0,0,0,33,33,33,33,0,0])
-vanillaDefaultNames=["ensign","captain","commondore","admiral", "grand_admiral", "scaling"]
+vanillaDefaultNames=["ensign","captain","commodore","admiral", "grand_admiral", "scaling"]
 
 
 #easy
@@ -251,19 +253,88 @@ for name, values in zip(vanillaDefaultNames, vanillaDefault):
 with open(outFolder+"/"+"custom_difficulty_defaults.txt",'w') as file:
   defaultEvents.writeAll(file, args())
 
-#     #easy
-# newEvent=deepcopy(defaultEventTemplate)
-# eventIndex+=1
-# defaultEvents.add("country_event", newEvent)
-# newEvent.replace("id","custom_difficulty.{:02d}".format(eventIndex))
-# immediate=newEvent.get("immediate")
-# immediate.add("set_global_flag","custom_difficulty_captain")
-# for cat in cats:
-#   for bonus in possibleBoniNames:
-#     bonusR=bonus.lower().replace(" ","_")
-#     if cat=="player":
-#       immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "25"))
-#     else:
-#       immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "0"))
 
 
+updateFile=TagList()
+updateFile.add("namespace","custom_difficulty")
+updateEvent=TagList()
+updateFile.add("country_event",updateEvent)
+
+updateEvent.add("id", "custom_difficulty.9998")
+updateEvent.add("is_triggered_only",yes)
+updateEvent.add("hide_window",yes)
+immediate=TagList()
+updateEvent.add("immediate",immediate)
+after=TagList()
+updateEvent.add("after",after)
+for catI,cat in enumerate(cats):
+  if "yearly" in cat:
+    continue
+  ifTagList=TagList()
+  immediate.add("if",ifTagList)
+  limit=TagList()
+  ifTagList.add("limit",limit)
+  if catCountryType[catI]!="":
+    limit.add("is_country_type", catCountryType[catI])
+  if catNotCountryType[catI]!="":
+    andTL=TagList()
+    for entry in catNotCountryType[catI]:
+      andTL.add("not", TagList().add("is_country_type", entry))
+    limit.add("and",andTL)
+  orTagList=TagList()
+  limit.add("or",orTagList)
+  if cat=="player":
+    orTagList.add("is_ai", "no")
+    orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","no")))
+  else:
+    orTagList.add("is_ai", yes)
+    orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","yes")))
+
+  afterIfTaglist=deepcopy(ifTagList)
+  after.add("if",afterIfTaglist)
+
+  for bonus in possibleBoniNames:
+    bonusR=bonus.lower().replace(" ","_")
+    ifTagList.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", ET))
+    if cat=="player":
+      # switchTL=TagList()
+      # afterIfTaglist.add("switch",switchTL)
+      for sign in [1,-1]:
+        if sign==1:
+          compSign=">="
+        else:
+          compSign="<="
+        for i in reversed(range(20)):
+          ifGT=TagList()
+          afterIfTaglist.add("if",ifGT)
+          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(sign*10*(i+1)),"",compSign)))
+          if sign>0:
+            modifierName="custom_difficulty_{}_{}_pos_player_value".format(i,bonusR)
+          else:
+            modifierName="custom_difficulty_{}_{}_neg_player_value".format(i,bonusR)
+          ifGT.add("add_modifier", modifierName)
+          immediate.add("remove_modifier", modifierName)
+          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*sign*10*(i+1))))
+          # ifGT.add("break","yes")
+    else:
+      for sign in [1,-1]:
+        if sign==1:
+          compSign=">="
+        else:
+          compSign="<="
+        for i in reversed(range(10)):
+          ifGT=TagList()
+          afterIfTaglist.add("if",ifGT)
+          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(sign*pow(2,i)),"",compSign)))
+          if sign>0:
+            modifierName="custom_difficulty_{}_{}_pos_value".format(i,bonusR)
+          else:
+            modifierName="custom_difficulty_{}_{}_neg_value".format(i,bonusR)
+          ifGT.add("add_modifier", modifierName)
+          if cat=="ai": #only add onces as they all have the same name
+            immediate.add("remove_modifier", modifierName)
+          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*sign*pow(2,i))))
+
+
+with open(outFolder+"/"+"custom_difficulty_update.txt",'w') as file:
+  updateFile.writeAll(file, args())
