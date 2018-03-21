@@ -312,7 +312,7 @@ for catI,cat in enumerate(cats):
             modifierName="custom_difficulty_{}_{}_pos_player_value".format(i,bonusR)
           else:
             modifierName="custom_difficulty_{}_{}_neg_player_value".format(i,bonusR)
-          ifGT.add("add_modifier", modifierName)
+          ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           immediate.add("remove_modifier", modifierName)
           ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*sign*10*(i+1))))
           # ifGT.add("break","yes")
@@ -330,7 +330,7 @@ for catI,cat in enumerate(cats):
             modifierName="custom_difficulty_{}_{}_pos_value".format(i,bonusR)
           else:
             modifierName="custom_difficulty_{}_{}_neg_value".format(i,bonusR)
-          ifGT.add("add_modifier", modifierName)
+          ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           if cat=="ai": #only add onces as they all have the same name
             immediate.add("remove_modifier", modifierName)
           ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*sign*pow(2,i))))
