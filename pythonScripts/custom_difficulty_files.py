@@ -12,7 +12,7 @@ possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence"
 possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_animal_wildlife", "GFX_evt_think_tank", "GFX_evt_ancient_alien_temple","GFX_evt_arguing_senate","GFX_evt_hangar_bay", "GFX_evt_debris", "GFX_evt_sabotaged_ship","GFX_evt_pirate_armada","GFX_evt_fleet_neutral","GFX_evt_city_ruins","GFX_evt_metropolis"]
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult","country_resource_influence_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["country_ship_upkeep_mult","country_building_upkeep_mult","country_starbase_upkeep_mult","country_army_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","","",""]
-possibleBoniColor=["P","Y","G","L","E","B","W","M","G","H","B","T","G"]
+possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
 boniListNames=["All","Vanilla Custom Empire", "All ship bonuses"]
 boniListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
 boniListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
@@ -28,11 +28,13 @@ locList.append(["custom_difficulty.0.lock.name", "Lock settings for the rest of 
 locList.append(["custom_difficulty.0.lock.desc", "Yearly changes will continue up to the maximum/minimum. Can only be unlocked via installing the unlock mod, editing save game or starting a new game. Use with care!"])
 locList.append(["custom_difficulty.0.unlock.name", "Unlock settings"])
 locList.append(["custom_difficulty.0.lock.desc", "Todo: Move to separate mod!"])
-locList.append(["custom_difficulty.0.name", "Ultimate Custom Difficulty Advanced Configuration"])
+locList.append(["custom_difficulty.0.name", "Ultimate Custom Difficulty Main Menu"])
+# locList.append(["custom_difficulty.0.name", "Ultimate Custom Difficulty Advanced Configuration"])
 locList.append(["custom_difficulty.0.desc", "Choose category to change or show"])
-locList.append(["custom_difficulty.1.name", "Ultimate Custom Difficulty Main Menu"])
+# locList.append(["custom_difficulty.1.name", "Ultimate Custom Difficulty Main Menu"])
+locList.append(["custom_difficulty.1.name", "Ultimate Custom Difficulty Predefined Difficulty"])
 locList.append(["custom_difficulty_currently_active", "Currently active:"])
-locList.append(["custom_difficulty_choose", "Choose vanilla setting or customize yourself."])
+locList.append(["custom_difficulty_choose", "Choose vanilla setting.§R Deletes previously made settings!§! Easy and vanilla can be combined. Easy does not overwrite non-player bonuses and vanilla does not overwrite player bonuses."])
 locList.append(["custom_difficulty_easy.name", "Easy - 20% Bonus in all categories for player"])
 locList.append(["custom_difficulty_ensign.name", "Ensign - No Bonus for empires. 33% for NPCs"])
 locList.append(["custom_difficulty_captain.name", "Captain - 15-25% Bonus for AI. 50% fo NPCs"])
@@ -45,6 +47,7 @@ locList.append(["custom_difficulty_advanced_configuration.name", "Advanced Diffi
 locList.append(["custom_difficulty_reset.name", "Reset all settings"])
 locList.append(["custom_difficulty_reset_conf.name", "Reset settings - Confirmation"])
 locList.append(["custom_difficulty_reset.desc", "Undo all changes and reset to difficulty set before game start"])
+locList.append(["custom_difficulty.predefined_difficulties", "§GPredefined Difficulties"])
 
 yes="yes"
 
@@ -207,8 +210,8 @@ for cat in cats:
     bonusR=bonus.lower().replace(" ","_")
     if cat=="player":
       immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "20"))
-    else:
-      immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "0"))
+    # else:
+    #   immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "0"))
 
 # defaultIndex=-1
 for name, values in zip(vanillaDefaultNames, vanillaDefault):
@@ -228,7 +231,7 @@ for name, values in zip(vanillaDefaultNames, vanillaDefault):
         immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(values[i])))
       elif cat=="fe" and i>=vanillaAItoNPCIndex:
         immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(values[i])))
-      else:
+      elif cat!="player":
         immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "0"))
 
 with open(outFolder+"/"+"custom_difficulty_defaults.txt",'w') as file:
