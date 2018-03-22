@@ -351,8 +351,7 @@ for catI,cat in enumerate(cats):
             bonusModifier=[bonusModifier]
           for modifierEntry in bonusModifier:
             if bonus=="Upkeep":
-              # print("blub")
-              modifier.add(modifierEntry,str(sign*changeVal/100))
+              modifier.add(modifierEntry,str(-sign*changeVal/100))
             else:
               modifier.add(modifierEntry,str(sign*changeVal/100))
             locList.append([modifierName,"Difficulty"])
@@ -380,7 +379,10 @@ for catI,cat in enumerate(cats):
           if not isinstance(bonusModifier,list):
             bonusModifier=[bonusModifier]
           for modifierEntry in bonusModifier:
-            modifier.add(modifierEntry,str(sign*changeVal/100))
+            if bonus=="Upkeep":
+              modifier.add(modifierEntry,str(-sign*changeVal/100))
+            else:
+              modifier.add(modifierEntry,str(sign*changeVal/100))
             locList.append([modifierName,"Difficulty"])
           staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
