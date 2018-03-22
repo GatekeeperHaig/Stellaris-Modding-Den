@@ -37,7 +37,7 @@ locList.append(["custom_difficulty.0.lock.desc", "Yearly changes will continue u
 locList.append(["custom_difficulty.0.locked.desc", "Difficulty locked. Yearly changes will continue up to the maximum/minimum. Can only be unlocked via installing the unlock mod, editing save game or starting a new game. Use with care!"])
 locList.append(["custom_difficulty.0.unlock.name", "Unlock Settings"])
 locList.append(["custom_difficulty.0.unlock.desc", "Todo: Move to separate mod!"])
-locList.append(["custom_difficulty.0.name", "Dynamic Difficulty Main Menu"])
+locList.append(["custom_difficulty.0.name", "Dynamic Difficulty - Main Menu"])
 # locList.append(["custom_difficulty.0.name", "Ultimate Custom Difficulty Advanced Configuration"])
 locList.append(["custom_difficulty.0.desc", "Choose category to change or show"])
 # locList.append(["custom_difficulty.1.name", "Ultimate Custom Difficulty Main Menu"])
@@ -93,6 +93,7 @@ for cat in cats:
     optionIndex+=1
     boniListNameR=boniListName.lower().replace(" ","_")
     option=TagList().add("name", "custom_difficulty_{}_change_{}_name".format(cat,boniListNameR))
+    option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
     locList.append(["custom_difficulty_{}_change_{}_name".format(cat,boniListNameR), "Change {} bonuses".format(boniListName)])
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.{:01d}{:02d}0".format(mainIndex,optionIndex))))
     choiceEvent.add("option",option)
