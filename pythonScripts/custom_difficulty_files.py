@@ -18,7 +18,7 @@ possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy
 "country_starbase_upkeep_mult","army_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","","",""]
 possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
-boniListNames=["All","Vanilla Default Empire", "All ship bonuses"]
+boniListNames=["All","Vanilla Default Empire", "All ship"]
 boniListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
 boniListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
 cats=["ai","ai_yearly","fe","leviathan","player"]
@@ -31,17 +31,17 @@ locList.append(["custom_difficulty.current_bonuses", "Current Bonuses:"])
 locList.append(["custom_difficulty.current_yearly_desc", "Positive year count gives increase, negative year count decrease. Every year is fastest possible. Zero (not displayed) means no change:"])
 locList.append(["custom_difficulty.back", "Back"])
 locList.append(["custom_difficulty.cancel", "Cancel and Back"])
-locList.append(["close_custom_difficulty.name", "Close Custom Difficulty menu"])
-locList.append(["custom_difficulty.0.lock.name", "Lock settings for the rest of the game"])
+locList.append(["close_custom_difficulty.name", "Close Dynamic Difficulty Menu"])
+locList.append(["custom_difficulty.0.lock.name", "Lock Settings for the Rest of the Game"])
 locList.append(["custom_difficulty.0.lock.desc", "Yearly changes will continue up to the maximum/minimum. Can only be unlocked via installing the unlock mod, editing save game or starting a new game. Use with care!"])
 locList.append(["custom_difficulty.0.locked.desc", "Difficulty locked. Yearly changes will continue up to the maximum/minimum. Can only be unlocked via installing the unlock mod, editing save game or starting a new game. Use with care!"])
-locList.append(["custom_difficulty.0.unlock.name", "Unlock settings"])
+locList.append(["custom_difficulty.0.unlock.name", "Unlock Settings"])
 locList.append(["custom_difficulty.0.unlock.desc", "Todo: Move to separate mod!"])
-locList.append(["custom_difficulty.0.name", "Ultimate Custom Difficulty Main Menu"])
+locList.append(["custom_difficulty.0.name", "Dynamic Difficulty Main Menu"])
 # locList.append(["custom_difficulty.0.name", "Ultimate Custom Difficulty Advanced Configuration"])
 locList.append(["custom_difficulty.0.desc", "Choose category to change or show"])
 # locList.append(["custom_difficulty.1.name", "Ultimate Custom Difficulty Main Menu"])
-locList.append(["custom_difficulty.1.name", "Ultimate Custom Difficulty Predefined Difficulty"])
+locList.append(["custom_difficulty.1.name", "Dynamic Difficulty - Predefined Difficulty"])
 locList.append(["custom_difficulty_currently_active", "Currently active:"])
 locList.append(["custom_difficulty_choose", "Choose predefined setting.§R Deletes previously made settings!§! Easy and vanilla can be combined. Easy does not overwrite non-player bonuses and Vanilla does not overwrite player bonuses."])
 locList.append(["custom_difficulty_easy.name", "Easy - 20% Bonus in all categories for player"])
@@ -120,7 +120,7 @@ for cat in cats:
 
     #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before the loop)
     option=TagList().add("name", "custom_difficulty_{}_change_{}_button.name".format(cat,bonusR))
-    locList.append(["custom_difficulty_{}_change_{}_button.name".format(cat,bonusR), "Change {} bonus".format(bonus)])
+    locList.append(["custom_difficulty_{}_change_{}_button.name".format(cat,bonusR), "Change {} Bonuses".format(bonus)])
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.{:01d}{:02d}0".format(mainIndex,optionIndex))))
     choiceEvent.add("option",option)
 
@@ -158,15 +158,15 @@ for cat in cats:
       if changeStep>0:
         option=TagList().add("name","custom_difficulty_{}_{}_increase_{!s}".format(cat,bonusR, changeStep))
         if cat=="ai_yearly":
-          locList.append(["custom_difficulty_{}_{}_increase_{!s}".format(cat,bonusR, changeStep), "Increase {} years by {}".format(bonus, changeStep)])
+          locList.append(["custom_difficulty_{}_{}_increase_{!s}".format(cat,bonusR, changeStep), "Increase {} Years by {}".format(bonus, changeStep)])
         else:
-          locList.append(["custom_difficulty_{}_{}_increase_{!s}".format(cat,bonusR, changeStep), "Increase {} bonuses by {}%".format(bonus, changeStep)])
+          locList.append(["custom_difficulty_{}_{}_increase_{!s}".format(cat,bonusR, changeStep), "Increase {} Bonuses by {}%".format(bonus, changeStep)])
       else:
         option=TagList().add("name","custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonusR, -changeStep))
         if cat=="ai_yearly":
-          locList.append(["custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonusR, -changeStep), "Decrease {} years by {}".format(bonus, -changeStep)])
+          locList.append(["custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonusR, -changeStep), "Decrease {} Years by {}".format(bonus, -changeStep)])
         else:
-          locList.append(["custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonusR, -changeStep), "Decrease {} bonuses by {}%".format(bonus, -changeStep)])
+          locList.append(["custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonusR, -changeStep), "Decrease {} Bonuses by {}%".format(bonus, -changeStep)])
 
       hidden_effect=TagList()
       if bonusIndex>len(boniListNames):
