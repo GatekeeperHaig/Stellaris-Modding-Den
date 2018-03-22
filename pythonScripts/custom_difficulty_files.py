@@ -224,7 +224,8 @@ eventIndex=9
 
 
 vanillaDefault=[]
-possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep", "Any Pop growth speed"]
+# possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep", "Any Pop growth speed"]
+scaleDefault=[True, True, True, True, True, False, True, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
 vanillaAItoNPCIndex=7
 vanillaDefault.append([0,0,0,0,0,0,0,33,33,33,33,0,0])
 vanillaDefault.append([25,25,25,15,15,0,15,50,50,50,50,0,0])
@@ -274,6 +275,10 @@ for name, values in zip(vanillaDefaultNames, vanillaDefault):
         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(values[i])))
       elif cat=="fe" and i>=vanillaAItoNPCIndex:
         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(values[i])))
+      # elif "yearly" in cat and (not name=="scaling" or not scaleDefault[i]):
+      #   et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "0"))
+      elif "yearly" in cat and name=="scaling" and scaleDefault[i]:
+        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "4"))
       elif cat!="player":
         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "0"))
 
@@ -400,9 +405,10 @@ yearlyEvent.add("is_triggered_only",yes)
 yearlyEvent.add("hide_window",yes)
 trigger=TagList()
 yearlyEvent.add("trigger",trigger)
-trigger.add("is_ai","no")
+trigger.add("has_country_flag","custom_difficulty_game_host")
 #todo: host only
 immediate=TagList()
+yearlyEvent.add("immediate",immediate)
 et=TagList()
 immediate.add(ET, et)
 cat="ai"
@@ -410,14 +416,31 @@ for bonus in possibleBoniNames:
   bonusR=bonus.lower().replace(" ","_")
   yearCountVar="custom_difficulty_{}_year_counter".format(bonusR)
   yearLimitVar="custom_difficulty_{}_{}_value".format(cat+"_yearly",bonusR)
+  bonusVar="custom_difficulty_{}_{}_value".format(cat,bonusR)
   #todo: negative yearly!
-  et.add("change_variable", TagList().add("which", yearCountVar).add("value", 1))
+  ifPos=TagList().add("limit",TagList().add("check_variable", TagList().add("which", yearLimitVar).add("value","0","",">")))
+  et.add("if", ifPos)
+  ifNeg=TagList().add("limit",TagList().add("check_variable", TagList().add("which", yearLimitVar).add("value","0","","<")))
+  et.add("if", ifNeg)
+  ifPos.add("change_variable", TagList().add("which", yearCountVar).add("value", "1"))
+  ifNeg.add("change_variable", TagList().add("which", yearCountVar).add("value", "1"))
+
   ifTagList=TagList()
-  et.add(ifTagList)
-  ifTagList.add("limit", TagList().add("not",TagList()add("check_variable", TagList().add("which", yearCountVar).add("val",yearLimitVar,"","<"))))
-  # ifTagList.add
+  ifPos.add("if",ifTagList)
+  ifTagList.add("limit", TagList().add("not",TagList().add("check_variable", TagList().add("which", yearCountVar).add("value",yearLimitVar,"","<"))))
+  ifTagList.add("set_variable", TagList().add("which", yearCountVar).add("value", "0"))
+  ifTagList.add("change_variable", TagList().add("which", bonusVar).add("value", "1"))
 
+  ifTagList=TagList()
+  ifNeg.add("multiply_variable", TagList().add("which", yearLimitVar).add("value","-1"))
+  ifNeg.add("if",ifTagList)
+  ifNeg.add("multiply_variable", TagList().add("which", yearLimitVar).add("value","-1"))
+  ifTagList.add("limit", TagList().add("not",TagList().add("check_variable", TagList().add("which", yearCountVar).add("value",yearLimitVar,"",">"))))
+  ifTagList.add("set_variable", TagList().add("which", yearCountVar).add("value", "0"))
+  ifTagList.add("change_variable", TagList().add("which", bonusVar).add("value", "-1"))
 
+with open(outFolder+"/"+"custom_difficulty_yealy_event.txt",'w') as file:
+  yearlyEvent.writeAll(file, args())
 
 
 outFolderLoc="../gratak_mods/custom_difficulty/localisation/english"
