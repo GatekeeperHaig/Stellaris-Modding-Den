@@ -13,7 +13,7 @@ for s in reversed(changeStepYears):
   changeStepYears.append(-s)
 possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep", "Any Pop growth speed"]
 possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_animal_wildlife", "GFX_evt_think_tank", "GFX_evt_ancient_alien_temple","GFX_evt_arguing_senate","GFX_evt_hangar_bay", "GFX_evt_debris", "GFX_evt_sabotaged_ship","GFX_evt_pirate_armada","GFX_evt_fleet_neutral","GFX_evt_city_ruins","GFX_evt_metropolis"]
-possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult","country_resource_influence_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","country_naval_cap_mult","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["ship_upkeep_mult",
+possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","country_resource_influence_mult","country_naval_cap_mult","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["ship_upkeep_mult",
 #"country_building_upkeep_mult", #is there any such modifier except on planet base?!
 "country_starbase_upkeep_mult","army_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","","",""]
@@ -350,7 +350,11 @@ for catI,cat in enumerate(cats):
           if not isinstance(bonusModifier,list):
             bonusModifier=[bonusModifier]
           for modifierEntry in bonusModifier:
-            modifier.add(modifierEntry,str(sign*changeVal/100))
+            if bonus=="Upkeep":
+              # print("blub")
+              modifier.add(modifierEntry,str(sign*changeVal/100))
+            else:
+              modifier.add(modifierEntry,str(sign*changeVal/100))
             locList.append([modifierName,"Difficulty"])
           staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
@@ -399,13 +403,13 @@ with open(outputFolderStaticModifiers+"/"+"custom_difficulty_static_modifiers.tx
 yearlyFile=TagList()
 yearlyFile.add("namespace","custom_difficulty")
 yearlyEvent=TagList()
-yearlyFile.add("country_event", yearlyEvent)
-yearlyEvent.add("id", "custom_difficulty_9990")
+yearlyFile.add("event", yearlyEvent)
+yearlyEvent.add("id", "custom_difficulty.9990")
 yearlyEvent.add("is_triggered_only",yes)
 yearlyEvent.add("hide_window",yes)
 trigger=TagList()
 yearlyEvent.add("trigger",trigger)
-trigger.add("has_country_flag","custom_difficulty_game_host")
+#trigger.add("has_country_flag","custom_difficulty_game_host")
 #todo: host only
 immediate=TagList()
 yearlyEvent.add("immediate",immediate)
@@ -435,12 +439,12 @@ for bonus in possibleBoniNames:
   ifNeg.add("multiply_variable", TagList().add("which", yearLimitVar).add("value","-1"))
   ifNeg.add("if",ifTagList)
   ifNeg.add("multiply_variable", TagList().add("which", yearLimitVar).add("value","-1"))
-  ifTagList.add("limit", TagList().add("not",TagList().add("check_variable", TagList().add("which", yearCountVar).add("value",yearLimitVar,"",">"))))
+  ifTagList.add("limit", TagList().add("not",TagList().add("check_variable", TagList().add("which", yearCountVar).add("value",yearLimitVar,"","<"))))
   ifTagList.add("set_variable", TagList().add("which", yearCountVar).add("value", "0"))
   ifTagList.add("change_variable", TagList().add("which", bonusVar).add("value", "-1"))
 
 with open(outFolder+"/"+"custom_difficulty_yealy_event.txt",'w') as file:
-  yearlyEvent.writeAll(file, args())
+  yearlyFile.writeAll(file, args())
 
 
 outFolderLoc="../gratak_mods/custom_difficulty/localisation/english"
