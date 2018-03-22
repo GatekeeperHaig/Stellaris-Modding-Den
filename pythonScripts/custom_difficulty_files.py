@@ -28,13 +28,14 @@ catNotCountryType=["", "","",["default","awakened_fallen_empire"],""]
 catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel"]
 locList=[]
 locList.append(["custom_difficulty.current_bonuses", "Current Bonuses:"])
-locList.append(["custom_difficulty.current_yearly_desc", "Positive year count gives increase, negative year count decrease. Every year is fastest possible. Zero (not displayed) means no change:"])
+locList.append(["custom_difficulty.current_yearly_desc", "Positive year count gives increase, negative year count decrease. Every year is fastest possible. Zero (not displayed) means no change. Currently:"])
 locList.append(["custom_difficulty.back", "Back"])
 locList.append(["custom_difficulty.cancel", "Cancel and Back"])
 locList.append(["close_custom_difficulty.name", "Close Dynamic Difficulty Menu"])
 locList.append(["custom_difficulty.0.lock.name", "Lock Settings for the Rest of the Game"])
 locList.append(["custom_difficulty.0.lock.desc", "Yearly changes will continue up to the maximum/minimum. Can only be unlocked via installing the unlock mod, editing save game or starting a new game. Use with care!"])
 locList.append(["custom_difficulty.0.locked.desc", "Difficulty locked. Yearly changes will continue up to the maximum/minimum. Can only be unlocked via installing the unlock mod, editing save game or starting a new game. Use with care!"])
+locList.append(["custom_difficulty.locked", "Difficulty locked!"])
 locList.append(["custom_difficulty.0.unlock.name", "Unlock Settings"])
 locList.append(["custom_difficulty.0.unlock.desc", "Todo: Move to separate mod!"])
 locList.append(["custom_difficulty.0.name", "Dynamic Difficulty - Main Menu"])
@@ -79,6 +80,8 @@ for cat in cats:
   locList.append(["custom_difficulty_{}.name".format(cat),"Change {} bonuses".format(catNames[mainIndex-1])])
   trigger=TagList()
   choiceEvent.add("desc", TagList().add("trigger",trigger))
+  successText=TagList().add("text","custom_difficulty.locked").add("has_global_flag","custom_difficulty_locked")
+  trigger.add("success_text",successText)
   if cat=="ai_yearly":
     immediate=TagList()
     choiceEvent.add("immediate",immediate)
@@ -121,6 +124,7 @@ for cat in cats:
 
     #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before the loop)
     option=TagList().add("name", "custom_difficulty_{}_change_{}_button.name".format(cat,bonusR))
+    option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
     locList.append(["custom_difficulty_{}_change_{}_button.name".format(cat,bonusR), "Change {} Bonuses".format(bonus)])
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.{:01d}{:02d}0".format(mainIndex,optionIndex))))
     choiceEvent.add("option",option)
