@@ -391,6 +391,34 @@ with open(outputFolderStaticModifiers+"/"+"custom_difficulty_static_modifiers.tx
   staticModifiers.writeAll(file, args())
 
 
+yearlyFile=TagList()
+yearlyFile.add("namespace","custom_difficulty")
+yearlyEvent=TagList()
+yearlyFile.add("country_event", yearlyEvent)
+yearlyEvent.add("id", "custom_difficulty_9990")
+yearlyEvent.add("is_triggered_only",yes)
+yearlyEvent.add("hide_window",yes)
+trigger=TagList()
+yearlyEvent.add("trigger",trigger)
+trigger.add("is_ai","no")
+#todo: host only
+immediate=TagList()
+et=TagList()
+immediate.add(ET, et)
+cat="ai"
+for bonus in possibleBoniNames:
+  bonusR=bonus.lower().replace(" ","_")
+  yearCountVar="custom_difficulty_{}_year_counter".format(bonusR)
+  yearLimitVar="custom_difficulty_{}_{}_value".format(cat+"_yearly",bonusR)
+  #todo: negative yearly!
+  et.add("change_variable", TagList().add("which", yearCountVar).add("value", 1))
+  ifTagList=TagList()
+  et.add(ifTagList)
+  ifTagList.add("limit", TagList().add("not",TagList()add("check_variable", TagList().add("which", yearCountVar).add("val",yearLimitVar,"","<"))))
+  # ifTagList.add
+
+
+
 
 outFolderLoc="../gratak_mods/custom_difficulty/localisation/english"
 if not os.path.exists(outFolderLoc):
