@@ -456,12 +456,13 @@ with open(outFolder+"/"+"custom_difficulty_yealy_event.txt",'w') as file:
   yearlyFile.writeAll(file, args())
 
 
-outFolderLoc="../gratak_mods/custom_difficulty/localisation/english"
-if not os.path.exists(outFolderLoc):
-  os.makedirs(outFolderLoc)
+for language in ["braz_por","english","french","german","polish","russian","spanish"]:
+  outFolderLoc="../gratak_mods/custom_difficulty/localisation/"+language
+  if not os.path.exists(outFolderLoc):
+    os.makedirs(outFolderLoc)
 
-with io.open(outFolderLoc+"/custom_difficulty_l_english.yml",'w', encoding="utf-8") as file:
-  file.write(u'\ufeff')
-  file.write("l_english:\n")
-  for locEntry in locList:
-    file.write(" "+locEntry[0]+":0 "+'"'+locEntry[1]+'"\n')
+  with io.open(outFolderLoc+"/custom_difficulty_l_"+language+".yml",'w', encoding="utf-8") as file:
+    file.write(u'\ufeff')
+    file.write("l_"+language+":\n")
+    for locEntry in locList:
+      file.write(" "+locEntry[0]+":0 "+'"'+locEntry[1]+'"\n')
