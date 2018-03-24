@@ -1,105 +1,28 @@
 namespace = ex_ai_building_events
 
-event = { #this event sets variables into scopes. It fires on a monthly pulse and on game start. 
-	id = ex_ai_building_events.0
-	hide_window = yes
-	is_triggered_only = yes
-		
-	immediate = {
-		every_country = {
-			limit = { 
-				OR = {
-					is_country_type = default
-					is_country_type = fallen_empire
-					is_country_type = awakened_fallen_empire
-				}	
-			}	
-			country_event = { id = ex_ai_building_events.1 days = 1 }
-			if = { 
-				limit = { NOT = { has_country_flag = ex_ai_variables_added_country } }				
-				set_variable = { which = energy_mult value = 0 }
-				set_variable = { which = minerals_mult value = 0 }
-				set_variable = { which = food_mult value = 0 }	
-				set_country_flag = ex_ai_variables_added_country
-			}	
-			every_owned_planet = {
-				limit = { 
-					is_colony = yes
-					OR = {
-						owner = { is_ai = yes }
-						sector_controlled = yes
-					}	
-				}
-				every_owned_pop = {
-					if = { 
-						limit = { NOT = { has_pop_flag = ex_ai_variables_added_pop } }					
-						set_variable = { which = energy_mult value = 0 }
-						set_variable = { which = minerals_mult value = 0 }
-						set_variable = { which = food_mult value = 0 }
-						set_variable = { which = unity_mult value = 0 }
-						set_variable = { which = society_research_mult value = 0 }
-						set_variable = { which = physics_research_mult value = 0 }
-						set_variable = { which = engineering_research_mult value = 0 }
-						set_pop_flag = ex_ai_variables_added_pop				
-					}		
-				}	
-				if = { 
-					limit = { NOT = { has_planet_flag = ex_ai_variables_added_planet } }					
-					set_variable = { which = energy_mult value = 0 }
-					set_variable = { which = minerals_mult value = 0 }
-					set_variable = { which = food_mult value = 0 }
-					set_variable = { which = unity_mult value = 0 }
-					set_variable = { which = society_research_mult value = 0 }
-					set_variable = { which = physics_research_mult value = 0 }
-					set_variable = { which = engineering_research_mult value = 0 }
-					every_tile = {
-						limit = { is_orbital_tile = no }
-						#multiplier variables
-						set_variable = { which = energy_mult value = 1 }
-						set_variable = { which = minerals_mult value = 1 }
-						set_variable = { which = food_mult value = 1 }
-						set_variable = { which = unity_mult value = 1 }
-						set_variable = { which = society_research_mult value = 1 }
-						set_variable = { which = physics_research_mult value = 1 }
-						set_variable = { which = engineering_research_mult value = 1 }					
-						#deposit/adj. variables
-						set_variable = { which = energy_weight value = 0 }
-						set_variable = { which = minerals_weight value = 0 }
-						set_variable = { which = food_weight value = 0 }
-						set_variable = { which = unity_weight value = 0 }
-						set_variable = { which = society_research_weight value = 0 }
-						set_variable = { which = physics_research_weight value = 0 }
-						set_variable = { which = engineering_research_weight value = 0 }
-						#building weight variables
-						set_variable = { which = energy_building_tile value = 0 }
-						set_variable = { which = minerals_building_tile value = 0 }
-						set_variable = { which = food_building_tile value = 0 }
-						set_variable = { which = society_research_building_tile value = 0 }
-						set_variable = { which = physics_research_building_tile value = 0 }
-						set_variable = { which = engineering_research_building_tile value = 0 }
-						#building adj. weight variables
-						set_variable = { which = energy_building_adj_weight value = 0 }
-						set_variable = { which = minerals_building_adj_weight value = 0 }
-						set_variable = { which = food_building_adj_weight value = 0 }
-						set_variable = { which = society_research_building_adj_weight value = 0 }
-						set_variable = { which = physics_research_building_adj_weight value = 0 }
-						set_variable = { which = engineering_research_building_adj_weight value = 0 }															
-					}
-					set_planet_flag = ex_ai_variables_added_planet
-				}	
-			}			
-		}
-	}
-}	
-
-country_event = { #this event runs on a monthly scope. 
+country_event = { #this event is fired on a monthly scope. 
 	id = ex_ai_building_events.1
 	hide_window = yes
 	is_triggered_only = yes
 
+	trigger = {
+		OR = {
+			is_country_type = default
+			is_country_type = fallen_empire
+			is_country_type = awakened_fallen_empire
+		}	
+	}	
+	
 	immediate = { 
-		check_deficities = yes
-		check_income_level = yes
+		if = { 
+			limit = { NOT = { has_country_flag = country_check_delay } }				
+			set_variable = { which = energy_weight value = 0 }
+			set_variable = { which = minerals_weight value = 0 }
+			set_variable = { which = food_weight value = 0 }	
+			check_deficities = yes
+			check_income_level = yes
+			set_timed_country_flag = { flag = country_check_delay days = 120 }
+		}	
 		every_owned_planet = {
 			limit = { 
 				is_colony = yes
@@ -108,61 +31,217 @@ country_event = { #this event runs on a monthly scope.
 					sector_controlled = yes
 				}	
 			}
-			if = { 
-				limit = { 
-					OR = {
-						num_modifiers > 0 
-						has_planet_bonus_building = yes
-						AND = {
-							planets_enhanced_enabled = yes
-							has_planets_enhanced_planet_bonus_buildings = yes									
-						}	
+			if = {
+				limit = { NOT = { has_planet_flag = planet_check_delay } }				
+				if = { 
+					limit = { NOT = { has_planet_flag = ex_ai_planet_variables_added } } 
+					set_variable = { which = energy_mult value = 0 }
+					set_variable = { which = minerals_mult value = 0 }
+					set_variable = { which = food_mult value = 0 }
+					set_variable = { which = unity_mult value = 0 }
+					set_variable = { which = society_research_mult value = 0 }
+					set_variable = { which = physics_research_mult value = 0 }
+					set_variable = { which = engineering_research_mult value = 0 }		
+					set_planet_flag = ex_ai_planet_variables_added
+				}	
+				if = { 
+					limit = { NOT = { has_planet_flag = ex_ai_first_time_planet_check_performed }}
+					check_planet_bonus_buildings = yes				
+					if = {
+						limit = { planets_enhanced_enabled = yes }	
+						check_planets_enhanced_planet_bonus_buildings = yes
+					}	
+					if = {
+						limit = { alphamod_enabled = yes }	
+						check_planet_bonus_buildings_am = yes
+					}	
+					set_planet_flag = ex_ai_planet_check_performed
+				}	
+				if = { 
+					limit = { 
+						num_modifiers > 0
+						NOR = {
+							AND = {
+								num_modifiers = 1
+								check_variable = { which = pm_num value = 1 }
+							}
+							AND = {
+								num_modifiers = 2
+								check_variable = { which = pm_num value = 2 }
+							}						
+							AND = {
+								num_modifiers = 3
+								check_variable = { which = pm_num value = 3 }
+							}						
+							AND = {
+								num_modifiers = 4
+								check_variable = { which = pm_num value = 4 }
+							}						
+							AND = {
+								num_modifiers = 5
+								check_variable = { which = pm_num value = 5 }
+							}						
+							AND = {
+								num_modifiers = 6
+								check_variable = { which = pm_num value = 6 }
+							}						
+							AND = {
+								num_modifiers = 7
+								check_variable = { which = pm_num value = 7 }
+							}						
+							AND = {
+								num_modifiers = 8
+								check_variable = { which = pm_num value = 8 }
+							}						
+							AND = {
+								num_modifiers = 9
+								check_variable = { which = pm_num value = 9 }
+							}						
+							AND = {
+								num_modifiers = 10
+								check_variable = { which = pm_num value = 10 }
+							}						
+						}
 					}
-				}
-				calculate_planet_weights = yes
+					switch = {
+						trigger = num_modifiers
+						1 = { set_variable = { which = pm_num value = 1 } }
+						2 = { set_variable = { which = pm_num value = 2 } }
+						3 = { set_variable = { which = pm_num value = 3 } }
+						4 = { set_variable = { which = pm_num value = 4 } }
+						5 = { set_variable = { which = pm_num value = 5 } }
+						6 = { set_variable = { which = pm_num value = 6 } }
+						7 = { set_variable = { which = pm_num value = 7 } }
+						8 = { set_variable = { which = pm_num value = 8 } }
+						9 = { set_variable = { which = pm_num value = 9 } }
+						10 = { set_variable = { which = pm_num value = 10 } }
+					}
+					check_planet_modifiers = yes	
+					if = {
+						limit = { planets_enhanced_enabled = yes }
+						check_planets_enhanced_planet_modifiers = yes
+					}	
+					if = {
+						limit = { guillis_planet_modifiers_enabled = yes }		
+						check_planet_modifiers_gpm = yes
+					}
+					if = {
+						limit = { planetary_diversity_enabled = yes }
+						check_planet_modifiers_pd = yes
+					}		
+					if = {
+						limit = { alphamod_enabled = yes }
+						check_planet_modifiers_am = yes		
+					}	
+				}					
 			}	
-			every_owned_pop = {
-				limit = { OR = { is_robot_pop = yes is_sapient = yes } }
-				calculate_pop_multipliers = yes
-			}				
 			every_tile = {
 				limit = { 
-					is_orbital_tile = no
-					has_blocker = no
+					has_deposit = yes
+					has_special_resource_deposit = yes
 				}
-				if = {
-					limit = { 
-						any_neighboring_tile = { 
-							OR = {
-								AND = {
-									has_building = yes
-									OR = { 	
-										has_capital_building = yes
-										has_hyperstorage_building = yes 
-										has_polytechnic_building = yes
-										has_special_capital_resource_building = yes
-										AND = {
-											has_global_flag = ex_planets_enhanced_active
-											has_sr_adj_bonus_building = yes
-										}	
-									}	
-								}
-								AND = {
-									has_blocker = yes
-									has_adj_bonus_blocker = yes
-								}		
-							}							
-						}							
+				add_deposit = special_resource_tile #this deposit ensures that these tiles are ignored
+			}		
+			if = {
+				limit = {
+					root = {
+						check_variable = { which = energy_weight value < 1 }
+						check_variable = { which = minerals_weight value < 1 }
+						check_variable = { which = food_weight value < 1 }												
 					}
-					calculate_adjcancy_weights = yes
 				}
-				calculate_tile_weights = yes
-				calculate_adj_potential_weights = yes
-			}					
-		}		
-	}	
+				while = {
+					limit = { 
+						any_tile = { 
+							has_blocker = yes
+							has_ai_null_deposit = no 
+							NOT = { has_deposit = special_resource_tile }
+						}
+					}
+					root = {
+						set_variable = { which = energy_weight_tile value = 0 }
+						set_variable = { which = minerals_weight_tile value = 0 }
+						set_variable = { which = food_weight_tile value = 0 }
+						set_variable = { which = society_research_weight_tile value = 0 }
+						set_variable = { which = physics_research_weight_tile value = 0 }
+						set_variable = { which = engineering_research_weight_tile value = 0 }
+					}				
+					random_tile = {
+						limit = { 
+							has_blocker = yes
+							has_ai_null_deposit = no
+							NOT = { has_deposit = special_resource_tile }
+						}
+						set_tile_building_weight = yes
+					}
+				}
+				else = {
+					every_tile = {
+						limit = { NOR = { has_deposit = no has_deposit = special_resource_tile } }
+						switch = {
+							trigger = has_deposit
+							d_mineral_deposit = { clear_deposits = yes add_deposit = d_mineral_deposit }
+							d_rich_mineral_deposit = { clear_deposits = yes add_deposit = d_rich_mineral_deposit }
+							d_vast_mineral_deposit = { clear_deposits = yes add_deposit = d_vast_mineral_deposit }
+							d_immense_mineral_deposit = { clear_deposits = yes add_deposit = d_immense_mineral_deposit }
+							d_energy_deposit = { clear_deposits = yes add_deposit = d_energy_deposit }
+							d_rich_energy_deposit = { clear_deposits = yes add_deposit = d_rich_energy_deposit }
+							d_vast_energy_deposit = { clear_deposits = yes add_deposit = d_vast_energy_deposit }
+							d_immense_energy_deposit = { clear_deposits = yes add_deposit = d_immense_energy_deposit }
+							d_farmland_deposit = { clear_deposits = yes add_deposit = d_farmland_deposit }
+							d_rich_farmland_deposit = { clear_deposits = yes add_deposit = d_rich_farmland_deposit }
+							d_vast_farmland_deposit = { clear_deposits = yes add_deposit = d_vast_farmland_deposit }
+							d_immense_farmland_deposit = { clear_deposits = yes add_deposit = d_immense_farmland_deposit }
+							d_mineral_energy_deposit = { clear_deposits = yes add_deposit = d_mineral_energy_deposit }
+							d_rich_mineral_energy_deposit = { clear_deposits = yes add_deposit = d_rich_mineral_energy_deposit }
+							d_mineral_food_deposit = { clear_deposits = yes add_deposit = d_mineral_food_deposit }
+							d_rich_food_mineral_deposit = { clear_deposits = yes add_deposit = d_rich_food_mineral_deposit }
+							d_society_deposit = { clear_deposits = yes add_deposit = d_society_deposit }
+							d_rich_society_deposit = { clear_deposits = yes add_deposit = d_rich_society_deposit }
+							d_vast_society_deposit = { clear_deposits = yes add_deposit = d_vast_society_deposit }
+							d_immense_society_deposit = { clear_deposits = yes add_deposit = d_immense_society_deposit }
+							d_physics_deposit = { clear_deposits = yes add_deposit = d_physics_deposit }
+							d_rich_physics_deposit = { clear_deposits = yes add_deposit = d_rich_physics_deposit }
+							d_vast_physics_deposit = { clear_deposits = yes add_deposit = d_vast_physics_deposit }
+							d_immense_physics_deposit = { clear_deposits = yes add_deposit = d_immense_physics_deposit }
+							d_engineering_deposit = { clear_deposits = yes add_deposit = d_engineering_deposit }
+							d_rich_engineering_deposit = { clear_deposits = yes add_deposit = d_rich_engineering_deposit }
+							d_vast_engineering_deposit = { clear_deposits = yes add_deposit = d_vast_engineering_deposit }
+							d_immense_engineering_deposit = { clear_deposits = yes add_deposit = d_immense_engineering_deposit }							
+						}
+					}
+					while = {
+						limit = { 
+							any_tile = { 
+								has_blocker = yes
+								has_ai_null_deposit = no 
+								NOT = { has_deposit = special_resource_tile }
+							}
+						}
+						root = {
+							set_variable = { which = energy_weight_tile value = 0 }
+							set_variable = { which = minerals_weight_tile value = 0 }
+							set_variable = { which = food_weight_tile value = 0 }
+							set_variable = { which = society_research_weight_tile value = 0 }
+							set_variable = { which = physics_research_weight_tile value = 0 }
+							set_variable = { which = engineering_research_weight_tile value = 0 }
+						}						
+						random_tile = {
+							limit = { 
+								has_blocker = yes
+								has_ai_null_deposit = no
+								NOT = { has_deposit = special_resource_tile }
+							}
+							set_tile_building_weight = yes
+						}
+					}
+				}
+			}
+			set_timed_planet_flag = { flag = planet_check_delay days = 360 } 			
+		}
+	}
 }
-
+				
 #this event runs on a monthly scope.
 #it places planet flags that are used by specific planet unique buildings
 
