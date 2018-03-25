@@ -262,7 +262,6 @@ building_eutab_dev_district = {
 		building_eutab_arcology
 		building_eutab_monument_unity
 		building_eutab_hive_grand_hatchery
-		building_eutab_aux_processing
 	}
 	ai_allow = {
 		NOR = {
@@ -3532,6 +3531,110 @@ building_eutab_comp_arcology = {
 	ai_weight = { weight = 100 }
 	upgrades = { building_eutab_dev_district_hidden_tree_root }
 }
+building_eutab_adv_clone_vats_direct_build = {
+	base_buildtime = 630
+	planet_unique = yes
+	cost = { minerals = 400 }
+	produced_resources = { society_research = 6 }
+	planet_modifier = { pop_growth_speed = 0.2 }
+	potential = {
+		owner = { has_ethic = ethic_fanatic_materialist }
+		NOT = {
+			tile = { has_building_eutab_adv_clone_vats = yes }
+		}
+	}
+	required_resources = { energy = 5 }
+	country_modifier = { category_biology_research_speed_mult = 0.01 }
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_1"
+			planet = {
+				OR = {
+					has_building = "building_hab_capital"
+					has_building_capital_1 = yes
+					has_building_capital_2 = yes
+					has_building = "building_capital_3"
+				}
+			}
+		}
+	}
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_authority = auth_machine_intelligence
+				has_authority = auth_hive_mind
+			}
+		}
+	}
+	prerequisites = { "tech_eutab_adv_clone_vats" }
+	ai_weight = { weight = 100 }
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}
+		}
+		NOT = {
+			planet = {
+				owner = {
+					any_owned_planet = {
+						NOT = { is_same_value = from }
+						has_building = building_clone_vats
+					}
+				}
+			}
+		}
+		# If planet only has slaves/robots, keep it to mining and farming...
+		is_slave_tile_or_planet = no
+	}
+	show_tech_unlock_if = { always = no }
+	icon = building_eutab_adv_clone_vats
+	upgrades = { building_clone_vats_hidden_tree_root }
+}
+building_eutab_adv_clone_vats = {
+	base_buildtime = 360
+	planet_unique = yes
+	is_listed = no
+	cost = { minerals = 200 }
+	produced_resources = { society_research = 6 }
+	planet_modifier = { pop_growth_speed = 0.2 }
+	potential = {
+		owner = { has_ethic = ethic_fanatic_materialist }
+	}
+	required_resources = { energy = 5 }
+	country_modifier = { category_biology_research_speed_mult = 0.01 }
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_1"
+			planet = {
+				OR = {
+					has_building = "building_hab_capital"
+					has_building_capital_1 = yes
+					has_building_capital_2 = yes
+					has_building = "building_capital_3"
+				}
+			}
+		}
+	}
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_authority = auth_machine_intelligence
+				has_authority = auth_hive_mind
+			}
+		}
+	}
+	prerequisites = { "tech_eutab_adv_clone_vats" }
+	ai_weight = { weight = 100 }
+	upgrades = { building_clone_vats_hidden_tree_root }
+}
 building_eutab_planet_sci = {
 	base_buildtime = 720
 	empire_unique = yes
@@ -3591,6 +3694,72 @@ building_eutab_planet_sci = {
 		pop_environment_tolerance = 0.05
 	}
 	prerequisites = { "tech_eutab_planet_sci" }
+	ai_weight = { weight = 100 }
+}
+building_eutab_grand_academy = {
+	base_buildtime = 720
+	empire_unique = yes
+	cost = {
+		minerals = 300
+		influence = 50
+	}
+	produced_resources = {
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+	required_resources = { energy = 7 }
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_2"
+			planet = {
+				OR = {
+					has_building_capital_2 = yes
+					has_building = "building_capital_3"
+				}
+			}
+		}
+	}
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}
+			has_resource = {
+				type = society_research
+				amount > 0
+			}
+			has_resource = {
+				type = engineering_research
+				amount > 0
+			}
+		}
+	}
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+		}
+	}
+	destroy_if = {
+		exists = owner
+		owner = {
+			OR = {
+				has_authority = auth_machine_intelligence
+				has_authority = auth_hive_mind
+			}
+		}
+	}
+	country_modifier = {
+		leader_cost = -0.20
+		species_leader_exp_gain = 0.25
+		country_leader_cap = 1
+	}
+	prerequisites = { "tech_eutab_grand_academy" }
 	ai_weight = { weight = 100 }
 }
 building_eutab_monument_unity_direct_build = {
@@ -5118,6 +5287,118 @@ building_hab_laboratory_module = {
 		building_eutab_hab_lab_phy
 		building_eutab_hab_lab_eng
 		building_eutab_hab_lab_soc
+	}
+}
+building_clone_vats_hidden_tree_root = {
+	potential = { always = no }
+	planet_unique = yes
+	icon = building_clone_vats
+}
+building_clone_vats = {
+	base_buildtime = 360
+	planet_unique = yes
+	cost = { minerals = 200 }
+	produced_resources = { society_research = 4 }
+	required_resources = { energy = 2 }
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+		}
+		NAND = {
+			owner = { has_technology = "tech_eutab_adv_clone_vats" }
+			owner = { has_ethic = ethic_fanatic_materialist }
+			custom_tooltip = {
+				text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_hab_capital"
+						has_building_capital_1 = yes
+						has_building_capital_2 = yes
+						has_building = "building_capital_3"
+					}
+				}
+			}
+			owner = {
+				NOT = { has_country_flag = display_low_tier_flag  }
+			}
+		}
+	}
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = {
+						has_building_capital_2 = yes
+						has_building = "building_capital_3"
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			custom_tooltip = {
+				text = "requires_building_machine_capital_2"
+				planet = {
+					OR = {
+						has_building_machine_capital_2 = yes
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+		}
+	}
+	prerequisites = { "tech_gene_banks" }
+	upgrades = { building_eutab_adv_clone_vats }
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}
+		}
+		NOT = {
+			planet = {
+				owner = {
+					any_owned_planet = {
+						NOT = { is_same_value = from }
+						has_building = building_clone_vats
+					}
+				}
+			}
+		}
+		# If planet only has slaves/robots, keep it to mining and farming...
+		is_slave_tile_or_planet = no
+	}
+	ai_weight = {
+		weight = 10
+		modifier = {
+			weight = 0
+			from = {
+				owner = {
+					NOT = {
+						has_technology = tech_gene_banks
+						OR = {
+							has_ethic = ethic_militarist
+							has_ethic = ethic_fanatic_militarist
+							has_ethic = ethic_fanatic_materialist #EUTAB ADD
+						}
+					}
+				}
+				NOT = { has_building = building_clone_vats }
+			}
+		}
 	}
 }
 building_clinic_hidden_tree_root = {
