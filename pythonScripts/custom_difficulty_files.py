@@ -177,6 +177,7 @@ name_rootUpdateEvent="custom_difficulty.40"
 name_rootUpdateEventDelay="custom_difficulty.41"
 name_countryUpdateEventDelay="custom_difficulty.50"
 id_defaultEvents=100 #reserved range up to 199
+id_ChangeEvents=1000 #reserved range up to 9999
 
 def outputToFolderAndFile(tagList, folder, file):
   folder="../gratak_mods/custom_difficulty/"+folder
@@ -591,7 +592,7 @@ outputToFolderAndFile(edictFile, "common/edicts", "custom_difficulty_edict.txt")
 
 onActions=TagList()
 onActions.add("on_yearly_pulse", TagList("events",TagList().add(name_rootYearlyEvent).add(name_rootUpdateEvent)))
-onActions.add("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce)))
+onActions.add("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
 # onActions.add("on_game_start", TagList("events",TagList().add("custom_difficulty.9999"))) #is called by "fire only once"
 outputToFolderAndFile(onActions, "common/on_actions", "custom_difficulty_on_action.txt")
 
@@ -627,6 +628,25 @@ scriptedModifiers.add("difficulty_scaled_hard",TagList())
 scriptedModifiers.add("difficulty_scaled_normal",TagList())
 outputToFolderAndFile(scriptedModifiers, "common/static_modifiers","!_custom_difficulty_00_static_modifier.txt")
 
+
+allowUnlock=False
+mainFileContent=TagList("namespace","custom_difficulty_")
+mainFileContent.add("","","#main menu")
+mainMenu=TagList()
+mainFileContent.add("country_event",mainMenu)
+mainMenu.add("id", name_mainMenuEvent)
+mainMenu.add("is_triggered_only", yes)
+mainMenu.add("title", "custom_difficulty.0.name")
+mainMenu.add("picture", "GFX_evt_towel")
+trigger=TagList()
+mainMenu.add("desc", TagList("trigger", trigger))
+trigger.add("fail_text", TagList().add("text", "custom_difficulty.0.desc").add("has_global_flag", "custom_difficulty_locked"))
+trigger.add("success_text", TagList().add("text", "custom_difficulty.0.locked.desc").add("has_global_flag", "custom_difficulty_locked"))
+mainMenu.add("option", TagList("name","custom_difficulty.predefined_difficulties").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
+for i,cat in enumerate(cats):
+  mainMenu.add("option", TagList("name","custom_difficulty_{}.name".format(cat)).add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+i*1000)))))
+
+outputToFolderAndFile(mainMenu, "events", "newMain.txt")
 
 
 for language in locClass.languages:
