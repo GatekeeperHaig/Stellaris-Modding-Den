@@ -18,7 +18,7 @@ possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy
 "country_starbase_upkeep_mult","army_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","","",""]
 possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
-boniListNames=["All","Vanilla Default Empire", "All ship"]
+boniListNames=["All","Vanilla Default Empire", "All Ship"]
 boniListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
 boniListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
 cats=["ai","ai_yearly","fe","leviathan","player"]
@@ -39,6 +39,8 @@ locList.append(["custom_difficulty.locked", "Difficulty locked!"])
 locList.append(["custom_difficulty.0.unlock.name", "Unlock Settings"])
 locList.append(["custom_difficulty.0.unlock.desc", "Todo: Move to separate mod!"])
 locList.append(["custom_difficulty.0.name", "Dynamic Difficulty - Main Menu"])
+locList.append(["edict_custom_difficulty", "Dynamic Difficulty - Main Menu"])
+locList.append(["edict_custom_difficulty_desc", "Triggers an event to let you customize the difficulty of your current game"])
 # locList.append(["custom_difficulty.0.name", "Ultimate Custom Difficulty Advanced Configuration"])
 locList.append(["custom_difficulty.0.desc", "Choose category to change or show"])
 # locList.append(["custom_difficulty.1.name", "Ultimate Custom Difficulty Main Menu"])
@@ -77,7 +79,7 @@ for cat in cats:
   choiceEvent.add("is_triggered_only", yes)
   choiceEvent.add("title","custom_difficulty_{}.name".format(cat))
   choiceEvent.add("picture",'"'+catPictures[mainIndex-1]+'"')
-  locList.append(["custom_difficulty_{}.name".format(cat),"Change {} bonuses".format(catNames[mainIndex-1])])
+  locList.append(["custom_difficulty_{}.name".format(cat),"Change {} Bonuses".format(catNames[mainIndex-1])])
   trigger=TagList()
   choiceEvent.add("desc", TagList().add("trigger",trigger))
   successText=TagList().add("text","custom_difficulty.locked").add("has_global_flag","custom_difficulty_locked")
@@ -97,7 +99,7 @@ for cat in cats:
     boniListNameR=boniListName.lower().replace(" ","_")
     option=TagList().add("name", "custom_difficulty_{}_change_{}_name".format(cat,boniListNameR))
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
-    locList.append(["custom_difficulty_{}_change_{}_name".format(cat,boniListNameR), "Change {} bonuses".format(boniListName)])
+    locList.append(["custom_difficulty_{}_change_{}_name".format(cat,boniListNameR), "Change {} Bonuses".format(boniListName)])
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.{:01d}{:02d}0".format(mainIndex,optionIndex))))
     choiceEvent.add("option",option)
 
@@ -147,7 +149,7 @@ for cat in cats:
     changeEvent.add("id","custom_difficulty.{:01d}{:02d}0".format(mainIndex,bonusIndex))
     changeEvent.add("is_triggered_only", yes)
     changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonusR))
-    locList.append(["custom_difficulty_{}_change_{}.name".format(cat,bonusR), "Change {} bonus ({})".format(bonus,catNames[mainIndex-1])])
+    locList.append(["custom_difficulty_{}_change_{}.name".format(cat,bonusR), "Change {} Bonuses ({})".format(bonus,catNames[mainIndex-1])])
     changeEvent.add("desc", TagList().add("trigger",trigger)) #same desc trigger as above?
     changeEvent.add("picture",'"'+(boniListPictures+possibleBoniPictures)[bonusIndex-1]+'"')
     if cat=="ai_yearly":
