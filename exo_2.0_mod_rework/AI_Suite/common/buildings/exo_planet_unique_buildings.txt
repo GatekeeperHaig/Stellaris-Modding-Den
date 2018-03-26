@@ -43,7 +43,7 @@ building_power_hub_1 = {
 	ai_weight = { 
 		modifier = { 
 			add = 50 
-			check_variable = { which = "energy_building_tile" value = 1 }
+			tile = { has_deposit = energy_building_tile }
 		}
 	}
 }
@@ -90,7 +90,58 @@ building_power_hub_2 = {
 	ai_weight = { 
 		modifier = { 
 			add = 50 
-			check_variable = { which = "energy_building_tile" value = 1 }
+			tile = { has_deposit = energy_building_tile }
+		}
+	}
+}
+
+building_akx_worm_1 = {
+	#building defines
+	tags = { worm_building }
+	base_buildtime = 180
+	is_listed = yes
+	planet_unique = yes
+	cost = { minerals = 120 }
+	potential = { conditions_akx_worm_1 = yes } 
+	prerequisites = { "tech_akx_worm_1" }	
+	triggered_planet_modifier = { 
+		potential = { overhauled_building_content_enabled = no }
+		modifier = { 
+			tile_resource_energy_mult = 0.25
+			pop_happiness = -0.05
+		}
+	}	
+	triggered_planet_modifier = { 
+		potential = { overhauled_building_content_enabled = yes }
+		modifier = { 
+			tile_resource_energy_mult = 0.25
+			pop_happiness = -0.05
+		}
+	}		
+	produced_resource_trigger = {
+		modifier = { #this is the base building output using vanilla stats
+			overhauled_building_content_enabled = no
+			resources = { energy = 6 }
+		}
+		modifier = { #this is the base building output using overhauled stats
+			overhauled_building_content_enabled = yes
+			resources = { energy = 6 }
+		}	
+		modifier = {
+			overhauled_building_content_enabled = yes
+			OR = {
+				has_non_swapped_tradition = tr_prosperity_pursuit_of_profit
+				has_swapped_tradition = tr_prosperity_pursuit_of_profit_machine
+			}
+			resources = { unity = 2	}
+		}			
+	}		
+	#ai restrictions and weights	
+	ai_allow = { tile_has_any_strategic_resource = no }		
+	ai_weight = { 
+		modifier = { 
+			add = 50 
+			tile = { has_deposit = energy_building_tile }
 		}
 	}
 }
@@ -132,7 +183,7 @@ building_mineral_processing_plant_1 = {
 	ai_weight = { 
 		modifier = { 
 			add = 50 
-			check_variable = { which = "minerals_building_tile" value = 1 }
+			tile = { has_deposit = minerals_building_tile }
 		}
 	}
 }
@@ -173,7 +224,7 @@ building_mineral_processing_plant_2 = {
 	ai_weight = { 
 		modifier = { 
 			add = 50 
-			check_variable = { which = "minerals_building_tile" value = 1 }
+			tile = { has_deposit = minerals_building_tile }
 		}
 	}
 }
@@ -223,8 +274,8 @@ building_clinic = {
 	ai_allow = { 
 		tile_has_any_strategic_resource = no
 		OR = {
-			has_deposit = no
-			check_variable = { which = "society_research_building_tile" value = 1 }
+			has_deposit = unique_building_tile
+			has_deposit = society_research_building_tile
 		}	
 	}
 	ai_weight = { 
@@ -279,8 +330,8 @@ building_hospital = {
 	ai_allow = { 
 		tile_has_any_strategic_resource = no
 		OR = {
-			has_deposit = no
-			check_variable = { which = "society_research_building_tile" value = 1 }
+			has_deposit = unique_building_tile
+			has_deposit = society_research_building_tile
 		}	
 	}
 	ai_weight = { 
@@ -335,8 +386,8 @@ building_spare_parts_depot = {
 	ai_allow = { 
 		tile_has_any_strategic_resource = no
 		OR = {
-			has_deposit = no
-			check_variable = { which = "society_research_building_tile" value = 1 }
+			has_deposit = unique_building_tile
+			has_deposit = society_research_building_tile
 		}	
 	}
 	ai_weight = { 
@@ -391,8 +442,8 @@ building_unit_assembly_plant = {
 	ai_allow = { 
 		tile_has_any_strategic_resource = no
 		OR = {
-			has_deposit = no
-			check_variable = { which = "society_research_building_tile" value = 1 }
+			has_deposit = unique_building_tile
+			has_deposit = society_research_building_tile
 		}	
 	}
 	ai_weight = { 
@@ -404,11 +455,11 @@ building_unit_assembly_plant = {
 	}
 }
 
-### Pop Growth Buildings
+### Pop Enhancement Buildings
 
 building_slave_processing = {
 	#building defines
-	tags = { slave_building }
+	tags = { pop_enhancement_building }
 	planet_unique = yes
 	is_listed = yes
 	base_buildtime = 360	
@@ -460,10 +511,14 @@ building_slave_processing = {
 	ai_allow = { 
 		tile_has_any_strategic_resource = no
 		OR = {
-			has_deposit = no
-			check_variable = { which = "minerals_building_tile" value = 1 }
-			check_variable = { which = "food_building_tile" value = 1 }
+			has_deposit = unique_building_tile
+			has_deposit = minerals_building_tile
+			has_deposit = food_building_tile
 		}	
+		count_pops = {
+			limit = { is_enslaved = yes }
+			count > 3
+		}			
 	}
 	
 	ai_weight = { 
@@ -471,6 +526,198 @@ building_slave_processing = {
 		modifier = { 
 			add = 100 
 			from = { has_planet_flag = build_slave_processing }
+		}
+	}
+}
+
+building_neuro_electric_amplifier = {
+	#building defines
+	tags = { pop_enhancement_building }
+	planet_unique = yes
+	is_listed = yes
+	base_buildtime = 360	
+	cost = { minerals = 250 }	
+	#requirements and upgrade
+	potential = { conditions_neuro_electric_amplifier = yes } 
+	allow = { requires_building_capital_1_or_hab = yes }
+	destroy_if = { neuro_electric_amplifier_destroy_conditions = yes }	
+	#resource output and modifiers	
+	planet_modifier_with_pop_trigger = {
+		key = building_neuro_electric_amplifier
+		potential = { 
+			has_trait = trait_cybernetic
+			overhauled_building_content_enabled = no
+		}
+		modifier = {
+			tile_resource_minerals_mult = 0.15
+			tile_resource_energy_mult = 0.15
+		}
+	}	
+	planet_modifier_with_pop_trigger = {
+		key = building_neuro_electric_amplifier_overhauled
+		potential = { 
+			has_trait = trait_cybernetic
+			overhauled_building_content_enabled = yes
+		}
+		modifier = {
+			tile_resource_minerals_mult = 0.15
+			tile_resource_energy_mult = 0.15
+		}
+	}		
+	produced_resource_trigger = {
+		modifier = { #this is the base building output using vanilla stats
+			overhauled_building_content_enabled = no
+			resources = { 
+				minerals = 2
+				energy = 2			
+			}
+		}
+		modifier = { #this is the base building output using overhauled stats
+			overhauled_building_content_enabled = yes
+			resources = { 
+				minerals = 2
+				energy = 2					
+			}
+		}			
+	}
+	#ai restrictions and weights	
+	ai_allow = { 
+		tile_has_any_strategic_resource = no
+		OR = {
+			has_deposit = unique_building_tile
+			has_deposit = minerals_building_tile
+			has_deposit = energy_building_tile
+		}	
+		count_pops = {
+			limit = { has_trait = trait_cybernetic }
+			count > 3
+		}			
+	}
+	
+	ai_weight = { weight = 100 }
+}
+
+### Tradition Planet Unique Buildings
+
+building_control_center = {
+	#building defines
+	tags = { pop_enhancement_building }
+	planet_unique = yes
+	is_listed = yes
+	base_buildtime = 360	
+	cost = { minerals = 250 }	
+	#requirements and upgrade
+	potential = { 
+		owner_is_machine_empire = yes
+		owner = { has_synchronicity_machine_center = yes }
+	} 
+	allow = { requires_building_capital_1_or_hab = yes }
+	destroy_if = { 
+		exists = owner
+		OR = {
+			owner_is_machine_empire = no
+			owner = { has_synchronicity_machine_center = no }
+		}	
+	}	
+	#resource output and modifiers	
+	triggered_planet_modifier = { 
+		potential = { 
+			overhauled_building_content_enabled = no
+		}
+		modifier = {
+			pop_robot_production_output = 0.05
+		}
+	}	
+	triggered_planet_modifier = {
+		potential = { 
+			overhauled_building_content_enabled = yes
+		}
+		modifier = {
+			pop_robot_production_output = 0.05
+		}
+	}		
+	produced_resource_trigger = {
+		modifier = { #this is the base building output using vanilla stats
+			overhauled_building_content_enabled = no
+			resources = { 
+				energy = 2
+				unity = 2		
+			}
+		}
+		modifier = { #this is the base building output using overhauled stats
+			overhauled_building_content_enabled = yes
+			resources = { 
+				energy = 2
+				unity = 2
+			}
+		}			
+	}
+	#ai restrictions and weights	
+	ai_allow = { 
+		tile_has_any_strategic_resource = no
+		OR = {
+			has_deposit = unique_building_tile
+			has_deposit = unity_building_tile
+			has_deposit = energy_building_tile
+		}	
+		count_pops = {
+			limit = { is_robot_pop = yes }
+			count > 3
+		}			
+	}
+	
+	ai_weight = { weight = 100 }
+}
+
+### Other Planet Unique Buildings
+
+building_akx_worm_2 = {
+	#building defines
+	tags = { ethic_attraction_building }
+	base_buildtime = 180
+	is_listed = yes
+	planet_unique = yes
+	prerequisites = { "tech_akx_worm_2" }
+	cost = { minerals = 120 }
+	potential = { conditions_akx_worm_2 = yes } 
+	required_resources = { energy = 2}
+	triggered_planet_modifier = { 
+		potential = { overhauled_building_content_enabled = no }
+		modifier = { 
+			pop_government_ethic_attraction = 0.05
+			pop_happiness = 0.05
+		}
+	}		
+	triggered_planet_modifier = { 
+		potential = { overhauled_building_content_enabled = yes }
+		modifier = { 
+			pop_government_ethic_attraction = 0.05
+			pop_happiness = 0.05
+		}
+	}			
+	produced_resource_trigger = {
+		modifier = { #this is the base building output using vanilla stats
+			overhauled_building_content_enabled = no
+			resources = { society_research = 8 }
+		}
+		modifier = { #this is the base building output using overhauled stats
+			overhauled_building_content_enabled = yes
+			resources = { society_research = 8 }
+		}			
+	}		
+	#ai restrictions and weights	
+	ai_allow = { 
+		tile_has_any_strategic_resource = no
+		OR = {
+			has_deposit = unique_building_tile
+			has_deposit = society_research_building_tile
+		}	
+	}	
+	ai_weight = { 
+		weight = 0
+		modifier = { 
+			add = 100 
+			from = { has_planet_flag = build_loop_institute }
 		}
 	}
 }
