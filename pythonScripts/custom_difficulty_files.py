@@ -4,6 +4,8 @@
 import sys, os, io
 from stellarisTxtRead import *
 from copy import deepcopy
+from googletrans import Translator
+import re
 
 changeStepYears=[5,4,3,2,1]
 changeSteps = [50, 25, 10, 5, 1]
@@ -41,6 +43,8 @@ locList.append(["custom_difficulty.0.unlock.desc", "Todo: Move to separate mod!"
 locList.append(["custom_difficulty.0.name", "Dynamic Difficulty - Main Menu"])
 locList.append(["edict_custom_difficulty", "Dynamic Difficulty - Main Menu"])
 locList.append(["edict_custom_difficulty_desc", "Triggers an event to let you customize the difficulty of your current game"])
+locList.append(["edict_custom_difficulty.0.name", "Dynamic Difficulty - Main Menu"])
+locList.append(["edict_custom_difficulty.0.name_desc", "Triggers an event to let you customize the difficulty of your current game"])
 # locList.append(["custom_difficulty.0.name", "Ultimate Custom Difficulty Advanced Configuration"])
 locList.append(["custom_difficulty.0.desc", "Choose category to change or show"])
 # locList.append(["custom_difficulty.1.name", "Ultimate Custom Difficulty Main Menu"])
@@ -332,6 +336,7 @@ for catI,cat in enumerate(cats):
 
   afterIfTaglist=deepcopy(ifTagList)
   after.add("if",afterIfTaglist)
+  shortened=False
 
   for bonus, bonusModifier in zip(possibleBoniNames,possibleBoniModifier):
     bonusR=bonus.lower().replace(" ","_")
@@ -345,6 +350,9 @@ for catI,cat in enumerate(cats):
         else:
           compSign="<"
         for i in reversed(range(20)):
+          if shortened:
+           if sign<0 and i>5 or i>10:
+            continue
           ifGT=TagList()
           afterIfTaglist.add("if",ifGT)
           changeVal=10*(i+1)
@@ -374,6 +382,10 @@ for catI,cat in enumerate(cats):
         else:
           compSign="<"
         for i in reversed(range(10)):
+          if shortened:
+           if sign<0 and i>5 or i>7:
+            continue
+
           ifGT=TagList()
           afterIfTaglist.add("if",ifGT)
           changeVal=pow(2,i)
@@ -456,12 +468,44 @@ with open(outFolder+"/"+"custom_difficulty_yealy_event.txt",'w') as file:
   yearlyFile.writeAll(file, args())
 
 
-outFolderLoc="../gratak_mods/custom_difficulty/localisation/english"
-if not os.path.exists(outFolderLoc):
-  os.makedirs(outFolderLoc)
+doTranslation=False
+for language, lcode in zip(["braz_por","english","french","german","polish","russian","spanish"],["pt","en","fr", "de","pl","ru", "es"]):
+  outFolderLoc="../gratak_mods/custom_difficulty/localisation/"+language
+  if not os.path.exists(outFolderLoc):
+    os.makedirs(outFolderLoc)
 
-with io.open(outFolderLoc+"/custom_difficulty_l_english.yml",'w', encoding="utf-8") as file:
-  file.write(u'\ufeff')
-  file.write("l_english:\n")
-  for locEntry in locList:
-    file.write(" "+locEntry[0]+":0 "+'"'+locEntry[1]+'"\n')
+  if doTranslation:
+    translatedDict=dict()
+    translatedDict["["]="["
+    translatedDict["]"]="]"
+    translator=Translator()
+  with io.open(outFolderLoc+"/custom_difficulty_l_"+language+".yml",'w', encoding="utf-8") as file:
+    file.write(u'\ufeff')
+    file.write("l_"+language+":\n")
+    for locEntry in locList:
+      if language=="english" or not doTranslation:
+        file.write(" "+locEntry[0]+":0 "+'"'+locEntry[1]+'"\n')
+      else:
+        locParts=re.split("(\[|\]|§|£)",locEntry[1])
+        for i in reversed(range(len(locParts))):
+          if locParts[i]=="":
+            del locParts[i]
+        for i,locPart in enumerate(locParts):
+          if locPart=="§":
+            if i!=len(locParts)-1:
+              locParts[i]+=locParts[i+1][0]
+              locParts[i+1]=locParts[i+1][1:]
+            continue
+          if locPart=="£":
+            locParts[i]+=locParts[i+1][0:locParts[i+1].index(" ")]
+            locParts[i+1]=locParts[i+1][locParts[i+1].index(" "):]
+            continue
+          if (i==0 or locParts[i-1]!="[") and not locPart.strip()=="":
+            if not locPart in translatedDict:
+              try:
+                translatedDict[locPart]=translator.translate(text=locPart, src="en", dest=lcode).text
+              except:
+                print(locPart)
+                translatedDict[locPart]=locPart
+            locParts[i]=translatedDict[locPart]
+        file.write(" "+locEntry[0]+":0 "+'"'+"".join(locParts)+'"\n')
