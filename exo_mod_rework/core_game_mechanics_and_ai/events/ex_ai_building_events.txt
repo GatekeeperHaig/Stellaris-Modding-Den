@@ -1,6 +1,6 @@
 namespace = ex_ai_building_events
 
-event = { #this event is fired using the previous event on a monthly scope. 
+event = { #this event is fires on a monthly scope. 
 	id = ex_ai_building_events.0
 	hide_window = yes
 	is_triggered_only = yes
@@ -35,13 +35,12 @@ country_event = { #this event is fired using the previous event on a monthly sco
 			set_timed_country_flag = { flag = country_check_delay days = 120 }
 		}	
 		every_owned_planet = {
-			limit = { 
-				is_colony = yes
-				OR = {
-					owner = { is_ai = yes }
-					sector_controlled = yes
-				}	
-			}
+			#limit = { 
+			#	OR = {
+			#		owner = { is_ai = yes }
+			#		sector_controlled = yes
+			#	}	
+			#}
 			if = {
 				limit = { NOT = { has_planet_flag = planet_check_delay } }				
 				if = { 
@@ -67,6 +66,7 @@ country_event = { #this event is fired using the previous event on a monthly sco
 						check_planet_bonus_buildings_am = yes
 					}	
 					set_planet_flag = ex_ai_planet_check_performed
+					###remember to update this through other on actions!
 				}	
 				if = { 
 					limit = { 
@@ -144,88 +144,93 @@ country_event = { #this event is fired using the previous event on a monthly sco
 						limit = { alphamod_enabled = yes }
 						check_planet_modifiers_am = yes		
 					}	
-				}					
-			}	
-			every_tile = {
-				limit = { 
-					has_deposit = yes
-					has_special_resource_deposit = yes
-				}
-				add_deposit = special_resource_tile #this deposit ensures that these tiles are ignored
-			}		
-			if = {
-				limit = {
-					owner = {
-						check_variable = { which = energy_weight value < 1 }
-						check_variable = { which = minerals_weight value < 1 }
-						check_variable = { which = food_weight value < 1 }												
-					}
-				}
-				while = {
-					limit = { 
-						any_tile = { 
-							has_blocker = yes
-							has_ai_null_deposit = no 
-							NOT = { has_deposit = special_resource_tile }
-						}
-					}
-					set_variable = { which = energy_weight value = 0 }
-					set_variable = { which = minerals_weight value = 0 }
-					set_variable = { which = food_weight value = 0 }
-					set_variable = { which = society_research_weight value = 0 }
-					set_variable = { which = physics_research_weight value = 0 }
-					set_variable = { which = engineering_research_weight value = 0 }
-					random_tile = {
-						limit = { 
-							has_blocker = yes
-							has_ai_null_deposit = no
-							NOT = { has_deposit = special_resource_tile }
-						}
-						set_tile_building_weight = yes
-					}
-				}
-				else = {
-					every_tile = {
-						limit = { NOR = { has_deposit = no has_deposit = special_resource_tile } }
-						switch = {
-							trigger = has_deposit
-							d_mineral_deposit = { clear_deposits = yes add_deposit = d_mineral_deposit }
-							d_rich_mineral_deposit = { clear_deposits = yes add_deposit = d_rich_mineral_deposit }
-							d_vast_mineral_deposit = { clear_deposits = yes add_deposit = d_vast_mineral_deposit }
-							d_immense_mineral_deposit = { clear_deposits = yes add_deposit = d_immense_mineral_deposit }
-							d_energy_deposit = { clear_deposits = yes add_deposit = d_energy_deposit }
-							d_rich_energy_deposit = { clear_deposits = yes add_deposit = d_rich_energy_deposit }
-							d_vast_energy_deposit = { clear_deposits = yes add_deposit = d_vast_energy_deposit }
-							d_immense_energy_deposit = { clear_deposits = yes add_deposit = d_immense_energy_deposit }
-							d_farmland_deposit = { clear_deposits = yes add_deposit = d_farmland_deposit }
-							d_rich_farmland_deposit = { clear_deposits = yes add_deposit = d_rich_farmland_deposit }
-							d_vast_farmland_deposit = { clear_deposits = yes add_deposit = d_vast_farmland_deposit }
-							d_immense_farmland_deposit = { clear_deposits = yes add_deposit = d_immense_farmland_deposit }
-							d_mineral_energy_deposit = { clear_deposits = yes add_deposit = d_mineral_energy_deposit }
-							d_rich_mineral_energy_deposit = { clear_deposits = yes add_deposit = d_rich_mineral_energy_deposit }
-							d_mineral_food_deposit = { clear_deposits = yes add_deposit = d_mineral_food_deposit }
-							d_rich_food_mineral_deposit = { clear_deposits = yes add_deposit = d_rich_food_mineral_deposit }
-							d_society_deposit = { clear_deposits = yes add_deposit = d_society_deposit }
-							d_rich_society_deposit = { clear_deposits = yes add_deposit = d_rich_society_deposit }
-							d_vast_society_deposit = { clear_deposits = yes add_deposit = d_vast_society_deposit }
-							d_immense_society_deposit = { clear_deposits = yes add_deposit = d_immense_society_deposit }
-							d_physics_deposit = { clear_deposits = yes add_deposit = d_physics_deposit }
-							d_rich_physics_deposit = { clear_deposits = yes add_deposit = d_rich_physics_deposit }
-							d_vast_physics_deposit = { clear_deposits = yes add_deposit = d_vast_physics_deposit }
-							d_immense_physics_deposit = { clear_deposits = yes add_deposit = d_immense_physics_deposit }
-							d_engineering_deposit = { clear_deposits = yes add_deposit = d_engineering_deposit }
-							d_rich_engineering_deposit = { clear_deposits = yes add_deposit = d_rich_engineering_deposit }
-							d_vast_engineering_deposit = { clear_deposits = yes add_deposit = d_vast_engineering_deposit }
-							d_immense_engineering_deposit = { clear_deposits = yes add_deposit = d_immense_engineering_deposit }							
-						}
-					}
 				}	
+				set_timed_planet_flag = { flag = planet_check_delay days = 360 }	
+			}
+			planet_event = { id = ex_ai_building_events.2 }	
+			planet_event = { id = ex_ai_building_events.3 }
+		}
+	}
+}
+
+planet_event = { #this event is fired using the previous event on a monthly scope. 
+	id = ex_ai_building_events.2
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = {
+				owner = {
+					check_variable = { which = energy_weight value < 1 }
+					check_variable = { which = minerals_weight value < 1 }
+					check_variable = { which = food_weight value < 1 }												
+				}
+			}
+			while = {
+				limit = { 
+					any_tile = { 
+						has_blocker = no
+						has_ai_null_deposit = no 
+						has_special_resource_deposit = no							
+					}
+				}
+				set_variable = { which = energy_weight value = 0 }
+				set_variable = { which = minerals_weight value = 0 }
+				set_variable = { which = food_weight value = 0 }
+				set_variable = { which = society_research_weight value = 0 }
+				set_variable = { which = physics_research_weight value = 0 }
+				set_variable = { which = engineering_research_weight value = 0 }
+				random_tile = {
+					limit = { 
+						has_blocker = no
+						has_ai_null_deposit = no
+						has_special_resource_deposit = no							
+					}
+					set_tile_building_weight = yes
+				}
+			}
+			else = {
+				every_tile = {
+					limit = { NOR = { has_deposit = no has_special_resource_deposit = yes } }
+					switch = {
+						trigger = has_deposit
+						d_mineral_deposit = { clear_deposits = yes add_deposit = d_mineral_deposit }
+						d_rich_mineral_deposit = { clear_deposits = yes add_deposit = d_rich_mineral_deposit }
+						d_vast_mineral_deposit = { clear_deposits = yes add_deposit = d_vast_mineral_deposit }
+						d_immense_mineral_deposit = { clear_deposits = yes add_deposit = d_immense_mineral_deposit }
+						d_energy_deposit = { clear_deposits = yes add_deposit = d_energy_deposit }
+						d_rich_energy_deposit = { clear_deposits = yes add_deposit = d_rich_energy_deposit }
+						d_vast_energy_deposit = { clear_deposits = yes add_deposit = d_vast_energy_deposit }
+						d_immense_energy_deposit = { clear_deposits = yes add_deposit = d_immense_energy_deposit }
+						d_farmland_deposit = { clear_deposits = yes add_deposit = d_farmland_deposit }
+						d_rich_farmland_deposit = { clear_deposits = yes add_deposit = d_rich_farmland_deposit }
+						d_vast_farmland_deposit = { clear_deposits = yes add_deposit = d_vast_farmland_deposit }
+						d_immense_farmland_deposit = { clear_deposits = yes add_deposit = d_immense_farmland_deposit }
+						d_mineral_energy_deposit = { clear_deposits = yes add_deposit = d_mineral_energy_deposit }
+						d_rich_mineral_energy_deposit = { clear_deposits = yes add_deposit = d_rich_mineral_energy_deposit }
+						d_mineral_food_deposit = { clear_deposits = yes add_deposit = d_mineral_food_deposit }
+						d_rich_food_mineral_deposit = { clear_deposits = yes add_deposit = d_rich_food_mineral_deposit }
+						d_society_deposit = { clear_deposits = yes add_deposit = d_society_deposit }
+						d_rich_society_deposit = { clear_deposits = yes add_deposit = d_rich_society_deposit }
+						d_vast_society_deposit = { clear_deposits = yes add_deposit = d_vast_society_deposit }
+						d_immense_society_deposit = { clear_deposits = yes add_deposit = d_immense_society_deposit }
+						d_physics_deposit = { clear_deposits = yes add_deposit = d_physics_deposit }
+						d_rich_physics_deposit = { clear_deposits = yes add_deposit = d_rich_physics_deposit }
+						d_vast_physics_deposit = { clear_deposits = yes add_deposit = d_vast_physics_deposit }
+						d_immense_physics_deposit = { clear_deposits = yes add_deposit = d_immense_physics_deposit }
+						d_engineering_deposit = { clear_deposits = yes add_deposit = d_engineering_deposit }
+						d_rich_engineering_deposit = { clear_deposits = yes add_deposit = d_rich_engineering_deposit }
+						d_vast_engineering_deposit = { clear_deposits = yes add_deposit = d_vast_engineering_deposit }
+						d_immense_engineering_deposit = { clear_deposits = yes add_deposit = d_immense_engineering_deposit }							
+					}
+				}				
 				while = {
 					limit = { 
 						any_tile = { 
-							has_blocker = yes
+							has_blocker = no
 							has_ai_null_deposit = no 
-							NOT = { has_deposit = special_resource_tile }
+							has_special_resource_deposit = no
 						}
 					}
 					set_variable = { which = energy_weight value = owner }
@@ -236,17 +241,15 @@ country_event = { #this event is fired using the previous event on a monthly sco
 					set_variable = { which = engineering_research_weight value = 0 }
 					random_tile = {
 						limit = { 
-							has_blocker = yes
+							has_blocker = no
 							has_ai_null_deposit = no
-							NOT = { has_deposit = special_resource_tile }
+							has_special_resource_deposit = no
 						}
 						set_tile_building_weight = yes
 					}
-				}				
-			}
-			set_timed_planet_flag = { flag = planet_check_delay days = 360 } 			
-			planet_event = { id = ex_ai_building_events.2 }
-		}
+				}	
+			}	
+		}			 					
 	}
 }
 				
@@ -254,7 +257,7 @@ country_event = { #this event is fired using the previous event on a monthly sco
 #it places planet flags that are used by specific planet unique buildings
 
 planet_event = {  
-	id = ex_ai_building_events.2
+	id = ex_ai_building_events.3
 	hide_window = yes
 	is_triggered_only = yes
 	
@@ -310,10 +313,11 @@ planet_event = {
 					}								
 				}
 			}
-			set_timed_planet_flag = { flag = fortify_planet days = 30 }
+			set_timed_planet_flag = { flag = fortify_planet days = 180 }
 		}
 		if = { #pop growth buildings
 			limit = { 
+				NOT = { has_planet_flag = build_pop_growth_building }
 				owner = {
 					OR = { 
 						has_technology = "tech_frontier_health"
@@ -344,10 +348,11 @@ planet_event = {
 					}
 				}
 			}
-			set_timed_planet_flag = { flag = build_pop_growth_building days = 30 }
+			set_timed_planet_flag = { flag = build_pop_growth_building days = 180 }
 		}
 		if = {
 			limit = {
+				NOT = { has_planet_flag = build_slave_processing }
 				owner = { 
 					has_technology = "tech_neural_implants"
 					OR = {
@@ -376,7 +381,7 @@ planet_event = {
 					unrest > 30
 				}	
 			}	
-			set_timed_planet_flag = { flag = build_slave_processing days = 30 }
+			set_timed_planet_flag = { flag = build_slave_processing days = 180 }
 		}								
 	}					
 }
