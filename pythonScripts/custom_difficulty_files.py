@@ -6,6 +6,7 @@ from stellarisTxtRead import *
 from copy import deepcopy
 from googletrans import Translator
 import re
+from locList import LocList
 
 changeStepYears=[5,4,3,2,1]
 changeSteps = [50, 25, 10, 5, 1]
@@ -13,58 +14,182 @@ for s in reversed(changeSteps):
   changeSteps.append(-s)
 for s in reversed(changeStepYears):
   changeStepYears.append(-s)
-possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep", "Any Pop growth speed"]
+# possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep", "Any Pop growth speed"]
+possibleBoniNames=["minerals", "energy","food", "research", "unity", "influence", "cap", "damage", "hull","armor","shield","upkeep", "growth"]
 possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_animal_wildlife", "GFX_evt_think_tank", "GFX_evt_ancient_alien_temple","GFX_evt_arguing_senate","GFX_evt_hangar_bay", "GFX_evt_debris", "GFX_evt_sabotaged_ship","GFX_evt_pirate_armada","GFX_evt_fleet_neutral","GFX_evt_city_ruins","GFX_evt_metropolis"]
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","country_resource_influence_mult","country_naval_cap_mult","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["ship_upkeep_mult",
 #"country_building_upkeep_mult", #is there any such modifier except on planet base?!
 "country_starbase_upkeep_mult","army_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","","",""]
 possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
-boniListNames=["All","Vanilla Default Empire", "All Ship"]
-boniListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
-boniListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
+bonusesListNames=["all","default", "allShip"]
+bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
+bonusesListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
 cats=["ai","ai_yearly","fe","leviathan","player"]
 catNames=["AI Default Empire", "AI Yearly Change", "Fallen and Awakened Empires", "Leviathans and other NPCs", "Player"]
 catCountryType=["default", "default","awakened_fallen_empire","",""]
 catNotCountryType=["", "","",["default","awakened_fallen_empire"],""]
 catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel"]
-locList=[]
-locList.append(["custom_difficulty.current_bonuses", "Current Bonuses:"])
-locList.append(["custom_difficulty.current_yearly_desc", "Positive year count gives increase, negative year count decrease. Every year is fastest possible. Zero (not displayed) means no change. Currently:"])
-locList.append(["custom_difficulty.back", "Back"])
-locList.append(["custom_difficulty.cancel", "Cancel and Back"])
-locList.append(["close_custom_difficulty.name", "Close Dynamic Difficulty Menu"])
-locList.append(["custom_difficulty.0.lock.name", "Lock Settings for the Rest of the Game"])
-locList.append(["custom_difficulty.0.lock.desc", "Yearly changes will continue up to the maximum/minimum. Can only be unlocked via installing the unlock mod, editing save game or starting a new game. Use with care!"])
-locList.append(["custom_difficulty.0.locked.desc", "Difficulty locked. Yearly changes will continue up to the maximum/minimum. Can only be unlocked via installing the unlock mod, editing save game or starting a new game. Use with care!"])
-locList.append(["custom_difficulty.locked", "Difficulty locked!"])
-locList.append(["custom_difficulty.0.unlock.name", "Unlock Settings"])
-locList.append(["custom_difficulty.0.unlock.desc", "Todo: Move to separate mod!"])
-locList.append(["custom_difficulty.0.name", "Dynamic Difficulty - Main Menu"])
-locList.append(["edict_custom_difficulty", "Dynamic Difficulty - Main Menu"])
-locList.append(["edict_custom_difficulty_desc", "Triggers an event to let you customize the difficulty of your current game"])
-locList.append(["edict_custom_difficulty.0.name", "Dynamic Difficulty - Main Menu"])
-locList.append(["edict_custom_difficulty.0.name_desc", "Triggers an event to let you customize the difficulty of your current game"])
-# locList.append(["custom_difficulty.0.name", "Ultimate Custom Difficulty Advanced Configuration"])
-locList.append(["custom_difficulty.0.desc", "Choose category to change or show"])
-# locList.append(["custom_difficulty.1.name", "Ultimate Custom Difficulty Main Menu"])
-locList.append(["custom_difficulty.1.name", "Dynamic Difficulty - Predefined Difficulty"])
-locList.append(["custom_difficulty_currently_active", "Currently active:"])
-locList.append(["custom_difficulty_choose", "Choose predefined setting.§R Deletes previously made settings!§! Easy and vanilla can be combined. Easy does not overwrite non-player bonuses and Vanilla does not overwrite player bonuses."])
-locList.append(["custom_difficulty_easy.name", "Easy - 20% Bonus in all categories for player"])
-locList.append(["custom_difficulty_ensign.name", "Ensign - No Bonus for empires. 33% for NPCs"])
-locList.append(["custom_difficulty_captain.name", "Captain - 15-25% Bonus for AI. 50% fo NPCs"])
-locList.append(["custom_difficulty_commodore.name", "Commodore - 30-50% Bonus for AI. 66% fo NPCs"])
-locList.append(["custom_difficulty_admiral.name", "Admiral - 45-75% Bonus for AI+NPCs"])
-locList.append(["custom_difficulty_grand_admiral.name", "Grand Admiral - 60-100% Bonus for AI+NPCs"])
-# locList.append(["custom_difficulty_grand_admiral.name", "Grand Admiral - 60-100% for AI"])
-locList.append(["custom_difficulty_scaling.name", "Scaling - 0-50% Bonus for AI+NPCs"])
-locList.append(["custom_difficulty_advanced_configuration.name", "Advanced Difficulty Customization non-player"])
-locList.append(["custom_difficulty_advanced_configuration_player.name", "Advanced Difficulty Customization player"])
-locList.append(["custom_difficulty_reset.name", "Reset all settings"])
-locList.append(["custom_difficulty_reset_conf.name", "Reset settings - Confirmation"])
-locList.append(["custom_difficulty_reset.desc", "Undo all changes and reset to difficulty set before game start"])
-locList.append(["custom_difficulty.predefined_difficulties", "§GPredefined Difficulties"])
+
+locClass=LocList(False)
+locClass.addLoc("modName", "Dynamic Difficulty", "all")
+
+
+
+#IMPORTANT
+#bonuses
+locClass.addLoc("minerals", "Minerals")
+locClass.addLoc("energy", "Energy")
+locClass.addLoc("food", "Food")
+locClass.addLoc("research", "Research")
+locClass.addLoc("unity", "Unity")
+locClass.addLoc("influence", "Influence")
+locClass.addLoc("cap", "Naval capacity")
+locClass.addLoc("damage", "Weapon Damage")
+locClass.addLoc("hull", "Hull")
+locClass.addLoc("armor", "Armor")
+locClass.addLoc("shield", "Shield")
+locClass.addLoc("upkeep", "Upkeep")
+locClass.addLoc("growth", "Any Pop Growth Speed")
+#bonusLists
+locClass.addLoc("all", "All")
+locClass.addLoc("default", "Standard")
+locClass.addLoc("allShip", "All Ship")
+#cats
+locClass.addLoc("ai", "AI Default Empire")
+locClass.addLoc("ai_yearly", "AI Yearly Change")
+locClass.addLoc("fe", "Fallen and Awakened Empires")
+locClass.addLoc("leviathan", "Leviathans and other NPCs")
+locClass.addLoc("player", "Player")
+
+
+
+
+locClass.addLoc("curBon", "Current Bonuses")
+locClass.addLoc("bonus", "Bonus")
+locClass.addLoc("bonuses", "Bonuses")
+locClass.addLoc("cur", "Currently")
+locClass.addLoc("yearlyDesc","Positive year count gives increase, negative year count decrease. Every year is fastest possible. Zero (not displayed) means no change")
+locClass.addLoc("back", "Back")
+locClass.addLoc("cancel", "Cancel and Back")
+locClass.addLoc("close", "Close")
+locClass.addLoc("main", "Main")
+locClass.addLoc("menu", "Menu")
+locClass.addLoc("menuDesc", "Triggers an event to let you customize the difficulty of your current game")
+locClass.addLoc("lock", "Lock Settings for the Rest of the Game")
+locClass.addLoc("locked", "Difficulty locked!")
+locClass.addLoc("lockedDesc", "Yearly changes will continue up to the maximum/minimum. Can only be unlocked via installing the unlock mod, editing save game or starting a new game.")
+locClass.addLoc("care", "Use with care!")
+locClass.addLoc("unlock", "Unlock Settings")
+locClass.addLoc("choose", "Choose category to change or show")
+locClass.addLoc("choosePreDef", "Choose predefined setting")
+locClass.addLoc("delWarn", "Deletes previously made settings!")
+locClass.addLoc("combineText", "Easy and vanilla can be combined. Easy does not overwrite non-player bonuses and Vanilla does not overwrite player bonuses.")
+locClass.addLoc("preDef", "Predefined Difficulties")
+locClass.addLoc("easy", "Easy")
+locClass.addLoc("ensign", "Ensign")
+locClass.addLoc("captain", "Captain")
+locClass.addLoc("commodore", "Commodore")
+locClass.addLoc("admiral", "Admiral")
+locClass.addLoc("grandAdmiral", "Grand Admiral")
+locClass.addLoc("scaling", "Scaling")
+locClass.addLoc("forAI", "for AI")
+locClass.addLoc("forNPCs", "for NPCs")
+locClass.addLoc("forPlayer", "for Player")
+locClass.addLoc("years", "year(s)")
+locClass.addLoc("every", "every")
+locClass.addLoc("advNonPlayer", "Advanced Difficulty Customization non-player") #todo
+locClass.addLoc("advPlayer", "Advanced Difficulty Customization player")
+locClass.addLoc("reset", "Reset all settings")
+locClass.addLoc("resetDesc", "Undo all changes and reset to difficulty set before game start")
+locClass.addLoc("confirmation", "Confirmation")
+locClass.addLoc("allCat", "in all Categories")
+locClass.addLoc("no", "No")
+locClass.addLoc("increase", "Increase")
+locClass.addLoc("decrease", "Decrease")
+locClass.addLoc("change", "Change")
+locClass.addLoc("difficulty", "Difficulty")
+locClass.addLoc("", "")
+locClass.addLoc("", "")
+locClass.addLoc("", "")
+locClass.addLoc("", "")
+locClass.addLoc("", "")
+locClass.addLoc("", "")
+locClass.addLoc("", "")
+locClass.addLoc("", "")
+locClass.addLoc("", "")
+locClass.addLoc("", "")
+
+
+# locClass.addEntry("custom_difficulty.current_bonuses",["curBon","@:"])
+# locClass.addEntry("custom_difficulty.current_yearly_desc", ["yearlyDesc","@. ","cur","@:"])
+# locClass.addEntry("custom_difficulty.back", "back")
+# locClass.addEntry("custom_difficulty.cancel", "cancel")
+# locClass.addEntry("close_custom_difficulty.name", ["close","@ ","modName","@ ","menu"])
+# locClass.addEntry("custom_difficulty.0.lock.name", "lock")
+# locClass.addEntry("custom_difficulty.0.lock.desc", ["lockedDesc","@ ","care"])
+# locClass.addEntry("custom_difficulty.0.locked.desc", ["locked","@ ","lockedDesc"])
+# locClass.addEntry("custom_difficulty.locked", ["locked"])
+# locClass.addEntry("custom_difficulty.0.unlock.name", ["unlock"])
+# locClass.addEntry("custom_difficulty.0.name", ["modName","@ - ","main","@ ","menu"])
+# locClass.addEntry("edict_custom_difficulty", ["modName","@ - ","main","@ ","menu"])
+# locClass.addEntry("edict_custom_difficulty_desc", ["menuDesc"])
+# locClass.addEntry("custom_difficulty.0.desc", ["choose"])
+# locClass.addEntry("custom_difficulty.1.name", ["modName","@ - ","preDef"])
+# locClass.addEntry("custom_difficulty.predefined_difficulties", ["@§G","preDef"])
+# locClass.addEntry("custom_difficulty_choose", ["choosePreDef","@.§R ","delWarn","@§! ","combineText"])
+# locClass.addEntry("custom_difficulty_easy.name", ["easy","@ - 20% ","bonus","@ ","allCat","@ ","forPlayer"])
+# # locClass.addEntry("custom_difficulty_scaling", ["","@ - 20% ","bonus","@ ","forAI","@. 50% ","forNPCs"])
+# locClass.addEntry("custom_difficulty_ensign.name", ["ensign","@ - ","no","@ ","bonus","@ ","forAI","@. 33% ","forNPCs"])
+# locClass.addEntry("custom_difficulty_captain.name", ["captain","@ - 15-25% ","bonus","@ ","forAI","@. 50% ","forNPCs"])
+# locClass.addEntry("custom_difficulty_commodore.name", ["commodore","@ - 30-50% ","bonus","@ ","forAI","@. 66% ","forNPCs"])
+# locClass.addEntry("custom_difficulty_admiral.name", ["admiral","@ - 45-75% ","bonus","@ ","forAI","@. 75% ","forNPCs"])
+# locClass.addEntry("custom_difficulty_grand_admiral.name", ["grandAdmiral","@ - 60-100% ","bonus","@ ","forAI","@. 100% ","forNPCs"])
+# locClass.addEntry("custom_difficulty_scaling.name", ["increase","@ ","bonus","@ ","forAI", "@ ","every","@ 4 ", "years"])
+# locClass.addEntry("custom_difficulty_advanced_configuration.name", ["advNonPlayer"])
+# locClass.addEntry("custom_difficulty_advanced_configuration_player.name", ["advPlayer"])
+# locClass.addEntry("custom_difficulty_reset.name", ["reset"])
+# locClass.addEntry("custom_difficulty_reset_conf.name", ["reset","@ - ","confirmation"])
+# locClass.addEntry("custom_difficulty_reset.desc", ["resetDesc"])
+
+
+
+locClass.addEntry("custom_difficulty.current_bonuses","@curBon:")
+locClass.addEntry("custom_difficulty.current_yearly_desc", "@yearlyDesc. @cur:")
+locClass.addEntry("custom_difficulty.back", "@back")
+locClass.addEntry("custom_difficulty.cancel", "@cancel")
+locClass.addEntry("close_custom_difficulty.name", "@close @modName @menu")
+locClass.addEntry("custom_difficulty.0.lock.name", "@lock")
+locClass.addEntry("custom_difficulty.0.lock.desc", "@lockedDesc @care")
+locClass.addEntry("custom_difficulty.0.locked.desc", "@locked @lockedDesc")
+locClass.addEntry("custom_difficulty.locked", "@locked")
+locClass.addEntry("custom_difficulty.0.unlock.name", "@unlock")
+locClass.addEntry("custom_difficulty.0.name", "@modName - @main @menu")
+locClass.addEntry("edict_custom_difficulty", "@modName - @main @menu")
+locClass.addEntry("edict_custom_difficulty_desc", "@menuDesc")
+locClass.addEntry("custom_difficulty.0.desc", "@choose")
+locClass.addEntry("custom_difficulty.1.name", "@modName - @preDef")
+locClass.addEntry("custom_difficulty.predefined_difficulties", "§G@preDef")
+locClass.addEntry("custom_difficulty_choose", "@choosePreDef.§R @delWarn§! @combineText")
+locClass.addEntry("custom_difficulty_easy.name", "@easy - 20% @bonus @allCat @forPlayer")
+locClass.addEntry("custom_difficulty_ensign.name", "@ensign - @no @bonus @forAI. 33% @forNPCs")
+locClass.addEntry("custom_difficulty_captain.name", "@captain - 15-25% @bonus @forAI. 50% @forNPCs")
+locClass.addEntry("custom_difficulty_commodore.name", "@commodore - 30-50% @bonus @forAI. 66% @forNPCs")
+locClass.addEntry("custom_difficulty_admiral.name", "@admiral - 45-75% @bonus @forAI. 75% @forNPCs")
+locClass.addEntry("custom_difficulty_grand_admiral.name", "@grandAdmiral - 60-100% @bonus @forAI. 100% @forNPCs")
+locClass.addEntry("custom_difficulty_scaling.name", "@increase @bonus @forAI @every 4 @years")
+locClass.addEntry("custom_difficulty_advanced_configuration.name", "@advNonPlayer")
+locClass.addEntry("custom_difficulty_advanced_configuration_player.name", "@advPlayer")
+locClass.addEntry("custom_difficulty_reset.name", "@reset")
+locClass.addEntry("custom_difficulty_reset_conf.name", "@reset - @confirmation")
+locClass.addEntry("custom_difficulty_reset.desc", "@resetDesc")
+# locClass.addEntry(, [])
+# locClass.addEntry(, [])
+
+
+
+
+
 
 ET = "event_target:custom_difficulty_var_storage"
 
@@ -83,8 +208,8 @@ for cat in cats:
   choiceEvent.add("is_triggered_only", yes)
   choiceEvent.add("title","custom_difficulty_{}.name".format(cat))
   choiceEvent.add("picture",'"'+catPictures[mainIndex-1]+'"')
-  locList.append(["custom_difficulty_{}.name".format(cat),"Change {} Bonuses".format(catNames[mainIndex-1])])
   trigger=TagList()
+  locClass.addEntry("custom_difficulty_{}.name".format(cat), "@change @{} @bonuses".format(cat))
   choiceEvent.add("desc", TagList().add("trigger",trigger))
   successText=TagList().add("text","custom_difficulty.locked").add("has_global_flag","custom_difficulty_locked")
   trigger.add("success_text",successText)
@@ -98,26 +223,24 @@ for cat in cats:
 
   #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before)
   optionIndex=0
-  for boniListName in boniListNames:
+  for bonusesListName in bonusesListNames:
     optionIndex+=1
-    boniListNameR=boniListName.lower().replace(" ","_")
-    option=TagList().add("name", "custom_difficulty_{}_change_{}_name".format(cat,boniListNameR))
+    option=TagList().add("name", "custom_difficulty_{}_change_{}_name".format(cat,bonusesListName))
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
-    locList.append(["custom_difficulty_{}_change_{}_name".format(cat,boniListNameR), "Change {} Bonuses".format(boniListName)])
+    locClass.addEntry("custom_difficulty_{}_change_{}_name".format(cat,bonusesListName), "@change @{} @bonuses".format(bonusesListName))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.{:01d}{:02d}0".format(mainIndex,optionIndex))))
     choiceEvent.add("option",option)
 
   for bonusI, bonus in enumerate(possibleBoniNames):
     optionIndex+=1
-    bonusR=bonus.lower().replace(" ","_")
-    localVarName="custom_difficulty_{}_{}_value".format(cat,bonusR)
+    localVarName="custom_difficulty_{}_{}_value".format(cat,bonus)
     if cat=="ai_yearly":
       checkVar=TagList().add("which", localVarName).add("value","0","",">")
-      trigger.add("success_text",TagList().add("text","custom_difficulty_{}_{}_inc_desc".format(cat,bonusR)).add(ET,TagList().add("check_variable", checkVar)))
+      trigger.add("success_text",TagList().add("text","custom_difficulty_{}_{}_inc_desc".format(cat,bonus)).add(ET,TagList().add("check_variable", checkVar)))
       checkVar=TagList().add("which", localVarName).add("value","0","","<")
-      trigger.add("success_text",TagList().add("text","custom_difficulty_{}_{}_dec_desc".format(cat,bonusR)).add(ET,TagList().add("check_variable", checkVar)))
-      locList.append(["custom_difficulty_{}_{}_inc_desc".format(cat,bonusR),"{} §{}{} : 1% increase every [this.custom_difficulty_{}_{}_value] year(s)".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonusR)]) #local tmp var
-      locList.append(["custom_difficulty_{}_{}_dec_desc".format(cat,bonusR),"{} §{}{} : 1% decrease every [this.custom_difficulty_{}_{}_value] year(s)".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonusR)]) #local tmp var
+      trigger.add("success_text",TagList().add("text","custom_difficulty_{}_{}_dec_desc".format(cat,bonus)).add(ET,TagList().add("check_variable", checkVar)))
+      locClass.addEntry("custom_difficulty_{}_{}_inc_desc".format(cat,bonus),"{} §{}@{} : 1% @increase @every [this.custom_difficulty_{}_{}_value] @years".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonus)) #local tmp var
+      locClass.addEntry("custom_difficulty_{}_{}_dec_desc".format(cat,bonus),"{} §{}@{} : 1% @decrease @every [this.custom_difficulty_{}_{}_value] @years".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonus)) #local tmp var
       #create a local variable and make sure it is positive!
       immediate.add("set_variable", TagList().add("which", localVarName).add("value",ET))
       immediateIf=TagList().add("limit",TagList().add("check_variable",checkVar)) #<0
@@ -125,13 +248,13 @@ for cat in cats:
       immediate.add("if",immediateIf)
     else:
       checkVar=TagList().add("which", localVarName).add("value","0")
-      trigger.add("fail_text",TagList().add("text","custom_difficulty_{}_{}_desc".format(cat,bonusR)).add(ET,TagList().add("check_variable", checkVar)))
-      locList.append(["custom_difficulty_{}_{}_desc".format(cat,bonusR),"{} §{}{} : [{}.custom_difficulty_{}_{}_value]% ".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, ET, cat,bonusR)])
+      trigger.add("fail_text",TagList().add("text","custom_difficulty_{}_{}_desc".format(cat,bonus)).add(ET,TagList().add("check_variable", checkVar)))
+      locClass.append("custom_difficulty_{}_{}_desc".format(cat,bonus),"{} §{}@{} : [{}.custom_difficulty_{}_{}_value]% ".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, ET, cat,bonus))
 
     #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before the loop)
-    option=TagList().add("name", "custom_difficulty_{}_change_{}_button.name".format(cat,bonusR))
+    option=TagList().add("name", "custom_difficulty_{}_change_{}_button.name".format(cat,bonus))
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
-    locList.append(["custom_difficulty_{}_change_{}_button.name".format(cat,bonusR), "Change {} Bonuses".format(bonus)])
+    locClass.append("custom_difficulty_{}_change_{}_button.name".format(cat,bonus), "@change @{} @bonuses".format(bonus))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.{:01d}{:02d}0".format(mainIndex,optionIndex))))
     choiceEvent.add("option",option)
 
@@ -145,17 +268,16 @@ for cat in cats:
   
 
   bonusIndex=0
-  for bonus in boniListNames+possibleBoniNames:
+  for bonus in bonusesListNames+possibleBoniNames:
     bonusIndex+=1
-    bonusR=bonus.lower().replace(" ","_")
     changeEvent=TagList()
     tagList.add("country_event", changeEvent)
     changeEvent.add("id","custom_difficulty.{:01d}{:02d}0".format(mainIndex,bonusIndex))
     changeEvent.add("is_triggered_only", yes)
-    changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonusR))
-    locList.append(["custom_difficulty_{}_change_{}.name".format(cat,bonusR), "Change {} Bonuses ({})".format(bonus,catNames[mainIndex-1])])
+    changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonus))
+    locClass.append("custom_difficulty_{}_change_{}.name".format(cat,bonus), "@change @{} @bonuses (@{})".format(bonus,cat))
     changeEvent.add("desc", TagList().add("trigger",trigger)) #same desc trigger as above?
-    changeEvent.add("picture",'"'+(boniListPictures+possibleBoniPictures)[bonusIndex-1]+'"')
+    changeEvent.add("picture",'"'+(bonusesListPictures+possibleBoniPictures)[bonusIndex-1]+'"')
     if cat=="ai_yearly":
       changeEvent.add("immediate",immediate)
 
@@ -167,27 +289,27 @@ for cat in cats:
       if cat=="player" and (abs(changeStep)==1 or abs(changeStep)==5 or abs(changeStep)==25):
         continue
       if changeStep>0:
-        option=TagList().add("name","custom_difficulty_{}_{}_increase_{!s}".format(cat,bonusR, changeStep))
+        option=TagList().add("name","custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep))
         if cat=="ai_yearly":
-          locList.append(["custom_difficulty_{}_{}_increase_{!s}".format(cat,bonusR, changeStep), "Increase {} Years by {}".format(bonus, changeStep)])
+          locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), "@increase @{} @years by {}".format(bonus, changeStep))
         else:
-          locList.append(["custom_difficulty_{}_{}_increase_{!s}".format(cat,bonusR, changeStep), "Increase {} Bonuses by {}%".format(bonus, changeStep)])
+          locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), "@increase @{} @bonuses by {}%".format(bonus, changeStep))
       else:
-        option=TagList().add("name","custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonusR, -changeStep))
+        option=TagList().add("name","custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep))
         if cat=="ai_yearly":
-          locList.append(["custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonusR, -changeStep), "Decrease {} Years by {}".format(bonus, -changeStep)])
+          locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), "@decrease @{} @years by {}".format(bonus, -changeStep))
         else:
-          locList.append(["custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonusR, -changeStep), "Decrease {} Bonuses by {}%".format(bonus, -changeStep)])
+          locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), "@decrease @{} @bonuses by {}%".format(bonus, -changeStep))
 
       hidden_effect=TagList()
-      if bonusIndex>len(boniListNames):
-        hidden_effect.add(ET,TagList().add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value",str(changeStep))))
+      if bonusIndex>len(bonusesListNames):
+        hidden_effect.add(ET,TagList().add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value",str(changeStep))))
       else:
         et=TagList()
         hidden_effect.add(ET,et)
-        for bonusListIndex in boniListEntries[bonusIndex-1]:
-          bonusListValue=possibleBoniNames[bonusListIndex].lower().replace(" ","_")
-          et.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusListValue)).add("value",str(changeStep)))
+        for bonusListIndex in bonusesListEntries[bonusIndex-1]:
+          bonusListValue=possibleBoniNames[bonusListIndex]
+          et.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,possibleBoniNames)).add("value",str(changeStep)))
       hidden_effect.add("country_event", TagList().add("id","custom_difficulty.{:01d}{:02d}0".format(mainIndex,bonusIndex)))
       if cat!="player":
         hidden_effect.add("country_event", TagList().add("id","custom_difficulty.98".format(mainIndex,bonusIndex))) #remove flags
@@ -259,11 +381,10 @@ et=TagList()
 immediate.add(ET,et)
 for cat in cats:
   for bonus in possibleBoniNames:
-    bonusR=bonus.lower().replace(" ","_")
     if cat=="player":
-      et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "20"))
+      et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "20"))
     # else:
-    #   immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "0"))
+    #   immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "0"))
 
 # defaultIndex=-1
 for name, values in zip(vanillaDefaultNames, vanillaDefault):
@@ -279,19 +400,18 @@ for name, values in zip(vanillaDefaultNames, vanillaDefault):
   immediate.add(ET,et)
   for cat in cats:
     for i,bonus in enumerate(possibleBoniNames):
-      bonusR=bonus.lower().replace(" ","_")
       if cat=="ai" and i<vanillaAItoNPCIndex:
-        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(values[i])))
+        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(values[i])))
       elif cat=="leviathan" and i>=vanillaAItoNPCIndex:
-        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(values[i])))
+        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(values[i])))
       elif cat=="fe" and i>=vanillaAItoNPCIndex:
-        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(values[i])))
+        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(values[i])))
       # elif "yearly" in cat and (not name=="scaling" or not scaleDefault[i]):
-      #   et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "0"))
+      #   et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "0"))
       elif "yearly" in cat and name=="scaling" and scaleDefault[i]:
-        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "4"))
+        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "4"))
       elif cat!="player":
-        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", "0"))
+        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "0"))
 
 with open(outFolder+"/"+"custom_difficulty_defaults.txt",'w') as file:
   defaultEvents.writeAll(file, args())
@@ -339,8 +459,7 @@ for catI,cat in enumerate(cats):
   shortened=False
 
   for bonus, bonusModifier in zip(possibleBoniNames,possibleBoniModifier):
-    bonusR=bonus.lower().replace(" ","_")
-    ifTagList.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", ET))
+    ifTagList.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", ET))
     if cat=="player":
       # switchTL=TagList()
       # afterIfTaglist.add("switch",switchTL)
@@ -356,11 +475,11 @@ for catI,cat in enumerate(cats):
           ifGT=TagList()
           afterIfTaglist.add("if",ifGT)
           changeVal=10*(i+1)
-          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(sign*(changeVal-0.1)),"",compSign)))
+          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(sign*(changeVal-0.1)),"",compSign)))
           if sign>0:
-            modifierName="custom_difficulty_{}_{}_pos_player_value".format(i,bonusR)
+            modifierName="custom_difficulty_{}_{}_pos_player_value".format(i,bonus)
           else:
-            modifierName="custom_difficulty_{}_{}_neg_player_value".format(i,bonusR)
+            modifierName="custom_difficulty_{}_{}_neg_player_value".format(i,bonus)
           modifier=TagList()
           if not isinstance(bonusModifier,list):
             bonusModifier=[bonusModifier]
@@ -369,11 +488,11 @@ for catI,cat in enumerate(cats):
               modifier.add(modifierEntry,str(-sign*changeVal/100))
             else:
               modifier.add(modifierEntry,str(sign*changeVal/100))
-            locList.append([modifierName,"Difficulty"])
+            locClass.append(modifierName,"@difficulty")
           staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           immediate.add("remove_modifier", modifierName)
-          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*sign*changeVal)))
+          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(-1*sign*changeVal)))
           # ifGT.add("break","yes")
     else:
       for sign in [1,-1]:
@@ -389,11 +508,11 @@ for catI,cat in enumerate(cats):
           ifGT=TagList()
           afterIfTaglist.add("if",ifGT)
           changeVal=pow(2,i)
-          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(sign*(changeVal-0.1)),"",compSign)))
+          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(sign*(changeVal-0.1)),"",compSign)))
           if sign>0:
-            modifierName="custom_difficulty_{}_{}_pos_value".format(i,bonusR)
+            modifierName="custom_difficulty_{}_{}_pos_value".format(i,bonus)
           else:
-            modifierName="custom_difficulty_{}_{}_neg_value".format(i,bonusR)
+            modifierName="custom_difficulty_{}_{}_neg_value".format(i,bonus)
           modifier=TagList()
           if not isinstance(bonusModifier,list):
             bonusModifier=[bonusModifier]
@@ -402,12 +521,12 @@ for catI,cat in enumerate(cats):
               modifier.add(modifierEntry,str(-sign*changeVal/100))
             else:
               modifier.add(modifierEntry,str(sign*changeVal/100))
-            locList.append([modifierName,"Difficulty"])
+            locClass.append(modifierName,"@difficulty")
           staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           if cat=="ai": #only add onces as they all have the same name
             immediate.add("remove_modifier", modifierName)
-          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonusR)).add("value", str(-1*sign*changeVal)))
+          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(-1*sign*changeVal)))
 immediate.addTagList(after)
 
 
@@ -438,10 +557,9 @@ et=TagList()
 immediate.add(ET, et)
 cat="ai"
 for bonus in possibleBoniNames:
-  bonusR=bonus.lower().replace(" ","_")
-  yearCountVar="custom_difficulty_{}_year_counter".format(bonusR)
-  yearLimitVar="custom_difficulty_{}_{}_value".format(cat+"_yearly",bonusR)
-  bonusVar="custom_difficulty_{}_{}_value".format(cat,bonusR)
+  yearCountVar="custom_difficulty_{}_year_counter".format(bonus)
+  yearLimitVar="custom_difficulty_{}_{}_value".format(cat+"_yearly",bonus)
+  bonusVar="custom_difficulty_{}_{}_value".format(cat,bonus)
   #todo: negative yearly!
   ifPos=TagList().add("limit",TagList().add("check_variable", TagList().add("which", yearLimitVar).add("value","0","",">")))
   et.add("if", ifPos)
@@ -468,96 +586,58 @@ with open(outFolder+"/"+"custom_difficulty_yealy_event.txt",'w') as file:
   yearlyFile.writeAll(file, args())
 
 
-doTranslation=False
-for language, lcode in zip(["braz_por","english","french","german","polish","russian","spanish"],["pt","en","fr", "de","pl","ru", "es"]):
+
+for language in locClass.languages:
   outFolderLoc="../gratak_mods/custom_difficulty/localisation/"+language
   if not os.path.exists(outFolderLoc):
     os.makedirs(outFolderLoc)
+  locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
 
-  if doTranslation:
-    translatedDict=dict()
-    translatedDict["["]="["
-    translatedDict["]"]="]"
-    translator=Translator()
-  with io.open(outFolderLoc+"/custom_difficulty_l_"+language+".yml",'w', encoding="utf-8") as file:
-    file.write(u'\ufeff')
-    file.write("l_"+language+":\n")
-    for locEntry in locList:
-      if language=="english" or not doTranslation:
-        file.write(" "+locEntry[0]+":0 "+'"'+locEntry[1]+'"\n')
-      else:
-        locParts=re.split("(\[|\]|§|£)",locEntry[1])
-        for i in reversed(range(len(locParts))):
-          if locParts[i]=="":
-            del locParts[i]
-        for i,locPart in enumerate(locParts):
-          if locPart=="§":
-            if i!=len(locParts)-1:
-              locParts[i]+=locParts[i+1][0]
-              locParts[i+1]=locParts[i+1][1:]
-            continue
-          if locPart=="£":
-            locParts[i]+=locParts[i+1][0:locParts[i+1].index(" ")]
-            locParts[i+1]=locParts[i+1][locParts[i+1].index(" "):]
-            continue
-          if (i==0 or locParts[i-1]!="[") and not locPart.strip()=="":
-            if not locPart in translatedDict:
-              try:
-                translatedDict[locPart]=translator.translate(text=locPart, src="en", dest=lcode).text
-              except:
-                print(locPart)
-                translatedDict[locPart]=locPart
-            locParts[i]=translatedDict[locPart]
-        file.write(" "+locEntry[0]+":0 "+'"'+"".join(locParts)+'"\n')
+# doTranslation=False
+# for language, lcode in zip(["braz_por","english","french","german","polish","russian","spanish"],["pt","en","fr", "de","pl","ru", "es"]):
+#   outFolderLoc="../gratak_mods/custom_difficulty/localisation/"+language
+#   if not os.path.exists(outFolderLoc):
+#     os.makedirs(outFolderLoc)
+
+#   if doTranslation:
+#     translatedDict=dict()
+#     translatedDict["["]="["
+#     translatedDict["]"]="]"
+#     translator=Translator()
+#   with io.open(outFolderLoc+"/custom_difficulty_l_"+language+".yml",'w', encoding="utf-8") as file:
+#     file.write(u'\ufeff')
+#     file.write("l_"+language+":\n")
+#     for locEntry in locList:
+#       if language=="english" or not doTranslation:
+#         file.write(" "+locEntry[0]+":0 "+'"'+locEntry[1]+'"\n')
+#       else:
+#         locParts=re.split("(\[|\]|§|£)",locEntry[1])
+#         for i in reversed(range(len(locParts))):
+#           if locParts[i]=="":
+#             del locParts[i]
+#         for i,locPart in enumerate(locParts):
+#           if locPart=="§":
+#             if i!=len(locParts)-1:
+#               locParts[i]+=locParts[i+1][0]
+#               locParts[i+1]=locParts[i+1][1:]
+#             continue
+#           if locPart=="£":
+#             locParts[i]+=locParts[i+1][0:locParts[i+1].index(" ")]
+#             locParts[i+1]=locParts[i+1][locParts[i+1].index(" "):]
+#             continue
+#           if (i==0 or locParts[i-1]!="[") and not locPart.strip()=="":
+#             if not locPart in translatedDict:
+#               try:
+#                 translatedDict[locPart]=translator.translate(text=locPart, src="en", dest=lcode).text
+#               except:
+#                 print(locPart)
+#                 translatedDict[locPart]=locPart
+#             locParts[i]=translatedDict[locPart]
+#         file.write(" "+locEntry[0]+":0 "+'"'+"".join(locParts)+'"\n')
 
 
 
 
-class LocList:
-  def __init__(self, translateRest=False):
-    self.languages=["braz_por","english","french","german","polish","russian","spanish"]
-    self.languageCodes=["pt","en","fr", "de","pl","ru", "es"]
-    self.entries=[]
-    self.dicts=dict()
-    self.translateRest=translateRest
-    for languageCode in self.languageCodes:
-      self.dicts[languageCode]=dict()
 
-  def addLoc(self, id, loc, language="en"):
-    self.dicts[language][id]=loc
-  def addEntry(self, gameLocId, stringOrList):
-    if isinstance(stringOrList,str):
-      self.entries.append([gameLocId, stringOrList])
-    else:
-      self.entries.append([gameLocId, [stringOrList]])
-  def write(self,fileName, language):
-    if len(language)==2:
-      languageCode=language
-      language=self.languages[self.languageCodes.index(language)]
-    else:
-      languageCode=self.languageCodes[self.languages.index(language)]
-
-    if self.translateRest:
-      translator=Translator()
-
-    localDict=self.dicts[languageCode]
-    for englishKey, englishLoc in self.dicts["en"]:
-      if not englishKey in localDict:
-        if self.translateRest:
-          localDict[englishKey]=translator.translate(text=englishLoc, src="en", dest=languageCode).text
-        else:
-          localDict[englishKey]=englishLoc
-
-    with io.open(outFolderLoc+"/custom_difficulty_l_"+language+".yml",'w', encoding="utf-8") as file:
-      file.write(u'\ufeff')
-      file.write("l_"+language+':\n')
-      for entry in self.entries:
-        file.write(" "+entry[0]+':0 "')
-        for loc in entry[1]:
-          if loc[0]=="@":
-            file.write(loc[1:])
-          else:
-            file.write(localDict[loc])
-        file.write('"\n')
 
 
