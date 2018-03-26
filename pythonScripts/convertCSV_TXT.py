@@ -134,11 +134,13 @@ def main(args,unused=0):
         if os.path.exists(filterFile):
           with open(filterFile) as file:
             args.filter=[word.strip() for line in file for word in line.split(",") ]
-          if not keyString in args.filter:
-            args.filter[0:0]=[keyString]#always need to be able to convert back to txt        
         else:
-          print("No filter file for: "+fileName)
-          args.filter=0
+          args.filter=args.manual_filter.split(",")
+        if not keyString in args.filter:
+          args.filter[0:0]=[keyString]#always need to be able to convert back to txt        
+        #else:
+        #  print("No filter file for: "+fileName)
+        #  args.filter=0
       elif args.filter:
         filterFile=fileName.replace(".txt",".filter")
         if os.path.exists(filterFile):
