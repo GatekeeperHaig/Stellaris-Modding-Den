@@ -20,7 +20,7 @@ possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy
 "country_starbase_upkeep_mult","army_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","","",""]
 possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
-boniListNames=["All","Vanilla Default Empire", "All ship"]
+boniListNames=["All","Vanilla Default Empire", "All Ship"]
 boniListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
 boniListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
 cats=["ai","ai_yearly","fe","leviathan","player"]
@@ -41,6 +41,8 @@ locList.append(["custom_difficulty.locked", "Difficulty locked!"])
 locList.append(["custom_difficulty.0.unlock.name", "Unlock Settings"])
 locList.append(["custom_difficulty.0.unlock.desc", "Todo: Move to separate mod!"])
 locList.append(["custom_difficulty.0.name", "Dynamic Difficulty - Main Menu"])
+locList.append(["edict_custom_difficulty", "Dynamic Difficulty - Main Menu"])
+locList.append(["edict_custom_difficulty_desc", "Triggers an event to let you customize the difficulty of your current game"])
 locList.append(["edict_custom_difficulty.0.name", "Dynamic Difficulty - Main Menu"])
 locList.append(["edict_custom_difficulty.0.name_desc", "Triggers an event to let you customize the difficulty of your current game"])
 # locList.append(["custom_difficulty.0.name", "Ultimate Custom Difficulty Advanced Configuration"])
@@ -81,7 +83,7 @@ for cat in cats:
   choiceEvent.add("is_triggered_only", yes)
   choiceEvent.add("title","custom_difficulty_{}.name".format(cat))
   choiceEvent.add("picture",'"'+catPictures[mainIndex-1]+'"')
-  locList.append(["custom_difficulty_{}.name".format(cat),"Change {} bonuses".format(catNames[mainIndex-1])])
+  locList.append(["custom_difficulty_{}.name".format(cat),"Change {} Bonuses".format(catNames[mainIndex-1])])
   trigger=TagList()
   choiceEvent.add("desc", TagList().add("trigger",trigger))
   successText=TagList().add("text","custom_difficulty.locked").add("has_global_flag","custom_difficulty_locked")
@@ -101,7 +103,7 @@ for cat in cats:
     boniListNameR=boniListName.lower().replace(" ","_")
     option=TagList().add("name", "custom_difficulty_{}_change_{}_name".format(cat,boniListNameR))
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
-    locList.append(["custom_difficulty_{}_change_{}_name".format(cat,boniListNameR), "Change {} bonuses".format(boniListName)])
+    locList.append(["custom_difficulty_{}_change_{}_name".format(cat,boniListNameR), "Change {} Bonuses".format(boniListName)])
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.{:01d}{:02d}0".format(mainIndex,optionIndex))))
     choiceEvent.add("option",option)
 
@@ -151,7 +153,7 @@ for cat in cats:
     changeEvent.add("id","custom_difficulty.{:01d}{:02d}0".format(mainIndex,bonusIndex))
     changeEvent.add("is_triggered_only", yes)
     changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonusR))
-    locList.append(["custom_difficulty_{}_change_{}.name".format(cat,bonusR), "Change {} bonus ({})".format(bonus,catNames[mainIndex-1])])
+    locList.append(["custom_difficulty_{}_change_{}.name".format(cat,bonusR), "Change {} Bonuses ({})".format(bonus,catNames[mainIndex-1])])
     changeEvent.add("desc", TagList().add("trigger",trigger)) #same desc trigger as above?
     changeEvent.add("picture",'"'+(boniListPictures+possibleBoniPictures)[bonusIndex-1]+'"')
     if cat=="ai_yearly":
@@ -507,3 +509,55 @@ for language, lcode in zip(["braz_por","english","french","german","polish","rus
                 translatedDict[locPart]=locPart
             locParts[i]=translatedDict[locPart]
         file.write(" "+locEntry[0]+":0 "+'"'+"".join(locParts)+'"\n')
+
+
+
+
+class LocList:
+  def __init__(self, translateRest=False):
+    self.languages=["braz_por","english","french","german","polish","russian","spanish"]
+    self.languageCodes=["pt","en","fr", "de","pl","ru", "es"]
+    self.entries=[]
+    self.dicts=dict()
+    self.translateRest=translateRest
+    for languageCode in self.languageCodes:
+      self.dicts[languageCode]=dict()
+
+  def addLoc(self, id, loc, language="en"):
+    self.dicts[language][id]=loc
+  def addEntry(self, gameLocId, stringOrList):
+    if isinstance(stringOrList,str):
+      self.entries.append([gameLocId, stringOrList])
+    else:
+      self.entries.append([gameLocId, [stringOrList]])
+  def write(self,fileName, language):
+    if len(language)==2:
+      languageCode=language
+      language=self.languages[self.languageCodes.index(language)]
+    else:
+      languageCode=self.languageCodes[self.languages.index(language)]
+
+    if self.translateRest:
+      translator=Translator()
+
+    localDict=self.dicts[languageCode]
+    for englishKey, englishLoc in self.dicts["en"]:
+      if not englishKey in localDict:
+        if self.translateRest:
+          localDict[englishKey]=translator.translate(text=englishLoc, src="en", dest=languageCode).text
+        else:
+          localDict[englishKey]=englishLoc
+
+    with io.open(outFolderLoc+"/custom_difficulty_l_"+language+".yml",'w', encoding="utf-8") as file:
+      file.write(u'\ufeff')
+      file.write("l_"+language+':\n')
+      for entry in self.entries:
+        file.write(" "+entry[0]+':0 "')
+        for loc in entry[1]:
+          if loc[0]=="@":
+            file.write(loc[1:])
+          else:
+            file.write(localDict[loc])
+        file.write('"\n')
+
+
