@@ -173,8 +173,9 @@ name_resetAIFlagsEvent="custom_difficulty.23"
 name_resetYearlyFlagsEvent="custom_difficulty.24"
 name_resetPlayerFlagsEvent="custom_difficulty.25"
 name_rootYearlyEvent="custom_difficulty.30"
-name_rootYearlyEventDelay="custom_difficulty.31"
-name_countryYearlyEventDelay="custom_difficulty.40"
+name_rootUpdateEvent="custom_difficulty.40"
+name_rootUpdateEventDelay="custom_difficulty.41"
+name_countryUpdateEventDelay="custom_difficulty.50"
 id_defaultEvents=100 #reserved range up to 199
 
 def outputToFolderAndFile(tagList, folder, file):
@@ -589,9 +590,9 @@ edictFile=TagList().add("country_edict", edict)
 outputToFolderAndFile(edictFile, "common/edicts", "custom_difficulty_edict.txt")
 
 onActions=TagList()
-onActions.add("on_yearly_pulse", TagList("events",TagList().add("custom_difficulty.9990").add("custom_difficulty.9999")))
-onActions.add("on_game_start_country", TagList("events",TagList().add("custom_difficulty.2")))
-onActions.add("on_game_start", TagList("events",TagList().add("custom_difficulty.9999")))
+onActions.add("on_yearly_pulse", TagList("events",TagList().add(name_rootYearlyEvent).add(name_rootUpdateEvent)))
+onActions.add("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce)))
+# onActions.add("on_game_start", TagList("events",TagList().add("custom_difficulty.9999"))) #is called by "fire only once"
 outputToFolderAndFile(onActions, "common/on_actions", "custom_difficulty_on_action.txt")
 
 scriptedEffects=TagList("guardian_difficulty",TagList()," #I commented out the effect of the stuff applied here, but it was not up to date. Once they update it, that will be active again. Thus I kill this function as well to make sure it won't become active!")
