@@ -12,12 +12,16 @@ def addCommonArgs(parser):
 
 
 class TagList: #Basically everything is stored recursively in objects of this class. Each file is one such object. Each tag within is one such object. The variables defined in a file are one such object. Only out-of-building comments are ignored and simply copied file to file.
-  def __init__(self,level=0):
+  def __init__(self,levelOrName=0,val=0,comment="", sep="="):
     self.names=[]
     self.vals=[]
     self.comments=[]
     self.seperators=[] #"=" by default
-    self.bracketLevel=level
+    if val!=0:
+      self.bracketLevel=0
+      self.add(levelOrName,val,comment,sep)
+    else:
+      self.bracketLevel=levelOrName
 
 
 

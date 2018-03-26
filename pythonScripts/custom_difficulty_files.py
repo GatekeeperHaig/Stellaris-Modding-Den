@@ -31,7 +31,10 @@ catCountryType=["default", "default","awakened_fallen_empire","",""]
 catNotCountryType=["", "","",["default","awakened_fallen_empire"],""]
 catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel"]
 
-locClass=LocList(False)
+
+# doTranslation=True
+doTranslation=False
+locClass=LocList(doTranslation)
 locClass.addLoc("modName", "Dynamic Difficulty", "all")
 
 
@@ -61,10 +64,22 @@ locClass.addLoc("ai_yearly", "AI Yearly Change")
 locClass.addLoc("fe", "Fallen and Awakened Empires")
 locClass.addLoc("leviathan", "Leviathans and other NPCs")
 locClass.addLoc("player", "Player")
+#difficiulties, AI, other important things
+locClass.addLoc("easy", "Easy")
+locClass.addLoc("ensign", "Ensign")
+locClass.addLoc("captain", "Captain")
+locClass.addLoc("commodore", "Commodore")
+locClass.addLoc("admiral", "Admiral")
+locClass.addLoc("grandAdmiral", "Grand Admiral")
+locClass.addLoc("scaling", "Scaling")
+locClass.addLoc("forAI", "for AI")
+locClass.addLoc("forNPCs", "for NPCs")
+locClass.addLoc("forPlayer", "for Player")
+locClass.addLoc("menu", "Menu")
 
 
 
-
+#less important
 locClass.addLoc("curBon", "Current Bonuses")
 locClass.addLoc("bonus", "Bonus")
 locClass.addLoc("bonuses", "Bonuses")
@@ -74,7 +89,6 @@ locClass.addLoc("back", "Back")
 locClass.addLoc("cancel", "Cancel and Back")
 locClass.addLoc("close", "Close")
 locClass.addLoc("main", "Main")
-locClass.addLoc("menu", "Menu")
 locClass.addLoc("menuDesc", "Triggers an event to let you customize the difficulty of your current game")
 locClass.addLoc("lock", "Lock Settings for the Rest of the Game")
 locClass.addLoc("locked", "Difficulty locked!")
@@ -86,16 +100,6 @@ locClass.addLoc("choosePreDef", "Choose predefined setting")
 locClass.addLoc("delWarn", "Deletes previously made settings!")
 locClass.addLoc("combineText", "Easy and vanilla can be combined. Easy does not overwrite non-player bonuses and Vanilla does not overwrite player bonuses.")
 locClass.addLoc("preDef", "Predefined Difficulties")
-locClass.addLoc("easy", "Easy")
-locClass.addLoc("ensign", "Ensign")
-locClass.addLoc("captain", "Captain")
-locClass.addLoc("commodore", "Commodore")
-locClass.addLoc("admiral", "Admiral")
-locClass.addLoc("grandAdmiral", "Grand Admiral")
-locClass.addLoc("scaling", "Scaling")
-locClass.addLoc("forAI", "for AI")
-locClass.addLoc("forNPCs", "for NPCs")
-locClass.addLoc("forPlayer", "for Player")
 locClass.addLoc("years", "year(s)")
 locClass.addLoc("every", "every")
 locClass.addLoc("advNonPlayer", "Advanced Difficulty Customization non-player") #todo
@@ -109,48 +113,9 @@ locClass.addLoc("increase", "Increase")
 locClass.addLoc("decrease", "Decrease")
 locClass.addLoc("change", "Change")
 locClass.addLoc("difficulty", "Difficulty")
-locClass.addLoc("", "")
-locClass.addLoc("", "")
-locClass.addLoc("", "")
-locClass.addLoc("", "")
-locClass.addLoc("", "")
-locClass.addLoc("", "")
-locClass.addLoc("", "")
-locClass.addLoc("", "")
-locClass.addLoc("", "")
-locClass.addLoc("", "")
 
 
-# locClass.addEntry("custom_difficulty.current_bonuses",["curBon","@:"])
-# locClass.addEntry("custom_difficulty.current_yearly_desc", ["yearlyDesc","@. ","cur","@:"])
-# locClass.addEntry("custom_difficulty.back", "back")
-# locClass.addEntry("custom_difficulty.cancel", "cancel")
-# locClass.addEntry("close_custom_difficulty.name", ["close","@ ","modName","@ ","menu"])
-# locClass.addEntry("custom_difficulty.0.lock.name", "lock")
-# locClass.addEntry("custom_difficulty.0.lock.desc", ["lockedDesc","@ ","care"])
-# locClass.addEntry("custom_difficulty.0.locked.desc", ["locked","@ ","lockedDesc"])
-# locClass.addEntry("custom_difficulty.locked", ["locked"])
-# locClass.addEntry("custom_difficulty.0.unlock.name", ["unlock"])
-# locClass.addEntry("custom_difficulty.0.name", ["modName","@ - ","main","@ ","menu"])
-# locClass.addEntry("edict_custom_difficulty", ["modName","@ - ","main","@ ","menu"])
-# locClass.addEntry("edict_custom_difficulty_desc", ["menuDesc"])
-# locClass.addEntry("custom_difficulty.0.desc", ["choose"])
-# locClass.addEntry("custom_difficulty.1.name", ["modName","@ - ","preDef"])
-# locClass.addEntry("custom_difficulty.predefined_difficulties", ["@§G","preDef"])
-# locClass.addEntry("custom_difficulty_choose", ["choosePreDef","@.§R ","delWarn","@§! ","combineText"])
-# locClass.addEntry("custom_difficulty_easy.name", ["easy","@ - 20% ","bonus","@ ","allCat","@ ","forPlayer"])
-# # locClass.addEntry("custom_difficulty_scaling", ["","@ - 20% ","bonus","@ ","forAI","@. 50% ","forNPCs"])
-# locClass.addEntry("custom_difficulty_ensign.name", ["ensign","@ - ","no","@ ","bonus","@ ","forAI","@. 33% ","forNPCs"])
-# locClass.addEntry("custom_difficulty_captain.name", ["captain","@ - 15-25% ","bonus","@ ","forAI","@. 50% ","forNPCs"])
-# locClass.addEntry("custom_difficulty_commodore.name", ["commodore","@ - 30-50% ","bonus","@ ","forAI","@. 66% ","forNPCs"])
-# locClass.addEntry("custom_difficulty_admiral.name", ["admiral","@ - 45-75% ","bonus","@ ","forAI","@. 75% ","forNPCs"])
-# locClass.addEntry("custom_difficulty_grand_admiral.name", ["grandAdmiral","@ - 60-100% ","bonus","@ ","forAI","@. 100% ","forNPCs"])
-# locClass.addEntry("custom_difficulty_scaling.name", ["increase","@ ","bonus","@ ","forAI", "@ ","every","@ 4 ", "years"])
-# locClass.addEntry("custom_difficulty_advanced_configuration.name", ["advNonPlayer"])
-# locClass.addEntry("custom_difficulty_advanced_configuration_player.name", ["advPlayer"])
-# locClass.addEntry("custom_difficulty_reset.name", ["reset"])
-# locClass.addEntry("custom_difficulty_reset_conf.name", ["reset","@ - ","confirmation"])
-# locClass.addEntry("custom_difficulty_reset.desc", ["resetDesc"])
+
 
 
 
@@ -195,6 +160,34 @@ ET = "event_target:custom_difficulty_var_storage"
 
 yes="yes"
 
+
+CuDi="custom_difficulty.{!s}"
+
+name_mainMenuEvent="custom_difficulty.0"
+name_defaultMenuEvent="custom_difficulty.1"
+name_gameStartFireOnlyOnce="custom_difficulty.10"
+name_resetEvent="custom_difficulty.20" # same as above with triggered_only instead of fire_only_once
+name_resetConfirmationEvent="custom_difficulty.21" # same as above with triggered_only instead of fire_only_once
+name_resetFlagsEvent="custom_difficulty.22"
+name_resetAIFlagsEvent="custom_difficulty.23"
+name_resetYearlyFlagsEvent="custom_difficulty.24"
+name_resetPlayerFlagsEvent="custom_difficulty.25"
+name_rootYearlyEvent="custom_difficulty.30"
+name_rootUpdateEvent="custom_difficulty.40"
+name_rootUpdateEventDelay="custom_difficulty.41"
+name_countryUpdateEventDelay="custom_difficulty.50"
+id_defaultEvents=100 #reserved range up to 199
+id_ChangeEvents=1000 #reserved range up to 9999
+
+def outputToFolderAndFile(tagList, folder, file):
+  folder="../gratak_mods/custom_difficulty/"+folder
+  if not os.path.exists(folder):
+    os.makedirs(folder)
+  with open(folder+"/"+file,'w') as file:
+    tagList.writeAll(file, args())
+
+
+
 difficultyChangeWindows = []
 mainIndex=0
 for cat in cats:
@@ -202,6 +195,7 @@ for cat in cats:
   tagList=TagList()
   difficultyChangeWindows.append(tagList)
   tagList.add("namespace", "custom_difficulty")
+  tagList.add("","","#Event ID starting at {0:d}000, blocked up to {0:d}999".format(mainIndex))
   choiceEvent=TagList()
   tagList.add("country_event", choiceEvent)
   choiceEvent.add("id","custom_difficulty.{!s}000".format(mainIndex))
@@ -309,7 +303,7 @@ for cat in cats:
         hidden_effect.add(ET,et)
         for bonusListIndex in bonusesListEntries[bonusIndex-1]:
           bonusListValue=possibleBoniNames[bonusListIndex]
-          et.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,possibleBoniNames)).add("value",str(changeStep)))
+          et.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusListValue)).add("value",str(changeStep)))
       hidden_effect.add("country_event", TagList().add("id","custom_difficulty.{:01d}{:02d}0".format(mainIndex,bonusIndex)))
       if cat!="player":
         hidden_effect.add("country_event", TagList().add("id","custom_difficulty.98".format(mainIndex,bonusIndex))) #remove flags
@@ -353,7 +347,8 @@ defaultEventTemplate.add("immediate",immediate)
 
 defaultEvents=TagList()
 defaultEvents.add("namespace", "custom_difficulty")
-eventIndex=9
+eventIndex=id_defaultEvents
+defaultEvents.add("","","#Events from {} blocked up to {}".format(id_defaultEvents,id_defaultEvents+99))
 
 
 vanillaDefault=[]
@@ -585,6 +580,73 @@ for bonus in possibleBoniNames:
 with open(outFolder+"/"+"custom_difficulty_yealy_event.txt",'w') as file:
   yearlyFile.writeAll(file, args())
 
+
+
+
+
+edict=TagList().add("name","custom_difficulty").add("length","0").add("cost",TagList())
+edict.add("effect", TagList("hidden_effect",TagList("country_event",TagList("id",name_mainMenuEvent))))
+edict.add("potential", TagList("is_ai","no"))
+edictFile=TagList().add("country_edict", edict)
+outputToFolderAndFile(edictFile, "common/edicts", "custom_difficulty_edict.txt")
+
+onActions=TagList()
+onActions.add("on_yearly_pulse", TagList("events",TagList().add(name_rootYearlyEvent).add(name_rootUpdateEvent)))
+onActions.add("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
+# onActions.add("on_game_start", TagList("events",TagList().add("custom_difficulty.9999"))) #is called by "fire only once"
+outputToFolderAndFile(onActions, "common/on_actions", "custom_difficulty_on_action.txt")
+
+scriptedEffects=TagList("guardian_difficulty",TagList()," #I commented out the effect of the stuff applied here, but it was not up to date. Once they update it, that will be active again. Thus I kill this function as well to make sure it won't become active!")
+outputToFolderAndFile(scriptedEffects,"common/scripted_effects","!_custom_difficulty_00_scripted_effects.txt")
+
+scriptedModifiers=TagList("","","########################################################################")
+scriptedModifiers.add("","","# Difficulty Modifiers - empty. Everything is applied via the mod to make it customizable. Defaults are basically the same!")
+scriptedModifiers.add("","","##########################################################################")
+scriptedModifiers.add("","","# For playable empires")
+scriptedModifiers.add("difficulty_scaling",TagList())
+scriptedModifiers.add("difficulty_grand_admiral",TagList())
+scriptedModifiers.add("difficulty_admiral",TagList())
+scriptedModifiers.add("difficulty_commodore",TagList())
+scriptedModifiers.add("difficulty_captain",TagList())
+scriptedModifiers.add("difficulty_ensign",TagList())
+scriptedModifiers.add("","","# For non-playable empires, scales to setting in country type")
+scriptedModifiers.add("difficulty_scaling_npc",TagList())
+scriptedModifiers.add("difficulty_grand_admiral_npc",TagList())
+scriptedModifiers.add("difficulty_admiral_npc",TagList())
+scriptedModifiers.add("difficulty_commodore_npc",TagList())
+scriptedModifiers.add("difficulty_captain_npc",TagList())
+scriptedModifiers.add("difficulty_ensign_npc",TagList())
+scriptedModifiers.add("guardian_hard",TagList())
+scriptedModifiers.add("guardian_insane",TagList())
+scriptedModifiers.add("difficulty_insane_ai",TagList())
+scriptedModifiers.add("difficulty_very_hard_ai",TagList())
+scriptedModifiers.add("difficulty_hard_ai",TagList())
+scriptedModifiers.add("difficulty_normal_ai",TagList())
+scriptedModifiers.add("difficulty_scaled_insane",TagList())
+scriptedModifiers.add("difficulty_scaled_very_hard",TagList())
+scriptedModifiers.add("difficulty_scaled_hard",TagList())
+scriptedModifiers.add("difficulty_scaled_normal",TagList())
+outputToFolderAndFile(scriptedModifiers, "common/static_modifiers","!_custom_difficulty_00_static_modifier.txt")
+
+
+allowUnlock=False
+mainFileContent=TagList("namespace","custom_difficulty_")
+mainFileContent.add("","","#main menu")
+mainMenu=TagList()
+mainFileContent.add("country_event",mainMenu)
+mainMenu.add("id", name_mainMenuEvent)
+mainMenu.add("is_triggered_only", yes)
+mainMenu.add("title", "custom_difficulty.0.name")
+mainMenu.add("picture", "GFX_evt_towel")
+trigger=TagList()
+mainMenu.add("desc", TagList("trigger", trigger))
+trigger.add("fail_text", TagList().add("text", "custom_difficulty.0.desc").add("has_global_flag", "custom_difficulty_locked"))
+trigger.add("success_text", TagList().add("text", "custom_difficulty.0.locked.desc").add("has_global_flag", "custom_difficulty_locked"))
+mainMenu.add("option", TagList("name","custom_difficulty.predefined_difficulties").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
+for i,cat in enumerate(cats):
+  mainMenu.add("option", TagList("name","custom_difficulty_{}.name".format(cat)).add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+i*1000)))))
+
+outputToFolderAndFile(mainMenu, "events", "newMain.txt")
 
 
 for language in locClass.languages:
