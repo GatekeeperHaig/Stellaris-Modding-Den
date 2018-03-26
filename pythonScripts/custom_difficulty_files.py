@@ -509,3 +509,55 @@ for language, lcode in zip(["braz_por","english","french","german","polish","rus
                 translatedDict[locPart]=locPart
             locParts[i]=translatedDict[locPart]
         file.write(" "+locEntry[0]+":0 "+'"'+"".join(locParts)+'"\n')
+
+
+
+
+class LocList:
+  def __init__(self, translateRest=False):
+    self.languages=["braz_por","english","french","german","polish","russian","spanish"]
+    self.languageCodes=["pt","en","fr", "de","pl","ru", "es"]
+    self.entries=[]
+    self.dicts=dict()
+    self.translateRest=translateRest
+    for languageCode in self.languageCodes:
+      self.dicts[languageCode]=dict()
+
+  def addLoc(self, id, loc, language="en"):
+    self.dicts[language][id]=loc
+  def addEntry(self, gameLocId, stringOrList):
+    if isinstance(stringOrList,str):
+      self.entries.append([gameLocId, stringOrList])
+    else:
+      self.entries.append([gameLocId, [stringOrList]])
+  def write(self,fileName, language):
+    if len(language)==2:
+      languageCode=language
+      language=self.languages[self.languageCodes.index(language)]
+    else:
+      languageCode=self.languageCodes[self.languages.index(language)]
+
+    if self.translateRest:
+      translator=Translator()
+
+    localDict=self.dicts[languageCode]
+    for englishKey, englishLoc in self.dicts["en"]:
+      if not englishKey in localDict:
+        if self.translateRest:
+          localDict[englishKey]=translator.translate(text=englishLoc, src="en", dest=languageCode).text
+        else:
+          localDict[englishKey]=englishLoc
+
+    with io.open(outFolderLoc+"/custom_difficulty_l_"+language+".yml",'w', encoding="utf-8") as file:
+      file.write(u'\ufeff')
+      file.write("l_"+language+':\n')
+      for entry in self.entries:
+        file.write(" "+entry[0]+':0 "')
+        for loc in entry[1]:
+          if loc[0]=="@":
+            file.write(loc[1:])
+          else:
+            file.write(localDict[loc])
+        file.write('"\n')
+
+
