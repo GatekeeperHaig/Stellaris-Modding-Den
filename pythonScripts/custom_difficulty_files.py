@@ -15,6 +15,7 @@ for s in reversed(changeSteps):
 for s in reversed(changeStepYears):
   changeStepYears.append(-s)
 possibleBoniNames=["minerals", "energy","food", "research", "unity", "influence", "cap", "damage", "hull","armor","shield","upkeep", "growth"]
+npcBoni=[False, False, False, False, False, False, False, True, True, True, True, False, False]
 possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_animal_wildlife", "GFX_evt_think_tank", "GFX_evt_ancient_alien_temple","GFX_evt_arguing_senate","GFX_evt_hangar_bay", "GFX_evt_debris", "GFX_evt_sabotaged_ship","GFX_evt_pirate_armada","GFX_evt_fleet_neutral","GFX_evt_city_ruins","GFX_evt_metropolis"]
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","country_resource_influence_mult","country_naval_cap_mult","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["ship_upkeep_mult",
 #"country_building_upkeep_mult", #is there any such modifier except on planet base?!
@@ -24,6 +25,7 @@ possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
 
 bonusesListNames=["all","default", "allShip"]
 bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
+bonusListNPC=[True, False, False]
 bonusesListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
 
 cats=["ai","ai_yearly","fe","leviathan","player","crisis","marauders", "other"]
@@ -126,6 +128,8 @@ locClass.addLoc("increase", "Increase")
 locClass.addLoc("decrease", "Decrease")
 locClass.addLoc("change", "Change")
 locClass.addLoc("difficulty", "Difficulty")
+locClass.addLoc("customization", "Customization")
+locClass.addLoc("strength", "Strength")
 
 
 
@@ -147,6 +151,9 @@ locClass.addEntry("edict_custom_difficulty_desc", "@menuDesc")
 locClass.addEntry("custom_difficulty_choose_desc", "@choose")
 locClass.addEntry("custom_difficulty_predef_head.name", "@modName - @preDef")
 locClass.addEntry("custom_difficulty_predefined_colored.name", "§G@preDef")
+locClass.append("custom_difficulty_crisis_colored.name","§R@crisis @strength")
+locClass.append("custom_difficulty_customize_colored.name","§Y@difficulty @customization")
+locClass.append("custom_difficulty_customize.name","§Y@difficulty @customization")
 locClass.addEntry("custom_difficulty_choose", "@choosePreDef.§R @delWarn§! @combineText")
 locClass.addEntry("custom_difficulty_easy.name", "@easy - 20% @bonus @allCat @forPlayer")
 locClass.addEntry("custom_difficulty_ensign.name", "@ensign - @no @bonus @forAI. 33% @forNPCs")
@@ -177,6 +184,7 @@ CuDi="custom_difficulty.{!s}"
 
 name_mainMenuEvent="custom_difficulty.0"
 name_defaultMenuEvent="custom_difficulty.1"
+name_customMenuEvent="custom_difficulty.2"
 name_gameStartFireOnlyOnce="custom_difficulty.10"
 name_resetEvent="custom_difficulty.20" # same as above with triggered_only instead of fire_only_once
 name_resetConfirmationEvent="custom_difficulty.21" # same as above with triggered_only instead of fire_only_once
@@ -243,7 +251,7 @@ for cat in cats:
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
     locClass.addEntry("custom_difficulty_{}_change_{}_name".format(cat,bonusesListName), "@change @{} @bonuses".format(bonusesListName))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
-    choiceEvent.add("option",option)
+    choiceEvent.add("option",option) #todo restict
 
   for bonusI, bonus in enumerate(possibleBoniNames):
     optionIndex+=1
@@ -270,10 +278,16 @@ for cat in cats:
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
     locClass.append("custom_difficulty_{}_change_{}_button.name".format(cat,bonus), "@change @{} @bonuses".format(bonus))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
-    choiceEvent.add("option",option)
+    choiceEvent.add("option",option) #todo restict
 
   option=TagList().add("name","custom_difficulty_back") #loc global
-  option.add("hidden_effect", TagList().add("country_event",TagList().add("id", name_mainMenuEvent)))
+  if cat=="crisis":
+    option2=deepcopy(option)
+    option2.add("trigger", TagList("not", TagList("has_global_flag","custom_difficulty_menu_crisis_from_custom")))
+    option2.add("hidden_effect", TagList().add("country_event",TagList().add("id", name_mainMenuEvent)))
+    choiceEvent.add("option",option2)
+    option.add("trigger", TagList("has_global_flag","custom_difficulty_menu_crisis_from_custom"))
+  option.add("hidden_effect", TagList().add("country_event",TagList().add("id", name_customMenuEvent)))
   choiceEvent.add("option",option)
   option=TagList().add("name","custom_difficulty_close.name") #loc global
   option.add("hidden_effect", TagList().add("country_event",TagList().add("id", name_rootUpdateEvent)))
@@ -285,7 +299,7 @@ for cat in cats:
   for bonus in bonusesListNames+possibleBoniNames:
     bonusIndex+=1
     changeEvent=TagList()
-    tagList.add("country_event", changeEvent)
+    tagList.add("country_event", changeEvent) #todo: restrict
     changeEvent.add("id",CuDi.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents))
     changeEvent.add("is_triggered_only", yes)
     changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonus))
@@ -688,8 +702,8 @@ for allowUnlock in [False,True]:
   trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("has_global_flag", "custom_difficulty_locked"))
   trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("has_global_flag", "custom_difficulty_locked"))
   mainMenu.add("option", TagList("name","custom_difficulty_predefined_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
-  for i,cat in enumerate(cats):
-    mainMenu.add("option", TagList("name","custom_difficulty_{}.name".format(cat)).add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+i*1000)))))
+  mainMenu.add("option", TagList("name","custom_difficulty_crisis_colored.name").add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+(cats.index("crisis")+1)*1000))).add("remove_global_flag","custom_difficulty_menu_crisis_from_custom")))
+  mainMenu.add("option", TagList("name","custom_difficulty_customize_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_customMenuEvent))))
   mainMenu.add("option", TagList("name","custom_difficulty_lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
   if allowUnlock:
     mainMenu.add("option",TagList("name","custom_difficulty_unlock.name").add("trigger", TagList("has_global_flag","custom_difficulty_locked")).add("hidden_effect",TagList("remove_global_flag", "custom_difficulty_locked").add("country_event", t_mainMenuEvent)))
@@ -700,6 +714,22 @@ for allowUnlock in [False,True]:
     mainFileUnlock=TagList("namespace", "custom_difficulty")
     mainFileUnlock.add("country_event", mainMenu)
     outputToFolderAndFile(mainFileUnlock, "events", "!_custom_difficulty_unlock.txt", 1, "../gratak_mods/custom_difficulty_unlock/")
+
+customMenu=TagList()
+mainFileContent.add("country_event",customMenu)
+customMenu.add("id", name_customMenuEvent)
+customMenu.add("is_triggered_only", yes)
+customMenu.add("title", "custom_difficulty_customize.name")
+customMenu.add("picture", "GFX_evt_towel")
+trigger=TagList()
+customMenu.add("desc", TagList("trigger", trigger))
+trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("has_global_flag", "custom_difficulty_locked"))
+trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("has_global_flag", "custom_difficulty_locked"))
+for i,cat in enumerate(cats):
+  hidden_effect=TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+i*1000)))
+  if cat=="crisis":
+    hidden_effect.add("add_global_flag","custom_difficulty_menu_crisis_from_custom")
+  customMenu.add("option", TagList("name","custom_difficulty_{}.name".format(cat)).add("hidden_effect", hidden_effect))
 
 mainFileContent.add("","","#default menu")
 defaultMenuEvent=TagList("id", name_defaultMenuEvent)
