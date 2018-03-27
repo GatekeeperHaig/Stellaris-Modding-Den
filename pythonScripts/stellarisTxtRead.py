@@ -59,8 +59,11 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def add(self,name,val='', comment='', seperator="="): #add via two separate pre-formated variables
     self._apply(lambda x,y:x.append(y),name,val,comment,seperator)
     return self
+  def addComment(self, comment):
+    self.add("","","#"+comment)
   def insert(self,index,name,val='',comment='', seperator="="):
     self._apply(lambda x,y:x.insert(index,y),name,val,comment,seperator)
+    return self
   def addFront(self,name,val='',comment='', seperator="="):
     self._apply(lambda x,y:x.insert(0,y),name,val,comment,seperator)
     return self
@@ -74,6 +77,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def addTagList(self, tagList): #adding up the two taglists. You can add a subtag with the standard add!
     for name,val, comment,seperator in zip(tagList.names,tagList.vals,tagList.comments,tagList.seperators):
       self.add(name,val,comment,seperator)
+    return self
   def remove(self, name): #remove via name
     i=self.names.index(name)
     self.removeIndex(i)
@@ -171,7 +175,11 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       file.write("\t")
   def writeEntry(self, file,i,args=0):
     self._writeTabs(file)
-    file.write(self.names[i])
+    try:
+      file.write(self.names[i])
+    except TypeError:
+      self.names[i].printAll()
+      raise
     if not isinstance(self.vals[i],TagList):
       if len(str(self.vals[i]))>0:
         file.write(" {!s} {!s}".format(self.seperators[i],self.vals[i]))
