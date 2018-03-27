@@ -29,6 +29,7 @@ bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
 bonusesListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
 
 cats=["ai","ai_yearly","fe","leviathan","player","crisis","marauders", "other"]
+timesTenCats=["crisis", "leviathan"]
 catCountryType=[
 ["default"], 
 ["default"],
@@ -251,7 +252,7 @@ for cat in cats:
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
     locClass.addEntry("custom_difficulty_{}_change_{}_name".format(cat,bonusesListName), "@change @{} @bonuses".format(bonusesListName))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
-    if (cat!="leviathan" and cat!="crisis") or bonusListNPC[optionIndex-1]:
+    if not cat in timesTenCats or bonusListNPC[optionIndex-1]:
       choiceEvent.add("option",option)
 
   for bonusI, bonus in enumerate(possibleBoniNames):
@@ -279,7 +280,7 @@ for cat in cats:
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
     locClass.append("custom_difficulty_{}_change_{}_button.name".format(cat,bonus), "@change @{} @bonuses".format(bonus))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
-    if (cat!="leviathan" and cat!="crisis") or npcBoni[bonusI]:
+    if not cat in timesTenCats or npcBoni[bonusI]:
       choiceEvent.add("option",option) 
 
   option=TagList().add("name","custom_difficulty_back") #loc global
@@ -301,64 +302,67 @@ for cat in cats:
   for bonus in bonusesListNames+possibleBoniNames:
     bonusIndex+=1
     changeEvent=TagList()
-    if (cat!="leviathan" and cat!="crisis") or (bonusListNPC+npcBoni)[bonusIndex-1]:
+    if not cat in timesTenCats or (bonusListNPC+npcBoni)[bonusIndex-1]:
       tagList.add("country_event", changeEvent) #todo: restrict
-    changeEvent.add("id",CuDi.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents))
-    changeEvent.add("is_triggered_only", yes)
-    changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonus))
-    locClass.append("custom_difficulty_{}_change_{}.name".format(cat,bonus), "@change @{} @bonuses (@{})".format(bonus,cat))
-    changeEvent.add("desc", TagList().add("trigger",trigger)) #same desc trigger as above?
-    changeEvent.add("picture",'"'+(bonusesListPictures+possibleBoniPictures)[bonusIndex-1]+'"')
-    if cat=="ai_yearly":
-      changeEvent.add("immediate",immediate)
+      changeEvent.add("id",CuDi.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents))
+      changeEvent.add("is_triggered_only", yes)
+      changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonus))
+      locClass.append("custom_difficulty_{}_change_{}.name".format(cat,bonus), "@change @{} @bonuses (@{})".format(bonus,cat))
+      changeEvent.add("desc", TagList().add("trigger",trigger)) #same desc trigger as above?
+      changeEvent.add("picture",'"'+(bonusesListPictures+possibleBoniPictures)[bonusIndex-1]+'"')
+      if cat=="ai_yearly":
+        changeEvent.add("immediate",immediate)
 
-    if cat=="ai_yearly":
-      changeStepListUsed=changeStepYears
-    else:
-      changeStepListUsed=changeSteps
-    for changeStep in changeStepListUsed:
-      if cat=="player" and (abs(changeStep)==1 or abs(changeStep)==5 or abs(changeStep)==25):
-        continue
-      if changeStep>0:
-        option=TagList().add("name","custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep))
-        if cat=="ai_yearly":
-          locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), "@increase @{} @years by {}".format(bonus, changeStep))
-        else:
-          locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), "@increase @{} @bonuses by {}%".format(bonus, changeStep))
+      if cat=="ai_yearly":
+        changeStepListUsed=changeStepYears
       else:
-        option=TagList().add("name","custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep))
-        if cat=="ai_yearly":
-          locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), "@decrease @{} @years by {}".format(bonus, -changeStep))
+        changeStepListUsed=changeSteps
+      for changeStep in changeStepListUsed:
+        if cat in timesTenCats:
+          changeStep*=10
+        if cat=="player" and (abs(changeStep)==1 or abs(changeStep)==5 or abs(changeStep)==25):
+          continue
+        if changeStep>0:
+          option=TagList().add("name","custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep))
+          if cat=="ai_yearly":
+            locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), "@increase @{} @years by {}".format(bonus, changeStep))
+          else:
+            locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), "@increase @{} @bonuses by {}%".format(bonus, changeStep))
         else:
-          locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), "@decrease @{} @bonuses by {}%".format(bonus, -changeStep))
+          option=TagList().add("name","custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep))
+          if cat=="ai_yearly":
+            locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), "@decrease @{} @years by {}".format(bonus, -changeStep))
+          else:
+            locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), "@decrease @{} @bonuses by {}%".format(bonus, -changeStep))
 
-      hidden_effect=TagList()
-      if bonusIndex>len(bonusesListNames):
-        hidden_effect.add(ET,TagList().add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value",str(changeStep))))
-      else:
-        et=TagList()
-        hidden_effect.add(ET,et)
-        for bonusListIndex in bonusesListEntries[bonusIndex-1]:
-          bonusListValue=possibleBoniNames[bonusListIndex]
-          et.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusListValue)).add("value",str(changeStep)))
-      hidden_effect.add("country_event", TagList().add("id",CuDi.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents)))
-      if cat=="player":
-        hidden_effect.add("country_event", TagList().add("id",name_resetPlayerFlagsEvent)) #remove flags
-      elif cat=="ai_yearly":
-        hidden_effect.add("country_event", TagList().add("id",name_resetYearlyFlagsEvent)) #remove flags
-      else:
-        hidden_effect.add("country_event", TagList().add("id",name_resetAIFlagsEvent)) #remove flags
-      hidden_effect.add("set_global_flag", "custom_difficulty_advanced_configuration")
-      option.add("hidden_effect",hidden_effect)
+        hidden_effect=TagList()
+        if bonusIndex>len(bonusesListNames):
+          hidden_effect.add(ET,TagList().add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value",str(changeStep))))
+        else:
+          et=TagList()
+          hidden_effect.add(ET,et)
+          for bonusListIndex in bonusesListEntries[bonusIndex-1]:
+            if not cat in timesTenCats or npcBoni[bonusListIndex]:
+              bonusListValue=possibleBoniNames[bonusListIndex]
+              et.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusListValue)).add("value",str(changeStep)))
+        hidden_effect.add("country_event", TagList().add("id",CuDi.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents)))
+        if cat=="player":
+          hidden_effect.add("country_event", TagList().add("id",name_resetPlayerFlagsEvent)) #remove flags
+        elif cat=="ai_yearly":
+          hidden_effect.add("country_event", TagList().add("id",name_resetYearlyFlagsEvent)) #remove flags
+        else:
+          hidden_effect.add("country_event", TagList().add("id",name_resetAIFlagsEvent)) #remove flags
+        hidden_effect.add("set_global_flag", "custom_difficulty_advanced_configuration")
+        option.add("hidden_effect",hidden_effect)
+        changeEvent.add("option",option)
+
+
+      option=TagList().add("name","custom_difficulty_back")
+      option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents))))
       changeEvent.add("option",option)
-
-
-    option=TagList().add("name","custom_difficulty_back")
-    option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents))))
-    changeEvent.add("option",option)
-    option=TagList().add("name","custom_difficulty_close.name")
-    option.add("hidden_effect", TagList().add("country_event",TagList().add("id", name_rootUpdateEvent)))
-    changeEvent.add("option",option)
+      option=TagList().add("name","custom_difficulty_close.name")
+      option.add("hidden_effect", TagList().add("country_event",TagList().add("id", name_rootUpdateEvent)))
+      changeEvent.add("option",option)
 
   # difficultyChangeWindows[-1].printAll()
   # break
@@ -544,13 +548,13 @@ for catI,cat in enumerate(cats):
               modifier.add(modifierEntry,str(-sign*changeVal/100))
             else:
               modifier.add(modifierEntry,str(sign*changeVal/100))
-            locClass.append(modifierName,"@difficulty")
+          locClass.append(modifierName,"@difficulty")
           staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           immediate.add("remove_modifier", modifierName)
           ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(-1*sign*changeVal)))
           # ifGT.add("break","yes")
-    else:
+    elif cat=="ai" or cat=="crisis":
       for sign in [1,-1]:
         if sign==1:
           compSign=">"
@@ -564,11 +568,15 @@ for catI,cat in enumerate(cats):
           ifGT=TagList()
           afterIfTaglist.add("if",ifGT)
           changeVal=pow(2,i)
+          if cat=="crisis":
+            changeVal*=10
           ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(sign*(changeVal-0.1)),"",compSign)))
           if sign>0:
             modifierName="custom_difficulty_{}_{}_pos_value".format(i,bonus)
           else:
             modifierName="custom_difficulty_{}_{}_neg_value".format(i,bonus)
+          if cat=="crisis":
+            modifierName+="_times_ten"
           modifier=TagList()
           if not isinstance(bonusModifier,list):
             bonusModifier=[bonusModifier]
@@ -577,7 +585,7 @@ for catI,cat in enumerate(cats):
               modifier.add(modifierEntry,str(-sign*changeVal/100))
             else:
               modifier.add(modifierEntry,str(sign*changeVal/100))
-            locClass.append(modifierName,"@difficulty")
+          locClass.append(modifierName,"@difficulty")
           staticModifiers.add(modifierName,modifier)
           ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
           if cat=="ai": #only add onces as they all have the same name
