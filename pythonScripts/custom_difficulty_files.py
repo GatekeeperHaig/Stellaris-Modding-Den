@@ -189,7 +189,7 @@ def outputToFolderAndFile(tagList, folder, file, level=2, modFolder="../gratak_m
   with open(folder+"/"+file,'w') as file:
     tagList.writeAll(file, args(level))
 
-notLockedTrigger=TagList("not", TagList("has_global_flag", "custom_difficulty_locked"))
+t_notLockedTrigger=TagList("not", TagList("has_global_flag", "custom_difficulty_locked"))
 t_mainMenuEvent=TagList("id",name_mainMenuEvent)
 t_rootUpdateEvent=TagList("id",name_rootUpdateEvent)
 t_backMainOption=TagList("name","custom_difficulty.back").add("hidden_effect", TagList("country_event",TagList("id", name_mainMenuEvent)))
@@ -654,7 +654,7 @@ for allowUnlock in [False,True]:
   mainMenu.add("option", TagList("name","custom_difficulty.predefined_difficulties").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
   for i,cat in enumerate(cats):
     mainMenu.add("option", TagList("name","custom_difficulty_{}.name".format(cat)).add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+i*1000)))))
-  mainMenu.add("option", TagList("name","custom_difficulty.0.lock.name").add("trigger", notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
+  mainMenu.add("option", TagList("name","custom_difficulty.0.lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
   if allowUnlock:
     mainMenu.add("option",TagList("name","custom_difficulty.0.unlock.name").add("trigger", TagList("has_global_flag","custom_difficulty_locked")).add("hidden_effect",TagList("remove_global_flag", "custom_difficulty_locked").add("country_event", t_mainMenuEvent)))
   mainMenu.add("option", t_closeOption)
@@ -685,8 +685,9 @@ trigger.add("fails_text", TagList("text", "custom_difficulty_choose").add("has_g
 for i,difficulty in enumerate(difficulties):
   option=TagList("name","custom_difficulty_{}.name".format(difficulty))
   defaultMenuEvent.add("option", option)
-  option.add("trigger", notLockedTrigger)
+  option.add("trigger", t_notLockedTrigger)
   option.add("hidden_effect", TagList("country_event", TagList("id", "custom_difficulty.{!s}".format(id_defaultEvents+i+1))).add("country_event", TagList("id", name_defaultMenuEvent)))
+defaultMenuEvent.add("option", TagList("name", "custom_difficulty_reset.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id", name_resetConfirmationEvent))))
 defaultMenuEvent.add("option", t_backMainOption)
 defaultMenuEvent.add("option", t_closeOption)
 
@@ -715,6 +716,7 @@ for i, difficulty in enumerate(difficulties):
 
 mainFileContent.add("","","#reset event")
 resetEvent=deepcopy(gameStartInitEvent)
+resetEvent.replace("id", name_resetEvent)
 resetEvent.remove("fire_only_once")
 resetEvent.add("is_triggered_only",yes)
 mainFileContent.add("country_event", resetEvent)
