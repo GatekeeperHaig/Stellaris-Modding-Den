@@ -15,7 +15,7 @@ for s in reversed(changeSteps):
 for s in reversed(changeStepYears):
   changeStepYears.append(-s)
 possibleBoniNames=["minerals", "energy","food", "research", "unity", "influence", "cap", "damage", "hull","armor","shield","upkeep", "growth"]
-npcBoni=[False, False, False, False, False, False, False, True, True, True, True, False, False]
+npcBoni=[           False,      False,   False,   False,    False,    False,      False,  True,   True,     True, True,   False,    False]
 possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_animal_wildlife", "GFX_evt_think_tank", "GFX_evt_ancient_alien_temple","GFX_evt_arguing_senate","GFX_evt_hangar_bay", "GFX_evt_debris", "GFX_evt_sabotaged_ship","GFX_evt_pirate_armada","GFX_evt_fleet_neutral","GFX_evt_city_ruins","GFX_evt_metropolis"]
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","country_resource_influence_mult","country_naval_cap_mult","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["ship_upkeep_mult",
 #"country_building_upkeep_mult", #is there any such modifier except on planet base?!
@@ -24,8 +24,8 @@ possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £eng
 possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
 
 bonusesListNames=["all","default", "allShip"]
+bonusListNPC=[    True,   False,    False]
 bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
-bonusListNPC=[True, False, False]
 bonusesListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
 
 cats=["ai","ai_yearly","fe","leviathan","player","crisis","marauders", "other"]
@@ -251,7 +251,8 @@ for cat in cats:
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
     locClass.addEntry("custom_difficulty_{}_change_{}_name".format(cat,bonusesListName), "@change @{} @bonuses".format(bonusesListName))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
-    choiceEvent.add("option",option) #todo restict
+    if (cat!="leviathan" and cat!="crisis") or bonusListNPC[optionIndex-1]:
+      choiceEvent.add("option",option)
 
   for bonusI, bonus in enumerate(possibleBoniNames):
     optionIndex+=1
@@ -278,7 +279,8 @@ for cat in cats:
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
     locClass.append("custom_difficulty_{}_change_{}_button.name".format(cat,bonus), "@change @{} @bonuses".format(bonus))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
-    choiceEvent.add("option",option) #todo restict
+    if (cat!="leviathan" and cat!="crisis") or npcBoni[bonusI]:
+      choiceEvent.add("option",option) 
 
   option=TagList().add("name","custom_difficulty_back") #loc global
   if cat=="crisis":
@@ -299,7 +301,8 @@ for cat in cats:
   for bonus in bonusesListNames+possibleBoniNames:
     bonusIndex+=1
     changeEvent=TagList()
-    tagList.add("country_event", changeEvent) #todo: restrict
+    if (cat!="leviathan" and cat!="crisis") or (bonusListNPC+npcBoni)[bonusIndex-1]:
+      tagList.add("country_event", changeEvent) #todo: restrict
     changeEvent.add("id",CuDi.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents))
     changeEvent.add("is_triggered_only", yes)
     changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonus))
