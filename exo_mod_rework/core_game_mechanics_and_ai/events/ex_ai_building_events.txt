@@ -6,6 +6,18 @@ event = { #this event is fires on a monthly scope.
 	is_triggered_only = yes
 	
 	immediate = {
+		###denbug
+		every_country = {
+			limit = { is_country_type = default }
+			add_minerals = 3500
+			add_energy = 3500
+			every_owned_planet = {
+				every_tile = {
+					limit = { has_blocker = yes}
+					remove_blocker = yes
+				}
+			}
+		}	
 		every_country = {
 			limit = {
 				OR = {
@@ -35,6 +47,24 @@ country_event = { #this event is fired using the previous event on a monthly sco
 			set_timed_country_flag = { flag = country_check_delay days = 120 }
 		}	
 		every_owned_planet = {
+			if = {
+				limit = { 
+					NOT = { has_planet_flag = deposits_converted } 					
+					any_tile = { has_deposit = yes has_special_resource_deposit = no }					
+				}	
+				set_variable = { which = energy_tile_resource value = 0 }	
+				set_variable = { which = minerals_tile_resource value = 0 }
+				set_variable = { which = food_tile_resource value = 0 }
+				set_variable = { which = unity_tile_resource value = 0 }
+				set_variable = { which = society_research_tile_resource value = 0 }
+				set_variable = { which = physics_research_tile_resource value = 0 }
+				set_variable = { which = engineering_research_tile_resource value = 0 }
+				every_tile = {
+					limit = { has_deposit = yes has_special_resource_deposit = no }
+					convert_deposits = yes					
+				}	
+				set_planet_flag = deposits_converted
+			}				
 			#limit = { 
 			#	OR = {
 			#		owner = { is_ai = yes }
@@ -193,39 +223,9 @@ planet_event = { #this event is fired using the previous event on a monthly scop
 			}
 			else = {
 				every_tile = {
-					limit = { NOR = { has_deposit = no has_special_resource_deposit = yes } }
-					switch = {
-						trigger = has_deposit
-						d_mineral_deposit = { clear_deposits = yes add_deposit = d_mineral_deposit }
-						d_rich_mineral_deposit = { clear_deposits = yes add_deposit = d_rich_mineral_deposit }
-						d_vast_mineral_deposit = { clear_deposits = yes add_deposit = d_vast_mineral_deposit }
-						d_immense_mineral_deposit = { clear_deposits = yes add_deposit = d_immense_mineral_deposit }
-						d_energy_deposit = { clear_deposits = yes add_deposit = d_energy_deposit }
-						d_rich_energy_deposit = { clear_deposits = yes add_deposit = d_rich_energy_deposit }
-						d_vast_energy_deposit = { clear_deposits = yes add_deposit = d_vast_energy_deposit }
-						d_immense_energy_deposit = { clear_deposits = yes add_deposit = d_immense_energy_deposit }
-						d_farmland_deposit = { clear_deposits = yes add_deposit = d_farmland_deposit }
-						d_rich_farmland_deposit = { clear_deposits = yes add_deposit = d_rich_farmland_deposit }
-						d_vast_farmland_deposit = { clear_deposits = yes add_deposit = d_vast_farmland_deposit }
-						d_immense_farmland_deposit = { clear_deposits = yes add_deposit = d_immense_farmland_deposit }
-						d_mineral_energy_deposit = { clear_deposits = yes add_deposit = d_mineral_energy_deposit }
-						d_rich_mineral_energy_deposit = { clear_deposits = yes add_deposit = d_rich_mineral_energy_deposit }
-						d_mineral_food_deposit = { clear_deposits = yes add_deposit = d_mineral_food_deposit }
-						d_rich_food_mineral_deposit = { clear_deposits = yes add_deposit = d_rich_food_mineral_deposit }
-						d_society_deposit = { clear_deposits = yes add_deposit = d_society_deposit }
-						d_rich_society_deposit = { clear_deposits = yes add_deposit = d_rich_society_deposit }
-						d_vast_society_deposit = { clear_deposits = yes add_deposit = d_vast_society_deposit }
-						d_immense_society_deposit = { clear_deposits = yes add_deposit = d_immense_society_deposit }
-						d_physics_deposit = { clear_deposits = yes add_deposit = d_physics_deposit }
-						d_rich_physics_deposit = { clear_deposits = yes add_deposit = d_rich_physics_deposit }
-						d_vast_physics_deposit = { clear_deposits = yes add_deposit = d_vast_physics_deposit }
-						d_immense_physics_deposit = { clear_deposits = yes add_deposit = d_immense_physics_deposit }
-						d_engineering_deposit = { clear_deposits = yes add_deposit = d_engineering_deposit }
-						d_rich_engineering_deposit = { clear_deposits = yes add_deposit = d_rich_engineering_deposit }
-						d_vast_engineering_deposit = { clear_deposits = yes add_deposit = d_vast_engineering_deposit }
-						d_immense_engineering_deposit = { clear_deposits = yes add_deposit = d_immense_engineering_deposit }							
-					}
-				}				
+					limit = { has_deposit = yes has_special_resource_deposit = no }
+					convert_deposits = yes
+				}					
 				while = {
 					limit = { 
 						any_tile = { 
