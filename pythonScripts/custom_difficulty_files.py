@@ -143,7 +143,7 @@ locClass.addEntry("custom_difficulty_captain.name", "@captain - 15-25% @bonus @f
 locClass.addEntry("custom_difficulty_commodore.name", "@commodore - 30-50% @bonus @forAI. 66% @forNPCs")
 locClass.addEntry("custom_difficulty_admiral.name", "@admiral - 45-75% @bonus @forAI. 75% @forNPCs")
 locClass.addEntry("custom_difficulty_grand_admiral.name", "@grandAdmiral - 60-100% @bonus @forAI. 100% @forNPCs")
-locClass.addEntry("custom_difficulty_scaling.name", "@increase @bonus @forAI @every 4 @years")
+locClass.addEntry("custom_difficulty_scaling.name", "@scaling - @increase @bonus @forAI @every 4 @years")
 locClass.addEntry("custom_difficulty_advanced_configuration.name", "@advNonPlayer")
 locClass.addEntry("custom_difficulty_advanced_configuration_player.name", "@advPlayer")
 locClass.addEntry("custom_difficulty_reset.name", "@reset")
@@ -702,8 +702,8 @@ immediate=TagList()
 gameStartInitEvent.add("immediate",immediate)
 immediate.add("set_global_flag", "custom_difficulty_active")
 immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
-for i, difficulty in enumerate(difficulties):
-  if i==6:
+for i, difficulty in enumerate(difficulties[1:]):
+  if i==5:
     k=1 #scaling with stupid place in between ensign and captain
   elif i>0:
     k=i+1
@@ -726,7 +726,7 @@ resetConfirmation=TagList("name", name_resetConfirmationEvent)
 mainFileContent.add("country_event", resetConfirmation)
 resetConfirmation.add("is_triggered_only",yes)
 resetConfirmation.add("title","custom_difficulty_reset_conf.name")
-resetConfirmation.add("title","custom_difficulty_reset.desc")
+resetConfirmation.add("desc","custom_difficulty_reset.desc")
 resetConfirmation.add("picture", "GFX_evt_towel")
 effect=TagList().add("country_event", TagList("id", name_resetFlagsEvent)).add("country_event", TagList("id", name_resetEvent)).add("country_event", TagList("id", name_defaultMenuEvent))
 resetConfirmation.add("option", TagList("name", "OK").add("hidden_effect", effect))
@@ -759,7 +759,7 @@ otherFlagResetEvent=deepcopy(flagResetEvent)
 playerFlagResetEvent.replace("id", name_resetPlayerFlagsEvent).add("immediate", playerFlags)
 scalingFlagResetEvent.replace("id", name_resetYearlyFlagsEvent).add("immediate", scalingFlags)
 otherFlagResetEvent.replace("id", name_resetAIFlagsEvent).add("immediate", otherFlags)
-flagResetEvent.add("immediate", playerFlags.addTagList(scalingFlags).addTagList(otherFlags))
+flagResetEvent.add("immediate", deepcopy(playerFlags).addTagList(scalingFlags).addTagList(otherFlags))
 
 mainFileContent.addComment("all flags")
 mainFileContent.add("country_event", flagResetEvent)
