@@ -681,7 +681,7 @@ trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configur
 trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration.name").add("has_global_flag", "custom_difficulty_advanced_configuration"))
 trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration_yearly.name").add("has_global_flag", "custom_difficulty_advanced_configuration_yearly"))
 trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration_crisis.name").add("has_global_flag", "custom_difficulty_advanced_configuration_crisis"))
-trigger.add("fails_text", TagList("text", "custom_difficulty_choose").add("has_global_flag", "custom_difficulty_locked"))
+trigger.add("fail_text", TagList("text", "custom_difficulty_choose").add("has_global_flag", "custom_difficulty_locked"))
 for i,difficulty in enumerate(difficulties):
   option=TagList("name","custom_difficulty_{}.name".format(difficulty))
   defaultMenuEvent.add("option", option)
