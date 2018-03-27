@@ -176,7 +176,7 @@ name_resetPlayerFlagsEvent="custom_difficulty.25"
 name_rootYearlyEvent="custom_difficulty.30"
 name_rootUpdateEvent="custom_difficulty.40"
 name_rootUpdateEventDelay="custom_difficulty.41"
-name_countryUpdateEventDelay="custom_difficulty.50"
+name_countryUpdateEvent="custom_difficulty.50"
 name_lockEvent="custom_difficulty.60"
 id_defaultEvents=100 #reserved range up to 199
 id_ChangeEvents=1000 #reserved range up to 9999
@@ -264,7 +264,7 @@ for cat in cats:
   option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.0")))
   choiceEvent.add("option",option)
   option=TagList().add("name","close_custom_difficulty.name") #loc global
-  option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.9999")))
+  option.add("hidden_effect", TagList().add("country_event",TagList().add("id", name_rootUpdateEvent)))
   choiceEvent.add("option",option)
 
   
@@ -313,10 +313,12 @@ for cat in cats:
           bonusListValue=possibleBoniNames[bonusListIndex]
           et.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusListValue)).add("value",str(changeStep)))
       hidden_effect.add("country_event", TagList().add("id","custom_difficulty.{:01d}{:02d}0".format(mainIndex,bonusIndex)))
-      if cat!="player":
-        hidden_effect.add("country_event", TagList().add("id","custom_difficulty.98".format(mainIndex,bonusIndex))) #remove flags
+      if cat=="player":
+        hidden_effect.add("country_event", TagList().add("id",name_resetPlayerFlagsEvent)) #remove flags
+      elif cat=="ai_yearly":
+        hidden_effect.add("country_event", TagList().add("id",name_resetYearlyFlagsEvent)) #remove flags
       else:
-        hidden_effect.add("country_event", TagList().add("id","custom_difficulty.97".format(mainIndex,bonusIndex))) #remove flags
+        hidden_effect.add("country_event", TagList().add("id",name_resetAIFlagsEvent)) #remove flags
       hidden_effect.add("set_global_flag", "custom_difficulty_advanced_configuration")
       option.add("hidden_effect",hidden_effect)
       changeEvent.add("option",option)
@@ -326,7 +328,7 @@ for cat in cats:
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.{}000".format(mainIndex))))
     changeEvent.add("option",option)
     option=TagList().add("name","close_custom_difficulty.name")
-    option.add("hidden_effect", TagList().add("country_event",TagList().add("id", "custom_difficulty.9999")))
+    option.add("hidden_effect", TagList().add("country_event",TagList().add("id", name_rootUpdateEvent)))
     changeEvent.add("option",option)
 
   # difficultyChangeWindows[-1].printAll()
@@ -397,7 +399,10 @@ for name, values in zip(vanillaDefaultNames, vanillaDefault):
   defaultEvents.add("country_event", newEvent)
   newEvent.replace("id","custom_difficulty.{:02d}".format(eventIndex))
   immediate=newEvent.get("immediate")
-  immediate.add("country_event",TagList().add("id","custom_difficulty.98"))
+  if "yearly" in cat:
+    immediate.add("country_event",TagList().add("id",name_resetYearlyFlagsEvent))
+  else:
+    immediate.add("country_event",TagList().add("id",name_resetAIFlagsEvent))
   immediate.add("set_global_flag","custom_difficulty_"+name)
   et=TagList()
   immediate.add(ET,et)
@@ -427,7 +432,7 @@ updateFile.add("namespace","custom_difficulty")
 updateEvent=TagList()
 updateFile.add("country_event",updateEvent)
 
-updateEvent.add("id", "custom_difficulty.9998")
+updateEvent.add("id", name_countryUpdateEvent)
 updateEvent.add("is_triggered_only",yes)
 updateEvent.add("hide_window",yes)
 immediate=TagList()
@@ -547,7 +552,7 @@ yearlyFile=TagList()
 yearlyFile.add("namespace","custom_difficulty")
 yearlyEvent=TagList()
 yearlyFile.add("event", yearlyEvent)
-yearlyEvent.add("id", "custom_difficulty.9990")
+yearlyEvent.add("id", name_rootYearlyEvent)
 yearlyEvent.add("is_triggered_only",yes)
 yearlyEvent.add("hide_window",yes)
 trigger=TagList()
@@ -601,7 +606,7 @@ outputToFolderAndFile(edictFile, "common/edicts", "custom_difficulty_edict.txt")
 onActions=TagList()
 onActions.add("on_yearly_pulse", TagList("events",TagList().add(name_rootYearlyEvent).add(name_rootUpdateEvent)))
 onActions.add("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
-# onActions.add("on_game_start", TagList("events",TagList().add("custom_difficulty.9999"))) #is called by "fire only once"
+# onActions.add("on_game_start", TagList("events",TagList().add(name_rootUpdateEvent))) #is called by "fire only once"
 outputToFolderAndFile(onActions, "common/on_actions", "custom_difficulty_on_action.txt")
 
 scriptedEffects=TagList("guardian_difficulty",TagList()," #I commented out the effect of the stuff applied here, but it was not up to date. Once they update it, that will be active again. Thus I kill this function as well to make sure it won't become active!")
@@ -710,7 +715,7 @@ for i, difficulty in enumerate(difficulties[1:]):
   else:
     k=i
   immediate.add("","","#"+difficulty)
-  immediate.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", "custom_difficulty.{!s}".format(id_defaultEvents+i+1))))
+  immediate.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", "custom_difficulty.{!s}".format(id_defaultEvents+i+2))))
   immediate.add("country_event", TagList("id", name_rootUpdateEvent))
 
 
@@ -722,7 +727,7 @@ resetEvent.add("is_triggered_only",yes)
 mainFileContent.add("country_event", resetEvent)
 
 mainFileContent.add("","","#reset confirmation")
-resetConfirmation=TagList("name", name_resetConfirmationEvent)
+resetConfirmation=TagList("id", name_resetConfirmationEvent)
 mainFileContent.add("country_event", resetConfirmation)
 resetConfirmation.add("is_triggered_only",yes)
 resetConfirmation.add("title","custom_difficulty_reset_conf.name")
