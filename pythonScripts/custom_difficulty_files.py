@@ -14,7 +14,6 @@ for s in reversed(changeSteps):
   changeSteps.append(-s)
 for s in reversed(changeStepYears):
   changeStepYears.append(-s)
-# possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep", "Any Pop growth speed"]
 possibleBoniNames=["minerals", "energy","food", "research", "unity", "influence", "cap", "damage", "hull","armor","shield","upkeep", "growth"]
 possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_animal_wildlife", "GFX_evt_think_tank", "GFX_evt_ancient_alien_temple","GFX_evt_arguing_senate","GFX_evt_hangar_bay", "GFX_evt_debris", "GFX_evt_sabotaged_ship","GFX_evt_pirate_armada","GFX_evt_fleet_neutral","GFX_evt_city_ruins","GFX_evt_metropolis"]
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","country_resource_influence_mult","country_naval_cap_mult","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["ship_upkeep_mult",
@@ -22,14 +21,24 @@ possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy
 "country_starbase_upkeep_mult","army_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","","",""]
 possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
+
 bonusesListNames=["all","default", "allShip"]
 bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
 bonusesListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
-cats=["ai","ai_yearly","fe","leviathan","player"]
-catNames=["AI Default Empire", "AI Yearly Change", "Fallen and Awakened Empires", "Leviathans and other NPCs", "Player"]
-catCountryType=["default", "default","awakened_fallen_empire","",""]
-catNotCountryType=["", "","",["default","awakened_fallen_empire"],""]
-catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel"]
+
+cats=["ai","ai_yearly","fe","leviathan","player","crisis","marauders", "other"]
+catCountryType=[
+["default"], 
+["default"],
+["fallen_empire", "awakened_fallen_empire"],
+["guardian", "guardian_dragon", "guardian_stellarite","guardian_wraith","guardian_hiver","guardian_horror","guardian_fortress","guardian_dreadnought", "guardian_sphere"],
+[],
+["swarm", "extradimensional", "extradimensional_2", "extradimensional_3", "ai_empire","cybrex_empire","sentinels", "portal_holders", "feral_prethoryn","feral_prethoryn_infighting"],
+["dormant_marauders","ruined_marauders", "awakened_marauders","marauder_raiders"],
+[]]
+catNotCountryType=[[], [],[],[],[],[],[],catCountryType]
+catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel","GFX_evt_towel","GFX_evt_towel","GFX_evt_towel"]
+
 difficulties=["easy", "ensign","captain","commodore","admiral", "grand_admiral", "scaling"]
 
 
@@ -63,8 +72,11 @@ locClass.addLoc("allShip", "All Ship")
 locClass.addLoc("ai", "AI Default Empire")
 locClass.addLoc("ai_yearly", "AI Yearly Change")
 locClass.addLoc("fe", "Fallen and Awakened Empires")
-locClass.addLoc("leviathan", "Leviathans and other NPCs")
+locClass.addLoc("leviathan", "Leviathans")
 locClass.addLoc("player", "Player")
+locClass.addLoc("crisis", "Crisis")
+locClass.addLoc("marauders", "Marauders")
+locClass.addLoc("other", "Other")
 #difficiulties, AI, other important things
 locClass.addLoc("easy", "Easy")
 locClass.addLoc("ensign", "Ensign")
@@ -365,6 +377,8 @@ vanillaDefault=[]
 # possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep", "Any Pop growth speed"]
 scaleDefault=[True, True, True, True, True, False, True, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
 vanillaAItoNPCIndex=7
+
+#BIG TODO : THIS needs updating to new cats!
 vanillaDefault.append([0,0,0,0,0,0,0,33,33,33,33,0,0])
 vanillaDefault.append([25,25,25,15,15,0,15,50,50,50,50,0,0])
 vanillaDefault.append([50,50,50,30,30,0,30,66,66,66,66,0,0])
@@ -446,21 +460,38 @@ for catI,cat in enumerate(cats):
   immediate.add("if",ifTagList)
   limit=TagList()
   ifTagList.add("limit",limit)
-  if catCountryType[catI]!="":
-    limit.add("is_country_type", catCountryType[catI])
-  if catNotCountryType[catI]!="":
-    andTL=TagList()
-    for entry in catNotCountryType[catI]:
-      andTL.add("not", TagList().add("is_country_type", entry))
-    limit.add("and",andTL)
-  orTagList=TagList()
-  limit.add("or",orTagList)
-  if cat=="player":
-    orTagList.add("is_ai", "no")
-    orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","no")))
-  else:
-    orTagList.add("is_ai", yes)
-    orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","yes")))
+  if len(catCountryType[catI])>1:
+    limitOr=TagList()
+    limit.add("or",limitOr)
+    for countryType in catCountryType[catI]:
+      limitOr.add("is_country_type", countryType)
+  elif len(catCountryType[catI])==1:
+    limit.add("is_country_type", catCountryType[catI][0])
+
+
+  if catNotCountryType[catI]:
+    norSet=set()
+    toParseList=deepcopy(catNotCountryType[catI])
+    while toParseList:
+      # print(toParseList)
+      entry=toParseList.pop(0)
+      if isinstance(entry, list):
+        toParseList+=entry
+      else:
+        norSet.add(entry)
+    norTagList=TagList()
+    limit.add("NOR", norTagList)
+    for entry in norSet:
+      norTagList.add("is_country_type", entry)
+  if "player"==cat or "ai" in cat:
+    orTagList=TagList()
+    limit.add("or",orTagList)
+    if cat=="player":
+      orTagList.add("is_ai", "no")
+      orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","no")))
+    else:
+      orTagList.add("is_ai", yes)
+      orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","yes")))
 
   afterIfTaglist=deepcopy(ifTagList)
   after.add("if",afterIfTaglist)
