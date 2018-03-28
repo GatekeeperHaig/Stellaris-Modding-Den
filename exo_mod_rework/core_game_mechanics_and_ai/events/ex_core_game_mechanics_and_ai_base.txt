@@ -1,0 +1,115 @@
+namespace = core_game_mechanics_and_ai_base
+
+country_event = { 
+	id = core_game_mechanics_and_ai_base.0
+	hide_window = yes	
+	fire_only_once = yes
+	trigger = { NOT = { has_global_flag = core_game_mechanics_and_ai } }
+	immediate = { 
+		set_global_flag = core_game_mechanics_and_ai
+		if = {
+			limit = {
+				is_multiplayer = yes
+				is_ai = no					
+			}	
+			set_country_flag = ex_game_host
+		}		
+		country_event = { id = core_game_mechanics_and_ai_base.1 }
+	}
+}
+
+country_event = {
+	id = core_game_mechanics_and_ai_base.1	
+	is_triggered_only = yes
+	title = core_game_mechanics_and_ai.main_menu_title
+	desc = core_game_mechanics_and_ai.main_menu_desc
+	picture = GFX_evt_metropolis
+	trigger = { 		
+		is_ai = no
+		OR = {
+			is_multiplayer = no
+			AND = { 
+				is_multiplayer = yes				
+				has_country_flag = ex_game_host
+			}	
+		}				
+	}	
+	option = {
+		name = vanilla_base_building_stats_name
+		custom_tooltip = vanilla_base_building_stats_tooltip
+		trigger = { vanilla_base_building_content_enabled = no }
+		hidden_effect = {
+			set_global_flag = ex_vanilla_base_building_stats
+			if = { 	
+				limit = { overhauled_building_content_enabled = yes }
+				remove_global_flag = ex_overhauled_building_content_active
+			}	
+			if = { 	
+				limit = { reworked_building_content_enabled = yes }
+				remove_global_flag = ex_reworked_building_content_active
+			}			
+			#every_planet = {
+			#	limit = { 
+			#		OR = {
+			#			is_colony = yes
+			#			is_colonizable = yes
+			#		}	
+			#		has_building = yes
+			#	}	
+			#	planet_event = { id = xyz }
+			#}
+		}
+	}
+	option = {
+		name = overhauled_building_content_name
+		custom_tooltip = overhauled_building_content_tooltip
+		trigger = { overhauled_building_content_enabled = no }
+		hidden_effect = {
+			set_global_flag = ex_overhauled_building_content_active
+			if = { 	
+				limit = { vanilla_base_building_content_enabled = yes }
+				remove_global_flag = ex_vanilla_base_building_stats
+			}	
+			if = { 	
+				limit = { reworked_building_content_enabled = yes }
+				remove_global_flag = ex_reworked_building_content_active
+			}			
+			#every_planet = {
+			#	limit = { 
+			#		OR = {
+			#			is_colony = yes
+			#			is_colonizable = yes
+			#		}	
+			#		has_building = yes
+			#	}	
+			#	planet_event = { id = xyz }
+			#}
+		}
+	}	
+	option = {
+		name = reworked_building_content_name
+		custom_tooltip = reworked_building_content_tooltip
+		trigger = { reworked_building_content_enabled = no }
+		hidden_effect = {
+			set_global_flag = ex_reworked_building_content_active
+			if = { 	
+				limit = { vanilla_base_building_content_enabled = yes }
+				remove_global_flag = ex_vanilla_base_building_stats
+			}	
+			if = { 	
+				limit = { overhauled_building_content_enabled = yes }
+				remove_global_flag = ex_overhauled_building_content_active
+			}			
+			#every_planet = {
+			#	limit = { 
+			#		OR = {
+			#			is_colony = yes
+			#			is_colonizable = yes
+			#		}	
+			#		has_building = yes
+			#	}	
+			#	planet_event = { id = xyz }
+			#}
+		}
+	}
+}

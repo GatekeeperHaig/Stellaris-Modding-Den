@@ -1586,6 +1586,279 @@ engineering_research_buildings_ai_allow = {
 	}	
 }
 
+general_research_buildings_ai_allow = {
+	OR = { 
+		has_deposit = society_research_building_tile
+		has_deposit = physics_research_building_tile
+		has_deposit = engineering_research_building_tile
+		AND = {
+			has_deposit = no
+			planet = { 
+				NOT = { 
+					any_tile = { 
+						OR = {
+							has_deposit = society_research_building_tile
+							has_deposit = physics_research_building_tile
+							has_deposit = engineering_research_building_tile
+						}	
+						has_building = no 
+						has_blocker = no
+					}
+				} 
+			}
+		}
+	}	
+}
+
+capital_buildings_ai_allow = {
+	num_adjacent_tiles > 2
+	any_neighboring_tile = { has_resource = yes }
+	OR = {
+		has_deposit = energy_building_tile
+		has_deposit = unity_building_tile
+		AND = {
+			has_deposit = no
+			planet = {
+				NOT = {
+					any_tile = {
+						OR = {
+							has_deposit = energy_building_tile
+							has_deposit = unity_building_tile
+						}
+						has_building = no
+						has_deposit = no
+					}	
+				}
+			}
+		}
+	}
+}	
+
+overhauled_power_hub_ai_allow = {
+	num_adjacent_tiles > 2
+	any_neighboring_tile = { 
+		OR = {
+			AND = {
+				has_building = no
+				has_deposit = energy_building_tile
+			}
+			has_energy_resource_building = yes
+		}
+	}
+	OR = {
+		has_deposit = energy_building_tile
+		AND = {
+			has_deposit = no
+			planet = {
+				NOT = {
+					any_tile = {
+						has_deposit = energy_building_tile
+						has_building = no
+						has_deposit = no
+					}	
+				}
+			}
+		}
+	}
+}	
+
+overhauled_mineral_processing_plant_ai_allow = {
+	num_adjacent_tiles > 2
+	any_neighboring_tile = { 
+		OR = {
+			AND = {
+				has_building = no
+				has_deposit = minerals_building_tile
+			}
+			has_minerals_resource_building = yes
+		}
+	}
+	OR = {
+		has_deposit = minerals_building_tile
+		AND = {
+			has_deposit = no
+			planet = {
+				NOT = {
+					any_tile = {
+						has_deposit = minerals_building_tile
+						has_building = no
+						has_deposit = no
+					}	
+				}
+			}
+		}
+	}
+}	
+
+agricultural_processor_ai_allow = {
+	num_adjacent_tiles > 2
+	any_neighboring_tile = { 
+		OR = {
+			AND = {
+				has_building = no
+				has_deposit = food_building_tile
+			}
+			has_food_resource_building = yes
+		}
+	}
+	OR = {
+		has_deposit = minerals_building_tile
+		AND = {
+			has_deposit = no
+			planet = {
+				NOT = {
+					any_tile = {
+						has_deposit = food_building_tile
+						has_building = no
+						has_deposit = no
+					}	
+				}
+			}
+		}
+	}
+}	
+
+military_academy_ai_allow_conditions = {
+	OR = {
+		AND = {
+			overhauled_building_content_enabled = no
+			OR = {
+				has_deposit = society_research_building_tile
+				has_deposit = engineering_research_building_tile
+				AND = {
+					has_deposit = no
+					planet = {
+						NOT = {
+							any_tile = {
+								OR = {
+									has_deposit = society_research_building_tile
+									has_deposit = engineering_research_building_tile
+								}
+								has_building = no
+								has_deposit = no
+							}	
+						}
+					}
+				}
+			}
+		}
+		AND = {
+			overhauled_building_content_enabled = yes
+			unity_buildings_ai_allow = yes
+		}	
+	}		
+	planet = { 
+		sector_controlled = no
+		any_owned_pop = { 
+			is_warrior_pop = yes
+			OR = {
+				has_military_service_type = { type = military_service_full country = owner }
+				has_military_service_type = { type = military_service_limited country = owner }
+			}				
+			OR = { 
+				is_enslaved = no
+				AND = {
+					is_enslaved = yes
+					planet = { has_building = building_slave_processing }
+				}
+			}
+		}
+		owner = {
+			NOT = {
+				any_owned_planet = {
+					NOT = { is_same_value = from }
+					has_building = building_military_academy			
+				}	
+			}
+		}	
+	}
+}
+
+clone_vats_ai_allow_conditions = {
+	society_research_buildings_ai_allow = yes
+	planet = { 
+		sector_controlled = no
+		any_owned_pop = { 
+			is_robot_pop = no
+			is_warrior_pop = yes
+			OR = {
+				has_military_service_type = { type = military_service_full country = owner }
+				has_military_service_type = { type = military_service_limited country = owner }
+			}				
+		}
+		owner = {
+			NOT = {
+				any_owned_planet = {
+					NOT = { is_same_value = from }
+					has_building = building_clone_vats
+				}	
+			}				
+		}
+	}
+}
+
+war_factory_ai_allow_conditions = {
+	OR = {
+		AND = {
+			overhauled_building_content_enabled = no
+			OR = {
+				has_deposit = society_research_building_tile
+				has_deposit = engineering_research_building_tile
+				AND = {
+					has_deposit = no
+					planet = {
+						NOT = {
+							any_tile = {
+								OR = {
+									has_deposit = society_research_building_tile
+									has_deposit = engineering_research_building_tile
+								}
+								has_building = no
+								has_deposit = no
+							}	
+						}
+					}
+				}
+			}
+		}
+		AND = {
+			overhauled_building_content_enabled = yes
+			unity_buildings_ai_allow = yes
+		}	
+	}	
+}
+
+planetary_shield_ai_allow_conditions = {
+	OR = {
+		AND = {
+			overhauled_building_content_enabled = no
+			OR = {
+				has_deposit = physics_research_building_tile
+				has_deposit = engineering_research_building_tile
+				AND = {
+					has_deposit = no
+					planet = {
+						NOT = {
+							any_tile = {
+								OR = {
+									has_deposit = physics_research_building_tile
+									has_deposit = engineering_research_building_tile
+								}
+								has_building = no
+								has_deposit = no
+							}	
+						}
+					}
+				}
+			}
+		}
+		AND = {
+			overhauled_building_content_enabled = yes
+			unity_buildings_ai_allow = yes
+		}	
+	}	
+}
+
 ### Destroy Conditions
 
 standard_unity_building_destroy_conditions = {
@@ -1784,59 +2057,6 @@ slave_processing_unlock_conditions = {
 
 ### AI Allow Conditions
 
-military_academy_ai_allow_conditions = {
-	NOT = {
-		planet = {
-			owner = {
-				any_owned_planet = {
-					NOT = { is_same_value = from }
-					has_building = building_military_academy
-				}				
-			}
-		}
-	}
-	planet = { 
-		sector_controlled = no
-		any_owned_pop = { 
-			is_warrior_pop = yes
-			OR = {
-				has_military_service_type = { type = military_service_full country = owner }
-				has_military_service_type = { type = military_service_limited country = owner }
-			}				
-			OR = { 
-				is_enslaved = no
-				AND = {
-					is_enslaved = yes
-					planet = { has_building = building_slave_processing }
-				}
-			}
-		}
-	}
-}
-
-clone_vats_ai_allow_conditions = {
-	NOT = {
-		planet = {
-			owner = {
-				any_owned_planet = {
-					NOT = { is_same_value = from }
-					has_building = building_clone_vats
-				}				
-			}
-		}
-	}
-	planet = { 
-		sector_controlled = no
-		any_owned_pop = { 
-			is_robot_pop = no
-			is_warrior_pop = yes
-			OR = {
-				has_military_service_type = { type = military_service_full country = owner }
-				has_military_service_type = { type = military_service_limited country = owner }
-			}				
-		}
-	}
-}
 
 	
 
