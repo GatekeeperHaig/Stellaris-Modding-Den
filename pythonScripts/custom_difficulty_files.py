@@ -239,6 +239,9 @@ for cat in cats:
   if cat=="ai_yearly":
     immediate=TagList()
     choiceEvent.add("immediate",immediate)
+  if cat=="crisis":
+    trigger.add("text", "custom_difficulty_crisis_strength_desc")
+    locClass.add("custom_difficulty_crisis_strength_desc", "@vanilla @example @values: @grandAdmiral + x5 @crisis @strength: 1000%. @ensign + x5 @crisis @strength: xxx%. @ensign + x0.25 @crisis @strength: xxx%.") #TODO: get correct values!
   if cat=="ai_yearly":
     trigger.add("text", "custom_difficulty_current_yearly_desc") #loc global
   else:
