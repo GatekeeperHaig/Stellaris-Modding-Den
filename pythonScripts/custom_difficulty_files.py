@@ -92,6 +92,8 @@ locClass.addLoc("forAI", "for AI")
 locClass.addLoc("forNPCs", "for NPCs")
 locClass.addLoc("forPlayer", "for Player")
 locClass.addLoc("menu", "Menu")
+locClass.addLoc("options", "Options")
+locClass.addLoc("vanilla", "Vanilla")
 
 
 
@@ -107,8 +109,9 @@ locClass.addLoc("close", "Close")
 locClass.addLoc("main", "Main")
 locClass.addLoc("menuDesc", "Triggers an event to let you customize the difficulty of your current game")
 locClass.addLoc("lock", "Lock Settings for the Rest of the Game")
-locClass.addLoc("locked", "Difficulty locked!")
-locClass.addLoc("lockedDesc", "Yearly changes will continue up to the maximum/minimum. Can only be unlocked via installing the unlock mod, editing save game or starting a new game.")
+locClass.addLoc("lockDesc", "Yearly changes will continue up to the maximum/minimum. Can only be unlocked via installing the unlock mod, editing save game or starting a new game.")
+locClass.addLoc("lockActive", "Difficulty locked!")
+locClass.addLoc("lockActiveDesc", "Yearly changes will continue up to the maximum/minimum. Can only be unlocked via installing the unlock mod, editing save game or starting a new game.")
 locClass.addLoc("care", "Use with care!")
 locClass.addLoc("unlock", "Unlock Settings")
 locClass.addLoc("choose", "Choose category to change or show")
@@ -131,6 +134,8 @@ locClass.addLoc("change", "Change")
 locClass.addLoc("difficulty", "Difficulty")
 locClass.addLoc("customization", "Customization")
 locClass.addLoc("strength", "Strength")
+locClass.addLoc("example", "Example")
+locClass.addLoc("values", "Values")
 
 
 
@@ -143,12 +148,14 @@ locClass.addEntry("custom_difficulty_back", "@back")
 locClass.addEntry("custom_difficulty_cancel", "@cancel")
 locClass.addEntry("custom_difficulty_close.name", "@close @modName @menu")
 locClass.addEntry("custom_difficulty_lock.name", "@lock")
-locClass.addEntry("custom_difficulty_lock.desc", "@lockedDesc @care")
-locClass.addEntry("custom_difficulty_locked.name", "@locked")
-locClass.addEntry("custom_difficulty_locked.desc", "@locked @lockedDesc")
+locClass.addEntry("custom_difficulty_lock.desc", "@lockDesc @care")
+locClass.addEntry("custom_difficulty_locked.name", "@lockActive")
+locClass.addEntry("custom_difficulty_locked.desc", "@lockActive @lockActiveDesc")
+# locClass.addEntry("custom_difficulty_lockActive.desc", "@lockActive @lockActiveDesc")
 locClass.addEntry("custom_difficulty_unlock.name", "@unlock")
 locClass.addEntry("edict_custom_difficulty", "@modName - @main @menu") #also used for menu title. Has to be named edict for the edict
 locClass.addEntry("edict_custom_difficulty_desc", "@menuDesc")
+locClass.addEntry("custom_difficulty_options.name", "@options")
 locClass.addEntry("custom_difficulty_choose_desc", "@choose")
 locClass.addEntry("custom_difficulty_predef_head.name", "@modName - @preDef")
 locClass.addEntry("custom_difficulty_predefined_colored.name", "§G@preDef")
@@ -186,6 +193,7 @@ CuDi="custom_difficulty.{!s}"
 name_mainMenuEvent="custom_difficulty.0"
 name_defaultMenuEvent="custom_difficulty.1"
 name_customMenuEvent="custom_difficulty.2"
+name_optionsEvent="custom_difficulty.3"
 name_gameStartFireOnlyOnce="custom_difficulty.10"
 name_resetEvent="custom_difficulty.20" # same as above with triggered_only instead of fire_only_once
 name_resetConfirmationEvent="custom_difficulty.21" # same as above with triggered_only instead of fire_only_once
@@ -216,6 +224,9 @@ t_rootUpdateEvent=TagList("id",name_rootUpdateEvent)
 t_backMainOption=TagList("name","custom_difficulty_back").add("hidden_effect", TagList("country_event",TagList("id", name_mainMenuEvent)))
 t_closeOption=TagList("name", "custom_difficulty_close.name").add("hidden_effect", TagList("country_event", t_rootUpdateEvent))
 
+def t_back(name):
+  return TagList("name","custom_difficulty_back").add("hidden_effect", TagList("country_event",TagList("id", name)))
+
 
 difficultyChangeWindows = []
 mainIndex=0
@@ -241,7 +252,7 @@ for cat in cats:
     choiceEvent.add("immediate",immediate)
   if cat=="crisis":
     trigger.add("text", "custom_difficulty_crisis_strength_desc")
-    locClass.add("custom_difficulty_crisis_strength_desc", "@vanilla @example @values: @grandAdmiral + x5 @crisis @strength: 1000%. @ensign + x5 @crisis @strength: xxx%. @ensign + x0.25 @crisis @strength: xxx%.") #TODO: get correct values!
+    locClass.append("custom_difficulty_crisis_strength_desc", "@vanilla @example @values: @grandAdmiral + x5 @crisis @strength: 1000%. @ensign + x5 @crisis @strength: xxx%. @ensign + x0.25 @crisis @strength: xxx%.") #TODO: get correct values!
   if cat=="ai_yearly":
     trigger.add("text", "custom_difficulty_current_yearly_desc") #loc global
   else:
@@ -706,7 +717,7 @@ mainFileContent.add("","","#main menu")
 # main Menu (including unlock output)
 mainMenu=TagList()
 mainFileContent.add("country_event",mainMenu)
-for allowUnlock in [False,True]:
+for allowUnlock in [False]:#[False,True]:
   mainMenu.add("id", name_mainMenuEvent)
   mainMenu.add("is_triggered_only", yes)
   mainMenu.add("title", "edict_custom_difficulty")
@@ -718,16 +729,17 @@ for allowUnlock in [False,True]:
   mainMenu.add("option", TagList("name","custom_difficulty_predefined_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
   mainMenu.add("option", TagList("name","custom_difficulty_crisis_colored.name").add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+(cats.index("crisis")+1)*1000))).add("remove_global_flag","custom_difficulty_menu_crisis_from_custom")))
   mainMenu.add("option", TagList("name","custom_difficulty_customize_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_customMenuEvent))))
-  mainMenu.add("option", TagList("name","custom_difficulty_lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
-  if allowUnlock:
-    mainMenu.add("option",TagList("name","custom_difficulty_unlock.name").add("trigger", TagList("has_global_flag","custom_difficulty_locked")).add("hidden_effect",TagList("remove_global_flag", "custom_difficulty_locked").add("country_event", t_mainMenuEvent)))
-  mainMenu.add("option", t_closeOption)
+  mainMenu.add("option", TagList("name","custom_difficulty_options.name").add("hidden_effect", TagList("country_event", TagList("id", name_optionsEvent))))
+  # mainMenu.add("option", TagList("name","custom_difficulty_lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
+  # if allowUnlock:
+  #   mainMenu.add("option",TagList("name","custom_difficulty_unlock.name").add("trigger", TagList("has_global_flag","custom_difficulty_locked")).add("hidden_effect",TagList("remove_global_flag", "custom_difficulty_locked").add("country_event", t_mainMenuEvent)))
+  # mainMenu.add("option", t_closeOption)
 
-  mainMenu=TagList()
-  if allowUnlock:
-    mainFileUnlock=TagList("namespace", "custom_difficulty")
-    mainFileUnlock.add("country_event", mainMenu)
-    outputToFolderAndFile(mainFileUnlock, "events", "!_custom_difficulty_unlock.txt", 1, "../gratak_mods/custom_difficulty_unlock/")
+  # mainMenu=TagList()
+  # if allowUnlock:
+  #   mainFileUnlock=TagList("namespace", "custom_difficulty")
+  #   mainFileUnlock.add("country_event", mainMenu)
+  #   outputToFolderAndFile(mainFileUnlock, "events", "!_custom_difficulty_unlock.txt", 1, "../gratak_mods/custom_difficulty_unlock/")
 
 customMenu=TagList()
 mainFileContent.add("country_event",customMenu)
@@ -798,6 +810,7 @@ mainFileContent.add("","","#reset event")
 resetEvent=deepcopy(gameStartInitEvent)
 resetEvent.replace("id", name_resetEvent)
 resetEvent.remove("fire_only_once")
+resetEvent.remove("trigger")
 resetEvent.add("is_triggered_only",yes)
 mainFileContent.add("country_event", resetEvent)
 
@@ -849,6 +862,74 @@ mainFileContent.addComment("scaling flags")
 mainFileContent.add("country_event", scalingFlagResetEvent)
 mainFileContent.addComment("other flags")
 mainFileContent.add("country_event", otherFlagResetEvent)
+
+
+optionsEvent=TagList()
+mainFileContent.addComment("options Event")
+mainFileContent.add("country_event", optionsEvent)
+optionsEvent.add("id", name_optionsEvent)
+optionsEvent.add("is_triggered_only", yes)
+optionsEvent.add("title", "custom_difficulty_options.name")
+# optionsEvent.add("desc", "custom_difficulty_options.desc")
+optionsEvent.add("picture", "GFX_evt_towel")
+
+descTrigger=TagList()
+optionsEvent.add("desc", TagList("trigger", descTrigger))
+descTrigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("has_global_flag", "custom_difficulty_locked"))
+descTrigger.add("text", "custom_difficulty_current_options")
+locClass.append("custom_difficulty_current_options", "@current_options")
+
+
+optionWithInverse=dict()
+# flag is going to be "custom_difficulty_"+key
+# name "custom_difficulty_"+key
+# desc "custom_difficulty_"+key+".desc"
+optionWithInverse["activate_custom_mode"]=["activate_simple_mode"]
+optionWithInverse["activate_simple_mode"]=["activate_custom_mode"]
+optionWithInverse["activate_player_vassal_ai_boni"]=["deactivate_player_vassal_ai_boni"]
+optionWithInverse["deactivate_player_vassal_ai_boni"]=["activate_player_vassal_ai_boni"]
+# optionWithInverse[]=[]
+
+#todo: move to top to be translated
+locClass.addLoc("current_options", "Currently active options")
+locClass.addLoc("activate_custom_mode", "Activate Custom Mode")
+locClass.addLoc("activate_simple_mode", "Activate Simple Mode")
+locClass.addLoc("activate_player_vassal_ai_boni", "Activate Player Vassal AI Bonus")
+locClass.addLoc("deactivate_player_vassal_ai_boni", "Deactivate Player Vassal AI Bonus")
+locClass.addLoc("activate_custom_mode"+"Desc", "Specific choice of bonuses to be applied possible.")
+locClass.addLoc("activate_simple_mode"+"Desc", "Only bonus groups and default difficulties can be chosen. Slightly improved performance.")
+locClass.addLoc("activate_player_vassal_ai_boni"+"Desc", "Player vassals will get the same bonuses as other AI empires")
+locClass.addLoc("deactivate_player_vassal_ai_boni"+"Desc", "Vanilla behavior of player vassals not getting AI bonuses. They will get player bonuses though if any such have been activated.")
+# locClass.addLoc("custom_difficulty_"+"activate_custom_mode"+".name", "")
+# locClass.addLoc("custom_difficulty_"+"activate_custom_mode"+".desc", "")
+for key, inverses in optionWithInverse.items():
+  seperateDesc=False
+  locClass.append("custom_difficulty_"+key+".desc", "@"+key+"Desc")
+  locClass.append("custom_difficulty_"+key+".name", "@"+key)
+  descTrigger.add("success_text", TagList().add("text", "custom_difficulty_"+key+".desc").add("has_global_flag", key))
+  option=TagList("name","custom_difficulty_{}.name".format(key))
+  optionsEvent.add("option", option)
+  option.add("custom_tooltip", "custom_difficulty_{}.desc".format(key))
+  trigger=deepcopy(t_notLockedTrigger)
+  option.add("trigger", trigger)
+  trigger.add("not", TagList("has_global_flag", "custom_difficulty_"+key))
+  effect=TagList("set_global_flag", "custom_difficulty_"+key)
+  for inverse in inverses:
+    effect.add("remove_global_flag", "custom_difficulty_"+inverse)
+  effect.add("country_event", TagList("id", name_optionsEvent))
+  option.add("hidden_effect", effect)
+optionsEvent.add("option", TagList("name","custom_difficulty_lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
+optionsEvent.add("option", t_backMainOption )
+optionsEvent.add("option", t_closeOption)
+
+optionEventUnlock=deepcopy(optionsEvent)
+optionEventUnlock.insert(-2,"option",TagList("name","custom_difficulty_unlock.name").add("trigger", TagList("has_global_flag","custom_difficulty_locked")).add("hidden_effect",TagList("remove_global_flag", "custom_difficulty_locked").add("country_event", t_mainMenuEvent)))
+mainFileUnlock=TagList("namespace", "custom_difficulty")
+mainFileUnlock.add("country_event", optionEventUnlock)
+outputToFolderAndFile(mainFileUnlock, "events", "!_custom_difficulty_unlock.txt", 1, "../gratak_mods/custom_difficulty_unlock_new/")
+optionsEvent=TagList()
+
+
 
 
 outputToFolderAndFile(mainFileContent , "events", "custom_difficulty_main.txt",1 )
