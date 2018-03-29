@@ -64,6 +64,7 @@ locClass.addLoc("modName", "Dynamic Difficulty", "all")
 
 #BIG TODO Add update flags! Only update when needed!
 #BIG TODO Implement the options!
+#BIG TODO I don't think "times 10" modifiers are removed so far before update. Update events have to be reworked first though!
 
 #IMPORTANT
 #bonuses
@@ -130,7 +131,7 @@ locClass.addLoc("unlock", "Unlock Settings")
 locClass.addLoc("choose", "Choose category to change or show")
 locClass.addLoc("choosePreDef", "Choose predefined setting")
 locClass.addLoc("delWarn", "Deletes previously made settings!")
-locClass.addLoc("combineText", "Colors indicate categories. From each category, one can be chosen. Choosing another one overwrites previous choice.") #TODO. Add remove player bonuses and remove scaling bonuses?
+locClass.addLoc("combineText", "Colors indicate categories. From each category, one can be chosen. Choosing another one overwrites previous choice.")
 locClass.addLoc("preDef", "Predefined Difficulties")
 locClass.addLoc("years", "year(s)")
 locClass.addLoc("yearly", "yearly")
