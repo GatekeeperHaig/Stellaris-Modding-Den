@@ -62,7 +62,8 @@ doTranslation=False
 locClass=LocList(doTranslation)
 locClass.addLoc("modName", "Dynamic Difficulty", "all")
 
-
+#BIG TODO Add update flags! Only update when needed!
+#BIG TODO Implement the options!
 
 #IMPORTANT
 #bonuses
@@ -176,7 +177,7 @@ locClass.append("custom_difficulty_crisis_colored.name","§R@crisis @strength")
 locClass.append("custom_difficulty_customize_colored.name","§Y@difficulty @customization")
 locClass.append("custom_difficulty_customize.name","§Y@difficulty @customization")
 locClass.addEntry("custom_difficulty_choose", "@choosePreDef.§R @delWarn§! @combineText")
-locClass.addEntry("custom_difficulty_easy.name", "§G@easy - 20% @bonus @allCat @forPlayer")
+locClass.addEntry("custom_difficulty_easy.name", "§G@easy - 20% @bonus @allCat @forPlayer") #TODO: color coding in custom menu same as here! To make clearer what overwrites what. "R" for crisis
 locClass.addEntry("custom_difficulty_ensign.name", "§B@ensign - @no @bonus @forAI. 33% @forNPCs")
 locClass.addEntry("custom_difficulty_captain.name", "§B@captain - 15-25% @bonus @forAI. 50% @forNPCs")
 locClass.addEntry("custom_difficulty_commodore.name", "§B@commodore - 30-50% @bonus @forAI. 66% @forNPCs")
