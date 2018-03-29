@@ -117,7 +117,7 @@ locClass.addLoc("unlock", "Unlock Settings")
 locClass.addLoc("choose", "Choose category to change or show")
 locClass.addLoc("choosePreDef", "Choose predefined setting")
 locClass.addLoc("delWarn", "Deletes previously made settings!")
-locClass.addLoc("combineText", "Easy and vanilla can be combined. Easy does not overwrite non-player bonuses and Vanilla does not overwrite player bonuses.") #TODO. Probably mark the buttons accordingly! Also add remove player bonuses and remove scaling bonuses?
+locClass.addLoc("combineText", "Colors indicate categories. From each category, one can be chosen. Choosing another one overwrites previous choice.") #TODO. Add remove player bonuses and remove scaling bonuses?
 locClass.addLoc("preDef", "Predefined Difficulties")
 locClass.addLoc("years", "year(s)")
 locClass.addLoc("yearly", "yearly")
@@ -164,13 +164,13 @@ locClass.append("custom_difficulty_crisis_colored.name","§R@crisis @strength")
 locClass.append("custom_difficulty_customize_colored.name","§Y@difficulty @customization")
 locClass.append("custom_difficulty_customize.name","§Y@difficulty @customization")
 locClass.addEntry("custom_difficulty_choose", "@choosePreDef.§R @delWarn§! @combineText")
-locClass.addEntry("custom_difficulty_easy.name", "@easy - 20% @bonus @allCat @forPlayer")
-locClass.addEntry("custom_difficulty_ensign.name", "@ensign - @no @bonus @forAI. 33% @forNPCs")
-locClass.addEntry("custom_difficulty_captain.name", "@captain - 15-25% @bonus @forAI. 50% @forNPCs")
-locClass.addEntry("custom_difficulty_commodore.name", "@commodore - 30-50% @bonus @forAI. 66% @forNPCs")
-locClass.addEntry("custom_difficulty_admiral.name", "@admiral - 45-75% @bonus @forAI. 75% @forNPCs")
-locClass.addEntry("custom_difficulty_grand_admiral.name", "@grandAdmiral - 60-100% @bonus @forAI. 100% @forNPCs")
-locClass.addEntry("custom_difficulty_scaling.name", "@scaling - @increase @bonus @forAI @every 4 @years")
+locClass.addEntry("custom_difficulty_easy.name", "§G@easy - 20% @bonus @allCat @forPlayer")
+locClass.addEntry("custom_difficulty_ensign.name", "§B@ensign - @no @bonus @forAI. 33% @forNPCs")
+locClass.addEntry("custom_difficulty_captain.name", "§B@captain - 15-25% @bonus @forAI. 50% @forNPCs")
+locClass.addEntry("custom_difficulty_commodore.name", "§B@commodore - 30-50% @bonus @forAI. 66% @forNPCs")
+locClass.addEntry("custom_difficulty_admiral.name", "§B@admiral - 45-75% @bonus @forAI. 75% @forNPCs")
+locClass.addEntry("custom_difficulty_grand_admiral.name", "§B@grandAdmiral - 60-100% @bonus @forAI. 100% @forNPCs")
+locClass.addEntry("custom_difficulty_scaling.name", "§H@scaling - @increase @bonus @forAI @every 4 @years")
 locClass.addEntry("custom_difficulty_advanced_configuration.name", "@advCust @nonPlayer")
 locClass.addEntry("custom_difficulty_advanced_configuration_player.name", "@advCust @player")
 locClass.addEntry("custom_difficulty_advanced_configuration_yearly.name", "@advCust @yearly")
@@ -890,6 +890,8 @@ optionWithInverse["activate_custom_mode"]=["activate_simple_mode"]
 optionWithInverse["activate_simple_mode"]=["activate_custom_mode"]
 optionWithInverse["activate_player_vassal_ai_boni"]=["deactivate_player_vassal_ai_boni"]
 optionWithInverse["deactivate_player_vassal_ai_boni"]=["activate_player_vassal_ai_boni"]
+optionWithInverse["activate_delay_mode"]=["deactivate_delay_mode"]
+optionWithInverse["deactivate_delay_mode"]=["activate_delay_mode"]
 # optionWithInverse[]=[]
 
 #todo: move to top to be translated
@@ -902,8 +904,10 @@ locClass.addLoc("activate_custom_mode"+"Desc", "Specific choice of bonuses to be
 locClass.addLoc("activate_simple_mode"+"Desc", "Only bonus groups and default difficulties can be chosen. Slightly improved performance.")
 locClass.addLoc("activate_player_vassal_ai_boni"+"Desc", "Player vassals will get the same bonuses as other AI empires")
 locClass.addLoc("deactivate_player_vassal_ai_boni"+"Desc", "Vanilla behavior of player vassals not getting AI bonuses. They will get player bonuses though if any such have been activated.")
-# locClass.addLoc("custom_difficulty_"+"activate_custom_mode"+".name", "")
-# locClass.addLoc("custom_difficulty_"+"activate_custom_mode"+".desc", "")
+locClass.addLoc("activate_delay_mode", "Activate Delay Mode")
+locClass.addLoc("activate_delay_mode"+"Desc", "Update events will happen with a random delay of 1-181 days after the menu is closed or a year ends.")
+locClass.addLoc("deactivate_delay_mode", "Deactivate Delay Mode")
+locClass.addLoc("deactivate_delay_mode"+"Desc", "Update events happen direclty after the menu is closed and at the start of each year.")
 for key, inverses in optionWithInverse.items():
   seperateDesc=False
   locClass.append("custom_difficulty_"+key+".desc", "@"+key+"Desc")
