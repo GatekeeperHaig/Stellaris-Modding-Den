@@ -263,6 +263,24 @@ planet_event = {
 	id = ex_ai_building_events.3
 	hide_window = yes
 	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			owner = {
+				NOR = {
+					has_modifier = energy_deficit
+					has_modifier = mineral_deficit
+				}
+			}	
+			AND = {
+				owner = {
+					is_synth_empire = no 
+					is_machine_empire = no
+				}
+				NOT = { has_modifier = starvation }
+			}	
+		}
+	}	
 	
 	immediate = {
 		if = { #military buildings
@@ -272,49 +290,134 @@ planet_event = {
 					has_planet_flag = fortify_planet
 					AND = {
 						owner = { is_at_war = no }
-						count_tile = {
-							limit = {
-								OR = {
-									has_building = building_stronghold
-									has_building = building_fortress
-								}
-							}
-							count > 2
-						}	
+						OR = {
+							AND = {
+								is_capital = no
+								count_tile = {
+									limit = {
+										OR = {
+											has_building = building_stronghold
+											has_building = building_fortress
+											has_building = building_military_academy
+											has_building = building_war_factory							
+											has_building = building_planetary_shield_generator
+										}
+									}
+									count > 2
+								}	
+							}	
+							AND = {
+								is_capital = no
+								count_tile = {
+									limit = {
+										OR = {
+											has_building = building_stronghold
+											has_building = building_fortress
+											has_building = building_military_academy
+											has_building = building_war_factory							
+											has_building = building_planetary_shield_generator
+										}
+									}
+									count > 3
+								}	
+							}							
+						}		
 					}	
 				}
 				OR = {
 					unrest > 50
-					any_country = {
-						is_at_war_with = root.owner
-						any_owned_planet = {
-							is_colony = yes
-							distance = { source = root min_distance = 70 max_distance = 100 }
-						}
-					}	
 					AND = {
+						owner = { is_at_war = yes }
 						OR = {
-							has_capital_1 = yes
-							has_capital_2 = yes
-						}	
-						NOR = {
-							has_building = building_stronghold
-							has_building = building_fortress	
+							AND = {
+								any_country = {
+									is_at_war_with = root.owner
+									any_owned_planet = {
+										is_colony = yes
+										distance = { source = root min_distance = 70 max_distance = 100 }
+									}
+								}	
+								NOT = {
+									count_tile = {
+										limit = {
+											OR = {
+												has_building = building_stronghold
+												has_building = building_fortress
+												has_building = building_military_academy
+												has_building = building_war_factory							
+												has_building = building_planetary_shield_generator
+											}
+										}
+										count > 4
+									}	
+								}	
+							}								
+							AND = {							
+								sector_controlled = yes
+								OR = {
+									has_capital_1 = yes
+									has_capital_2 = yes
+								}	
+								count_tile = {
+									limit = {
+										OR = {
+											has_building = building_stronghold
+											has_building = building_fortress
+										}
+									}
+									count < 1								
+								}	
+							}	
+							AND = {							
+								sector_controlled = no
+								has_capital_1 = yes
+								count_tile = {
+									limit = {
+										OR = {
+											has_building = building_stronghold
+											has_building = building_fortress
+											has_building = building_military_academy
+											has_building = building_war_factory							
+											has_building = building_planetary_shield_generator
+										}
+									}
+									count < 1								
+								}	
+							}	
+							AND = {							
+								sector_controlled = no
+								has_capital_2 = yes
+								count_tile = {
+									limit = {
+										OR = {
+											has_building = building_stronghold
+											has_building = building_fortress
+											has_building = building_military_academy
+											has_building = building_war_factory							
+											has_building = building_planetary_shield_generator
+										}
+									}
+									count < 2								
+								}	
+							}																	
+							AND = {
+								is_capital = yes
+								count_tile = {
+									limit = {
+										OR = {
+											has_building = building_stronghold
+											has_building = building_fortress
+											has_building = building_military_academy
+											has_building = building_war_factory							
+											has_building = building_planetary_shield_generator
+										}
+									}
+									count < 3
+								}	
+							}								
 						}
 					}	
-					AND = {
-						has_capital_3 = yes
-						count_tile = {
-							limit = {
-								OR = {
-									has_building = building_stronghold
-									has_building = building_fortress
-								}
-							}
-							count < 2
-						}	
-					}								
-				}
+				}	
 			}
 			set_timed_planet_flag = { flag = fortify_planet days = 180 }
 		}
@@ -379,12 +482,27 @@ planet_event = {
 								has_slavery_type = { country = owner type = slavery_normal }
 							}	
 						}
-						count > 2
+						count > 3
 					}	
 					unrest > 30
 				}	
 			}	
 			set_timed_planet_flag = { flag = build_slave_processing days = 180 }
-		}								
+		}			
+		if = {
+			limit = {
+				NOT = { has_planet_flag = build_neuro_electric_amplifier }
+				owner = {
+					has_authority = auth_machine_intelligence
+					has_government = gov_machine_assimilator
+					has_swapped_tradition = tr_synchronicity_cyber_comms
+				}
+				count_pops = {
+					limit = { has_trait = trait_cybernetic }
+					count > 3
+				}			
+			}	
+			set_planet_flag = build_neuro_electric_amplifier
+		}			
 	}					
 }
