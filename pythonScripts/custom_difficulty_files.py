@@ -42,7 +42,19 @@ catCountryType=[
 catNotCountryType=[[], [],[],[],[],[],[],catCountryType]
 catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel","GFX_evt_towel","GFX_evt_towel","GFX_evt_towel"]
 
-difficulties=["easy", "ensign","captain","commodore","admiral", "grand_admiral", "scaling"]
+difficulties=["easy", "no_player_bonus", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
+vanillaDefaultDifficultyNames=difficulties[2:]
+ai_non_scaling_DifficultyNames=difficulties[2:-2]
+
+vanillaDefaultDifficulty=[]
+# possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep", "Any Pop growth speed"]
+aiDefault=[True, True, True, True, True, False, True, False, False, False, False, False, False]
+aiDefaultPrecise=[2, 2, 2, 1, 1, 0, 1, 0,0,0,0,0,0]
+npcDefault=[False,False,False,False,False,False,False, True, True, True, True, False, False]
+catsWithNPCDefaultBoni=["fe","leviathan","marauders", "other"]
+vanillaAItoNPCIndex=7
+
+
 
 
 # doTranslation=True
@@ -397,80 +409,113 @@ for cat, eventFileCont in zip(cats, difficultyChangeWindows):
 
 
 
-defaultEventTemplate=TagList()
-defaultEventTemplate.add("id")
-defaultEventTemplate.add("is_triggered_only",yes)
-defaultEventTemplate.add("hide_window",yes)
-immediate=TagList()
-defaultEventTemplate.add("immediate",immediate)
-
 defaultEvents=TagList()
 defaultEvents.add("namespace", "custom_difficulty")
-eventIndex=id_defaultEvents
+# eventIndex=id_defaultEvents
 defaultEvents.add("","","#Events from {} blocked up to {}".format(id_defaultEvents,id_defaultEvents+99))
 
 
-vanillaDefault=[]
-# possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep", "Any Pop growth speed"]
-scaleDefault=[True, True, True, True, True, False, True, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
-vanillaAItoNPCIndex=7
+class PreDefinedDifficulty:
+  def __init__(self):
+    self.dict=dict()
 
-#BIG TODO : THIS needs updating to new cats!
-vanillaDefault.append([0,0,0,0,0,0,0,33,33,33,33,0,0])
-vanillaDefault.append([25,25,25,15,15,0,15,50,50,50,50,0,0])
-vanillaDefault.append([50,50,50,30,30,0,30,66,66,66,66,0,0])
-vanillaDefault.append([75,75,75,45,45,0,45,75,75,75,75,0,0])
-vanillaDefault.append([100,100,100,60,60,0,60,100,100,100,100,0,0])
-vanillaDefault.append([0,0,0,0,0,0,0,33,33,33,33,0,0])
-vanillaDefaultNames=difficulties[1:]
+condVal = lambda x,y: x if y else 0
+condValPrec = lambda x1,x2,y: x1 if y==1 else (x2 if y==2  else 0)
+difficultiesPresetProperties=dict()
+for difficulty in difficulties:
+  difficultiesPresetProperties[difficulty]=dict()
+difficultiesPresetProperties["easy"]["player"]=[20 for b in possibleBoniNames]
+difficultiesPresetProperties["no_player_bonus"]["player"]=[0 for b in possibleBoniNames]
+difficultiesPresetProperties["scaling"]["ai_yearly"]=[condVal(4,s) for s in aiDefault]
+difficultiesPresetProperties["no_scaling"]["ai_yearly"]=[0 for b in possibleBoniNames]
+
+diffLevels=dict() 
+diffLevels["ensign"]=[33, 0,0 ] # npc, high ai, low ai
+diffLevels["captain"]=[50, 25,15 ]
+diffLevels["commodore"]=[66, 50,30 ]
+diffLevels["admiral"]=[75, 75,45 ]
+diffLevels["grand_admiral"]=[100, 100,60 ]
+for diff, level in diffLevels.items():
+  difficultiesPresetProperties[diff]["ai"]=[condValPrec(level[2], level[1],b) for b in aiDefaultPrecise]
+  for cat in catsWithNPCDefaultBoni:
+    difficultiesPresetProperties[diff][cat]=[condVal(level[0],s) for b in npcDefault]
+
+#TODO CRISIS DEFAULTS
+
+
+playerFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_player")
+scalingFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_scaling")
+otherFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_other")
+# for difficulty in ai_non_scaling_DifficultyNames:
+#   otherFlags.add("remove_global_flag", "custom_difficulty_{}".format(difficulty))
+
+for difficultyIndex, difficulty in enumerate(difficulties):
+  defaultDifficultyEvent=TagList("id", CuDi.format(id_defaultEvents+difficultyIndex))
+  defaultEvents.add("country_event",defaultDifficultyEvent)
+  defaultDifficultyEvent.add("is_triggered_only",yes)
+  defaultDifficultyEvent.add("hide_window",yes)
+  immediate=TagList()
+  defaultDifficultyEvent.add("immediate",immediate)
+  if "scaling" in difficulty:
+    immediate.add("country_event",TagList().add("id",name_resetYearlyFlagsEvent))
+    scalingFlags.add("remove_global_flag","custom_difficulty_"+difficulty)
+  elif "player" in difficulty or "easy" in difficulty:
+    immediate.add("country_event",TagList().add("id",name_resetPlayerFlagsEvent))
+    playerFlags.add("remove_global_flag","custom_difficulty_"+difficulty)
+  else:
+    immediate.add("country_event",TagList().add("id",name_resetAIFlagsEvent))
+    otherFlags.add("remove_global_flag","custom_difficulty_"+difficulty)
+  immediate.add("set_global_flag","custom_difficulty_"+difficulty)
+  et=TagList()
+  immediate.add(ET,et)
+  for cat, values in difficultiesPresetProperties[difficulty].items():
+    for i, value in enumerate(values):
+      et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,possibleBoniNames[i])).add("value", str(value)))
+
 
 
 #easy
-newEvent=deepcopy(defaultEventTemplate)
-eventIndex+=1
-defaultEvents.add("country_event", newEvent)
-newEvent.replace("id",CuDi.format(eventIndex))
-immediate=newEvent.get("immediate")
-immediate.add("country_event",TagList().add("id",name_resetPlayerFlagsEvent))
-immediate.add("set_global_flag","custom_difficulty_easy")
-et=TagList()
-immediate.add(ET,et)
-for cat in cats:
-  for bonus in possibleBoniNames:
-    if cat=="player":
-      et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "20"))
-    # else:
-    #   immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "0"))
 
-# defaultIndex=-1
-for name, values in zip(vanillaDefaultNames, vanillaDefault):
-  # defaultIndex+=1
-  newEvent=deepcopy(defaultEventTemplate)
-  eventIndex+=1
-  defaultEvents.add("country_event", newEvent)
-  newEvent.replace("id",CuDi.format(eventIndex))
-  immediate=newEvent.get("immediate")
-  if "scaling"==name:
-    immediate.add("country_event",TagList().add("id",name_resetYearlyFlagsEvent))
-  else:
-    immediate.add("country_event",TagList().add("id",name_resetAIFlagsEvent))
-  immediate.add("set_global_flag","custom_difficulty_"+name)
-  et=TagList()
-  immediate.add(ET,et)
-  for cat in cats:
-    for i,bonus in enumerate(possibleBoniNames):
-      if cat=="ai" and i<vanillaAItoNPCIndex:
-        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(values[i])))
-      elif cat=="leviathan" and i>=vanillaAItoNPCIndex:
-        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(values[i])))
-      elif cat=="fe" and i>=vanillaAItoNPCIndex:
-        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(values[i])))
-      # elif "yearly" in cat and (not name=="scaling" or not scaleDefault[i]):
-      #   et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "0"))
-      elif "yearly" in cat and name=="scaling" and scaleDefault[i]:
-        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "4"))
-      elif cat!="player":
-        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "0"))
+
+
+# et=TagList()
+# immediate.add(ET,et)
+# for cat in cats:
+#   for bonus in possibleBoniNames:
+#     if cat=="player":
+#       et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "20"))
+#     # else:
+#     #   immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "0"))
+
+# # defaultIndex=-1
+# for name, values in zip(vanillaDefaultDifficultyNames, vanillaDefaultDifficulty):
+#   # defaultIndex+=1
+#   newEvent=deepcopy(defaultEventTemplate)
+#   eventIndex+=1
+#   defaultEvents.add("country_event", newEvent)
+#   newEvent.replace("id",CuDi.format(eventIndex))
+#   immediate=newEvent.get("immediate")
+#   if "scaling"==name:
+#     immediate.add("country_event",TagList().add("id",name_resetYearlyFlagsEvent))
+#   else:
+#     immediate.add("country_event",TagList().add("id",name_resetAIFlagsEvent))
+#   immediate.add("set_global_flag","custom_difficulty_"+name)
+#   et=TagList()
+#   immediate.add(ET,et)
+#   for cat in cats:
+#     for i,bonus in enumerate(possibleBoniNames):
+#       if cat=="ai" and i<vanillaAItoNPCIndex:
+#         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(values[i])))
+#       elif cat=="leviathan" and i>=vanillaAItoNPCIndex:
+#         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(values[i])))
+#       elif cat=="fe" and i>=vanillaAItoNPCIndex:
+#         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(values[i])))
+#       # elif "yearly" in cat and (not name=="scaling" or not scaleDefault[i]):
+#       #   et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "0"))
+#       elif "yearly" in cat and name=="scaling" and scaleDefault[i]:
+#         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "4"))
+#       elif cat!="player":
+#         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "0"))
 
 with open(outFolder+"/"+"custom_difficulty_defaults.txt",'w') as file:
   defaultEvents.writeAll(file, args())
@@ -779,8 +824,8 @@ trigger.add("fail_text", TagList("text", "custom_difficulty_choose").add("has_gl
 for i,difficulty in enumerate(difficulties):
   option=TagList("name","custom_difficulty_{}.name".format(difficulty))
   defaultMenuEvent.add("option", option)
-  option.add("trigger", t_notLockedTrigger)
-  option.add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_defaultEvents+i+1))).add("country_event", TagList("id", name_defaultMenuEvent)))
+  option.add("trigger", deepcopy(t_notLockedTrigger).add("not",TagList("has_global_flag", "custom_difficulty_{}".format(difficulty))))
+  option.add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_defaultEvents+i))).add("country_event", TagList("id", name_defaultMenuEvent)))
 defaultMenuEvent.add("option", TagList("name", "custom_difficulty_reset.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id", name_resetConfirmationEvent))))
 defaultMenuEvent.add("option", t_backMainOption)
 defaultMenuEvent.add("option", t_closeOption)
@@ -796,15 +841,17 @@ immediate=TagList()
 gameStartInitEvent.add("immediate",immediate)
 immediate.add("set_global_flag", "custom_difficulty_active")
 immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
-for i, difficulty in enumerate(difficulties[1:]):
-  if i==5:
+for i, difficulty in enumerate(difficulties):
+  if difficulty=="scaling":
     k=1 #scaling with stupid place in between ensign and captain
-  elif i>0:
-    k=i+1
+  elif difficulty=="ensign":
+    k=0
+  elif difficulty in vanillaDefaultDifficultyNames:
+    k=vanillaDefaultDifficultyNames.index(difficulty)+1
   else:
-    k=i
+    continue #those cannot be preset in game creation
   immediate.add("","","#"+difficulty)
-  immediate.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", CuDi.format(id_defaultEvents+i+2))))
+  immediate.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", CuDi.format(id_defaultEvents+i))))
   immediate.add("country_event", TagList("id", name_rootUpdateEvent))
 
 
@@ -842,11 +889,11 @@ flagResetEvent=TagList("id", name_resetFlagsEvent)
 flagResetEvent.add("is_triggered_only",yes)
 flagResetEvent.add("hide_window",yes)
 
-playerFlags=TagList("remove_global_flag", "custom_difficulty_easy").add("remove_global_flag", "custom_difficulty_advanced_configuration_player")
-scalingFlags=TagList("remove_global_flag", "custom_difficulty_scaling").add("remove_global_flag", "custom_difficulty_advanced_configuration_scaling")
-otherFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_other")
-for difficulty in difficulties[1:-1]:
-  otherFlags.add("remove_global_flag", "custom_difficulty_{}".format(difficulty))
+# playerFlags=TagList("remove_global_flag", "custom_difficulty_easy").add("remove_global_flag", "custom_difficulty_advanced_configuration_player")
+# scalingFlags=TagList("remove_global_flag", "custom_difficulty_scaling").add("remove_global_flag", "custom_difficulty_advanced_configuration_scaling")
+# otherFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_other")
+# for difficulty in ai_non_scaling_DifficultyNames:
+#   otherFlags.add("remove_global_flag", "custom_difficulty_{}".format(difficulty))
 
 playerFlagResetEvent=deepcopy(flagResetEvent)
 scalingFlagResetEvent=deepcopy(flagResetEvent)
