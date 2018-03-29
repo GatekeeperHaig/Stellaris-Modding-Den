@@ -264,28 +264,17 @@ planet_event = {
 	hide_window = yes
 	is_triggered_only = yes
 
-	trigger = {
-		OR = {
-			owner = {
-				NOR = {
-					has_modifier = energy_deficit
-					has_modifier = mineral_deficit
-				}
-			}	
-			AND = {
-				owner = {
-					is_synth_empire = no 
-					is_machine_empire = no
-				}
-				NOT = { has_modifier = starvation }
-			}	
+	trigger = { 
+		owner = { 
+			minerals > 1000
+			has_monthly_income = { resource = energy value > 50 }
 		}
-	}	
+	}		
 	
 	immediate = {
 		if = { #military buildings
 			limit = { 
-				years_passed > 25
+				years_passed > 25				
 				NOR = { 
 					has_planet_flag = fortify_planet
 					AND = {
@@ -298,8 +287,6 @@ planet_event = {
 										OR = {
 											has_building = building_stronghold
 											has_building = building_fortress
-											has_building = building_military_academy
-											has_building = building_war_factory							
 											has_building = building_planetary_shield_generator
 										}
 									}
@@ -312,9 +299,7 @@ planet_event = {
 									limit = {
 										OR = {
 											has_building = building_stronghold
-											has_building = building_fortress
-											has_building = building_military_academy
-											has_building = building_war_factory							
+											has_building = building_fortress						
 											has_building = building_planetary_shield_generator
 										}
 									}
@@ -325,7 +310,13 @@ planet_event = {
 					}	
 				}
 				OR = {
-					unrest > 50
+					AND = {
+						unrest > 40
+						OR = {
+							NOT = { any_owned_pop = { is_enslaved = yes } }
+							has_building = building_slave_processing
+						}
+					}	
 					AND = {
 						owner = { is_at_war = yes }
 						OR = {
@@ -343,9 +334,6 @@ planet_event = {
 											OR = {
 												has_building = building_stronghold
 												has_building = building_fortress
-												has_building = building_military_academy
-												has_building = building_war_factory							
-												has_building = building_planetary_shield_generator
 											}
 										}
 										count > 4
@@ -376,9 +364,6 @@ planet_event = {
 										OR = {
 											has_building = building_stronghold
 											has_building = building_fortress
-											has_building = building_military_academy
-											has_building = building_war_factory							
-											has_building = building_planetary_shield_generator
 										}
 									}
 									count < 1								
@@ -392,9 +377,6 @@ planet_event = {
 										OR = {
 											has_building = building_stronghold
 											has_building = building_fortress
-											has_building = building_military_academy
-											has_building = building_war_factory							
-											has_building = building_planetary_shield_generator
 										}
 									}
 									count < 2								
@@ -407,9 +389,6 @@ planet_event = {
 										OR = {
 											has_building = building_stronghold
 											has_building = building_fortress
-											has_building = building_military_academy
-											has_building = building_war_factory							
-											has_building = building_planetary_shield_generator
 										}
 									}
 									count < 3
@@ -420,22 +399,177 @@ planet_event = {
 				}	
 			}
 			set_timed_planet_flag = { flag = fortify_planet days = 180 }
-		}
+		}			
+		if = { #planetary shield generator
+			limit = {
+				NOR = { 
+					has_planet_flag = build_planetary_shield_generator
+					has_building = building_planetary_shield_generator					
+				}
+				owner = { 
+					has_technology = "tech_planetary_shield_generator"
+					is_subject = no
+				}			
+				any_country = { 
+					OR = {
+						is_hostile_to = owner
+						is_angry_to = owner
+						is_domineering_to = owner
+						is_rival = owner
+						is_at_war_with = owner
+					} 
+				}											
+				OR = {
+					AND = {
+						is_capital = yes
+						count_tile = {
+							limit = {
+								OR = {
+									has_building = building_stronghold
+									has_building = building_fortress
+								}
+							}
+							count > 2
+						}
+					}	
+					AND = {
+						is_capital = no
+						sector_controlled = no
+						count_tile = {
+							limit = {
+								OR = {
+									has_building = building_stronghold
+									has_building = building_fortress
+								}
+							}
+							count > 1
+						}						
+					}	
+				}
+			}
+			if = {
+				limit = { has_planet_flag = fortify_planet }
+				remove_planet_flag = fortify_planet
+			}
+			set_timed_planet_flag = { flag = build_planetary_shield_generator days = 180 }	
+		}				
+		if = { #military academy
+			limit = {			
+				owner = {
+					has_technology = "tech_centralized_command"
+					if = {
+						limit = { overhauled_building_content_enabled = no }
+						is_machine_empire = no
+					}	
+					if = {
+						limit = { overhauled_building_content_enabled = yes }
+						is_gestalt_consciousness = no
+					}	
+					NOT = {
+						any_owned_planet = {
+							NOT = { is_same_value = from }
+							has_building = building_military_academy			
+						}	
+					}
+				}	
+				sector_controlled = no
+				NOR = {
+					has_planet_flag = fortify_planet
+					has_planet_flag = build_planetary_shield_generator
+					has_planet_flag = build_military_academy
+					has_building = building_military_academy
+				}	
+				any_owned_pop = { 
+					is_warrior_pop = yes
+					OR = {
+						has_military_service_type = { type = military_service_full country = owner }
+						has_military_service_type = { type = military_service_limited country = owner }
+					}				
+					OR = { 
+						is_enslaved = no
+						AND = {
+							is_enslaved = yes
+							prev = { has_building = building_slave_processing }
+						}
+					}	
+				}
+			}
+			set_timed_planet_flag = { flag = build_military_academy days = 180 }	
+		}		
+		if = { #cloning vats
+			limit = {			
+				sector_controlled = no
+				NOR = {
+					has_planet_flag = fortify_planet
+					has_planet_flag = build_planetary_shield_generator
+					has_planet_flag = build_military_academy
+					has_planet_flag = build_clone_vats
+					has_building = building_clone_vats
+				}				
+				owner = {
+					is_machine_empire = no
+					is_synth_empire = no
+					has_technology = "tech_gene_banks"
+					OR = {
+						NOT = { any_owned_planet = { has_building = building_military_academy }	}
+						has_building = building_military_academy			
+					}	
+				}	
+				any_owned_pop = { 
+					is_robot_pop = no
+					is_warrior_pop = yes
+					OR = {
+						has_military_service_type = { type = military_service_full country = owner }
+						has_military_service_type = { type = military_service_limited country = owner }
+					}				
+				}
+			}
+			set_timed_planet_flag = { flag = build_clone_vats days = 180 }	
+		}			
+		if = { #war factory
+			limit = { 
+				overhauled_building_content_enabled = yes
+				owner_is_machine_empire = yes
+				sector_controlled = no
+				NOR = {
+					has_planet_flag = fortify_planet
+					has_planet_flag = build_planetary_shield_generator
+					has_planet_flag = build_war_factory					
+					has_building = building_war_factory
+				}						
+				count_pops = {
+					limit = { 
+						is_colony_pop = yes
+						OR = {
+							is_robot_pop = yes
+							AND = { 
+								owner = { is_assimilator = yes }
+								has_trait = trait_cybernetic
+							}
+						}
+					}
+					count > 9
+				}
+			}	
+			set_timed_planet_flag = { flag = build_war_factory days = 180 }
+		}				
 		if = { #pop growth buildings
 			limit = { 
-				NOT = { has_planet_flag = build_pop_growth_building }
+				NOR = { 
+					has_planet_flag = fortify_planet
+					has_planet_flag = build_planetary_shield_generator
+					has_planet_flag = build_pop_growth_building
+					has_building = building_clinic
+					has_building = building_hospital							
+					has_building = building_spare_parts_depot
+					has_building = building_unit_assembly_plant						
+				}
 				owner = {
 					OR = { 
 						has_technology = "tech_frontier_health"
 						has_technology = "tech_frontier_hospital"
 					}
 				}
-				NOR = { 
-					has_building = building_clinic
-					has_building = building_hospital							
-					has_building = building_spare_parts_depot
-					has_building = building_unit_assembly_plant							
-				}	
 				free_pop_tiles > 2
 				OR = {
 					any_owned_pop = {
@@ -458,7 +592,10 @@ planet_event = {
 		}
 		if = {
 			limit = {
-				NOT = { has_planet_flag = build_slave_processing }
+				NOR = { 
+					has_planet_flag = build_slave_processing
+					has_building = building_slave_processing
+				}
 				owner = { 
 					has_technology = "tech_neural_implants"
 					OR = {
@@ -491,7 +628,10 @@ planet_event = {
 		}			
 		if = {
 			limit = {
-				NOT = { has_planet_flag = build_neuro_electric_amplifier }
+				NOR = { 
+					has_planet_flag = build_neuro_electric_amplifier
+					has_building = building_neuro_electric_amplifier
+				}
 				owner = {
 					has_authority = auth_machine_intelligence
 					has_government = gov_machine_assimilator
