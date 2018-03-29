@@ -755,6 +755,8 @@ for i,cat in enumerate(cats):
   if cat=="crisis":
     hidden_effect.add("add_global_flag","custom_difficulty_menu_crisis_from_custom")
   customMenu.add("option", TagList("name","custom_difficulty_{}.name".format(cat)).add("hidden_effect", hidden_effect))
+customMenu.add("optionIndex", t_backMainOption)
+customMenu.add("optionIndex", t_closeOption)
 
 mainFileContent.add("","","#default menu")
 defaultMenuEvent=TagList("id", name_defaultMenuEvent)
