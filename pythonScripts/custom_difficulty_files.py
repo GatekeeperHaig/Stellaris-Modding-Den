@@ -726,7 +726,7 @@ for allowUnlock in [False]:#[False,True]:
   trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("has_global_flag", "custom_difficulty_locked"))
   trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("has_global_flag", "custom_difficulty_locked"))
   mainMenu.add("option", TagList("name","custom_difficulty_predefined_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
-  mainMenu.add("option", TagList("name","custom_difficulty_crisis_colored.name").add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+(cats.index("crisis")+1)*1000))).add("remove_global_flag","custom_difficulty_menu_crisis_from_custom")))
+  mainMenu.add("option", TagList("name","custom_difficulty_crisis_colored.name").add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+cats.index("crisis")*id_ChangeEvents))).add("remove_global_flag","custom_difficulty_menu_crisis_from_custom")))
   mainMenu.add("option", TagList("name","custom_difficulty_customize_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_customMenuEvent))))
   mainMenu.add("option", TagList("name","custom_difficulty_options.name").add("hidden_effect", TagList("country_event", TagList("id", name_optionsEvent))))
   # mainMenu.add("option", TagList("name","custom_difficulty_lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
@@ -741,6 +741,7 @@ for allowUnlock in [False]:#[False,True]:
   #   outputToFolderAndFile(mainFileUnlock, "events", "!_custom_difficulty_unlock.txt", 1, "../gratak_mods/custom_difficulty_unlock/")
 
 customMenu=TagList()
+mainFileContent.addComment("custom Menu")
 mainFileContent.add("country_event",customMenu)
 customMenu.add("id", name_customMenuEvent)
 customMenu.add("is_triggered_only", yes)
@@ -751,12 +752,12 @@ customMenu.add("desc", TagList("trigger", trigger))
 trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("has_global_flag", "custom_difficulty_locked"))
 trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("has_global_flag", "custom_difficulty_locked"))
 for i,cat in enumerate(cats):
-  hidden_effect=TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+i*1000)))
+  hidden_effect=TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+i*id_ChangeEvents)))
   if cat=="crisis":
     hidden_effect.add("add_global_flag","custom_difficulty_menu_crisis_from_custom")
   customMenu.add("option", TagList("name","custom_difficulty_{}.name".format(cat)).add("hidden_effect", hidden_effect))
-customMenu.add("optionIndex", t_backMainOption)
-customMenu.add("optionIndex", t_closeOption)
+customMenu.add("option", t_backMainOption)
+customMenu.add("option", t_closeOption)
 
 mainFileContent.add("","","#default menu")
 defaultMenuEvent=TagList("id", name_defaultMenuEvent)
