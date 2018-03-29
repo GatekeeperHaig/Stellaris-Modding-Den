@@ -117,7 +117,7 @@ locClass.addLoc("unlock", "Unlock Settings")
 locClass.addLoc("choose", "Choose category to change or show")
 locClass.addLoc("choosePreDef", "Choose predefined setting")
 locClass.addLoc("delWarn", "Deletes previously made settings!")
-locClass.addLoc("combineText", "Easy and vanilla can be combined. Easy does not overwrite non-player bonuses and Vanilla does not overwrite player bonuses.")
+locClass.addLoc("combineText", "Easy and vanilla can be combined. Easy does not overwrite non-player bonuses and Vanilla does not overwrite player bonuses.") #TODO. Probably mark the buttons accordingly! Also add remove player bonuses and remove scaling bonuses?
 locClass.addLoc("preDef", "Predefined Difficulties")
 locClass.addLoc("years", "year(s)")
 locClass.addLoc("yearly", "yearly")
@@ -450,7 +450,7 @@ for name, values in zip(vanillaDefaultNames, vanillaDefault):
   defaultEvents.add("country_event", newEvent)
   newEvent.replace("id",CuDi.format(eventIndex))
   immediate=newEvent.get("immediate")
-  if "yearly" in cat:
+  if "scaling"==name:
     immediate.add("country_event",TagList().add("id",name_resetYearlyFlagsEvent))
   else:
     immediate.add("country_event",TagList().add("id",name_resetAIFlagsEvent))
@@ -833,7 +833,7 @@ lockEvent.add("title", "custom_difficulty_lock.name")
 lockEvent.add("desc", "custom_difficulty_lock.desc")
 lockEvent.add("picture", "GFX_evt_towel")
 lockEvent.add("option", TagList("name","OK").add("hidden_effect", TagList("set_global_flag", "custom_difficulty_locked").add("country_event", t_rootUpdateEvent)))
-lockEvent.add("option", TagList("name","custom_difficulty_cancel").add("hidden_effect", TagList("country_event", t_mainMenuEvent)))
+lockEvent.add("option", TagList("name","custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_optionsEvent))))
 
 flagResetEvent=TagList("id", name_resetFlagsEvent)
 flagResetEvent.add("is_triggered_only",yes)
