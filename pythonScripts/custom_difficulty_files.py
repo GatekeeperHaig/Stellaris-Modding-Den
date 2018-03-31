@@ -73,10 +73,7 @@ doTranslation=False
 locClass=LocList(doTranslation)
 locClass.addLoc("modName", "Dynamic Difficulty", "all")
 
-#BIG TODO Add update flags! Only update when needed!
 #BIG TODO Implement the options!
-#BIG TODO I don't think "times 10" modifiers are removed so far before update. Update events have to be reworked first though!
-# TODO: Make sure changing cat is recognized and old modifiers deleted
 # todo: init flags for scaling and easy
 # loc for not easy and not scaling
 # second scaling?
@@ -585,14 +582,15 @@ for catI,cat in enumerate(cats):
       norTagList.add("is_country_type", entry)
   if "player"==cat or "ai" in cat:
     orTagList=TagList()
-    limit.add("or",orTagList)
     if cat=="player":
       orTagList.add("is_ai", "no")
-      orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","no")))
+      orTagList.add("and", TagList().add("has_global_flag", "deactivate_player_vassal_ai_boni").add("exists","overlord").add("overlord",TagList().add("is_ai","no")))
     else:
-      orTagList.add("is_ai", yes)
+      limit.add("is_ai", yes)
+      orTagList.add("has_global_flag", "activate_player_vassal_ai_boni")
+      orTagList.add("not", TagList().add("exists","overlord"))
       orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","yes")))
-
+    limit.add("or",orTagList)
   # afterIfTaglist=deepcopy(ifTagList)
   # after.add("if",afterIfTaglist)
   shortened=False
@@ -638,20 +636,17 @@ for catI,cat in enumerate(cats):
         ifModifierApplied=TagList()
         if sign>0:
           addIFChanged.insert(addIFChanged.names.index("if"),"if", ifModifierApplied)
-          # addIFChanged.insert(2,"set_variable",TagList("which", "custom_difficulty_tmp").add("value","custom_difficulty_{}_value".format(bonus)))
         else:
-          # addIFChanged.add("set_variable",TagList("which", "custom_difficulty_tmp").add("value","custom_difficulty_{}_value".format(bonus)))
           addIFChanged.add("if", ifModifierApplied)
         ifModifierApplied.add("limit",TagList().add("check_variable",
           TagList().add("which","custom_difficulty_tmp")
           .add("value", str(sign*(changeVal-0.1)),"",compSign)))
-        # ifModifierApplied.add("set_variable",TagList("which", "custom_difficulty_tmp").add("value","custom_difficulty_{}_value".format(bonus)))
         modifierName="custom_difficulty_{:02d}_{}_{}_{}_value".format(i,bonus,signName,cat)
         modifier=TagList()
         if not isinstance(bonusModifier,list):
           bonusModifier=[bonusModifier]
         for modifierEntry in bonusModifier:
-          if bonus=="Upkeep":
+          if bonus=="upkeep":
             modifier.add(modifierEntry,str(-sign*changeVal/100))
           else:
             modifier.add(modifierEntry,str(sign*changeVal/100))
@@ -664,80 +659,6 @@ for catI,cat in enumerate(cats):
         if debugMode and i==1:
           removeIFChanged.add("log",'"removing modifiers (all of them, not only 1) {}"'.format(modifierName))
         ifModifierApplied.add("change_variable",TagList().add("which","custom_difficulty_tmp").add("value", str(-1*sign*changeVal)))
-
-
-
-    # if cat=="player":
-    #   # switchTL=TagList()
-    #   # afterIfTaglist.add("switch",switchTL)
-    #   for sign in [1,-1]:
-    #     if sign==1:
-    #       compSign=">"
-    #     else:
-    #       compSign="<"
-    #     for i in reversed(range(20)):
-    #       if shortened:
-    #        if sign<0 and i>5 or i>10:
-    #         continue
-    #       ifGT=TagList()
-    #       afterIfTaglist.add("if",ifGT)
-    #       changeVal=10*(i+1)
-    #       ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(sign*(changeVal-0.1)),"",compSign)))
-    #       if sign>0:
-    #         modifierName="custom_difficulty_{}_{}_pos_player_value".format(i,bonus)
-    #       else:
-    #         modifierName="custom_difficulty_{}_{}_neg_player_value".format(i,bonus)
-    #       modifier=TagList()
-    #       if not isinstance(bonusModifier,list):
-    #         bonusModifier=[bonusModifier]
-    #       for modifierEntry in bonusModifier:
-    #         if bonus=="Upkeep":
-    #           modifier.add(modifierEntry,str(-sign*changeVal/100))
-    #         else:
-    #           modifier.add(modifierEntry,str(sign*changeVal/100))
-    #       locClass.append(modifierName,"@difficulty")
-    #       staticModifiers.add(modifierName,modifier)
-    #       ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
-    #       immediate.add("remove_modifier", modifierName)
-    #       ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(-1*sign*changeVal)))
-    #       # ifGT.add("break","yes")
-    # elif cat=="ai" or cat=="crisis":
-    #   for sign in [1,-1]:
-    #     if sign==1:
-    #       compSign=">"
-    #     else:
-    #       compSign="<"
-    #     for i in reversed(range(10)):
-    #       if shortened:
-    #        if sign<0 and i>5 or i>7:
-    #         continue
-
-    #       ifGT=TagList()
-    #       afterIfTaglist.add("if",ifGT)
-    #       changeVal=pow(2,i)
-    #       if cat=="crisis":
-    #         changeVal*=10
-    #       ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(sign*(changeVal-0.1)),"",compSign)))
-    #       if sign>0:
-    #         modifierName="custom_difficulty_{}_{}_pos_value".format(i,bonus)
-    #       else:
-    #         modifierName="custom_difficulty_{}_{}_neg_value".format(i,bonus)
-    #       if cat=="crisis":
-    #         modifierName+="_times_ten"
-    #       modifier=TagList()
-    #       if not isinstance(bonusModifier,list):
-    #         bonusModifier=[bonusModifier]
-    #       for modifierEntry in bonusModifier:
-    #         if bonus=="Upkeep":
-    #           modifier.add(modifierEntry,str(-sign*changeVal/100))
-    #         else:
-    #           modifier.add(modifierEntry,str(sign*changeVal/100))
-    #       locClass.append(modifierName,"@difficulty")
-    #       staticModifiers.add(modifierName,modifier)
-    #       ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
-    #       if cat=="ai": #only add onces as they all have the same name
-    #         immediate.add("remove_modifier", modifierName)
-    #       ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(-1*sign*changeVal)))
   for modifierCat in modifierCats:
     ifModifierCat=TagList("limit", TagList("has_country_flag","custom_difficulty_{}_modifier_active".format(modifierCat)))
     ifModifierCat.add("country_event", TagList("id", name_removeModifiers[modifierCat]))
