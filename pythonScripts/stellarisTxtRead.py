@@ -71,6 +71,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     lam_method(self.names,name)
     if isinstance(val,TagList):
       val.giveCorrectLevel(self)
+    elif not isinstance(val,str):
+      val=str(val)
     lam_method(self.vals,val)
     lam_method(self.comments,comment)
     lam_method(self.seperators,seperator)

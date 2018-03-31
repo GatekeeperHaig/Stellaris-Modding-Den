@@ -51,7 +51,8 @@ catCountryType=[
 ["dormant_marauders","ruined_marauders", "awakened_marauders","marauder_raiders"],
 []]
 catNotCountryType=[[], [],[],[],[],[],[],catCountryType]
-catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel","GFX_evt_towel","GFX_evt_towel","GFX_evt_towel"]
+catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel","GFX_evt_towel","GFX_evt_towel","GFX_evt_towel"] #todo: pictures for new cats!
+catColors="BHBBGRBB"
 
 difficulties=["easy", "no_player_bonus", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
 vanillaDefaultDifficultyNames=difficulties[2:]
@@ -73,10 +74,7 @@ doTranslation=False
 locClass=LocList(doTranslation)
 locClass.addLoc("modName", "Dynamic Difficulty", "all")
 
-#BIG TODO Implement the options!
-# todo: init flags for scaling and easy
-# loc for not easy and not scaling
-# second scaling?
+#BIG TODO simple mode
 
 #IMPORTANT
 #bonuses
@@ -163,6 +161,13 @@ locClass.addLoc("customization", "Customization")
 locClass.addLoc("strength", "Strength")
 locClass.addLoc("example", "Example")
 locClass.addLoc("values", "Values")
+locClass.addLoc("init", "Initialization")
+locClass.addLoc("initDesc", "Thanks for using Dynamic Difficulty. Start the Event Menu via 'ModMenu' or edict.")
+locClass.addLoc("crisisInit","Since it seems to be impossible to read crisis strength in a mod, you'll have to enter it here."+
+  " The option chosen during game start will not have an effect anymore."+
+  " The chosen value will be translated into a bonus according to the same formula as in vanilla and can be customized at any time.")
+locClass.addLoc("noCrisisInit","This game has crisis disabled via the game start options. Crisis options are thus also disabled in this mod. You can activate crisis only with a new game or a save-game edit.")
+locClass.addLoc("crisisStrength","Crisis Strength")
 
 
 
@@ -182,6 +187,9 @@ locClass.addEntry("custom_difficulty_locked.desc", "@lockActive @lockActiveDesc"
 locClass.addEntry("custom_difficulty_unlock.name", "@unlock")
 locClass.addEntry("edict_custom_difficulty", "@modName - @main @menu") #also used for menu title. Has to be named edict for the edict
 locClass.addEntry("edict_custom_difficulty_desc", "@menuDesc")
+locClass.addEntry("custom_difficulty_init", "@modName - @init") #also used for menu title. Has to be named edict for the edict
+locClass.addEntry("custom_difficulty_init_desc", "@initDesc @crisisInit")
+locClass.addEntry("custom_difficulty_init_no_crisis_desc", "@initDesc @noCrisisInit")
 locClass.addEntry("custom_difficulty_options.name", "@options")
 locClass.addEntry("custom_difficulty_choose_desc", "@choose")
 locClass.addEntry("custom_difficulty_predef_head.name", "@modName - @preDef")
@@ -191,12 +199,14 @@ locClass.append("custom_difficulty_customize_colored.name","§Y@difficulty @cust
 locClass.append("custom_difficulty_customize.name","§Y@difficulty @customization")
 locClass.addEntry("custom_difficulty_choose", "@choosePreDef.§R @delWarn§! @combineText")
 locClass.addEntry("custom_difficulty_easy.name", "§G@easy - 20% @bonus @allCat @forPlayer§!") #TODO: color coding in custom menu same as here! To make clearer what overwrites what. "R" for crisis
+locClass.addEntry("custom_difficulty_no_player_bonus.name", "§G@no @bonus @forPlayer§!")
 locClass.addEntry("custom_difficulty_ensign.name", "§B@ensign - @no @bonus @forAI. 33% @forNPCs§!")
 locClass.addEntry("custom_difficulty_captain.name", "§B@captain - 15-25% @bonus @forAI. 50% @forNPCs§!")
 locClass.addEntry("custom_difficulty_commodore.name", "§B@commodore - 30-50% @bonus @forAI. 66% @forNPCs§!")
 locClass.addEntry("custom_difficulty_admiral.name", "§B@admiral - 45-75% @bonus @forAI. 75% @forNPCs§!")
 locClass.addEntry("custom_difficulty_grand_admiral.name", "§B@grandAdmiral - 60-100% @bonus @forAI. 100% @forNPCs§!")
 locClass.addEntry("custom_difficulty_scaling.name", "§H@scaling - @increase @bonus @forAI @every 4 @years§!")
+locClass.addEntry("custom_difficulty_no_scaling.name", "§H@no @scaling§!")
 locClass.addEntry("custom_difficulty_advanced_configuration.name", "@advCust @nonPlayer")
 locClass.addEntry("custom_difficulty_advanced_configuration_player.name", "@advCust @player")
 locClass.addEntry("custom_difficulty_advanced_configuration_yearly.name", "@advCust @yearly")
@@ -282,7 +292,7 @@ for cat in cats:
     choiceEvent.add("immediate",immediate)
   if cat=="crisis":
     trigger.add("text", "custom_difficulty_crisis_strength_desc")
-    locClass.append("custom_difficulty_crisis_strength_desc", "@vanilla @example @values: @grandAdmiral + x5 @crisis @strength: 1000%. @ensign + x5 @crisis @strength: xxx%. @ensign + x0.25 @crisis @strength: xxx%.") #TODO: get correct values!
+    locClass.append("custom_difficulty_crisis_strength_desc", "@vanilla @example @values: @grandAdmiral + x5 @crisis @strength: 1500%. @ensign + x5 @crisis @strength: 495%. @ensign + x0.25 @crisis @strength: 24.75%.")
   if cat=="ai_yearly":
     trigger.add("text", "custom_difficulty_current_yearly_desc") #loc global
   else:
@@ -442,18 +452,28 @@ difficultiesPresetProperties["scaling"]["ai_yearly"]=[condVal(4,s) for s in aiDe
 difficultiesPresetProperties["no_scaling"]["ai_yearly"]=[0 for b in possibleBoniNames]
 
 diffLevels=dict() 
-diffLevels["ensign"]=[33, 0,0 ] # npc, high ai, low ai
+diffLevels["ensign"]=[33, 0,0 ] # crisis, high ai and npc, low ai
 diffLevels["captain"]=[50, 25,15 ]
 diffLevels["commodore"]=[66, 50,30 ]
 diffLevels["admiral"]=[75, 75,45 ]
 diffLevels["grand_admiral"]=[100, 100,60 ]
+# diffLevels["ensign"]=[0, 0,0 ] # npc, high ai, low ai
+# diffLevels["captain"]=[25, 25,15 ]
+# diffLevels["commodore"]=[50, 50,30 ]
+# diffLevels["admiral"]=[75, 75,45 ]
+# diffLevels["grand_admiral"]=[100, 100,60 ]
 for diff, level in diffLevels.items():
   difficultiesPresetProperties[diff]["ai"]=[condValPrec(level[2], level[1],b) for b in aiDefaultPrecise]
+  difficultiesPresetProperties[diff]["crisis"]=[condVal(level[0],b) for b in npcDefault]
   for cat in catsWithNPCDefaultBoni:
-    difficultiesPresetProperties[diff][cat]=[condVal(level[0],s) for b in npcDefault]
+    difficultiesPresetProperties[diff][cat]=[condVal(level[1],b) for b in npcDefault]
 
 #TODO CRISIS DEFAULTS
-
+#get_galaxy_setup_value = { 
+# setting = crises
+# which = localVar
+#scaling ?
+#}
 
 playerFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_player")
 scalingFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_scaling")
@@ -481,7 +501,17 @@ for difficultyIndex, difficulty in enumerate(difficulties):
   for cat, values in difficultiesPresetProperties[difficulty].items():
     for i, value in enumerate(values):
       et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,possibleBoniNames[i])).add("value", str(value)))
+  
 
+  cat="crisis"
+  if cat in difficultiesPresetProperties[difficulty]:
+    et.addComment("Crisis strength multiply")
+    values=difficultiesPresetProperties[difficulty][cat]
+    # et.add("get_galaxy_setup_value", TagList("setting", "crises").add("which", "custom_difficulty_crisis_strength").add("scale_by", "3"))
+    for i, value in enumerate(values):
+      if value:
+        et.add("multiply_variable", TagList("which", "custom_difficulty_{}_{}_value".format(cat,possibleBoniNames[i])).add("value", "custom_difficulty_crisis_strength"))
+        et.add("multiply_variable", TagList("which", "custom_difficulty_{}_{}_value".format(cat,possibleBoniNames[i])).add("value", 3))
 
 with open(outFolder+"/"+"custom_difficulty_defaults.txt",'w') as file:
   defaultEvents.writeAll(file, args())
@@ -548,7 +578,7 @@ updateEvent.add("immediate",immediate)
 after=TagList()
 # updateEvent.add("after",after)
 for catI,cat in enumerate(cats):
-  if "yearly" in cat:
+  if catToModifierType[cat]=="none":
     continue
   immediate.addComment(cat)
   ifTagList=TagList()
@@ -791,7 +821,7 @@ for allowUnlock in [False]:#[False,True]:
   trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("has_global_flag", "custom_difficulty_locked"))
   trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("has_global_flag", "custom_difficulty_locked"))
   mainMenu.add("option", TagList("name","custom_difficulty_predefined_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
-  mainMenu.add("option", TagList("name","custom_difficulty_crisis_colored.name").add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+cats.index("crisis")*id_ChangeEvents))).add("remove_global_flag","custom_difficulty_menu_crisis_from_custom")))
+  mainMenu.add("option", TagList("name","custom_difficulty_crisis_colored.name").add("trigger", TagList("is_crises_allowed", yes)).add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+cats.index("crisis")*id_ChangeEvents))).add("remove_global_flag","custom_difficulty_menu_crisis_from_custom")))
   mainMenu.add("option", TagList("name","custom_difficulty_customize_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_customMenuEvent))))
   mainMenu.add("option", TagList("name","custom_difficulty_options.name").add("hidden_effect", TagList("country_event", TagList("id", name_optionsEvent))))
   # mainMenu.add("option", TagList("name","custom_difficulty_lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
@@ -818,9 +848,13 @@ trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").
 trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("has_global_flag", "custom_difficulty_locked"))
 for i,cat in enumerate(cats):
   hidden_effect=TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+i*id_ChangeEvents)))
+  option=TagList("name","custom_difficulty_{}_colored.name".format(cat))
+  customMenu.add("option",option)
   if cat=="crisis":
     hidden_effect.add("set_global_flag","custom_difficulty_menu_crisis_from_custom")
-  customMenu.add("option", TagList("name","custom_difficulty_{}.name".format(cat)).add("hidden_effect", hidden_effect))
+    option.add("trigger", TagList("is_crises_allowed", yes))
+  option.add("hidden_effect", hidden_effect)
+  locClass.addEntry("custom_difficulty_{}_colored.name".format(cat), "§{}@change @{} @bonuses§!".format(catColors[i],cat))
 customMenu.add("option", t_backMainOption)
 customMenu.add("option", t_closeOption)
 
@@ -850,6 +884,10 @@ defaultMenuEvent.add("option", TagList("name", "custom_difficulty_reset.name").a
 defaultMenuEvent.add("option", t_backMainOption)
 defaultMenuEvent.add("option", t_closeOption)
 
+optionsEvent=TagList()
+mainFileContent.addComment("options Event")
+mainFileContent.add("country_event", optionsEvent)
+
 rootUpdateMenu=TagList("id",name_rootUpdateEvent)
 mainFileContent.addComment("root update event")
 mainFileContent.add("event", rootUpdateMenu)
@@ -866,27 +904,123 @@ immediate.add("if", ifDelay)
 
 
 mainFileContent.add("","","#game start init")
-gameStartInitEvent=TagList("id", name_gameStartFireOnlyOnce)
+gameStartInitEvent=TagList("id", name_gameStartFireOnlyOnce) #TODO BILD
+gameStartInitEvent.add("title","custom_difficulty_init" )
+trigger=TagList()
+gameStartInitEvent.add("desc", TagList("trigger", trigger)) #"" )
+trigger.add("success_text", TagList("text", "custom_difficulty_init_desc").add("is_crises_allowed", "yes"))
+trigger.add("success_text", TagList("text", "custom_difficulty_init_no_crisis_desc").add("is_crises_allowed", "no"))
 mainFileContent.add("country_event", gameStartInitEvent)
 gameStartInitEvent.add("fire_only_once", yes)
-gameStartInitEvent.add("hide_window", yes)
+# gameStartInitEvent.add("hide_window", yes)
 gameStartInitEvent.add("trigger", TagList("is_ai","no").add("not", TagList("has_global_flag", "custom_difficulty_active")))
 immediate=TagList()
 gameStartInitEvent.add("immediate",immediate)
-immediate.add("set_global_flag", "custom_difficulty_active")
 immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
+for strength in [0.25, 0.5, 1, 2,3,4,5]:
+  gameStartInitEvent.add("option", TagList("name", "custom_difficulty_{!s}_crisis.name".format(strength))
+    .add("trigger", TagList("is_crises_allowed", yes))
+    .add("hidden_effect", TagList(ET,TagList("set_variable", TagList("which","custom_difficulty_crisis_strength").add("value",str(strength))))))
+  locClass.addEntry("custom_difficulty_{!s}_crisis.name".format(strength), "§R{}x @crisisStrength§!".format(strength))
+gameStartInitEvent.add("option", TagList("name", "OK").add("trigger", TagList("is_crises_allowed", "no")))
+gameStartAfter=TagList()
+gameStartInitEvent.add("after",TagList("hidden_effect", gameStartAfter))
+gameStartAfter.add("set_global_flag", "custom_difficulty_active")
+gameStartAfter.add("set_global_flag","custom_difficulty_no_player_bonus")
+gameStartAfter.add("set_global_flag","custom_difficulty_no_scaling")
 for i, difficulty in enumerate(difficulties):
   if difficulty=="scaling":
     k=1 #scaling with stupid place in between ensign and captain
+    gameStartAfter.addComment("#execute enisgn event to get the flag and non-ai stuff (that does not scale for my mod!)")
+    gameStartAfter.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", CuDi.format(id_defaultEvents+difficulties.index("ensign")))))
   elif difficulty=="ensign":
     k=0
   elif difficulty in vanillaDefaultDifficultyNames:
     k=vanillaDefaultDifficultyNames.index(difficulty)+1
   else:
     continue #those cannot be preset in game creation
-  immediate.add("","","#"+difficulty)
-  immediate.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", CuDi.format(id_defaultEvents+i))))
-  immediate.add("country_event", TagList("id", name_rootUpdateEvent))
+  gameStartAfter.add("","","#"+difficulty)
+  gameStartAfter.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", CuDi.format(id_defaultEvents+i))))
+gameStartAfter.add("country_event", TagList("id", name_rootUpdateEvent))
+
+
+
+
+
+
+optionsEvent.add("id", name_optionsEvent)
+optionsEvent.add("is_triggered_only", yes)
+optionsEvent.add("title", "custom_difficulty_options.name")
+# optionsEvent.add("desc", "custom_difficulty_options.desc")
+optionsEvent.add("picture", "GFX_evt_towel")
+
+descTrigger=TagList()
+optionsEvent.add("desc", TagList("trigger", descTrigger))
+descTrigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("has_global_flag", "custom_difficulty_locked"))
+descTrigger.add("text", "custom_difficulty_current_options")
+locClass.append("custom_difficulty_current_options", "@current_options")
+
+
+optionWithInverse=dict()
+# flag is going to be "custom_difficulty_"+key
+# name "custom_difficulty_"+key
+# desc "custom_difficulty_"+key+".desc"
+optionWithInverse["activate_simple_mode"]=["activate_custom_mode"]
+optionWithInverse["activate_custom_mode"]=["activate_simple_mode"]
+optionWithInverse["deactivate_player_vassal_ai_boni"]=["activate_player_vassal_ai_boni"]
+optionWithInverse["activate_player_vassal_ai_boni"]=["deactivate_player_vassal_ai_boni"]
+optionWithInverse["deactivate_delay_mode"]=["activate_delay_mode"]
+optionWithInverse["activate_delay_mode"]=["deactivate_delay_mode"]
+# optionWithInverse[]=[]
+
+defaultOptions=[]
+
+
+#todo: move to top to be translated
+locClass.addLoc("current_options", "Currently active options")
+locClass.addLoc("activate_custom_mode", "Activate Custom Mode")
+locClass.addLoc("activate_simple_mode", "Activate Simple Mode")
+locClass.addLoc("activate_player_vassal_ai_boni", "Activate Player Vassal AI Bonus")
+locClass.addLoc("deactivate_player_vassal_ai_boni", "Deactivate Player Vassal AI Bonus")
+locClass.addLoc("activate_custom_mode"+"Desc", "Specific choice of bonuses to be applied possible.")
+locClass.addLoc("activate_simple_mode"+"Desc", "Only bonus groups and default difficulties can be chosen. Slightly improved performance.")
+locClass.addLoc("activate_player_vassal_ai_boni"+"Desc", "Player vassals will get the same bonuses as other AI empires")
+locClass.addLoc("deactivate_player_vassal_ai_boni"+"Desc", "Vanilla behavior of player vassals not getting AI bonuses. They will get player bonuses though if any such have been activated.")
+locClass.addLoc("activate_delay_mode", "Activate Delay Mode")
+locClass.addLoc("activate_delay_mode"+"Desc", "Update events will happen with a random delay of 1-181 days after the menu is closed or a year ends.")
+locClass.addLoc("deactivate_delay_mode", "Deactivate Delay Mode")
+locClass.addLoc("deactivate_delay_mode"+"Desc", "Update events happen direclty after the menu is closed and at the start of each year.")
+for key, inverses in optionWithInverse.items():
+  seperateDesc=False
+  locClass.append("custom_difficulty_"+key+".desc", "@"+key+"Desc")
+  locClass.append("custom_difficulty_"+key+".name", "@"+key)
+  descTrigger.add("success_text", TagList().add("text", "custom_difficulty_"+key+".desc").add("has_global_flag", key))
+  option=TagList("name","custom_difficulty_{}.name".format(key))
+  optionsEvent.add("option", option)
+  option.add("custom_tooltip", "custom_difficulty_{}.desc".format(key))
+  trigger=deepcopy(t_notLockedTrigger)
+  option.add("trigger", trigger)
+  trigger.add("not", TagList("has_global_flag", "custom_difficulty_"+key))
+  effect=TagList("set_global_flag", "custom_difficulty_"+key)
+  inverseIsDefault=False
+  for inverse in inverses:
+    effect.add("remove_global_flag", "custom_difficulty_"+inverse)
+    if inverse in defaultOptions:
+      inverseIsDefault=True
+  if not inverseIsDefault:
+    gameStartAfter.addTagList(deepcopy(effect))
+    defaultOptions.append(key)
+  effect.add("country_event", TagList("id", name_optionsEvent))
+  option.add("hidden_effect", effect)
+optionsEvent.add("option", TagList("name","custom_difficulty_lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
+optionsEvent.add("option", t_backMainOption )
+optionsEvent.add("option", t_closeOption)
+
+optionEventUnlock=deepcopy(optionsEvent)
+optionEventUnlock.insert(-2,"option",TagList("name","custom_difficulty_unlock.name").add("trigger", TagList("has_global_flag","custom_difficulty_locked")).add("hidden_effect",TagList("remove_global_flag", "custom_difficulty_locked").add("country_event", t_mainMenuEvent)))
+mainFileUnlock=TagList("namespace", "custom_difficulty")
+mainFileUnlock.add("country_event", optionEventUnlock)
+outputToFolderAndFile(mainFileUnlock, "events", "!_custom_difficulty_unlock.txt", 1, "../gratak_mods/custom_difficulty_unlock_new/")
 
 
 mainFileContent.add("","","#reset event")
@@ -895,6 +1029,7 @@ resetEvent.replace("id", name_resetEvent)
 resetEvent.remove("fire_only_once")
 resetEvent.remove("trigger")
 resetEvent.add("is_triggered_only",yes)
+resetEvent.get("immediate").insert(0, "country_event", TagList("id", name_resetFlagsEvent))
 mainFileContent.add("country_event", resetEvent)
 
 mainFileContent.add("","","#reset confirmation")
@@ -947,77 +1082,6 @@ mainFileContent.addComment("other flags")
 mainFileContent.add("country_event", otherFlagResetEvent)
 
 
-optionsEvent=TagList()
-mainFileContent.addComment("options Event")
-mainFileContent.add("country_event", optionsEvent)
-optionsEvent.add("id", name_optionsEvent)
-optionsEvent.add("is_triggered_only", yes)
-optionsEvent.add("title", "custom_difficulty_options.name")
-# optionsEvent.add("desc", "custom_difficulty_options.desc")
-optionsEvent.add("picture", "GFX_evt_towel")
-
-descTrigger=TagList()
-optionsEvent.add("desc", TagList("trigger", descTrigger))
-descTrigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("has_global_flag", "custom_difficulty_locked"))
-descTrigger.add("text", "custom_difficulty_current_options")
-locClass.append("custom_difficulty_current_options", "@current_options")
-
-
-optionWithInverse=dict()
-# flag is going to be "custom_difficulty_"+key
-# name "custom_difficulty_"+key
-# desc "custom_difficulty_"+key+".desc"
-optionWithInverse["activate_custom_mode"]=["activate_simple_mode"]
-optionWithInverse["activate_simple_mode"]=["activate_custom_mode"]
-optionWithInverse["activate_player_vassal_ai_boni"]=["deactivate_player_vassal_ai_boni"]
-optionWithInverse["deactivate_player_vassal_ai_boni"]=["activate_player_vassal_ai_boni"]
-optionWithInverse["activate_delay_mode"]=["deactivate_delay_mode"]
-optionWithInverse["deactivate_delay_mode"]=["activate_delay_mode"]
-# optionWithInverse[]=[]
-
-#todo: move to top to be translated
-locClass.addLoc("current_options", "Currently active options")
-locClass.addLoc("activate_custom_mode", "Activate Custom Mode")
-locClass.addLoc("activate_simple_mode", "Activate Simple Mode")
-locClass.addLoc("activate_player_vassal_ai_boni", "Activate Player Vassal AI Bonus")
-locClass.addLoc("deactivate_player_vassal_ai_boni", "Deactivate Player Vassal AI Bonus")
-locClass.addLoc("activate_custom_mode"+"Desc", "Specific choice of bonuses to be applied possible.")
-locClass.addLoc("activate_simple_mode"+"Desc", "Only bonus groups and default difficulties can be chosen. Slightly improved performance.")
-locClass.addLoc("activate_player_vassal_ai_boni"+"Desc", "Player vassals will get the same bonuses as other AI empires")
-locClass.addLoc("deactivate_player_vassal_ai_boni"+"Desc", "Vanilla behavior of player vassals not getting AI bonuses. They will get player bonuses though if any such have been activated.")
-locClass.addLoc("activate_delay_mode", "Activate Delay Mode")
-locClass.addLoc("activate_delay_mode"+"Desc", "Update events will happen with a random delay of 1-181 days after the menu is closed or a year ends.")
-locClass.addLoc("deactivate_delay_mode", "Deactivate Delay Mode")
-locClass.addLoc("deactivate_delay_mode"+"Desc", "Update events happen direclty after the menu is closed and at the start of each year.")
-for key, inverses in optionWithInverse.items():
-  seperateDesc=False
-  locClass.append("custom_difficulty_"+key+".desc", "@"+key+"Desc")
-  locClass.append("custom_difficulty_"+key+".name", "@"+key)
-  descTrigger.add("success_text", TagList().add("text", "custom_difficulty_"+key+".desc").add("has_global_flag", key))
-  option=TagList("name","custom_difficulty_{}.name".format(key))
-  optionsEvent.add("option", option)
-  option.add("custom_tooltip", "custom_difficulty_{}.desc".format(key))
-  trigger=deepcopy(t_notLockedTrigger)
-  option.add("trigger", trigger)
-  trigger.add("not", TagList("has_global_flag", "custom_difficulty_"+key))
-  effect=TagList("set_global_flag", "custom_difficulty_"+key)
-  for inverse in inverses:
-    effect.add("remove_global_flag", "custom_difficulty_"+inverse)
-  effect.add("country_event", TagList("id", name_optionsEvent))
-  option.add("hidden_effect", effect)
-optionsEvent.add("option", TagList("name","custom_difficulty_lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
-optionsEvent.add("option", t_backMainOption )
-optionsEvent.add("option", t_closeOption)
-
-optionEventUnlock=deepcopy(optionsEvent)
-optionEventUnlock.insert(-2,"option",TagList("name","custom_difficulty_unlock.name").add("trigger", TagList("has_global_flag","custom_difficulty_locked")).add("hidden_effect",TagList("remove_global_flag", "custom_difficulty_locked").add("country_event", t_mainMenuEvent)))
-mainFileUnlock=TagList("namespace", "custom_difficulty")
-mainFileUnlock.add("country_event", optionEventUnlock)
-outputToFolderAndFile(mainFileUnlock, "events", "!_custom_difficulty_unlock.txt", 1, "../gratak_mods/custom_difficulty_unlock_new/")
-optionsEvent=TagList()
-
-
-
 
 outputToFolderAndFile(mainFileContent , "events", "custom_difficulty_main.txt",1 )
 
@@ -1027,51 +1091,6 @@ for language in locClass.languages:
   if not os.path.exists(outFolderLoc):
     os.makedirs(outFolderLoc)
   locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
-
-# doTranslation=False
-# for language, lcode in zip(["braz_por","english","french","german","polish","russian","spanish"],["pt","en","fr", "de","pl","ru", "es"]):
-#   outFolderLoc="../gratak_mods/custom_difficulty/localisation/"+language
-#   if not os.path.exists(outFolderLoc):
-#     os.makedirs(outFolderLoc)
-
-#   if doTranslation:
-#     translatedDict=dict()
-#     translatedDict["["]="["
-#     translatedDict["]"]="]"
-#     translator=Translator()
-#   with io.open(outFolderLoc+"/custom_difficulty_l_"+language+".yml",'w', encoding="utf-8") as file:
-#     file.write(u'\ufeff')
-#     file.write("l_"+language+":\n")
-#     for locEntry in locList:
-#       if language=="english" or not doTranslation:
-#         file.write(" "+locEntry[0]+":0 "+'"'+locEntry[1]+'"\n')
-#       else:
-#         locParts=re.split("(\[|\]|§|£)",locEntry[1])
-#         for i in reversed(range(len(locParts))):
-#           if locParts[i]=="":
-#             del locParts[i]
-#         for i,locPart in enumerate(locParts):
-#           if locPart=="§":
-#             if i!=len(locParts)-1:
-#               locParts[i]+=locParts[i+1][0]
-#               locParts[i+1]=locParts[i+1][1:]
-#             continue
-#           if locPart=="£":
-#             locParts[i]+=locParts[i+1][0:locParts[i+1].index(" ")]
-#             locParts[i+1]=locParts[i+1][locParts[i+1].index(" "):]
-#             continue
-#           if (i==0 or locParts[i-1]!="[") and not locPart.strip()=="":
-#             if not locPart in translatedDict:
-#               try:
-#                 translatedDict[locPart]=translator.translate(text=locPart, src="en", dest=lcode).text
-#               except:
-#                 print(locPart)
-#                 translatedDict[locPart]=locPart
-#             locParts[i]=translatedDict[locPart]
-#         file.write(" "+locEntry[0]+":0 "+'"'+"".join(locParts)+'"\n')
-
-
-
 
 
 
