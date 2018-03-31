@@ -54,7 +54,7 @@ class LocList:
         file.write(" "+entry[0]+':0 "')
         # for loc in entry[1]:
         awaitingVar=False
-        for loc in re.split("(@| |\.|,|:|§|\))",entry[1]):
+        for loc in re.split("(@| |\.|,|:|§|\)|\\n)",entry[1]):
           if loc=="":
             continue
           if loc[0]=="@":

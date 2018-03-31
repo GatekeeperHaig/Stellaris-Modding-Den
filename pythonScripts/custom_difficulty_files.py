@@ -25,10 +25,14 @@ possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","","",""]
 possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
 
-bonusesListNames=["all","default", "allShip"]
-bonusListNPC=[    True,   False,    False]
-bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
-bonusesListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
+bonusesListNames=["all","resourceProd","humanResources", "allShip"]
+bonusListNPC=[    True,   False, False,  False]
+bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2],[3,4,6], [7,8,9,10]]
+bonusesListPictures=["GFX_evt_towel", "GFX_evt_alien_city", "GFX_evt_alien_city","GFX_evt_federation_fleet"] #todo: new picture: resource and human resources
+# bonusesListNames=["all","default", "allShip"]
+# bonusListNPC=[    True,   False,    False]
+# bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
+# bonusesListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
 
 cats=["ai","ai_yearly","fe","leviathan","player","crisis","marauders", "other"]
 catToModifierType=dict()
@@ -40,7 +44,6 @@ catToModifierType["player"]="player"
 catToModifierType["crisis"]="crisis"
 catToModifierType["marauders"]="ai"
 catToModifierType["other"]="ai"
-# timesTenCats=["crisis", "leviathan"]
 catCountryType=[
 ["default"], 
 ["default"],
@@ -93,8 +96,14 @@ locClass.addLoc("upkeep", "Upkeep")
 locClass.addLoc("growth", "Any Pop Growth Speed")
 #bonusLists
 locClass.addLoc("all", "All")
+locClass.addLoc("allDesc", "Change all available bonuses at once.")
 locClass.addLoc("default", "Standard")
+locClass.addLoc("resourceProd", "Resource Production")
+locClass.addLoc("resourceProdDesc", "Change mineral, energy and food bonuses.")
+locClass.addLoc("humanResources", "Human Resource")
+locClass.addLoc("humanResourcesDesc", "Change unity, research and naval capacity bonuses.")
 locClass.addLoc("allShip", "All Ship")
+locClass.addLoc("allShipDesc", "Change ship bonuses: weapon damage, hull, shields and armor.")
 #cats
 locClass.addLoc("ai", "AI Default Empire")
 locClass.addLoc("ai_yearly", "AI Yearly Change")
@@ -168,6 +177,22 @@ locClass.addLoc("crisisInit","Since it seems to be impossible to read crisis str
   " The chosen value will be translated into a bonus according to the same formula as in vanilla and can be customized at any time.")
 locClass.addLoc("noCrisisInit","This game has crisis disabled via the game start options. Crisis options are thus also disabled in this mod. You can activate crisis only with a new game or a save-game edit.")
 locClass.addLoc("crisisStrength","Crisis Strength")
+locClass.addLoc("current_options", "Currently active options")
+
+#options loc
+locClass.addLoc("activate_custom_mode", "Activate Custom Mode")
+locClass.addLoc("activate_simple_mode", "Activate Simple Mode")
+locClass.addLoc("activate_player_vassal_ai_boni", "Activate Player Vassal AI Bonus")
+locClass.addLoc("deactivate_player_vassal_ai_boni", "Deactivate Player Vassal AI Bonus")
+locClass.addLoc("activate_custom_mode"+"Desc", "Specific choice of bonuses to be applied possible.")
+locClass.addLoc("activate_simple_mode"+"Desc", "Only bonus groups and default difficulties can be chosen. Slightly improved performance.")
+locClass.addLoc("activate_player_vassal_ai_boni"+"Desc", "Player vassals will get the same bonuses as other AI empires")
+locClass.addLoc("deactivate_player_vassal_ai_boni"+"Desc", "Vanilla behavior of player vassals not getting AI bonuses. They will get player bonuses though if any such have been activated.")
+locClass.addLoc("activate_delay_mode", "Activate Delay Mode")
+locClass.addLoc("activate_delay_mode"+"Desc", "Update events will happen with a random delay of 1-181 days after the menu is closed or a year ends.")
+locClass.addLoc("deactivate_delay_mode", "Deactivate Delay Mode")
+locClass.addLoc("deactivate_delay_mode"+"Desc", "Update events happen direclty after the menu is closed and at the start of each year.")
+
 
 
 
@@ -188,8 +213,8 @@ locClass.addEntry("custom_difficulty_unlock.name", "@unlock")
 locClass.addEntry("edict_custom_difficulty", "@modName - @main @menu") #also used for menu title. Has to be named edict for the edict
 locClass.addEntry("edict_custom_difficulty_desc", "@menuDesc")
 locClass.addEntry("custom_difficulty_init", "@modName - @init") #also used for menu title. Has to be named edict for the edict
-locClass.addEntry("custom_difficulty_init_desc", "@initDesc @crisisInit")
-locClass.addEntry("custom_difficulty_init_no_crisis_desc", "@initDesc @noCrisisInit")
+locClass.addEntry("custom_difficulty_init_desc", "@initDesc\n@crisisInit")
+locClass.addEntry("custom_difficulty_init_no_crisis_desc", "@initDesc\n@noCrisisInit")
 locClass.addEntry("custom_difficulty_options.name", "@options")
 locClass.addEntry("custom_difficulty_choose_desc", "@choose")
 locClass.addEntry("custom_difficulty_predef_head.name", "@modName - @preDef")
@@ -198,11 +223,11 @@ locClass.append("custom_difficulty_crisis_colored.name","§R@crisis @strength")
 locClass.append("custom_difficulty_customize_colored.name","§Y@difficulty @customization")
 locClass.append("custom_difficulty_customize.name","§Y@difficulty @customization")
 locClass.addEntry("custom_difficulty_choose", "@choosePreDef.§R @delWarn§! @combineText")
-locClass.addEntry("custom_difficulty_easy.name", "§G@easy - 20% @bonus @allCat @forPlayer§!") #TODO: color coding in custom menu same as here! To make clearer what overwrites what. "R" for crisis
+locClass.addEntry("custom_difficulty_easy.name", "§G@easy - 20% @bonus @allCat @forPlayer§!")
 locClass.addEntry("custom_difficulty_no_player_bonus.name", "§G@no @bonus @forPlayer§!")
-locClass.addEntry("custom_difficulty_ensign.name", "§B@ensign - @no @bonus @forAI. 33% @forNPCs§!")
-locClass.addEntry("custom_difficulty_captain.name", "§B@captain - 15-25% @bonus @forAI. 50% @forNPCs§!")
-locClass.addEntry("custom_difficulty_commodore.name", "§B@commodore - 30-50% @bonus @forAI. 66% @forNPCs§!")
+locClass.addEntry("custom_difficulty_ensign.name", "§B@ensign - @no @bonus @forAI. @no @bonus @forNPCs§!")
+locClass.addEntry("custom_difficulty_captain.name", "§B@captain - 15-25% @bonus @forAI. 25% @forNPCs§!")
+locClass.addEntry("custom_difficulty_commodore.name", "§B@commodore - 30-50% @bonus @forAI. 50% @forNPCs§!")
 locClass.addEntry("custom_difficulty_admiral.name", "§B@admiral - 45-75% @bonus @forAI. 75% @forNPCs§!")
 locClass.addEntry("custom_difficulty_grand_admiral.name", "§B@grandAdmiral - 60-100% @bonus @forAI. 100% @forNPCs§!")
 locClass.addEntry("custom_difficulty_scaling.name", "§H@scaling - @increase @bonus @forAI @every 4 @years§!")
@@ -373,7 +398,7 @@ for cat in cats:
         changeStepListUsed=changeSteps
       for changeStep in changeStepListUsed:
         if catToModifierType[cat]=="crisis":
-          changeStep*=10
+          changeStep*=5
         if cat=="player" and (abs(changeStep)==1 or abs(changeStep)==5 or abs(changeStep)==25):
           continue
         if changeStep>0:
@@ -468,11 +493,11 @@ for diff, level in diffLevels.items():
   for cat in catsWithNPCDefaultBoni:
     difficultiesPresetProperties[diff][cat]=[condVal(level[1],b) for b in npcDefault]
 
-#TODO CRISIS DEFAULTS
+#CRISIS DEFAULTS scheint nicht zu klappen!
 #get_galaxy_setup_value = { 
 # setting = crises
 # which = localVar
-#scaling ?
+#scale_by = 3
 #}
 
 playerFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_player")
@@ -558,12 +583,12 @@ createModifierEvents(addModifierImmediates,name_addModifiers,addEvents, id_addMo
 modifierFuns=dict()
 modifierFuns["player"]=lambda i: 10*i
 modifierFuns["ai"]=lambda i: pow(2,i) 
-modifierFuns["crisis"]=lambda i: pow(2,i)*10
+modifierFuns["crisis"]=lambda i: pow(2,i)*5
 
 modifierRange=dict()
 modifierRange["player"]=[-10, 20] #[0]*10 to [1]*10
 modifierRange["ai"]=[-8, 11] #2^([0]-1)-1 to 2^([1]-1)-1
-modifierRange["crisis"]=[-4, 11] #10*(2^([0]-1)-1) to 10*(2^([1]-1)-1)
+modifierRange["crisis"]=[-5, 11] #10*(2^([0]-1)-1) to 10*(2^([1]-1)-1)
 
 updateFile=TagList()
 updateFile.add("namespace","custom_difficulty")
@@ -976,20 +1001,6 @@ optionWithInverse["activate_delay_mode"]=["deactivate_delay_mode"]
 defaultOptions=[]
 
 
-#todo: move to top to be translated
-locClass.addLoc("current_options", "Currently active options")
-locClass.addLoc("activate_custom_mode", "Activate Custom Mode")
-locClass.addLoc("activate_simple_mode", "Activate Simple Mode")
-locClass.addLoc("activate_player_vassal_ai_boni", "Activate Player Vassal AI Bonus")
-locClass.addLoc("deactivate_player_vassal_ai_boni", "Deactivate Player Vassal AI Bonus")
-locClass.addLoc("activate_custom_mode"+"Desc", "Specific choice of bonuses to be applied possible.")
-locClass.addLoc("activate_simple_mode"+"Desc", "Only bonus groups and default difficulties can be chosen. Slightly improved performance.")
-locClass.addLoc("activate_player_vassal_ai_boni"+"Desc", "Player vassals will get the same bonuses as other AI empires")
-locClass.addLoc("deactivate_player_vassal_ai_boni"+"Desc", "Vanilla behavior of player vassals not getting AI bonuses. They will get player bonuses though if any such have been activated.")
-locClass.addLoc("activate_delay_mode", "Activate Delay Mode")
-locClass.addLoc("activate_delay_mode"+"Desc", "Update events will happen with a random delay of 1-181 days after the menu is closed or a year ends.")
-locClass.addLoc("deactivate_delay_mode", "Deactivate Delay Mode")
-locClass.addLoc("deactivate_delay_mode"+"Desc", "Update events happen direclty after the menu is closed and at the start of each year.")
 for key, inverses in optionWithInverse.items():
   seperateDesc=False
   locClass.append("custom_difficulty_"+key+".desc", "@"+key+"Desc")
@@ -1039,7 +1050,7 @@ resetConfirmation.add("is_triggered_only",yes)
 resetConfirmation.add("title","custom_difficulty_reset_conf.name")
 resetConfirmation.add("desc","custom_difficulty_reset.desc")
 resetConfirmation.add("picture", "GFX_evt_towel")
-effect=TagList().add("country_event", TagList("id", name_resetFlagsEvent)).add("country_event", TagList("id", name_resetEvent)).add("country_event", TagList("id", name_defaultMenuEvent))
+effect=TagList().add("country_event", TagList("id", name_resetFlagsEvent)).add("country_event", TagList("id", name_resetEvent))#.add("country_event", TagList("id", name_defaultMenuEvent))
 resetConfirmation.add("option", TagList("name", "OK").add("hidden_effect", effect))
 resetConfirmation.add("option", TagList("name", "custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
 
