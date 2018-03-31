@@ -157,24 +157,36 @@ planet_event = {
 				}
 				remove_regular_planet_modifiers = yes 
 				ex_planet_modifier_spawn_engine = yes
-			}			
+			}		
 			if = {
-				limit = { any_tile = { is_orbital_tile = no has_deposit = yes has_regular_vanilla_deposit = yes has_building = no } }
-				every_tile = { 
-					limit = { has_deposit = yes has_regular_vanilla_deposit = yes has_building = no is_orbital_tile = no }
-					clear_deposits = yes
-					ex_planetary_diversity_planetary_resource_spawn_table = yes
-				}				
-			}
+				limit = { years_passed < 1 }			
+				reroll_deposits = yes
+				else = {
+					if = {
+						limit = { any_tile = { is_orbital_tile = no has_deposit = yes has_regular_vanilla_deposit = yes has_building = no } }
+						every_tile = { 
+							limit = { has_deposit = yes has_regular_vanilla_deposit = yes has_building = no is_orbital_tile = no }
+							clear_deposits = yes
+							ex_planetary_diversity_planetary_resource_spawn_table = yes
+						}				
+					}
+				}
+			}	
 		}	
 		if = {
-			limit = { any_tile = { is_orbital_tile = yes has_deposit = yes has_regular_vanilla_deposit = yes } }
-			random_tile = { 
-				limit = { is_orbital_tile = yes has_deposit = yes has_regular_vanilla_deposit = yes }
-				clear_deposits = yes
-				ex_planetary_diversity_orbital_resource_spawn_table = yes
-			}				
-		}						
+			limit = { years_passed < 1 }			
+			reroll_deposits = yes		
+			else = {
+				if = {
+					limit = { any_tile = { is_orbital_tile = yes has_deposit = yes has_regular_vanilla_deposit = yes } }
+					random_tile = { 
+						limit = { is_orbital_tile = yes has_deposit = yes has_regular_vanilla_deposit = yes }
+						clear_deposits = yes
+						ex_planetary_diversity_orbital_resource_spawn_table = yes
+					}				
+				}						
+			}
+		}	
 	}
 }
 
@@ -192,21 +204,27 @@ planet_event = {
 		}	
 		ex_planetary_diversity_adjust_inhabitable_planet_size = yes
 		if = {
-			limit = { NOT = { any_tile = { has_deposit = yes } } }				
-			every_tile = {
-				limit = { is_orbital_tile = no has_deposit = no has_building = no } 
-				random_list = { 
-					60 = { ex_planetary_diversity_planetary_resource_spawn_table = yes } 
-					40 = { } 
-				} 
-			}
+			limit = { years_passed < 1 }			
+			reroll_deposits = yes	
 			else = {
-				every_tile = { 
-					limit = { has_deposit = yes has_regular_vanilla_deposit = yes has_building = no is_orbital_tile = no }
-					clear_deposits = yes
-					ex_planetary_diversity_planetary_resource_spawn_table = yes
-				}			
-			}					
+				if = {
+					limit = { NOT = { any_tile = { has_deposit = yes } } }				
+					every_tile = {
+						limit = { is_orbital_tile = no has_deposit = no has_building = no } 
+						random_list = { 
+							60 = { ex_planetary_diversity_planetary_resource_spawn_table = yes } 
+							40 = { } 
+						} 
+					}
+					else = {
+						every_tile = { 
+							limit = { has_deposit = yes has_regular_vanilla_deposit = yes has_building = no is_orbital_tile = no }
+							clear_deposits = yes
+							ex_planetary_diversity_planetary_resource_spawn_table = yes
+						}			
+					}					
+				}
+			}	
 		}						 					
 		if = {
 			limit = { NOT = { any_tile = { has_blocker = yes } } }
