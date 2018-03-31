@@ -8,6 +8,8 @@ from googletrans import Translator
 import re
 from locList import LocList
 
+debugMode=True
+
 changeStepYears=[5,4,3,2,1]
 changeSteps = [50, 25, 10, 5, 1]
 for s in reversed(changeSteps):
@@ -29,7 +31,16 @@ bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
 bonusesListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
 
 cats=["ai","ai_yearly","fe","leviathan","player","crisis","marauders", "other"]
-timesTenCats=["crisis", "leviathan"]
+catToModifierType=dict()
+catToModifierType["ai"]="ai"
+catToModifierType["ai_yearly"]="none"
+catToModifierType["fe"]="ai"
+catToModifierType["leviathan"]="crisis"
+catToModifierType["player"]="player"
+catToModifierType["crisis"]="crisis"
+catToModifierType["marauders"]="ai"
+catToModifierType["other"]="ai"
+# timesTenCats=["crisis", "leviathan"]
 catCountryType=[
 ["default"], 
 ["default"],
@@ -62,9 +73,10 @@ doTranslation=False
 locClass=LocList(doTranslation)
 locClass.addLoc("modName", "Dynamic Difficulty", "all")
 
-#BIG TODO Add update flags! Only update when needed!
 #BIG TODO Implement the options!
-#BIG TODO I don't think "times 10" modifiers are removed so far before update. Update events have to be reworked first though!
+# todo: init flags for scaling and easy
+# loc for not easy and not scaling
+# second scaling?
 
 #IMPORTANT
 #bonuses
@@ -178,13 +190,13 @@ locClass.append("custom_difficulty_crisis_colored.name","§R@crisis @strength")
 locClass.append("custom_difficulty_customize_colored.name","§Y@difficulty @customization")
 locClass.append("custom_difficulty_customize.name","§Y@difficulty @customization")
 locClass.addEntry("custom_difficulty_choose", "@choosePreDef.§R @delWarn§! @combineText")
-locClass.addEntry("custom_difficulty_easy.name", "§G@easy - 20% @bonus @allCat @forPlayer") #TODO: color coding in custom menu same as here! To make clearer what overwrites what. "R" for crisis
-locClass.addEntry("custom_difficulty_ensign.name", "§B@ensign - @no @bonus @forAI. 33% @forNPCs")
-locClass.addEntry("custom_difficulty_captain.name", "§B@captain - 15-25% @bonus @forAI. 50% @forNPCs")
-locClass.addEntry("custom_difficulty_commodore.name", "§B@commodore - 30-50% @bonus @forAI. 66% @forNPCs")
-locClass.addEntry("custom_difficulty_admiral.name", "§B@admiral - 45-75% @bonus @forAI. 75% @forNPCs")
-locClass.addEntry("custom_difficulty_grand_admiral.name", "§B@grandAdmiral - 60-100% @bonus @forAI. 100% @forNPCs")
-locClass.addEntry("custom_difficulty_scaling.name", "§H@scaling - @increase @bonus @forAI @every 4 @years")
+locClass.addEntry("custom_difficulty_easy.name", "§G@easy - 20% @bonus @allCat @forPlayer§!") #TODO: color coding in custom menu same as here! To make clearer what overwrites what. "R" for crisis
+locClass.addEntry("custom_difficulty_ensign.name", "§B@ensign - @no @bonus @forAI. 33% @forNPCs§!")
+locClass.addEntry("custom_difficulty_captain.name", "§B@captain - 15-25% @bonus @forAI. 50% @forNPCs§!")
+locClass.addEntry("custom_difficulty_commodore.name", "§B@commodore - 30-50% @bonus @forAI. 66% @forNPCs§!")
+locClass.addEntry("custom_difficulty_admiral.name", "§B@admiral - 45-75% @bonus @forAI. 75% @forNPCs§!")
+locClass.addEntry("custom_difficulty_grand_admiral.name", "§B@grandAdmiral - 60-100% @bonus @forAI. 100% @forNPCs§!")
+locClass.addEntry("custom_difficulty_scaling.name", "§H@scaling - @increase @bonus @forAI @every 4 @years§!")
 locClass.addEntry("custom_difficulty_advanced_configuration.name", "@advCust @nonPlayer")
 locClass.addEntry("custom_difficulty_advanced_configuration_player.name", "@advCust @player")
 locClass.addEntry("custom_difficulty_advanced_configuration_yearly.name", "@advCust @yearly")
@@ -222,6 +234,8 @@ name_rootUpdateEvent="custom_difficulty.40"
 name_rootUpdateEventDelay="custom_difficulty.41"
 name_countryUpdateEvent="custom_difficulty.50"
 name_lockEvent="custom_difficulty.60"
+id_removeModifiers=70  #reserved range up to 79
+id_addModifiers=80  #reserved range up to 89
 id_defaultEvents=100 #reserved range up to 199
 id_ChangeEvents=1000 #reserved range up to 9999
 id_subChangeEvents=10
@@ -282,7 +296,7 @@ for cat in cats:
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
     locClass.addEntry("custom_difficulty_{}_change_{}_name".format(cat,bonusesListName), "@change @{} @bonuses".format(bonusesListName))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
-    if not cat in timesTenCats or bonusListNPC[optionIndex-1]:
+    if not catToModifierType[cat]=="crisis" or bonusListNPC[optionIndex-1]:
       choiceEvent.add("option",option)
 
   for bonusI, bonus in enumerate(possibleBoniNames):
@@ -310,7 +324,7 @@ for cat in cats:
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
     locClass.append("custom_difficulty_{}_change_{}_button.name".format(cat,bonus), "@change @{} @bonuses".format(bonus))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
-    if not cat in timesTenCats or npcBoni[bonusI]:
+    if not catToModifierType[cat]=="crisis" or npcBoni[bonusI]:
       choiceEvent.add("option",option) 
 
   option=TagList().add("name","custom_difficulty_back") #loc global
@@ -332,7 +346,7 @@ for cat in cats:
   for bonus in bonusesListNames+possibleBoniNames:
     bonusIndex+=1
     changeEvent=TagList()
-    if not cat in timesTenCats or (bonusListNPC+npcBoni)[bonusIndex-1]:
+    if not catToModifierType[cat]=="crisis" or (bonusListNPC+npcBoni)[bonusIndex-1]:
       tagList.add("country_event", changeEvent)
       changeEvent.add("id",CuDi.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents))
       changeEvent.add("is_triggered_only", yes)
@@ -348,7 +362,7 @@ for cat in cats:
       else:
         changeStepListUsed=changeSteps
       for changeStep in changeStepListUsed:
-        if cat in timesTenCats:
+        if catToModifierType[cat]=="crisis":
           changeStep*=10
         if cat=="player" and (abs(changeStep)==1 or abs(changeStep)==5 or abs(changeStep)==25):
           continue
@@ -372,7 +386,7 @@ for cat in cats:
           et=TagList()
           hidden_effect.add(ET,et)
           for bonusListIndex in bonusesListEntries[bonusIndex-1]:
-            if not cat in timesTenCats or npcBoni[bonusListIndex]:
+            if not catToModifierType[cat]=="crisis" or npcBoni[bonusListIndex]:
               bonusListValue=possibleBoniNames[bonusListIndex]
               et.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusListValue)).add("value",str(changeStep)))
         hidden_effect.add("country_event", TagList().add("id",CuDi.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents)))
@@ -417,10 +431,6 @@ defaultEvents.add("namespace", "custom_difficulty")
 defaultEvents.add("","","#Events from {} blocked up to {}".format(id_defaultEvents,id_defaultEvents+99))
 
 
-class PreDefinedDifficulty:
-  def __init__(self):
-    self.dict=dict()
-
 condVal = lambda x,y: x if y else 0
 condValPrec = lambda x1,x2,y: x1 if y==1 else (x2 if y==2  else 0)
 difficultiesPresetProperties=dict()
@@ -448,8 +458,6 @@ for diff, level in diffLevels.items():
 playerFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_player")
 scalingFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_scaling")
 otherFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_other")
-# for difficulty in ai_non_scaling_DifficultyNames:
-#   otherFlags.add("remove_global_flag", "custom_difficulty_{}".format(difficulty))
 
 for difficultyIndex, difficulty in enumerate(difficulties):
   defaultDifficultyEvent=TagList("id", CuDi.format(id_defaultEvents+difficultyIndex))
@@ -475,55 +483,57 @@ for difficultyIndex, difficulty in enumerate(difficulties):
       et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,possibleBoniNames[i])).add("value", str(value)))
 
 
-
-#easy
-
-
-
-# et=TagList()
-# immediate.add(ET,et)
-# for cat in cats:
-#   for bonus in possibleBoniNames:
-#     if cat=="player":
-#       et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "20"))
-#     # else:
-#     #   immediate.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "0"))
-
-# # defaultIndex=-1
-# for name, values in zip(vanillaDefaultDifficultyNames, vanillaDefaultDifficulty):
-#   # defaultIndex+=1
-#   newEvent=deepcopy(defaultEventTemplate)
-#   eventIndex+=1
-#   defaultEvents.add("country_event", newEvent)
-#   newEvent.replace("id",CuDi.format(eventIndex))
-#   immediate=newEvent.get("immediate")
-#   if "scaling"==name:
-#     immediate.add("country_event",TagList().add("id",name_resetYearlyFlagsEvent))
-#   else:
-#     immediate.add("country_event",TagList().add("id",name_resetAIFlagsEvent))
-#   immediate.add("set_global_flag","custom_difficulty_"+name)
-#   et=TagList()
-#   immediate.add(ET,et)
-#   for cat in cats:
-#     for i,bonus in enumerate(possibleBoniNames):
-#       if cat=="ai" and i<vanillaAItoNPCIndex:
-#         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(values[i])))
-#       elif cat=="leviathan" and i>=vanillaAItoNPCIndex:
-#         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(values[i])))
-#       elif cat=="fe" and i>=vanillaAItoNPCIndex:
-#         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(values[i])))
-#       # elif "yearly" in cat and (not name=="scaling" or not scaleDefault[i]):
-#       #   et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "0"))
-#       elif "yearly" in cat and name=="scaling" and scaleDefault[i]:
-#         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "4"))
-#       elif cat!="player":
-#         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", "0"))
-
 with open(outFolder+"/"+"custom_difficulty_defaults.txt",'w') as file:
   defaultEvents.writeAll(file, args())
 
 
 staticModifiers=TagList()
+
+modifierCats=["ai", "player", "crisis"] #three different types of modifiers. Those cats are "randomly" chosen to represent those
+
+removeModifierImmediates=dict()
+name_removeModifiers=dict()
+removeModifierImmediates["player"]=TagList()
+removeModifierImmediates["ai"]=TagList()
+removeModifierImmediates["crisis"]=TagList()
+addModifierImmediates=dict()
+name_addModifiers=dict()
+addModifierImmediates["player"]=TagList()
+addModifierImmediates["ai"]=TagList()
+addModifierImmediates["crisis"]=TagList()
+
+removeEvents=TagList("namespace", "custom_difficulty")
+addEvents=TagList("namespace", "custom_difficulty")
+
+
+def createModifierEvents(inDict, outDict, eventTaglist, id, addBool):
+  for i,item in enumerate(inDict.items()):
+    name=CuDi.format(id+i)
+    event=TagList("id", name )
+    outDict[item[0]]=name
+    eventTaglist.addComment(item[0])
+    eventTaglist.add("country_event",event)
+    event.add("is_triggered_only",yes)
+    event.add("hide_window",yes)
+    event.add("immediate",item[1])
+    if addBool:
+      item[1].add("set_country_flag", "custom_difficulty_{}_modifier_active".format(item[0]))
+    else:
+      item[1].add("remove_country_flag", "custom_difficulty_{}_modifier_active".format(item[0]))
+
+createModifierEvents(removeModifierImmediates,name_removeModifiers,removeEvents,id_removeModifiers,False)
+createModifierEvents(addModifierImmediates,name_addModifiers,addEvents, id_addModifiers,True)
+
+
+modifierFuns=dict()
+modifierFuns["player"]=lambda i: 10*i
+modifierFuns["ai"]=lambda i: pow(2,i) 
+modifierFuns["crisis"]=lambda i: pow(2,i)*10
+
+modifierRange=dict()
+modifierRange["player"]=[-10, 20] #[0]*10 to [1]*10
+modifierRange["ai"]=[-8, 11] #2^([0]-1)-1 to 2^([1]-1)-1
+modifierRange["crisis"]=[-4, 11] #10*(2^([0]-1)-1) to 10*(2^([1]-1)-1)
 
 updateFile=TagList()
 updateFile.add("namespace","custom_difficulty")
@@ -540,10 +550,13 @@ after=TagList()
 for catI,cat in enumerate(cats):
   if "yearly" in cat:
     continue
+  immediate.addComment(cat)
   ifTagList=TagList()
   immediate.add("if",ifTagList)
   limit=TagList()
   ifTagList.add("limit",limit)
+  et=TagList()
+  ifTagList.add(ET,et)
   if len(catCountryType[catI])>1:
     limitOr=TagList()
     limit.add("or",limitOr)
@@ -569,93 +582,98 @@ for catI,cat in enumerate(cats):
       norTagList.add("is_country_type", entry)
   if "player"==cat or "ai" in cat:
     orTagList=TagList()
-    limit.add("or",orTagList)
     if cat=="player":
       orTagList.add("is_ai", "no")
-      orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","no")))
+      orTagList.add("and", TagList().add("has_global_flag", "deactivate_player_vassal_ai_boni").add("exists","overlord").add("overlord",TagList().add("is_ai","no")))
     else:
-      orTagList.add("is_ai", yes)
+      limit.add("is_ai", yes)
+      orTagList.add("has_global_flag", "activate_player_vassal_ai_boni")
+      orTagList.add("not", TagList().add("exists","overlord"))
       orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","yes")))
-
-  afterIfTaglist=deepcopy(ifTagList)
-  after.add("if",afterIfTaglist)
+    limit.add("or",orTagList)
+  # afterIfTaglist=deepcopy(ifTagList)
+  # after.add("if",afterIfTaglist)
   shortened=False
 
   for bonus, bonusModifier in zip(possibleBoniNames,possibleBoniModifier):
-    ifTagList.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", ET))
-    if cat=="player":
-      # switchTL=TagList()
-      # afterIfTaglist.add("switch",switchTL)
-      for sign in [1,-1]:
-        if sign==1:
-          compSign=">"
-        else:
+    et.add("set_variable", TagList().add("which", "custom_difficulty_{}_value".format(bonus)).add("value", "custom_difficulty_{}_{}_value".format(cat,bonus)))
+    ifChanged=TagList("limit", TagList("not", 
+      TagList("check_variable", 
+        TagList("which","custom_difficulty_{}_value".format(bonus))
+        .add("value", ET))))
+    # ifChanged=TagList("limit", TagList("not", 
+    #   TagList("check_variable", 
+    #     TagList("which","custom_difficulty_{}_value".format(bonus))
+    #     .add("value", ET+":custom_difficulty_{}_value".format(bonus)))))
+    ifTagList.add("if",ifChanged)
+    ifChanged.add("set_country_flag", "custom_difficulty_{}_changed".format(bonus))
+    if debugMode:
+      ifChanged.add("log",'"setting flag {}"'.format("custom_difficulty_{}_changed".format(bonus)))
+    ifChanged.add("set_variable", TagList().add("which", "custom_difficulty_{}_value".format(bonus)).add("value", ET))
+    if cat in modifierCats: #only create the modifier for these cats. Rest use the same as one of those!
+      removeIFChanged=TagList("limit", TagList("has_country_flag", "custom_difficulty_{}_changed".format(bonus)))
+      addIFChanged=deepcopy(removeIFChanged)
+      removeModifierImmediates[cat].add("if",removeIFChanged)
+      addModifierImmediates[cat].add("if",addIFChanged)
+      addIFChanged.add("remove_country_flag","custom_difficulty_{}_changed".format(bonus) )
+      addIFChanged.add("set_variable",TagList("which", "custom_difficulty_tmp").add("value","custom_difficulty_{}_value".format(bonus)))
+      for i in range(modifierRange[cat][0],modifierRange[cat][1]+1):
+        #compare signs and stop for i==0
+        if i<0:
           compSign="<"
-        for i in reversed(range(20)):
-          if shortened:
-           if sign<0 and i>5 or i>10:
-            continue
-          ifGT=TagList()
-          afterIfTaglist.add("if",ifGT)
-          changeVal=10*(i+1)
-          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(sign*(changeVal-0.1)),"",compSign)))
-          if sign>0:
-            modifierName="custom_difficulty_{}_{}_pos_player_value".format(i,bonus)
-          else:
-            modifierName="custom_difficulty_{}_{}_neg_player_value".format(i,bonus)
-          modifier=TagList()
-          if not isinstance(bonusModifier,list):
-            bonusModifier=[bonusModifier]
-          for modifierEntry in bonusModifier:
-            if bonus=="Upkeep":
-              modifier.add(modifierEntry,str(-sign*changeVal/100))
-            else:
-              modifier.add(modifierEntry,str(sign*changeVal/100))
-          locClass.append(modifierName,"@difficulty")
-          staticModifiers.add(modifierName,modifier)
-          ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
-          immediate.add("remove_modifier", modifierName)
-          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(-1*sign*changeVal)))
-          # ifGT.add("break","yes")
-    elif cat=="ai" or cat=="crisis":
-      for sign in [1,-1]:
-        if sign==1:
+          sign=-1
+          signName="neg"
+        elif i>0:
           compSign=">"
+          sign=1
+          signName="pos"
         else:
-          compSign="<"
-        for i in reversed(range(10)):
-          if shortened:
-           if sign<0 and i>5 or i>7:
-            continue
-
-          ifGT=TagList()
-          afterIfTaglist.add("if",ifGT)
-          changeVal=pow(2,i)
-          if cat=="crisis":
-            changeVal*=10
-          ifGT.add("limit", TagList().add("check_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(sign*(changeVal-0.1)),"",compSign)))
-          if sign>0:
-            modifierName="custom_difficulty_{}_{}_pos_value".format(i,bonus)
+          continue
+        i=abs(i)
+        if cat!="player":
+          i-=1
+        changeVal=modifierFuns[cat](i)
+        ifModifierApplied=TagList()
+        if sign>0:
+          addIFChanged.insert(addIFChanged.names.index("if"),"if", ifModifierApplied)
+        else:
+          addIFChanged.add("if", ifModifierApplied)
+        ifModifierApplied.add("limit",TagList().add("check_variable",
+          TagList().add("which","custom_difficulty_tmp")
+          .add("value", str(sign*(changeVal-0.1)),"",compSign)))
+        modifierName="custom_difficulty_{:02d}_{}_{}_{}_value".format(i,bonus,signName,cat)
+        modifier=TagList()
+        if not isinstance(bonusModifier,list):
+          bonusModifier=[bonusModifier]
+        for modifierEntry in bonusModifier:
+          if bonus=="upkeep":
+            modifier.add(modifierEntry,str(-sign*changeVal/100))
           else:
-            modifierName="custom_difficulty_{}_{}_neg_value".format(i,bonus)
-          if cat=="crisis":
-            modifierName+="_times_ten"
-          modifier=TagList()
-          if not isinstance(bonusModifier,list):
-            bonusModifier=[bonusModifier]
-          for modifierEntry in bonusModifier:
-            if bonus=="Upkeep":
-              modifier.add(modifierEntry,str(-sign*changeVal/100))
-            else:
-              modifier.add(modifierEntry,str(sign*changeVal/100))
-          locClass.append(modifierName,"@difficulty")
-          staticModifiers.add(modifierName,modifier)
-          ifGT.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
-          if cat=="ai": #only add onces as they all have the same name
-            immediate.add("remove_modifier", modifierName)
-          ifGT.add("change_variable",TagList().add("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value", str(-1*sign*changeVal)))
-immediate.addTagList(after)
+            modifier.add(modifierEntry,str(sign*changeVal/100))
+        locClass.append(modifierName,"@difficulty")
+        staticModifiers.add(modifierName,modifier)
+        ifModifierApplied.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
+        if debugMode:
+          ifModifierApplied.add("log",'"adding modifier {}"'.format(modifierName))
+        removeIFChanged.add("remove_modifier", modifierName)
+        if debugMode and i==1:
+          removeIFChanged.add("log",'"removing modifiers (all of them, not only 1) {}"'.format(modifierName))
+        ifModifierApplied.add("change_variable",TagList().add("which","custom_difficulty_tmp").add("value", str(-1*sign*changeVal)))
+  for modifierCat in modifierCats:
+    ifModifierCat=TagList("limit", TagList("has_country_flag","custom_difficulty_{}_modifier_active".format(modifierCat)))
+    ifModifierCat.add("country_event", TagList("id", name_removeModifiers[modifierCat]))
+    ifTagList.addComment("removing {} bonuses if they exist".format(modifierCat))
+    ifTagList.add("if", ifModifierCat)
+  ifTagList.addComment("adding {} bonuses".format(catToModifierType[cat]))
+  ifTagList.add("country_event", TagList("id", name_addModifiers[catToModifierType[cat]]))
+# immediate.addTagList(after)
 
+
+
+with open(outFolder+"/"+"custom_difficulty_remove_modifiers.txt",'w') as file:
+  removeEvents.writeAll(file, args(1))
+with open(outFolder+"/"+"custom_difficulty_add_modifiers.txt",'w') as file:
+  addEvents.writeAll(file, args(1))
 
 with open(outFolder+"/"+"custom_difficulty_update.txt",'w') as file:
   updateFile.writeAll(file, args())
@@ -779,7 +797,7 @@ for allowUnlock in [False]:#[False,True]:
   # mainMenu.add("option", TagList("name","custom_difficulty_lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
   # if allowUnlock:
   #   mainMenu.add("option",TagList("name","custom_difficulty_unlock.name").add("trigger", TagList("has_global_flag","custom_difficulty_locked")).add("hidden_effect",TagList("remove_global_flag", "custom_difficulty_locked").add("country_event", t_mainMenuEvent)))
-  # mainMenu.add("option", t_closeOption)
+  mainMenu.add("option", t_closeOption)
 
   # mainMenu=TagList()
   # if allowUnlock:
@@ -801,7 +819,7 @@ trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc
 for i,cat in enumerate(cats):
   hidden_effect=TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+i*id_ChangeEvents)))
   if cat=="crisis":
-    hidden_effect.add("add_global_flag","custom_difficulty_menu_crisis_from_custom")
+    hidden_effect.add("set_global_flag","custom_difficulty_menu_crisis_from_custom")
   customMenu.add("option", TagList("name","custom_difficulty_{}.name".format(cat)).add("hidden_effect", hidden_effect))
 customMenu.add("option", t_backMainOption)
 customMenu.add("option", t_closeOption)
@@ -831,6 +849,20 @@ for i,difficulty in enumerate(difficulties):
 defaultMenuEvent.add("option", TagList("name", "custom_difficulty_reset.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id", name_resetConfirmationEvent))))
 defaultMenuEvent.add("option", t_backMainOption)
 defaultMenuEvent.add("option", t_closeOption)
+
+rootUpdateMenu=TagList("id",name_rootUpdateEvent)
+mainFileContent.addComment("root update event")
+mainFileContent.add("event", rootUpdateMenu)
+rootUpdateMenu.add("is_triggered_only", yes)
+rootUpdateMenu.add("hide_window", yes)
+immediate=TagList()
+rootUpdateMenu.add("immediate",immediate)
+ifDelay=TagList("limit",TagList("has_global_flag", "custom_difficulty_delay_mode"))
+ifDelay.add("every_country", TagList("country_event", TagList("id", name_countryUpdateEvent).add("days","1").add("random","180")))
+# ifInstant=TagList("limit",TagList("not", TagList("has_global_flag", "custom_difficulty_delay_mode")))
+ifDelay.add("else", TagList("every_country", TagList("country_event", TagList("id", name_countryUpdateEvent))))
+immediate.add("if", ifDelay)
+
 
 
 mainFileContent.add("","","#game start init")
