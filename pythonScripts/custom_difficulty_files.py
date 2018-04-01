@@ -102,7 +102,7 @@ locClass.addLoc("allDesc", "Change all available bonuses at once.")
 locClass.addLoc("default", "Standard")
 locClass.addLoc("resourceProd", "Resource Production")
 locClass.addLoc("resourceProdDesc", "Change mineral, energy and food bonuses.")
-locClass.addLoc("humanResources", "Human Resource")
+locClass.addLoc("humanResources", "Human Resources")
 locClass.addLoc("humanResourcesDesc", "Change unity, research and naval capacity bonuses.")
 locClass.addLoc("allShip", "All Combat")
 locClass.addLoc("allShipDesc", "Change combat bonuses: weapon damage, hull, shields and armor.")
@@ -341,13 +341,14 @@ for cat in cats:
     optionIndex+=1
     if bonusesListName=="all":
       icons=""
+      locClass.addEntry("custom_difficulty_{}_change_{}_name".format(cat,bonusesListName), "@change @{} @bonuses".format(bonusesListName))
     else:
       icons=" ".join([possibleBoniIcons[i] for i in bonusesListEntries[optionIndex-1]])
+      locClass.addEntry("custom_difficulty_{}_change_{}_name".format(cat,bonusesListName), "@change @{} ({} ) @bonuses".format(bonusesListName,icons))
     firstVarName=possibleBoniNames[bonusesListEntries[optionIndex-1][0]]
     option=TagList().add("name", "custom_difficulty_{}_change_{}_name".format(cat,bonusesListName))
     option.add("custom_tooltip", "custom_difficulty_{}_change_{}_desc".format(cat,bonusesListName))
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
-    locClass.addEntry("custom_difficulty_{}_change_{}_name".format(cat,bonusesListName), "@change @{} ({}) @bonuses".format(bonusesListName,icons))
     locClass.addEntry("custom_difficulty_{}_change_{}_desc".format(cat,bonusesListName), "@{}Desc".format(bonusesListName))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
     if bonusesListName!="all":
