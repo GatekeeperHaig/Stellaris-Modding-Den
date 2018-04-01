@@ -1031,7 +1031,7 @@ country_event = {
 		#other
 		if = {
 			limit = {
-				NOR = { is_country_type = default is_country_type = cybrex_empire is_country_type = portal_holders is_country_type = guardian_stellarite is_country_type = feral_prethoryn is_country_type = guardian_hiver is_country_type = guardian_fortress is_country_type = marauder_raiders is_country_type = feral_prethoryn_infighting is_country_type = sentinels is_country_type = extradimensional_2 is_country_type = awakened_marauders is_country_type = swarm is_country_type = extradimensional is_country_type = ruined_marauders is_country_type = guardian_dreadnought is_country_type = awakened_fallen_empire is_country_type = guardian_wraith is_country_type = guardian_dragon is_country_type = guardian_sphere is_country_type = dormant_marauders is_country_type = guardian is_country_type = fallen_empire is_country_type = guardian_horror is_country_type = ai_empire is_country_type = extradimensional_3 }
+				NOR = { is_country_type = guardian_wraith is_country_type = ruined_marauders is_country_type = feral_prethoryn is_country_type = marauder_raiders is_country_type = ai_empire is_country_type = extradimensional_3 is_country_type = guardian_sphere is_country_type = cybrex_empire is_country_type = awakened_fallen_empire is_country_type = dormant_marauders is_country_type = default is_country_type = guardian_fortress is_country_type = guardian_hiver is_country_type = sentinels is_country_type = extradimensional is_country_type = guardian_stellarite is_country_type = portal_holders is_country_type = awakened_marauders is_country_type = guardian_dragon is_country_type = guardian_horror is_country_type = swarm is_country_type = guardian is_country_type = extradimensional_2 is_country_type = feral_prethoryn_infighting is_country_type = fallen_empire is_country_type = guardian_dreadnought }
 			}
 			event_target:custom_difficulty_var_storage = {
 				set_variable = { which = custom_difficulty_minerals_value value = custom_difficulty_other_minerals_value }
@@ -1177,6 +1177,435 @@ country_event = {
 				set_country_flag = custom_difficulty_growth_changed
 				log = "setting flag custom_difficulty_growth_changed"
 				set_variable = { which = custom_difficulty_growth_value value = event_target:custom_difficulty_var_storage }
+			}
+			#removing ai bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_ai_modifier_active }
+				country_event = { id = custom_difficulty.71 }
+			}
+			#removing player bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_player_modifier_active }
+				country_event = { id = custom_difficulty.70 }
+			}
+			#removing crisis bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_crisis_modifier_active }
+				country_event = { id = custom_difficulty.72 }
+			}
+			#adding ai bonuses
+			country_event = { id = custom_difficulty.81 }
+		}
+	}
+}
+country_event = {
+	id = custom_difficulty.51
+	is_triggered_only = yes
+	hide_window = yes
+	immediate = {
+		#ai
+		if = {
+			limit = {
+				is_country_type = default
+				is_ai = yes
+				or = {
+					has_global_flag = activate_player_vassal_ai_boni
+					not = { exists = overlord }
+					and = {
+						exists = overlord
+						overlord = { is_ai = yes }
+					}
+				}
+			}
+			event_target:custom_difficulty_var_storage = {
+				set_variable = { which = custom_difficulty_minerals_value value = custom_difficulty_ai_minerals_value }
+				set_variable = { which = custom_difficulty_research_value value = custom_difficulty_ai_research_value }
+				set_variable = { which = custom_difficulty_damage_value value = custom_difficulty_ai_damage_value }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_minerals_changed
+				log = "setting flag custom_difficulty_minerals_changed"
+				set_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_research_changed
+				log = "setting flag custom_difficulty_research_changed"
+				set_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_damage_changed
+				log = "setting flag custom_difficulty_damage_changed"
+				set_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
+			}
+			#removing ai bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_ai_modifier_active }
+				country_event = { id = custom_difficulty.71 }
+			}
+			#removing player bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_player_modifier_active }
+				country_event = { id = custom_difficulty.70 }
+			}
+			#removing crisis bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_crisis_modifier_active }
+				country_event = { id = custom_difficulty.72 }
+			}
+			#adding ai bonuses
+			country_event = { id = custom_difficulty.81 }
+		}
+		#fe
+		if = {
+			limit = {
+				or = { is_country_type = fallen_empire is_country_type = awakened_fallen_empire }
+			}
+			event_target:custom_difficulty_var_storage = {
+				set_variable = { which = custom_difficulty_minerals_value value = custom_difficulty_fe_minerals_value }
+				set_variable = { which = custom_difficulty_research_value value = custom_difficulty_fe_research_value }
+				set_variable = { which = custom_difficulty_damage_value value = custom_difficulty_fe_damage_value }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_minerals_changed
+				log = "setting flag custom_difficulty_minerals_changed"
+				set_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_research_changed
+				log = "setting flag custom_difficulty_research_changed"
+				set_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_damage_changed
+				log = "setting flag custom_difficulty_damage_changed"
+				set_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
+			}
+			#removing ai bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_ai_modifier_active }
+				country_event = { id = custom_difficulty.71 }
+			}
+			#removing player bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_player_modifier_active }
+				country_event = { id = custom_difficulty.70 }
+			}
+			#removing crisis bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_crisis_modifier_active }
+				country_event = { id = custom_difficulty.72 }
+			}
+			#adding ai bonuses
+			country_event = { id = custom_difficulty.81 }
+		}
+		#leviathan
+		if = {
+			limit = {
+				or = { is_country_type = guardian is_country_type = guardian_dragon is_country_type = guardian_stellarite is_country_type = guardian_wraith is_country_type = guardian_hiver is_country_type = guardian_horror is_country_type = guardian_fortress is_country_type = guardian_dreadnought is_country_type = guardian_sphere }
+			}
+			event_target:custom_difficulty_var_storage = {
+				set_variable = { which = custom_difficulty_minerals_value value = custom_difficulty_leviathan_minerals_value }
+				set_variable = { which = custom_difficulty_research_value value = custom_difficulty_leviathan_research_value }
+				set_variable = { which = custom_difficulty_damage_value value = custom_difficulty_leviathan_damage_value }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_minerals_changed
+				log = "setting flag custom_difficulty_minerals_changed"
+				set_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_research_changed
+				log = "setting flag custom_difficulty_research_changed"
+				set_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_damage_changed
+				log = "setting flag custom_difficulty_damage_changed"
+				set_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
+			}
+			#removing ai bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_ai_modifier_active }
+				country_event = { id = custom_difficulty.71 }
+			}
+			#removing player bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_player_modifier_active }
+				country_event = { id = custom_difficulty.70 }
+			}
+			#removing crisis bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_crisis_modifier_active }
+				country_event = { id = custom_difficulty.72 }
+			}
+			#adding crisis bonuses
+			country_event = { id = custom_difficulty.82 }
+		}
+		#player
+		if = {
+			limit = {
+				or = {
+					is_ai = no
+					and = {
+						has_global_flag = deactivate_player_vassal_ai_boni
+						exists = overlord
+						overlord = { is_ai = no }
+					}
+				}
+			}
+			event_target:custom_difficulty_var_storage = {
+				set_variable = { which = custom_difficulty_minerals_value value = custom_difficulty_player_minerals_value }
+				set_variable = { which = custom_difficulty_research_value value = custom_difficulty_player_research_value }
+				set_variable = { which = custom_difficulty_damage_value value = custom_difficulty_player_damage_value }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_minerals_changed
+				log = "setting flag custom_difficulty_minerals_changed"
+				set_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_research_changed
+				log = "setting flag custom_difficulty_research_changed"
+				set_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_damage_changed
+				log = "setting flag custom_difficulty_damage_changed"
+				set_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
+			}
+			#removing ai bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_ai_modifier_active }
+				country_event = { id = custom_difficulty.71 }
+			}
+			#removing player bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_player_modifier_active }
+				country_event = { id = custom_difficulty.70 }
+			}
+			#removing crisis bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_crisis_modifier_active }
+				country_event = { id = custom_difficulty.72 }
+			}
+			#adding player bonuses
+			country_event = { id = custom_difficulty.80 }
+		}
+		#crisis
+		if = {
+			limit = {
+				or = { is_country_type = swarm is_country_type = extradimensional is_country_type = extradimensional_2 is_country_type = extradimensional_3 is_country_type = ai_empire is_country_type = cybrex_empire is_country_type = sentinels is_country_type = portal_holders is_country_type = feral_prethoryn is_country_type = feral_prethoryn_infighting }
+			}
+			event_target:custom_difficulty_var_storage = {
+				set_variable = { which = custom_difficulty_minerals_value value = custom_difficulty_crisis_minerals_value }
+				set_variable = { which = custom_difficulty_research_value value = custom_difficulty_crisis_research_value }
+				set_variable = { which = custom_difficulty_damage_value value = custom_difficulty_crisis_damage_value }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_minerals_changed
+				log = "setting flag custom_difficulty_minerals_changed"
+				set_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_research_changed
+				log = "setting flag custom_difficulty_research_changed"
+				set_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_damage_changed
+				log = "setting flag custom_difficulty_damage_changed"
+				set_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
+			}
+			#removing ai bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_ai_modifier_active }
+				country_event = { id = custom_difficulty.71 }
+			}
+			#removing player bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_player_modifier_active }
+				country_event = { id = custom_difficulty.70 }
+			}
+			#removing crisis bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_crisis_modifier_active }
+				country_event = { id = custom_difficulty.72 }
+			}
+			#adding crisis bonuses
+			country_event = { id = custom_difficulty.82 }
+		}
+		#marauders
+		if = {
+			limit = {
+				or = { is_country_type = dormant_marauders is_country_type = ruined_marauders is_country_type = awakened_marauders is_country_type = marauder_raiders }
+			}
+			event_target:custom_difficulty_var_storage = {
+				set_variable = { which = custom_difficulty_minerals_value value = custom_difficulty_marauders_minerals_value }
+				set_variable = { which = custom_difficulty_research_value value = custom_difficulty_marauders_research_value }
+				set_variable = { which = custom_difficulty_damage_value value = custom_difficulty_marauders_damage_value }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_minerals_changed
+				log = "setting flag custom_difficulty_minerals_changed"
+				set_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_research_changed
+				log = "setting flag custom_difficulty_research_changed"
+				set_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_damage_changed
+				log = "setting flag custom_difficulty_damage_changed"
+				set_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
+			}
+			#removing ai bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_ai_modifier_active }
+				country_event = { id = custom_difficulty.71 }
+			}
+			#removing player bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_player_modifier_active }
+				country_event = { id = custom_difficulty.70 }
+			}
+			#removing crisis bonuses if they exist
+			if = {
+				limit = { has_country_flag = custom_difficulty_crisis_modifier_active }
+				country_event = { id = custom_difficulty.72 }
+			}
+			#adding crisis bonuses
+			country_event = { id = custom_difficulty.82 }
+		}
+		#other
+		if = {
+			limit = {
+				NOR = { is_country_type = guardian_wraith is_country_type = ruined_marauders is_country_type = feral_prethoryn is_country_type = marauder_raiders is_country_type = ai_empire is_country_type = extradimensional_3 is_country_type = guardian_sphere is_country_type = cybrex_empire is_country_type = awakened_fallen_empire is_country_type = dormant_marauders is_country_type = default is_country_type = guardian_fortress is_country_type = guardian_hiver is_country_type = sentinels is_country_type = extradimensional is_country_type = guardian_stellarite is_country_type = portal_holders is_country_type = awakened_marauders is_country_type = guardian_dragon is_country_type = guardian_horror is_country_type = swarm is_country_type = guardian is_country_type = extradimensional_2 is_country_type = feral_prethoryn_infighting is_country_type = fallen_empire is_country_type = guardian_dreadnought }
+			}
+			event_target:custom_difficulty_var_storage = {
+				set_variable = { which = custom_difficulty_minerals_value value = custom_difficulty_other_minerals_value }
+				set_variable = { which = custom_difficulty_research_value value = custom_difficulty_other_research_value }
+				set_variable = { which = custom_difficulty_damage_value value = custom_difficulty_other_damage_value }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_minerals_changed
+				log = "setting flag custom_difficulty_minerals_changed"
+				set_variable = { which = custom_difficulty_minerals_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_research_changed
+				log = "setting flag custom_difficulty_research_changed"
+				set_variable = { which = custom_difficulty_research_value value = event_target:custom_difficulty_var_storage }
+			}
+			if = {
+				limit = {
+					not = {
+						check_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
+					}
+				}
+				set_country_flag = custom_difficulty_damage_changed
+				log = "setting flag custom_difficulty_damage_changed"
+				set_variable = { which = custom_difficulty_damage_value value = event_target:custom_difficulty_var_storage }
 			}
 			#removing ai bonuses if they exist
 			if = {
