@@ -77,8 +77,7 @@ doTranslation=False
 locClass=LocList(doTranslation)
 locClass.addLoc("modName", "Dynamic Difficulty", "all")
 
-#BIG TODO crisis and ensign,etc collide atm: Crisis changes stuff to "advanced". ensign etc changes crisis strength. Both should not happen!
-# todo: In simple mode, use minerals, research and weapon damage variables to apply combined modifiers and ignore the rest: Changes needed:
+# BIG todo: In simple mode, use minerals, research and weapon damage variables to apply combined modifiers and ignore the rest: Changes needed:
 #       1. removeAllModifiers function when switching. 2. Alternative remove and add modifier functions. 3. Alternative display. 4. Change update and yearly update
 
 
@@ -274,6 +273,8 @@ name_rootUpdateEventDelay="custom_difficulty.41"
 name_countryUpdateEvent="custom_difficulty.50"
 name_lockEvent="custom_difficulty.60"
 id_removeModifiers=70  #reserved range up to 79
+name_removeAllModifiers=CuDi.format(id_removeModifiers+9)
+name_removeEventTarget=CuDi.format(id_removeModifiers+8)
 id_addModifiers=80  #reserved range up to 89
 id_defaultEvents=100 #reserved range up to 199
 id_ChangeEvents=1000 #reserved range up to 9999
@@ -295,6 +296,13 @@ t_closeOption=TagList("name", "custom_difficulty_close.name").add("hidden_effect
 
 def t_back(name):
   return TagList("name","custom_difficulty_back").add("hidden_effect", TagList("country_event",TagList("id", name)))
+
+def add_event(tagList, name):
+  if name[:5]!="name_":
+    print("add_event only works with predefined event names")
+    return
+  tagList.add("country_event", TagList("id", eval(name))," #"+name.replace("name_",""))
+  return tagList
 
 
 difficultyChangeWindows = []
@@ -739,6 +747,32 @@ for catI,cat in enumerate(cats):
 
 
 
+
+removeALLmodifiersEvent=TagList("name", name_removeAllModifiers)
+removeEvents.addComment("remove ALL modifier no matter what. Slow but sure. Not called on yearly stuff.")
+removeEvents.add("event", removeALLmodifiersEvent)
+removeALLmodifiersEvent.add("is_triggered_only",yes)
+removeALLmodifiersEvent.add("hide_window",yes)
+everyCountry=TagList()
+removeALLmodifiersEvent.add("immediate",TagList("every_country",everyCountry))
+for name in staticModifiers.names:
+  if name!="":
+    everyCountry.add("remove_modifier",name)
+for bonus in possibleBoniNames:
+  everyCountry.add("set_variable", TagList("which","custom_difficulty_{}_value".format(bonus)).add("value",0))
+
+removeEventTargetEvent=TagList("name", name_removeEventTarget)
+removeEvents.addComment("remove everything on event target. Slow but sure. Not called on yearly stuff.")
+removeEvents.add("event", removeEventTargetEvent)
+removeEventTargetEvent.add("is_triggered_only",yes)
+removeEventTargetEvent.add("hide_window",yes)
+et=TagList()
+removeEventTargetEvent.add("immediate",TagList(ET,et))
+for cat in cats:
+  for bonus in possibleBoniNames:
+    et.add("set_variable", TagList("which","custom_difficulty_{}_{}_value".format(cat,bonus)).add("value",0))
+
+
 with open(outFolder+"/"+"custom_difficulty_remove_modifiers.txt",'w') as file:
   removeEvents.writeAll(file, args(1))
 with open(outFolder+"/"+"custom_difficulty_add_modifiers.txt",'w') as file:
@@ -746,6 +780,7 @@ with open(outFolder+"/"+"custom_difficulty_add_modifiers.txt",'w') as file:
 
 with open(outFolder+"/"+"custom_difficulty_update.txt",'w') as file:
   updateFile.writeAll(file, args())
+
 
 outputFolderStaticModifiers="../gratak_mods/custom_difficulty/common/static_modifiers"
 if not os.path.exists(outputFolderStaticModifiers):
@@ -807,7 +842,7 @@ edictFile=TagList().add("country_edict", edict)
 outputToFolderAndFile(edictFile, "common/edicts", "custom_difficulty_edict.txt")
 
 onActions=TagList()
-onActions.add("on_yearly_pulse", TagList("events",TagList().add(name_rootYearlyEvent).add(name_rootUpdateEvent)))
+onActions.add("on_yearly_pulse", TagList("events",TagList().add(name_rootYearlyEvent,""," #rootYearly").add(name_rootUpdateEvent,""," #rootUpdate")))
 onActions.add("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
 # onActions.add("on_game_start", TagList("events",TagList().add(name_rootUpdateEvent))) #is called by "fire only once"
 outputToFolderAndFile(onActions, "common/on_actions", "custom_difficulty_on_action.txt")
@@ -1058,7 +1093,7 @@ resetEvent.replace("id", name_resetEvent)
 resetEvent.remove("fire_only_once")
 resetEvent.remove("trigger")
 resetEvent.add("is_triggered_only",yes)
-resetEvent.get("immediate").insert(0, "country_event", TagList("id", name_resetFlagsEvent))
+resetEvent.get("immediate").insert(0, "country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent").insert(0, "country_event", TagList("id", name_removeEventTarget)," #removeEventTarget")
 mainFileContent.add("country_event", resetEvent)
 
 mainFileContent.add("","","#reset confirmation")
@@ -1068,7 +1103,9 @@ resetConfirmation.add("is_triggered_only",yes)
 resetConfirmation.add("title","custom_difficulty_reset_conf.name")
 resetConfirmation.add("desc","custom_difficulty_reset.desc")
 resetConfirmation.add("picture", "GFX_evt_towel")
-effect=TagList().add("country_event", TagList("id", name_resetFlagsEvent)).add("country_event", TagList("id", name_resetEvent))#.add("country_event", TagList("id", name_defaultMenuEvent))
+effect=TagList()
+add_event(effect, "name_resetFlagsEvent")
+add_event(effect, "name_resetEvent")
 resetConfirmation.add("option", TagList("name", "OK").add("hidden_effect", effect))
 resetConfirmation.add("option", TagList("name", "custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
 

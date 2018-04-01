@@ -61,6 +61,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     return self
   def addComment(self, comment):
     self.add("","","#"+comment)
+    return self
   def insert(self,index,name,val='',comment='', seperator="="):
     self._apply(lambda x,y:x.insert(index,y),name,val,comment,seperator)
     return self
