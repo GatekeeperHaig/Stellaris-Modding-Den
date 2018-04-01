@@ -302,6 +302,7 @@ def add_event(tagList, name):
     print("add_event only works with predefined event names")
     return
   tagList.add("country_event", TagList("id", eval(name))," #"+name.replace("name_",""))
+  return tagList
 
 
 difficultyChangeWindows = []
@@ -841,7 +842,7 @@ edictFile=TagList().add("country_edict", edict)
 outputToFolderAndFile(edictFile, "common/edicts", "custom_difficulty_edict.txt")
 
 onActions=TagList()
-onActions.add("on_yearly_pulse", TagList("events",TagList().add(name_rootYearlyEvent).add(name_rootUpdateEvent)))
+onActions.add("on_yearly_pulse", TagList("events",TagList().add(name_rootYearlyEvent,""," #rootYearly").add(name_rootUpdateEvent,""," #rootUpdate")))
 onActions.add("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
 # onActions.add("on_game_start", TagList("events",TagList().add(name_rootUpdateEvent))) #is called by "fire only once"
 outputToFolderAndFile(onActions, "common/on_actions", "custom_difficulty_on_action.txt")
@@ -1102,7 +1103,9 @@ resetConfirmation.add("is_triggered_only",yes)
 resetConfirmation.add("title","custom_difficulty_reset_conf.name")
 resetConfirmation.add("desc","custom_difficulty_reset.desc")
 resetConfirmation.add("picture", "GFX_evt_towel")
-effect=TagList().add("country_event", TagList("id", name_resetFlagsEvent)).add("country_event", TagList("id", name_resetEvent))#.add("country_event", TagList("id", name_defaultMenuEvent))
+effect=TagList()
+add_event(effect, "name_resetFlagsEvent")
+add_event(effect, "name_resetEvent")
 resetConfirmation.add("option", TagList("name", "OK").add("hidden_effect", effect))
 resetConfirmation.add("option", TagList("name", "custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
 
