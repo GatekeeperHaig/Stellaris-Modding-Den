@@ -175,7 +175,7 @@ locClass.addLoc("strength", "Strength")
 locClass.addLoc("example", "Example")
 locClass.addLoc("values", "Values")
 locClass.addLoc("init", "Initialization")
-locClass.addLoc("initDesc", "Thanks for using Dynamic Difficulty. Start the event menu via 'ModMenu' or edict.")
+locClass.addLoc("initDesc", "Thank you for using Dynamic Difficulty. Start the event menu via 'ModMenu' or edict.")
 locClass.addLoc("crisisInit","Since it seems to be impossible to read crisis strength in a mod, you'll have to enter it here."+
   " The option chosen during game start will not have an effect anymore."+
   " The chosen value will be translated into a bonus according to the same formula as in vanilla and can be customized at any time.")
@@ -813,12 +813,15 @@ for groupUpdate in [False,True]:
           ifModifierApplied.add("change_variable",TagList().add("which","custom_difficulty_tmp").add("value", str(-1*sign*changeVal)))
     for modifierCat in modifierCats:
       ifModifierCat=TagList("limit", TagList("has_country_flag","custom_difficulty_{}_modifier_active".format(modifierCat)))
-      ifModifierCat.add("country_event", TagList("id", name_removeModifiers[modifierCat]))
+      if groupUpdate:
+        ifModifierCat.add("country_event", TagList("id", name_removeGroupModifiers[modifierCat]))
+      else:
+        ifModifierCat.add("country_event", TagList("id", name_removeModifiers[modifierCat]))
       ifTagList.addComment("removing {} bonuses if they exist".format(modifierCat))
       ifTagList.add("if", ifModifierCat)
     ifTagList.addComment("adding {} bonuses".format(catToModifierType[cat]))
     if groupUpdate:
-      ifTagList.add("country_event", TagList("id", name_addModifiers[catToModifierType[cat]]))
+      ifTagList.add("country_event", TagList("id", name_addGroupModifiers[catToModifierType[cat]]))
     else:
       ifTagList.add("country_event", TagList("id", name_addModifiers[catToModifierType[cat]]))
   # immediate.addTagList(after)
@@ -826,7 +829,7 @@ for groupUpdate in [False,True]:
 
 
 
-removeALLmodifiersEvent=TagList("name", name_removeAllModifiers)
+removeALLmodifiersEvent=TagList("id", name_removeAllModifiers)
 removeEvents.addComment("remove ALL modifier no matter what. Slow but sure. Not called on yearly stuff.")
 removeEvents.add("event", removeALLmodifiersEvent)
 removeALLmodifiersEvent.add("is_triggered_only",yes)
@@ -839,7 +842,7 @@ for name in staticModifiers.names:
 for bonus in possibleBoniNames:
   everyCountry.add("set_variable", TagList("which","custom_difficulty_{}_value".format(bonus)).add("value",0))
 
-removeEventTargetEvent=TagList("name", name_removeEventTarget)
+removeEventTargetEvent=TagList("id", name_removeEventTarget)
 removeEvents.addComment("remove everything on event target. Slow but sure. Not called on yearly stuff.")
 removeEvents.add("event", removeEventTargetEvent)
 removeEventTargetEvent.add("is_triggered_only",yes)
@@ -1055,7 +1058,7 @@ def ifDelay(name):
   self.add("else", TagList("every_country", TagList("country_event", TagList("id", name))))
   return self
 ifSimple=TagList("limit",TagList("has_global_flag", "custom_difficulty_activate_simple_mode"))
-ifSimple.add("if", ifDelay(name_countryUpdateEventSimple)).add("else", ifDelay(name_countryUpdateEvent))
+ifSimple.add("if", ifDelay(name_countryUpdateEventSimple)).add("else", TagList("if",ifDelay(name_countryUpdateEvent)))
 immediate.add("if", ifSimple)
 
 
@@ -1159,7 +1162,9 @@ for key, inverses in optionWithInverse.items():
     if inverse in defaultOptions:
       inverseIsDefault=True
   if not inverseIsDefault:
-    gameStartAfter.addTagList(deepcopy(effect))
+    for name, val in effect.getNameVal():
+      gameStartAfter.insert(0, name, deepcopy(val))
+    # gameStartAfter.addTagList(deepcopy(effect))
     defaultOptions.append(key)
   if key in optionExtraEvents:
     for e in optionExtraEvents[key]:
