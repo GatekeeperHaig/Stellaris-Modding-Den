@@ -78,6 +78,9 @@ locClass=LocList(doTranslation)
 locClass.addLoc("modName", "Dynamic Difficulty", "all")
 
 #BIG TODO crisis and ensign,etc collide atm: Crisis changes stuff to "advanced". ensign etc changes crisis strength. Both should not happen!
+# todo: In simple mode, use minerals, research and weapon damage variables to apply combined modifiers and ignore the rest: Changes needed:
+#       1. removeAllModifiers function when switching. 2. Alternative remove and add modifier functions. 3. Alternative display. 4. Change update and yearly update
+
 
 #IMPORTANT
 #bonuses
@@ -235,7 +238,7 @@ locClass.addEntry("custom_difficulty_scaling.name", "§H@scaling - @increase @bo
 locClass.addEntry("custom_difficulty_no_scaling.name", "§H@no @scaling§!")
 locClass.addEntry("custom_difficulty_advanced_configuration.name", "§B@advCust @nonPlayer§!")
 locClass.addEntry("custom_difficulty_advanced_configuration_player.name", "§G@advCust @player§!")
-locClass.addEntry("custom_difficulty_advanced_configuration_yearly.name", "§H@advCust @yearly§!")
+locClass.addEntry("custom_difficulty_advanced_configuration_scaling.name", "§H@advCust @yearly§!")
 locClass.addEntry("custom_difficulty_reset.name", "@reset")
 locClass.addEntry("custom_difficulty_reset_conf.name", "@reset - @confirmation")
 locClass.addEntry("custom_difficulty_reset.desc", "@resetDesc")
@@ -430,11 +433,13 @@ for cat in cats:
         hidden_effect.add("country_event", TagList().add("id",CuDi.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents)))
         if cat=="player":
           hidden_effect.add("country_event", TagList().add("id",name_resetPlayerFlagsEvent)) #remove flags
+          hidden_effect.add("set_global_flag", "custom_difficulty_advanced_configuration_player")
         elif cat=="ai_yearly":
           hidden_effect.add("country_event", TagList().add("id",name_resetYearlyFlagsEvent)) #remove flags
-        else:
+          hidden_effect.add("set_global_flag", "custom_difficulty_advanced_configuration_scaling")
+        elif cat!="crisis":
           hidden_effect.add("country_event", TagList().add("id",name_resetAIFlagsEvent)) #remove flags
-        hidden_effect.add("set_global_flag", "custom_difficulty_advanced_configuration")
+          hidden_effect.add("set_global_flag", "custom_difficulty_advanced_configuration")
         option.add("hidden_effect",hidden_effect)
         changeEvent.add("option",option)
 
@@ -527,6 +532,8 @@ for difficultyIndex, difficulty in enumerate(difficulties):
   et=TagList()
   immediate.add(ET,et)
   for cat, values in difficultiesPresetProperties[difficulty].items():
+    if cat=="crisis":
+      continue
     for i, value in enumerate(values):
       et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,possibleBoniNames[i])).add("value", str(value)))
   
@@ -538,8 +545,12 @@ for difficultyIndex, difficulty in enumerate(difficulties):
     # et.add("get_galaxy_setup_value", TagList("setting", "crises").add("which", "custom_difficulty_crisis_strength").add("scale_by", "3"))
     for i, value in enumerate(values):
       if value:
-        et.add("multiply_variable", TagList("which", "custom_difficulty_{}_{}_value".format(cat,possibleBoniNames[i])).add("value", "custom_difficulty_crisis_strength"))
-        et.add("multiply_variable", TagList("which", "custom_difficulty_{}_{}_value".format(cat,possibleBoniNames[i])).add("value", 3))
+        crisisVar="custom_difficulty_{}_{}_value".format(cat,possibleBoniNames[i])
+        ifCrisisNotSet=TagList("limit", TagList("check_variable", TagList("which",crisisVar).add("value",0)))
+        et.add("if", ifCrisisNotSet)
+        ifCrisisNotSet.add("set_variable", TagList().add("which", crisisVar).add("value", str(value)))
+        ifCrisisNotSet.add("multiply_variable", TagList("which", crisisVar).add("value", "custom_difficulty_crisis_strength"))
+        ifCrisisNotSet.add("multiply_variable", TagList("which", crisisVar).add("value", 3))
 
 with open(outFolder+"/"+"custom_difficulty_defaults.txt",'w') as file:
   defaultEvents.writeAll(file, args())
@@ -900,7 +911,7 @@ for difficulty in difficulties:
   trigger.add("success_text", TagList("text", "custom_difficulty_{}.name".format(difficulty)).add("has_global_flag", "custom_difficulty_{}".format(difficulty)))
 trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration_player.name").add("has_global_flag", "custom_difficulty_advanced_configuration_player"))
 trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration.name").add("has_global_flag", "custom_difficulty_advanced_configuration"))
-trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration_yearly.name").add("has_global_flag", "custom_difficulty_advanced_configuration_yearly"))
+trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration_scaling.name").add("has_global_flag", "custom_difficulty_advanced_configuration_scaling"))
 # trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration_crisis.name").add("has_global_flag", "custom_difficulty_advanced_configuration_crisis"))
 trigger.add("fail_text", TagList("text", "custom_difficulty_choose").add("has_global_flag", "custom_difficulty_locked"))
 for i,difficulty in enumerate(difficulties):
