@@ -22,7 +22,7 @@ possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_a
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","country_resource_influence_mult","country_naval_cap_mult","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["ship_upkeep_mult",
 #"country_building_upkeep_mult", #is there any such modifier except on planet base?!
 "country_starbase_upkeep_mult","army_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
-possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","","","","","","",""]
+possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","£navy_size","£military_power","£ship_stats_hitpoints","£ship_stats_armor","£ship_stats_shield","£ship_stats_maintenance","£pops"]
 possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
 
 bonusesListNames=["all","resourceProd","humanResources", "allShip"]
@@ -339,12 +339,41 @@ for cat in cats:
   optionIndex=0
   for bonusesListName in bonusesListNames:
     optionIndex+=1
+    if bonusesListName=="all":
+      icons=""
+    else:
+      icons=" ".join([possibleBoniIcons[i] for i in bonusesListEntries[optionIndex-1]])
+    firstVarName=possibleBoniNames[bonusesListEntries[optionIndex-1][0]]
     option=TagList().add("name", "custom_difficulty_{}_change_{}_name".format(cat,bonusesListName))
     option.add("custom_tooltip", "custom_difficulty_{}_change_{}_desc".format(cat,bonusesListName))
     option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
-    locClass.addEntry("custom_difficulty_{}_change_{}_name".format(cat,bonusesListName), "@change @{} @bonuses".format(bonusesListName))
+    locClass.addEntry("custom_difficulty_{}_change_{}_name".format(cat,bonusesListName), "@change @{} ({}) @bonuses".format(bonusesListName,icons))
     locClass.addEntry("custom_difficulty_{}_change_{}_desc".format(cat,bonusesListName), "@{}Desc".format(bonusesListName))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
+    if bonusesListName!="all":
+      if cat!="ai_yearly":
+        localVarName="custom_difficulty_{}_{}_value".format(cat,firstVarName)
+        localDescName="custom_difficulty_{}_{}_desc".format(cat,bonusesListName)
+        checkVar=TagList().add("which", localVarName).add("value","0")
+        trigger.add("success_text",TagList()
+            .add("text",localDescName).add(ET,TagList()
+              .add("not", TagList("check_variable", checkVar))).add("has_global_flag", "custom_difficulty_activate_simple_mode"))
+        locClass.addEntry(localDescName, "{} @{}: [{}.custom_difficulty_{}_{}_value]%".format(icons, bonusesListName,ET,cat,firstVarName))
+      else:
+        localVarName="custom_difficulty_{}_{}_value".format(cat,firstVarName)
+        localDescIncName="custom_difficulty_{}_{}_inc_desc".format(cat,bonusesListName)
+        localDescDecName="custom_difficulty_{}_{}_dec_desc".format(cat,bonusesListName)
+        checkVar=TagList().add("which", localVarName).add("value","0","",">")
+        trigger.add("success_text",TagList().add("text",localDescIncName).add(ET,TagList().add("check_variable", checkVar)).add("has_global_flag", "custom_difficulty_activate_simple_mode"))
+        checkVar=TagList().add("which", localVarName).add("value","0","","<")
+        trigger.add("success_text",TagList().add("text",localDescDecName).add(ET,TagList().add("check_variable", checkVar)).add("has_global_flag", "custom_difficulty_activate_simple_mode"))
+        locClass.addEntry("custom_difficulty_{}_{}_inc_desc".format(cat,bonusesListName),"{0} @{1} : 1% @increase @every [this.custom_difficulty_{2}_{3}_value] @years".format(icons, bonusesListName, cat,firstVarName)) #local tmp var
+        locClass.addEntry("custom_difficulty_{}_{}_dec_desc".format(cat,bonusesListName),"{0} @{1} : 1% @decrease @every [this.custom_difficulty_{2}_{3}_value] @years".format(icons, bonusesListName, cat,firstVarName)) #local tmp var
+        #create a local variable and make sure it is positive!
+        immediate.add("set_variable", TagList().add("which", localVarName).add("value",ET))
+        immediateIf=TagList().add("limit",TagList().add("check_variable",checkVar)) #<0
+        immediateIf.add("multiply_variable", TagList().add("which", localVarName).add("value","-1"))
+        immediate.add("if",immediateIf)
     if not catToModifierType[cat]=="crisis" or bonusListNPC[optionIndex-1]:
       choiceEvent.add("option",option)
 
@@ -352,10 +381,11 @@ for cat in cats:
     optionIndex+=1
     localVarName="custom_difficulty_{}_{}_value".format(cat,bonus)
     if cat=="ai_yearly":
+      #todo: yearly trigger desc for groups!
       checkVar=TagList().add("which", localVarName).add("value","0","",">")
-      trigger.add("success_text",TagList().add("text","custom_difficulty_{}_{}_inc_desc".format(cat,bonus)).add(ET,TagList().add("check_variable", checkVar)))
+      trigger.add("success_text",TagList().add("text","custom_difficulty_{}_{}_inc_desc".format(cat,bonus)).add(ET,TagList().add("check_variable", checkVar)).add("has_global_flag", "custom_difficulty_activate_custom_mode"))
       checkVar=TagList().add("which", localVarName).add("value","0","","<")
-      trigger.add("success_text",TagList().add("text","custom_difficulty_{}_{}_dec_desc".format(cat,bonus)).add(ET,TagList().add("check_variable", checkVar)))
+      trigger.add("success_text",TagList().add("text","custom_difficulty_{}_{}_dec_desc".format(cat,bonus)).add(ET,TagList().add("check_variable", checkVar)).add("has_global_flag", "custom_difficulty_activate_custom_mode"))
       locClass.addEntry("custom_difficulty_{}_{}_inc_desc".format(cat,bonus),"{} §{}@{} : 1% @increase @every [this.custom_difficulty_{}_{}_value] @years".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonus)) #local tmp var
       locClass.addEntry("custom_difficulty_{}_{}_dec_desc".format(cat,bonus),"{} §{}@{} : 1% @decrease @every [this.custom_difficulty_{}_{}_value] @years".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonus)) #local tmp var
       #create a local variable and make sure it is positive!
@@ -365,13 +395,16 @@ for cat in cats:
       immediate.add("if",immediateIf)
     else:
       checkVar=TagList().add("which", localVarName).add("value","0")
-      trigger.add("fail_text",TagList().add("text","custom_difficulty_{}_{}_desc".format(cat,bonus)).add(ET,TagList().add("check_variable", checkVar)))
+      # trigger.add("fail_text",TagList().add("text","custom_difficulty_{}_{}_desc".format(cat,bonus)).add(ET,TagList().add("check_variable", checkVar)))
+      trigger.add("success_text",TagList()
+        .add("text","custom_difficulty_{}_{}_desc".format(cat,bonus)).add(ET,TagList()
+          .add("not", TagList("check_variable", checkVar))).add("has_global_flag", "custom_difficulty_activate_custom_mode"))
       locClass.append("custom_difficulty_{}_{}_desc".format(cat,bonus),"{} §{}@{} : [{}.custom_difficulty_{}_{}_value]% ".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, ET, cat,bonus))
 
     #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before the loop)
     option=TagList().add("name", "custom_difficulty_{}_change_{}_button.name".format(cat,bonus))
     option.add("trigger", TagList().add("NOR", TagList().add("has_global_flag","custom_difficulty_locked").add("has_global_flag", "custom_difficulty_activate_simple_mode")))
-    locClass.append("custom_difficulty_{}_change_{}_button.name".format(cat,bonus), "@change @{} @bonuses".format(bonus))
+    locClass.append("custom_difficulty_{}_change_{}_button.name".format(cat,bonus), "@change {} @{} @bonuses".format(possibleBoniIcons[bonusI],bonus))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
     if not catToModifierType[cat]=="crisis" or npcBoni[bonusI]:
       choiceEvent.add("option",option) 
