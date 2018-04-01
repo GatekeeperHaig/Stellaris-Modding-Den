@@ -712,7 +712,7 @@ for groupUpdate in [False,True]:
           norSet.add(entry)
       norTagList=TagList()
       limit.add("NOR", norTagList)
-      for entry in norSet:
+      for entry in sorted(norSet):
         norTagList.add("is_country_type", entry)
     if "player"==cat or "ai" in cat:
       orTagList=TagList()
