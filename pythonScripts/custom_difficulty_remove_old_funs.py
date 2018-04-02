@@ -61,8 +61,8 @@ for name, val in modifiers.getNameVal():
 
 with open(oldFolder+"/events/custom_difficulty_remove_old.txt",'w') as file:
 	oldEvents.writeAll(file)
-with open(newFolder+"/events/custom_difficulty_remove_old.txt",'w') as file:
-	oldEvents.writeAll(file)
+# with open(newFolder+"/events/custom_difficulty_remove_old.txt",'w') as file:
+# 	oldEvents.writeAll(file)
 
 
 locList=LocList()
@@ -72,7 +72,7 @@ locList.addLoc("newVersionDesc2","Due to major changes in modifiers and other fu
 	+"You can choose whether to update now or to finish your game first. I'm very sure the update is save, but you will have to configure the difficulty anew. "
 	+"If you want to update, click the reset option, save and close the game, activate the new version of the mod and deactivate the beta. "
 	+"Then you can start the game again and load this save-game. You should be greeted by the new mod welcome screen after unpausing.")
-locList.addLoc("newVersionreset","Reset")
+locList.addLoc("newVersionreset","Remove")
 locList.addLoc("newVersionresetDesc","There will be no more difficulty modifiers until you deactivate this beta version of")
 locList.addLoc("newVersionresetDesc2","You'll then have to activate the release Version of")
 locList.addLoc("newVersionresetDesc3","to have custom difficulty modifiers again.")
@@ -81,7 +81,7 @@ locList.addLoc("finishThisGameDesc","If you change your mind, the reset can also
 
 locList.addEntry("custom_difficulty_new_version", "Dynamic Difficulty - @newVersion")
 locList.addEntry("custom_difficulty_new_version.desc", "@newVersionDesc1 'Dynamic Difficulty - Ultimate Customization'. @newVersionDesc2")
-locList.addEntry("custom_difficulty.resetSaveExit", "@newVersionreset Dynamic Difficulty")
+locList.addEntry("custom_difficulty.resetSaveExit", "@newVersionreset Dynamic Difficulty Beta")
 locList.addEntry("custom_difficulty.resetSaveExit.desc", "@newVersionresetDesc Dynamic Difficulty! @newVersionresetDesc2 'Dynamic Difficulty - Ultimate Customization' @newVersionresetDesc3")
 locList.addEntry("custom_difficulty.finishThisGame", "@finishThisGame")
 locList.addEntry("custom_difficulty.finishThisGame.desc", "@finishThisGameDesc")
@@ -94,9 +94,9 @@ for language in locList.languages:
     os.makedirs(outFolderLoc)
   locList.write(outFolderLoc+"/custom_difficulty_change_version_l_"+language+".yml",language)
 
-# locList2.translateRest=True
-# for language in locList2.languages:
-#   outFolderLoc="../gratak_mods/custom_difficulty_translate/localisation/"+language
-#   if not os.path.exists(outFolderLoc):
-#     os.makedirs(outFolderLoc)
-#   locList2.write(outFolderLoc+"/custom_difficulty_change_version_l_"+language+".yml",language)
+locList2.translateRest=True
+for language in locList2.languages:
+  outFolderLoc="../gratak_mods/custom_difficulty_translate/localisation/"+language
+  if not os.path.exists(outFolderLoc):
+    os.makedirs(outFolderLoc)
+  locList2.write(outFolderLoc+"/custom_difficulty_change_version_l_"+language+".yml",language)
