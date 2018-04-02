@@ -35,12 +35,12 @@ class LocList:
       language=self.languages[self.languageCodes.index(language)]
     else:
       languageCode=self.languageCodes[self.languages.index(language)]
-
     if self.translateRest:
       translator=Translator()
 
     localDict=self.dicts[languageCode]
     for englishKey, englishLoc in self.dicts["en"].items():
+      # print(self.translateRest)
       if not englishKey in localDict:
         if self.translateRest:
           localDict[englishKey]=translator.translate(text=englishLoc, src="en", dest=languageCode).text
