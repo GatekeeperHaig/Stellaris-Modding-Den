@@ -248,7 +248,7 @@ locClass.addEntry("custom_difficulty_reset.desc", "@resetDesc")
 
 
 
-
+#todo: check was happens with delay events when switching from beta to release!
 
 
 ET = "event_target:custom_difficulty_var_storage"
@@ -673,8 +673,10 @@ for groupUpdate in [False,True]:
 
   if groupUpdate:
     updateEvent.add("id", name_countryUpdateEventSimple)
+    updateEvent.add("trigger", TagList("has_global_flag", "custom_difficulty_activate_simple_mode"))
   else:
     updateEvent.add("id", name_countryUpdateEvent)
+    updateEvent.add("trigger", TagList("has_global_flag", "custom_difficulty_activate_custom_mode"))
   updateEvent.add("is_triggered_only",yes)
   updateEvent.add("hide_window",yes)
   immediate=TagList()
