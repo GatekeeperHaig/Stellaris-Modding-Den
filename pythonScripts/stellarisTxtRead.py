@@ -440,6 +440,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           if isinstance(name,TagList):
             print("Invalid header variable")
           varsToValue.add(name,val)
+    return self
   def nonEqualToValue(self): #move "<",">","<=",">=" to value and make the whole value a string to be able to store it in ods
     for i in range(len(self)):
       if self.seperators[i]!="=":

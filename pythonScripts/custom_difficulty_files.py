@@ -279,6 +279,7 @@ id_removeModifiers=70  #reserved range up to 72
 id_removeGroupModifiers=73  #reserved range up to 75
 name_removeAllModifiers=CuDi.format(id_removeModifiers+9)
 name_removeEventTarget=CuDi.format(id_removeModifiers+8)
+name_removeOLDModifiers="custom_difficulty_old.{}".format(id_removeModifiers+9)
 id_addModifiers=80  #reserved range up to 82
 id_addGroupModifiers=83  #reserved range up to 85
 id_defaultEvents=100 #reserved range up to 199
@@ -1076,9 +1077,16 @@ trigger.add("success_text", TagList("text", "custom_difficulty_init_no_crisis_de
 mainFileContent.add("country_event", gameStartInitEvent)
 gameStartInitEvent.add("fire_only_once", yes)
 # gameStartInitEvent.add("hide_window", yes)
-gameStartInitEvent.add("trigger", TagList("is_ai","no").add("not", TagList("has_global_flag", "custom_difficulty_active")))
+t_anyOption=TagList()
+gameStartInitEvent.add("trigger", TagList("is_ai","no").add("or", TagList("NOR", t_anyOption).add("not", TagList("has_global_flag", "custom_difficulty_active"))))
 immediate=TagList()
 gameStartInitEvent.add("immediate",immediate)
+immediate.add("if", TagList("limit", TagList("NOR", t_anyOption).add("has_global_flag", "custom_difficulty_active"))
+  .add("country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent")
+  .add("country_event", TagList("id", name_removeEventTarget)," #removeEventTarget")
+  .add("any_country",TagList("country_event", TagList("id", name_removeOLDModifiers)," #removeOldModifiers")))
+
+# resetEvent.get("immediate").insert(0, "country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent").insert(0, "country_event", TagList("id", name_removeEventTarget)," #removeEventTarget")
 immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
 for strength in [0.25, 0.5, 1, 2,3,4,5]:
   gameStartInitEvent.add("option", TagList("name", "custom_difficulty_{!s}_crisis.name".format(strength))
@@ -1157,6 +1165,7 @@ for key, inverses in optionWithInverse.items():
   trigger=deepcopy(t_notLockedTrigger)
   option.add("trigger", trigger)
   trigger.add("not", TagList("has_global_flag", "custom_difficulty_"+key))
+  t_anyOption.add("has_global_flag", "custom_difficulty_"+key)
   effect=TagList("set_global_flag", "custom_difficulty_"+key)
   inverseIsDefault=False
   for inverse in inverses:
@@ -1191,6 +1200,7 @@ resetEvent.replace("id", name_resetEvent)
 resetEvent.remove("fire_only_once")
 resetEvent.remove("trigger")
 resetEvent.add("is_triggered_only",yes)
+resetEvent.get("immediate").remove("if")
 resetEvent.get("immediate").insert(0, "country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent").insert(0, "country_event", TagList("id", name_removeEventTarget)," #removeEventTarget")
 mainFileContent.add("country_event", resetEvent)
 
