@@ -74,7 +74,6 @@ catsWithNPCDefaultBoni=["fe","leviathan","marauders", "other"]
 vanillaAItoNPCIndex=7
 
 
-#todo: add flag that prevents init event once reset event removes the active flag! In both reset events!
 
 # doTranslation=True
 doTranslation=False
