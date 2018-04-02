@@ -1066,7 +1066,7 @@ immediate.add("if", ifSimple)
 
 
 mainFileContent.add("","","#game start init")
-gameStartInitEvent=TagList("id", name_gameStartFireOnlyOnce) #TODO BILD
+gameStartInitEvent=TagList("id", name_gameStartFireOnlyOnce) #TODO BILD: Am besten eigenes!
 gameStartInitEvent.add("title","custom_difficulty_init" )
 trigger=TagList()
 gameStartInitEvent.add("desc", TagList("trigger", trigger)) #"" )
