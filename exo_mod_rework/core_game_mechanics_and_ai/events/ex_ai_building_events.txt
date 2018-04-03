@@ -5,20 +5,7 @@ event = { #this event is fires on a monthly scope.
 	hide_window = yes
 	is_triggered_only = yes
 	
-	immediate = {
-		###the part below is for testing purposes only and should be removed before release
-		every_country = {
-			limit = { is_country_type = default }
-			add_minerals = 3500
-			add_energy = 3500
-			every_owned_planet = {
-				every_tile = {
-					limit = { has_blocker = yes}
-					remove_blocker = yes
-				}
-			}
-		}	
-		###
+	immediate = {		
 		every_country = {
 			limit = {
 				OR = {
@@ -27,7 +14,7 @@ event = { #this event is fires on a monthly scope.
 					is_country_type = awakened_fallen_empire
 				}				
 			}
-			country_event = { id = ex_ai_building_events.1 }
+			country_event = { id = ex_ai_building_events.1 }			
 		}
 	}	
 }	
@@ -180,6 +167,7 @@ country_event = { #this event is fired using the previous event on a monthly sco
 			}
 			planet_event = { id = ex_ai_building_events.2 }	
 			planet_event = { id = ex_ai_building_events.3 }
+			planet_event = { id = ex_ai_building_events.4 }
 		}
 	}
 }
@@ -645,4 +633,26 @@ planet_event = {
 			set_planet_flag = build_neuro_electric_amplifier
 		}			
 	}					
+}
+
+planet_event = {
+	id = ex_ai_building_events.4
+	hide_window = yes
+	is_triggered_only = yes
+	
+	trigger = { 
+		exists = owner
+		owner = { is_country_type = default }
+		any_owned_pop = { 
+			NOT = { has_pop_flag = tile_resources_recorded }
+		}	
+	}	
+	
+	immediate = {
+		every_owned_pop = { 
+			limit = { NOT = { has_pop_flag = tile_resources_recorded } }
+			record_tile_resources_in_pop = yes
+			set_pop_flag = tile_resources_recorded
+		}
+	}
 }
