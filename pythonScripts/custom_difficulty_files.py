@@ -18,10 +18,10 @@ for s in reversed(changeStepYears):
   changeStepYears.append(-s)
 possibleBoniNames=["minerals", "energy","food", "research", "unity", "influence", "cap", "damage", "hull","armor","shield","upkeep", "growth"]
 npcBoni=[           False,      False,   False,   False,    False,    False,      False,  True,   True,     True, True,   False,    False]
-possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_animal_wildlife", "GFX_evt_think_tank", "GFX_evt_ancient_alien_temple","GFX_evt_arguing_senate","GFX_evt_hangar_bay", "GFX_evt_debris", "GFX_evt_sabotaged_ship","GFX_evt_pirate_armada","GFX_evt_fleet_neutral","GFX_evt_city_ruins","GFX_evt_metropolis"]
+possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_animal_wildlife", "GFX_evt_think_tank", "GFX_evt_unity_symbol","GFX_evt_arguing_senate","GFX_evt_hangar_bay", "GFX_evt_debris", "GFX_evt_sabotaged_ship","GFX_evt_pirate_armada","GFX_evt_fleet_neutral","GFX_evt_city_ruins","GFX_evt_metropolis"]
 possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","country_resource_influence_mult","country_naval_cap_mult","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["ship_upkeep_mult",
-#"country_building_upkeep_mult", #is there any such modifier except on planet base?!
-"country_starbase_upkeep_mult","army_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
+"planet_building_upkeep_mult",
+"country_starbase_upkeep_mult","army_upkeep_mult","pop_robot_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
 possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","£navy_size","£military_power","£ship_stats_hitpoints","£ship_stats_armor","£ship_stats_shield","£ship_stats_maintenance","£pops"]
 possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
 
@@ -32,7 +32,7 @@ representGroup["research"]="humanResources"
 representGroup["damage"]="allShip"
 bonusListNPC=[    False,   False, False,  True]
 bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2],[3,4,6], [7,8,9,10]]
-bonusesListPictures=["GFX_evt_towel", "GFX_evt_alien_city", "GFX_evt_alien_city","GFX_evt_federation_fleet"] #todo: new picture: resource and human resources
+bonusesListPictures=["GFX_evt_alien_city", "GFX_evt_mining_operations", "GFX_evt_ancient_alien_temple","GFX_evt_federation_fleet"]
 # bonusesListNames=["all","default", "allShip"]
 # bonusListNPC=[    True,   False,    False]
 # bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
@@ -58,7 +58,7 @@ catCountryType=[
 ["dormant_marauders","ruined_marauders", "awakened_marauders","marauder_raiders"],
 []]
 catNotCountryType=[[], [],[],[],[],[],[],catCountryType]
-catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire","GFX_evt_wraith","GFX_evt_towel","GFX_evt_towel","GFX_evt_towel","GFX_evt_towel"] #todo: pictures for new cats!
+catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire_awakes","GFX_evt_wraith","GFX_evt_towel","GFX_evt_ai_planet","GFX_evt_khan_throne_room","GFX_evt_unknown_ships"]
 catColors="BHBBGRBB"
 
 difficulties=["easy", "no_player_bonus", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
@@ -247,8 +247,6 @@ locClass.addEntry("custom_difficulty_reset.desc", "@resetDesc")
 
 
 
-#todo: check was happens with delay events when switching from beta to release!
-
 
 ET = "event_target:custom_difficulty_var_storage"
 
@@ -409,7 +407,7 @@ for cat in cats:
     #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before the loop)
     option=TagList().add("name", "custom_difficulty_{}_change_{}_button.name".format(cat,bonus))
     option.add("trigger", TagList().add("NOR", TagList().add("has_global_flag","custom_difficulty_locked").add("has_global_flag", "custom_difficulty_activate_simple_mode")))
-    locClass.append("custom_difficulty_{}_change_{}_button.name".format(cat,bonus), "@change {} @{} @bonuses".format(possibleBoniIcons[bonusI],bonus))
+    locClass.append("custom_difficulty_{}_change_{}_button.name".format(cat,bonus), "@change @{} ({} ) @bonuses".format(bonus,possibleBoniIcons[bonusI]))
     option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
     if not catToModifierType[cat]=="crisis" or npcBoni[bonusI]:
       choiceEvent.add("option",option) 
@@ -972,7 +970,7 @@ for allowUnlock in [False]:#[False,True]:
   mainMenu.add("id", name_mainMenuEvent)
   mainMenu.add("is_triggered_only", yes)
   mainMenu.add("title", "edict_custom_difficulty")
-  mainMenu.add("picture", "GFX_evt_towel")
+  mainMenu.add("picture", "GFX_evt_custom_difficulty_pyra")
   trigger=TagList()
   mainMenu.add("desc", TagList("trigger", trigger))
   trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("has_global_flag", "custom_difficulty_locked"))
@@ -998,7 +996,7 @@ mainFileContent.add("country_event",customMenu)
 customMenu.add("id", name_customMenuEvent)
 customMenu.add("is_triggered_only", yes)
 customMenu.add("title", "custom_difficulty_customize.name")
-customMenu.add("picture", "GFX_evt_towel")
+customMenu.add("picture", "GFX_evt_custom_difficulty")
 trigger=TagList()
 customMenu.add("desc", TagList("trigger", trigger))
 trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("has_global_flag", "custom_difficulty_locked"))
@@ -1054,9 +1052,9 @@ immediate=TagList()
 rootUpdateMenu.add("immediate",immediate)
 def ifDelay(name):
   self=TagList()
-  self=TagList("limit",TagList("has_global_flag", "custom_difficulty_delay_mode"))
+  self=TagList("limit",TagList("has_global_flag", "custom_difficulty_activate_delay_mode"))
   self.add("every_country", TagList("country_event", TagList("id", name).add("days","1").add("random","180")))
-  # ifInstant=TagList("limit",TagList("not", TagList("has_global_flag", "custom_difficulty_delay_mode")))
+  # ifInstant=TagList("limit",TagList("not", TagList("has_global_flag", "custom_difficulty_activate_delay_mode")))
   self.add("else", TagList("every_country", TagList("country_event", TagList("id", name))))
   return self
 ifSimple=TagList("limit",TagList("has_global_flag", "custom_difficulty_activate_simple_mode"))
@@ -1066,8 +1064,9 @@ immediate.add("if", ifSimple)
 
 
 mainFileContent.add("","","#game start init")
-gameStartInitEvent=TagList("id", name_gameStartFireOnlyOnce) #TODO BILD: Am besten eigenes!
+gameStartInitEvent=TagList("id", name_gameStartFireOnlyOnce)
 gameStartInitEvent.add("title","custom_difficulty_init" )
+gameStartInitEvent.add("picture","GFX_evt_custom_difficulty")
 trigger=TagList()
 gameStartInitEvent.add("desc", TagList("trigger", trigger)) #"" )
 trigger.add("text","custom_difficulty_init_desc")
@@ -1082,8 +1081,8 @@ immediate=TagList()
 gameStartInitEvent.add("immediate",immediate)
 immediate.add("if", TagList("limit", TagList("NOR", t_anyOption).add("has_global_flag", "custom_difficulty_active"))
   .add("country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent")
-  .add("country_event", TagList("id", name_removeEventTarget)," #removeEventTarget")
-  .add("any_country",TagList("country_event", TagList("id", name_removeOLDModifiers)," #removeOldModifiers")))
+  .add("country_event", TagList("id", name_removeEventTarget)," #removeEventTarget"))
+  # .add("every_country",TagList("country_event", TagList("id", name_removeOLDModifiers)," #removeOldModifiers")))
 
 # resetEvent.get("immediate").insert(0, "country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent").insert(0, "country_event", TagList("id", name_removeEventTarget)," #removeEventTarget")
 immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
@@ -1123,6 +1122,8 @@ optionsEvent.add("is_triggered_only", yes)
 optionsEvent.add("title", "custom_difficulty_options.name")
 # optionsEvent.add("desc", "custom_difficulty_options.desc")
 optionsEvent.add("picture", "GFX_evt_towel")
+# optionsEvent.add("picture","GFX_evt_custom_difficulty_pyra")
+
 
 descTrigger=TagList()
 optionsEvent.add("desc", TagList("trigger", descTrigger))
