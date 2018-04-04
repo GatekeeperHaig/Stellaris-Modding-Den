@@ -5,178 +5,332 @@ set_tile_building_weight = {
 	#tile weight = country deficit/income + tile resources + pop traits (if exists on tile) + adj. bonuses (if exist)
 	#planet multiplier = planet modifier(s) + buildings that give a planet modifier
 	#the operation below multiplies tile weight * planet multiplier 
-	prev = {
-		multiply_variable = { which = "energy_weight" value = "energy_mult" }
-		multiply_variable = { which = "minerals_weight" value = "minerals_mult" }
-		multiply_variable = { which = "food_weight" value = "food_mult" }
-		multiply_variable = { which = "unity_weight" value = "unity_mult" }
-		multiply_variable = { which = "society_research_weight" value = "society_research_mult" }
-		multiply_variable = { which = "physics_research_weight" value = "physics_research_mult" }
-		multiply_variable = { which = "engineering_research_weight" value = "engineering_research_mult" }
-	}	
 	if = {
 		limit = {
-			prev = {
+			prev.owner = { 
 				OR = {
-					check_variable = { which = "energy_weight" value > 0 }
-					check_variable = { which = "minerals_weight" value > 0 }
-					check_variable = { which = "food_weight" value > 0 }
-					check_variable = { which = "unity_weight" value > 0 }
-					check_variable = { which = "society_research_weight" value > 0 }
-					check_variable = { which = "physics_research_weight" value > 0 }
-					check_variable = { which = "engineering_research_weight" value > 0 }
+					is_machine_empire = no
+					is_servitor = yes
+				}
+			}
+		}	
+		prev = {
+			multiply_variable = { which = "energy_weight" value = "energy_mult" }
+			multiply_variable = { which = "minerals_weight" value = "minerals_mult" }
+			multiply_variable = { which = "food_weight" value = "food_mult" }
+			multiply_variable = { which = "unity_weight" value = "unity_mult" }
+			multiply_variable = { which = "society_research_weight" value = "society_research_mult" }
+			multiply_variable = { which = "physics_research_weight" value = "physics_research_mult" }
+			multiply_variable = { which = "engineering_research_weight" value = "engineering_research_mult" }
+		}	
+		if = {
+			limit = {
+				prev = {
+					OR = {
+						check_variable = { which = "energy_weight" value > 0 }
+						check_variable = { which = "minerals_weight" value > 0 }
+						check_variable = { which = "food_weight" value > 0 }
+						check_variable = { which = "unity_weight" value > 0 }
+						check_variable = { which = "society_research_weight" value > 0 }
+						check_variable = { which = "physics_research_weight" value > 0 }
+						check_variable = { which = "engineering_research_weight" value > 0 }
+					}	
+				}		
+			}				
+			if = { 
+				limit = { 
+					prev = { check_variable = { which = "energy_weight" value > 0 } }
+				}
+				prev = { change_variable = { which = "energy_weight" value = 0.001 } }
+				if = {
+					limit = {
+						prev = {					
+							check_variable = { which = "energy_weight" value > "minerals_weight" }
+							check_variable = { which = "energy_weight" value > "food_weight" }
+							check_variable = { which = "energy_weight" value > "unity_weight" }
+							check_variable = { which = "energy_weight" value > "society_research_weight" }
+							check_variable = { which = "energy_weight" value > "physics_research_weight" }
+							check_variable = { which = "energy_weight" value > "engineering_research_weight" }
+						}	
+					}					
+					add_deposit = energy_building_tile
+					#log = "energy_building_tile_deposit"			
+				}
+				prev = { change_variable = { which = "energy_weight" value = -0.001 } }						
+			}	
+			if = { 
+				limit = { 
+					prev = { check_variable = { which = "minerals_weight" value > 0 } }
+				}
+				prev = { change_variable = { which = "minerals_weight" value = 0.001 } }
+				if = {
+					limit = {
+						prev = {					
+							check_variable = { which = "minerals_weight" value > "energy_weight" }
+							check_variable = { which = "minerals_weight" value > "food_weight" }
+							check_variable = { which = "minerals_weight" value > "unity_weight" }
+							check_variable = { which = "minerals_weight" value > "society_research_weight" }
+							check_variable = { which = "minerals_weight" value > "physics_research_weight" }
+							check_variable = { which = "minerals_weight" value > "engineering_research_weight" }
+						}	
+					}					
+					add_deposit = minerals_building_tile
+					#log = "minerals_building_tile_deposit"			
+				}
+				prev = { change_variable = { which = "minerals_weight" value = -0.001 } }						
+			}	
+			if = { 
+				limit = { 
+					prev = { check_variable = { which = "food_weight" value > 0 } }
+				}
+				prev = { change_variable = { which = "food_weight" value = 0.001 } }
+				if = {
+					limit = {
+						prev = {					
+							check_variable = { which = "food_weight" value > "minerals_weight" }
+							check_variable = { which = "food_weight" value > "energy_weight" }
+							check_variable = { which = "food_weight" value > "unity_weight" }
+							check_variable = { which = "food_weight" value > "society_research_weight" }
+							check_variable = { which = "food_weight" value > "physics_research_weight" }
+							check_variable = { which = "food_weight" value > "engineering_research_weight" }
+						}	
+					}					
+					add_deposit = food_building_tile
+					#log = "food_building_tile_deposit"			
+				}
+				prev = { change_variable = { which = "food_weight" value = -0.001 } }						
+			}	
+			if = { 
+				limit = { 
+					prev = { check_variable = { which = "society_research_weight" value > 0 } }
+				}
+				prev = { change_variable = { which = "society_research_weight" value = 0.001 } }
+				if = {
+					limit = {
+						prev = {					
+							check_variable = { which = "society_research_weight" value > "minerals_weight" }
+							check_variable = { which = "society_research_weight" value > "food_weight" }
+							check_variable = { which = "society_research_weight" value > "unity_weight" }
+							check_variable = { which = "society_research_weight" value > "energy_weight" }
+							check_variable = { which = "society_research_weight" value > "physics_research_weight" }
+							check_variable = { which = "society_research_weight" value > "engineering_research_weight" }
+						}	
+					}					
+					add_deposit = society_research_building_tile
+					#log = "society_research_building_tile_deposit"			
+				}
+				prev = { change_variable = { which = "society_research_weight" value = -0.001 } }						
+			}	
+			if = { 
+				limit = { 
+					prev = { check_variable = { which = "physics_research_weight" value > 0 } }
+				}
+				prev = { change_variable = { which = "physics_research_weight" value = 0.001 } }
+				if = {
+					limit = {
+						prev = {					
+							check_variable = { which = "physics_research_weight" value > "minerals_weight" }
+							check_variable = { which = "physics_research_weight" value > "food_weight" }
+							check_variable = { which = "physics_research_weight" value > "unity_weight" }
+							check_variable = { which = "physics_research_weight" value > "energy_weight" }
+							check_variable = { which = "physics_research_weight" value > "society_research_weight" }
+							check_variable = { which = "physics_research_weight" value > "engineering_research_weight" }
+						}	
+					}					
+					add_deposit = physics_research_building_tile
+					#log = "physics_research_building_tile_deposit"			
+				}
+				prev = { change_variable = { which = "physics_research_weight" value = -0.001 } }						
+			}	
+			if = { 
+				limit = { 
+					prev = { check_variable = { which = "engineering_research_weight" value > 0 } }
+				}
+				prev = { change_variable = { which = "engineering_research_weight" value = 0.001 } }
+				if = {
+					limit = {
+						prev = {					
+							check_variable = { which = "engineering_research_weight" value > "minerals_weight" }
+							check_variable = { which = "engineering_research_weight" value > "food_weight" }
+							check_variable = { which = "engineering_research_weight" value > "unity_weight" }
+							check_variable = { which = "engineering_research_weight" value > "energy_weight" }
+							check_variable = { which = "engineering_research_weight" value > "society_research_weight" }
+							check_variable = { which = "engineering_research_weight" value > "physics_research_weight" }
+						}	
+					}					
+					add_deposit = engineering_research_building_tile
+					#log = "engineering_research_building_tile_deposit"			
+				}
+				prev = { change_variable = { which = "engineering_research_weight" value = -0.001 } }						
+			}	
+			if = { 
+				limit = { 
+					prev = { check_variable = { which = "unity_weight" value > 0 } }
+				}
+				prev = { change_variable = { which = "unity_weight" value = 0.001 } }
+				if = {
+					limit = {
+						prev = {					
+							check_variable = { which = "unity_weight" value > "minerals_weight" }
+							check_variable = { which = "unity_weight" value > "food_weight" }						
+							check_variable = { which = "unity_weight" value > "energy_weight" }
+							check_variable = { which = "unity_weight" value > "engineering_research_weight" }
+							check_variable = { which = "unity_weight" value > "society_research_weight" }
+							check_variable = { which = "unity_weight" value > "physics_research_weight" }
+						}	
+					}					
+					add_deposit = unity_building_tile
+					#log = "unity_building_tile_deposit"
+				}
+				prev = { change_variable = { which = "unity_weight" value = -0.001 } }									
+			}
+			else = {
+				prev = {
+					multiply_variable = { which = "energy_weight" value = "energy_mult" }
+					multiply_variable = { which = "minerals_weight" value = "minerals_mult" }
+					multiply_variable = { which = "unity_weight" value = "unity_mult" }
+					multiply_variable = { which = "society_research_weight" value = "society_research_mult" }
+					multiply_variable = { which = "physics_research_weight" value = "physics_research_mult" }
+					multiply_variable = { which = "engineering_research_weight" value = "engineering_research_mult" }
 				}	
-			}		
-		}				
-		if = { 
-			limit = { 
-				prev = { check_variable = { which = "energy_weight" value > 0 } }
-			}
-			prev = { change_variable = { which = "energy_weight" value = 0.001 } }
-			if = {
-				limit = {
-					prev = {					
-						check_variable = { which = "energy_weight" value > "minerals_weight" }
-						check_variable = { which = "energy_weight" value > "food_weight" }
-						check_variable = { which = "energy_weight" value > "unity_weight" }
-						check_variable = { which = "energy_weight" value > "society_research_weight" }
-						check_variable = { which = "energy_weight" value > "physics_research_weight" }
-						check_variable = { which = "energy_weight" value > "engineering_research_weight" }
+				if = {
+					limit = {
+						prev = {
+							OR = {
+								check_variable = { which = "energy_weight" value > 0 }
+								check_variable = { which = "minerals_weight" value > 0 }
+								check_variable = { which = "unity_weight" value > 0 }
+								check_variable = { which = "society_research_weight" value > 0 }
+								check_variable = { which = "physics_research_weight" value > 0 }
+								check_variable = { which = "engineering_research_weight" value > 0 }
+							}	
+						}		
+					}				
+					if = { 
+						limit = { 
+							prev = { check_variable = { which = "energy_weight" value > 0 } }
+						}
+						prev = { change_variable = { which = "energy_weight" value = 0.001 } }
+						if = {
+							limit = {
+								prev = {					
+									check_variable = { which = "energy_weight" value > "minerals_weight" }
+									check_variable = { which = "energy_weight" value > "unity_weight" }
+									check_variable = { which = "energy_weight" value > "society_research_weight" }
+									check_variable = { which = "energy_weight" value > "physics_research_weight" }
+									check_variable = { which = "energy_weight" value > "engineering_research_weight" }
+								}	
+							}					
+							add_deposit = energy_building_tile
+							#log = "energy_building_tile_deposit"			
+						}
+						prev = { change_variable = { which = "energy_weight" value = -0.001 } }						
 					}	
-				}					
-				add_deposit = energy_building_tile
-				#log = "energy_building_tile_deposit"			
-			}
-			prev = { change_variable = { which = "energy_weight" value = -0.001 } }						
-		}	
-		if = { 
-			limit = { 
-				prev = { check_variable = { which = "minerals_weight" value > 0 } }
-			}
-			prev = { change_variable = { which = "minerals_weight" value = 0.001 } }
-			if = {
-				limit = {
-					prev = {					
-						check_variable = { which = "minerals_weight" value > "energy_weight" }
-						check_variable = { which = "minerals_weight" value > "food_weight" }
-						check_variable = { which = "minerals_weight" value > "unity_weight" }
-						check_variable = { which = "minerals_weight" value > "society_research_weight" }
-						check_variable = { which = "minerals_weight" value > "physics_research_weight" }
-						check_variable = { which = "minerals_weight" value > "engineering_research_weight" }
+					if = { 
+						limit = { 
+							prev = { check_variable = { which = "minerals_weight" value > 0 } }
+						}
+						prev = { change_variable = { which = "minerals_weight" value = 0.001 } }
+						if = {
+							limit = {
+								prev = {					
+									check_variable = { which = "minerals_weight" value > "energy_weight" }
+									check_variable = { which = "minerals_weight" value > "unity_weight" }
+									check_variable = { which = "minerals_weight" value > "society_research_weight" }
+									check_variable = { which = "minerals_weight" value > "physics_research_weight" }
+									check_variable = { which = "minerals_weight" value > "engineering_research_weight" }
+								}	
+							}					
+							add_deposit = minerals_building_tile
+							#log = "minerals_building_tile_deposit"			
+						}
+						prev = { change_variable = { which = "minerals_weight" value = -0.001 } }						
 					}	
-				}					
-				add_deposit = minerals_building_tile
-				#log = "minerals_building_tile_deposit"			
-			}
-			prev = { change_variable = { which = "minerals_weight" value = -0.001 } }						
-		}	
-		if = { 
-			limit = { 
-				prev = { check_variable = { which = "food_weight" value > 0 } }
-			}
-			prev = { change_variable = { which = "food_weight" value = 0.001 } }
-			if = {
-				limit = {
-					prev = {					
-						check_variable = { which = "food_weight" value > "minerals_weight" }
-						check_variable = { which = "food_weight" value > "energy_weight" }
-						check_variable = { which = "food_weight" value > "unity_weight" }
-						check_variable = { which = "food_weight" value > "society_research_weight" }
-						check_variable = { which = "food_weight" value > "physics_research_weight" }
-						check_variable = { which = "food_weight" value > "engineering_research_weight" }
+					if = { 
+						limit = { 
+							prev = { check_variable = { which = "society_research_weight" value > 0 } }
+						}
+						prev = { change_variable = { which = "society_research_weight" value = 0.001 } }
+						if = {
+							limit = {
+								prev = {					
+									check_variable = { which = "society_research_weight" value > "minerals_weight" }
+									check_variable = { which = "society_research_weight" value > "unity_weight" }
+									check_variable = { which = "society_research_weight" value > "energy_weight" }
+									check_variable = { which = "society_research_weight" value > "physics_research_weight" }
+									check_variable = { which = "society_research_weight" value > "engineering_research_weight" }
+								}	
+							}					
+							add_deposit = society_research_building_tile
+							#log = "society_research_building_tile_deposit"			
+						}
+						prev = { change_variable = { which = "society_research_weight" value = -0.001 } }						
 					}	
-				}					
-				add_deposit = food_building_tile
-				#log = "food_building_tile_deposit"			
-			}
-			prev = { change_variable = { which = "food_weight" value = -0.001 } }						
-		}	
-		if = { 
-			limit = { 
-				prev = { check_variable = { which = "society_research_weight" value > 0 } }
-			}
-			prev = { change_variable = { which = "society_research_weight" value = 0.001 } }
-			if = {
-				limit = {
-					prev = {					
-						check_variable = { which = "society_research_weight" value > "minerals_weight" }
-						check_variable = { which = "society_research_weight" value > "food_weight" }
-						check_variable = { which = "society_research_weight" value > "unity_weight" }
-						check_variable = { which = "society_research_weight" value > "energy_weight" }
-						check_variable = { which = "society_research_weight" value > "physics_research_weight" }
-						check_variable = { which = "society_research_weight" value > "engineering_research_weight" }
+					if = { 
+						limit = { 
+							prev = { check_variable = { which = "physics_research_weight" value > 0 } }
+						}
+						prev = { change_variable = { which = "physics_research_weight" value = 0.001 } }
+						if = {
+							limit = {
+								prev = {					
+									check_variable = { which = "physics_research_weight" value > "minerals_weight" }
+									check_variable = { which = "physics_research_weight" value > "unity_weight" }
+									check_variable = { which = "physics_research_weight" value > "energy_weight" }
+									check_variable = { which = "physics_research_weight" value > "society_research_weight" }
+									check_variable = { which = "physics_research_weight" value > "engineering_research_weight" }
+								}	
+							}					
+							add_deposit = physics_research_building_tile
+							#log = "physics_research_building_tile_deposit"			
+						}
+						prev = { change_variable = { which = "physics_research_weight" value = -0.001 } }						
 					}	
-				}					
-				add_deposit = society_research_building_tile
-				#log = "society_research_building_tile_deposit"			
-			}
-			prev = { change_variable = { which = "society_research_weight" value = -0.001 } }						
-		}	
-		if = { 
-			limit = { 
-				prev = { check_variable = { which = "physics_research_weight" value > 0 } }
-			}
-			prev = { change_variable = { which = "physics_research_weight" value = 0.001 } }
-			if = {
-				limit = {
-					prev = {					
-						check_variable = { which = "physics_research_weight" value > "minerals_weight" }
-						check_variable = { which = "physics_research_weight" value > "food_weight" }
-						check_variable = { which = "physics_research_weight" value > "unity_weight" }
-						check_variable = { which = "physics_research_weight" value > "energy_weight" }
-						check_variable = { which = "physics_research_weight" value > "society_research_weight" }
-						check_variable = { which = "physics_research_weight" value > "engineering_research_weight" }
+					if = { 
+						limit = { 
+							prev = { check_variable = { which = "engineering_research_weight" value > 0 } }
+						}
+						prev = { change_variable = { which = "engineering_research_weight" value = 0.001 } }
+						if = {
+							limit = {
+								prev = {					
+									check_variable = { which = "engineering_research_weight" value > "minerals_weight" }
+									check_variable = { which = "engineering_research_weight" value > "unity_weight" }
+									check_variable = { which = "engineering_research_weight" value > "energy_weight" }
+									check_variable = { which = "engineering_research_weight" value > "society_research_weight" }
+									check_variable = { which = "engineering_research_weight" value > "physics_research_weight" }
+								}	
+							}					
+							add_deposit = engineering_research_building_tile
+							#log = "engineering_research_building_tile_deposit"			
+						}
+						prev = { change_variable = { which = "engineering_research_weight" value = -0.001 } }						
 					}	
-				}					
-				add_deposit = physics_research_building_tile
-				#log = "physics_research_building_tile_deposit"			
-			}
-			prev = { change_variable = { which = "physics_research_weight" value = -0.001 } }						
-		}	
-		if = { 
-			limit = { 
-				prev = { check_variable = { which = "engineering_research_weight" value > 0 } }
-			}
-			prev = { change_variable = { which = "engineering_research_weight" value = 0.001 } }
-			if = {
-				limit = {
-					prev = {					
-						check_variable = { which = "engineering_research_weight" value > "minerals_weight" }
-						check_variable = { which = "engineering_research_weight" value > "food_weight" }
-						check_variable = { which = "engineering_research_weight" value > "unity_weight" }
-						check_variable = { which = "engineering_research_weight" value > "energy_weight" }
-						check_variable = { which = "engineering_research_weight" value > "society_research_weight" }
-						check_variable = { which = "engineering_research_weight" value > "physics_research_weight" }
-					}	
-				}					
-				add_deposit = engineering_research_building_tile
-				#log = "engineering_research_building_tile_deposit"			
-			}
-			prev = { change_variable = { which = "engineering_research_weight" value = -0.001 } }						
-		}	
-		if = { 
-			limit = { 
-				prev = { check_variable = { which = "unity_weight" value > 0 } }
-			}
-			prev = { change_variable = { which = "unity_weight" value = 0.001 } }
-			if = {
-				limit = {
-					prev = {					
-						check_variable = { which = "unity_weight" value > "minerals_weight" }
-						check_variable = { which = "unity_weight" value > "food_weight" }						
-						check_variable = { which = "unity_weight" value > "energy_weight" }
-						check_variable = { which = "unity_weight" value > "engineering_research_weight" }
-						check_variable = { which = "unity_weight" value > "society_research_weight" }
-						check_variable = { which = "unity_weight" value > "physics_research_weight" }
-					}	
-				}					
-				add_deposit = unity_building_tile
-				#log = "unity_building_tile_deposit"
-			}
-			prev = { change_variable = { which = "unity_weight" value = -0.001 } }									
-		}			
-	}	
-}	   
+					if = { 
+						limit = { 
+							prev = { check_variable = { which = "unity_weight" value > 0 } }
+						}
+						prev = { change_variable = { which = "unity_weight" value = 0.001 } }
+						if = {
+							limit = {
+								prev = {					
+									check_variable = { which = "unity_weight" value > "minerals_weight" }
+									check_variable = { which = "unity_weight" value > "energy_weight" }
+									check_variable = { which = "unity_weight" value > "engineering_research_weight" }
+									check_variable = { which = "unity_weight" value > "society_research_weight" }
+									check_variable = { which = "unity_weight" value > "physics_research_weight" }
+								}	
+							}					
+							add_deposit = unity_building_tile
+							#log = "unity_building_tile_deposit"
+						}
+						prev = { change_variable = { which = "unity_weight" value = -0.001 } }									
+					}
+				}			
+			}	
+		}	   
+	}
+}	
 
 calculate_tile_weight = {	
 	if = {
@@ -227,6 +381,12 @@ calculate_tile_weight = {
 		}
 		if = {
 			limit = { 
+				prev.owner = {
+					OR = {
+						is_machine_empire = no
+						is_servitor = yes
+					}
+				}	
 				has_resource = {
 					type = food
 					amount > 0

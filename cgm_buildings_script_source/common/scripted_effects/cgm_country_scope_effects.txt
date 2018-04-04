@@ -1,6 +1,6 @@
 ### Effects in this file are ran on country scope.
 
-check_if_low_income_or_in_deficit = { #the checks below determine whether there is a negative income of a specific resource.	
+check_income = { #the checks below determine whether there is a negative income of a specific resource.	
 	if = {
 		limit = { has_monthly_income = { resource = energy  value < 5 }	}
 		if = {				
@@ -44,7 +44,10 @@ check_if_low_income_or_in_deficit = { #the checks below determine whether there 
 	}
 	if = {
 		limit = { 
-			is_machine_empire = no
+			OR = {
+				is_machine_empire = no
+				is_servitor = yes
+			}			
 			has_monthly_income = { resource = food  value < 5 }
 		}
 		if = {				
@@ -66,7 +69,10 @@ check_if_low_income_or_in_deficit = { #the checks below determine whether there 
 		else = { 
 			if = { 
 				limit = { 
-					is_machine_empire = no
+					OR = {
+						is_machine_empire = no
+						is_servitor = no
+					}	
 					has_monthly_income = { resource = food  value > 4 }
 				}
 				record_food_income = yes
@@ -77,6 +83,126 @@ check_if_low_income_or_in_deficit = { #the checks below determine whether there 
 	record_engineering_research_income = yes 
 	record_physics_research_income = yes 
 	record_unity_income = yes 
+}
+
+### The effect below checks the resource requrements of the country
+
+check_resource_requirements = {
+	if = {
+		limit = {
+			check_variable = { which = society_research_income value < physics_research_income }
+			check_variable = { which = society_research_income value < engineering_research_income }
+		}	
+		multiply_variable = { which = society_research_income value = 1.25 }
+		if = {
+			limit = {
+				check_variable = { which = society_research_income value < physics_research_income }
+				check_variable = { which = society_research_income value < engineering_research_income }
+			}		
+			set_timed_country_flag = { flag = society_research_focus_factor_2 days = 360 }
+			else = {
+				if = {
+					limit = {
+						OR = {
+							check_variable = { which = society_research_income value < physics_research_income }
+							check_variable = { which = society_research_income value < engineering_research_income }
+						}	
+					}		
+					set_timed_country_flag = { flag = society_research_focus_factor_1 days = 360 }
+				}
+			}
+		}
+		else = {
+			if = {
+				limit = {
+					check_variable = { which = physics_research_income value < society_research_income }
+					check_variable = { which = physics_research_income value < engineering_research_income }
+				}	
+				multiply_variable = { which = physics_research_income value = 1.25 }
+				if = {
+					limit = {
+						check_variable = { which = physics_research_income value < society_research_income }
+						check_variable = { which = physics_research_income value < engineering_research_income }
+					}		
+					set_timed_country_flag = { flag = physics_research_focus_factor_2 days = 360 }
+					else = {
+						if = {
+							limit = {
+								OR = {
+									check_variable = { which = physics_research_income value < society_research_income }
+									check_variable = { which = physics_research_income value < engineering_research_income }
+								}	
+							}		
+							set_timed_country_flag = { flag = physics_research_focus_factor_1 days = 360 }
+						}
+					}
+				}
+				else = {
+					if = {
+						limit = {
+							check_variable = { which = engineering_research_income value < society_research_income }
+							check_variable = { which = engineering_research_income value < physics_research_income }
+						}	
+						multiply_variable = { which = engineering_research_income value = 1.25 }
+						if = {
+							limit = {
+								check_variable = { which = engineering_research_income value < society_research_income }
+								check_variable = { which = engineering_research_income value < physics_research_income }
+							}		
+							set_timed_country_flag = { flag = engineering_research_focus_factor_2 days = 360 }
+							else = {
+								if = {
+									limit = {
+										OR = {
+											check_variable = { which = engineering_research_income value < society_research_income }
+											check_variable = { which = engineering_research_income value < physics_research_income }
+										}	
+									}		
+									set_timed_country_flag = { flag = engineering_research_focus_factor_1 days = 360 }
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}	
+	if = { 
+		limit = { 
+			check_variable = { which = minerals_income value > 10 }
+			check_variable = { which = energy_income value > 10 }			
+		}
+		if = { 
+			limit = { check_variable = { which = minerals_income value > energy_income } }
+			divide_variable = { which = minerals_income value = energy_income }
+			if = { 
+				limit = { check_variable = { which = minerals_income value > 2 } }
+				set_timed_country_flag = { flag = energy_focus_factor_2 days = 360 }
+				else = { 
+					if = { 
+						limit = { check_variable = { which = minerals_income value > 1.49 } }
+						set_timed_country_flag = { flag = energy_focus_factor_1 days = 360 }
+					}
+				}
+			}
+			else = { 	
+				if = { 
+					limit = { check_variable = { which = energy_income value > minerals_income } }
+					divide_variable = { which = energy_income value = minerals_income }
+					if = { 
+						limit = { check_variable = { which = energy_income value > 2 } }
+						set_timed_country_flag = { flag = minerals_focus_factor_2 days = 360 }
+						else = { 
+							if = { 
+								limit = { check_variable = { which = energy_income value > 1.49 } }
+								set_timed_country_flag = { flag = minerals_focus_factor_1 days = 360 }
+							}
+						}
+					}			
+				}
+			}
+		}
+	}
 }
 
 ### The effects below record a given country's resource income.
