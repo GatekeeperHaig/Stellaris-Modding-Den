@@ -1,174 +1,82 @@
 ### Effects in this file are ran on country scope.
 
-check_country_deficities = {
-	#the checks below determine whether the country in question is currently starving - that is if one of the starvation modifier is applied. Note that the food deficit modifier is applied per planet by the vanilla engine!
+check_if_low_income_or_in_deficit = { #the checks below determine whether there is a negative income of a specific resource.	
 	if = {
-		limit = {
-			has_modifier = mineral_deficit
-			has_monthly_income = {
-				resource = minerals  value < 1
-			}
+		limit = { has_monthly_income = { resource = energy  value < 5 }	}
+		if = {				
+			limit = {			
+				has_modifier = energy_deficit		
+				has_monthly_income = {	resource = energy  value < 1 }
+			}			
+			change_variable = {	which = energy_weight value = 10	}
+		}			
+		change_variable = {	which = energy_weight value = 3 } }
+		if = { 
+			limit = { has_monthly_income = { resource = energy  value < -10 } }
+			change_variable = {	which = energy_weight value = 4	}
 		}
-		change_variable = {
-			which = minerals_weight
-			value = 10
+		if = { 
+			limit = { has_monthly_income = { resource = energy  value < -20 } }
+			change_variable = {	which = energy_weight value = 5	}
 		}
+		else = { record_energy_income = yes }		
 	}
-	
 	if = {
-		limit = {
-			has_modifier = energy_deficit
-			has_monthly_income = {
-				resource = energy  value < 1
-			}
+		limit = { has_monthly_income = { resource = minerals  value < 5 } }
+		if = {				
+			limit = {			
+				has_modifier = mineral_deficit		
+				has_monthly_income = {	resource = minerals  value < 1 }
+			}					
+			change_variable = {	which = minerals_weight	value = 10 }
+		}			
+		change_variable = {	which = minerals_weight value = 3 } }
+		if = { 
+			limit = { has_monthly_income = { resource = minerals  value < -10 } }
+			change_variable = {	which = minerals_weight value = 4	}
 		}
-		change_variable = {
-			which = energy_weight
-			value = 10
+		if = { 
+			limit = { has_monthly_income = { resource = minerals  value < -20 } }
+			change_variable = {	which = minerals_weight value = 5	}
 		}
+		else = { record_minerals_income = yes }
+		
 	}
-	
 	if = {
-		limit = {
-			any_owned_planet = {
-				has_modifier = starvation
-			}#this checks for planets starving
-			has_monthly_income = {
-				resource = food  value < 1
+		limit = { 
+			is_machine_empire = no
+			has_monthly_income = { resource = food  value < 5 }
+		}
+		if = {				
+			limit = {			
+				any_owned_planet = { has_modifier = starvation }
+				has_monthly_income = {	resource = food  value < 1	}
+			}			
+			change_variable = {	which = food_weight	value = 10	}
+		}			
+		change_variable = {	which = food_weight value = 3 } }
+		if = { 
+			limit = { has_monthly_income = { resource = food  value < -10 } }
+			change_variable = {	which = food_weight value = 4	}
+		}
+		if = { 
+			limit = { has_monthly_income = { resource = food  value < -20 } }
+			change_variable = {	which = food_weight value = 5	}
+		}
+		else = { 
+			if = { 
+				limit = { 
+					is_machine_empire = no
+					has_monthly_income = { resource = food  value > 4 }
+				}
+				record_food_income = yes
 			}
-		}
-		change_variable = {
-			which = food_weight
-			value = 10
-		}
+		}			
 	}
-}
-
-check_country_income_level = {
-	#the checks below determine whether there is a negative income of a specific resource.
-	
-	if = {
-		limit = {
-			has_monthly_income = {
-				resource = energy  value < 5
-			}
-		}
-		if = {
-			limit = {
-				has_monthly_income = {
-					resource = energy  value < 5
-				}
-			}
-			change_variable = {
-				which = energy_weight
-				value = 3
-			}
-		}
-		if = {
-			limit = {
-				has_monthly_income = {
-					resource = energy  value < -10
-				}
-			}
-			change_variable = {
-				which = energy_weight
-				value = 4
-			}
-		}
-		if = {
-			limit = {
-				has_monthly_income = {
-					resource = energy  value < -20
-				}
-			}
-			change_variable = {
-				which = energy_weight
-				value = 5
-			}
-		}
-	}
-	
-	if = {
-		limit = {
-			has_monthly_income = {
-				resource = minerals  value < 10
-			}
-		}
-		if = {
-			limit = {
-				has_monthly_income = {
-					resource = minerals  value < 10
-				}
-			}
-			change_variable = {
-				which = minerals_weight
-				value = 3
-			}
-		}
-		if = {
-			limit = {
-				has_monthly_income = {
-					resource = minerals  value <0
-				}
-			}
-			change_variable = {
-				which = minerals_weight
-				value = 4
-			}
-		}
-		if = {
-			limit = {
-				has_monthly_income = {
-					resource = minerals  value < -10
-				}
-			}
-			change_variable = {
-				which = minerals_weight
-				value = 5
-			}
-		}
-	}
-	
-	if = {
-		limit = {
-			has_monthly_income = {
-				resource = food  value < 1
-			}
-		}
-		if = {
-			limit = {
-				has_monthly_income = {
-					resource = food  value < 1
-				}
-			}
-			change_variable = {
-				which = food_weight
-				value = 3
-			}
-		}
-		if = {
-			limit = {
-				has_monthly_income = {
-					resource = food  value < -10
-				}
-			}
-			change_variable = {
-				which = food_weight
-				value = 4
-			}
-		}
-		if = {
-			limit = {
-				has_monthly_income = {
-					resource = food  value < -20
-				}
-			}
-			change_variable = {
-				which = food_weight
-				value = 5
-			}
-		}
-	}
+	record_society_research_income = yes 
+	record_engineering_research_income = yes 
+	record_physics_research_income = yes 
+	record_unity_income = yes 
 }
 
 ### The effects below record a given country's resource income.
