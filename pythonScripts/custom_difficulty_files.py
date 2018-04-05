@@ -78,25 +78,30 @@ vanillaAItoNPCIndex=7
 # doTranslation=True
 doTranslation=False
 locClass=LocList(doTranslation)
+#global things: No translation needed (mod name and stuff taken from vanilla translations)
 locClass.addLoc("modName", "Dynamic Difficulty", "all")
+locClass.addLoc("minerals", "$minerals$","all")
+locClass.addLoc("energy", "$energy$","all")
+locClass.addLoc("food", "$food$","all")
+locClass.addLoc("research", "$RESEARCH$","all")
+locClass.addLoc("unity", "$unity$","all")
+locClass.addLoc("influence", "$influence$","all")
+locClass.addLoc("cap", "$NAVY_SIZE_TITLE$","all")
+locClass.addLoc("hull", "$HULL$","all")
+locClass.addLoc("armor", "$ARMOR$","all")
+locClass.addLoc("shield", "$SHIELD$","all")
+locClass.addLoc("upkeep", "$MAINTENANCE$","all")
+locClass.addLoc("growth", "$POPULATION_GROWTH$","all") #Any Pop Growth Speed","all")
+locClass.addLoc("ensign", "$DIFFICULTY_ENSIGN$","all")
+locClass.addLoc("captain", "$DIFFICULTY_CAPTAIN$","all")
+locClass.addLoc("commodore", "$DIFFICULTY_COMMODORE$","all")
+locClass.addLoc("admiral", "$DIFFICULTY_ADMIRAL$","all")
+locClass.addLoc("grandAdmiral", "$DIFFICULTY_GRAND_ADMIRAL$","all")
+locClass.addLoc("scaling", "$DIFFICULTY_SCALING$","all")
 
 
 
 #IMPORTANT
-#bonuses
-locClass.addLoc("minerals", "Minerals")
-locClass.addLoc("energy", "Energy")
-locClass.addLoc("food", "Food")
-locClass.addLoc("research", "Research")
-locClass.addLoc("unity", "Unity")
-locClass.addLoc("influence", "Influence")
-locClass.addLoc("cap", "Naval capacity")
-locClass.addLoc("damage", "Weapon Damage")
-locClass.addLoc("hull", "Hull")
-locClass.addLoc("armor", "Armor")
-locClass.addLoc("shield", "Shield")
-locClass.addLoc("upkeep", "Upkeep")
-locClass.addLoc("growth", "Any Pop Growth Speed")
 #bonusLists
 locClass.addLoc("all", "All")
 locClass.addLoc("allDesc", "Change all available bonuses at once.")
@@ -116,14 +121,7 @@ locClass.addLoc("player", "Player")
 locClass.addLoc("crisis", "Crisis")
 locClass.addLoc("marauders", "Marauders")
 locClass.addLoc("other", "Other")
-#difficiulties, AI, other important things
-locClass.addLoc("easy", "Easy")
-locClass.addLoc("ensign", "Ensign")
-locClass.addLoc("captain", "Captain")
-locClass.addLoc("commodore", "Commodore")
-locClass.addLoc("admiral", "Admiral")
-locClass.addLoc("grandAdmiral", "Grand Admiral")
-locClass.addLoc("scaling", "Scaling")
+
 locClass.addLoc("forAI", "for AI")
 locClass.addLoc("forNPCs", "for NPCs")
 locClass.addLoc("forPlayer", "for Player")
@@ -134,6 +132,9 @@ locClass.addLoc("vanilla", "Vanilla")
 
 
 #less important
+
+locClass.addLoc("easy", "Easy")
+locClass.addLoc("damage", "Weapon Damage")
 locClass.addLoc("curBon", "Current Bonuses")
 locClass.addLoc("bonus", "Bonus")
 locClass.addLoc("bonuses", "Bonuses")
@@ -181,6 +182,8 @@ locClass.addLoc("crisisInit","Since it seems to be impossible to read crisis str
 locClass.addLoc("noCrisisInit","This game has crisis disabled via the game start options. Crisis options are thus also disabled in this mod. You can activate crisis only with a new game or a save-game edit.")
 locClass.addLoc("crisisStrength","Crisis Strength")
 locClass.addLoc("current_options", "Currently active options")
+locClass.addLoc("uninstall", "Uninstall")
+locClass.addLoc("uninstallDesc", "Removes all modifiers, flags and variables. The mod can only be reinstalled in the same save-game via calling 'event custom_difficulty.20' in the console.")
 
 #options loc
 locClass.addLoc("activate_custom_mode", "Activate Custom Mode")
@@ -266,6 +269,7 @@ name_resetFlagsEvent="custom_difficulty.22"
 name_resetAIFlagsEvent="custom_difficulty.23"
 name_resetYearlyFlagsEvent="custom_difficulty.24"
 name_resetPlayerFlagsEvent="custom_difficulty.25"
+name_removeEvent="custom_difficulty.29"
 name_rootYearlyEvent="custom_difficulty.30"
 name_rootUpdateEvent="custom_difficulty.40"
 # name_rootUpdateEventSimple="custom_difficulty.41"
@@ -1184,6 +1188,7 @@ for key, inverses in optionWithInverse.items():
   # effect.add("country_event", TagList("id", name_optionsEvent))
   option.add("hidden_effect", effect)
 optionsEvent.add("option", TagList("name","custom_difficulty_lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
+optionsEvent.add("option", TagList("name","custom_difficulty_remove.name").add("custom_tooltip","custom_difficulty_remove.name").add("hidden_effect", TagList("country_event", TagList("id",name_removeEvent))))
 optionsEvent.add("option", t_backMainOption )
 optionsEvent.add("option", t_closeOption)
 
@@ -1216,6 +1221,23 @@ add_event(effect, "name_resetFlagsEvent")
 add_event(effect, "name_resetEvent")
 resetConfirmation.add("option", TagList("name", "OK").add("hidden_effect", effect))
 resetConfirmation.add("option", TagList("name", "custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
+
+mainFileContent.add("","","#remove confirmation")
+removeConfirmation=TagList("id", name_removeEvent)
+mainFileContent.add("country_event", removeConfirmation)
+removeConfirmation.add("is_triggered_only",yes)
+removeConfirmation.add("title","custom_difficulty_remove.name")
+locClass.addEntry("custom_difficulty_remove.name", "@uninstall @modName")
+locClass.addEntry("custom_difficulty_remove.desc", "@uninstallDesc")
+removeConfirmation.add("desc","custom_difficulty_remove.desc")
+removeConfirmation.add("picture", "GFX_evt_towel")
+effect=TagList()
+add_event(effect, "name_resetFlagsEvent")
+add_event(effect, "name_resetEvent")
+add_event(effect, "name_removeAllModifiers")
+effect.add("remove_global_flag", "custom_difficulty_active")
+removeConfirmation.add("option", TagList("name", "OK").add("hidden_effect", effect))
+removeConfirmation.add("option", TagList("name", "custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
 
 
 mainFileContent.add("","","#lock confirmation")
@@ -1260,8 +1282,18 @@ mainFileContent.add("country_event", otherFlagResetEvent)
 outputToFolderAndFile(mainFileContent , "events", "custom_difficulty_main.txt",1 )
 
 
+locClassCopy=deepcopy(locClass)
 for language in locClass.languages:
   outFolderLoc="../gratak_mods/custom_difficulty/localisation/"+language
+  if not os.path.exists(outFolderLoc):
+    os.makedirs(outFolderLoc)
+  locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
+
+
+locClass=locClassCopy
+locClass.translateRest=True
+for language in locClass.languages:
+  outFolderLoc="../gratak_mods/custom_difficulty_translate_new/localisation/"+language
   if not os.path.exists(outFolderLoc):
     os.makedirs(outFolderLoc)
   locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
