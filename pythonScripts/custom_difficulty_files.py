@@ -78,25 +78,30 @@ vanillaAItoNPCIndex=7
 # doTranslation=True
 doTranslation=False
 locClass=LocList(doTranslation)
+#global things: No translation needed (mod name and stuff taken from vanilla translations)
 locClass.addLoc("modName", "Dynamic Difficulty", "all")
+locClass.addLoc("minerals", "$minerals$","all")
+locClass.addLoc("energy", "$energy$","all")
+locClass.addLoc("food", "$food$","all")
+locClass.addLoc("research", "$RESEARCH","all")
+locClass.addLoc("unity", "$unity$","all")
+locClass.addLoc("influence", "$influence$","all")
+locClass.addLoc("cap", "$NAVY_SIZE_TITLE$","all")
+locClass.addLoc("hull", "$HULL$","all")
+locClass.addLoc("armor", "$ARMOR$","all")
+locClass.addLoc("shield", "$SHIELD$","all")
+locClass.addLoc("upkeep", "$MAINTENANCE$","all")
+locClass.addLoc("growth", "$POPULATION_GROWTH$","all") #Any Pop Growth Speed","all")
+locClass.addLoc("ensign", "$DIFFICULTY_ENSIGN$","all")
+locClass.addLoc("captain", "$DIFFICULTY_CAPTAIN$","all")
+locClass.addLoc("commodore", "$DIFFICULTY_COMMODORE$","all")
+locClass.addLoc("admiral", "$DIFFICULTY_ADMIRAL$","all")
+locClass.addLoc("grandAdmiral", "$DIFFICULTY_GRAND_ADMIRAL$","all")
+locClass.addLoc("scaling", "$DIFFICULTY_SCALING$","all")
 
 
 
 #IMPORTANT
-#bonuses
-locClass.addLoc("minerals", "Minerals")
-locClass.addLoc("energy", "Energy")
-locClass.addLoc("food", "Food")
-locClass.addLoc("research", "Research")
-locClass.addLoc("unity", "Unity")
-locClass.addLoc("influence", "Influence")
-locClass.addLoc("cap", "Naval capacity")
-locClass.addLoc("damage", "Weapon Damage")
-locClass.addLoc("hull", "Hull")
-locClass.addLoc("armor", "Armor")
-locClass.addLoc("shield", "Shield")
-locClass.addLoc("upkeep", "Upkeep")
-locClass.addLoc("growth", "Any Pop Growth Speed")
 #bonusLists
 locClass.addLoc("all", "All")
 locClass.addLoc("allDesc", "Change all available bonuses at once.")
@@ -116,14 +121,7 @@ locClass.addLoc("player", "Player")
 locClass.addLoc("crisis", "Crisis")
 locClass.addLoc("marauders", "Marauders")
 locClass.addLoc("other", "Other")
-#difficiulties, AI, other important things
-locClass.addLoc("easy", "Easy")
-locClass.addLoc("ensign", "Ensign")
-locClass.addLoc("captain", "Captain")
-locClass.addLoc("commodore", "Commodore")
-locClass.addLoc("admiral", "Admiral")
-locClass.addLoc("grandAdmiral", "Grand Admiral")
-locClass.addLoc("scaling", "Scaling")
+
 locClass.addLoc("forAI", "for AI")
 locClass.addLoc("forNPCs", "for NPCs")
 locClass.addLoc("forPlayer", "for Player")
@@ -134,6 +132,9 @@ locClass.addLoc("vanilla", "Vanilla")
 
 
 #less important
+
+locClass.addLoc("easy", "Easy")
+locClass.addLoc("damage", "Weapon Damage")
 locClass.addLoc("curBon", "Current Bonuses")
 locClass.addLoc("bonus", "Bonus")
 locClass.addLoc("bonuses", "Bonuses")
