@@ -178,7 +178,7 @@ locClass.addLoc("init", "Initialization")
 locClass.addLoc("initDesc", "Thank you for using Dynamic Difficulty. Start the event menu via 'ModMenu' or edict.")
 locClass.addLoc("crisisInit","Since it seems to be impossible to read crisis strength in a mod, you'll have to enter it here."+
   " The option chosen during game start will not have an effect anymore."+
-  " The chosen value will be translated into a bonus according to the same formula as in vanilla and can be customized at any time.")
+  " The value chosen below is translated into a bonus using the same formula as Vanilla Stellaris and can be customized at any time.")
 locClass.addLoc("noCrisisInit","This game has crisis disabled via the game start options. Crisis options are thus also disabled in this mod. You can activate crisis only with a new game or a save-game edit.")
 locClass.addLoc("crisisStrength","Crisis Strength")
 locClass.addLoc("current_options", "Currently active options")
