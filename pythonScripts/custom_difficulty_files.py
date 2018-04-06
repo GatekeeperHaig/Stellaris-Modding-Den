@@ -51,7 +51,7 @@ catToModifierType["other"]="ai"
 catCountryType=[
 ["default"], 
 ["default"],
-["fallen_empire", "awakened_fallen_empire"],
+["fallen_empire", "awakened_fallen_empire","ascended_empire"],
 ["guardian", "guardian_dragon", "guardian_stellarite","guardian_wraith","guardian_hiver","guardian_horror","guardian_fortress","guardian_dreadnought", "guardian_sphere"],
 [],
 ["swarm", "extradimensional", "extradimensional_2", "extradimensional_3", "ai_empire","cybrex_empire","sentinels", "portal_holders", "feral_prethoryn","feral_prethoryn_infighting"],
@@ -729,6 +729,8 @@ for groupUpdate in [False,True]:
         orTagList.add("not", TagList().add("exists","overlord"))
         orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","yes")))
       limit.add("or",orTagList)
+    else:
+      limit.add("is_ai", "yes")
     # afterIfTaglist=deepcopy(ifTagList)
     # after.add("if",afterIfTaglist)
     shortened=False
@@ -1290,13 +1292,13 @@ for language in locClass.languages:
   locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
 
 
-locClass=locClassCopy
-locClass.translateRest=True
-for language in locClass.languages:
-  outFolderLoc="../gratak_mods/custom_difficulty_translate_new/localisation/"+language
-  if not os.path.exists(outFolderLoc):
-    os.makedirs(outFolderLoc)
-  locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
+# locClass=locClassCopy
+# locClass.translateRest=True
+# for language in locClass.languages:
+#   outFolderLoc="../gratak_mods/custom_difficulty_translate_new/localisation/"+language
+#   if not os.path.exists(outFolderLoc):
+#     os.makedirs(outFolderLoc)
+#   locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
 
 
 
