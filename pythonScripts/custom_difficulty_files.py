@@ -458,15 +458,15 @@ for cat in cats:
         if changeStep>0:
           option=TagList().add("name","custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep))
           if cat=="ai_yearly":
-            locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), "@increase @{} @years by {}".format(bonus, changeStep))
+            locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), "§G@increase @{} @years by {}".format(bonus, changeStep))
           else:
-            locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), "@increase @{} @bonuses by {}%".format(bonus, changeStep))
+            locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), "§G@increase @{} @bonuses by {}%".format(bonus, changeStep))
         else:
           option=TagList().add("name","custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep))
           if cat=="ai_yearly":
-            locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), "@decrease @{} @years by {}".format(bonus, -changeStep))
+            locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), "§R@decrease @{} @years by {}".format(bonus, -changeStep))
           else:
-            locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), "@decrease @{} @bonuses by {}%".format(bonus, -changeStep))
+            locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), "§R@decrease @{} @bonuses by {}%".format(bonus, -changeStep))
 
         hidden_effect=TagList()
         if bonusIndex>len(bonusesListNames):
