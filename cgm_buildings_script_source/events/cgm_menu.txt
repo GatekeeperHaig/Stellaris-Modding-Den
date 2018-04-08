@@ -12,18 +12,20 @@ country_event = {
 				is_multiplayer = yes
 				is_ai = no					
 			}	
-			set_country_flag = cgm_game_host
+			set_country_flag = cgm_game_host			
 		}		
 		country_event = { id = core_game_mechanics_and_ai_base.1 }
 	}
 }
 
-country_event = {
+#the event below opens the main menu for CGM - each CGM mod gets a unique option
+
+country_event = { 
 	id = core_game_mechanics_and_ai_base.1	
 	is_triggered_only = yes
-	title = core_game_mechanics_and_ai.main_menu_title
-	desc = core_game_mechanics_and_ai.main_menu_desc
-	picture = GFX_CGM_buildings_menu
+	title = cgm.main_menu.title
+	desc = cgm.main_menu.desc
+	picture = GFX_CGM_buildings_menu #remember to change the even picture when you add other mods
 	trigger = { 		
 		is_ai = no
 		OR = {
@@ -35,19 +37,92 @@ country_event = {
 		}				
 	}	
 	option = {
-		name = vanilla_building_stats_name
-		custom_tooltip = vanilla_building_stats_tooltip
-		trigger = { overhauled_building_stats_enabled = yes	}		
-		hidden_effect = { remove_global_flag = overhauled_building_stats_active }			
-	}
+		name = cgm_buildings_preset.enable_new_building_content.name
+		custom_tooltip = cgm_buildings_preset.enable_new_building_content.desc
+		trigger = { 
+			has_global_flag = cgm_game_start
+			NOR = { 
+				has_global_flag = new_building_content_active
+				has_global_flag = vanilla_building_content_active
+			}
+		}	
+		hidden_effect = { 
+			set_global_flag = new_building_content_active			
+			hidden_effect = { 
+				every_country = {
+					limit = { 
+						OR = {
+							is_country_type = default
+							is_country_type = fallen_empire
+							is_country_tyle = awakened_fallen_empire
+						}
+					}	
+					country_event = { id = cgm_building_operations.1 }
+				}
+				country_event = { id = core_game_mechanics_and_ai_base.1 }
+			}	
+		}
+	}	
 	option = {
-		name = overhauled_building_stats_name
-		custom_tooltip = overhauled_building_stats_tooltip
-		trigger = { overhauled_building_stats_enabled = no }		
-		hidden_effect = { set_global_flag = overhauled_building_stats_active }		
+		name = cgm_buildings_preset.keep_vanilla_building_content.name
+		custom_tooltip = cgm_buildings_preset.keep_vanilla_building_content.desc
+		trigger = { 
+			has_global_flag = cgm_game_start
+			NOR = { 
+				has_global_flag = new_building_content_active
+				has_global_flag = vanilla_building_content_active
+			}
+		}	
+		hidden_effect = { 
+			set_global_flag = vanilla_building_content_active			
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
+	}	
+	option = {
+		name = cgm_buildings_option.enable_overhauled_vanilla_building_stats.name
+		custom_tooltip = cgm_buildings_option.enable_overhauled_vanilla_building_stats.desc
+		trigger = { 
+			has_global_flag = vanilla_building_content_active
+			NOT = { has_global_flag = overhauled_building_stats_active }
+		}	
+		hidden_effect = { 
+			set_global_flag = overhauled_building_stats_active
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
 	}		
 	option = {
-		name = OK
-	}	
-	#after = { hidden_effect = { country_event = { id = core_game_mechanics_and_ai_base.1 } } }	
+		name = cgm_buildings_option.disable_overhauled_vanilla_building_stats.name
+		custom_tooltip = cgm_buildings_option.disable_overhauled_vanilla_building_stats.desc
+		trigger = { 
+			has_global_flag = vanilla_building_content_active
+			has_global_flag = overhauled_building_stats_active
+		}	
+		hidden_effect = { 
+			remove_global_flag = overhauled_building_stats_active
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
+	}			
+	option = {
+		name = cgm_buildings_option.advanced_building_configuration.name
+		custom_tooltip = cgm_buildings_option.advanced_building_configuration.desc
+		trigger = { 
+			OR = {
+				has_global_flag = vanilla_building_content_active
+				has_global_flag = new_building_content_active
+			}	
+		}	
+		#hidden_effect = { 			
+		#	country_event = { id = core_game_mechanics_and_ai_base.1 } ### gratak - this is where the configuration menu should be called. You can insert it in this file using this namespace or in another file. 
+		#}
+	}					
+	option = {
+		name = cgm_main_menu.close.name
+		custom_tooltip = cgm_main_menu.close.desc
+		trigger = { 
+			OR = {
+				has_global_flag = vanilla_building_content_active
+				has_global_flag = new_building_content_active
+			}	
+		}			
+	}		
 }
