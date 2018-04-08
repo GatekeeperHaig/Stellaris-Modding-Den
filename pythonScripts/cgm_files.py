@@ -12,7 +12,7 @@ from functools import reduce
 
 debugMode=True
 
-changeSteps = [50, 20, 1]
+changeSteps = [50, 20, 10]
 for s in reversed(changeSteps):
   changeSteps.append(-s)
 bonusNames=["capital_building","empire_unique_building","planet_unique_building","military_building","standard_resource_building","research_resource_building","unity_resource_building","special_resource_building","replicator_building", "all"]
@@ -98,6 +98,7 @@ for catI,cat in enumerate(cats):
       bonusMenu.add("option", TagList("name", eventNames.format("change_"+str(changeStep).replace("-", "neg"))))
     bonusMenu.add("option", TagList("name", "BACK").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_subMainMenuEvent+catI)))))
   mainSubMenu.add("option", TagList("name", "BACK").add("hidden_effect", TagList("country_event", TagList("id",name_mainMenuEvent))))
+mainMenu.add("option", TagList("name", "BACK").add("hidden_effect", TagList("country_event", TagList("id",1))))
 
 
 # buildingOptionsFile.printAll()
