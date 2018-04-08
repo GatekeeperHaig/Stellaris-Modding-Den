@@ -8,7 +8,7 @@ from googletrans import Translator
 import re
 from locList import LocList
 
-debugMode=True
+debugMode=False
 
 changeStepYears=[5,4,3,2,1]
 changeSteps = [50, 25, 10, 5, 1]
