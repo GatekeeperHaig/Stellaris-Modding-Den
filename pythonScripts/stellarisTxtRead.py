@@ -701,7 +701,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           continue
       self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
       if isinstance(self.vals[valIndex], TagList):
-        if len(header[self.bracketLevel+1])<=headerIndex or header[self.bracketLevel+1][headerIndex]=="" and bodyEntry[headerIndex].strip()[0]=="{":
+        if len(header[self.bracketLevel+1])<=headerIndex or header[self.bracketLevel+1][headerIndex]=="" and bodyEntry[headerIndex].strip()[0] in ["{","#"]:
           self.vals[valIndex]=bodyEntry[headerIndex]
         else:
           self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,local_n_th_occurence,occHeader,occEntry)
