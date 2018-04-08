@@ -11,6 +11,7 @@ def addCommonArgs(parser):
   parser.add_argument('--test_run', action="store_true", help="No Output.")
 
 
+
 class TagList: #Basically everything is stored recursively in objects of this class. Each file is one such object. Each tag within is one such object. The variables defined in a file are one such object. Only out-of-building comments are ignored and simply copied file to file.
   def __init__(self,levelOrName=0,val=0,comment="", sep="="):
     self.names=[]
@@ -165,6 +166,27 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     if self.bracketLevel!=0:
       out+="\n"+self._printTabs()+"}"
     return out
+  def _toLine(self):
+    out="{"
+    for name, val, comment, seperator in self.getAll():
+      out+=" "+name
+      if val:
+        out+=" {} ".format(seperator)
+        if isinstance(val, TagList):
+          out+=val._toLine()
+        else:
+          out+=val
+    out+=" }"
+    return out
+  def forceOneLineIf(self, conditionVal, condition):
+    if conditionVal:
+      return self._toLine()
+    else:
+      # self.vals= list(map(lambda val: applyIfTagList(val, lambda *x: val.forceOneLineIf(*x), condition(name, val), conditionForm), self.vals))
+      for i in range(len(self)):
+        self.vals[i]=applyIfTagList(self.vals[i], lambda *x: self.vals[i].forceOneLineIf(*x), condition(self.names[i], self.vals[i]), condition)
+      return self
+
   def writeAll(self,file,args=0,checkForHelpers=False): #formatted writing. Paradox style minus most whitespace tailing errors
     for i in range(len(self.names)):
       try:
@@ -679,7 +701,10 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           continue
       self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
       if isinstance(self.vals[valIndex], TagList):
-        self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,local_n_th_occurence,occHeader,occEntry)
+        if len(header[self.bracketLevel+1])<=headerIndex or header[self.bracketLevel+1][headerIndex]=="" and bodyEntry[headerIndex].strip()[0]=="{":
+          self.vals[valIndex]=bodyEntry[headerIndex]
+        else:
+          self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,local_n_th_occurence,occHeader,occEntry)
       else:
         # print(entry)         
         entry=bodyEntry[headerIndex]
@@ -860,3 +885,9 @@ class ParseError(Exception):
   def __init__(self, message):
     # self.expression = expression
     self.message = message
+
+def applyIfTagList(val, fun, *args):
+  if isinstance(val, TagList):
+    return fun(*args)
+  else:
+    return val

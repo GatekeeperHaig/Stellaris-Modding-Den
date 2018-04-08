@@ -575,7 +575,7 @@ class TabControlClass:
     oll="one_line_level"
     jf="join_files"
 
-    self.newTab("Txt To Ods",convertCSV_TXT,("text files",'*.txt;*.gfx'),[],["filter","manual_filter","create_new_file","use_csv"],"")
+    self.newTab("Txt To Ods",convertCSV_TXT,("text files",'*.txt;*.gfx'),[],["filter","manual_filter","single_line_below_key","create_new_file","use_csv"],"")
     self.tabClasses[-1].helpText="Creates an ods file from a Stellaris .txt file. Currently works for txt files that are lists of same top-tag entries (for example all components and sections."
 
     self.newTab("Ods To Txt",convertCSV_TXT,("table documents","*.ods"),["--to_txt"]

@@ -30,6 +30,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('--remove_header', action="store_true", help="Header ('@' variables) will be converted into values inside the tags. Allows easier changes in ods.")
   parser.add_argument('--keep_inlines', action="store_true", help="With this option, the script will try not to split inlines into the long tag form.")
   parser.add_argument('--occ_sheet',action="store_true",help="Depricated. Activates the old occurence mode in a different sheet. I think this is no longer needed with the OCCNUM column (which is certainly able of doing things the occ sheet wasn't able to do)")
+  parser.add_argument('--single_line_below_key', default="", help="Comma separated list. Txt To Ods only (Ods to Txt detects your previously chosen option). Anything below this keyword will be stored as a string in excel, rather than being taken appart further.")
   addCommonArgs(parser)
   
   
@@ -102,7 +103,33 @@ def main(args,unused=0):
     else:
       keepExtraLines=False
     if not args.to_txt or os.path.exists(fileName):
-      nameToData.readFile(fileName,args, varsToValue) 
+      nameToData.readFile(fileName,args, varsToValue)
+      # print(nameToData._toLine()) 
+
+      if not args.to_txt:
+        compareName="upgrades"
+        def ifName(name, val):
+          if name==compareName:
+            return True
+          else:
+            return False
+        # nameToData.forceOneLineIf(False,ifName)
+        for compareName in args.single_line_below_key.split(","):
+          compareName=compareName.strip()
+          nameToData.forceOneLineIf(False,ifName)
+
+
+      def ifNoVals(name, val):
+        if isinstance(val, TagList):
+          for subName, subVal in val.getNameVal():
+            if subName and subVal=="":
+              # print(subName)
+              return True
+        return False
+      nameToData.forceOneLineIf(False,ifNoVals)
+
+
+      # nameToData.printAll()
       if not args.to_txt:
         nameToData.nonEqualToValue()
     else:
