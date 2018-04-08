@@ -87,6 +87,24 @@ check_income = { #the checks below determine whether there is a negative income 
 ### The effect below checks the resource requrements of the country
 
 check_resource_requirements = {
+	switch = {
+		trigger = has_country_flag 
+		society_research_focus_factor_1	= { remove_country_flag = society_research_focus_factor_1 }
+		society_research_focus_factor_2	= { remove_country_flag = society_research_focus_factor_2 }
+		physics_research_focus_factor_1	= { remove_country_flag = physics_research_focus_factor_1 }
+		physics_research_focus_factor_2	= { remove_country_flag = physics_research_focus_factor_2 }
+		engineering_research_focus_factor_1	= { remove_country_flag = engineering_research_focus_factor_1 }
+		engineering_research_focus_factor_2	= { remove_country_flag = engineering_research_focus_factor_2 }
+		energy_focus_factor_1 = { remove_country_flag = energy_focus_factor_1 }
+		energy_focus_factor_2 = { remove_country_flag = energy_focus_factor_2 }
+		minerals_focus_factor_1	= { remove_country_flag = minerals_focus_factor_1 }
+		minerals_focus_factor_2	= { remove_country_flag = minerals_focus_factor_2 }
+		food_delimited	= { remove_country_flag = food_delimited }
+		food_focus_factor_1	= { remove_country_flag = food_focus_factor_1 }		 		
+		food_focus_factor_2	= { remove_country_flag = food_focus_factor_2 }
+		food_focus_factor_3	= { remove_country_flag = food_focus_factor_3 }
+		food_focus_factor_4	= { remove_country_flag = food_focus_factor_4 }
+	}	
 	if = {
 		limit = {
 			check_variable = { which = society_research_income value < physics_research_income }
@@ -98,7 +116,7 @@ check_resource_requirements = {
 				check_variable = { which = society_research_income value < physics_research_income }
 				check_variable = { which = society_research_income value < engineering_research_income }
 			}		
-			set_timed_country_flag = { flag = society_research_focus_factor_2 days = 360 }
+			set_country_flag = society_research_focus_factor_2
 			else = {
 				if = {
 					limit = {
@@ -107,7 +125,7 @@ check_resource_requirements = {
 							check_variable = { which = society_research_income value < engineering_research_income }
 						}	
 					}		
-					set_timed_country_flag = { flag = society_research_focus_factor_1 days = 360 }
+					set_country_flag = society_research_focus_factor_1
 				}
 			}
 		}
@@ -123,7 +141,7 @@ check_resource_requirements = {
 						check_variable = { which = physics_research_income value < society_research_income }
 						check_variable = { which = physics_research_income value < engineering_research_income }
 					}		
-					set_timed_country_flag = { flag = physics_research_focus_factor_2 days = 360 }
+					set_country_flag = physics_research_focus_factor_2
 					else = {
 						if = {
 							limit = {
@@ -132,7 +150,7 @@ check_resource_requirements = {
 									check_variable = { which = physics_research_income value < engineering_research_income }
 								}	
 							}		
-							set_timed_country_flag = { flag = physics_research_focus_factor_1 days = 360 }
+							set_country_flag = physics_research_focus_factor_1
 						}
 					}
 				}
@@ -148,7 +166,7 @@ check_resource_requirements = {
 								check_variable = { which = engineering_research_income value < society_research_income }
 								check_variable = { which = engineering_research_income value < physics_research_income }
 							}		
-							set_timed_country_flag = { flag = engineering_research_focus_factor_2 days = 360 }
+							set_country_flag = engineering_research_focus_factor_2
 							else = {
 								if = {
 									limit = {
@@ -157,7 +175,7 @@ check_resource_requirements = {
 											check_variable = { which = engineering_research_income value < physics_research_income }
 										}	
 									}		
-									set_timed_country_flag = { flag = engineering_research_focus_factor_1 days = 360 }
+									set_country_flag = engineering_research_focus_factor_1
 								}
 							}
 						}
@@ -176,11 +194,11 @@ check_resource_requirements = {
 			divide_variable = { which = minerals_income value = energy_income }
 			if = { 
 				limit = { check_variable = { which = minerals_income value > 2 } }
-				set_timed_country_flag = { flag = energy_focus_factor_2 days = 360 }
+				set_country_flag = energy_focus_factor_2
 				else = { 
 					if = { 
 						limit = { check_variable = { which = minerals_income value > 1.49 } }
-						set_timed_country_flag = { flag = energy_focus_factor_1 days = 360 }
+						set_country_flag = energy_focus_factor_1
 					}
 				}
 			}
@@ -190,11 +208,11 @@ check_resource_requirements = {
 					divide_variable = { which = energy_income value = minerals_income }
 					if = { 
 						limit = { check_variable = { which = energy_income value > 2 } }
-						set_timed_country_flag = { flag = minerals_focus_factor_2 days = 360 }
+						set_country_flag = minerals_focus_factor_2
 						else = { 
 							if = { 
 								limit = { check_variable = { which = energy_income value > 1.49 } }
-								set_timed_country_flag = { flag = minerals_focus_factor_1 days = 360 }
+								set_country_flag = minerals_focus_factor_1
 							}
 						}
 					}			
@@ -202,6 +220,78 @@ check_resource_requirements = {
 			}
 		}
 	}
+	if = { 
+		limit = { 	
+			has_monthly_income = { resource = food value > 0 }
+			OR = {
+				is_machine_empire = no
+				is_servitor = yes
+				AND = {
+					is_synthethic_empire = yes
+					any_owned_pop = { 
+						is_colony_pop = yes 
+						is_robot_pop = no
+						is_growing = yes
+					}
+				}						
+			}				
+		}	
+		set_variable = { which = num_growing_planets value = 0 }	
+		every_owned_planet = {
+			limit = {
+				is_colony = yes
+				has_growing_pop = yes
+				free_pop_tiles > 0
+			}
+			prev = { change_variable = { which = num_growing_planets value = 1 } }
+		}
+		if = {
+			limit = { check_variable = { which = num_growing_planets value > 0 } }
+			set_variable = { which = food_requirment value = 0 }
+			while = {
+				limit = { check_variable = { which = num_growing_planets value > 0 } }
+				change_variable = { which = food_requirment value = 100 }
+				change_variable = { which = num_growing_planets value = -1 }
+			}
+			if = {
+				limit = { check_variable = { which = food_requirment value > food_income } }
+				set_country_flag = food_delimited
+				else = {
+					set_variable = { which = food_requirment_check value = food_requirment } 
+					multiply_variable = { which = food_requirment_check value = 1.25 } 
+					if = {
+						limit = { check_variable = { which = food_requirment_check value > food_income } }					
+						set_country_flag = food_focus_factor_1
+						else = {
+							set_variable = { which = food_requirment_check value = food_requirment } 
+							multiply_variable = { which = food_requirment_check value = 1.5 } 	
+							if = {
+								limit = { check_variable = { which = food_requirment_check value > food_income } }					
+								set_country_flag = food_focus_factor_2							
+								else = {
+									set_variable = { which = food_requirment_check value = food_requirment } 
+									multiply_variable = { which = food_requirment_check value = 1.75 } 	
+									if = {
+										limit = { check_variable = { which = food_requirment_check value > food_income } }					
+										set_country_flag = food_focus_factor_3
+										else = {
+											set_variable = { which = food_requirment_check value = food_requirment } 
+											multiply_variable = { which = food_requirment_check value = 2 } 	
+											if = {
+												limit = { check_variable = { which = food_requirment_check value > food_income } }					
+												set_country_flag = food_focus_factor_4																	
+											}
+										}	
+									}
+								}
+							}
+						}
+					}
+				}
+			}								
+			else = { set_country_flag = food_delimited }			
+		}			
+	}					
 }
 
 ### The effects below record a given country's resource income.
