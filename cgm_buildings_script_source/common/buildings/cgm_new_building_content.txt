@@ -1,9 +1,14 @@
+#### Structure of this file
+# 1. planet unique buildings and unity
+# 2. non-restricted resource buildings
+# 3. tile restricted resource buildings
+
 ###planet unique buildings
 
 #resource buildings
 building_agricultural_processor_1 = {
 	#building defines
-	tags = { planet_unique_resource_building }
+	tags = { planet_unique_building }
 	planet_unique = yes
 	is_listed = yes
 	base_buildtime = 180	
@@ -21,23 +26,34 @@ building_agricultural_processor_1 = {
 	#resource output and modifiers	
 	produced_resources = { food = 2 }
 	planet_modifier = { tile_resource_food_mult = 0.10 }
+	#construction effects
+	on_queued = { check_food_buildings = yes }
+	on_unqueued = { subtract_food_buildings = yes }		
 	#ai restrictions and weights	
-	ai_allow = { food_buildings_ai_allow = yes }		
-	ai_weight = { 
+	ai_allow = { 
+		has_resource = no
+		food_buildings_limitation = no
+	}			
+	ai_weight = {
+		weight = 10
 		modifier = { 
-			weight = 250 
-			has_deposit = food_building_tile
+			factor = 5
+			from.owner = { has_country_flag = food_focus_factor_1 }
 		}
+		modifier = { 
+			factor = 10
+			from.owner = { has_country_flag = food_focus_factor_2 }
+		}	
 	}
 }
 
 building_agricultural_processor_2 = {
 	#building defines	
-	tags = { planet_unique_resource_building }
+	tags = { planet_unique_building }
 	planet_unique = yes
 	is_listed = no
 	base_buildtime = 180	
-	cost = { minerals = 150 }	
+	cost = { minerals = 200 }		
 	required_resources = { energy = 3 }
 	destroy_if = { new_building_content_enabled = no }
 	#requirements and upgrade
@@ -50,14 +66,6 @@ building_agricultural_processor_2 = {
 	#resource output and modifiers	
 	produced_resources = { food = 4 }
 	planet_modifier = { tile_resource_food_mult = 0.20 }
-	#ai restrictions and weights	
-	ai_allow = { food_buildings_ai_allow = yes }		
-	ai_weight = { 
-		modifier = { 
-			weight = 250 
-			has_deposit = food_building_tile
-		}
-	}
 }
 
 #hive unity buildings
@@ -209,4 +217,732 @@ building_hive_nexus = {
 	#ai restrictions and weights	
 	ai_allow = { unity_buildings_ai_allow = yes }		
 	ai_weight = { weight = 100 }
+}
+
+### Non-restricted Resource Buildings
+
+building_economic_district_1 = {
+	#building defines
+	tags = { standard_resource_building }
+	is_listed = no	base_buildtime = @non_restricted_t1time	
+	cost = { minerals = @non_restricted_t1cost }	
+	required_resources = { minerals = @economic_district_upkeep_1 }
+	#requirements and upgrade
+	potential = { conditions_economic_district_1 = yes } 
+	allow = { requires_capital_0 = yes }
+	prerequisites = { "tech_basic_industry_1" }
+	upgrades = { building_economic_district_2 }
+	#resource output and modifiers	
+	produced_resources = { energy = @non_restricted_t1_output }
+	planet_modifier = { static_planet_resource_energy_add = @non_restricted_t1_static_planet_resource_add }
+	#construction effects
+	on_queued = { check_energy_buildings = yes }
+	on_unqueued = { subtract_energy_buildings = yes }		
+	#ai restrictions and weights	
+	ai_allow = { has_resource = no }		
+	ai_weight = { 
+		modifier = { 
+			factor = 5
+			from.owner = { has_country_flag = energy_focus_factor_1 }
+		}
+		modifier = { 
+			factor = 10
+			from.owner = { has_country_flag = energy_focus_factor_2 }
+		}	
+	}
+}
+building_economic_district_2 = {
+	#building defines
+	tags = { standard_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t2time	
+	cost = { minerals = @non_restricted_t2cost }
+	required_resources = { minerals = @economic_district_upkeep_2 }	
+	#requirements and upgrade
+	potential = { conditions_economic_district_2 = yes } 
+	allow = { requires_capital_1 = yes }
+	prerequisites = { "tech_applied_economics_1" }
+	upgrades = { building_economic_district_3 }
+	#resource output and modifiers	
+	produced_resources = { energy = @non_restricted_t2_output }
+	planet_modifier = { static_planet_resource_energy_add = @non_restricted_t2_static_planet_resource_add }
+}
+building_economic_district_3 = {
+	#building defines
+	tags = { standard_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t3time	
+	cost = { minerals = @non_restricted_t3cost }	
+	required_resources = { minerals = @economic_district_upkeep_3 }		
+	#requirements and upgrade
+	potential = { conditions_economic_district_3 = yes } 
+	allow = { requires_capital_1 = yes }
+	prerequisites = { "tech_applied_economics_2" }
+	upgrades = { building_economic_district_4 }
+	#resource output and modifiers	
+	produced_resources = { energy = @non_restricted_t3_output }
+	planet_modifier = { static_planet_resource_energy_add = @non_restricted_t3_static_planet_resource_add }
+}
+building_economic_district_4 = {
+	#building defines
+	tags = { standard_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t4time	
+	cost = { minerals = @non_restricted_t4cost }	
+	required_resources = { minerals = @economic_district_upkeep_4 }		
+	#requirements and upgrade
+	potential = { conditions_economic_district_4 = yes } 
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_applied_economics_3" }
+	upgrades = { building_economic_district_5 }
+	#resource output and modifiers	
+	produced_resources = { energy = @non_restricted_t4_output }
+	planet_modifier = { static_planet_resource_energy_add = @non_restricted_t4_static_planet_resource_add }
+
+}
+building_economic_district_5 = { 
+	#building defines
+	tags = { standard_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t5time	
+	cost = { minerals = @non_restricted_t5cost }	
+	required_resources = { minerals = @economic_district_upkeep_5 }		
+	#requirements and upgrade
+	potential = { conditions_economic_district_5 = yes } 
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_applied_economics_3" }
+	#resource output and modifiers
+	produced_resources = { energy = @non_restricted_t5_output }
+	planet_modifier = { static_planet_resource_energy_add = @non_restricted_t5_static_planet_resource_add }
+	triggered_planet_modifier = {
+		key = "capital_3_resource_bonus_modifier"
+		potential = { planet = { has_capital_3 = yes } }
+		modifier = { tile_resource_energy_mult = @non_restricted_t5_capital_static_planet_resource_add }
+	}
+}
+building_manufacturing_complex_1 = {
+	#building defines
+	tags = { standard_resource_building }
+	is_listed = no	base_buildtime = @non_restricted_t1time	
+	cost = { minerals = @non_restricted_t1cost }	
+	required_resources = { energy = @manufacturing_complex_upkeep_1 }
+	#requirements and upgrade
+	potential = { conditions_manufacturing_complex_1 = yes } 
+	allow = { requires_capital_0 = yes }
+	prerequisites = { "tech_basic_industry_1" }
+	upgrades = { building_manufacturing_complex_2 }
+	#resource output and modifiers	
+	produced_resources = { minerals = @non_restricted_t1_output }
+	planet_modifier = { static_planet_resource_minerals_add = @non_restricted_t1_static_planet_resource_add }
+	#construction effects
+	on_queued = { check_minerals_buildings = yes }
+	on_unqueued = { subtract_minerals_buildings = yes }		
+	#ai restrictions and weights	
+	ai_allow = { has_resource = no }		
+	ai_weight = { 
+		modifier = { 
+			factor = 5
+			from.owner = { has_country_flag = minerals_focus_factor_1 }
+		}
+		modifier = { 
+			factor = 10
+			from.owner = { has_country_flag = minerals_focus_factor_2 }
+		}	
+	}
+}
+building_manufacturing_complex_2 = {
+	#building defines
+	tags = { standard_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t2time	
+	cost = { minerals = @non_restricted_t2cost }
+	required_resources = { energy = @manufacturing_complex_upkeep_2 }	
+	#requirements and upgrade
+	potential = { conditions_manufacturing_complex_2 = yes } 
+	allow = { requires_capital_1 = yes }
+	prerequisites = { "tech_advanced_industry_1" }
+	upgrades = { building_manufacturing_complex_3 }
+	#resource output and modifiers	
+	produced_resources = { minerals = @non_restricted_t2_output }
+	planet_modifier = { static_planet_resource_minerals_add = @non_restricted_t2_static_planet_resource_add }
+}
+building_manufacturing_complex_3 = {
+	#building defines
+	tags = { standard_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t3time	
+	cost = { minerals = @non_restricted_t3cost }	
+	required_resources = { energy = @manufacturing_complex_upkeep_3 }		
+	#requirements and upgrade
+	potential = { conditions_manufacturing_complex_3 = yes } 
+	allow = { requires_capital_1 = yes }
+	prerequisites = { "tech_advanced_industry_2" }
+	upgrades = { building_manufacturing_complex_4 }
+	#resource output and modifiers	
+	produced_resources = { minerals = @non_restricted_t3_output }
+	planet_modifier = { static_planet_resource_minerals_add = @non_restricted_t3_static_planet_resource_add }
+}
+building_manufacturing_complex_4 = {
+	#building defines
+	tags = { standard_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t4time	
+	cost = { minerals = @non_restricted_t4cost }	
+	required_resources = { energy = @manufacturing_complex_upkeep_4 }		
+	#requirements and upgrade
+	potential = { conditions_manufacturing_complex_4 = yes } 
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_advanced_industry_3" }
+	upgrades = { building_manufacturing_complex_5 }
+	#resource output and modifiers	
+	produced_resources = { minerals = @non_restricted_t4_output }
+	planet_modifier = { static_planet_resource_minerals_add = @non_restricted_t4_static_planet_resource_add }
+}
+building_manufacturing_complex_5 = { 
+	#building defines
+	tags = { standard_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t5time	
+	cost = { minerals = @non_restricted_t5cost }	
+	required_resources = { energy = @manufacturing_complex_upkeep_5 }		
+	destroy_if = { planet_is_capital = no }
+	#requirements and upgrade
+	potential = { conditions_manufacturing_complex_5 = yes } 
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_advanced_industry_3" }
+	#resource output and modifiers
+	produced_resources = { minerals = @non_restricted_t5_output }
+	planet_modifier = { static_planet_resource_minerals_add = @non_restricted_t5_static_planet_resource_add }
+	triggered_planet_modifier = {
+		key = "capital_3_resource_bonus_modifier"
+		potential = { planet = { has_capital_3 = yes } }
+		modifier = { tile_resource_minerals_mult = @non_restricted_t5_capital_static_planet_resource_add }
+	}
+}
+building_hydrophonic_farm_1 = {
+	#building defines
+	icon = "building_hydroponics_farm_1"
+	tags = { standard_resource_building }
+	is_listed = no	base_buildtime = @non_restricted_t1time	
+	cost = { minerals = @non_restricted_t1cost }	
+	required_resources = { 
+		energy = @hydrophonic_farm_upkeep_1
+		minerals = @hydrophonic_farm_upkeep_1
+	}	
+	show_tech_unlock_if = { is_machine_empire = no }
+	destroy_if = { owner_is_machine_empire = yes }		
+	#requirements and upgrade
+	potential = { conditions_hydrophonic_farm_1 = yes } 
+	allow = { requires_capital_0 = yes }
+	prerequisites = { "tech_eco_simulation" }
+	upgrades = { building_hydrophonic_farm_2 }
+	#resource output and modifiers	
+	produced_resources = { food = @non_restricted_t1_output }
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			resources = { unity = 1	}
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			resources = { minerals = 1 }
+		}
+	}		
+	planet_modifier = { static_planet_resource_food_add = @non_restricted_t1_static_planet_resource_add }
+	#construction effects
+	on_queued = { check_food_buildings = yes }
+	on_unqueued = { subtract_food_buildings = yes }		
+	#ai restrictions and weights	
+	ai_allow = { 
+		has_resource = no
+		food_buildings_limitation = no
+	}			
+	ai_weight = { 
+		modifier = { 
+			factor = 5
+			from.owner = { has_country_flag = food_focus_factor_1 }
+		}
+		modifier = { 
+			factor = 10
+			from.owner = { has_country_flag = food_focus_factor_2 }
+		}	
+	}
+}
+building_hydrophonic_farm_2 = {
+	#building defines
+	icon = "building_hydroponics_farm_2"
+	tags = { standard_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t2time	
+	cost = { minerals = @non_restricted_t2cost }
+	required_resources = { 
+		energy = @hydrophonic_farm_upkeep_2
+		minerals = @hydrophonic_farm_upkeep_2
+	}		
+	show_tech_unlock_if = { is_machine_empire = no }
+	destroy_if = { owner_is_machine_empire = yes }		
+	#requirements and upgrade
+	potential = { conditions_hydrophonic_farm_2 = yes } 
+	allow = { requires_capital_1 = yes }
+	prerequisites = { "tech_hydroponics" }
+	upgrades = { building_hydrophonic_farm_3 }
+	#resource output and modifiers	
+	produced_resources = { food = @non_restricted_t2_output }
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			resources = { unity = 1	}
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			resources = { minerals = 1 }
+		}
+	}		
+	planet_modifier = { static_planet_resource_food_add = @non_restricted_t2_static_planet_resource_add }
+}
+building_hydrophonic_farm_3 = {
+	#building defines
+	icon = "building_hydroponics_farm_3"
+	tags = { standard_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t3time	
+	cost = { minerals = @non_restricted_t3cost }	
+	required_resources = { 
+		energy = @hydrophonic_farm_upkeep_3
+		minerals = @hydrophonic_farm_upkeep_3
+	}	
+	show_tech_unlock_if = { is_machine_empire = no }
+	destroy_if = { owner_is_machine_empire = yes }		
+	#requirements and upgrade
+	potential = { conditions_hydrophonic_farm_3 = yes } 
+	allow = { requires_capital_1 = yes }
+	prerequisites = { "tech_gene_crops" }
+	upgrades = { building_hydrophonic_farm_4 }
+	#resource output and modifiers	
+	produced_resources = { food = @non_restricted_t3_output }
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			resources = { unity = 1	}
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			resources = { minerals = 1 }
+		}
+	}		
+	planet_modifier = { static_planet_resource_food_add = @non_restricted_t3_static_planet_resource_add }
+}
+building_hydrophonic_farm_4 = {
+	#building defines
+	icon = "building_hydroponics_farm_4"
+	tags = { standard_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t4time	
+	cost = { minerals = @non_restricted_t4cost }	
+	required_resources = { 
+		energy = @hydrophonic_farm_upkeep_4
+		minerals = @hydrophonic_farm_upkeep_4
+	}	
+	show_tech_unlock_if = { is_machine_empire = no }
+	destroy_if = { owner_is_machine_empire = yes }		
+	#requirements and upgrade
+	potential = { conditions_hydrophonic_farm_4 = yes } 
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_nano_vitality_crops" }
+	upgrades = { building_hydrophonic_farm_5 }
+	#resource output and modifiers	
+	produced_resources = { food = @non_restricted_t4_output }
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			resources = { unity = 1	}
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			resources = { minerals = 1 }
+		}
+	}		
+	planet_modifier = { static_planet_resource_food_add = @non_restricted_t4_static_planet_resource_add }
+}
+building_hydrophonic_farm_5 = { 
+	#building defines
+	icon = "building_hydroponics_farm_5"
+	tags = { standard_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t5time	
+	cost = { minerals = @non_restricted_t5cost }	
+	required_resources = { 
+		energy = @hydrophonic_farm_upkeep_5
+		minerals = @hydrophonic_farm_upkeep_5
+	}	
+	show_tech_unlock_if = { is_machine_empire = no }
+	destroy_if = { owner_is_machine_empire = yes }		
+	#requirements and upgrade
+	potential = { conditions_hydrophonic_farm_5 = yes } 
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_nano_vitality_crops" }	
+	#resource output and modifiers
+	produced_resources = { food = @non_restricted_t5_output }
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			resources = { unity = 1	}
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			resources = { minerals = 1 }
+		}
+	}		
+	planet_modifier = { static_planet_resource_food_add = @non_restricted_t5_static_planet_resource_add }
+	triggered_planet_modifier = {
+		key = "capital_3_resource_bonus_modifier"
+		potential = { planet = { has_capital_3 = yes } }
+		modifier = { tile_resource_food_mult = @non_restricted_t5_capital_static_planet_resource_add }
+	}
+}
+
+building_sociological_campus_1 = {
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no	
+	base_buildtime = @non_restricted_t1time	
+	cost = { minerals = @non_restricted_t1cost }	
+	required_resources = { 
+		energy = @sociological_campus_upkeep_1 
+		minerals = @sociological_campus_upkeep_1
+	}
+	#requirements and upgrade
+	potential = { conditions_sociological_campus_1 = yes } 
+	allow = { requires_capital_0 = yes }
+	prerequisites = { "tech_basic_science_lab_1" }
+	upgrades = { building_sociological_campus_2 }
+	#resource output and modifiers	
+	produced_resources = { society_research = @non_restricted_t1_output }
+	planet_modifier = { static_planet_resource_society_research_add = @non_restricted_t1_static_planet_resource_add }
+	#construction effects
+	on_queued = { check_society_research_buildings = yes }
+	on_unqueued = { subtract_society_research_buildings = yes }		
+	#ai restrictions and weights	
+	ai_allow = { has_resource = no }		
+	ai_weight = { 
+		modifier = { 
+			factor = 5
+			from.owner = { has_country_flag = society_research_focus_factor_1 }
+		}
+		modifier = { 
+			factor = 10
+			from.owner = { has_country_flag = society_research_focus_factor_2 }
+		}	
+	}
+}
+building_sociological_campus_2 = {
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t2time	
+	cost = { minerals = @non_restricted_t2cost }
+	required_resources = { 
+		energy = @sociological_campus_upkeep_2 
+		minerals = @sociological_campus_upkeep_2
+	}
+	#requirements and upgrade
+	potential = { conditions_sociological_campus_2 = yes } 
+	allow = { requires_capital_1 = yes }
+	prerequisites = { "tech_cultural_dynamics_1" }
+	upgrades = { building_sociological_campus_3 }
+	#resource output and modifiers	
+	produced_resources = { society_research = @non_restricted_t2_output }
+	planet_modifier = { static_planet_resource_society_research_add = @non_restricted_t2_static_planet_resource_add }
+}
+building_sociological_campus_3 = {
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t3time	
+	cost = { minerals = @non_restricted_t3cost }	
+	required_resources = { 
+		energy = @sociological_campus_upkeep_3 
+		minerals = @sociological_campus_upkeep_3
+	}	
+	#requirements and upgrade
+	potential = { conditions_sociological_campus_3 = yes } 
+	allow = { requires_capital_1 = yes }
+	prerequisites = { "tech_cultural_dynamics_2" }
+	upgrades = { building_sociological_campus_4 }
+	#resource output and modifiers	
+	produced_resources = { society_research = @non_restricted_t3_output }
+	planet_modifier = { static_planet_resource_society_research_add = @non_restricted_t3_static_planet_resource_add }
+}
+building_sociological_campus_4 = {
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t4time	
+	cost = { minerals = @non_restricted_t4cost }	
+	required_resources = { 
+		energy = @sociological_campus_upkeep_4 
+		minerals = @sociological_campus_upkeep_4
+	}	
+	#requirements and upgrade
+	potential = { conditions_sociological_campus_4 = yes } 
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_cultural_dynamics_3" }
+	upgrades = { building_sociological_campus_5 }
+	#resource output and modifiers	
+	produced_resources = { society_research = @non_restricted_t4_output }
+	planet_modifier = { static_planet_resource_society_research_add = @non_restricted_t4_static_planet_resource_add }
+}
+building_sociological_campus_5 = { 
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t5time	
+	cost = { minerals = @non_restricted_t5cost }	
+	required_resources = { 
+		energy = @sociological_campus_upkeep_5 
+		minerals = @sociological_campus_upkeep_5
+	}	
+	destroy_if = { planet_is_capital = no }
+	#requirements and upgrade
+	potential = { conditions_sociological_campus_5 = yes } 
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_cultural_dynamics_3" }
+	#resource output and modifiers
+	produced_resources = { society_research = @non_restricted_t5_output }
+	planet_modifier = { static_planet_resource_society_research_add = @non_restricted_t5_static_planet_resource_add }
+	triggered_planet_modifier = {
+		key = "capital_3_resource_bonus_modifier"
+		potential = { planet = { has_capital_3 = yes } }
+		modifier = { tile_resource_society_research_mult = @non_restricted_t5_capital_static_planet_resource_add }
+	}
+}
+building_physics_campus_1 = {
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no	
+	base_buildtime = @non_restricted_t1time	
+	cost = { minerals = @non_restricted_t1cost }	
+	required_resources = { 
+		energy = @physics_campus_upkeep_1 
+		minerals = @physics_campus_upkeep_1
+	}
+	#requirements and upgrade
+	potential = { conditions_physics_campus_1 = yes } 
+	allow = { requires_capital_0 = yes }
+	prerequisites = { "tech_basic_science_lab_1" }
+	upgrades = { building_physics_campus_2 }
+	#resource output and modifiers	
+	produced_resources = { physics_research = @non_restricted_t1_output }
+	planet_modifier = { static_planet_resource_physics_research_add = @non_restricted_t1_static_planet_resource_add }
+	#construction effects
+	on_queued = { check_physics_research_buildings = yes }
+	on_unqueued = { subtract_physics_research_buildings = yes }		
+	#ai restrictions and weights	
+	ai_allow = { has_resource = no }		
+	ai_weight = { 
+		modifier = { 
+			factor = 5
+			from.owner = { has_country_flag = physics_research_focus_factor_1 }
+		}
+		modifier = { 
+			factor = 10
+			from.owner = { has_country_flag = physics_research_focus_factor_2 }
+		}	
+	}
+}
+building_physics_campus_2 = {
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t2time	
+	cost = { minerals = @non_restricted_t2cost }
+	required_resources = { 
+		energy = @physics_campus_upkeep_2 
+		minerals = @physics_campus_upkeep_2
+	}
+	#requirements and upgrade
+	potential = { conditions_physics_campus_2 = yes } 
+	allow = { requires_capital_1 = yes }
+	prerequisites = { "tech_cosmology_1" }
+	upgrades = { building_physics_campus_3 }
+	#resource output and modifiers	
+	produced_resources = { physics_research = @non_restricted_t2_output }
+	planet_modifier = { static_planet_resource_physics_research_add = @non_restricted_t2_static_planet_resource_add }
+}
+building_physics_campus_3 = {
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t3time	
+	cost = { minerals = @non_restricted_t3cost }	
+	required_resources = { 
+		energy = @physics_campus_upkeep_3 
+		minerals = @physics_campus_upkeep_3
+	}	
+	#requirements and upgrade
+	potential = { conditions_physics_campus_3 = yes } 
+	allow = { requires_capital_1 = yes }
+	prerequisites = { "tech_cosmology_2" }
+	upgrades = { building_physics_campus_4 }
+	#resource output and modifiers	
+	produced_resources = { physics_research = @non_restricted_t3_output }
+	planet_modifier = { static_planet_resource_physics_research_add = @non_restricted_t3_static_planet_resource_add }
+}
+building_physics_campus_4 = {
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t4time	
+	cost = { minerals = @non_restricted_t4cost }	
+	required_resources = { 
+		energy = @physics_campus_upkeep_4 
+		minerals = @physics_campus_upkeep_4
+	}	
+	#requirements and upgrade
+	potential = { conditions_physics_campus_4 = yes } 
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_cosmology_3" }
+	upgrades = { building_physics_campus_5 }
+	#resource output and modifiers	
+	produced_resources = { physics_research = @non_restricted_t4_output }
+	planet_modifier = { static_planet_resource_physics_research_add = @non_restricted_t4_static_planet_resource_add }
+}
+building_physics_campus_5 = { 
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t5time	
+	cost = { minerals = @non_restricted_t5cost }	
+	required_resources = { 
+		energy = @physics_campus_upkeep_5 
+		minerals = @physics_campus_upkeep_5
+	}	
+	destroy_if = { planet_is_capital = no }
+	#requirements and upgrade
+	potential = { conditions_physics_campus_5 = yes } 
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_cosmology_3" }
+	#resource output and modifiers
+	produced_resources = { physics_research = @non_restricted_t5_output }
+	planet_modifier = { static_planet_resource_physics_research_add = @non_restricted_t5_static_planet_resource_add }
+	triggered_planet_modifier = {
+		key = "capital_3_resource_bonus_modifier"
+		potential = { planet = { has_capital_3 = yes } }
+		modifier = { tile_resource_physics_research_mult = @non_restricted_t5_capital_static_planet_resource_add }
+	}
+}
+building_engineering_campus_1 = {
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no	
+	base_buildtime = @non_restricted_t1time	
+	cost = { minerals = @non_restricted_t1cost }	
+	required_resources = { 
+		energy = @engineering_campus_upkeep_1 
+		minerals = @engineering_campus_upkeep_1
+	}
+	#requirements and upgrade
+	potential = { conditions_engineering_campus_1 = yes } 
+	allow = { requires_capital_0 = yes }
+	prerequisites = { "tech_basic_science_lab_1" }
+	upgrades = { building_engineering_campus_2 }
+	#resource output and modifiers	
+	produced_resources = { engineering_research = @non_restricted_t1_output }
+	planet_modifier = { static_planet_resource_engineering_research_add = @non_restricted_t1_static_planet_resource_add }
+	#construction effects
+	on_queued = { check_engineering_research_buildings = yes }
+	on_unqueued = { subtract_engineering_research_buildings = yes }		
+	#ai restrictions and weights	
+	ai_allow = { has_resource = no }		
+	ai_weight = { 
+		modifier = { 
+			factor = 5
+			from.owner = { has_country_flag = engineering_research_focus_factor_1 }
+		}
+		modifier = { 
+			factor = 10
+			from.owner = { has_country_flag = engineering_research_focus_factor_2 }
+		}	
+	}
+}
+building_engineering_campus_2 = {
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t2time	
+	cost = { minerals = @non_restricted_t2cost }
+	required_resources = { 
+		energy = @engineering_campus_upkeep_2 
+		minerals = @engineering_campus_upkeep_2
+	}
+	#requirements and upgrade
+	potential = { conditions_engineering_campus_2 = yes } 
+	allow = { requires_capital_1 = yes }
+	prerequisites = { "tech_design_paradigms_1" }
+	upgrades = { building_engineering_campus_3 }
+	#resource output and modifiers	
+	produced_resources = { engineering_research = @non_restricted_t2_output }
+	planet_modifier = { static_planet_resource_engineering_research_add = @non_restricted_t2_static_planet_resource_add }
+}
+building_engineering_campus_3 = {
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t3time	
+	cost = { minerals = @non_restricted_t3cost }	
+	required_resources = { 
+		energy = @engineering_campus_upkeep_3 
+		minerals = @engineering_campus_upkeep_3
+	}	
+	#requirements and upgrade
+	potential = { conditions_engineering_campus_3 = yes } 
+	allow = { requires_capital_1 = yes }
+	prerequisites = { "tech_design_paradigms_2" }
+	upgrades = { building_engineering_campus_4 }
+	#resource output and modifiers	
+	produced_resources = { engineering_research = @non_restricted_t3_output }
+	planet_modifier = { static_planet_resource_engineering_research_add = @non_restricted_t3_static_planet_resource_add }
+}
+building_engineering_campus_4 = {
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t4time	
+	cost = { minerals = @non_restricted_t4cost }	
+	required_resources = { 
+		energy = @engineering_campus_upkeep_4 
+		minerals = @engineering_campus_upkeep_4
+	}	
+	#requirements and upgrade
+	potential = { conditions_engineering_campus_4 = yes } 
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_design_paradigms_3" }
+	upgrades = { building_engineering_campus_5 }
+	#resource output and modifiers	
+	produced_resources = { engineering_research = @non_restricted_t4_output }
+	planet_modifier = { static_planet_resource_engineering_research_add = @non_restricted_t4_static_planet_resource_add }
+}
+building_engineering_campus_5 = { 
+	#building defines
+	tags = { research_resource_building }
+	is_listed = no
+	base_buildtime = @non_restricted_t5time	
+	cost = { minerals = @non_restricted_t5cost }	
+	required_resources = { 
+		energy = @engineering_campus_upkeep_5 
+		minerals = @engineering_campus_upkeep_5
+	}	
+	destroy_if = { planet_is_capital = no }
+	#requirements and upgrade
+	potential = { conditions_engineering_campus_5 = yes } 
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_design_paradigms_3" }
+	#resource output and modifiers
+	produced_resources = { engineering_research = @non_restricted_t5_output }
+	planet_modifier = { static_planet_resource_engineering_research_add = @non_restricted_t5_static_planet_resource_add }
+	triggered_planet_modifier = {
+		key = "capital_3_resource_bonus_modifier"
+		potential = { planet = { has_capital_3 = yes } }
+		modifier = { tile_resource_engineering_research_mult = @non_restricted_t5_capital_static_planet_resource_add }
+	}
 }

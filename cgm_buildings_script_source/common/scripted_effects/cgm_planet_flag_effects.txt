@@ -320,6 +320,8 @@ add_ai_planet_flags = {
 	if = {
 		limit = {
 			NOR = { 
+				has_planet_flag = fortify_planet
+				has_planet_flag = build_planetary_shield_generator			
 				has_planet_flag = build_slave_processing
 				has_building = building_slave_processing
 			}
@@ -356,6 +358,8 @@ add_ai_planet_flags = {
 	if = {
 		limit = {
 			NOR = { 
+				has_planet_flag = fortify_planet
+				has_planet_flag = build_planetary_shield_generator			
 				has_planet_flag = build_neuro_electric_amplifier
 				has_building = building_neuro_electric_amplifier
 			}
@@ -369,6 +373,42 @@ add_ai_planet_flags = {
 				count > 3
 			}			
 		}	
-		set_planet_flag = build_neuro_electric_amplifier
+		set_timed_planet_flag = { flag = build_neuro_electric_amplifier days = 180 }
 	}			
+	#### empire unique buildings
+	if = {
+		limit = {
+			NOR = {
+				has_planet_flag = fortify_planet
+				has_planet_flag = build_planetary_shield_generator
+				has_planet_flag = build_ethics_and_unrest_empire_unique
+			}	
+			is_capital = yes
+			has_capital_3 = yes
+			owner = { 
+				is_machine_empire = no
+				OR = {
+					AND = {
+						has_technology = "tech_galactic_benevolence"
+						prev = { NOT = { has_building = building_ministry_benevolence } }
+					}					
+					AND = { 
+						has_ascension_perk = ap_mind_over_matter
+						prev = { NOT = { has_building = building_psi_corps } }
+					}
+				}					
+				any_owned_planet = {
+					OR = { 
+						unrest > 0.3
+						count_pops = {
+							limit = { opposing_ethics_divergence = { steps > 1 who = owner } }
+							count > 3
+						}						
+					}
+				}	
+				influence > 250
+			}	
+		}
+		set_timed_planet_flag = { flag = build_ethics_and_unrest_empire_unique days = 180 }
+	}	
 }					
