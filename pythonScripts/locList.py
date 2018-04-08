@@ -29,7 +29,7 @@ class LocList:
       # self.entries.append([gameLocId, [stringOrList]])
   def append(self, gameLocId, string):
     self.addEntry(gameLocId,string)
-  def write(self,fileName, language):
+  def write(self,fileName, language, yml=True):
     if len(language)==2:
       languageCode=language
       language=self.languages[self.languageCodes.index(language)]
@@ -48,10 +48,12 @@ class LocList:
           localDict[englishKey]=englishLoc
 
     with io.open(fileName,'w', encoding="utf-8") as file:
-      file.write(u'\ufeff')
-      file.write("l_"+language+':\n')
+      if yml:
+        file.write(u'\ufeff')
+        file.write("l_"+language+':\n')
       for entry in self.entries:
-        file.write(" "+entry[0]+':0 "')
+        if yml:
+          file.write(" "+entry[0]+':0 "')
         # for loc in entry[1]:
         awaitingVar=False
         for loc in re.split("(@| |\.|,|:|§|\)|\\n)",entry[1]):
@@ -70,4 +72,6 @@ class LocList:
               raise
           else:
             file.write(loc)
-        file.write('"\n')
+        if yml:
+          file.write('"')
+        file.write("\n")
