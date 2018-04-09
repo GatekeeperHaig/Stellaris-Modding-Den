@@ -6,6 +6,12 @@ import argparse
 import re
 # import shlex
 
+splitSigns=[">=","<=","#"," ","\t","{","}","=",">","<"]
+splitPattern="("
+for sign in splitSigns:
+  splitPattern+=sign+"|"
+splitPattern=splitPattern[:-1]+")"
+
 def addCommonArgs(parser):
   parser.add_argument("--one_line_level", type= float, default=.0, help="How much the script tries to create one-liners on output: 0 - never, only keeping some existing one-liners. 1 - whenever only one text subtag exists. 2 - whenever only text subtags exist")
   parser.add_argument('--test_run', action="store_true", help="No Output.")
@@ -375,86 +381,144 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       i+=1
       if i==len(self.vals):
         break
-  # def readString(self, input):
+  def readString(self, line, args=0, bracketLevel=0, useNamedTagList=False,objectList=0,expectingVal=False, lineI=0):
+    if objectList==0:
+      objectList=[self]
+    lineSplit=re.split(splitPattern,line)
+    countEmpty=0
+    for wordI, word in enumerate(lineSplit):
+      try:
+        word=word.strip()
+        #empty
+        if len(word)==0:
+          countEmpty+=1
+          continue
+        elif word=="{":
+          if not expectingVal:
+            raise ParseError("ERROR: Unexpected '{'")
+          bracketLevel+=1
+          if useNamedTagList and bracketLevel==1:
+            newTag=NamedTagList(objectList[-1].names[-1])
+          else:
+            newTag=TagList(bracketLevel)
+          objectList[-1].vals[-1]=newTag
+          objectList.append(newTag)
+          expectingVal=False
+        #bracket level decrease
+        elif word=="}":
+          if expectingVal or bracketLevel==0:
+            raise ParseError("ERROR: Too many '}' found. Beware that the one that triggered this error is most likely not the incorrect one!")
+          bracketLevel-=1
+          objectList.pop()
+        #equal
+        # elif word=="=":
+        #   expectingVal=True
+        #comment 
+        elif word=='#': 
+          comment="".join(lineSplit[wordI:]).strip()
+          #comment without anything else in line
+          if countEmpty==wordI or len(objectList[-1].names)==0:
+            objectList[-1].add("","",comment) #will print comment only line at right place later
+          else:
+            objectList[-1].comments[-1]=" "+comment
+          break #rest of line is comment. Was already added, not being parsed to avoid special characters to have an impact in the comment
+        elif word in [">=","<=",">","<","="]:
+          objectList[-1].seperators[-1]=word
+          expectingVal=True
+        elif word=="log":
+          objectList[-1].add("","","".join(lineSplit[wordI:]).strip())
+          break
+        elif expectingVal:
+          objectList[-1].vals[-1]+=word
+          expectingVal=False
+
+        # elif expectingNameAddition:
+        #   objectList[-1].names[-1]+=word
+        #   expectingNameAddition=False
+        else:
+          objectList[-1].add(word)
+      except:
+        print("Error reading line {}, word {}".format(lineI+1,wordI+1))
+        print("Line content: {}".format(line),end='')
+        print("Word: {}".format(word))
+        raise
+    return self, bracketLevel, expectingVal
 
 
-  def readFile(self, fileName, args, varsToValue=0,useNamedTagList=False): #the varsToValue is mostly still in due to me being to lazy to remove it atm. Try to avoid using it as it will be removed at some point in the future.
-    splitSigns=[">=","<=","#"," ","\t","{","}","=",">","<"]
-    splitPattern="("
-    for sign in splitSigns:
-      splitPattern+=sign+"|"
-    splitPattern=splitPattern[:-1]+")"
+  def readFile(self, fileName, args=0, varsToValue=0,useNamedTagList=False): #the varsToValue is mostly still in due to me being to lazy to remove it atm. Try to avoid using it as it will be removed at some point in the future.
+
     bracketLevel=0
     objectList=[self] #objects currently open objectList[0] would be lowest bracket object (a building), etc
     # currentlyInHeader=True
     # writeToList=self
     # writeTo=False
     expectingVal=False
-    expectingNameAddition=False
+    # expectingNameAddition=False
     with open(fileName,'r') as inputFile:
       print("Start reading "+fileName)
       for lineI,line in enumerate(inputFile):
-        lineSplit=re.split(splitPattern,line)
-        countEmpty=0
-        for wordI, word in enumerate(lineSplit):
-          try:
-            word=word.strip()
-            #empty
-            if len(word)==0:
-              countEmpty+=1
-              continue
-            elif word=="{":
-              if not expectingVal:
-                raise ParseError("ERROR: Unexpected '{'")
-              bracketLevel+=1
-              if useNamedTagList and bracketLevel==1:
-                newTag=NamedTagList(objectList[-1].names[-1])
-              else:
-                newTag=TagList(bracketLevel)
-              objectList[-1].vals[-1]=newTag
-              objectList.append(newTag)
-              expectingVal=False
-            #bracket level decrease
-            elif word=="}":
-              if expectingVal or bracketLevel==0:
-                raise ParseError("ERROR: Too many '}' found. Beware that the one that triggered this error is most likely not the incorrect one!")
-              bracketLevel-=1
-              objectList.pop()
-            #equal
-            # elif word=="=":
-            #   expectingVal=True
-            #comment 
-            elif word=='#': 
-              comment="".join(lineSplit[wordI:]).strip()
-              #comment without anything else in line
-              if countEmpty==wordI or len(objectList[-1].names)==0:
-                objectList[-1].add("","",comment) #will print comment only line at right place later
-              else:
-                objectList[-1].comments[-1]=" "+comment
-              break #rest of line is comment. Was already added, not being parsed to avoid special characters to have an impact in the comment
-            #signs that should be equivalt to "=" but are currently not supported. Thus simply saved as plain text in "name"
-            elif word in [">=","<=",">","<","="]:
-              objectList[-1].seperators[-1]=word
-              expectingVal=True
-              # objectList[-1].names[-1]+=" "+word+" "
-              # expectingNameAddition=True
-            elif word=="log":
-              objectList[-1].add("","","".join(lineSplit[wordI:]).strip())
-              break
-            elif expectingVal:
-              objectList[-1].vals[-1]+=word
-              expectingVal=False
+        _,bracketLevel, expectingVal=self.readString(line, args, bracketLevel, useNamedTagList,objectList,expectingVal, lineI)
+        # lineSplit=re.split(splitPattern,line)
+        # countEmpty=0
+        # for wordI, word in enumerate(lineSplit):
+        #   try:
+        #     word=word.strip()
+        #     #empty
+        #     if len(word)==0:
+        #       countEmpty+=1
+        #       continue
+        #     elif word=="{":
+        #       if not expectingVal:
+        #         raise ParseError("ERROR: Unexpected '{'")
+        #       bracketLevel+=1
+        #       if useNamedTagList and bracketLevel==1:
+        #         newTag=NamedTagList(objectList[-1].names[-1])
+        #       else:
+        #         newTag=TagList(bracketLevel)
+        #       objectList[-1].vals[-1]=newTag
+        #       objectList.append(newTag)
+        #       expectingVal=False
+        #     #bracket level decrease
+        #     elif word=="}":
+        #       if expectingVal or bracketLevel==0:
+        #         raise ParseError("ERROR: Too many '}' found. Beware that the one that triggered this error is most likely not the incorrect one!")
+        #       bracketLevel-=1
+        #       objectList.pop()
+        #     #equal
+        #     # elif word=="=":
+        #     #   expectingVal=True
+        #     #comment 
+        #     elif word=='#': 
+        #       comment="".join(lineSplit[wordI:]).strip()
+        #       #comment without anything else in line
+        #       if countEmpty==wordI or len(objectList[-1].names)==0:
+        #         objectList[-1].add("","",comment) #will print comment only line at right place later
+        #       else:
+        #         objectList[-1].comments[-1]=" "+comment
+        #       break #rest of line is comment. Was already added, not being parsed to avoid special characters to have an impact in the comment
+        #     #signs that should be equivalt to "=" but are currently not supported. Thus simply saved as plain text in "name"
+        #     elif word in [">=","<=",">","<","="]:
+        #       objectList[-1].seperators[-1]=word
+        #       expectingVal=True
+        #       # objectList[-1].names[-1]+=" "+word+" "
+        #       # expectingNameAddition=True
+        #     elif word=="log":
+        #       objectList[-1].add("","","".join(lineSplit[wordI:]).strip())
+        #       break
+        #     elif expectingVal:
+        #       objectList[-1].vals[-1]+=word
+        #       expectingVal=False
 
-            # elif expectingNameAddition:
-            #   objectList[-1].names[-1]+=word
-            #   expectingNameAddition=False
-            else:
-              objectList[-1].add(word)
-          except:
-            print("Error readling line {}, word {}".format(lineI,wordI))
-            print("Line content: {}".format(line),end='')
-            print("Word: {}".format(word))
-            raise
+        #     # elif expectingNameAddition:
+        #     #   objectList[-1].names[-1]+=word
+        #     #   expectingNameAddition=False
+        #     else:
+        #       objectList[-1].add(word)
+        #   except:
+        #     print("Error reading line {}, word {}".format(lineI,wordI))
+        #     print("Line content: {}".format(line),end='')
+        #     print("Word: {}".format(word))
+        #     raise
 
     if isinstance(varsToValue,TagList):
       for name,val in self.getNameVal():
@@ -891,3 +955,11 @@ def applyIfTagList(val, fun, *args):
     return fun(*args)
   else:
     return val
+
+def readString(line):
+  out=TagList()
+  out.readString(line)
+  return out
+
+def readFile(fileName):
+  return TagList().readFile(fileName)
