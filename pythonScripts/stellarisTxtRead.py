@@ -141,6 +141,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     for val in self.vals:
       if isinstance(val,TagList):
         val.giveCorrectLevel(self)
+    return self
   def _printTabs(self):
     out=""
     for b in range(self.bracketLevel):
@@ -381,7 +382,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       i+=1
       if i==len(self.vals):
         break
-  def readString(self, line, args=0, bracketLevel=0, useNamedTagList=False,objectList=0,expectingVal=False, lineI=0):
+  def readString(self, line, expectingVal=False,objectList=0,args=0, bracketLevel=0, useNamedTagList=False, lineI=0):
     if objectList==0:
       objectList=[self]
     lineSplit=re.split(splitPattern,line)
@@ -457,7 +458,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     with open(fileName,'r') as inputFile:
       print("Start reading "+fileName)
       for lineI,line in enumerate(inputFile):
-        _,bracketLevel, expectingVal=self.readString(line, args, bracketLevel, useNamedTagList,objectList,expectingVal, lineI)
+        _,bracketLevel, expectingVal=self.readString(line, expectingVal,objectList,args, bracketLevel, useNamedTagList, lineI)
         # lineSplit=re.split(splitPattern,line)
         # countEmpty=0
         # for wordI, word in enumerate(lineSplit):
@@ -684,28 +685,29 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       headerName=headerName.strip()
       # print(headerName)
       headerIndex+=1
-      if headerName=="" or len(bodyEntry)<=headerIndex:# or bodyEntry[headerIndex]=="":
+      if headerName=="" or len(bodyEntry)<=headerIndex:# or entry=="":
         continue
+      entry=str(bodyEntry[headerIndex]).strip()
       nextMaxIndex=nextMinIndex=headerIndex
       while nextMaxIndex+1<len(header[self.bracketLevel]) and not header[self.bracketLevel][nextMaxIndex+1]:
         nextMaxIndex+=1
       if nextMaxIndex+1>=len(header[self.bracketLevel]):
         nextMaxIndex=-1 #end of list reached. make all possible (ods lists are shorter if only empty elements are following)
-      if not args.forbid_additions and not headerName in self.names:# and bodyEntry[headerIndex]:
+      if not args.forbid_additions and not headerName in self.names:# and entry:
         if len(header)>self.bracketLevel+1 and len(header[self.bracketLevel+1])>headerIndex and header[self.bracketLevel+1][headerIndex]!="":
           val=self.getOrCreate(headerName)
           self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
           val.setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,n_th_occurence,occHeader,occEntry)
         else:
-          if bodyEntry[headerIndex]!="" and headerName!="OCCNUM":
-            self.add(headerName,bodyEntry[headerIndex]) 
+          if entry!="" and headerName!="OCCNUM":
+            self.add(headerName,entry) 
           else:
             self.add(headerName,'#delete') #delete again later. It is important that this is added as otherwise empty stuff remains!
         continue
       valIndex=-1
       local_n_th_occurence=n_th_occurence
-      if bodyEntry[headerIndex][:3]=="OCC" and headerName!="OCCNUM": #in the tag ABOVE OCCNUM
-        occs=bodyEntry[headerIndex][3:].split("-");
+      if entry[:3]=="OCC" and headerName!="OCCNUM": #in the tag ABOVE OCCNUM
+        occs=entry[3:].split("-");
         # [actual_OCC,local_n_th_occurence]=
         actual_OCC=int(occs[0].strip())
         if len(occs)>1:
@@ -733,11 +735,11 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             valIndex=self.n_thIndex(headerName,n_th_occurence)
             local_n_th_occurence=0
           except ValueError:
-            # print(bodyEntry[headerIndex])
+            # print(entry)
             # print(headerName)
             # print(local_n_th_occurence)
             # print(bodyEntry)
-            if bodyEntry[headerIndex]!="" and (not isinstance(self.get(headerName),TagList) or self.names.count(headerName)>1):
+            if entry!="" and (not isinstance(self.get(headerName),TagList) or self.names.count(headerName)>1):
               if not args.forbid_additions:
                 if isinstance(self.getN_th(headerName, n_th_occurence-1), TagList):
                   self.add(headerName, TagList(self.bracketLevel+1))
@@ -758,22 +760,25 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         try:
           valIndex=self.names.index(headerName)
         except ValueError:
-          if bodyEntry[headerIndex]!="":
-            print("Invalid tag '{}' with data '{}'. You need to allow additions if you add tags".format(headerName,bodyEntry[headerIndex]))
+          if entry!="":
+            print("Invalid tag '{}' with data '{}'. You need to allow additions if you add tags".format(headerName,entry))
             print(n_th_occurence)
             print(self.names)
           continue
       self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
-      if isinstance(self.vals[valIndex], TagList):
-        if len(header[self.bracketLevel+1])<=headerIndex or header[self.bracketLevel+1][headerIndex]=="" and bodyEntry[headerIndex].strip()[0] in ["{","#"]:
-          self.vals[valIndex]=bodyEntry[headerIndex]
-        else:
-          self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,local_n_th_occurence,occHeader,occEntry)
+
+      #if excel file tells us we have reached the lowest level according to header and our entry starts with "{" or "#"
+      if (len(header[self.bracketLevel+1])<=headerIndex or header[self.bracketLevel+1][headerIndex]=="") and entry!="" and entry[0] in ["{","#"]:
+        if entry[0]=="{": #overwrite the old value (wheather tagList or string) with the parsed value of the cell
+          self.vals[valIndex]=readVal(entry)
+          self.vals[valIndex].giveCorrectLevel(self)
+        else: #overwrite the old value (wheather tagList or string) with the comment command
+          self.vals[valIndex]=entry #overwrite with #delete
+      #continue deeper to find values
+      elif isinstance(self.vals[valIndex], TagList):
+        self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,local_n_th_occurence,occHeader,occEntry)
+      #Simple value in ods, simple value in txt:
       else:
-        # print(entry)         
-        entry=bodyEntry[headerIndex]
-        if isinstance(entry,str):
-          entry=entry.strip()
         if entry!="" and headerName!="OCCNUM":
           # print(entry)
           # self.printAll()
@@ -956,10 +961,16 @@ def applyIfTagList(val, fun, *args):
   else:
     return val
 
-def readString(line):
+def readString(line): #string must not start with a "{"
   out=TagList()
   out.readString(line)
   return out
+
+def readVal(line): #string needs to start with a "{"
+  tmpTagList=TagList()
+  tmpTagList.add("","")
+  tmpTagList.readString(line, True)
+  return tmpTagList.vals[0]
 
 def readFile(fileName):
   return TagList().readFile(fileName)
