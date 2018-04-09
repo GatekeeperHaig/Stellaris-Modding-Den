@@ -706,7 +706,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         continue
       valIndex=-1
       local_n_th_occurence=n_th_occurence
-      if entry[:3]=="OCC" and headerName!="OCCNUM": #in the tag ABOVE OCCNUM
+      if entry[:3]=="OCC" and headerName!="OCCNUM" and header[self.bracketLevel+1][headerIndex]=="OCCNUM": #in the tag ABOVE OCCNUM
         occs=entry[3:].split("-");
         # [actual_OCC,local_n_th_occurence]=
         actual_OCC=int(occs[0].strip())
