@@ -722,10 +722,10 @@ for groupUpdate in [False,True]:
       orTagList=TagList()
       if cat=="player":
         orTagList.add("is_ai", "no")
-        orTagList.add("and", TagList().add("has_global_flag", "deactivate_player_vassal_ai_boni").add("exists","overlord").add("overlord",TagList().add("is_ai","no")))
+        orTagList.add("and", TagList().add("has_global_flag", "custom_difficulty_deactivate_player_vassal_ai_boni").add("exists","overlord").add("overlord",TagList().add("is_ai","no")))
       else:
         limit.add("is_ai", yes)
-        orTagList.add("has_global_flag", "activate_player_vassal_ai_boni")
+        orTagList.add("has_global_flag", "custom_difficulty_activate_player_vassal_ai_boni")
         orTagList.add("not", TagList().add("exists","overlord"))
         orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","yes")))
       limit.add("or",orTagList)
