@@ -1,0 +1,259 @@
+namespace = cgm_buildings
+
+event = { #this event fires on game start and on a yearly pulse. 
+	id = cgm_buildings.1
+	hide_window = yes
+	is_triggered_only = yes
+		
+	immediate = {
+		every_planet = {
+			limit = { 
+				NOT = { has_planet_flag = deposits_converted }
+				OR = {
+					is_colonizable = yes
+					is_colony = yes
+					any_tile = { 
+						has_deposit = yes 
+						has_special_resource_deposit = no
+					}										
+				}	
+			}
+			set_variable = { which = energy_tile_resource value = 0 }	
+			set_variable = { which = minerals_tile_resource value = 0 }
+			set_variable = { which = food_tile_resource value = 0 }
+			set_variable = { which = unity_tile_resource value = 0 }
+			set_variable = { which = society_research_tile_resource value = 0 }
+			set_variable = { which = physics_research_tile_resource value = 0 }
+			set_variable = { which = engineering_research_tile_resource value = 0 }
+			every_tile = {
+				limit = { 
+					has_deposit = yes 
+					has_special_resource_deposit = no
+				}
+				convert_deposits = yes					
+			}	
+			set_planet_flag = deposits_converted
+		}
+	}
+}	
+
+event = { #this event is fires on game start and on a monthly pulse. 
+	id = cgm_buildings.1
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {				
+		every_country = { ### switch to country scope
+			limit = {
+				OR = {
+					is_country_type = default
+					is_country_type = awakened_fallen_empire
+				}				
+			}
+			if = { #see the scripted effects file cgm_country_scope_effects.txt
+				limit = { NOT = { has_country_flag = country_check_delay } }				
+				set_variable = { which = energy_weight value = 0 }
+				set_variable = { which = minerals_weight value = 0 }
+				set_variable = { which = food_weight value = 0 }					
+				check_income = yes 
+				check_resource_requirements = yes
+				set_timed_country_flag = { flag = country_check_delay days = 90 }
+			}	
+			every_owned_planet = { ### switch to planet scope
+				limit = { 
+					OR = {
+						prev = { is_ai = yes }
+						sector_controlled = yes
+					}	
+				}
+				if = { #see the scripted effects file cgm_planet_scope_effects.txt
+					limit = { NOT = { has_planet_flag = planet_check_delay } }				
+					if = { 
+						limit = { NOT = { has_planet_flag = cgm_ai_planet_variables_added } } 
+						set_variable = { which = energy_mult value = 1 }
+						set_variable = { which = minerals_mult value = 1 }
+						set_variable = { which = food_mult value = 1 }
+						set_variable = { which = unity_mult value = 1 }
+						set_variable = { which = society_research_mult value = 1 }
+						set_variable = { which = physics_research_mult value = 1 }
+						set_variable = { which = engineering_research_mult value = 1 }		
+						set_planet_flag = cgm_ai_planet_variables_added
+					}	
+					if = { 
+						limit = { NOT = { has_planet_flag = cgm_ai_first_time_planet_check_performed }}
+						check_planet_bonus_buildings = yes				
+						if = {
+							limit = { planets_enhanced_enabled = yes }	
+							check_planet_bonus_buildings_pe = yes
+						}	
+						if = {
+							limit = { alphamod_enabled = yes }	
+							check_planet_bonus_buildings_am = yes
+						}	
+						set_planet_flag = cgm_ai_planet_check_performed ###remember to update this through other on actions!						
+					}	
+					if = { 
+						limit = { 
+							num_modifiers > 0
+							NOR = {
+								AND = {
+									num_modifiers = 1
+									check_variable = { which = pm_num value = 1 }
+								}
+								AND = {
+									num_modifiers = 2
+									check_variable = { which = pm_num value = 2 }
+								}						
+								AND = {
+									num_modifiers = 3
+									check_variable = { which = pm_num value = 3 }
+								}						
+								AND = {
+									num_modifiers = 4
+									check_variable = { which = pm_num value = 4 }
+								}						
+								AND = {
+									num_modifiers = 5
+									check_variable = { which = pm_num value = 5 }
+								}						
+								AND = {
+									num_modifiers = 6
+									check_variable = { which = pm_num value = 6 }
+								}						
+								AND = {
+									num_modifiers = 7
+									check_variable = { which = pm_num value = 7 }
+								}						
+								AND = {
+									num_modifiers = 8
+									check_variable = { which = pm_num value = 8 }
+								}						
+								AND = {
+									num_modifiers = 9
+									check_variable = { which = pm_num value = 9 }
+								}						
+								AND = {
+									num_modifiers = 10
+									check_variable = { which = pm_num value = 10 }
+								}						
+							}
+						}
+						switch = {
+							trigger = num_modifiers
+							1 = { set_variable = { which = pm_num value = 1 } }
+							2 = { set_variable = { which = pm_num value = 2 } }
+							3 = { set_variable = { which = pm_num value = 3 } }
+							4 = { set_variable = { which = pm_num value = 4 } }
+							5 = { set_variable = { which = pm_num value = 5 } }
+							6 = { set_variable = { which = pm_num value = 6 } }
+							7 = { set_variable = { which = pm_num value = 7 } }
+							8 = { set_variable = { which = pm_num value = 8 } }
+							9 = { set_variable = { which = pm_num value = 9 } }
+							10 = { set_variable = { which = pm_num value = 10 } }
+						}
+						check_planet_modifiers = yes	
+						if = {
+							limit = { planets_enhanced_enabled = yes }
+							check_planet_modifiers_pe = yes
+						}	
+						if = {
+							limit = { guillis_planet_modifiers_enabled = yes }		
+							check_planet_modifiers_gpm = yes
+						}
+						if = {
+							limit = { planetary_diversity_enabled = yes }
+							check_planet_modifiers_pd = yes
+						}		
+						if = {
+							limit = { alphamod_enabled = yes }
+							check_planet_modifiers_am = yes		
+						}	
+					}	
+					set_timed_planet_flag = { flag = planet_check_delay days = 360 }	
+				}
+				planet_event = { id = cgm_buildings.2 days = 15 random = 10 } # random used here to spread the load more evenly.
+			}
+		}
+	}
+}	
+
+planet_event = { #this event is fired using the previous event on a monthly scope. 
+	id = cgm_buildings.2
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		if = { 
+			limit = {
+				owner = {
+					check_variable = { which = energy_weight value < 1 }
+					check_variable = { which = minerals_weight value < 1 }
+					check_variable = { which = food_weight value < 1 }												
+				}
+			}
+			while = { #see the scripted effects file cgm_tile_scope_effects.txt
+				limit = { 
+					any_tile = { 
+						has_blocker = no
+						has_ai_null_deposit = no 
+						has_special_resource_deposit = no							
+					}
+				}
+				set_variable = { which = energy_weight value = 0 }
+				set_variable = { which = minerals_weight value = 0 }
+				set_variable = { which = food_weight value = 0 }
+				set_variable = { which = unity_weight value = 0 }
+				set_variable = { which = society_research_weight value = 0 }
+				set_variable = { which = physics_research_weight value = 0 }
+				set_variable = { which = engineering_research_weight value = 0 }
+				random_tile = {
+					limit = { 
+						has_blocker = no
+						has_ai_null_deposit = no
+						has_special_resource_deposit = no							
+					}
+					set_tile_building_weight = yes
+				}
+			}
+			else = {
+				every_tile = {
+					limit = { has_deposit = yes has_special_resource_deposit = no }
+					convert_deposits = yes
+				}					
+				while = {
+					limit = { 
+						any_tile = { 
+							has_blocker = no
+							has_ai_null_deposit = no 
+							has_special_resource_deposit = no
+						}
+					}
+					set_variable = { which = energy_weight value = owner }
+					set_variable = { which = minerals_weight value = owner }
+					set_variable = { which = food_weight value = owner }
+					set_variable = { which = unity_weight value = 0 }
+					set_variable = { which = society_research_weight value = 0 }
+					set_variable = { which = physics_research_weight value = 0 }
+					set_variable = { which = engineering_research_weight value = 0 }
+					random_tile = {
+						limit = { 
+							has_blocker = no
+							has_ai_null_deposit = no
+							has_special_resource_deposit = no
+						}
+						set_tile_building_weight = yes
+					}
+				}	
+			}	
+		}
+		if = {
+			limit = { 
+				owner = { 
+					minerals > 1000
+					income > 50
+				}
+			}	
+			add_ai_planet_flags = yes
+		}		
+	}
+}

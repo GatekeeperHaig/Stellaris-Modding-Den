@@ -6,9 +6,16 @@ import argparse
 import re
 # import shlex
 
+splitSigns=[">=","<=","#"," ","\t","{","}","=",">","<"]
+splitPattern="("
+for sign in splitSigns:
+  splitPattern+=sign+"|"
+splitPattern=splitPattern[:-1]+")"
+
 def addCommonArgs(parser):
   parser.add_argument("--one_line_level", type= float, default=.0, help="How much the script tries to create one-liners on output: 0 - never, only keeping some existing one-liners. 1 - whenever only one text subtag exists. 2 - whenever only text subtags exist")
   parser.add_argument('--test_run', action="store_true", help="No Output.")
+
 
 
 class TagList: #Basically everything is stored recursively in objects of this class. Each file is one such object. Each tag within is one such object. The variables defined in a file are one such object. Only out-of-building comments are ignored and simply copied file to file.
@@ -134,6 +141,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     for val in self.vals:
       if isinstance(val,TagList):
         val.giveCorrectLevel(self)
+    return self
   def _printTabs(self):
     out=""
     for b in range(self.bracketLevel):
@@ -165,6 +173,27 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     if self.bracketLevel!=0:
       out+="\n"+self._printTabs()+"}"
     return out
+  def _toLine(self):
+    out="{"
+    for name, val, comment, seperator in self.getAll():
+      out+=" "+name
+      if val:
+        out+=" {} ".format(seperator)
+        if isinstance(val, TagList):
+          out+=val._toLine()
+        else:
+          out+=val
+    out+=" }"
+    return out
+  def forceOneLineIf(self, conditionVal, condition):
+    if conditionVal:
+      return self._toLine()
+    else:
+      # self.vals= list(map(lambda val: applyIfTagList(val, lambda *x: val.forceOneLineIf(*x), condition(name, val), conditionForm), self.vals))
+      for i in range(len(self)):
+        self.vals[i]=applyIfTagList(self.vals[i], lambda *x: self.vals[i].forceOneLineIf(*x), condition(self.names[i], self.vals[i]), condition)
+      return self
+
   def writeAll(self,file,args=0,checkForHelpers=False): #formatted writing. Paradox style minus most whitespace tailing errors
     for i in range(len(self.names)):
       try:
@@ -353,86 +382,144 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       i+=1
       if i==len(self.vals):
         break
-  # def readString(self, input):
+  def readString(self, line, expectingVal=False,objectList=0,args=0, bracketLevel=0, useNamedTagList=False, lineI=0):
+    if objectList==0:
+      objectList=[self]
+    lineSplit=re.split(splitPattern,line)
+    countEmpty=0
+    for wordI, word in enumerate(lineSplit):
+      try:
+        word=word.strip()
+        #empty
+        if len(word)==0:
+          countEmpty+=1
+          continue
+        elif word=="{":
+          if not expectingVal:
+            raise ParseError("ERROR: Unexpected '{'")
+          bracketLevel+=1
+          if useNamedTagList and bracketLevel==1:
+            newTag=NamedTagList(objectList[-1].names[-1])
+          else:
+            newTag=TagList(bracketLevel)
+          objectList[-1].vals[-1]=newTag
+          objectList.append(newTag)
+          expectingVal=False
+        #bracket level decrease
+        elif word=="}":
+          if expectingVal or bracketLevel==0:
+            raise ParseError("ERROR: Too many '}' found. Beware that the one that triggered this error is most likely not the incorrect one!")
+          bracketLevel-=1
+          objectList.pop()
+        #equal
+        # elif word=="=":
+        #   expectingVal=True
+        #comment 
+        elif word=='#': 
+          comment="".join(lineSplit[wordI:]).strip()
+          #comment without anything else in line
+          if countEmpty==wordI or len(objectList[-1].names)==0:
+            objectList[-1].add("","",comment) #will print comment only line at right place later
+          else:
+            objectList[-1].comments[-1]=" "+comment
+          break #rest of line is comment. Was already added, not being parsed to avoid special characters to have an impact in the comment
+        elif word in [">=","<=",">","<","="]:
+          objectList[-1].seperators[-1]=word
+          expectingVal=True
+        elif word=="log":
+          objectList[-1].add("","","".join(lineSplit[wordI:]).strip())
+          break
+        elif expectingVal:
+          objectList[-1].vals[-1]+=word
+          expectingVal=False
+
+        # elif expectingNameAddition:
+        #   objectList[-1].names[-1]+=word
+        #   expectingNameAddition=False
+        else:
+          objectList[-1].add(word)
+      except:
+        print("Error reading line {}, word {}".format(lineI+1,wordI+1))
+        print("Line content: {}".format(line),end='')
+        print("Word: {}".format(word))
+        raise
+    return self, bracketLevel, expectingVal
 
 
-  def readFile(self, fileName, args, varsToValue=0,useNamedTagList=False): #the varsToValue is mostly still in due to me being to lazy to remove it atm. Try to avoid using it as it will be removed at some point in the future.
-    splitSigns=[">=","<=","#"," ","\t","{","}","=",">","<"]
-    splitPattern="("
-    for sign in splitSigns:
-      splitPattern+=sign+"|"
-    splitPattern=splitPattern[:-1]+")"
+  def readFile(self, fileName, args=0, varsToValue=0,useNamedTagList=False): #the varsToValue is mostly still in due to me being to lazy to remove it atm. Try to avoid using it as it will be removed at some point in the future.
+
     bracketLevel=0
     objectList=[self] #objects currently open objectList[0] would be lowest bracket object (a building), etc
     # currentlyInHeader=True
     # writeToList=self
     # writeTo=False
     expectingVal=False
-    expectingNameAddition=False
+    # expectingNameAddition=False
     with open(fileName,'r') as inputFile:
       print("Start reading "+fileName)
       for lineI,line in enumerate(inputFile):
-        lineSplit=re.split(splitPattern,line)
-        countEmpty=0
-        for wordI, word in enumerate(lineSplit):
-          try:
-            word=word.strip()
-            #empty
-            if len(word)==0:
-              countEmpty+=1
-              continue
-            elif word=="{":
-              if not expectingVal:
-                raise ParseError("ERROR: Unexpected '{'")
-              bracketLevel+=1
-              if useNamedTagList and bracketLevel==1:
-                newTag=NamedTagList(objectList[-1].names[-1])
-              else:
-                newTag=TagList(bracketLevel)
-              objectList[-1].vals[-1]=newTag
-              objectList.append(newTag)
-              expectingVal=False
-            #bracket level decrease
-            elif word=="}":
-              if expectingVal or bracketLevel==0:
-                raise ParseError("ERROR: Too many '}' found. Beware that the one that triggered this error is most likely not the incorrect one!")
-              bracketLevel-=1
-              objectList.pop()
-            #equal
-            # elif word=="=":
-            #   expectingVal=True
-            #comment 
-            elif word=='#': 
-              comment="".join(lineSplit[wordI:]).strip()
-              #comment without anything else in line
-              if countEmpty==wordI or len(objectList[-1].names)==0:
-                objectList[-1].add("","",comment) #will print comment only line at right place later
-              else:
-                objectList[-1].comments[-1]=" "+comment
-              break #rest of line is comment. Was already added, not being parsed to avoid special characters to have an impact in the comment
-            #signs that should be equivalt to "=" but are currently not supported. Thus simply saved as plain text in "name"
-            elif word in [">=","<=",">","<","="]:
-              objectList[-1].seperators[-1]=word
-              expectingVal=True
-              # objectList[-1].names[-1]+=" "+word+" "
-              # expectingNameAddition=True
-            elif word=="log":
-              objectList[-1].add("","","".join(lineSplit[wordI:]).strip())
-              break
-            elif expectingVal:
-              objectList[-1].vals[-1]+=word
-              expectingVal=False
+        _,bracketLevel, expectingVal=self.readString(line, expectingVal,objectList,args, bracketLevel, useNamedTagList, lineI)
+        # lineSplit=re.split(splitPattern,line)
+        # countEmpty=0
+        # for wordI, word in enumerate(lineSplit):
+        #   try:
+        #     word=word.strip()
+        #     #empty
+        #     if len(word)==0:
+        #       countEmpty+=1
+        #       continue
+        #     elif word=="{":
+        #       if not expectingVal:
+        #         raise ParseError("ERROR: Unexpected '{'")
+        #       bracketLevel+=1
+        #       if useNamedTagList and bracketLevel==1:
+        #         newTag=NamedTagList(objectList[-1].names[-1])
+        #       else:
+        #         newTag=TagList(bracketLevel)
+        #       objectList[-1].vals[-1]=newTag
+        #       objectList.append(newTag)
+        #       expectingVal=False
+        #     #bracket level decrease
+        #     elif word=="}":
+        #       if expectingVal or bracketLevel==0:
+        #         raise ParseError("ERROR: Too many '}' found. Beware that the one that triggered this error is most likely not the incorrect one!")
+        #       bracketLevel-=1
+        #       objectList.pop()
+        #     #equal
+        #     # elif word=="=":
+        #     #   expectingVal=True
+        #     #comment 
+        #     elif word=='#': 
+        #       comment="".join(lineSplit[wordI:]).strip()
+        #       #comment without anything else in line
+        #       if countEmpty==wordI or len(objectList[-1].names)==0:
+        #         objectList[-1].add("","",comment) #will print comment only line at right place later
+        #       else:
+        #         objectList[-1].comments[-1]=" "+comment
+        #       break #rest of line is comment. Was already added, not being parsed to avoid special characters to have an impact in the comment
+        #     #signs that should be equivalt to "=" but are currently not supported. Thus simply saved as plain text in "name"
+        #     elif word in [">=","<=",">","<","="]:
+        #       objectList[-1].seperators[-1]=word
+        #       expectingVal=True
+        #       # objectList[-1].names[-1]+=" "+word+" "
+        #       # expectingNameAddition=True
+        #     elif word=="log":
+        #       objectList[-1].add("","","".join(lineSplit[wordI:]).strip())
+        #       break
+        #     elif expectingVal:
+        #       objectList[-1].vals[-1]+=word
+        #       expectingVal=False
 
-            # elif expectingNameAddition:
-            #   objectList[-1].names[-1]+=word
-            #   expectingNameAddition=False
-            else:
-              objectList[-1].add(word)
-          except:
-            print("Error readling line {}, word {}".format(lineI,wordI))
-            print("Line content: {}".format(line),end='')
-            print("Word: {}".format(word))
-            raise
+        #     # elif expectingNameAddition:
+        #     #   objectList[-1].names[-1]+=word
+        #     #   expectingNameAddition=False
+        #     else:
+        #       objectList[-1].add(word)
+        #   except:
+        #     print("Error reading line {}, word {}".format(lineI,wordI))
+        #     print("Line content: {}".format(line),end='')
+        #     print("Word: {}".format(word))
+        #     raise
 
     if isinstance(varsToValue,TagList):
       for name,val in self.getNameVal():
@@ -440,6 +527,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           if isinstance(name,TagList):
             print("Invalid header variable")
           varsToValue.add(name,val)
+    return self
   def nonEqualToValue(self): #move "<",">","<=",">=" to value and make the whole value a string to be able to store it in ods
     for i in range(len(self)):
       if self.seperators[i]!="=":
@@ -597,28 +685,29 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       headerName=headerName.strip()
       # print(headerName)
       headerIndex+=1
-      if headerName=="" or len(bodyEntry)<=headerIndex:# or bodyEntry[headerIndex]=="":
+      if headerName=="" or len(bodyEntry)<=headerIndex:# or entry=="":
         continue
+      entry=str(bodyEntry[headerIndex]).strip()
       nextMaxIndex=nextMinIndex=headerIndex
       while nextMaxIndex+1<len(header[self.bracketLevel]) and not header[self.bracketLevel][nextMaxIndex+1]:
         nextMaxIndex+=1
       if nextMaxIndex+1>=len(header[self.bracketLevel]):
         nextMaxIndex=-1 #end of list reached. make all possible (ods lists are shorter if only empty elements are following)
-      if not args.forbid_additions and not headerName in self.names:# and bodyEntry[headerIndex]:
+      if not args.forbid_additions and not headerName in self.names:# and entry:
         if len(header)>self.bracketLevel+1 and len(header[self.bracketLevel+1])>headerIndex and header[self.bracketLevel+1][headerIndex]!="":
           val=self.getOrCreate(headerName)
           self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
           val.setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,n_th_occurence,occHeader,occEntry)
         else:
-          if bodyEntry[headerIndex]!="" and headerName!="OCCNUM":
-            self.add(headerName,bodyEntry[headerIndex]) 
+          if entry!="" and headerName!="OCCNUM":
+            self.add(headerName,entry) 
           else:
             self.add(headerName,'#delete') #delete again later. It is important that this is added as otherwise empty stuff remains!
         continue
       valIndex=-1
       local_n_th_occurence=n_th_occurence
-      if bodyEntry[headerIndex][:3]=="OCC" and headerName!="OCCNUM": #in the tag ABOVE OCCNUM
-        occs=bodyEntry[headerIndex][3:].split("-");
+      if entry[:3]=="OCC" and headerName!="OCCNUM" and header[self.bracketLevel+1][headerIndex]=="OCCNUM": #in the tag ABOVE OCCNUM
+        occs=entry[3:].split("-");
         # [actual_OCC,local_n_th_occurence]=
         actual_OCC=int(occs[0].strip())
         if len(occs)>1:
@@ -646,11 +735,11 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             valIndex=self.n_thIndex(headerName,n_th_occurence)
             local_n_th_occurence=0
           except ValueError:
-            # print(bodyEntry[headerIndex])
+            # print(entry)
             # print(headerName)
             # print(local_n_th_occurence)
             # print(bodyEntry)
-            if bodyEntry[headerIndex]!="" and (not isinstance(self.get(headerName),TagList) or self.names.count(headerName)>1):
+            if entry!="" and (not isinstance(self.get(headerName),TagList) or self.names.count(headerName)>1):
               if not args.forbid_additions:
                 if isinstance(self.getN_th(headerName, n_th_occurence-1), TagList):
                   self.add(headerName, TagList(self.bracketLevel+1))
@@ -671,19 +760,25 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         try:
           valIndex=self.names.index(headerName)
         except ValueError:
-          if bodyEntry[headerIndex]!="":
-            print("Invalid tag '{}' with data '{}'. You need to allow additions if you add tags".format(headerName,bodyEntry[headerIndex]))
+          if entry!="":
+            print("Invalid tag '{}' with data '{}'. You need to allow additions if you add tags".format(headerName,entry))
             print(n_th_occurence)
             print(self.names)
           continue
       self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
-      if isinstance(self.vals[valIndex], TagList):
+
+      #if excel file tells us we have reached the lowest level according to header and our entry starts with "{" or "#"
+      if (len(header[self.bracketLevel+1])<=headerIndex or header[self.bracketLevel+1][headerIndex]=="") and entry!="" and entry[0] in ["{","#"]:
+        if entry[0]=="{": #overwrite the old value (wheather tagList or string) with the parsed value of the cell
+          self.vals[valIndex]=readVal(entry)
+          self.vals[valIndex].giveCorrectLevel(self)
+        else: #overwrite the old value (wheather tagList or string) with the comment command
+          self.vals[valIndex]=entry #overwrite with #delete
+      #continue deeper to find values
+      elif isinstance(self.vals[valIndex], TagList):
         self.vals[valIndex].setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,local_n_th_occurence,occHeader,occEntry)
+      #Simple value in ods, simple value in txt:
       else:
-        # print(entry)         
-        entry=bodyEntry[headerIndex]
-        if isinstance(entry,str):
-          entry=entry.strip()
         if entry!="" and headerName!="OCCNUM":
           # print(entry)
           # self.printAll()
@@ -859,3 +954,23 @@ class ParseError(Exception):
   def __init__(self, message):
     # self.expression = expression
     self.message = message
+
+def applyIfTagList(val, fun, *args):
+  if isinstance(val, TagList):
+    return fun(*args)
+  else:
+    return val
+
+def readString(line): #string must not start with a "{"
+  out=TagList()
+  out.readString(line)
+  return out
+
+def readVal(line): #string needs to start with a "{"
+  tmpTagList=TagList()
+  tmpTagList.add("","")
+  tmpTagList.readString(line, True)
+  return tmpTagList.vals[0]
+
+def readFile(fileName):
+  return TagList().readFile(fileName)
