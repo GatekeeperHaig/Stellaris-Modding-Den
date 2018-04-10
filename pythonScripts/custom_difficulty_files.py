@@ -198,6 +198,10 @@ locClass.addLoc("activate_delay_mode", "Activate Delay Mode")
 locClass.addLoc("activate_delay_mode"+"Desc", "Update events will happen with a random delay of 1-181 days after the menu is closed or a year ends.")
 locClass.addLoc("deactivate_delay_mode", "Deactivate Delay Mode")
 locClass.addLoc("deactivate_delay_mode"+"Desc", "Update events happen direclty after the menu is closed and at the start of each year.")
+locClass.addLoc("deactivate_edict", "Hide Menu Edict")
+locClass.addLoc("deactivate_edict"+"Desc", "Removes the edict to start the main menu of this mod. Main menu can still be started via Mod Menu or calling 'event custum_difficulty.0' in console")
+locClass.addLoc("activate_edict", "Show Menu Edict")
+locClass.addLoc("activate_edict"+"Desc", "Show the edict to start the main menu of this mod")
 
 
 
@@ -924,7 +928,7 @@ with open(outFolder+"/"+"custom_difficulty_yealy_event.txt",'w') as file:
 
 edict=TagList().add("name","custom_difficulty").add("length","0").add("cost",TagList())
 edict.add("effect", TagList("hidden_effect",TagList("country_event",TagList("id",name_mainMenuEvent))))
-edict.add("potential", TagList("is_ai","no"))
+edict.add("potential", TagList("is_ai","no").add("not",TagList("has_global_flag", "custom_difficulty_deactivate_edict")))
 edictFile=TagList().add("country_edict", edict)
 outputToFolderAndFile(edictFile, "common/edicts", "custom_difficulty_edict.txt")
 
@@ -1148,13 +1152,15 @@ optionWithInverse["deactivate_player_vassal_ai_boni"]=["activate_player_vassal_a
 optionWithInverse["activate_player_vassal_ai_boni"]=["deactivate_player_vassal_ai_boni"]
 optionWithInverse["deactivate_delay_mode"]=["activate_delay_mode"]
 optionWithInverse["activate_delay_mode"]=["deactivate_delay_mode"]
+optionWithInverse["activate_edict"]=["deactivate_edict"]
+optionWithInverse["deactivate_edict"]=["activate_edict"]
 # optionWithInverse[]=[]
 
 optionExtraEvents=dict()
 optionExtraEvents["activate_simple_mode"]=["name_removeAllModifiers"]
 optionExtraEvents["activate_custom_mode"]=["name_removeAllModifiers"]
 
-optionColors="GGBBYY"
+optionColors="GGBBYY!!"
 defaultOptions=[]
 
 
