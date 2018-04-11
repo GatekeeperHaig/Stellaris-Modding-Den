@@ -126,6 +126,8 @@
 @engineering_campus_upkeep_3 = 0.75
 @engineering_campus_upkeep_4 = 1
 @engineering_campus_upkeep_5 = 1.25
+#planet unique buildings
+@hyperstorage_t1_adjacency_bonus = 1
 ###planet unique buildings
 #resource buildings
 building_agricultural_processor_1_hidden_tree_root = {
@@ -244,6 +246,132 @@ building_agricultural_processor_2 = {
 		}
 	}
 	upgrades = { building_agricultural_processor_1_hidden_tree_root }
+}
+building_hyperstorage_facility_1_hidden_tree_root = {
+	potential = { always = no }
+	planet_unique = yes
+	icon = building_hyperstorage_facility_1
+}
+building_hyperstorage_facility_1 = {
+	#building defines
+	tags = { planet_unique_building }
+	planet_unique = yes
+	is_listed = yes
+	base_buildtime = 180
+	cost = { minerals = 150 }
+	required_resources = { energy = 2 }
+	destroy_if = { new_building_content_enabled = no }
+	#requirements and upgrade
+	potential = {
+		conditions_hyperstorage_facility_1 = yes
+		new_building_content_enabled = yes
+		NAND = {
+			owner = { has_technology = "tech_hyperstorage_2" }
+			conditions_hyperstorage_facility_2 = yes
+			new_building_content_enabled = yes
+			requires_capital_2 = yes
+			owner = {
+				NOT = { has_country_flag = display_low_tier_flag  }
+			}
+		}
+	}
+	allow = { requires_capital_1 = yes }
+	prerequisites = { "tech_hyperstorage_1" }
+	upgrades = { building_hyperstorage_facility_2 }
+	#resource output and modifiers
+	produced_resources = { minerals = 1 }
+	produced_resource_trigger = {
+		modifier = {
+			is_machine_empire = no
+			is_synth_empire = no
+			has_country_flag = is_food_starved
+			NOT = { has_modifier = mineral_deficit }
+			resources = { food = 2 minerals = -1 }
+		}
+		modifier = {
+			has_modifier = mineral_deficit
+			NOT = { has_modifier = energy_deficit }
+			resources = { minerals = 1 }
+		}
+	}
+	adjacency_bonus = { tile_building_resource_minerals_add = @hyperstorage_t1_adjacency_bonus tile_building_resource_energy_add = @hyperstorage_t1_adjacency_bonus tile_building_resource_food_add = @hyperstorage_t1_adjacency_bonus }
+	#ai restrictions and weights
+	ai_allow = { hyperstorage_ai_allow = yes }
+	ai_weight = { weight = 20 }
+}
+building_hyperstorage_facility_2_direct_build = {
+	#building defines
+	tags = { planet_unique_building }
+	planet_unique = yes
+	base_buildtime = 315
+	cost = { minerals = 350 }
+	required_resources = { energy = 3 }
+	destroy_if = { new_building_content_enabled = no }
+	#requirements and upgrade
+	potential = {
+		conditions_hyperstorage_facility_2 = yes
+		new_building_content_enabled = yes
+		NOT = {
+			tile = { has_building_hyperstorage_facility_2 = yes }
+		}
+	}
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_hyperstorage_2" }
+	#resource output and modifiers
+	produced_resources = { minerals = 2 }
+	produced_resource_trigger = {
+		modifier = {
+			is_machine_empire = no
+			is_synth_empire = no
+			has_country_flag = is_food_starved
+			NOT = { has_modifier = mineral_deficit }
+			resources = { food = 4 minerals = -2 }
+		}
+		modifier = {
+			has_modifier = mineral_deficit
+			resources = { minerals = 2 }
+		}
+	}
+	adjacency_bonus = { tile_building_resource_minerals_add = @hyperstorage_t2_adjacency_bonus tile_building_resource_energy_add = @hyperstorage_t2_adjacency_bonus tile_building_resource_food_add = @hyperstorage_t2_adjacency_bonus }
+	#ai restrictions and weights
+	ai_weight = { weight = 20 }
+	ai_allow = { hyperstorage_ai_allow = yes }
+	show_tech_unlock_if = { always = no }
+	icon = building_hyperstorage_facility_2
+	upgrades = { building_hyperstorage_facility_1_hidden_tree_root }
+}
+building_hyperstorage_facility_2 = {
+	#building defines
+	tags = { planet_unique_building }
+	planet_unique = yes
+	is_listed = no
+	base_buildtime = 180
+	cost = { minerals = 200 }
+	required_resources = { energy = 3 }
+	destroy_if = { new_building_content_enabled = no }
+	#requirements and upgrade
+	potential = { conditions_hyperstorage_facility_2 = yes new_building_content_enabled = yes }
+	allow = { requires_capital_2 = yes }
+	prerequisites = { "tech_hyperstorage_2" }
+	#resource output and modifiers
+	produced_resources = { minerals = 2 }
+	produced_resource_trigger = {
+		modifier = {
+			is_machine_empire = no
+			is_synth_empire = no
+			has_country_flag = is_food_starved
+			NOT = { has_modifier = mineral_deficit }
+			resources = { food = 4 minerals = -2 }
+		}
+		modifier = {
+			has_modifier = mineral_deficit
+			resources = { minerals = 2 }
+		}
+	}
+	adjacency_bonus = { tile_building_resource_minerals_add = @hyperstorage_t2_adjacency_bonus tile_building_resource_energy_add = @hyperstorage_t2_adjacency_bonus tile_building_resource_food_add = @hyperstorage_t2_adjacency_bonus }
+	#ai restrictions and weights
+	ai_weight = { weight = 20 }
+	upgrades = { building_hyperstorage_facility_1_hidden_tree_root }
 }
 ### Non-restricted Resource Buildings
 building_economic_district_1 = {

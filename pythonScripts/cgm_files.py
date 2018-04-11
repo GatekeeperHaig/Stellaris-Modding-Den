@@ -30,17 +30,22 @@ cats=["building_time_mult","building_cost_mult"]
 
 
 # # doTranslation=True
-# doTranslation=False
-# locClass=LocList(doTranslation)
-# #global things: No translation needed (mod name and stuff taken from vanilla translations)
-# locClass.addLoc("modName", "Dynamic Difficulty", "all")
-# locClass.addLoc("minerals", "$minerals$","all")
-# locClass.addLoc("energy", "$energy$","all")
-# locClass.addLoc("food", "$food$","all")
-# locClass.addLoc("research", "$RESEARCH$","all")
-# locClass.addLoc("unity", "$unity$","all")
-# locClass.addLoc("influence", "$influence$","all")
-# locClass.addLoc("cap", "$NAVY_SIZE_TITLE$","all")
+doTranslation=False
+locList=LocList(doTranslation)
+locList.addLoc("building_time_mult", "Building Times")
+locList.addLoc("building_cost_mult", "Building Costs")
+locList.addLoc("capital_building","Capital Buildings")
+locList.addLoc("empire_unique_building","Empire Unique Buildings")
+locList.addLoc("planet_unique_building","Planet Unique Buildings")
+locList.addLoc("military_building","Military Buildings")
+locList.addLoc("standard_resource_building","Standard Resource Buildings")
+locList.addLoc("research_resource_building","Research Buildings")
+locList.addLoc("unity_resource_building","Unity Buildings")
+locList.addLoc("special_resource_building","Special Resource Buildings")
+locList.addLoc("replicator_building","Replicator Buildings")
+locList.addLoc("all","All Buildings")
+# locList.addLoc("","")
+
 
 
 
@@ -71,6 +76,8 @@ mainMenu=TagList("id", name_mainMenuEvent)
 mainMenu.add("is_triggered_only", "yes")
 mainMenu.add("name", eventNames.format("main_event.name"))
 mainMenu.add("desc", eventNames.format("main_event.desc"))
+locList.append(eventNames.format("main_event.name"), "Advanced Building Configuration")
+locList.append(eventNames.format("main_event.desc"), "Here you can change global costs and build speed of building groups (or all buildings)")
 mainMenu.add("picture", "GFX_CGM_buildings_menu")
 buildingOptionsFile.addComment("main menu")
 buildingOptionsFile.add("country_event", mainMenu)
@@ -79,10 +86,12 @@ for catI,cat in enumerate(cats):
   mainSubMenu.add("is_triggered_only", "yes")
   mainSubMenu.add("name", eventNames.format(cat+"_event.name"))
   mainSubMenu.add("desc", eventNames.format(cat+"_event.desc"))
+  locList.append(eventNames.format(cat+"_event.name"), "Change @{}".format(cat))
+  locList.append(eventNames.format(cat+"_event.desc"), "Here you can change global @{} of building groups (or all buildings)".format(cat))
   mainSubMenu.add("picture", "GFX_CGM_buildings_menu")
   buildingOptionsFile.addComment(cat)
   buildingOptionsFile.add("country_event", mainSubMenu)
-  mainMenu.add("option", TagList("name", eventNames.format(cat)+"_option.name").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_subMainMenuEvent+catI)))))
+  mainMenu.add("option", TagList("name", eventNames.format(cat+"_event.name")).add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_subMainMenuEvent+catI)))))
   bonuses=[[entry+"_"+cat] for entry in bonusNames if entry !="all"]
   bonuses.append(reduce(lambda x,y: x+y, bonuses))
   for bonusI,bonus,bonusName in zip(range(len(bonuses)),bonuses, bonusNames):
@@ -90,12 +99,16 @@ for catI,cat in enumerate(cats):
     bonusMenu.add("is_triggered_only", "yes")
     bonusMenu.add("name", eventNames.format("{}_{}_event.name".format(cat, bonusName)))
     bonusMenu.add("desc", eventNames.format("{}_{}_event.desc".format(cat, bonusName)))
+    locList.append(eventNames.format(cat+"_event.name"), "Change @{}".format(bonusName))
+    locList.append(eventNames.format(cat+"_event.desc"), "Here you can change global @{} of @{}".format(cat,bonusName))
     bonusMenu.add("picture", "GFX_CGM_buildings_menu")
     buildingOptionsFile.addComment(bonusName+" "+cat)
     buildingOptionsFile.add("country_event", bonusMenu)
-    mainSubMenu.add("option", TagList("name", eventNames.format("{}_{}_event_option.name".format(cat, bonusName))).add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_Change[catI]+bonusI)))))
+    mainSubMenu.add("option", TagList("name", eventNames.format("{}_{}_event.name".format(cat, bonusName))).add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_Change[catI]+bonusI)))))
     for changeStep in changeSteps:
       bonusMenu.add("option", TagList("name", eventNames.format("change_"+str(changeStep).replace("-", "neg"))))
+      if catI==0 and bonusI==0:
+        locList.append("change_"+str(changeStep).replace("-", "neg"), "Change by {}%".format(changeStep))
     bonusMenu.add("option", TagList("name", "BACK").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_subMainMenuEvent+catI)))))
   mainSubMenu.add("option", TagList("name", "BACK").add("hidden_effect", TagList("country_event", TagList("id",name_mainMenuEvent))))
 mainMenu.add("option", TagList("name", "BACK").add("hidden_effect", TagList("country_event", TagList("id",1))))
@@ -103,3 +116,10 @@ mainMenu.add("option", TagList("name", "BACK").add("hidden_effect", TagList("cou
 
 # buildingOptionsFile.printAll()
 outputToFolderAndFile(buildingOptionsFile, "events", "cgm_buildings_modifiers.txt", level=2, modFolder="../cgm_buildings_script_source")
+
+
+for language in locClass.languages:
+  outFolderLoc="../cgm_buildings_script_source/localisation/"+language
+  if not os.path.exists(outFolderLoc):
+    os.makedirs(outFolderLoc)
+  locList.write(outFolderLoc+"/cgm_building_customize_l_"+language+".yml",language)
