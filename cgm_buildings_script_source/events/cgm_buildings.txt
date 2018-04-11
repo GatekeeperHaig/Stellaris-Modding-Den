@@ -1,7 +1,7 @@
 namespace = cgm_buildings
 
 event = { #this event fires on game start and on a yearly pulse. 
-	id = cgm_buildings.1
+	id = cgm_buildings.0
 	hide_window = yes
 	is_triggered_only = yes
 		
@@ -77,6 +77,7 @@ event = { #this event is fires on game start and on a monthly pulse.
 						set_variable = { which = society_research_mult value = 1 }
 						set_variable = { which = physics_research_mult value = 1 }
 						set_variable = { which = engineering_research_mult value = 1 }		
+					
 						set_planet_flag = cgm_ai_planet_variables_added
 					}	
 					if = { 
@@ -90,7 +91,16 @@ event = { #this event is fires on game start and on a monthly pulse.
 							limit = { alphamod_enabled = yes }	
 							check_planet_bonus_buildings_am = yes
 						}	
-						set_planet_flag = cgm_ai_planet_check_performed ###remember to update this through other on actions!						
+						set_planet_flag = cgm_ai_planet_check_performed ###further updates are done locally using different on action triggers, see cgm_buildings.3 onwards
+					}	
+					if = {
+						limit = { 
+							any_owned_pop = { 
+								is_growing = no
+								NOT = { has_pop_flag = pop_checked }
+							}	
+						}
+						calculate_average_pop_multipliers = yes
 					}	
 					if = { 
 						limit = { 
@@ -177,12 +187,33 @@ event = { #this event is fires on game start and on a monthly pulse.
 	}
 }	
 
-planet_event = { #this event is fired using the previous event on a monthly scope. 
+planet_event = { #this event is fired using the previous event on a monthly pulse. 
 	id = cgm_buildings.2
 	hide_window = yes
 	is_triggered_only = yes
 	
 	immediate = {
+		set_variable = { which = energy_mult_tile value = 0 }
+		set_variable = { which = minerals_mult_tile value = 0 }
+		set_variable = { which = food_mult_tile value = 0 }
+		set_variable = { which = unity_mult_tile value = 0 }
+		set_variable = { which = society_research_mult_tile value = 0 }
+		set_variable = { which = physics_research_mult_tile value = 0 }
+		set_variable = { which = engineering_research_mult_tile value = 0 }	
+		change_variable = { which = energy_mult_tile value = energy_mult }
+		change_variable = { which = minerals_mult_tile value = minerals_mult }
+		change_variable = { which = food_mult_tile value = food_mult }
+		change_variable = { which = unity_mult_tile value = unity_mult }
+		change_variable = { which = society_research_mult_tile value = society_research_mult }
+		change_variable = { which = physics_research_mult_tile value = physics_research_mult }
+		change_variable = { which = engineering_research_mult_tile value = engineering_research_mult }			
+		change_variable = { which = energy_mult_tile value = energy_mult_pop }
+		change_variable = { which = minerals_mult_tile value = minerals_mult_pop }
+		change_variable = { which = food_mult_tile value = food_mult_pop }
+		change_variable = { which = unity_mult_tile value = unity_mult_pop }
+		change_variable = { which = society_research_mult_tile value = society_research_mult_pop }
+		change_variable = { which = physics_research_mult_tile value = physics_research_mult_pop }
+		change_variable = { which = engineering_research_mult_tile value = engineering_research_mult_pop }	
 		if = { 
 			limit = {
 				owner = {
@@ -254,6 +285,107 @@ planet_event = { #this event is fired using the previous event on a monthly scop
 				}
 			}	
 			add_ai_planet_flags = yes
+		}		
+	}
+}
+
+#this event is fired using the on_building_complete and on_building_upgraded on action triggers.
+#checking whether the upgraded building gave a planet modifier bonus, and recalculating variables if needed.
+
+planet_event = { 
+	id = cgm_buildings.3
+	hide_window = yes
+	is_triggered_only = yes
+	
+	trigger = { 
+		from = { has_planet_bonus_building = yes }	
+	}	
+	
+	immediate = { 
+		set_variable = { which = energy_mult value = 1 }
+		set_variable = { which = minerals_mult value = 1 }
+		set_variable = { which = food_mult value = 1 }
+		set_variable = { which = unity_mult value = 1 }
+		set_variable = { which = society_research_mult value = 1 }
+		set_variable = { which = physics_research_mult value = 1 }
+		set_variable = { which = engineering_research_mult value = 1 }			
+		check_planet_bonus_buildings = yes				
+		if = {
+			limit = { planets_enhanced_enabled = yes }	
+			check_planet_bonus_buildings_pe = yes
+		}	
+		if = {
+			limit = { alphamod_enabled = yes }	
+			check_planet_bonus_buildings_am = yes
+		}			
+	}
+}
+
+#this event is fired using the on_building_demolished and on_building_ruined on action triggers.
+#checking whether the building demolished/ruined used to give a planet modifier, and recalculating variables if needed.
+
+planet_event = { 
+	id = cgm_buildings.4
+	hide_window = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		from = { had_planet_bonus_building = yes }
+	}	
+	
+	immediate = { 
+		set_variable = { which = energy_mult value = 1 }
+		set_variable = { which = minerals_mult value = 1 }
+		set_variable = { which = food_mult value = 1 }
+		set_variable = { which = unity_mult value = 1 }
+		set_variable = { which = society_research_mult value = 1 }
+		set_variable = { which = physics_research_mult value = 1 }
+		set_variable = { which = engineering_research_mult value = 1 }			
+		check_planet_bonus_buildings = yes				
+		if = {
+			limit = { planets_enhanced_enabled = yes }	
+			check_planet_bonus_buildings_pe = yes
+		}	
+		if = {
+			limit = { alphamod_enabled = yes }	
+			check_planet_bonus_buildings_am = yes
+		}		
+	}
+}
+
+#this event is fired using the on_building_replaced on action trigger.
+#checking whether the building replaced used to give a planet modifier or if the new building does, and recalculating variables if needed.
+
+planet_event = { 
+	id = cgm_buildings.5
+	hide_window = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		from = { 
+			OR = {
+				had_planet_bonus_building = yes
+				has_planet_bonus_building = yes				
+			}
+		}	
+	}	
+	
+	immediate = { 
+		set_variable = { which = energy_mult value = 1 }
+		set_variable = { which = minerals_mult value = 1 }
+		set_variable = { which = food_mult value = 1 }
+		set_variable = { which = unity_mult value = 1 }
+		set_variable = { which = society_research_mult value = 1 }
+		set_variable = { which = physics_research_mult value = 1 }
+		set_variable = { which = engineering_research_mult value = 1 }			
+		check_planet_bonus_buildings = yes				
+		if = {
+			limit = { planets_enhanced_enabled = yes }	
+			check_planet_bonus_buildings_pe = yes
+		}	
+		if = {
+			limit = { alphamod_enabled = yes }	
+			check_planet_bonus_buildings_am = yes
 		}		
 	}
 }

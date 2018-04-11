@@ -1,0 +1,333 @@
+### Effects in this file are ran on pop scope.
+
+calculate_average_pop_multipliers = {
+	### store the number of pops on the planet
+	switch = {
+		trigger = num_pops
+		1 = { set_variable = { which = pop_num value = 1 } }
+		2 = { set_variable = { which = pop_num value = 2 } }
+		3 = { set_variable = { which = pop_num value = 3 } }
+		4 = { set_variable = { which = pop_num value = 4 } }
+		5 = { set_variable = { which = pop_num value = 5 } }
+		6 = { set_variable = { which = pop_num value = 6 } }
+		7 = { set_variable = { which = pop_num value = 7 } }
+		8 = { set_variable = { which = pop_num value = 8 } }
+		9 = { set_variable = { which = pop_num value = 9 } }
+		10 = { set_variable = { which = pop_num value = 10 } }
+		11 = { set_variable = { which = pop_num value = 11 } }
+		12 = { set_variable = { which = pop_num value = 12 } }
+		13 = { set_variable = { which = pop_num value = 13 } }
+		14 = { set_variable = { which = pop_num value = 14 } }
+		15 = { set_variable = { which = pop_num value = 15 } }
+		16 = { set_variable = { which = pop_num value = 16 } }
+		17 = { set_variable = { which = pop_num value = 17 } }
+		18 = { set_variable = { which = pop_num value = 18 } }
+		19 = { set_variable = { which = pop_num value = 19 } }
+		20 = { set_variable = { which = pop_num value = 20 } }
+		21 = { set_variable = { which = pop_num value = 21 } }
+		22 = { set_variable = { which = pop_num value = 22 } }
+		23 = { set_variable = { which = pop_num value = 23 } }
+		24 = { set_variable = { which = pop_num value = 24 } }
+		25 = { set_variable = { which = pop_num value = 25 } }
+	}		
+	### pop variables - these are factored alongside the planet multiplier using an average number - see the tile scope effect to see the actual calculation used
+	set_variable = { which = energy_mult_pop value = 0 }
+	set_variable = { which = minerals_mult_pop value = 0 }
+	set_variable = { which = food_mult_pop value = 0 }
+	set_variable = { which = unity_mult_pop value = 0 }
+	set_variable = { which = society_research_mult_pop value = 0 }
+	set_variable = { which = physics_research_mult_pop value = 0 }
+	set_variable = { which = engineering_research_mult_pop value = 0 }	
+	while = {
+		limit = { 
+			any_owned_pop = { 
+				is_growing = no
+				NOT = { has_pop_flag = pop_checked }
+			}
+		}	
+		random_owned_pop = {
+			limit = {
+				is_growing = no
+				NOT = { has_pop_flag = pop_checked }
+			}
+			check_pop_traits = yes
+			check_pop_species_rights = yes
+			set_pop_flag = { pop_checked }
+		}
+	}	
+	### get the average planet pop multiplier by dividing the multiplier variables with the number of pop variable.
+	divide_variable = { which = energy_mult_pop value = pop_num }
+	divide_variable = { which = minerals_mult_pop value = pop_num }
+	divide_variable = { which = food_mult_pop value = pop_num }
+	divide_variable = { which = unity_mult_pop value = pop_num }
+	divide_variable = { which = society_research_mult_pop value = pop_num }
+	divide_variable = { which = physics_research_mult_pop value = pop_num }
+	divide_variable = { which = engineering_research_mult_pop value = pop_num }			
+}
+
+check_pop_traits = {
+	if = { 
+		limit = { is_robot_pop = no }
+		if = { 
+			limit = { has_trait = "trait_nerve_stapled" }
+			prev = {
+				change_variable = { which = energy_mult_pop value = 0.5 }
+				change_variable = { which = minerals_mult_pop value = 1.1 }
+				change_variable = { which = food_mult_pop value = 1.1 }
+				change_variable = { which = unity_mult_pop value = 0.5 }
+				change_variable = { which = society_research_mult_pop value = 0.25 }
+				change_variable = { which = physics_research_mult_pop value = 0.25 }
+				change_variable = { which = engineering_research_mult_pop value = 0.25 }
+			}	
+		}
+		if = { 
+			limit = { has_trait = "trait_presapient_proles" }
+			prev = {
+				change_variable = { which = energy_mult_pop value = 0.5 }
+				change_variable = { which = minerals_mult_pop value = 1.1 }
+				change_variable = { which = food_mult_pop value = 1.1 }     
+				change_variable = { which = society_research_mult_pop value = 0.75 }
+				change_variable = { which = physics_research_mult_pop value = 0.75 }
+				change_variable = { which = engineering_research_mult_pop value = 0.75 }
+			}	
+		}   
+		if = { 
+			limit = { has_trait = "trait_syncretic_proles" }
+			prev = {
+				change_variable = { which = minerals_mult_pop value = 1.1 }
+				change_variable = { which = food_mult_pop value = 1.1 }     
+				change_variable = { which = society_research_mult_pop value = 0.85 }
+				change_variable = { which = physics_research_mult_pop value = 0.85 }
+				change_variable = { which = engineering_research_mult_pop value = 0.85 }
+			}	
+		}     
+		if = { 
+			limit = { has_trait = "trait_agrarian" }
+			prev = { change_variable = { which = food_mult_pop value = 1.15 } }
+		} 
+		if = { 
+			limit = { has_trait = "trait_thrifty" }
+			prev = { change_variable = { which = energy_mult_pop value = 1.15 } }
+		}       
+		if = { 
+			limit = { has_trait = "trait_industrious" }
+			prev = { change_variable = { which = minerals_mult_pop value = 1.15 } }
+		}     
+		if = { 
+			limit = { has_trait = "trait_intelligent" }
+			prev = {
+				change_variable = { which = society_research_mult_pop value = 1.1 }
+				change_variable = { which = physics_research_mult_pop value = 1.1 }
+				change_variable = { which = engineering_research_mult_pop value = 1.1 }
+			}	
+		}     
+		if = { 
+			limit = { has_trait = "trait_natural_engineers" }
+			prev = { change_variable = { which = engineering_research_mult_pop value = 1.15 } }
+		}           
+		if = { 
+			limit = { has_trait = "trait_natural_physicists" }
+			prev = { change_variable = { which = physics_research_mult_pop value = 1.15 } }
+		}           
+		if = { 
+			limit = { has_trait = "trait_natural_sociologists" }
+			prev = { change_variable = { which = society_research_mult_pop value = 1.15 } }
+		}     
+		if = { 
+			limit = { has_trait = "trait_very_strong" }
+			prev = { change_variable = { which = minerals_mult_pop value = 1.1 } }
+		}           
+		if = { 
+			limit = { has_trait = "trait_strong" }
+			prev = { change_variable = { which = minerals_mult_pop value = 1.05 } }
+		}                 
+		if = { 
+			limit = { has_trait = "trait_weak" }
+			prev = { change_variable = { which = minerals_mult_pop value = 0.95 } }
+		} 
+		if = { 
+			limit = { has_trait = "trait_erudite" }
+			prev = {
+				change_variable = { which = society_research_mult_pop value = 1.2 }
+				change_variable = { which = physics_research_mult_pop value = 1.2 }
+				change_variable = { which = engineering_research_mult_pop value = 1.2 }
+			}	
+		}
+		if = {        
+			limit = { has_trait = "trait_presapient_earthbound" }     
+			prev = { change_variable = { which = energy_mult_pop value = 1.1 } }
+		}
+		if = {        
+			limit = { has_trait = "trait_presapient_natural_intellectuals" }      
+			prev = {
+				change_variable = { which = society_research_mult_pop value = 1.1 }
+				change_variable = { which = physics_research_mult_pop value = 1.1 }
+				change_variable = { which = engineering_research_mult_pop value = 1.1 }
+				change_variable = { which = minerals_mult_pop value = 1.1 }
+			}	
+		} 
+		if = {
+			limit = { 
+				has_trait = "trait_cybernetic" 
+				planet = { has_building = building_neuro_electric_amplifier } 
+		  }
+		  prev = {
+				change_variable = { which = minerals_mult_pop value = 1.15 }
+				change_variable = { which = energy_mult_pop value = 1.15 }
+			}	
+		} 
+	  } 
+	  if = { 
+		limit = { is_robot_pop = yes }
+		if = { 
+			limit = { has_trait = "trait_robotic_1" }
+			prev = {
+				change_variable = { which = energy_mult_pop value = 0.2 }
+				change_variable = { which = minerals_mult_pop value = 1.1 }       
+				change_variable = { which = unity_mult_pop value = 0.6 }
+				change_variable = { which = society_research_mult_pop value = 0.2 }
+				change_variable = { which = physics_research_mult_pop value = 0.2 }
+				change_variable = { which = engineering_research_mult_pop value = 0.2 }
+			}	
+		}           
+		if = { 
+			limit = { has_trait = "trait_robotic_2" }
+			prev = {
+				change_variable = { which = energy_mult_pop value = 0.8 }
+				change_variable = { which = minerals_mult_pop value = 1.15 }       
+				change_variable = { which = unity_mult_pop value = 0.8 }
+				change_variable = { which = society_research_mult_pop value = 0.6 }
+				change_variable = { which = physics_research_mult_pop value = 0.6 }
+				change_variable = { which = engineering_research_mult_pop value = 0.6 }
+			}	
+		}
+		if = { 
+			limit = { has_trait = "trait_robotic_3" }
+			prev = {
+				change_variable = { which = energy_mult_pop value = 1.2 }
+				change_variable = { which = minerals_mult_pop value = 1.2 }       
+				change_variable = { which = unity_mult_pop value = 1.2 }
+				change_variable = { which = society_research_mult_pop value = 1.2 }
+				change_variable = { which = physics_research_mult_pop value = 1.2 }
+				change_variable = { which = engineering_research_mult_pop value = 1.2 }
+			}	
+		}     
+		if = { 
+			limit = { has_trait = "trait_robot_power_drills" }
+			prev = { change_variable = { which = minerals_mult_pop value = 1.1 } }       
+		}     
+		if = { 
+			limit = { has_trait = "trait_robot_harvesters" }
+			prev = { change_variable = { which = food_mult_pop value = 1.1 } }       
+		}     
+		if = { 
+			limit = { has_trait = "trait_robot_logic_engines" }
+			prev = {
+				change_variable = { which = society_research_mult_pop value = 1.1 }
+				change_variable = { which = physics_research_mult_pop value = 1.1 }
+				change_variable = { which = engineering_research_mult_pop value = 1.1 }
+			}	
+		}
+		if = { 
+			limit = { has_trait = "trait_robot_superconductive" }
+			prev = { change_variable = { which = energy_mult_pop value = 1.1 } }       
+		}
+		if = { 
+			limit = { has_trait = "trait_robot_propaganda_machines" }
+			prev = { change_variable = { which = unity_mult_pop value = 1.1 } }
+		}      
+	}
+}   
+
+check_pop_species_rights = {
+	if = {
+		limit = { has_living_standard = { type = living_standard_chemical_bliss } }
+		prev = {
+			change_variable = { which = energy_mult_pop value = 0.4 }
+			change_variable = { which = minerals_mult_pop value = 0.4 }       
+			change_variable = { which = food_mult_pop value = 0.4 }
+			change_variable = { which = unity_mult_pop value = 0.4 }
+			change_variable = { which = society_research_mult_pop value = 0.4 }
+			change_variable = { which = physics_research_mult_pop value = 0.4 }
+			change_variable = { which = engineering_research_mult_pop value = 0.4 }		
+		}	
+	}	
+	if = {
+		limit = { has_living_standard = { type = living_standard_academic_privilege } }
+		prev = {
+			change_variable = { which = society_research_mult_pop value = 1.1 }
+			change_variable = { which = physics_research_mult_pop value = 1.1 }
+			change_variable = { which = engineering_research_mult_pop value = 1.1 }		
+		}	
+	}	
+	if = {
+		limit = {
+			OR = {
+				is_enslaved = yes
+				is_being_purged = yes
+			}
+		}
+		if = {
+			limit = { has_slavery_type = { type = slavery_normal } }
+			prev = {
+				change_variable = { which = energy_mult_pop value = 0.67 }
+				change_variable = { which = minerals_mult_pop value = 1.1 }       
+				change_variable = { which = food_mult_pop value = 1.1 }
+				change_variable = { which = unity_mult_pop value = 0.25 }
+				change_variable = { which = society_research_mult_pop value = 0.25 }
+				change_variable = { which = physics_research_mult_pop value = 0.25 }
+				change_variable = { which = engineering_research_mult_pop value = 0.25 }		
+			}	
+		}			
+		if = {
+			limit = { has_slavery_type = { type = slavery_domestic } }
+			prev = {
+				change_variable = { which = energy_mult_pop value = 0.67 }		
+				change_variable = { which = unity_mult_pop value = 0.67 }
+				change_variable = { which = society_research_mult_pop value = 0.25 }
+				change_variable = { which = physics_research_mult_pop value = 0.25 }
+				change_variable = { which = engineering_research_mult_pop value = 0.25 }		
+			}	
+		}				
+		if = {
+			limit = { has_slavery_type = { type = slavery_military } }
+			prev = {
+				change_variable = { which = energy_mult_pop value = 0.85 }		
+				change_variable = { which = unity_mult_pop value = 0.5 }
+				change_variable = { which = society_research_mult_pop value = 0.5 }
+				change_variable = { which = physics_research_mult_pop value = 0.5 }
+				change_variable = { which = engineering_research_mult_pop value = 0.5 }		
+			}	
+		}
+		if = {
+			limit = {
+				OR = { 
+					has_purge_type = { type = purge_normal }
+					has_purge_type = { type = purge_matrix }
+					has_purge_type = { type = purge_processing }
+					has_slavery_type = { type = slavery_livestock }
+					has_slavery_type = { type = slavery_matrix }
+				}
+			}
+			prev = {
+				change_variable = { which = energy_mult_pop value = -10 }		
+				change_variable = { which = minerals_mult_pop value = -10 }		
+				change_variable = { which = food_mult_pop value = -10 }		
+				change_variable = { which = unity_mult_pop value = -10 }
+				change_variable = { which = society_research_mult_pop value = -10 }
+				change_variable = { which = physics_research_mult_pop value = -10 }
+				change_variable = { which = engineering_research_mult_pop value = -10 }				
+			}	
+		}	
+		if = {
+			limit = { has_purge_type = { type = purge_labor_camps }	}
+			prev = {
+				change_variable = { which = energy_mult_pop value = -10 }		
+				change_variable = { which = unity_mult_pop value = -10 }
+				change_variable = { which = society_research_mult_pop value = -10 }
+				change_variable = { which = physics_research_mult_pop value = -10 }
+				change_variable = { which = engineering_research_mult_pop value = -10 }				
+			}	
+		}		
+	}	
+}

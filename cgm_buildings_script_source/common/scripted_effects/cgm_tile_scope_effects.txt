@@ -2,8 +2,9 @@
 
 set_tile_building_weight = { 
 	calculate_tile_weight = yes
-	#tile weight = country deficit/income + tile resources + pop traits (if exists on tile) + adj. bonuses (if exist)
+	###tile weight = country deficit/income + tile resources + adj. bonuses (if exist) + tile multiplier ( planet multiplier + planet average pop multiplier )
 	#planet multiplier = planet modifier(s) + buildings that give a planet modifier
+	#pop multiplier = all pops' trait and species rights' modifiers combined then divided by number of pops on planet
 	#the operation below multiplies tile weight * planet multiplier 
 	if = {
 		limit = {
@@ -15,13 +16,13 @@ set_tile_building_weight = {
 			}
 		}	
 		prev = {
-			multiply_variable = { which = "energy_weight" value = "energy_mult" }
-			multiply_variable = { which = "minerals_weight" value = "minerals_mult" }
-			multiply_variable = { which = "food_weight" value = "food_mult" }
-			multiply_variable = { which = "unity_weight" value = "unity_mult" }
-			multiply_variable = { which = "society_research_weight" value = "society_research_mult" }
-			multiply_variable = { which = "physics_research_weight" value = "physics_research_mult" }
-			multiply_variable = { which = "engineering_research_weight" value = "engineering_research_mult" }
+			multiply_variable = { which = "energy_weight" value = "energy_mult_tile" }
+			multiply_variable = { which = "minerals_weight" value = "minerals_mult_tile" }
+			multiply_variable = { which = "food_weight" value = "food_mult_tile" }
+			multiply_variable = { which = "unity_weight" value = "unity_mult_tile" }
+			multiply_variable = { which = "society_research_weight" value = "society_research_mult_tile" }
+			multiply_variable = { which = "physics_research_weight" value = "physics_research_mult_tile" }
+			multiply_variable = { which = "engineering_research_weight" value = "engineering_research_mult_tile" }
 		}	
 		if = {
 			limit = {
@@ -186,12 +187,12 @@ set_tile_building_weight = {
 			}
 			else = {
 				prev = {
-					multiply_variable = { which = "energy_weight" value = "energy_mult" }
-					multiply_variable = { which = "minerals_weight" value = "minerals_mult" }
-					multiply_variable = { which = "unity_weight" value = "unity_mult" }
-					multiply_variable = { which = "society_research_weight" value = "society_research_mult" }
-					multiply_variable = { which = "physics_research_weight" value = "physics_research_mult" }
-					multiply_variable = { which = "engineering_research_weight" value = "engineering_research_mult" }
+					multiply_variable = { which = "energy_weight" value = "energy_mult_tile" }
+					multiply_variable = { which = "minerals_weight" value = "minerals_mult_tile" }
+					multiply_variable = { which = "unity_weight" value = "unity_mult_tile" }
+					multiply_variable = { which = "society_research_weight" value = "society_research_mult_tile" }
+					multiply_variable = { which = "physics_research_weight" value = "physics_research_mult_tile" }
+					multiply_variable = { which = "engineering_research_weight" value = "engineering_research_mult_tile" }
 				}	
 				if = {
 					limit = {
@@ -483,13 +484,6 @@ calculate_tile_weight = {
 			check_adj_bonus_blockers = yes
 		}		
 	}	
-	if = {
-		limit = { has_pop = yes }
-		pop = {
-			check_pop_traits = yes
-			check_pop_species_rights = yes
-		}	
-	}
 }				
 
 check_energy_deposit = {	
@@ -1632,273 +1626,6 @@ check_adj_bonus_blockers = {
 		}	
 	}			
 }		
-
-check_pop_traits = {
-	if = { 
-		limit = { is_robot_pop = no }
-		if = { 
-			limit = { has_trait = "trait_nerve_stapled" }
-			prevprev = {
-				multiply_variable = { which = energy_weight value = 0.5 }
-				multiply_variable = { which = minerals_weight value = 1.1 }
-				multiply_variable = { which = food_weight value = 1.1 }
-				multiply_variable = { which = unity_weight value = 0.5 }
-				multiply_variable = { which = society_research_weight value = 0.25 }
-				multiply_variable = { which = physics_research_weight value = 0.25 }
-				multiply_variable = { which = engineering_research_weight value = 0.25 }
-			}	
-		}
-		if = { 
-			limit = { has_trait = "trait_presapient_proles" }
-			prevprev = {
-				multiply_variable = { which = energy_weight value = 0.5 }
-				multiply_variable = { which = minerals_weight value = 1.1 }
-				multiply_variable = { which = food_weight value = 1.1 }     
-				multiply_variable = { which = society_research_weight value = 0.75 }
-				multiply_variable = { which = physics_research_weight value = 0.75 }
-				multiply_variable = { which = engineering_research_weight value = 0.75 }
-			}	
-		}   
-		if = { 
-			limit = { has_trait = "trait_syncretic_proles" }
-			prevprev = {
-				multiply_variable = { which = minerals_weight value = 1.1 }
-				multiply_variable = { which = food_weight value = 1.1 }     
-				multiply_variable = { which = society_research_weight value = 0.85 }
-				multiply_variable = { which = physics_research_weight value = 0.85 }
-				multiply_variable = { which = engineering_research_weight value = 0.85 }
-			}	
-		}     
-		if = { 
-			limit = { has_trait = "trait_agrarian" }
-			prevprev = { multiply_variable = { which = food_weight value = 1.15 } }
-		} 
-		if = { 
-			limit = { has_trait = "trait_thrifty" }
-			prevprev = { multiply_variable = { which = energy_weight value = 1.15 } }
-		}       
-		if = { 
-			limit = { has_trait = "trait_industrious" }
-			prevprev = { multiply_variable = { which = minerals_weight value = 1.15 } }
-		}     
-		if = { 
-			limit = { has_trait = "trait_intelligent" }
-			prevprev = {
-				multiply_variable = { which = society_research_weight value = 1.1 }
-				multiply_variable = { which = physics_research_weight value = 1.1 }
-				multiply_variable = { which = engineering_research_weight value = 1.1 }
-			}	
-		}     
-		if = { 
-			limit = { has_trait = "trait_natural_engineers" }
-			prevprev = { multiply_variable = { which = engineering_research_weight value = 1.15 } }
-		}           
-		if = { 
-			limit = { has_trait = "trait_natural_physicists" }
-			prevprev = { multiply_variable = { which = physics_research_weight value = 1.15 } }
-		}           
-		if = { 
-			limit = { has_trait = "trait_natural_sociologists" }
-			prevprev = { multiply_variable = { which = society_research_weight value = 1.15 } }
-		}     
-		if = { 
-			limit = { has_trait = "trait_very_strong" }
-			prevprev = { multiply_variable = { which = minerals_weight value = 1.1 } }
-		}           
-		if = { 
-			limit = { has_trait = "trait_strong" }
-			prevprev = { multiply_variable = { which = minerals_weight value = 1.05 } }
-		}                 
-		if = { 
-			limit = { has_trait = "trait_weak" }
-			prevprev = { multiply_variable = { which = minerals_weight value = 0.95 } }
-		} 
-		if = { 
-			limit = { has_trait = "trait_erudite" }
-			prevprev = {
-				multiply_variable = { which = society_research_weight value = 1.2 }
-				multiply_variable = { which = physics_research_weight value = 1.2 }
-				multiply_variable = { which = engineering_research_weight value = 1.2 }
-			}	
-		}
-		if = {        
-			limit = { has_trait = "trait_presapient_earthbound" }     
-			prevprev = { multiply_variable = { which = energy_weight value = 1.1 } }
-		}
-		if = {        
-			limit = { has_trait = "trait_presapient_natural_intellectuals" }      
-			prevprev = {
-				multiply_variable = { which = society_research_weight value = 1.1 }
-				multiply_variable = { which = physics_research_weight value = 1.1 }
-				multiply_variable = { which = engineering_research_weight value = 1.1 }
-				multiply_variable = { which = minerals_weight value = 1.1 }
-			}	
-		} 
-		if = {
-			limit = { 
-				has_trait = "trait_cybernetic" 
-				planet = { has_building = building_neuro_electric_amplifier } 
-		  }
-		  prevprev = {
-				multiply_variable = { which = minerals_weight value = 1.15 }
-				multiply_variable = { which = energy_weight value = 1.15 }
-			}	
-		} 
-	  } 
-	  if = { 
-		limit = { is_robot_pop = yes }
-		if = { 
-			limit = { has_trait = "trait_robotic_1" }
-			prevprev = {
-				multiply_variable = { which = energy_weight value = 0.2 }
-				multiply_variable = { which = minerals_weight value = 1.1 }       
-				multiply_variable = { which = unity_weight value = 0.6 }
-				multiply_variable = { which = society_research_weight value = 0.2 }
-				multiply_variable = { which = physics_research_weight value = 0.2 }
-				multiply_variable = { which = engineering_research_weight value = 0.2 }
-			}	
-		}           
-		if = { 
-			limit = { has_trait = "trait_robotic_2" }
-			prevprev = {
-				multiply_variable = { which = energy_weight value = 0.8 }
-				multiply_variable = { which = minerals_weight value = 1.15 }       
-				multiply_variable = { which = unity_weight value = 0.8 }
-				multiply_variable = { which = society_research_weight value = 0.6 }
-				multiply_variable = { which = physics_research_weight value = 0.6 }
-				multiply_variable = { which = engineering_research_weight value = 0.6 }
-			}	
-		}
-		if = { 
-			limit = { has_trait = "trait_robotic_3" }
-			prevprev = {
-				multiply_variable = { which = energy_weight value = 1.2 }
-				multiply_variable = { which = minerals_weight value = 1.2 }       
-				multiply_variable = { which = unity_weight value = 1.2 }
-				multiply_variable = { which = society_research_weight value = 1.2 }
-				multiply_variable = { which = physics_research_weight value = 1.2 }
-				multiply_variable = { which = engineering_research_weight value = 1.2 }
-			}	
-		}     
-		if = { 
-			limit = { has_trait = "trait_robot_power_drills" }
-			prevprev = { multiply_variable = { which = minerals_weight value = 1.1 } }       
-		}     
-		if = { 
-			limit = { has_trait = "trait_robot_harvesters" }
-			prevprev = { multiply_variable = { which = food_weight value = 1.1 } }       
-		}     
-		if = { 
-			limit = { has_trait = "trait_robot_logic_engines" }
-			prevprev = {
-				multiply_variable = { which = society_research_weight value = 1.1 }
-				multiply_variable = { which = physics_research_weight value = 1.1 }
-				multiply_variable = { which = engineering_research_weight value = 1.1 }
-			}	
-		}
-		if = { 
-			limit = { has_trait = "trait_robot_superconductive" }
-			prevprev = { multiply_variable = { which = energy_weight value = 1.1 } }       
-		}
-		if = { 
-			limit = { has_trait = "trait_robot_propaganda_machines" }
-			prevprev = { multiply_variable = { which = unity_weight value = 1.1 } }
-		}      
-	}
-}   
-
-check_pop_species_rights = {
-	if = {
-		limit = { has_living_standard = { type = living_standard_chemical_bliss } }
-		prevprev = {
-			multiply_variable = { which = energy_weight value = 0.4 }
-			multiply_variable = { which = minerals_weight value = 0.4 }       
-			multiply_variable = { which = food_weight value = 0.4 }
-			multiply_variable = { which = unity_weight value = 0.4 }
-			multiply_variable = { which = society_research_weight value = 0.4 }
-			multiply_variable = { which = physics_research_weight value = 0.4 }
-			multiply_variable = { which = engineering_research_weight value = 0.4 }		
-		}	
-	}	
-	if = {
-		limit = { has_living_standard = { type = living_standard_academic_privilege } }
-		prevprev = {
-			multiply_variable = { which = society_research_weight value = 1.1 }
-			multiply_variable = { which = physics_research_weight value = 1.1 }
-			multiply_variable = { which = engineering_research_weight value = 1.1 }		
-		}	
-	}	
-	if = {
-		limit = {
-			OR = {
-				is_enslaved = yes
-				is_being_purged = yes
-			}
-		}
-		if = {
-			limit = { has_slavery_type = { type = slavery_normal } }
-			prevprev = {
-				multiply_variable = { which = energy_weight value = 0.67 }
-				multiply_variable = { which = minerals_weight value = 1.1 }       
-				multiply_variable = { which = food_weight value = 1.1 }
-				multiply_variable = { which = unity_weight value = 0.25 }
-				multiply_variable = { which = society_research_weight value = 0.25 }
-				multiply_variable = { which = physics_research_weight value = 0.25 }
-				multiply_variable = { which = engineering_research_weight value = 0.25 }		
-			}	
-		}			
-		if = {
-			limit = { has_slavery_type = { type = slavery_domestic } }
-			prevprev = {
-				multiply_variable = { which = energy_weight value = 0.67 }		
-				multiply_variable = { which = unity_weight value = 0.67 }
-				multiply_variable = { which = society_research_weight value = 0.25 }
-				multiply_variable = { which = physics_research_weight value = 0.25 }
-				multiply_variable = { which = engineering_research_weight value = 0.25 }		
-			}	
-		}				
-		if = {
-			limit = { has_slavery_type = { type = slavery_military } }
-			prevprev = {
-				multiply_variable = { which = energy_weight value = 0.85 }		
-				multiply_variable = { which = unity_weight value = 0.5 }
-				multiply_variable = { which = society_research_weight value = 0.5 }
-				multiply_variable = { which = physics_research_weight value = 0.5 }
-				multiply_variable = { which = engineering_research_weight value = 0.5 }		
-			}	
-		}
-		if = {
-			limit = {
-				OR = { 
-					has_purge_type = { type = purge_normal }
-					has_purge_type = { type = purge_matrix }
-					has_purge_type = { type = purge_processing }
-					has_slavery_type = { type = slavery_livestock }
-					has_slavery_type = { type = slavery_matrix }
-				}
-			}
-			prevprev = {
-				multiply_variable = { which = energy_weight value = -10 }		
-				multiply_variable = { which = minerals_weight value = -10 }		
-				multiply_variable = { which = food_weight value = -10 }		
-				multiply_variable = { which = unity_weight value = -10 }
-				multiply_variable = { which = society_research_weight value = -10 }
-				multiply_variable = { which = physics_research_weight value = -10 }
-				multiply_variable = { which = engineering_research_weight value = -10 }				
-			}	
-		}	
-		if = {
-			limit = { has_purge_type = { type = purge_labor_camps }	}
-			prevprev = {
-				multiply_variable = { which = energy_weight value = -10 }		
-				multiply_variable = { which = unity_weight value = -10 }
-				multiply_variable = { which = society_research_weight value = -10 }
-				multiply_variable = { which = physics_research_weight value = -10 }
-				multiply_variable = { which = engineering_research_weight value = -10 }				
-			}	
-		}		
-	}	
-}
 
 convert_deposits = {
 	if = {
