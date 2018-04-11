@@ -607,7 +607,7 @@ def main(args, argv):
         for i in range(level):
           file.write("os.chdir('..')\n")  #script will have been placed is subdir!
         
-      callString=os.path.normpath("subprocess.call('python ./createUpgradedBuildings.py "+'"'+'" "'.join(argv)+'"'+"', shell=True)\n").replace(os.sep,"/")
+      callString=os.path.normpath("subprocess.call('python "+__file__+" "+'"'+'" "'.join(argv)+'"'+"', shell=True)\n").replace(os.sep,"/")
       file.write(callString)
       if not args.just_copy_and_check and not args.create_standalone_mod_from_mod:
         file.write("import fnmatch\n")
