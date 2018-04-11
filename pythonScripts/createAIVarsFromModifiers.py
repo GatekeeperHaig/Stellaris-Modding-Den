@@ -39,7 +39,7 @@ def main(args,*unused):
       # val.printAll()
       newCheck=TagList(2).add("limit", TagList(3).add("has_modifier",name))
       newCheckBuildingModifier=TagList(2).add("limit", TagList(3).add("has_"+args.type,name))
-      newCheckAdjModifier=TagList(2).add("limit", TagList(3).add("has_"+args.type,name)).add("prev",TagList(3))
+      newCheckAdjModifier=TagList(2).add("limit", TagList(3).add("has_"+args.type,name)).add("prevprev",TagList(3))
 
       for possibleModifierName, pmVal in val.getNameVal():
         if "tile_resource_" in possibleModifierName:
@@ -59,7 +59,7 @@ def main(args,*unused):
         outTagList.get(args.effect_name).add("if", newCheck)
       if len(newCheckBuildingModifier.names)>1:
         outTagList.get(args.effect_name).add("if", newCheckBuildingModifier)
-      if len(newCheckAdjModifier.get("prev").names)>0:
+      if len(newCheckAdjModifier.get("prevprev").names)>0:
         outTagList.get(args.effect_name).add("every_neighboring_tile", newCheckAdjModifier)
     outFile=args.output_folder+"/"+os.path.basename(inputFileName).replace("txt","ai_weight_static_effects.txt")
     if not args.test_run:
