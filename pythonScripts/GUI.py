@@ -600,8 +600,8 @@ class TabControlClass:
     self.tabClasses[-1].separateStart=False
     self.tabClasses[-1].singleEntryCheck="Source File"
 
-    #self.newTab("Create AI Vars",createAIVarsFromModifiers,("text files","*.txt"),[],[of,"effect_name","type",oll],"")
-    #self.tabClasses[-1].helpText="Creates weight files to be used in AI buiding weights. Since options are global, it's best to create one 'project' for different tpyes, e.g. one for planet modifiers, one for buildings, one for blocker"
+    self.newTab("Create AI Vars",createAIVarsFromModifiers,("text files","*.txt"),[],[of,"effect_name","type",oll],"")
+    self.tabClasses[-1].helpText="Creates weight files to be used in AI buiding weights. Since options are global, it's best to create one 'project' for different tpyes, e.g. one for planet modifiers, one for buildings, one for blocker"
 
 
     nb.pack(expand=1, fill="both")  # Pack to make visible
