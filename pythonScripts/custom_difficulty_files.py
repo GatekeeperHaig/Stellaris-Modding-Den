@@ -1160,7 +1160,7 @@ optionExtraEvents=dict()
 optionExtraEvents["activate_simple_mode"]=["name_removeAllModifiers"]
 optionExtraEvents["activate_custom_mode"]=["name_removeAllModifiers"]
 
-optionColors="GGBBYY!!"
+optionColors="GGBBYYEE"
 defaultOptions=[]
 
 
@@ -1245,7 +1245,7 @@ add_event(effect, "name_resetEvent")
 add_event(effect, "name_removeAllModifiers")
 effect.add("remove_global_flag", "custom_difficulty_active")
 removeConfirmation.add("option", TagList("name", "OK").add("hidden_effect", effect))
-removeConfirmation.add("option", TagList("name", "custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
+removeConfirmation.add("option", TagList("name", "custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_optionsEvent))))
 
 
 mainFileContent.add("","","#lock confirmation")
