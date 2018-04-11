@@ -12,7 +12,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('inputFileNames', nargs = '*' )
   parser.add_argument('--output_folder',default="common/scripted_effect" )
   parser.add_argument('-n','--effect_name', default='check_planet_modifier', help="The name that will be given to the generated scripted_effect")
-  parser.add_argument('-t','--type', default="building", help="Type of objects that are used: 'has_<value>' will be the check. Not needed for planet based modifiers. Reasonable values are 'building'(default)/'blocker' and possible others")
+  parser.add_argument('-t','--type', default="building", help="Type of objects that are used: 'has_<value>' will be the check. Not needed for planet based modifiers. Reasonable values are 'building'(default)/'blocker/trait' and possible others")
   # parser.add_argument('-a','--adjacency',action="store_true", help="qu")
   if returnParser:
     return parser
@@ -50,6 +50,12 @@ def main(args,*unused):
         for possPlanetModName, ppmVal in val.get("planet_modifier").getNameVal():
          if "tile_resource_" in possPlanetModName:
            newCheckBuildingModifier.add("change_variable", TagList(3).add("which",possPlanetModName.replace("tile_resource_","").replace("_add","_weight")+"_planet_base").add("value",ppmVal))
+      if "trait" in val.names:
+        # print("NAME"+name)
+        # val.printAll()
+        for possPlanetModName, ppmVal in val.get("planet_modifier").getNameVal():
+         if "tile_resource_" in possPlanetModName:
+           newCheckBuildingModifier.add("change_variable", TagList(3).add("which",possPlanetModName.replace("tile_resource_","").replace("_add","_weight")+"_planet_pop").add("value",ppmVal))
       if "adjacency_bonus" in val.names:
         for possPlanetModName, ppmVal in val.get("adjacency_bonus").getNameVal():
           if "tile_building_resource_" in possPlanetModName:
