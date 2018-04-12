@@ -682,11 +682,17 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       maxIndex=len(header[self.bracketLevel])-1
     headerIndex=minIndex-1
     for headerName in header[self.bracketLevel][minIndex:(maxIndex+1)]:
-      headerName=headerName.strip()
-      # print(headerName)
       headerIndex+=1
+
+      headerName=headerName.strip()
+
+      belowHeaderName=""
+      if len(header)>self.bracketLevel+1 and len(header[self.bracketLevel+1])>headerIndex:
+        belowHeaderName=header[self.bracketLevel+1][headerIndex]
+
       if headerName=="" or len(bodyEntry)<=headerIndex:# or entry=="":
         continue
+
       entry=str(bodyEntry[headerIndex]).strip()
       nextMaxIndex=nextMinIndex=headerIndex
       while nextMaxIndex+1<len(header[self.bracketLevel]) and not header[self.bracketLevel][nextMaxIndex+1]:
@@ -694,7 +700,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       if nextMaxIndex+1>=len(header[self.bracketLevel]):
         nextMaxIndex=-1 #end of list reached. make all possible (ods lists are shorter if only empty elements are following)
       if not args.forbid_additions and not headerName in self.names:# and entry:
-        if len(header)>self.bracketLevel+1 and len(header[self.bracketLevel+1])>headerIndex and header[self.bracketLevel+1][headerIndex]!="":
+        if belowHeaderName!="":
           val=self.getOrCreate(headerName)
           self.addLines(headerName, bodyEntry, headerIndex,n_th_occurence)
           val.setValFromCSV(header, bodyEntry,varsToValue,args, nextMinIndex, nextMaxIndex,n_th_occurence,occHeader,occEntry)
@@ -735,11 +741,12 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             valIndex=self.n_thIndex(headerName,n_th_occurence)
             local_n_th_occurence=0
           except ValueError:
-            # print(entry)
-            # print(headerName)
-            # print(local_n_th_occurence)
-            # print(bodyEntry)
-            if entry!="" and (not isinstance(self.get(headerName),TagList) or self.names.count(headerName)>1):
+            if entry!="" and belowHeaderName=="": #allow additons without OCCNUM only at the very end!
+              print(entry)
+              print(headerName)
+              print(local_n_th_occurence)
+              print(bodyEntry)
+              print(entry)
               if not args.forbid_additions:
                 if isinstance(self.getN_th(headerName, n_th_occurence-1), TagList):
                   self.add(headerName, TagList(self.bracketLevel+1))
@@ -750,7 +757,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
               else:
                 raise
               local_n_th_occurence=0
-            elif self.names.count(headerName)>1:
+            if self.names.count(headerName)>1:
               valIndex=self.n_thIndex(headerName,self.names.count(headerName)-1)
               local_n_th_occurence-=self.names.count(headerName)-1
               # print(local_n_th_occurence)
