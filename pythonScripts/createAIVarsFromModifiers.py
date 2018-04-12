@@ -219,17 +219,23 @@ def addBuildings(outTags, name, val, args):
     prev=TagList()
     ifLoc=TagList("limit", TagList("has_building", name)).add("prev", prev)
     addFinalModifier(val.get("planet_modifier"), prev, "_planet_base")
+    elseTagList=TagList()
+    ifLoc.add("else", elseTagList)
     if len(prev)>0:
       outTags[0].add("if", ifLoc)
+      outTags[0]=elseTagList
   if "adjacency_bonus" in val.names:
     prev=TagList()
     ifLoc=TagList("limit", TagList("has_building", name)).add("prevprev", prev)
     addFinalModifier(val.get("adjacency_bonus"), prev, "","tile_building_resource_")
+    elseTagList=TagList()
+    ifLoc.add("else", elseTagList)
     if len(prev)>0:
       outTags[1].add("if", ifLoc)
+      outTags[1]=elseTagList
 
 def addBlockers(outTags, name, val, args):
-  if not "spawn_chance":# and not name[:2]==tb:
+  if not "spawn_chance" in val.names:# and not name[:2]==tb:
     if args.debug:
       print("Not used for tile blocker: "+name)
     return
@@ -237,8 +243,11 @@ def addBlockers(outTags, name, val, args):
     prev=TagList()
     ifLoc=TagList("limit", TagList("has_blocker", name)).add("prevprev", prev)
     addFinalModifier(val.get("adjacency_bonus"), prev, "","tile_building_resource_")
+    elseTagList=TagList()
+    ifLoc.add("else", elseTagList)
     if len(prev)>0:
       outTags[0].add("if", ifLoc)
+      outTags[0]=elseTagList
 
 
 def addFinalModifier(input, output, extraName="", searchFor="tile_resource_"):
