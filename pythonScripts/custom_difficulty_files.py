@@ -14,7 +14,7 @@ ET = "event_target:custom_difficulty_var_storage"
 yes="yes"
 
 
-CuDi="custom_difficulty.{!s}"
+eventNameSpace="custom_difficulty.{!s}"
 
 name_mainMenuEvent="custom_difficulty.0"
 name_defaultMenuEvent="custom_difficulty.1"
@@ -36,8 +36,8 @@ name_countryUpdateEventSimple="custom_difficulty.51"
 name_lockEvent="custom_difficulty.60"
 id_removeModifiers=70  #reserved range up to 72
 id_removeGroupModifiers=73  #reserved range up to 75
-name_removeAllModifiers=CuDi.format(id_removeModifiers+9)
-name_removeEventTarget=CuDi.format(id_removeModifiers+8)
+name_removeAllModifiers=eventNameSpace.format(id_removeModifiers+9)
+name_removeEventTarget=eventNameSpace.format(id_removeModifiers+8)
 name_removeOLDModifiers="custom_difficulty_old.{}".format(id_removeModifiers+9)
 id_addModifiers=80  #reserved range up to 82
 id_addGroupModifiers=83  #reserved range up to 85
@@ -316,7 +316,7 @@ def main():
     tagList.add("","","#Event ID starting at {0:d}000, blocked up to {0:d}999".format(mainIndex))
     choiceEvent=TagList()
     tagList.add("country_event", choiceEvent)
-    choiceEvent.add("id",CuDi.format(mainIndex*id_ChangeEvents))
+    choiceEvent.add("id",eventNameSpace.format(mainIndex*id_ChangeEvents))
     choiceEvent.add("is_triggered_only", yes)
     choiceEvent.add("title","custom_difficulty_{}.name".format(cat))
     choiceEvent.add("picture",'"'+catPictures[mainIndex-1]+'"')
@@ -351,7 +351,7 @@ def main():
       option.add("custom_tooltip", "custom_difficulty_{}_change_{}_desc".format(cat,bonusesListName))
       option.add("trigger", TagList().add("not", TagList().add("has_global_flag","custom_difficulty_locked")))
       locClass.addEntry("custom_difficulty_{}_change_{}_desc".format(cat,bonusesListName), "@{}Desc".format(bonusesListName))
-      option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
+      option.add("hidden_effect", TagList().add("country_event",TagList().add("id", eventNameSpace.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
       if bonusesListName!="all":
         if cat!="ai_yearly":
           localVarName="custom_difficulty_{}_{}_value".format(cat,firstVarName)
@@ -406,7 +406,7 @@ def main():
       option=TagList().add("name", "custom_difficulty_{}_change_{}_button.name".format(cat,bonus))
       option.add("trigger", TagList().add("NOR", TagList().add("has_global_flag","custom_difficulty_locked").add("has_global_flag", "custom_difficulty_activate_simple_mode")))
       locClass.append("custom_difficulty_{}_change_{}_button.name".format(cat,bonus), "@change @{} ({} ) @bonuses".format(bonus,possibleBoniIcons[bonusI]))
-      option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
+      option.add("hidden_effect", TagList().add("country_event",TagList().add("id", eventNameSpace.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
       if not catToModifierType[cat]=="crisis" or npcBoni[bonusI]:
         choiceEvent.add("option",option) 
 
@@ -431,7 +431,7 @@ def main():
       changeEvent=TagList()
       if not catToModifierType[cat]=="crisis" or (bonusListNPC+npcBoni)[bonusIndex-1]:
         tagList.add("country_event", changeEvent)
-        changeEvent.add("id",CuDi.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents))
+        changeEvent.add("id",eventNameSpace.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents))
         changeEvent.add("is_triggered_only", yes)
         changeEvent.add("title","custom_difficulty_{}_change_{}.name".format(cat,bonus))
         locClass.append("custom_difficulty_{}_change_{}.name".format(cat,bonus), "@change @{} @bonuses (@{})".format(bonus,cat))
@@ -472,7 +472,7 @@ def main():
               if not catToModifierType[cat]=="crisis" or npcBoni[bonusListIndex]:
                 bonusListValue=possibleBoniNames[bonusListIndex]
                 et.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusListValue)).add("value",str(changeStep)))
-          hidden_effect.add("country_event", TagList().add("id",CuDi.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents)))
+          hidden_effect.add("country_event", TagList().add("id",eventNameSpace.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents)))
           if cat=="player":
             hidden_effect.add("country_event", TagList().add("id",name_resetPlayerFlagsEvent)) #remove flags
             hidden_effect.add("set_global_flag", "custom_difficulty_advanced_configuration_player")
@@ -487,7 +487,7 @@ def main():
 
 
         option=TagList().add("name","custom_difficulty_back")
-        option.add("hidden_effect", TagList().add("country_event",TagList().add("id", CuDi.format(mainIndex*id_ChangeEvents))))
+        option.add("hidden_effect", TagList().add("country_event",TagList().add("id", eventNameSpace.format(mainIndex*id_ChangeEvents))))
         changeEvent.add("option",option)
         option=TagList().add("name","custom_difficulty_close.name")
         option.add("hidden_effect", TagList().add("country_event",TagList().add("id", name_rootUpdateEvent)))
@@ -553,7 +553,7 @@ def main():
   otherFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_other")
 
   for difficultyIndex, difficulty in enumerate(difficulties):
-    defaultDifficultyEvent=TagList("id", CuDi.format(id_defaultEvents+difficultyIndex))
+    defaultDifficultyEvent=TagList("id", eventNameSpace.format(id_defaultEvents+difficultyIndex))
     defaultEvents.add("country_event",defaultDifficultyEvent)
     defaultDifficultyEvent.add("is_triggered_only",yes)
     defaultDifficultyEvent.add("hide_window",yes)
@@ -961,7 +961,7 @@ def main():
     trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("has_global_flag", "custom_difficulty_locked"))
     trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("has_global_flag", "custom_difficulty_locked"))
     mainMenu.add("option", TagList("name","custom_difficulty_predefined_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
-    mainMenu.add("option", TagList("name","custom_difficulty_crisis_colored.name").add("trigger", TagList("is_crises_allowed", yes)).add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+cats.index("crisis")*id_ChangeEvents))).add("remove_global_flag","custom_difficulty_menu_crisis_from_custom")))
+    mainMenu.add("option", TagList("name","custom_difficulty_crisis_colored.name").add("trigger", TagList("is_crises_allowed", yes)).add("hidden_effect", TagList("country_event", TagList("id", eventNameSpace.format(id_ChangeEvents+cats.index("crisis")*id_ChangeEvents))).add("remove_global_flag","custom_difficulty_menu_crisis_from_custom")))
     mainMenu.add("option", TagList("name","custom_difficulty_customize_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_customMenuEvent))))
     mainMenu.add("option", TagList("name","custom_difficulty_options.name").add("hidden_effect", TagList("country_event", TagList("id", name_optionsEvent))))
     # mainMenu.add("option", TagList("name","custom_difficulty_lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
@@ -987,7 +987,7 @@ def main():
   trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("has_global_flag", "custom_difficulty_locked"))
   trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("has_global_flag", "custom_difficulty_locked"))
   for i,cat in enumerate(cats):
-    hidden_effect=TagList("country_event", TagList("id", CuDi.format(id_ChangeEvents+i*id_ChangeEvents)))
+    hidden_effect=TagList("country_event", TagList("id", eventNameSpace.format(id_ChangeEvents+i*id_ChangeEvents)))
     option=TagList("name","custom_difficulty_{}_colored.name".format(cat))
     customMenu.add("option",option)
     if cat=="crisis":
@@ -1019,7 +1019,7 @@ def main():
     option=TagList("name","custom_difficulty_{}.name".format(difficulty))
     defaultMenuEvent.add("option", option)
     option.add("trigger", deepcopy(t_notLockedTrigger).add("not",TagList("has_global_flag", "custom_difficulty_{}".format(difficulty))))
-    option.add("hidden_effect", TagList("country_event", TagList("id", CuDi.format(id_defaultEvents+i))).add("country_event", TagList("id", name_defaultMenuEvent)))
+    option.add("hidden_effect", TagList("country_event", TagList("id", eventNameSpace.format(id_defaultEvents+i))).add("country_event", TagList("id", name_defaultMenuEvent)))
   defaultMenuEvent.add("option", TagList("name", "custom_difficulty_reset.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id", name_resetConfirmationEvent))))
   defaultMenuEvent.add("option", t_backMainOption)
   defaultMenuEvent.add("option", t_closeOption)
@@ -1080,7 +1080,7 @@ def main():
     if difficulty=="scaling":
       k=1 #scaling with stupid place in between ensign and captain
       gameStartAfter.addComment("#execute enisgn event to get the flag and non-ai stuff (that does not scale for my mod!)")
-      gameStartAfter.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", CuDi.format(id_defaultEvents+difficulties.index("ensign")))))
+      gameStartAfter.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", eventNameSpace.format(id_defaultEvents+difficulties.index("ensign")))))
     elif difficulty=="ensign":
       k=0
     elif difficulty in vanillaDefaultDifficultyNames:
@@ -1088,7 +1088,7 @@ def main():
     else:
       continue #those cannot be preset in game creation
     gameStartAfter.add("","","#"+difficulty)
-    gameStartAfter.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", CuDi.format(id_defaultEvents+i))))
+    gameStartAfter.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", eventNameSpace.format(id_defaultEvents+i))))
   gameStartAfter.add("country_event", TagList("id", name_rootUpdateEvent))
 
 
@@ -1312,9 +1312,9 @@ class args:
 
 
 
-def createModifierEvents(inDict, outDict, eventTaglist, id, addBool):
+def createModifierEvents(inDict, outDict, eventTaglist, id, addBool, eventNameSpace="custom_difficulty.{!s}"):
   for i,item in enumerate(inDict.items()):
-    name=CuDi.format(id+i)
+    name=eventNameSpace.format(id+i)
     event=TagList("id", name )
     outDict[item[0]]=name
     eventTaglist.addComment(item[0])
@@ -1323,9 +1323,9 @@ def createModifierEvents(inDict, outDict, eventTaglist, id, addBool):
     event.add("hide_window",yes)
     event.add("immediate",item[1])
     if addBool:
-      item[1].add("set_country_flag", "custom_difficulty_{}_modifier_active".format(item[0]))
+      item[1].add("set_country_flag", eventNameSpace.format("")[:-1]+"_{}_modifier_active".format(item[0]))
     else:
-      item[1].add("remove_country_flag", "custom_difficulty_{}_modifier_active".format(item[0]))
+      item[1].add("remove_country_flag", eventNameSpace.format("")[:-1]+"_{}_modifier_active".format(item[0]))
 
 if __name__ == "__main__":
   main()
