@@ -74,7 +74,7 @@ id_Change=[20,30]  #reserved range up to 39
 buildingOptionsFile=TagList("namespace","core_game_mechanics_and_ai_base")
 mainMenu=TagList("id", name_mainMenuEvent)
 mainMenu.add("is_triggered_only", "yes")
-mainMenu.add("custom_gui","enclave_trader_window").add("diplomatic","yes").add("force_open", "yes") 
+mainMenu.add("custom_gui","enclave_trader_window").add("diplomatic","yes").add("force_open", "no") 
 
 mainMenu.add("name", eventNames.format("main_event.name"))
 mainMenu.add("desc", eventNames.format("main_event.desc"))
@@ -86,7 +86,7 @@ buildingOptionsFile.add("country_event", mainMenu)
 for catI,cat in enumerate(cats):
   mainSubMenu=TagList("id", eventNameSpace.format(id_subMainMenuEvent+catI))
   mainSubMenu.add("is_triggered_only", "yes")
-  mainSubMenu.add("custom_gui","enclave_trader_window").add("diplomatic","yes").add("force_open", "yes")
+  mainSubMenu.add("custom_gui","enclave_trader_window").add("diplomatic","yes").add("force_open", "no")
   mainSubMenu.add("name", eventNames.format(cat+"_event.name"))
   mainSubMenu.add("desc", eventNames.format(cat+"_event.desc"))
   locList.append(eventNames.format(cat+"_event.name"), "Change @{}".format(cat))
@@ -100,7 +100,7 @@ for catI,cat in enumerate(cats):
   for bonusI,bonus,bonusName in zip(range(len(bonuses)),bonuses, bonusNames):
     bonusMenu=TagList("id", eventNameSpace.format(id_Change[catI]+bonusI))
     bonusMenu.add("is_triggered_only", "yes")
-    bonusMenu.add("custom_gui","enclave_trader_window").add("diplomatic","yes").add("force_open", "yes")
+    bonusMenu.add("custom_gui","enclave_trader_window").add("diplomatic","yes").add("force_open", "no")
     bonusMenu.add("name", eventNames.format("{}_{}_event.name".format(cat, bonusName)))
     bonusMenu.add("desc", eventNames.format("{}_{}_event.desc".format(cat, bonusName)))
     locList.append(eventNames.format("{}_{}_event.name".format(cat, bonusName)), "Change @{}".format(bonusName))
@@ -110,12 +110,15 @@ for catI,cat in enumerate(cats):
     buildingOptionsFile.add("country_event", bonusMenu)
     mainSubMenu.add("option", TagList("name", eventNames.format("{}_{}_event.name".format(cat, bonusName))).add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_Change[catI]+bonusI)))))
     for changeStep in changeSteps:
-      bonusMenu.add("option", TagList("name", eventNames.format("change_"+str(changeStep).replace("-", "neg"))).add("custom_gui","cgm_option"))
+      bonusMenu.add("option", TagList("name", eventNames.format("change_"+str(changeStep).replace("-", "neg"))).add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_Change[catI]+bonusI)))))
       if catI==0 and bonusI==0:
-        locList.append("change_"+str(changeStep).replace("-", "neg"), "Change by {}%".format(changeStep))
+        locList.append(eventNames.format("change_"+str(changeStep).replace("-", "neg")), "Change by {}%".format(changeStep))
     bonusMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_subMainMenuEvent+catI)))))
+    bonusMenu.add("option", TagList("name", "close").add("custom_gui","cgm_option"))
   mainSubMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",name_mainMenuEvent))))
+  mainSubMenu.add("option", TagList("name", "close").add("custom_gui","cgm_option"))
 mainMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",1))))
+mainMenu.add("option", TagList("name", "close").add("custom_gui","cgm_option"))
 
 
 # buildingOptionsFile.printAll()
