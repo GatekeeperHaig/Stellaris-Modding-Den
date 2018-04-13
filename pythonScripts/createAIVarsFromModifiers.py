@@ -156,6 +156,21 @@ def main(args,*unused):
       for fun, outSubTag in zip(funsToApply, outSubTagLists):
         fun(outSubTag, name, val,args)
 
+  if not args.no_traits:
+    check_traits=outTagList[0]
+    for i in reversed(range(2)):
+      ifTag=check_traits.getN_th("if", i)
+      if len(ifTag)<2:
+        check_traits.removeIndex(check_traits.n_thIndex("if", i))
+  for name in outTagList.names:
+    if name[-10:]=="_adjacency":
+  # for adj in ["check_adjacency","check_blocker_adjacency"]:
+      adjTag=outTagList.get(name)
+      if len(adjTag.get("every_neighboring_tile"))==0:
+        adjTag.remove("every_neighboring_tile")
+  for name,val in outTagList.getNameVal():
+    if len(val)==0:
+      outTagList.remove(name)
   #todo: delete empty!
 
   if not args.test_run:

@@ -10,7 +10,8 @@ class LocList:
   def __init__(self, translateRest=False):
     self.languages=["braz_por","english","french","german","polish","russian","spanish"]
     self.languageCodes=["pt","en","fr", "de","pl","ru", "es"]
-    self.entries=[]
+    # self.entries=[]
+    self.entries=dict()
     self.dicts=dict()
     self.translateRest=translateRest
     for languageCode in self.languageCodes:
@@ -22,13 +23,16 @@ class LocList:
         d[id]=loc
     else:
       self.dicts[language][id]=loc
-  def addEntry(self, gameLocId, string):
-    # if not isinstance(stringOrList,str):
-      self.entries.append([gameLocId, string])
-    # else:
-      # self.entries.append([gameLocId, [stringOrList]])
-  def append(self, gameLocId, string):
-    self.addEntry(gameLocId,string)
+    return id
+  def addEntry(self, gameLocId, string, complainOnOverwrite=False):
+    if complainOnOverwrite:
+      if gameLocId in self.entries:
+        print("Warning: Overwriting loc entry!")
+    self.entries[gameLocId]=string
+    # self.entries.append([gameLocId, string])
+    return gameLocId
+  def append(self, gameLocId, string, complainOnOverwrite=False):
+    return self.addEntry(gameLocId,string,complainOnOverwrite)
   def write(self,fileName, language, yml=True):
     if len(language)==2:
       languageCode=language
@@ -51,12 +55,11 @@ class LocList:
       if yml:
         file.write(u'\ufeff')
         file.write("l_"+language+':\n')
-      for entry in self.entries:
+      for key,entry in self.entries.items():
         if yml:
-          file.write(" "+entry[0]+':0 "')
-        # for loc in entry[1]:
+          file.write(" "+key+':0 "')
         awaitingVar=False
-        for loc in re.split("(@| |\.|,|:|§|\)|\\n)",entry[1]):
+        for loc in re.split("(@| |\.|,|:|§|\)|\\n)",entry):
           if loc=="":
             continue
           if loc[0]=="@":
@@ -67,7 +70,7 @@ class LocList:
               file.write(localDict[loc])
               awaitingVar=False
             except:
-              print(entry[1])
+              print(entry)
               print(loc)
               raise
           else:
