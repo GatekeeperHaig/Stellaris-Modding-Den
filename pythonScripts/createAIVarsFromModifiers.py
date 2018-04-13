@@ -211,7 +211,7 @@ def addStaticModifiers(outTags, name, val, args):
       print("Unassigned:"+name)
 
 def addBuildings(outTags, name, val, args):
-  if name[:8]!="building":
+  if (not args.no_traits or not args.no_blocker or not args.no_modifiers) and name[:8]!="building":
     if args.debug:
       print("Not used for building: "+name)
     return
