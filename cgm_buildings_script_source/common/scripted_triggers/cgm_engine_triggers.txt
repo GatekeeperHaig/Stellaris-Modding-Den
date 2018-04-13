@@ -1,16 +1,19 @@
 ### Flag Triggers
 
+#CGM buildings internal flags
+
 overhauled_building_stats_enabled = { has_global_flag = overhauled_building_stats_active }
 vanilla_building_content_enabled = { has_global_flag = vanilla_building_content_active } 
 new_building_content_enabled = { has_global_flag = new_building_content_active } 
 
-food_buildings_limitation = { from.owner = { has_country_flag = food_delimited } }
-empire_unique_prerequisite = {
-	from.owner = { 
-		minerals > 1500
-		influence > 300
-	}
-}	
+#Other mods' global flags
+
+alphamod_enabled = { has_global_flag = gf_alphamod_activated }
+gpm_enabled = { has_global_flag = guillis_planet_modifiers_active }
+planets_enhanced_enabled = { has_global_flag = planets_enhanced_active }
+stellar_expedition_enabled = { has_global_flag = has_stellar_expedition_mod }
+eutab_enabled = { has_global_flag = eutab_active }
+planetary_diversity_enabled = { has_global_flag = planetary_diversity_active }
 
 ### Building Allow Effects
 
@@ -399,12 +402,10 @@ is_artificial = {
 	OR = {
 		is_ringworld = yes
 		is_planet_class = pc_habitat			
-		is_planet_class = pc_machine
-		is_planet_class = pc_gaia
-		#AND = {
-		#	planets_enhanced_enabled = yes
-		#	is_class_pc_cybertronic = yes
-		#}			
+		AND = {
+			planets_enhanced_enabled = yes
+			is_class_pc_cybertronic = yes
+		}			
 	}
 }	
 is_special = {
@@ -416,6 +417,18 @@ is_special = {
 		is_planet_class = pc_nuked		
 	}	
 }	
+is_fallen_empire_planet = {
+	owner = {
+		OR = {
+			is_country_type = fallen_empire
+			is_country_type = awakened_fallen_empire
+		}
+	}
+}	
+
+is_primitive_planet = {
+	owner = { is_country_type = primitive }
+}
 # with planet scope
 planet_in_sector = { planet = { sector_controlled = yes } }
 planet_is_habitat = { planet = { is_planet_class = pc_habitat } }
@@ -429,12 +442,10 @@ planet_is_artificial = {
 	planet = {
 		OR = {
 			is_planet_class = pc_habitat			
-			is_planet_class = pc_machine
-			is_planet_class = pc_gaia
-			#AND = {
-			#	planets_enhanced_enabled = yes
-			#	is_planet_class_pc_cybertronic = yes
-			#}	
+			AND = {
+				planets_enhanced_enabled = yes
+				is_planet_class_pc_cybertronic = yes
+			}	
 			is_ringworld = yes
 		}
 	}	
@@ -450,6 +461,20 @@ planet_is_special = {
 		}
 	}	
 }	
+planet_is_fallen_empire_planet = {
+	planet = {
+		owner = {
+			OR = {
+				is_country_type = fallen_empire
+				is_country_type = awakened_fallen_empire
+			}
+		}
+	}
+}	
+
+planet_is_primitive_planet = {
+	planet = { owner = { is_country_type = primitive } }
+}
 
 ### Solar System Checks
 
@@ -466,11 +491,22 @@ has_black_hole_or_dyson_sphere = {
 	}
 }
 
+### limit and prerequisite conditions - meant to be used in AI allow effects
+
+food_buildings_limitation = { from.owner = { has_country_flag = food_delimited } }
+empire_unique_prerequisite = {
+	from.owner = { 
+		minerals > 1500
+		influence > 300
+	}
+}
+
 ### Resource Triggers
 #ai_allow scopes to trigger by default
 
 planet_has_betharian = { planet = { any_tile = { has_resource = { type = sr_betharian amount > 0 } } } }	
 planet_has_alien_pets = { planet = { any_tile = { has_resource = { type = sr_alien_pets amount > 0 } } } }
+planet_has_megastructure_node = { planet = { any_tile = { has_resource = { type = sr_megastructure_node amount > 0 } } } }
 
 ### Building Triggers
 
@@ -519,10 +555,23 @@ has_any_tile_strategic_resource = {
 	OR = {
 		has_resource = { type = sr_betharian amount > 0	}
 		has_resource = { type = sr_alien_pets amount > 0 }	
+		has_resource = { type = sr_megastructure_node amount > 0 }
 		AND = {
-			has_global_flag = ex_planets_enhanced_active
+			planets_enhanced_enabled = yes
 			has_planets_enhanced_planetary_strategic_resources = yes
+		}		
+		AND = {
+			alphamod_enabled = yes
+			has_alphamod_planetary_strategic_resources = yes
+		}	
+		AND = {
+			stellar_expedition_enabled = yes
+			has_stellar_expedition_planetary_strategic_resources = yes
 		}			
+		AND = {
+			planetary_diversity_enabled = yes
+			has_planetary_diversity_planetary_strategic_resources = yes
+		}					
 	}
 }
 
@@ -553,55 +602,3 @@ has_ai_null_deposit = {
 		has_deposit = physics_research_building_tile
 	}
 }
-
-### Building Triggers
-
-has_adjcancy_bonus_building = {
-	OR = {
-		has_capital_1 = yes
-		has_capital_2 = yes
-		has_capital_3 = yes
-		AND = {
-			alphamod_enabled = yes
-			has_am_adj_bonus_buildings = yes
-		}
-		AND = {
-			planets_enhanced_enabled = yes
-			has_pe_adj_bonus_blocker = yes
-		}			
-	}
-}
-	
-has_adjcancy_bonus_blocker = { 
-	OR = {
-		has_blocker = tb_tribal_settlement
-		has_blocker = tb_wandering_forest_reserve
-		AND = {
-			guillis_planet_modifiers_enabled = yes
-			has_gpm_adj_bonus_blocker = yes
-		}
-		AND = {
-			alphamod_enabled = yes
-			has_am_adj_bonus_blocker = yes
-		}
-		AND = {
-			planets_enhanced_enabled = yes
-			has_pe_adj_bonus_blocker = yes
-		}	
-	}
-}	
-
-has_special_resource_deposit = {
-	OR = {
-		has_deposit = d_betharian_deposit
-		has_deposit = d_alien_pets_deposit
-		AND = {
-			alphamod_enabled = yes
-			has_am_special_resource_deposit = yes
-		}
-		AND = {
-			planets_enhanced_enabled = yes
-			has_pe_special_resource_deposit = yes
-		}			
-	}
-}	
