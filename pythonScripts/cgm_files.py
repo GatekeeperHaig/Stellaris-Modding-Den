@@ -91,7 +91,7 @@ def main():
 
   mainMenu.add("name", locList.append(eventNames.format("main_event.name"), "Advanced Building Configuration"))
   mainMenu.add("desc", locList.append(eventNames.format("main_event.desc"), "Here you can change global costs and build speed of building groups (or all buildings)"))
-  mainMenu.add("picture_event_data", TagList("room","cgm_menu_room"))
+  mainMenu.add("picture_event_data", TagList("room","cgm_advanced_configuration_option"))
   buildingOptionsFile.addComment("main menu")
   buildingOptionsFile.add("country_event", mainMenu)
   for catI,cat in enumerate(cats):
@@ -100,7 +100,7 @@ def main():
     mainSubMenu.add("custom_gui","enclave_trader_window").add("diplomatic","yes").add("force_open", "no")
     mainSubMenu.add("name", locList.append(eventNames.format(cat+"_event.name"), "Change @{}".format(cat)))
     mainSubMenu.add("desc", locList.append(eventNames.format(cat+"_event.desc"), "Here you can change global @{} of building groups (or all buildings)".format(cat)))
-    mainSubMenu.add("picture_event_data", TagList("room","cgm_menu_room"))
+    mainSubMenu.add("picture_event_data", TagList("room","cgm_advanced_configuration_option"))
     buildingOptionsFile.addComment(cat)
     buildingOptionsFile.add("country_event", mainSubMenu)
     mainMenu.add("option", TagList("name", eventNames.format(cat+"_event.name")).add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_subMainMenuEvent+catI)))))
@@ -112,7 +112,7 @@ def main():
       bonusMenu.add("custom_gui","enclave_trader_window").add("diplomatic","yes").add("force_open", "no")
       bonusMenu.add("name", locList.append(eventNames.format("{}_{}_event.name".format(cat, bonusName)), "Change @{}".format(bonusName)))
       bonusMenu.add("desc", locList.append(eventNames.format("{}_{}_event.desc".format(cat, bonusName)), "Here you can change global @{} of @{}".format(cat,bonusName)))
-      bonusMenu.add("picture_event_data", TagList("room","cgm_menu_room"))
+      bonusMenu.add("picture_event_data", TagList("room","cgm_advanced_configuration_option"))
       buildingOptionsFile.addComment(bonusName+" "+cat)
       buildingOptionsFile.add("country_event", bonusMenu)
       mainSubMenu.add("option", TagList("name", eventNames.format("{}_{}_event.name".format(cat, bonusName))).add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_Change[catI]+bonusI)))))
