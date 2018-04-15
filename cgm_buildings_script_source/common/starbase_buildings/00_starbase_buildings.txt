@@ -14,12 +14,20 @@ hydroponics_bay = {
 	construction_days = 180
 	cost = { minerals = 100 }
 	potential = {
-		exists = owner
-		owner = {
-			NOT = { has_authority = auth_machine_intelligence }
-		}
+		owner_is_machine_empire = no
+		if = {
+			limit = { overhauled_building_stats_enabled = yes }
+			requires_colonized_planet = yes
+		}	
 	}
 	produced_resources = { food = 3 }
+	produced_resource_trigger = {
+		modifier = {
+			hidden_trigger = { exists = this }
+			overhauled_building_stats_enabled = yes
+			resources = { food = 3 }
+		}
+	}	
 	upkeep_resources = { energy = 1 }
 	ai_build_at_chokepoint = no
 	ai_build_outside_chokepoint = yes
@@ -42,11 +50,8 @@ nebula_refinery = {
 		owner = { has_technology = tech_mineral_processing_1 }
 	}
 	possible = {
-		custom_tooltip = { fail_text = "requires_starport" has_starbase_size >= starbase_starport }
-		custom_tooltip = {
-			fail_text = "requires_nebula"
-			star = { is_inside_nebula = yes }
-		}
+		requires_starport = yes
+		requires_nebula = yes
 	}
 	cost = { minerals = 200 }
 	produced_resources = { minerals = 5 }
@@ -76,13 +81,10 @@ offworld_trading_company = {
 	construction_days = 360
 	potential = {
 		exists = owner
-		owner = {
-			has_technology = tech_space_trading
-			#NOT = { has_ethic = ethic_gestalt_consciousness }
-		}
+		owner = { has_technology = tech_space_trading }
 	}
 	possible = {
-		custom_tooltip = { fail_text = "requires_starport" has_starbase_size >= starbase_starport }
+		requires_starport = yes
 		has_starbase_module = trading_hub
 	}
 	cost = { minerals = 200 }
@@ -150,7 +152,7 @@ titan_yards = {
 		owner = { has_technology = tech_titans }
 	}
 	possible = {
-		custom_tooltip = { fail_text = "requires_citadel" has_starbase_size >= starbase_citadel }
+		requires_citadel = yes
 		has_starbase_module = shipyard
 	}
 	cost = { minerals = 1000 }
@@ -174,7 +176,7 @@ colossus_yards = {
 		owner = { has_technology = tech_colossus }
 	}
 	possible = {
-		custom_tooltip = { fail_text = "requires_citadel" has_starbase_size >= starbase_citadel }
+		requires_citadel = yes
 		has_starbase_module = shipyard
 	}
 	cost = { minerals = 2000 }
@@ -199,11 +201,8 @@ black_hole_observatory = {
 		owner = { has_technology = tech_sensors_3 }
 	}
 	possible = {
-		custom_tooltip = { fail_text = "requires_starport" has_starbase_size >= starbase_starport }
-		custom_tooltip = {
-			fail_text = "requires_black_hole"
-			star = { is_star_class = sc_black_hole }
-		}
+		requires_starport = yes
+		requires_black_hole = yes
 	}
 	cost = { minerals = 200 }
 	produced_resources = { physics_research = 10 }
@@ -218,7 +217,7 @@ target_uplink_computer = {
 	construction_days = 360
 	potential = { exists = owner }
 	possible = {
-		custom_tooltip = { fail_text = "requires_starport" has_starbase_size >= starbase_starport }
+		requires_starport = yes
 	}
 	cost = { minerals = 200 }
 	station_modifier = { ship_weapon_range_mult = 0.50 }
@@ -235,7 +234,7 @@ defense_grid = {
 		owner = { has_technology = tech_synchronized_defences }
 	}
 	possible = {
-		custom_tooltip = { fail_text = "requires_starport" has_starbase_size >= starbase_starport }
+		requires_starport = yes
 	}
 	cost = { minerals = 300 }
 	station_modifier = { starbase_defense_platform_capacity_add = 8 }
@@ -252,17 +251,12 @@ deep_space_black_site = {
 		exists = owner
 		owner = {
 			has_technology = tech_living_state
-			NOT = { has_ethic = ethic_gestalt_consciousness }
+			is_gestalt_consciousness = no
 		}
 	}
 	possible = {
-		custom_tooltip = { fail_text = "requires_starport" has_starbase_size >= starbase_starport }
-		custom_tooltip = {
-			fail_text = "requires_colonized_planet"
-			solar_system = {
-				any_planet = { is_owned_by = from }
-			}
-		}
+		requires_starport = yes
+		requires_colonized_planet = yes
 	}
 	cost = { minerals = 200 }
 	produced_resources = { unity = 1 }
@@ -278,36 +272,16 @@ curator_think_tank = {
 	construction_days = 360
 	potential = {
 		exists = owner
+		owner = { is_exterminator = no }
 		OR = {
 			owner = { has_country_flag = curator_intro }
 			solar_system = { has_star_flag = enclave }
 		}
-		owner = {
-			NOR = { has_valid_civic = civic_fanatic_purifiers has_valid_civic = civic_hive_devouring_swarm has_valid_civic = civic_machine_terminator }
-		}
 	}
 	possible = {
-		custom_tooltip = { fail_text = "requires_starport" has_starbase_size >= starbase_starport }
-		custom_tooltip = {
-			fail_text = "requires_curator"
-			solar_system = {
-				has_star_flag = enclave
-				any_ship_in_system = {
-					exists = owner
-					owner = { has_country_flag = curator_enclave_country }
-				}
-			}
-		}
-		custom_tooltip = {
-			fail_text = "requires_curator_agreement"
-			solar_system = {
-				has_star_flag = enclave
-				any_ship_in_system = {
-					exists = owner
-					owner = { has_country_flag = curator_enclave_country has_country_flag = think_tank@root.owner }
-				}
-			}
-		}
+		requires_starport = yes
+		requires_curator = yes
+		requires_curator_agreement = yes
 	}
 	cost = { minerals = 200 }
 	produced_resources = { physics_research = 5 society_research = 5 engineering_research = 5 }
@@ -319,38 +293,18 @@ curator_think_tank = {
 art_college = {
 	icon = "GFX_starbase_artist_college"
 	construction_days = 360
-	potential = {
+	potential = {		
 		exists = owner
-		OR = {
-			owner = { has_country_flag = enclave_artist_encountered }
+		owner = { is_exterminator = no }
+		OR = {			
 			solar_system = { has_star_flag = enclave }
-		}
-		owner = {
-			NOR = { has_valid_civic = civic_fanatic_purifiers has_valid_civic = civic_hive_devouring_swarm has_valid_civic = civic_machine_terminator }
-		}
+			owner = { has_country_flag = enclave_artist_encountered }			
+		}		
 	}
 	possible = {
-		custom_tooltip = { fail_text = "requires_starport" has_starbase_size >= starbase_starport }
-		custom_tooltip = {
-			fail_text = "requires_artisans"
-			solar_system = {
-				has_star_flag = enclave
-				any_ship_in_system = {
-					exists = owner
-					owner = { is_same_value = event_target:artist_enclave_country }
-				}
-			}
-		}
-		custom_tooltip = {
-			fail_text = "requires_artist_agreement"
-			solar_system = {
-				has_star_flag = enclave
-				any_ship_in_system = {
-					exists = owner
-					owner = { is_same_value = event_target:artist_enclave_country has_country_flag = art_college@root.owner }
-				}
-			}
-		}
+		requires_starport = yes		
+		requires_artisans = yes
+		requires_artist_agreement = yes
 	}
 	cost = { minerals = 200 }
 	produced_resources = { unity = 10 }
@@ -359,14 +313,14 @@ art_college = {
 	ai_build_outside_chokepoint = yes
 	ai_weight = { weight = 150 }
 }
-#####
+
 # Aura buildings
-#####
+
 communications_jammer = {
 	icon = "GFX_starbase_communication_jammer"
 	construction_days = 180
 	possible = {
-		custom_tooltip = { fail_text = "requires_starport" has_starbase_size >= starbase_starport }
+		requires_starport = yes
 	}
 	cost = { minerals = 100 }
 	upkeep_resources = { energy = 1 }
@@ -379,7 +333,7 @@ disruption_field = {
 	icon = "GFX_spaceport_module_orbital_mind_control_lazer"
 	construction_days = 180
 	possible = {
-		custom_tooltip = { fail_text = "requires_starport" has_starbase_size >= starbase_starport }
+		requires_starport = yes
 	}
 	cost = { minerals = 200 }
 	upkeep_resources = { energy = 2 }
@@ -396,7 +350,7 @@ warp_fluctuator = {
 		owner = { has_technology = tech_hyper_drive_2 }
 	}
 	possible = {
-		custom_tooltip = { fail_text = "requires_starport" has_starbase_size >= starbase_starport }
+		requires_starport = yes
 	}
 	cost = { minerals = 200 }
 	upkeep_resources = { energy = 2 }
@@ -414,7 +368,7 @@ command_center = {
 		owner = { has_technology = tech_command_matrix }
 	}
 	possible = {
-		custom_tooltip = { fail_text = "requires_starfortress" has_starbase_size >= starbase_starfortress }
+		requires_starfortress = yes
 	}
 	cost = { minerals = 500 }
 	upkeep_resources = { energy = 5 }
@@ -424,44 +378,3 @@ command_center = {
 	ai_build_outside_chokepoint = no
 	ai_weight = { weight = 10 }
 }
-#offworld_trading_company_gestalt = {
-#	icon = "GFX_starbase_offworld_trading_company"
-#	construction_days = 360
-#
-#	potential = {
-#		exists = owner
-#		owner = {
-#			has_technology = tech_space_trading
-#			has_ethic = ethic_gestalt_consciousness
-#		}
-#	}
-#
-#	possible = {
-#		custom_tooltip = {
-#			fail_text = "requires_starport"
-#			has_starbase_size >= starbase_starport
-#		}
-#		has_starbase_module = trading_hub_gestalt
-#	}
-#
-#	cost = {
-#		minerals = 200
-#	}
-#
-#	custom_tooltip = sm_offworld_trading_company_gestalt_desc_modifier
-#	show_in_tech = "tech_space_trading"
-#	#show_tech_unlock_if = { has_ethic = auth_machine_intelligence }
-#
-#	ai_build_at_chokepoint = no
-#	ai_build_outside_chokepoint = yes
-#	ai_weight = {
-#		weight = 200
-#		modifier = {
-#			factor = 0
-#			count_starbase_modules = {
-#				type = trading_hub
-#				count < 3
-#			}
-#		}
-#	}
-#}
