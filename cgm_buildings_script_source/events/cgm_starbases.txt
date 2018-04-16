@@ -1,0 +1,84 @@
+namespace = cgm_starbase
+
+event = { #this event is fires on game start and on a monthly pulse. 
+	id = cgm_starbase.1
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {	
+		every_country = {
+			limit = {
+				is_country_type = default
+				is_country_type = awakened_fallen_empire
+			}		
+			if = { 
+				limit = { used_naval_capacity_percent > 0.5 }
+				if = { 
+					limit = { 
+						used_naval_capacity_percent > 0.5
+						used_naval_capacity_percent < 0.75
+					}	
+					set_timed_country_flag = { flag = nav_cap_focus_1 days = 359 }
+				}	
+				if = { 
+					limit = { 
+						used_naval_capacity_percent > 0.75
+						used_naval_capacity_percent < 1
+					}	
+					set_timed_country_flag = { flag = nav_cap_focus_2 days = 359 }
+				}				
+				if = { 
+					limit = { 
+						used_naval_capacity_percent > 0.99
+					}	
+					set_timed_country_flag = { flag = nav_cap_focus_3 days = 359 }
+				}								
+			}	
+			calculate_number_of_required_shipyard_starbases = yes #see the cgm_country_scope_effects.txt in common/scripted_effects.
+			every_owned_starbase = {
+				solar_system = {
+					if = { 
+						limit = { 
+							exists = sector
+							sector = { is_core_sector = no }
+						}
+						if = { 
+							limit = { has_star_flag = core_sector_starbase_system }
+							remove_star_flag = core_sector_starbase_system
+						}					
+						set_star_flag = sector_controlled_starbase_system
+						else = {
+							if = { 
+								limit = { has_star_flag = sector_controlled_starbase_system }
+								remove_star_flag = sector_controlled_starbase_system
+							}					
+							set_star_flag = core_sector_starbase_system
+						}
+					}	
+					if = { 
+						limit = { 
+							any_planet = { 
+								is_owned_by = root
+							}		
+							set_star_flag = colonized_system						
+							if = { 
+								limit = { any_planet = { is_capital = yes } }
+								if = { 
+									limit = { NOT = { has_star_flag = capital_system } }
+									set_star_flag = capital_system
+								}	
+								else = { 							
+									if = { 
+										limit = { has_star_flag = capital_system }
+										remove_star_flag = capital_system										
+									}
+								}								
+							}							
+						}					
+					}						
+				}
+			}
+		}
+	}
+}
+						
