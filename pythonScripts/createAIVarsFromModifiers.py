@@ -20,6 +20,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('--no_buildings', action="store_true", help="Does NOT search for buildings in given files (for adjacency and planet bonuses)")
   parser.add_argument('--no_modifiers', action="store_true", help="Does NOT search for any static modifiers in given files. Supported at the time I write this: Pop and Planet modifier")
   parser.add_argument('--no_blocker', action="store_true", help="Does NOT search for adjacency bonus blockers in given files")
+  parser.add_argument('--multiple_bonus_buildings', action="store_true", help="Check number of planet wide bonus buildings, rather than checking whether at least one exists on a planet.")
   # parser.add_argument('--traits', default=True, help="")
   if returnParser:
     return parser
@@ -131,7 +132,11 @@ def main(args,*unused):
   if not args.no_buildings:
     outSubTags=[]
     effect=TagList()
-    outTagList.add(args.effect_name+"_buildings", effect)
+    if args.multiple_bonus_buildings:
+      outTagList.add(args.effect_name+"_buildings",TagList("every_tile",effect))
+    else:
+      outTagList.add(args.effect_name+"_buildings",effect)
+
     outSubTags.append(effect)
     effect=TagList()
     ent=TagList()
@@ -139,7 +144,10 @@ def main(args,*unused):
     effect.add("every_neighboring_tile", ent)
     outSubTags.append(ent)
     effect=TagList()
-    outTagList.add(args.effect_name+"_buildings_triggered", effect)
+    if args.multiple_bonus_buildings:
+      outTagList.add(args.effect_name+"_buildings_triggered",TagList("every_tile",effect))
+    else:
+      outTagList.add(args.effect_name+"_buildings_triggered", effect)
     outSubTags.append(effect)
     outSubTagLists.append(outSubTags)
     funsToApply.append(addBuildings)
@@ -159,7 +167,7 @@ def main(args,*unused):
       for fun, outSubTag in zip(funsToApply, outSubTagLists):
         fun(outSubTag, name, val,args)
 
-  #delete empty
+  #delete empty: Todo: make more general: Recursivly remove emptry "if"?
   if not args.no_traits:
     check_traits=outTagList.get(args.effect_name+"_trait")
     for i in reversed(range(2)):
@@ -242,14 +250,20 @@ def addBuildings(outTags, name, val, args):
       print("Not used for building: "+name)
     return
   if "planet_modifier" in val.names:
-    prev=TagList()
-    ifLoc=TagList("limit", TagList("has_building", name)).add("prev", prev)
-    addFinalModifier(val.get("planet_modifier"), prev, "_planet_base")
-    elseTagList=TagList()
-    ifLoc.add("else", elseTagList)
-    if len(prev)>0:
-      outTags[0].add("if", ifLoc)
-      outTags[0]=elseTagList
+    if args.multiple_bonus_buildings:
+      prev=TagList()
+      ifLoc=TagList("limit", TagList("has_building", name)).add("prev", prev)
+      addFinalModifier(val.get("planet_modifier"), prev, "_planet_building")
+      elseTagList=TagList()
+      ifLoc.add("else", elseTagList)
+      if len(prev)>0:
+        outTags[0].add("if", ifLoc)
+        outTags[0]=elseTagList
+    else:
+      ifLoc=TagList("limit", TagList("has_building", name))
+      addFinalModifier(val.get("planet_modifier"), ifLoc, "_planet_building")
+      if len(ifLoc)>1:
+        outTags[0].add("if", ifLoc)
   if "adjacency_bonus" in val.names:
     prev=TagList()
     ifLoc=TagList("limit", TagList("has_building", name)).add("prevprev", prev)
@@ -263,19 +277,20 @@ def addBuildings(outTags, name, val, args):
   if triggeredNum>0:
     # print(val)
     for i in range(triggeredNum):
-      prev=TagList()
-      ifLoc=TagList("limit", TagList("has_building", name)).add("prev", prev)
+
+      if args.multiple_bonus_buildings:
+        addHere=TagList()
+        ifLoc=TagList("limit", TagList("has_building", name)).add("prev", addHere)
+      else:
+        ifLoc=TagList("limit", TagList("has_building", name))
+        addHere=ifLoc
 
       tpm=val.getN_th("triggered_planet_modifier",i)
-      prev.add("if", TagList("limit", tpm.get("potential")))
-      # finalModifiers=TagList()
-      # prev.add(finalModifiers)
-      # print(val.getN_th("triggered_planet_modifier",i))
-      addFinalModifier(tpm.get("modifier"), prev, "_planet_base")
-      # print(prev)
-      if len(prev)>1:
+      addHere.add("if", TagList("limit", tpm.get("potential")))
+      addFinalModifier(tpm.get("modifier"), addHere, "_planet_bulding")
+      if len(addHere)>1:
         outTags[2].add("if", ifLoc)
-    if outTags[2].count("if")>0:
+    if args.multiple_bonus_buildings and outTags[2].count("if")>0:
       elseTagList=TagList()
       ifLoc.add("else", elseTagList)
       outTags[2]=elseTagList
