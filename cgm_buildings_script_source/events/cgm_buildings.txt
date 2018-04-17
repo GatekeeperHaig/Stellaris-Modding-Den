@@ -89,10 +89,10 @@ event = { #this event is fires on game start and on a monthly pulse.
 							limit = { NOT = { has_planet_flag = multipliers_updated } }
 							set_timed_planet_flag = { flag = multipliers_updated days = 1 }
 						}	
-						else = { 											
+						else = { #the check below is a failsafe, since there is no way to check if amount of modifiers has been changed 											
 							if = { 
 								limit = { 
-									num_modifiers > 0 #the check below is a failsafe, since there is no way to check if amount of modifiers has been changed
+									num_modifiers > 0 
 									NOR = {
 										AND = {
 											num_modifiers = 1
@@ -133,7 +133,31 @@ event = { #this event is fires on game start and on a monthly pulse.
 										AND = {
 											num_modifiers = 10
 											check_variable = { which = pm_num value = 10 }
-										}						
+										}	
+										AND = {
+											num_modifiers = 11
+											check_variable = { which = pm_num value = 11 }
+										}	
+										AND = {
+											num_modifiers = 12
+											check_variable = { which = pm_num value = 12 }
+										}	
+										AND = {
+											num_modifiers = 13
+											check_variable = { which = pm_num value = 13 }
+										}	
+										AND = {
+											num_modifiers = 14
+											check_variable = { which = pm_num value = 14 }
+										}	
+										AND = {
+											num_modifiers = 15
+											check_variable = { which = pm_num value = 15 }
+										}											
+										AND = {
+											num_modifiers > 15
+											check_variable = { which = pm_num value = 15 }
+										}																					
 									}
 								}					
 								switch = {
@@ -148,6 +172,12 @@ event = { #this event is fires on game start and on a monthly pulse.
 									8 = { set_variable = { which = pm_num value = 8 } }
 									9 = { set_variable = { which = pm_num value = 9 } }
 									10 = { set_variable = { which = pm_num value = 10 } }
+									11 = { set_variable = { which = pm_num value = 11 } }
+									12 = { set_variable = { which = pm_num value = 12 } }
+									13 = { set_variable = { which = pm_num value = 13 } }
+									14 = { set_variable = { which = pm_num value = 14 } }
+									15 = { set_variable = { which = pm_num value = 15 } }
+									15 < { set_variable = { which = pm_num value = 15 } }
 								}	
 								set_variable = { which = energy_mult_planet_base value = 1 }
 								set_variable = { which = minerals_mult_planet_base value = 1 }
@@ -156,7 +186,7 @@ event = { #this event is fires on game start and on a monthly pulse.
 								set_variable = { which = society_research_mult_planet_base value = 1 }
 								set_variable = { which = physics_research_mult_planet_base value = 1 }
 								set_variable = { which = engineering_research_mult_planet_base value = 1 }							
-								check_planet_modifiers = yes	
+								check_vanilla_planet_modifiers = yes	
 								if = {
 									limit = { planets_enhanced_enabled = yes }
 									check_planet_modifiers_pe = yes
@@ -231,12 +261,13 @@ event = { #this event is fires on game start and on a monthly pulse.
 								OR = {
 									is_being_purged = no
 									has_purge_type = { type = purge_displacement }
+									has_purge_type = { type = purge_labor_camps }
 								}	
 								OR = {
 									is_sapient = yes
 									is_robot_pop = yes
 								}	
-								NOT = { has_pop_flag = pop_checked }
+								NOT = { has_pop_flag = pop_checked }								
 							}								
 						}							
 					}
@@ -253,6 +284,7 @@ event = { #this event is fires on game start and on a monthly pulse.
 							OR = {
 								is_being_purged = no
 								has_purge_type = { type = purge_displacement }
+								has_purge_type = { type = purge_labor_camps }
 							}
 							OR = {
 								is_sapient = yes
@@ -279,7 +311,6 @@ event = { #this event is fires on game start and on a monthly pulse.
 							limit = {
 								NOT = { 
 									any_owned_pop = { 							
-										is_growing = no
 										is_being_purged = no
 									}
 								}	
