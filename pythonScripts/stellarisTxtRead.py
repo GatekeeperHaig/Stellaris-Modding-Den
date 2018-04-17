@@ -385,7 +385,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       if i==len(self.vals):
         break
   def deleteOnLowestLevel(self, func, *argList):#,attributeList=[]):
-    print(self)
+    # print(self)
     for i in reversed(range(len(self))):
       if isinstance(self.vals[i], TagList):
         self.vals[i].deleteOnLowestLevel(func, *argList)
