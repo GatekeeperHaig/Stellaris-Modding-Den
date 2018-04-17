@@ -11,8 +11,7 @@ event = {
 	
 	immediate = {
 		every_system = {
-			random_system_planet = { 
-				limit = { is_star = yes } 
+			system_star = { 
 				set_variable = { which = num_of_hyperlane_connections value = 0 }
 				save_event_target_as = hyperlane_check_star
 				set_planet_flag = system_variable_repository
@@ -36,6 +35,7 @@ event = { #this event is fires on game start and on a monthly pulse.
 				is_country_type = default
 				is_country_type = awakened_fallen_empire
 			}		
+			country_event = { id = cgm_starbase.2 days = 1 random = 10 }
 			if = { 
 				limit = { used_naval_capacity_percent > 0.75 }
 				if = { 
@@ -118,42 +118,65 @@ event = { #this event is fires on game start and on a monthly pulse.
 			}	
 			every_owned_starbase = {			
 				solar_system = {
-					if = { 
-						limit = { 
-							OR = { 
-								has_star_flag = wormhole_or_gateway_system
-								AND = { 
-									NOT = {
-										any_planet = { 
-											OR = { 
-												is_planet_class = pc_pulsar
-												is_colonizable = yes
-												is_colony = yes
+					random_system_planet = {
+						limit = { has_planet_flag = system_variable_repository }
+						set_variable = { which = starbase_level value = 0 }
+						save_event_target_as = starbase_system_star
+					}	
+					if = {
+						limit = { prev = { has_starbase_size = starbase_outpost } }
+						event_target:starbase_system_star = { change_variable = { which = starbase_level value = 1 } }
+						else = { 					
+							if = {
+								limit = { prev = { has_starbase_size = starbase_starport } }
+								event_target:starbase_system_star = { change_variable = { which = starbase_level value = 2 } }
+								else = { 
+									if = {
+										limit = { prev = { has_starbase_size = starbase_starhold } }
+										event_target:starbase_system_star = { change_variable = { which = starbase_level value = 3 } }	
+										else = { 
+											if = {
+												limit = { prev = { has_starbase_size = starbase_starfortress } }
+												event_target:starbase_system_star = { change_variable = { which = starbase_level value = 4 } }	
+												else = { 
+													if = {
+														limit = { prev = { has_starbase_size = starbase_citadel } }
+														event_target:starbase_system_star = { change_variable = { which = starbase_level value = 5 } }									
+													}
+												}
 											}
 										}
-									}	
-									any_neighbor_system = { 
-										ignore_hyperlanes = no 
-										any_planet = { exists = owner owner = root }	
 									}
-									root = { 
-										any_system_within_border = { 						
-											NOR = { 
-												is_same_value = prevprev
-												distance = { source = prevprev min = 0 max = 25 type = hyperlane }
-												has_star_flag = shipyard_system
-											}
-										}
-									}										
-									prev = { count_starbase_modules = { type = shipyard count > 0 } }	
-								}								
-							}								
-						}	
-						check_shipyard_candidacy = yes
-					}													
-					assign_shipyard_system_flag = yes	
+								}	
+							}	
+						}
+					}	
+					set_shipyard_weight = yes																								
 				}	
-			}
+			}						
 		}
 	}
-}						
+}			
+event = { #this event is fires on game start and on a monthly pulse. 
+	id = cgm_starbase.1
+	hide_window = yes
+	is_triggered_only = yes
+every_owned_starbase = {			
+				if = { 
+					limit = { 
+						solar_system = { has_star_flag = shipyard_candidate_system }
+					random_system_planet = {
+						limit = { 
+							has_planet_flag = system_variable_repository
+							check_variable = { which = shipyard_weight value > 2 }
+						}				
+						if = { 
+							limit = { 
+								NOT = { 
+									any_system = { 
+									
+							
+							check_and_assign_shipyard_system_flag = yes
+					}
+				}		
+			}			
