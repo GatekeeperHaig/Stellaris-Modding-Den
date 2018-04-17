@@ -3,17 +3,22 @@
 # Shipyard
 stb_shipyard = {
 	potential = {
-		from = { 
-			check_variable = { which = required_shipyard_starbases value > 0 }
-		}
-		has_starbase_size >= starbase_starport
-		solar_system = { 
-			OR = {
-				has_star_flag = shipyard_candidate_system
-				has_star_flag = capital_system
-			}	
-		}
-		count_starbase_modules = { type = shipyard count > 0 }	
+		if = {
+			limit = { from = { is_ai = yes } }
+			from = { check_variable = { which = required_shipyard_starbases value > 0 } }
+			solar_system = { 
+				OR = {
+					has_star_flag = shipyard_system
+					has_star_flag = capital_system
+				}	
+			}
+			has_starbase_size >= starbase_starport
+			count_starbase_modules = { type = shipyard count > 0 }				
+			else = {
+				has_starbase_size >= starbase_starport
+				count_starbase_modules = { type = shipyard count > 0 }	
+			}
+		}	
 	}
 	weight_modifier = {
 		base = 100
@@ -44,7 +49,7 @@ stb_shipyard = {
 		buildings = {
 			crew_quarters = { base = 1.00 }
 			fleet_academy = { base = 1.00 }
-			titan_yards = { base = 0.1 }
+			titan_yards = { base = 0 }
 			colossus_yards = { base = 0.1 }
 		}
 		modules = {

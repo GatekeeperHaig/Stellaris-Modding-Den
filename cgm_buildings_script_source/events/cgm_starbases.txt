@@ -1,5 +1,30 @@
 namespace = cgm_starbase
 
+#this event is fires on game start and on a monthly pulse but only once.
+#it stores data regarding number of hyperlane connections in every system, so this number can be used later
+
+event = {  
+	id = cgm_starbase.0
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once
+	
+	immediate = {
+		every_system = {
+			random_system_planet = { 
+				limit = { is_star = yes } 
+				set_variable = { which = num_of_hyperlane_connections value = 0 }
+				save_event_target_as = hyperlane_check_star
+				set_planet_flag = system_variable_repository
+			}
+			every_neighboring_system = { 
+				ignore_hyperlanes = no 
+				event_target:hyperlane_check_star = { change_variable = num_of_hyperlane_connections value = 1 }
+			}				
+		}
+	}	
+}				
+
 event = { #this event is fires on game start and on a monthly pulse. 
 	id = cgm_starbase.1
 	hide_window = yes
@@ -12,73 +37,123 @@ event = { #this event is fires on game start and on a monthly pulse.
 				is_country_type = awakened_fallen_empire
 			}		
 			if = { 
-				limit = { used_naval_capacity_percent > 0.5 }
+				limit = { used_naval_capacity_percent > 0.75 }
 				if = { 
 					limit = { 
-						used_naval_capacity_percent > 0.5
-						used_naval_capacity_percent < 0.75
+						used_naval_capacity_percent > 0.74
+						used_naval_capacity_percent < 0.9
 					}	
 					set_timed_country_flag = { flag = nav_cap_focus_1 days = 359 }
 				}	
 				if = { 
 					limit = { 
-						used_naval_capacity_percent > 0.75
+						used_naval_capacity_percent > 0.89
 						used_naval_capacity_percent < 1
 					}	
 					set_timed_country_flag = { flag = nav_cap_focus_2 days = 359 }
 				}				
 				if = { 
 					limit = { 
-						used_naval_capacity_percent > 0.99
+						used_naval_capacity_percent > 1
 					}	
 					set_timed_country_flag = { flag = nav_cap_focus_3 days = 359 }
 				}								
 			}	
-			calculate_number_of_required_shipyard_starbases = yes #see the cgm_country_scope_effects.txt in common/scripted_effects.
-			every_owned_starbase = {
+			calculate_number_of_required_shipyard_starbases = yes #see the cgm_country_scope_effects.txt in common/scripted_effects.			
+			every_system_within_border = {
+				if = { 
+					limit = { 
+						exists = sector
+						sector = { is_core_sector = no }
+					}
+					if = { 
+						limit = { has_star_flag = core_sector_starbase_system }
+						remove_star_flag = core_sector_starbase_system
+					}					
+					set_star_flag = sector_controlled_starbase_system
+					else = {
+						if = { 
+							limit = { has_star_flag = sector_controlled_starbase_system }
+							remove_star_flag = sector_controlled_starbase_system
+						}					
+						set_star_flag = core_sector_starbase_system
+					}
+				}	
+				if = { 
+					limit = { 
+						any_planet = { 
+							is_owned_by = root
+						}		
+						set_star_flag = colonized_system						
+						if = { 
+							limit = { any_planet = { is_capital = yes } }
+							if = { 
+								limit = { NOT = { has_star_flag = capital_system } }
+								set_star_flag = capital_system
+							}	
+							else = { 							
+								if = { 
+									limit = { has_star_flag = capital_system }
+									remove_star_flag = capital_system										
+								}
+							}								
+						}							
+					}					
+				}	
+				if = {
+					limit = { 
+						OR = { 
+							has_natural_wormhole = yes
+							AND = {
+								root = { has_technology = "tech_gateway_activation" } 
+								OR = {
+									has_megastructure = gateway_restored
+									has_megastructure = gateway_final								
+								}
+							}
+						}
+						set_star_flag = wormhole_or_gateway_system
+					}
+				}
+			}	
+			every_owned_starbase = {			
 				solar_system = {
 					if = { 
 						limit = { 
-							exists = sector
-							sector = { is_core_sector = no }
-						}
-						if = { 
-							limit = { has_star_flag = core_sector_starbase_system }
-							remove_star_flag = core_sector_starbase_system
-						}					
-						set_star_flag = sector_controlled_starbase_system
-						else = {
-							if = { 
-								limit = { has_star_flag = sector_controlled_starbase_system }
-								remove_star_flag = sector_controlled_starbase_system
-							}					
-							set_star_flag = core_sector_starbase_system
-						}
-					}	
-					if = { 
-						limit = { 
-							any_planet = { 
-								is_owned_by = root
-							}		
-							set_star_flag = colonized_system						
-							if = { 
-								limit = { any_planet = { is_capital = yes } }
-								if = { 
-									limit = { NOT = { has_star_flag = capital_system } }
-									set_star_flag = capital_system
-								}	
-								else = { 							
-									if = { 
-										limit = { has_star_flag = capital_system }
-										remove_star_flag = capital_system										
+							OR = { 
+								has_star_flag = wormhole_or_gateway_system
+								AND = { 
+									NOT = {
+										any_planet = { 
+											OR = { 
+												is_planet_class = pc_pulsar
+												is_colonizable = yes
+												is_colony = yes
+											}
+										}
+									}	
+									any_neighbor_system = { 
+										ignore_hyperlanes = no 
+										any_planet = { exists = owner owner = root }	
 									}
+									root = { 
+										any_system_within_border = { 						
+											NOR = { 
+												is_same_value = prevprev
+												distance = { source = prevprev min = 0 max = 25 type = hyperlane }
+												has_star_flag = shipyard_system
+											}
+										}
+									}										
+									prev = { count_starbase_modules = { type = shipyard count > 0 } }	
 								}								
-							}							
-						}					
-					}						
-				}
+							}								
+						}	
+						check_shipyard_candidacy = yes
+					}													
+					assign_shipyard_system_flag = yes	
+				}	
 			}
 		}
 	}
-}
-						
+}						
