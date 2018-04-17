@@ -31,66 +31,6 @@ def parse(argv, returnParser=False):
   
   return(args)
 
-        
-def mainOld(args,*unused):
-  outFile=""
-  for inputFileName in args.inputFileNames:
-    varsToValue=TagList(0)
-    inputTagList=TagList(0)
-    inputTagList.readFile(inputFileName,args, varsToValue)
-    outTagList=TagList(0)
-    outTagList.add(args.effect_name, TagList(1))
-
-    for name,val in inputTagList.getNameVal():
-      # print(val.name)
-      if not isinstance(val, TagList):
-        continue
-      # val.printAll()
-      newCheck=TagList(2).add("limit", TagList(3).add("has_modifier",name))
-      newCheckBuildingModifier=TagList(2).add("limit", TagList(3).add("has_"+args.type,name))
-      newCheckAdjModifier=TagList(2).add("limit", TagList(3).add("has_"+args.type,name)).add("prevprev",TagList(3))
-      newCheckBio=TagList("limit", TagList("is robot_pop", "no"))
-
-      for possibleModifierName, pmVal in val.getNameVal():
-        # print(possibleModifierName)
-        if "tile_resource_" in possibleModifierName:
-          newCheck.add("change_variable", TagList(3).add("which",possibleModifierName.replace("tile_resource_","")).add("value",pmVal))
-
-      #BUILDINGS!
-      if "planet_modifier" in val.names:
-        # print("NAME"+name)
-        # val.printAll()
-        for modName, modVal in val.get("planet_modifier").getNameVal():
-         if "tile_resource_" in modName:
-           newCheckBuildingModifier.add("change_variable", TagList(3).add("which",modName.replace("tile_resource_","").replace("_add","_weight")+"_planet_base").add("value",modVal))
-      #TRAITS     
-      if "trait" in args.type:
-        # print("NAME"+name)
-        # val.printAll()
-        try:
-          for modName, modVal in val.get("modifier").getNameVal():
-            if "tile_resource_" in modName:
-              newCheckBuildingModifier.add("change_variable", TagList(3).add("which",modName.replace("tile_resource_","").replace("_add","_weight")+"_planet_pop").add("value",modVal))
-        except:
-          print("No modifiers for "+name)
-      if "adjacency_bonus" in val.names:
-        for modName, modVal in val.get("adjacency_bonus").getNameVal():
-          if "tile_building_resource_" in modName:
-            newCheckAdjModifier.get("prevprev").add("change_variable", TagList(4).add("which",modName.replace("tile_building_resource_","").replace("_add","_weight")).add("value",modVal))
-
-      if len(newCheck.names)>1:
-        outTagList.get(args.effect_name).add("if", newCheck)
-      if len(newCheckBuildingModifier.names)>1:
-        outTagList.get(args.effect_name).add("if", newCheckBuildingModifier)
-      if len(newCheckAdjModifier.get("prevprev").names)>0:
-        outTagList.get(args.effect_name).add("every_neighboring_tile", newCheckAdjModifier)
-    outFile=args.output_folder+"/"+os.path.basename(inputFileName).replace("txt","ai_weight_static_effects.txt")
-    if not args.test_run:
-      if not os.path.exists(args.output_folder):
-        os.makedirs(args.output_folder)
-      with open(outFile,'w') as file:
-        outTagList.writeAll(file,args)
-  return outFile
 
 def main(args,*unused):
   inputTagList=TagList()
@@ -176,23 +116,34 @@ def main(args,*unused):
       for fun, outSubTag in zip(funsToApply, outSubTagLists):
         fun(outSubTag, name, val,args)
 
-  #delete empty: Todo: make more general: Recursivly remove emptry "if"?
-  if not args.no_traits:
-    check_traits=outTagList.get(args.effect_name+"_trait")
-    for i in reversed(range(2)):
-      ifTag=check_traits.getN_th("if", i)
-      if len(ifTag)<2:
-        check_traits.removeIndex(check_traits.n_thIndex("if", i))
-  for name in outTagList.names:
-    if name[-10:]=="_adjacency":
-  # for adj in ["check_adjacency","check_blocker_adjacency"]:
-      adjTag=outTagList.get(name)
-      if len(adjTag.get("every_neighboring_tile"))==0:
-        adjTag.remove("every_neighboring_tile")
-  for name,val in outTagList.getNameVal():
-    if len(val)==0:
-      outTagList.remove(name)
+  # #delete empty: Todo: make more general: Recursivly remove emptry "if"?
+  # if not args.no_traits:
+  #   check_traits=outTagList.get(args.effect_name+"_trait")
+  #   for i in reversed(range(2)):
+  #     ifTag=check_traits.getN_th("if", i)
+  #     if len(ifTag)<2:
+  #       check_traits.removeIndex(check_traits.n_thIndex("if", i))
+  # for name in outTagList.names:
+  #   if name[-10:]=="_adjacency":
+  # # for adj in ["check_adjacency","check_blocker_adjacency"]:
+  #     adjTag=outTagList.get(name)
+  #     if len(adjTag.get("every_neighboring_tile"))==0:
+  #       adjTag.remove("every_neighboring_tile")
+  # for name,val in outTagList.getNameVal():
+  #   if len(val)==0:
+  #     outTagList.remove(name)
 
+  def checkEmpty(item):
+    name=item[0]
+    val=item[1]
+    if isinstance(val, TagList) and (len(val)==0 or name=="if" and len(val)==1):
+      return True
+    else:
+      return False
+  outTagList.deleteOnLowestLevel(checkEmpty)
+
+  # print(outTagList)
+# 
   # if args.effect_name+"_buildings" in outTagList.names or args.effect_name+"_buildings_triggered" in outTagList.names:
   #   buildingTag=TagList()
   #   outTagList.insert(0,args.effect_name+"_building_planet_modifiers", buildingTag)
@@ -306,8 +257,9 @@ def addBuildings(outTags, name, val, args):
     addedSomething=False
     for i in range(triggeredNum):
       tpm=val.getN_th("triggered_planet_modifier",i)
-      addHere.add("if", TagList("limit", tpm.get("potential")))
-      if addFinalModifier(tpm.get("modifier"), addHere, "_planet_bulding"):
+      addHere2=TagList("limit", tpm.get("potential"))
+      addHere.add("if",addHere2 )
+      if addFinalModifier(tpm.get("modifier"), addHere2, "_planet_bulding"):
         addedSomething=True
 
     if addedSomething:
