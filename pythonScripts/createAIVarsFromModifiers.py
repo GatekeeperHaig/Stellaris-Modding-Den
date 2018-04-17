@@ -192,7 +192,7 @@ def main(args,*unused):
   for name,val in outTagList.getNameVal():
     if len(val)==0:
       outTagList.remove(name)
-      
+
   # if args.effect_name+"_buildings" in outTagList.names or args.effect_name+"_buildings_triggered" in outTagList.names:
   #   buildingTag=TagList()
   #   outTagList.insert(0,args.effect_name+"_building_planet_modifiers", buildingTag)
@@ -238,7 +238,7 @@ def addTrait(outTags, name, val,args): #outTags[0]: any outTags[1]: bio outTags[
 def addStaticModifiers(outTags, name, val, args):
   if "icon" in val.names: #possibly planet
     ifLoc=TagList("limit", TagList("has_modifier", name))
-    addFinalModifier(val, ifLoc)
+    addFinalModifier(val, ifLoc, "_planet_base")
     # for possibleModifierName, pmVal in val.getNameVal():
     #   if "tile_resource_" in possibleModifierName:
     #     ifLoc.add("change_variable", TagList(3).add("which",possibleModifierName.replace("tile_resource_","")).add("value",pmVal))
