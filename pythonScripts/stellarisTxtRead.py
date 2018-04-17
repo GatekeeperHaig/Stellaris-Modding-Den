@@ -63,6 +63,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     return [[self.names[i],self.vals[i]] for i in range(len(self.names))]
   def getAll(self):
     return zip(self.names, self.vals, self.comments, self.seperators)
+  def getAllI(self,i):
+    return [self.names[i], self.vals[i], self.comments[i], self.seperators[i]]
   def add(self,name,val='', comment='', seperator="="): #add via two separate pre-formated variables
     self._apply(lambda x,y:x.append(y),name,val,comment,seperator)
     return self
@@ -382,6 +384,15 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       i+=1
       if i==len(self.vals):
         break
+  def deleteOnLowestLevel(self, func, *argList):#,attributeList=[]):
+    print(self)
+    for i in reversed(range(len(self))):
+      if isinstance(self.vals[i], TagList):
+        self.vals[i].deleteOnLowestLevel(func, *argList)
+      if func(self.getAllI(i),*argList):
+        self.removeIndex(i)
+
+
   def readString(self, line, expectingVal=False,objectList=0,args=0, bracketLevel=0, useNamedTagList=False, lineI=0):
     if objectList==0:
       objectList=[self]
