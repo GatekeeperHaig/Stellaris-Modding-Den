@@ -19,16 +19,18 @@ def main():
   changeSteps = [50, 20, 10]
   for s in reversed(changeSteps):
     changeSteps.append(-s)
-  bonusNames=["capital_building","empire_unique_building","planet_unique_building","military_building","standard_resource_building","research_resource_building","unity_resource_building","special_resource_building","replicator_building", "all"]
+  bonusNames=[]
+  bonusNames.append(["planet_building"])
+  bonusNames.append(["capital_building","empire_unique_building","planet_unique_building","military_building","standard_resource_building","research_resource_building","unity_resource_building","special_resource_building","replicator_building", "all"])
   bonusPictures=["GFX_CGM_buildings_menu" for entry in bonusNames]
-  cats=["construction_speed_mult","build_cost_mult"]
+  cats=["build_speed_mult","build_cost_mult"]
 
   modifierFuns=dict()
-  modifierFuns["construction_speed_mult"]=lambda i: 10*i
+  modifierFuns["build_speed_mult"]=lambda i: 10*i
   modifierFuns["build_cost_mult"]=lambda i: 10*i
 
   modifierRange=dict()
-  modifierRange["construction_speed_mult"]=[-10, 10] #[0]*10 to [1]*10
+  modifierRange["build_speed_mult"]=[-10, 10] #[0]*10 to [1]*10
   modifierRange["build_cost_mult"]=[-10, 10] #[0]*10 to [1]*10
   # buildSpeedBonus=[[entry+"_construction_speed_mult"] for entry in bonusNames if entry !="all"]
   # buildCostBonus=[[entry+"_build_cost_mult"] for entry in bonusNames if entry !="all"]
@@ -44,7 +46,7 @@ def main():
   # # doTranslation=True
   doTranslation=False
   locList=LocList(doTranslation)
-  locList.addLoc("construction_speed_mult", "Building Times")
+  locList.addLoc("build_speed_mult", "Building Construction Speed")
   locList.addLoc("build_cost_mult", "Building Costs")
   locList.addLoc("capital_building","Capital Buildings")
   locList.addLoc("empire_unique_building","Empire Unique Buildings")
@@ -56,6 +58,7 @@ def main():
   locList.addLoc("special_resource_building","Special Resource Buildings")
   locList.addLoc("replicator_building","Replicator Buildings")
   locList.addLoc("all","All Buildings")
+  locList.addLoc("planet_building","All Buildings")
   # locList.addLoc("","")
 
 
@@ -106,7 +109,7 @@ def main():
     mainMenu.add("option", TagList("name", eventNames.format(cat+"_event.name")).add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_subMainMenuEvent+catI)))))
 
     # for bonusI,bonus,bonusName in zip(range(len(bonuses)),bonuses, bonusNames):
-    for bonusI,bonusName in enumerate(bonusNames):
+    for bonusI,bonusName in enumerate(bonusNames[catI]):
       bonusMenu=TagList("id", eventNameSpace.format(id_Change[catI]+bonusI))
       bonusMenu.add("is_triggered_only", "yes")
       bonusMenu.add("custom_gui","cgm_buildings_advanced_configuration").add("diplomatic","yes").add("force_open", "no")
@@ -170,8 +173,9 @@ def main():
   after=TagList()
   # updateEvent.add("after",after)
   for catI,cat in enumerate(cats):
-    bonusModifiers=[[entry+"_"+cat] for entry in bonusNames if entry !="all"]
-    bonusModifiers.append(reduce(lambda x,y: x+y, bonusModifiers))
+    bonusModifiers=[[entry+"_"+cat] for entry in bonusNames[catI] if entry !="all"]
+    if "all" in bonusName[catI]:
+      bonusModifiers.append(reduce(lambda x,y: x+y, bonusModifiers))
     immediate.addComment(cat)
     # ifTagList=TagList()
     # immediate.add("if",ifTagList)
@@ -179,7 +183,7 @@ def main():
     # ifTagList.add("limit",limit)
 
 
-    for bonusName, bonusModifier in zip(bonusNames,bonusModifiers):
+    for bonusName, bonusModifier in zip(bonusNames[catI],bonusModifiers):
       changedFlag="cgm_{}_{}_changed".format(cat, bonusName)
       varName="cgm_{}_{}_value".format(cat, bonusName)
       ifChanged=TagList("limit", TagList("not", 
