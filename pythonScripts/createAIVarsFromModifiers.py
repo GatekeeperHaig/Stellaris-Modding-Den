@@ -5,6 +5,7 @@ import sys, argparse, subprocess,os
 from argparse import RawTextHelpFormatter
 import math
 import glob
+from copy import deepcopy
 from stellarisTxtRead import *
 # import copy
 
@@ -51,10 +52,10 @@ def main(args,*unused):
     effect=TagList()
     outTagList.add(args.effect_name+"_trait", effect)
     outSubTags.append(effect)
-    bios=TagList("limit", TagList("is robot_pop", "no"))
+    bios=TagList("limit", TagList("is_robot_pop", "no"))
     effect.add("if", bios)
     outSubTags.append(bios)
-    robots=TagList("limit", TagList("is robot_pop", "yes"))
+    robots=TagList("limit", TagList("is_robot_pop", "yes"))
     effect.add("if", robots)
     outSubTags.append(robots)
     funsToApply.append(addTrait)
@@ -88,12 +89,12 @@ def main(args,*unused):
     effect.add("every_neighboring_tile", ent)
     outSubTags[name]=ent
 
-    name=args.effect_name+"_buildings_triggered_non_unique"
-    effect=TagList()
-    outTagList.add(name,TagList("every_tile",effect))
-    outSubTags[name]=effect
+    # name=args.effect_name+"_buildings_triggered_non_unique"
+    # effect=TagList()
+    # outTagList.add(name,TagList("every_tile",effect))
+    # outSubTags[name]=effect
 
-    name=args.effect_name+"_buildings_triggered_unique"
+    name=args.effect_name+"_buildings_triggered"#_unique"
     effect=TagList()
     outTagList.add(name, effect)
     outSubTags[name]=effect
@@ -243,13 +244,13 @@ def addBuildings(outTags, name, val, args):
   triggeredNum=val.count("triggered_planet_modifier")
   if triggeredNum>0:
     # print(val)
+    tagName=args.effect_name+"_buildings_triggered"
     if val.attemptGet("planet_unique")=="yes" or val.attemptGet("empire_unique")=="yes":
-      tagName=args.effect_name+"_buildings_triggered_unique"
       ifLoc=TagList("limit", TagList("has_building", name))
       addHere=ifLoc
       addElse=False
     else:
-      tagName=args.effect_name+"_buildings_triggered_non_unique"
+      # tagName=args.effect_name+"_buildings_triggered_non_unique"
       addHere=TagList()
       ifLoc=TagList("limit", TagList("has_building", name)).add("prev", addHere)
       addElse=True
@@ -257,17 +258,36 @@ def addBuildings(outTags, name, val, args):
     addedSomething=False
     for i in range(triggeredNum):
       tpm=val.getN_th("triggered_planet_modifier",i)
-      addHere2=TagList("limit", tpm.get("potential"))
-      addHere.add("if",addHere2 )
-      if addFinalModifier(tpm.get("modifier"), addHere2, "_planet_bulding"):
-        addedSomething=True
+      tgmPotential=tpm.get("potential")
+      tgmString=str(addElse)+"_"+tgmPotential._toLine()
+      if not tgmString in outTags:
+        tgmStringOpp=str(not addElse)+"_"+tgmPotential._toLine()
+        outTags[tgmString]=TagList()
+        if addElse:
+          if tgmStringOpp in outTags:
+            outTags[tgmStringOpp].addComment("NON_UNIQUE").add("every_tile", outTags[tgmString])
+          else:
+            outTags[tgmString+"Orig"]=TagList("limit",tgmPotential).addComment("NON_UNIQUE").add("every_tile", outTags[tgmString])
+            outTags[tagName].add("if",outTags[tgmString+"Orig"] )
+        else:
+          if tgmStringOpp in outTags:
+            outTags[tgmString]=outTags[tgmStringOpp+"Orig"].addComment("UNIQUE")
+          else:
+            outTags[tgmString].add("limit",tgmPotential).addComment("UNIQUE")
+            outTags[tagName].add("if",outTags[tgmString])
 
-    if addedSomething:
-      outTags[tagName].add("if", ifLoc)
-      if addElse:
-        elseTagList=TagList()
-        ifLoc.add("else", elseTagList)
-        outTags[tagName]=elseTagList
+      # addHere2=TagList("limit",tgmPotential )
+      # addHere.add("if",addHere2 )
+      if addFinalModifier(tpm.get("modifier"), addHere, "_planet_bulding"):
+        # addedSomething=True
+
+      # if addedSomething:
+        icLocLoc=deepcopy(ifLoc)
+        outTags[tgmString].add("if", icLocLoc)
+        if addElse:
+          elseTagList=TagList()
+          icLocLoc.add("else", elseTagList)
+          outTags[tgmString]=elseTagList
 
 
 def addBlockers(outTags, name, val, args):
