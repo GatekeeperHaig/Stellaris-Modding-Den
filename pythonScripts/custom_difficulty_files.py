@@ -1078,13 +1078,9 @@ def main():
   gameStartAfter.add("set_global_flag","custom_difficulty_no_scaling")
   for i, difficulty in enumerate(difficulties):
     if difficulty=="scaling":
-      k=1 #scaling with stupid place in between ensign and captain
-      gameStartAfter.addComment("#execute enisgn event to get the flag and non-ai stuff (that does not scale for my mod!)")
-      gameStartAfter.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", eventNameSpace.format(id_defaultEvents+difficulties.index("ensign")))))
-    elif difficulty=="ensign":
-      k=0
+      continue
     elif difficulty in vanillaDefaultDifficultyNames:
-      k=vanillaDefaultDifficultyNames.index(difficulty)+1
+      k=vanillaDefaultDifficultyNames.index(difficulty)
     else:
       continue #those cannot be preset in game creation
     gameStartAfter.add("","","#"+difficulty)
