@@ -219,60 +219,66 @@ def addBuildings(outTags, name, val, args):
 
   if "adjacency_bonus" in val.names:
     tagName=args.effect_name+"_buildings_adjacency"
-    prev=TagList()
-    ifLoc=TagList("limit", TagList("has_building", name)).add("prevprev", prev)
-    if addFinalModifier(val.get("adjacency_bonus"), prev, "","tile_building_resource_"):
-      elseTagList=TagList()
-      ifLoc.add("else", elseTagList)
-      outTags[tagName].add("if", ifLoc)
-      outTags[tagName]=elseTagList
-
+    processBuilding(outTags, TagList(), val,name,"adjacency_bonus",False,tagName,"","tile_building_resource_" )
 
   if val.attemptGet("planet_unique")=="yes" or val.attemptGet("empire_unique")=="yes":
     buildingUnique=True
   else:
     buildingUnique=False
 
-
-
-
   if "planet_modifier" in val.names:
-    potential=val.attemptGet("potential")
-    processBuilding(outTags, potential, val,name,"planet_modifier",buildingUnique )
+    potential=val.attemptGet("destroy_if")
+    if len(potential)==1:
+      if potential.vals[0]=="yes":
+        potential.vals[0]="no"
+      elif potential.vals[0]=="no":
+        potential.vals[0]="yes"
+      else:
+        potential=TagList("NOT", potential)
+    elif len(potential)>1: #don't think this case will ever happen but who knows...
+      potential=TagList("NAND", potential)
+    processBuilding(outTags, potential, val,name,"planet_modifier",buildingUnique,args.effect_name+"_buildings" )
     
-
   triggeredNum=val.count("triggered_planet_modifier")
   if triggeredNum>0:
     for i in range(triggeredNum):
       tpm=val.getN_th("triggered_planet_modifier",i)
       tpmPotential=tpm.get("potential")
-      processBuilding(outTags, tpmPotential, tpm,name, "modifier", buildingUnique)
+      processBuilding(outTags, tpmPotential, tpm,name, "modifier", buildingUnique,args.effect_name+"_buildings")
 
-def processBuilding(outTags, potential, val,name, modifierName, buildingUnique):
-  tagName=args.effect_name+"_buildings"
-  if buildingUnique:
+def processBuilding(outTags, potential, val,name, modifierName, buildingUnique, tagName, extraName="_planet_building", searchFor="tile_resource_"):
+  adjacencyCase=False
+  if "adjacency"==tagName[-9:]:
+    adjacencyCase=True
+    addHere=TagList()
+    ifLoc=TagList("limit", TagList("has_building", name)).add("prevprev", addHere)
+  elif buildingUnique:
     ifLoc=TagList("limit", TagList("has_building", name))
     addHere=ifLoc
   else:
     addHere=TagList()
     ifLoc=TagList("limit", TagList("has_building", name)).add("prev", addHere)
 
-  potentialString=potential._toLine()
+  potentialString=tagName+"_"+potential._toLine()
   if not potentialString in outTags:
-    outTags[potentialString]=TagList()
-    outTags[potentialString].add("limit",potential)
-    outTags[tagName].add("if", outTags[potentialString])
+    if len(potential)>0:
+      outTags[potentialString]=TagList()
+      outTags[potentialString].add("limit",potential)
+      outTags[tagName].add("if", outTags[potentialString])
+    else:
+     outTags[potentialString]=outTags[tagName] #no potential stuff is directly written into the effect. This cannot be tpms
   specPotentialString=str(buildingUnique)+"_"+potentialString
 
   if not specPotentialString in outTags:
-    if not buildingUnique:
+    if not buildingUnique and not adjacencyCase:
       outTags[specPotentialString]=TagList()
       outTags[potentialString].addComment("NON_UNIQUE").add("every_tile", outTags[specPotentialString])
     else:
       outTags[specPotentialString]=outTags[potentialString]
-      outTags[specPotentialString].addComment("UNIQUE")
+      if not adjacencyCase:
+        outTags[specPotentialString].addComment("UNIQUE")
 
-  if addFinalModifier(val.get(modifierName), addHere, "_planet_building"):
+  if addFinalModifier(val.get(modifierName), addHere, extraName,searchFor):
     #added something:
     outTags[specPotentialString].add("if", ifLoc)
     if not buildingUnique:
