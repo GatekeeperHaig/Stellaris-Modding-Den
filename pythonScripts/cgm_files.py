@@ -59,7 +59,14 @@ def main():
   locList.addLoc("replicator_building","Replicator Buildings")
   locList.addLoc("all","All Buildings")
   locList.addLoc("planet_building","All Buildings")
-  # locList.addLoc("","")
+
+
+  locList.addLoc("mainTitle","Advanced Building Configuration")
+  locList.addLoc("mainDesc","Here you can change global costs and build speed of building groups (or all buildings)")
+  locList.addLoc("changeDesc1", "Here you can change global")
+  locList.addLoc("changeDesc2", "of building groups (or all buildings)")
+  locList.addLoc("change", "Change")
+  locList.addLoc("changeBy", "Change by")
 
 
 
@@ -92,8 +99,8 @@ def main():
   mainMenu.add("is_triggered_only", "yes")
   mainMenu.add("custom_gui","cgm_buildings_advanced_configuration").add("diplomatic","yes").add("force_open", "no") 
 
-  mainMenu.add("title", locList.append(eventNames.format("main_event.name"), "Advanced Building Configuration"))
-  mainMenu.add("desc", locList.append(eventNames.format("main_event.desc"), "Here you can change global costs and build speed of building groups (or all buildings)"))
+  mainMenu.add("title", locList.append(eventNames.format("main_event.name"), "@mainTitle"))
+  mainMenu.add("desc", locList.append(eventNames.format("main_event.desc"), "@mainDesc"))
   mainMenu.add("picture_event_data", TagList("room","cgm_menu_room"))
   buildingOptionsFile.addComment("main menu")
   buildingOptionsFile.add("country_event", mainMenu)
@@ -101,8 +108,8 @@ def main():
     mainSubMenu=TagList("id", eventNameSpace.format(id_subMainMenuEvent+catI))
     mainSubMenu.add("is_triggered_only", "yes")
     mainSubMenu.add("custom_gui","cgm_buildings_advanced_configuration").add("diplomatic","yes").add("force_open", "no")
-    mainSubMenu.add("title", locList.append(eventNames.format(cat+"_event.name"), "Change @{}".format(cat)))
-    mainSubMenu.add("desc", locList.append(eventNames.format(cat+"_event.desc"), "Here you can change global @{} of building groups (or all buildings)".format(cat)))
+    mainSubMenu.add("title", locList.append(eventNames.format(cat+"_event.name"), "@change @{}".format(cat)))
+    mainSubMenu.add("desc", locList.append(eventNames.format(cat+"_event.desc"), "@changeDesc1 @{} @changeDesc2".format(cat)))
     mainSubMenu.add("picture_event_data", TagList("room","cgm_menu_room"))
     buildingOptionsFile.addComment(cat)
     buildingOptionsFile.add("country_event", mainSubMenu)
@@ -113,14 +120,14 @@ def main():
       bonusMenu=TagList("id", eventNameSpace.format(id_Change[catI]+bonusI))
       bonusMenu.add("is_triggered_only", "yes")
       bonusMenu.add("custom_gui","cgm_buildings_advanced_configuration").add("diplomatic","yes").add("force_open", "no")
-      bonusMenu.add("title", locList.append(eventNames.format("{}_{}_event.name".format(cat, bonusName)), "Change @{}".format(bonusName)))
-      bonusMenu.add("desc", locList.append(eventNames.format("{}_{}_event.desc".format(cat, bonusName)), "Here you can change global @{} of @{}".format(cat,bonusName)))
+      bonusMenu.add("title", locList.append(eventNames.format("{}_{}_event.name".format(cat, bonusName)), "@change @{}".format(bonusName)))
+      bonusMenu.add("desc", locList.append(eventNames.format("{}_{}_event.desc".format(cat, bonusName)), "@changeDesc1 @{} of @{}".format(cat,bonusName)))
       bonusMenu.add("picture_event_data", TagList("room","cgm_menu_room"))
       buildingOptionsFile.addComment(bonusName+" "+cat)
       buildingOptionsFile.add("country_event", bonusMenu)
       mainSubMenu.add("option", TagList("name", eventNames.format("{}_{}_event.name".format(cat, bonusName))).add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_Change[catI]+bonusI)))))
       for changeStep in changeSteps:
-        optName=locList.append(eventNames.format("change_"+str(changeStep).replace("-", "neg")), "Change by {}%".format(changeStep))
+        optName=locList.append(eventNames.format("change_"+str(changeStep).replace("-", "neg")), "@changeBy {}%".format(changeStep))
         bonusMenu.add("option", TagList("name", optName).add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_Change[catI]+bonusI))).add(ET, TagList("change_variable", TagList("which", "cgm_{}_{}_value".format(cat, bonusName)).add("value", changeStep)))))
       bonusMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_subMainMenuEvent+catI)))))
       bonusMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
