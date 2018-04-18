@@ -792,3 +792,167 @@ country_event = {
 		}	
 	}
 }	
+
+country_event = {
+	id = cgm_building_operations.2
+	hide_window = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		fromfrom = { 
+			any_planet = { 								
+				OR = {					
+					is_habitat = yes
+					is_ringworld = yes
+					has_planet_flag = megastructure
+				}
+				is_colonizable = yes
+				NOT = { has_planet_flag = megastructure_nodes_spawned }
+			}
+		}				
+	}
+	
+	immediate = {
+		every_system_planet = { 
+			limit = { 
+				OR = {					
+					is_habitat = yes
+					is_ringworld = yes
+					has_planet_flag = megastructure
+				}
+				is_colonizable = yes
+				NOT = { has_planet_flag = megastructure_nodes_spawned }			
+			}
+			planet_event = { id = cgm_building_operations.3 }
+		}
+	}	
+}
+
+country_event = {
+	id = cgm_building_operations.3
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = { 
+		every_tile = {
+			limit = { 
+				OR = { 
+					has_resource = { type = minerals amount > 0 }
+					has_resource = { type = energy amount > 0 }
+				}	
+			}
+			clear_deposits = yes
+		}						
+		if = { 
+			limit = { 
+				OR = {
+					is_habitat = yes
+					AND = {
+						has_planet_flag = megastructure
+						is_ringworld = no
+					}
+				}	
+			}
+			random_list = { 
+				33.3 = { set_variable = { which = num_megastructure_node_tiles value = 2 } }
+				33.3 = { set_variable = { which = num_megastructure_node_tiles value = 3 } }
+				33.3 = { set_variable = { which = num_megastructure_node_tiles value = 4 } }
+			}	
+			random_list = { 
+				60 = { set_variable = { which = num_megastructure_node_points value = 4 } }
+				30 = { set_variable = { which = num_megastructure_node_points value = 5 } }
+				10 = { set_variable = { which = num_megastructure_node_points value = 6 } }
+			}							
+			while = {
+				limit = { check_variable = { which = num_megastructure_node_tiles value > 0 } }
+				random_tile = { 
+					limit = { 
+						NOT = { has_resource = { type = sr_megastructure_node amount > 0 } }
+						num_adjacent_tiles = 4
+						NOT = { any_neighboring_tile = { has_resource = { type = sr_megastructure_node amount > 0 } } }
+					}
+					clear_deposits = yes
+					if = {
+						limit = { 
+							has_building = yes
+							NOR = {
+								has_capital_3 = yes
+								has_building = building_hab_capital
+							}											
+						}
+						remove_building = yes
+					}	
+					add_deposit = d_megastructure_node
+					change_variable = { which = num_megastructure_node_tiles value = -1 }
+					change_variable = { which = num_megastructure_node_points value = -1 }
+				}
+			}
+			while = {
+				limit = { check_variable = { which = num_megastructure_node_points value > 0 } }
+				random_tile = { 
+					limit = { has_resource = { type = sr_megastructure_node amount > 0 } }
+					random_list = { 
+						50 = { }
+						50 = { 
+							add_deposit = d_megastructure_node
+							change_variable = { which = num_megastructure_node_points value = -1 }
+							modifier = { add = -20 has_resource = { type = sr_megastructure_node amount = 2	} }	
+							modifier = { add = -30 has_resource = { type = sr_megastructure_node amount = 3	} }
+							modifier = { add = -40 has_resource = { type = sr_megastructure_node amount = 4	} }
+							modifier = { factor = 0 has_resource = { type = sr_megastructure_node amount = 5 } }
+						}									
+					}
+				}	
+			}				
+			else = {
+				random_list = { 
+					50 = { set_variable = { which = num_megastructure_node_tiles value = 4 } }
+					50 = { set_variable = { which = num_megastructure_node_tiles value = 5 } }
+				}	
+				random_list = { 
+					35 = { set_variable = { which = num_megastructure_node_points value = 8 } }
+					30 = { set_variable = { which = num_megastructure_node_points value = 9 } }
+					20 = { set_variable = { which = num_megastructure_node_points value = 10 } }
+					10 = { set_variable = { which = num_megastructure_node_points value = 11 } }
+					5 = { set_variable = { which = num_megastructure_node_points value = 12 } }
+				}	
+				while = {
+					limit = { check_variable = { which = num_megastructure_node_tiles value > 0 } }
+					random_tile = { 
+						limit = { 
+							NOT = { has_resource = { type = sr_megastructure_node amount > 0 } }											
+							num_adjacent_tiles = 4
+							NOT = { any_neighboring_tile = { has_resource = { type = sr_megastructure_node amount > 0 } } }
+							has_capital_building = no
+						}
+						clear_deposits = yes
+						if = {
+							limit = { has_building = yes }	
+							remove_building = yes											
+						}	
+						add_deposit = d_megastructure_node
+						change_variable = { which = num_megastructure_node_tiles value = -1 }
+						change_variable = { which = num_megastructure_node_points value = -1 }
+					}
+				}
+				while = {
+					limit = { check_variable = { which = num_megastructure_node_points value > 0 } }
+					random_tile = { 
+						limit = { has_resource = { type = sr_megastructure_node amount > 0 } }
+						random_list = { 
+							50 = { }
+							50 = { 
+								add_deposit = d_megastructure_node
+								change_variable = { which = num_megastructure_node_points value = -1 }
+								modifier = { add = -20 has_resource = { type = sr_megastructure_node amount = 2	} }	
+								modifier = { add = -30 has_resource = { type = sr_megastructure_node amount = 3	} }
+								modifier = { add = -40 has_resource = { type = sr_megastructure_node amount = 4	} }
+								modifier = { factor = 0 has_resource = { type = sr_megastructure_node amount = 5 } }
+							}									
+						}
+					}	
+				}			
+			}
+		}
+	}
+}
