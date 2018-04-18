@@ -47,6 +47,7 @@ def main(args,*unused):
   funsToApply=[]
 
   outSubTagLists=[]
+  triggerSets=[]
   if not args.no_traits:
     outSubTags=[]
     effect=TagList()
@@ -93,6 +94,8 @@ def main(args,*unused):
     effect=TagList()
     outTagList.add(name, effect)
     outSubTags[name]=effect
+    outSubTags[name+"triggerSet"]=set()
+    triggerSets.append(outSubTags[name+"triggerSet"])
 
     # name=args.effect_name+"_buildings_triggered_non_unique"
     # effect=TagList()
@@ -103,6 +106,9 @@ def main(args,*unused):
     effect=TagList()
     outTagList.add(name, effect)
     outSubTags[name]=effect
+
+    outSubTags[name+"triggerSet"]=set()
+    triggerSets.append(outSubTags[name+"triggerSet"])
 
     outSubTagLists.append(outSubTags)
     funsToApply.append(addBuildings)
@@ -163,6 +169,27 @@ def main(args,*unused):
   #   if args.effect_name+"_buildings_triggered" in outTagList.names:
   #     buildingTag.add(args.effect_name+"_buildings_triggered", "yes")
 
+  triggerList=TagList()
+  for i,triggerSet in enumerate(triggerSets):
+    triggerContentA=TagList()
+    triggerContentB=TagList()
+    triggerNameA=args.effect_name+"_building_trigger_new"
+    triggerNameB=args.effect_name+"_building_trigger_old"
+    if i==0:
+      triggerNameA+="_adjacency"
+      triggerNameB+="_adjacency"
+    triggerList.add(triggerNameA, TagList("OR", triggerContentA))
+    triggerList.add(triggerNameB, TagList("OR", triggerContentB))
+    for building in sorted(triggerSet):
+      triggerContentA.add("has_building", building)
+      triggerContentB.add("has_prev_building", building)
+
+  triggerFolder=args.output_folder.replace("scripted_effect", "scripted_triggers")
+  if not os.path.exists(triggerFolder):
+    os.makedirs(triggerFolder)
+  triggerFile=triggerFolder+"/"+args.effect_name+"_ai_weight_scripted_trigger.txt"
+  with open(triggerFile,"w") as file:
+    triggerList.writeAll(file)
 
   if not args.test_run:
     if not os.path.exists(args.output_folder):
@@ -289,6 +316,7 @@ def processBuilding(outTags, potential, val,name, modifierName, buildingUnique, 
 
   if addFinalModifier(val.get(modifierName), addHere, extraName,searchFor):
     #added something:
+    outTags[tagName+"triggerSet"].add(name)
     outTags[specPotentialString].add("if", ifLoc)
     if not buildingUnique:
       elseTagList=TagList()
