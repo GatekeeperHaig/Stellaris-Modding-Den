@@ -330,7 +330,7 @@ def main():
       choiceEvent.add("immediate",immediate)
     if cat=="crisis":
       trigger.add("text", "custom_difficulty_crisis_strength_desc")
-      locClass.append("custom_difficulty_crisis_strength_desc", "@vanilla @example @values: @grandAdmiral + x5 @crisis @strength: 1500%. @ensign + x5 @crisis @strength: 495%. @ensign + x0.25 @crisis @strength: 24.75%.")
+      locClass.append("custom_difficulty_crisis_strength_desc", "@vanilla @example @values: @grandAdmiral + x5 @crisis @strength: 750%. @ensign + x5 @crisis @strength: 450%. @ensign + x0.25 @crisis @strength: 22.5%.")
     if cat=="ai_yearly":
       trigger.add("text", "custom_difficulty_current_yearly_desc") #loc global
     else:
@@ -525,11 +525,11 @@ def main():
   difficultiesPresetProperties["no_scaling"]["ai_yearly"]=[0 for b in possibleBoniNames]
 
   diffLevels=dict() 
-  diffLevels["ensign"]=[33, 0,0 ] # crisis, high ai and npc, low ai
-  diffLevels["captain"]=[50, 25,15 ]
-  diffLevels["commodore"]=[66, 50,30 ]
-  diffLevels["admiral"]=[75, 75,45 ]
-  diffLevels["grand_admiral"]=[100, 100,60 ]
+  diffLevels["ensign"]=[30, 0,0 ] # crisis, high ai and npc, low ai
+  diffLevels["captain"]=[35, 25,15 ]
+  diffLevels["commodore"]=[40, 50,30 ]
+  diffLevels["admiral"]=[45, 75,45 ]
+  diffLevels["grand_admiral"]=[50, 100,60 ]
   # diffLevels["ensign"]=[0, 0,0 ] # npc, high ai, low ai
   # diffLevels["captain"]=[25, 25,15 ]
   # diffLevels["commodore"]=[50, 50,30 ]
