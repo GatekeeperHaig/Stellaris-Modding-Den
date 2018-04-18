@@ -7,7 +7,7 @@ event = {
 	id = cgm_starbase.0
 	hide_window = yes
 	is_triggered_only = yes
-	fire_only_once
+	fire_only_once = yes
 	
 	immediate = {
 		every_system = {
@@ -84,21 +84,21 @@ event = { #this event is fires on game start and on a monthly pulse.
 						any_planet = { 
 							is_owned_by = root
 						}		
-						set_star_flag = colonized_system						
+					}	
+					set_star_flag = colonized_system						
+					if = { 
+						limit = { any_planet = { is_capital = yes } }
 						if = { 
-							limit = { any_planet = { is_capital = yes } }
+							limit = { NOT = { has_star_flag = capital_system } }
+							set_star_flag = capital_system
+						}	
+						else = { 							
 							if = { 
-								limit = { NOT = { has_star_flag = capital_system } }
-								set_star_flag = capital_system
-							}	
-							else = { 							
-								if = { 
-									limit = { has_star_flag = capital_system }
-									remove_star_flag = capital_system										
-								}
-							}								
-						}							
-					}					
+								limit = { has_star_flag = capital_system }
+								remove_star_flag = capital_system										
+							}
+						}								
+					}							
 				}	
 				if = {
 					limit = { 
@@ -111,51 +111,53 @@ event = { #this event is fires on game start and on a monthly pulse.
 									has_megastructure = gateway_final								
 								}
 							}
-						}
-						set_star_flag = wormhole_or_gateway_system
+						}						
 					}
+					set_star_flag = wormhole_or_gateway_system
 				}
 			}	
-			every_owned_starbase = {			
-				solar_system = {
-					random_system_planet = {
-						limit = { has_planet_flag = system_variable_repository }
-						set_variable = { which = starbase_level value = 0 }
-						save_event_target_as = starbase_system_star
-					}	
-					if = {
-						limit = { prev = { has_starbase_size = starbase_outpost } }
-						event_target:starbase_system_star = { change_variable = { which = starbase_level value = 1 } }
-						else = { 					
-							if = {
-								limit = { prev = { has_starbase_size = starbase_starport } }
-								event_target:starbase_system_star = { change_variable = { which = starbase_level value = 2 } }
-								else = { 
-									if = {
-										limit = { prev = { has_starbase_size = starbase_starhold } }
-										event_target:starbase_system_star = { change_variable = { which = starbase_level value = 3 } }	
-										else = { 
-											if = {
-												limit = { prev = { has_starbase_size = starbase_starfortress } }
-												event_target:starbase_system_star = { change_variable = { which = starbase_level value = 4 } }	
-												else = { 
-													if = {
-														limit = { prev = { has_starbase_size = starbase_citadel } }
-														event_target:starbase_system_star = { change_variable = { which = starbase_level value = 5 } }									
+			every_owned_starbase = {
+				fleet = { 
+					solar_system = {
+						random_system_planet = {
+							limit = { has_planet_flag = system_variable_repository }
+							set_variable = { which = starbase_level value = 0 }
+							save_event_target_as = starbase_system_star
+						}	
+						if = {
+							limit = { prev = { has_starbase_size = starbase_outpost } }
+							event_target:starbase_system_star = { change_variable = { which = starbase_level value = 1 } }
+							else = { 					
+								if = {
+									limit = { prev = { has_starbase_size = starbase_starport } }
+									event_target:starbase_system_star = { change_variable = { which = starbase_level value = 2 } }
+									else = { 
+										if = {
+											limit = { prev = { has_starbase_size = starbase_starhold } }
+											event_target:starbase_system_star = { change_variable = { which = starbase_level value = 3 } }	
+											else = { 
+												if = {
+													limit = { prev = { has_starbase_size = starbase_starfortress } }
+													event_target:starbase_system_star = { change_variable = { which = starbase_level value = 4 } }	
+													else = { 
+														if = {
+															limit = { prev = { has_starbase_size = starbase_citadel } }
+															event_target:starbase_system_star = { change_variable = { which = starbase_level value = 5 } }									
+														}
 													}
 												}
 											}
 										}
-									}
+									}	
 								}	
-							}	
-						}
+							}
+						}	
+						set_shipyard_weight = yes																								
 					}	
-					set_shipyard_weight = yes																								
-				}	
-			}						
+				}						
+			}
 		}
-	}
+	}	
 }			
 country_event = { #this event is fires from the previous event.
 	id = cgm_starbase.2
