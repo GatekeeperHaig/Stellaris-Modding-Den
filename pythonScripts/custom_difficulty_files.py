@@ -142,7 +142,7 @@ def main():
   locClass.addLoc("commodore", "$DIFFICULTY_COMMODORE$","all")
   locClass.addLoc("admiral", "$DIFFICULTY_ADMIRAL$","all")
   locClass.addLoc("grandAdmiral", "$DIFFICULTY_GRAND_ADMIRAL$","all")
-  locClass.addLoc("scaling", "$DIFFICULTY_SCALING$","all")
+  locClass.addLoc("scaling", "$FE_SCALING_DIFFICULTY$","all")
 
 
 
