@@ -8,59 +8,63 @@ set_shipyard_weight = {
 				has_star_flag = shipyard_candidate_system
 				has_star_flag = shipyard_check_delay
 				star = { is_star_class = sc_black_hole }
-				any_planet = {
-					OR = { is_planet_class = pc_pulsar is_colonizable = yes is_colony = yes }
-				}
+				any_planet = { is_planet_class = pc_pulsar }				
 			}
 		}
 		if = {
 			limit = {
-				event_target:starbase_system_star = {
-					check_variable = { which = num_of_hyperlane_connections value > 2 }
-				}
-				NOR = {
-					has_star_flag = shipyard_system
-					AND = {
-						has_star_flag = enclave
-						any_ship_in_system = {
-							exists = owner
-							owner = { has_country_flag = curator_enclave_country }
-						}
+				calc_true_if = {
+					amount = 3
+					event_target:starbase_system_star = {
+						check_variable = { which = num_of_hyperlane_connections value > 1 }
 					}
-					AND = {
-						has_star_flag = enclave
-						any_ship_in_system = {
-							exists = owner
-							owner = { is_same_value = event_target:artist_enclave_country }
-						}
-					}
-					AND = {
-						has_star_flag = enclave
-						any_ship_in_system = {
-							exists = owner
-							owner = { has_country_flag = trader_enclave_country }
-						}
+					prev = {
+						count_starbase_modules = { type = shipyard count > 2 }
 					}
 					root = {
 						any_system_within_border = {
-							distance = { source = event_target:starbase_system_star type = hyperlane min_jumps = 1 max_jumps = 5 }
+							distance = { source = event_target:starbase_system_star type = hyperlane min_jumps = 3 }
 							has_star_flag = shipyard_system
+						}
+					}					
+					NOR = {
+						has_star_flag = shipyard_system
+						AND = {
+							has_star_flag = enclave
+							any_ship_in_system = {
+								exists = owner
+								owner = { has_country_flag = curator_enclave_country }
+							}
+						}
+						AND = {
+							has_star_flag = enclave
+							any_ship_in_system = {
+								exists = owner
+								owner = { is_same_value = event_target:artist_enclave_country }
+							}
+						}
+						AND = {
+							has_star_flag = enclave
+							any_ship_in_system = {
+								exists = owner
+								owner = { has_country_flag = trader_enclave_country }
+							}
+						}
+					}
+					any_country = {
+						OR = { is_at_war_with = root is_rival = root is_hostile_to = root is_threatened_to = root is_angry_to = root is_domineering_to = root }
+						any_system_within_border = {
+							distance = { source = event_target:starbase_system_star type = hyperlane min_jumps = 4 }
+						}
+					}
+					NOT = {
+						any_system = {
+							distance = { source = event_target:starbase_system_star type = hyperlane max_jumps = 2 }
+							NOT = { is_within_borders_of = root }
 						}
 					}
 				}
-				any_country = {
-					OR = { is_at_war_with = root is_rival = root is_hostile_to = root is_threatened_to = root is_angry_to = root is_domineering_to = root }
-					any_system_within_border = {
-						distance = { source = event_target:starbase_system_star type = hyperlane min_jumps = 5 }
-					}
-				}
-				NOT = {
-					any_system = {
-						distance = { source = event_target:starbase_system_star type = hyperlane max_jumps = 2 }
-						NOT = { is_within_borders_of = root }
-					}
-				}
-			}
+			}	
 			if = {
 				limit = {
 					prev = {
@@ -138,7 +142,7 @@ set_shipyard_weight = {
 				set_variable = { which = shipyard_weight value = num_of_shipyard_modules }
 			}
 			if = {
-				limit = { has_star_flag = wormhole_or_gateway_system }
+				limit = { has_star_flag = gateway_system }
 				event_target:starbase_system_star = {
 					change_variable = { which = shipyard_weight value = 4 }
 				}
@@ -158,7 +162,7 @@ set_shipyard_weight = {
 			}
 			every_neighbor_system = {
 				ignore_hyperlanes = no
-				limit = { has_star_flag = wormhole_or_gateway_system is_within_borders_of = root }
+				limit = { has_star_flag = gateway_system is_within_borders_of = root }
 				event_target:starbase_system_star = {
 					change_variable = { which = shipyard_weight value = 2 }
 				}
