@@ -37,6 +37,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)
   # parser.add_argument('--test_run', action="store_true", help="No Output.")
   parser.add_argument('--helper_file_list', default="", help="Non-separated list of zeros and ones. N-th number defines whether file number n is a helper file (1 helperfile, 0 standard file)")
+  parser.add_argument('--make_optional', action="store_true", help="Adds 'direct_build_enabled = yes' as potential to all direct build buildings. IMPORTANT: Make sure to set 'set_country_flag = display_low_tier_flag' and 'set_country_flag = do_no_remove_low_tier_flag' whenever 'direct_build_enabled == no' as otherwise buildings will disappear..." )
   addCommonArgs(parser)
 
   if returnParser:
@@ -318,6 +319,8 @@ def readAndConvert(args, allowRestart=1):
 
             #Make sure you cannot replace a building by itself (i.e. upgraded version by same tier direct build)
             upgradeData.getOrCreate("potential").add("NOT",TagList().add("tile",TagList().add("has_building",origUpgradeData.tagName))) #Prevent self replace") #Since has_building is hidden in the name of the data, no replace of has_building will take place. Should be a minimal performance improvement.
+            if args.make_optional:
+              upgradeData.get("potential").add("direct_build_enabled", "yes")
               
             if "upgrades" in upgradeData.names:
               buildingDataList.append(upgradeData)
