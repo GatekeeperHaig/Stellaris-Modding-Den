@@ -67,8 +67,8 @@ def main():
   locList.addLoc("changeDesc2", "of building groups (or all buildings)")
   locList.addLoc("change", "Change")
   locList.addLoc("changeBy", "Change by")
-  locList.addLoc("enableBU", "Enable direct construction of high tier buildings")
-  locList.addLoc("disableBU", "Disable direct construction of high tier buildings")
+  locList.addLoc("enableBU", "Enable Direct Construction of High Tier Buildings")
+  locList.addLoc("disableBU", "Disable Direct Construction of High Tier Buildings")
 
 
 
