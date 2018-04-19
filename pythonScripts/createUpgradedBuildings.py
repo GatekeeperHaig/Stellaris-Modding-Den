@@ -38,6 +38,7 @@ def parse(argv, returnParser=False):
   # parser.add_argument('--test_run', action="store_true", help="No Output.")
   parser.add_argument('--helper_file_list', default="", help="Non-separated list of zeros and ones. N-th number defines whether file number n is a helper file (1 helperfile, 0 standard file)")
   parser.add_argument('--make_optional', action="store_true", help="Adds 'direct_build_enabled = yes' as potential to all direct build buildings. IMPORTANT: Make sure to set 'set_country_flag = display_low_tier_flag' and 'set_country_flag = do_no_remove_low_tier_flag' whenever 'direct_build_enabled == no' as otherwise buildings will disappear..." )
+  parser.add_argument('--scripted_variables', default="", help="Comma separated list of files that contain scripted variables used in the building files. This option is mandatory if you building costs use any of those variables. Recognizable at the spam of missing variable errors you get if not doing this!")
   addCommonArgs(parser)
 
   if returnParser:
@@ -121,6 +122,10 @@ def readAndConvert(args, allowRestart=1):
         outputFile.write("#overwrite\n")
     if fileIndex==0 or (not args.join_files) and (not isHelperFileItList): #create empty lists. Do only in first iteration when args.join_files is active as we add to the lists in each iteration here
       varsToValue=TagList(0)
+      if args.scripted_variables!="":
+        for scriptVarFile in args.scripted_variables.split(","):
+          scriptVarFile=scriptVarFile.strip()
+          varsToValue.readFile(scriptVarFile)
       buildingNameToData=TagList(0)
       args.preventLinePrint=[]
     prevLen=len(buildingNameToData.vals)
