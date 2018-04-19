@@ -94,8 +94,8 @@ def main(args,*unused):
     effect=TagList()
     outTagList.add(name, effect)
     outSubTags[name]=effect
-    outSubTags[name+"triggerSet"]=set()
-    triggerSets.append(outSubTags[name+"triggerSet"])
+    outSubTags["triggerSet"]=set()
+    triggerSets.append(outSubTags["triggerSet"])
 
     # name=args.effect_name+"_buildings_triggered_non_unique"
     # effect=TagList()
@@ -107,8 +107,8 @@ def main(args,*unused):
     outTagList.add(name, effect)
     outSubTags[name]=effect
 
-    outSubTags[name+"triggerSet"]=set()
-    triggerSets.append(outSubTags[name+"triggerSet"])
+    outSubTags["triggerSet"]=set()
+    triggerSets.append(outSubTags["triggerSet"])
 
     outSubTagLists.append(outSubTags)
     funsToApply.append(addBuildings)
@@ -316,7 +316,7 @@ def processBuilding(outTags, potential, val,name, modifierName, buildingUnique, 
 
   if addFinalModifier(val.get(modifierName), addHere, extraName,searchFor):
     #added something:
-    outTags[tagName+"triggerSet"].add(name)
+    outTags["triggerSet"].add(name)
     outTags[specPotentialString].add("if", ifLoc)
     if not buildingUnique:
       elseTagList=TagList()

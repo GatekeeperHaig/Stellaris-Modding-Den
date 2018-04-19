@@ -70,6 +70,29 @@ def main():
   locList.addLoc("enableBU", "Enable Direct Construction of High Tier Buildings")
   locList.addLoc("disableBU", "Disable Direct Construction of High Tier Buildings")
 
+  locList.addLoc("build_speed_mult", "Скорость строительства зданий","ru")
+  locList.addLoc("build_cost_mult", "Затраты на строительство","ru")
+  locList.addLoc("capital_building","Главные здания","ru")
+  locList.addLoc("empire_unique_building","Уникальные здания Империи","ru")
+  locList.addLoc("planet_unique_building","Уникальные планетарные здания","ru")
+  locList.addLoc("military_building","Военные здания","ru")
+  locList.addLoc("standard_resource_building","Стандартные ресурсные здания","ru")
+  locList.addLoc("research_resource_building","Научные здания","ru")
+  locList.addLoc("unity_resource_building","Здания единства","ru")
+  locList.addLoc("special_resource_building","Специальные ресурсные здания","ru")
+  locList.addLoc("replicator_building","Здания репликаторы","ru")
+  locList.addLoc("all","Все здания","ru")
+  locList.addLoc("planet_building","Все здания","ru")
+
+
+  locList.addLoc("mainTitle","Продвинутое конфигурирование зданий","ru")
+  locList.addLoc("mainDesc","Здесь можно изменить стоимость и скорость постройки для отдельных групп зданий (или для всех сразу)","ru")
+  locList.addLoc("changeDesc1", "Здесь можно изменить глобальную","ru")
+  locList.addLoc("changeDesc2", "групп зданий (или всех зданий)","ru")
+  locList.addLoc("change", "Изменить","ru")
+  locList.addLoc("changeBy", "Изменить на","ru")
+
+
 
 
 
@@ -242,7 +265,7 @@ def main():
         ifModifierApplied.add("limit",TagList().add("check_variable",
           TagList().add("which",tmpVar)
           .add("value", str(sign*(changeVal-0.1)),"",compSign)))
-        modifierName=locList.append("cgm_{:02d}_{}_{}_{}_value".format(i,bonusName,signName,cat), cat+"_"+bonusName)
+        modifierName=locList.append("cgm_{:02d}_{}_{}_{}_value".format(i,bonusName,signName,cat), "@"+cat+" @"+bonusName)
         modifier=TagList()
         if not isinstance(bonusModifier,list):
           bonusModifier=[bonusModifier]
