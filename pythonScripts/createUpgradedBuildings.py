@@ -37,7 +37,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)
   # parser.add_argument('--test_run', action="store_true", help="No Output.")
   parser.add_argument('--helper_file_list', default="", help="Non-separated list of zeros and ones. N-th number defines whether file number n is a helper file (1 helperfile, 0 standard file)")
-  parser.add_argument('--make_optional', action="store_true", help="Adds 'direct_build_enabled = yes' as potential to all direct build buildings. IMPORTANT: Make sure to set 'set_country_flag = display_low_tier_flag' and 'set_country_flag = do_no_remove_low_tier_flag' whenever 'direct_build_enabled == no' as otherwise buildings will disappear..." )
+  parser.add_argument('--make_optional', action="store_true", help="Adds 'direct_build_enabled = yes' as potential to all direct build buildings. IMPORTANT: Make sure to set 'set_global_flag = display_low_tier_flag' and 'set_global_flag = do_no_remove_low_tier_flag' whenever 'direct_build_enabled == no' as otherwise buildings will disappear..." )
   parser.add_argument('--scripted_variables', default="", help="Comma separated list of files that contain scripted variables used in the building files. This option is mandatory if you building costs use any of those variables. Recognizable at the spam of missing variable errors you get if not doing this!")
   addCommonArgs(parser)
 
@@ -364,7 +364,7 @@ def readAndConvert(args, allowRestart=1):
           if isinstance(buildingData.splitToListIfString("potential").vals[-1], TagList) and len(buildingData.get("potential").vals[-1].names)<=0:
             buildingData.get("potential").removeIndex(-1)   #remove potentially empty entry thanks to empire_unique buildings that cannot be copied.
           elif len(newRequirements.vals)>0:
-            newRequirements.add("owner",TagList().add("NOT", TagList().add("has_country_flag","display_low_tier_flag ")))
+            newRequirements.add("NOT", TagList("has_global_flag","display_low_tier_flag"))
           # newRequirements.increaseLevelRec() #push them to correct level. list will always exist, might be empty if unused.
     #END OF COPY AND MODIFY        
 
