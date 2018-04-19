@@ -67,6 +67,8 @@ def main():
   locList.addLoc("changeDesc2", "of building groups (or all buildings)")
   locList.addLoc("change", "Change")
   locList.addLoc("changeBy", "Change by")
+  locList.addLoc("enableBU", "Enable direct construction of high tier buildings")
+  locList.addLoc("disableBU", "Disable direct construction of high tier buildings")
 
 
 
@@ -133,6 +135,9 @@ def main():
       bonusMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
     mainSubMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",name_mainMenuEvent))))
     mainSubMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
+  
+  mainMenu.add("option", TagList("name", locList.addEntry("enable_direct_build.name", "@enableBU")).add("custom_gui", "cgm_option").add("trigger", TagList("not", TagList("has_global_flag", "direct_build_enabled"))).add("hidden_effect", TagList("set_global_flag", "direct_build_enabled").add("remove_global_flag", "display_low_tier_flag").add("remove_global_flag", "do_no_remove_low_tier_flag")))
+  mainMenu.add("option", TagList("name", locList.addEntry("disable_direct_build.name", "@disableBU")).add("custom_gui", "cgm_option").add("trigger", TagList("has_global_flag", "direct_build_enabled")).add("hidden_effect", TagList("remove_global_flag", "direct_build_enabled").add("set_global_flag", "display_low_tier_flag").add("set_global_flag", "do_no_remove_low_tier_flag")))
   mainMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(1))).add("country_event", TagList("id",name_updateEvent))))
   mainMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
 
