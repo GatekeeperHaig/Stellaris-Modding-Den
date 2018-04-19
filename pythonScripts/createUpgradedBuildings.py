@@ -522,9 +522,10 @@ def readAndConvert(args, allowRestart=1):
               locOutPutFile.write(" "+line+"\n")
         
         #scripted_triggers OUTPUT
-        triggerFile=open(args.output_folder+"/common/scripted_triggers/{}build_upgraded_".format(prioFile)+outfileBaseName.replace(".txt","")+"_triggers.txt",'w')
-        triggerFile.write(args.scriptDescription)
-        triggers.writeAll(triggerFile,args)
+        if len(triggers)>0:
+          triggerFile=open(args.output_folder+"/common/scripted_triggers/{}build_upgraded_".format(prioFile)+outfileBaseName.replace(".txt","")+"_triggers.txt",'w')
+          triggerFile.write(args.scriptDescription)
+          triggers.writeAll(triggerFile,args)
       
       #BUILDING OUTPUT
       if len(args.copiedBuildings)>0:
