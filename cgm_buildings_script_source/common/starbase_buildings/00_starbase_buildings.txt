@@ -31,7 +31,32 @@ hydroponics_bay = {
 	upkeep_resources = { energy = 1 }
 	ai_build_at_chokepoint = no
 	ai_build_outside_chokepoint = yes
-	ai_weight = { weight = 50 }
+	ai_weight = { 
+		weight = 20
+		modifier = { 
+			factor = 0 
+			OR = { 
+				overhauled_building_stats_enabled = no
+				owner = { food_buildings_limitation = yes }
+			}
+		}	
+		modifier = {
+			factor = 5
+			owner = { has_country_flag = food_focus_factor_1 }
+		}
+		modifier = {
+			factor = 10
+			owner = { has_country_flag = food_focus_factor_2 }
+		}
+		modifier = {
+			factor = 15
+			owner = { has_country_flag = food_focus_factor_3 }
+		}
+		modifier = {
+			factor = 20
+			owner = { has_country_flag = food_focus_factor_4 }
+		}		
+	}
 }
 resource_silo = {
 	icon = "GFX_spaceport_module_resource_silo"
@@ -41,7 +66,7 @@ resource_silo = {
 	country_modifier = { max_minerals = 2500 max_energy = 2500 }
 	ai_build_at_chokepoint = no
 	ai_build_outside_chokepoint = yes
-	ai_weight = { weight = 0 }
+	ai_weight = { weight = 0 } #this is a fucking joke
 }
 nebula_refinery = {
 	icon = "GFX_spaceport_nebula_refinery"
@@ -60,7 +85,7 @@ nebula_refinery = {
 	show_in_tech = "tech_mineral_processing_1"
 	ai_build_at_chokepoint = yes
 	ai_build_outside_chokepoint = yes
-	ai_weight = { weight = 150 }
+	ai_weight = { weight = 250 }
 }
 listening_post = {
 	icon = "GFX_spaceport_module_navigators_guild"
@@ -74,7 +99,7 @@ listening_post = {
 	upkeep_resources = { energy = 2 }
 	ai_build_at_chokepoint = yes
 	ai_build_outside_chokepoint = no
-	ai_weight = { weight = 50 }
+	ai_weight = { weight = 0 } #this has no real effect for the AI. 
 	show_in_tech = "tech_sensors_2"
 }
 offworld_trading_company = {
@@ -97,8 +122,15 @@ offworld_trading_company = {
 		weight = 200
 		modifier = {
 			factor = 0
-			count_starbase_modules = { type = trading_hub count < 3 }
+			OR = {
+				count_starbase_modules = { type = trading_hub count < 3 }
+				solar_system = { has_star_flag = shipyard_system }
+			}	
 		}
+		modifier = {
+			factor = 10
+			solar_system = { has_star_flag = trade_hub_system }
+		}		
 	}
 }
 fleet_academy = {
@@ -116,11 +148,14 @@ fleet_academy = {
 	ai_build_at_chokepoint = no
 	ai_build_outside_chokepoint = yes
 	ai_weight = {
-		weight = 200
+		weight = 1000
 		modifier = {
 			factor = 0
-			count_starbase_modules = { type = shipyard count < 3 }
-		}
+			NAND = { 
+				count_starbase_modules = { type = shipyard count > 2 }
+				solar_system = { has_star_flag = shipyard_system }
+			}	
+		}		
 	}
 }
 naval_logistics_office = {
@@ -162,11 +197,14 @@ titan_yards = {
 	ai_build_at_chokepoint = no
 	ai_build_outside_chokepoint = yes
 	ai_weight = {
-		weight = 200
+		weight = 1000
 		modifier = {
 			factor = 0
-			count_starbase_modules = { type = shipyard count < 3 }
-		}
+			NAND = { 
+				count_starbase_modules = { type = shipyard count > 3 }
+				solar_system = { has_star_flag = shipyard_system }
+			}	
+		}		
 	}
 }
 colossus_yards = {
@@ -187,11 +225,14 @@ colossus_yards = {
 	ai_build_at_chokepoint = no
 	ai_build_outside_chokepoint = yes
 	ai_weight = {
-		weight = 200
+		weight = 1000
 		modifier = {
 			factor = 0
-			count_starbase_modules = { type = shipyard count < 3 }
-		}
+			NAND = { 
+				count_starbase_modules = { type = shipyard count > 3 }
+				solar_system = { has_star_flag = shipyard_system }
+			}	
+		}		
 	}
 }
 black_hole_observatory = {
@@ -211,7 +252,7 @@ black_hole_observatory = {
 	show_in_tech = "tech_sensors_3"
 	ai_build_at_chokepoint = no
 	ai_build_outside_chokepoint = yes
-	ai_weight = { weight = 150 }
+	ai_weight = { weight = 250 }
 }
 target_uplink_computer = {
 	icon = "GFX_spaceport_synchronized_defenses"
@@ -261,12 +302,32 @@ deep_space_black_site = {
 	}
 	cost = { minerals = 200 }
 	produced_resources = { unity = 1 }
+	produced_resource_trigger = {
+		modifier = {
+			#hidden_trigger = { exists = this }
+			overhauled_building_stats_enabled = yes
+			resources = { unity = 2 }
+		}
+	}		
 	upkeep_resources = { energy = 2 }
 	system_modifier = { pop_government_ethic_attraction = 0.25 planet_unrest_add = -20 }
 	show_in_tech = "tech_living_state"
 	ai_build_at_chokepoint = no
 	ai_build_outside_chokepoint = yes
-	ai_weight = { weight = 150 }
+	ai_weight = { 
+		weight = 50
+		modifier = { 
+			factor = 0
+			NAND = { 
+				owner = { NOT = { any_owned_planet = { unrest > 40 } } }
+				overhauled_building_stats_enabled = no
+			}	
+		}	
+		modifier = { 
+			factor = 2
+			overhauled_building_stats_enabled = yes				
+		}			
+	}
 }
 curator_think_tank = {
 	icon = "GFX_starbase_curator_think_tank"
@@ -289,7 +350,7 @@ curator_think_tank = {
 	upkeep_resources = { energy = 2 }
 	ai_build_at_chokepoint = yes
 	ai_build_outside_chokepoint = yes
-	ai_weight = { weight = 150 }
+	ai_weight = { weight = 250 }
 }
 art_college = {
 	icon = "GFX_starbase_artist_college"
@@ -312,7 +373,7 @@ art_college = {
 	upkeep_resources = { energy = 2 }
 	ai_build_at_chokepoint = yes
 	ai_build_outside_chokepoint = yes
-	ai_weight = { weight = 150 }
+	ai_weight = { weight = 250 }
 }
 
 # Aura buildings

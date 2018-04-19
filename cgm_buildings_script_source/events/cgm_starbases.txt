@@ -58,7 +58,7 @@ event = { #this event is fires on game start and on a monthly pulse.
 					set_timed_country_flag = { flag = nav_cap_focus_3 days = 359 }
 				}								
 			}	
-			calculate_number_of_required_shipyard_starbases = yes #see the cgm_country_scope_effects.txt in common/scripted_effects.			
+			calculate_number_of_required_shipyard_systems = yes #see the cgm_country_scope_effects.txt in common/scripted_effects.			
 			every_system_within_border = {
 				if = { 
 					limit = { 
@@ -99,6 +99,39 @@ event = { #this event is fires on game start and on a monthly pulse.
 						}								
 					}							
 				}	
+				if = {
+					limit = { 
+						root = { is_exterminator = no } 
+						OR = { 
+							AND = {
+								has_star_flag = enclave
+								any_ship_in_system = {
+									exists = owner
+									owner = { has_country_flag = trader_enclave_country }
+								}
+							}
+							AND = { 
+								has_star_flag = enclave
+								any_ship_in_system = {
+									exists = owner
+									owner = { 
+										is_same_value = event_target:artist_enclave_country
+									}
+								}
+								root = { has_country_flag = art_college }
+							}	
+							AND = { 
+								has_star_flag = enclave
+									any_ship_in_system = {
+										exists = owner
+										owner = { has_country_flag = curator_enclave_country }
+								}
+								root = { has_country_flag = think_tank }
+							}								
+						}	
+					}
+					set_star_flag = trade_hub_system
+				}							
 				if = {
 					limit = { 
 						root = { has_technology = "tech_gateway_activation" } 
