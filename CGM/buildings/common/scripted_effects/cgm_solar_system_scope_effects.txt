@@ -1,0 +1,243 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+#this in this file is solar_system scope
+#root in this file is country
+#prev in this file is starbase scope
+set_shipyard_weight = {
+	if = {
+		limit = {
+			NOR = {
+				has_star_flag = shipyard_candidate_system
+				has_star_flag = shipyard_check_delay
+				star = { is_star_class = sc_black_hole }
+				any_planet = { is_planet_class = pc_pulsar }
+			}
+		}
+		if = {
+			limit = {
+				calc_true_if = {
+					amount = 3
+					event_target:starbase_system_star = {
+						check_variable = { which = num_of_hyperlane_connections value > 1 }
+					}
+					prev = {
+						count_starbase_modules = { type = shipyard count > 2 }
+					}
+					root = {
+						any_system_within_border = {
+							distance = { source = event_target:starbase_system_star type = hyperlane min_jumps = 3 }
+							has_star_flag = shipyard_system
+						}
+					}
+					NOR = {
+						has_star_flag = shipyard_system
+						AND = {
+							has_star_flag = enclave
+							any_ship_in_system = {
+								exists = owner
+								owner = { has_country_flag = curator_enclave_country }
+							}
+						}
+						AND = {
+							has_star_flag = enclave
+							any_ship_in_system = {
+								exists = owner
+								owner = { is_same_value = event_target:artist_enclave_country }
+							}
+						}
+						AND = {
+							has_star_flag = enclave
+							any_ship_in_system = {
+								exists = owner
+								owner = { has_country_flag = trader_enclave_country }
+							}
+						}
+					}
+					any_country = {
+						OR = { is_at_war_with = root is_rival = root is_hostile_to = root is_threatened_to = root is_angry_to = root is_domineering_to = root }
+						any_system_within_border = {
+							distance = { source = event_target:starbase_system_star type = hyperlane min_jumps = 4 }
+						}
+					}
+					NOT = {
+						any_system = {
+							distance = { source = event_target:starbase_system_star type = hyperlane max_jumps = 2 }
+							NOT = { is_within_borders_of = root }
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					prev = {
+						count_starbase_modules = { type = shipyard count = 1 }
+					}
+				}
+				event_target:starbase_system_star = {
+					set_variable = { which = num_of_shipyard_modules value = 1 }
+				}
+				else = {
+					if = {
+						limit = {
+							prev = {
+								count_starbase_modules = { type = shipyard count = 2 }
+							}
+						}
+						event_target:starbase_system_star = {
+							set_variable = { which = num_of_shipyard_modules value = 2 }
+						}
+						else = {
+							if = {
+								limit = {
+									prev = {
+										count_starbase_modules = { type = shipyard count = 3 }
+									}
+								}
+								event_target:starbase_system_star = {
+									set_variable = { which = num_of_shipyard_modules value = 3 }
+								}
+								else = {
+									if = {
+										limit = {
+											prev = {
+												count_starbase_modules = { type = shipyard count = 4 }
+											}
+										}
+										event_target:starbase_system_star = {
+											set_variable = { which = num_of_shipyard_modules value = 4 }
+										}
+										else = {
+											if = {
+												limit = {
+													prev = {
+														count_starbase_modules = { type = shipyard count = 5 }
+													}
+												}
+												event_target:starbase_system_star = {
+													set_variable = { which = num_of_shipyard_modules value = 5 }
+												}
+												else = {
+													if = {
+														limit = {
+															prev = {
+																OR = {
+																	count_starbase_modules = { type = shipyard count = 6 }
+																	count_starbase_modules = { type = shipyard count > 6 } #failsafe for mods that add more module slots
+																}
+															}
+														}
+														event_target:starbase_system_star = {
+															set_variable = { which = num_of_shipyard_modules value = 6 }
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			event_target:starbase_system_star = {
+				set_variable = { which = shipyard_weight value = num_of_shipyard_modules }
+			}
+			if = {
+				limit = {
+					any_planet = {
+						is_colony = yes
+						exists = owner
+						owner = { is_same_value = root }
+					}
+				}
+				every_system_planet = {
+					limit = {
+						is_colony = yes
+						exists = owner
+						owner = { is_same_value = root }
+					}
+					event_target:starbase_system_star = {
+						change_variable = { which = shipyard_weight value = -1 }
+					}
+				}
+			}
+			every_neighbor_system = {
+				ignore_hyperlanes = no
+				limit = {
+					is_within_borders_of = root
+					any_planet = {
+						exists = owner
+						owner = { is_same_value = root }
+					}
+				}
+				event_target:starbase_system_star = {
+					change_variable = { which = shipyard_weight value = 1 }
+				}
+			}
+			if = {
+				limit = { has_star_flag = gateway_system }
+				event_target:starbase_system_star = {
+					change_variable = { which = shipyard_weight value = 4 }
+				}
+			}
+			every_neighbor_system = {
+				ignore_hyperlanes = no
+				limit = { has_star_flag = gateway_system is_within_borders_of = root }
+				event_target:starbase_system_star = {
+					change_variable = { which = shipyard_weight value = 2 }
+				}
+			}
+			event_target:starbase_system_star = {
+				multiply_variable = { which = shipyard_weight value = num_of_hyperlane_connections }
+				change_variable = { which = shipyard_weight value = starbase_level_record }
+			}
+			if = {
+				limit = {
+					event_target:starbase_system_star = {
+						check_variable = { which = shipyard_weight value > 0 }
+					}
+				}
+				set_timed_star_flag = { flag = shipyard_candidate_system days = 3600 }
+				else = {
+					set_timed_star_flag = { flag = shipyard_check_delay days = 3600 }
+				}
+			}
+		}
+	}
+}
+check_and_assign_shipyard_system_flag = {
+	random_system_planet = {
+		limit = { has_planet_flag = system_variable_repository }
+		save_event_target_as = system_check_target
+	}
+	root = {
+		every_system_within_border = {
+			limit = {
+				NOT = { is_same_value = event_target:system_check_target.solar_system }
+				distance = { source = event_target:system_check_target type = hyperlane max_jumps = 4 }
+				has_star_flag = shipyard_candidate_system
+			}
+			if = {
+				limit = {
+					NOR = {
+						any_planet = {
+							check_variable = { which = shipyard_weight value > event_target:system_check_target }
+						}
+						has_star_flag = shipyard_system
+					}
+				}
+				event_target:system_check_target.solar_system = { remove_star_flag = shipyard_candidate_system set_star_flag = shipyard_system }
+				root = {
+					change_variable = { which = num_existing_shipyard_systems value = 1 }
+					change_variable = { which = required_shipyard_systems value = -1 }
+				}
+				else = {
+					remove_star_flag = shipyard_candidate_system
+					set_timed_star_flag = { flag = shipyard_check_delay days = 3589 }
+				}
+			}
+		}
+	}
+}

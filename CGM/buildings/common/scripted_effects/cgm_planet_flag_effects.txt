@@ -1,0 +1,332 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+add_ai_planet_flags = {
+	if = {
+		#stronghold/fortress
+		limit = {
+			years_passed > 25
+			NOR = {
+				has_planet_flag = fortify_planet
+				AND = {
+					owner = { is_at_war = no }
+					OR = {
+						AND = {
+							is_capital = no
+							count_tile = {
+								limit = {
+									OR = { has_building = building_stronghold has_building_fortress = yes has_building = building_planetary_shield_generator }
+								}
+								count > 2
+							}
+						}
+						AND = {
+							is_capital = no
+							count_tile = {
+								limit = {
+									OR = { has_building = building_stronghold has_building_fortress = yes has_building = building_planetary_shield_generator }
+								}
+								count > 3
+							}
+						}
+					}
+				}
+			}
+			OR = {
+				AND = {
+					unrest > 40
+					OR = {
+						NOT = {
+							any_owned_pop = { is_enslaved = yes }
+						}
+						has_building = building_slave_processing
+					}
+				}
+				AND = {
+					owner = { is_at_war = yes }
+					OR = {
+						AND = {
+							any_country = {
+								is_at_war_with = root.owner
+								any_owned_planet = {
+									is_colony = yes
+									distance = { source = root min_distance = 70 max_distance = 100 }
+								}
+							}
+							NOT = {
+								count_tile = {
+									limit = {
+										OR = { has_building = building_stronghold has_building_fortress = yes }
+									}
+									count > 4
+								}
+							}
+						}
+						AND = {
+							sector_controlled = yes
+							OR = { has_capital_1 = yes has_capital_2 = yes }
+							count_tile = {
+								limit = {
+									OR = { has_building = building_stronghold has_building_fortress = yes }
+								}
+								count < 1
+							}
+						}
+						AND = {
+							sector_controlled = no
+							has_capital_1 = yes
+							count_tile = {
+								limit = {
+									OR = { has_building = building_stronghold has_building_fortress = yes }
+								}
+								count < 1
+							}
+						}
+						AND = {
+							sector_controlled = no
+							has_capital_2 = yes
+							count_tile = {
+								limit = {
+									OR = { has_building = building_stronghold has_building_fortress = yes }
+								}
+								count < 2
+							}
+						}
+						AND = {
+							is_capital = yes
+							count_tile = {
+								limit = {
+									OR = { has_building = building_stronghold has_building_fortress = yes }
+								}
+								count < 3
+							}
+						}
+					}
+				}
+			}
+		}
+		set_timed_planet_flag = { flag = fortify_planet days = 180 }
+	}
+	if = {
+		#planetary shield generator
+		limit = {
+			NOR = { has_planet_flag = build_planetary_shield_generator has_building = building_planetary_shield_generator }
+			owner = { has_technology = "tech_planetary_shield_generator" is_subject = no }
+			any_country = {
+				OR = { is_hostile_to = owner is_angry_to = owner is_domineering_to = owner is_rival = owner is_at_war_with = owner }
+			}
+			OR = {
+				AND = {
+					is_capital = yes
+					count_tile = {
+						limit = {
+							OR = { has_building = building_stronghold has_building_fortress = yes }
+						}
+						count > 2
+					}
+				}
+				AND = {
+					is_capital = no
+					sector_controlled = no
+					count_tile = {
+						limit = {
+							OR = { has_building = building_stronghold has_building_fortress = yes }
+						}
+						count > 1
+					}
+				}
+			}
+		}
+		if = {
+			limit = { has_planet_flag = fortify_planet }
+			remove_planet_flag = fortify_planet
+		}
+		set_timed_planet_flag = { flag = build_planetary_shield_generator days = 180 }
+	}
+	if = {
+		#military academy
+		limit = {
+			owner = {
+				has_technology = "tech_centralized_command"
+				if = {
+					limit = { overhauled_building_stats_enabled = no }
+					is_machine_empire = no
+				}
+				if = {
+					limit = { overhauled_building_stats_enabled = yes }
+					is_gestalt_consciousness = no
+				}
+				NOT = {
+					any_owned_planet = {
+						NOT = { is_same_value = from }
+						has_building = building_military_academy
+					}
+				}
+			}
+			sector_controlled = no
+			NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_military_academy has_building = building_military_academy }
+			any_owned_pop = {
+				is_warrior_pop = yes
+				OR = {
+					has_military_service_type = { type = military_service_full country = owner }
+					has_military_service_type = { type = military_service_limited country = owner }
+				}
+				OR = {
+					is_enslaved = no
+					AND = {
+						is_enslaved = yes
+						prev = { has_building = building_slave_processing }
+					}
+				}
+			}
+		}
+		set_timed_planet_flag = { flag = build_military_academy days = 180 }
+	}
+	if = {
+		#cloning vats
+		limit = {
+			sector_controlled = no
+			NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_military_academy has_planet_flag = build_clone_vats has_building = building_clone_vats }
+			owner = {
+				is_machine_empire = no
+				is_synth_empire = no
+				has_technology = "tech_gene_banks"
+				OR = {
+					NOT = {
+						any_owned_planet = { has_building = building_military_academy }
+					}
+					prev = { has_building = building_military_academy }
+				}
+			}
+			any_owned_pop = {
+				is_robot_pop = no
+				is_warrior_pop = yes
+				OR = {
+					has_military_service_type = { type = military_service_full country = owner }
+					has_military_service_type = { type = military_service_limited country = owner }
+				}
+			}
+		}
+		set_timed_planet_flag = { flag = build_clone_vats days = 180 }
+	}
+	if = {
+		#war factory
+		limit = {
+			overhauled_building_stats_enabled = yes
+			owner_is_machine_empire = yes
+			sector_controlled = no
+			NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_war_factory has_building = building_war_factory }
+			count_pops = {
+				limit = {
+					is_colony_pop = yes
+					OR = {
+						is_robot_pop = yes
+						AND = {
+							owner = { is_assimilator = yes }
+							has_trait = trait_cybernetic
+						}
+					}
+				}
+				count > 9
+			}
+		}
+		set_timed_planet_flag = { flag = build_war_factory days = 180 }
+	}
+	if = {
+		#pop growth buildings
+		limit = {
+			NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_pop_growth_building has_building = building_clinic has_building_hospital = yes has_building = building_spare_parts_depot has_building_unit_assembly_plant = yes }
+			owner = {
+				OR = { has_technology = "tech_frontier_health" has_technology = "tech_frontier_hospital" has_technology = "tech_modular_components" has_technology = "tech_intelligent_factories" }
+			}
+			free_pop_tiles > 2
+			OR = {
+				any_owned_pop = { is_robot_pop = no has_population_control = no }
+				AND = {
+					owner = {
+						OR = { has_authority = auth_machine_intelligence has_country_flag = synthethic_age }
+						balance > 250
+					}
+					any_owned_pop = { is_robot_pop = yes }
+				}
+			}
+		}
+		set_timed_planet_flag = { flag = build_pop_growth_building days = 180 }
+	}
+	if = {
+		limit = {
+			NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_slave_processing has_building = building_slave_processing }
+			owner = {
+				has_technology = "tech_neural_implants"
+				OR = {
+					AND = { overhauled_building_stats_enabled = no is_machine_empire = no }
+					AND = { overhauled_building_stats_enabled = yes is_gestalt_consciousness = no }
+				}
+				has_policy_flag = slavery_allowed
+			}
+			any_owned_pop = { is_enslaved = yes }
+			OR = {
+				count_pops = {
+					limit = {
+						OR = {
+							has_slavery_type = { country = owner type = slavery_military }
+							has_slavery_type = { country = owner type = slavery_normal }
+						}
+					}
+					count > 3
+				}
+				unrest > 30
+			}
+		}
+		set_timed_planet_flag = { flag = build_slave_processing days = 180 }
+	}
+	if = {
+		limit = {
+			NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_neuro_electric_amplifier has_building = building_neuro_electric_amplifier }
+			owner = { has_authority = auth_machine_intelligence has_government = gov_machine_assimilator has_swapped_tradition = tr_synchronicity_cyber_comms }
+			count_pops = {
+				limit = { has_trait = trait_cybernetic }
+				count > 3
+			}
+		}
+		set_timed_planet_flag = { flag = build_neuro_electric_amplifier days = 180 }
+	}
+	#### empire unique buildings
+	if = {
+		limit = {
+			NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_ethics_and_unrest_empire_unique }
+			is_capital = yes
+			has_capital_3 = yes
+			owner = {
+				is_machine_empire = no
+				OR = {
+					AND = {
+						has_technology = "tech_galactic_benevolence"
+						prev = {
+							NOT = { has_building = building_ministry_benevolence }
+						}
+					}
+					AND = {
+						has_ascension_perk = ap_mind_over_matter
+						prev = {
+							NOT = { has_building = building_psi_corps }
+						}
+					}
+				}
+				any_owned_planet = {
+					OR = {
+						unrest > 0.3
+						count_pops = {
+							limit = {
+								opposing_ethics_divergence = { steps > 1 who = owner }
+							}
+							count > 3
+						}
+					}
+				}
+				influence > 250
+			}
+		}
+		set_timed_planet_flag = { flag = build_ethics_and_unrest_empire_unique days = 180 }
+	}
+}

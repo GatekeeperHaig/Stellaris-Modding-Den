@@ -1,0 +1,2880 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+### Effects in this file are ran on tile scope.
+set_tile_building_weight = {
+	calculate_tile_weight = yes
+	###tile weight = country deficit/income + tile resources + adj. bonuses (if exist) + tile multiplier ( planet multiplier + planet average pop multiplier )
+	#planet multiplier = planet modifier(s) + buildings that give a planet modifier
+	#pop multiplier = all pops' trait and species rights' modifiers combined then divided by number of pops on planet
+	#the operation below multiplies tile weight * planet multiplier
+	if = {
+		limit = {
+			prev.owner = {
+				OR = { is_machine_empire = no is_servitor = yes }
+			}
+		}
+		prev = {
+			#to make sure the multiplier is counted on 0 variable tiles
+			#change_variable = { which = "energy_weight" value = 0.001 }
+			#change_variable = { which = "minerals_weight" value = 0.001 }
+			#change_variable = { which = "food_weight" value = 0.001 }
+			#change_variable = { which = "unity_weight" value = 0.001 }
+			#change_variable = { which = "society_research_weight" value = 0.001 }
+			#change_variable = { which = "physics_research_weight" value = 0.001 }
+			#change_variable = { which = "engineering_research_weight" value = 0.001 }
+			multiply_variable = { which = "energy_weight" value = "energy_mult_planet_tile" }
+			multiply_variable = { which = "minerals_weight" value = "minerals_mult_planet_tile" }
+			multiply_variable = { which = "food_weight" value = "food_mult_planet_tile" }
+			multiply_variable = { which = "unity_weight" value = "unity_mult_planet_tile" }
+			multiply_variable = { which = "society_research_weight" value = "society_research_mult_planet_tile" }
+			multiply_variable = { which = "physics_research_weight" value = "physics_research_mult_planet_tile" }
+			multiply_variable = { which = "engineering_research_weight" value = "engineering_research_mult_planet_tile" }
+			#change_variable = { which = "energy_weight" value = -0.001 }
+			#change_variable = { which = "minerals_weight" value = -0.001 }
+			#change_variable = { which = "food_weight" value = -0.001 }
+			#change_variable = { which = "unity_weight" value = -0.001 }
+			#change_variable = { which = "society_research_weight" value = -0.001 }
+			#change_variable = { which = "physics_research_weight" value = -0.001 }
+			#change_variable = { which = "engineering_research_weight" value = -0.001 }
+		}
+		if = {
+			limit = {
+				prev = {
+					OR = {
+						check_variable = { which = "energy_weight" value > 0 }
+						check_variable = { which = "minerals_weight" value > 0 }
+						check_variable = { which = "food_weight" value > 0 }
+						check_variable = { which = "unity_weight" value > 0 }
+						check_variable = { which = "society_research_weight" value > 0 }
+						check_variable = { which = "physics_research_weight" value > 0 }
+						check_variable = { which = "engineering_research_weight" value > 0 }
+					}
+				}
+			}
+			if = {
+				limit = {
+					prev = {
+						check_variable = { which = "energy_weight" value > 0 }
+					}
+				}
+				prev = {
+					change_variable = { which = "energy_weight" value = 0.001 }
+				}
+				if = {
+					limit = {
+						prev = {
+							check_variable = { which = "energy_weight" value > "minerals_weight" }
+							check_variable = { which = "energy_weight" value > "food_weight" }
+							check_variable = { which = "energy_weight" value > "unity_weight" }
+							check_variable = { which = "energy_weight" value > "society_research_weight" }
+							check_variable = { which = "energy_weight" value > "physics_research_weight" }
+							check_variable = { which = "energy_weight" value > "engineering_research_weight" }
+						}
+					}
+					add_deposit = energy_building_tile
+					#log = "energy_building_tile_deposit"
+				}
+				prev = {
+					change_variable = { which = "energy_weight" value = -0.001 }
+				}
+			}
+			if = {
+				limit = {
+					prev = {
+						check_variable = { which = "minerals_weight" value > 0 }
+					}
+				}
+				prev = {
+					change_variable = { which = "minerals_weight" value = 0.001 }
+				}
+				if = {
+					limit = {
+						prev = {
+							check_variable = { which = "minerals_weight" value > "energy_weight" }
+							check_variable = { which = "minerals_weight" value > "food_weight" }
+							check_variable = { which = "minerals_weight" value > "unity_weight" }
+							check_variable = { which = "minerals_weight" value > "society_research_weight" }
+							check_variable = { which = "minerals_weight" value > "physics_research_weight" }
+							check_variable = { which = "minerals_weight" value > "engineering_research_weight" }
+						}
+					}
+					add_deposit = minerals_building_tile
+					#log = "minerals_building_tile_deposit"
+				}
+				prev = {
+					change_variable = { which = "minerals_weight" value = -0.001 }
+				}
+			}
+			if = {
+				limit = {
+					prev = {
+						check_variable = { which = "food_weight" value > 0 }
+					}
+				}
+				prev = {
+					change_variable = { which = "food_weight" value = 0.001 }
+				}
+				if = {
+					limit = {
+						prev = {
+							check_variable = { which = "food_weight" value > "minerals_weight" }
+							check_variable = { which = "food_weight" value > "energy_weight" }
+							check_variable = { which = "food_weight" value > "unity_weight" }
+							check_variable = { which = "food_weight" value > "society_research_weight" }
+							check_variable = { which = "food_weight" value > "physics_research_weight" }
+							check_variable = { which = "food_weight" value > "engineering_research_weight" }
+						}
+					}
+					add_deposit = food_building_tile
+					#log = "food_building_tile_deposit"
+				}
+				prev = {
+					change_variable = { which = "food_weight" value = -0.001 }
+				}
+			}
+			if = {
+				limit = {
+					prev = {
+						check_variable = { which = "society_research_weight" value > 0 }
+					}
+				}
+				prev = {
+					change_variable = { which = "society_research_weight" value = 0.001 }
+				}
+				if = {
+					limit = {
+						prev = {
+							check_variable = { which = "society_research_weight" value > "minerals_weight" }
+							check_variable = { which = "society_research_weight" value > "food_weight" }
+							check_variable = { which = "society_research_weight" value > "unity_weight" }
+							check_variable = { which = "society_research_weight" value > "energy_weight" }
+							check_variable = { which = "society_research_weight" value > "physics_research_weight" }
+							check_variable = { which = "society_research_weight" value > "engineering_research_weight" }
+						}
+					}
+					add_deposit = society_research_building_tile
+					#log = "society_research_building_tile_deposit"
+				}
+				prev = {
+					change_variable = { which = "society_research_weight" value = -0.001 }
+				}
+			}
+			if = {
+				limit = {
+					prev = {
+						check_variable = { which = "physics_research_weight" value > 0 }
+					}
+				}
+				prev = {
+					change_variable = { which = "physics_research_weight" value = 0.001 }
+				}
+				if = {
+					limit = {
+						prev = {
+							check_variable = { which = "physics_research_weight" value > "minerals_weight" }
+							check_variable = { which = "physics_research_weight" value > "food_weight" }
+							check_variable = { which = "physics_research_weight" value > "unity_weight" }
+							check_variable = { which = "physics_research_weight" value > "energy_weight" }
+							check_variable = { which = "physics_research_weight" value > "society_research_weight" }
+							check_variable = { which = "physics_research_weight" value > "engineering_research_weight" }
+						}
+					}
+					add_deposit = physics_research_building_tile
+					#log = "physics_research_building_tile_deposit"
+				}
+				prev = {
+					change_variable = { which = "physics_research_weight" value = -0.001 }
+				}
+			}
+			if = {
+				limit = {
+					prev = {
+						check_variable = { which = "engineering_research_weight" value > 0 }
+					}
+				}
+				prev = {
+					change_variable = { which = "engineering_research_weight" value = 0.001 }
+				}
+				if = {
+					limit = {
+						prev = {
+							check_variable = { which = "engineering_research_weight" value > "minerals_weight" }
+							check_variable = { which = "engineering_research_weight" value > "food_weight" }
+							check_variable = { which = "engineering_research_weight" value > "unity_weight" }
+							check_variable = { which = "engineering_research_weight" value > "energy_weight" }
+							check_variable = { which = "engineering_research_weight" value > "society_research_weight" }
+							check_variable = { which = "engineering_research_weight" value > "physics_research_weight" }
+						}
+					}
+					add_deposit = engineering_research_building_tile
+					#log = "engineering_research_building_tile_deposit"
+				}
+				prev = {
+					change_variable = { which = "engineering_research_weight" value = -0.001 }
+				}
+			}
+			if = {
+				limit = {
+					prev = {
+						check_variable = { which = "unity_weight" value > 0 }
+					}
+				}
+				prev = {
+					change_variable = { which = "unity_weight" value = 0.001 }
+				}
+				if = {
+					limit = {
+						prev = {
+							check_variable = { which = "unity_weight" value > "minerals_weight" }
+							check_variable = { which = "unity_weight" value > "food_weight" }
+							check_variable = { which = "unity_weight" value > "energy_weight" }
+							check_variable = { which = "unity_weight" value > "engineering_research_weight" }
+							check_variable = { which = "unity_weight" value > "society_research_weight" }
+							check_variable = { which = "unity_weight" value > "physics_research_weight" }
+						}
+					}
+					add_deposit = unity_building_tile
+					#log = "unity_building_tile_deposit"
+				}
+				prev = {
+					change_variable = { which = "unity_weight" value = -0.001 }
+				}
+			}
+			else = {
+				prev = {
+					multiply_variable = { which = "energy_weight" value = "energy_mult_planet_tile" }
+					multiply_variable = { which = "minerals_weight" value = "minerals_mult_planet_tile" }
+					multiply_variable = { which = "unity_weight" value = "unity_mult_planet_tile" }
+					multiply_variable = { which = "society_research_weight" value = "society_research_mult_planet_tile" }
+					multiply_variable = { which = "physics_research_weight" value = "physics_research_mult_planet_tile" }
+					multiply_variable = { which = "engineering_research_weight" value = "engineering_research_mult_planet_tile" }
+				}
+				if = {
+					limit = {
+						prev = {
+							OR = {
+								check_variable = { which = "energy_weight" value > 0 }
+								check_variable = { which = "minerals_weight" value > 0 }
+								check_variable = { which = "unity_weight" value > 0 }
+								check_variable = { which = "society_research_weight" value > 0 }
+								check_variable = { which = "physics_research_weight" value > 0 }
+								check_variable = { which = "engineering_research_weight" value > 0 }
+							}
+						}
+					}
+					if = {
+						limit = {
+							prev = {
+								check_variable = { which = "energy_weight" value > 0 }
+							}
+						}
+						prev = {
+							change_variable = { which = "energy_weight" value = 0.001 }
+						}
+						if = {
+							limit = {
+								prev = {
+									check_variable = { which = "energy_weight" value > "minerals_weight" }
+									check_variable = { which = "energy_weight" value > "unity_weight" }
+									check_variable = { which = "energy_weight" value > "society_research_weight" }
+									check_variable = { which = "energy_weight" value > "physics_research_weight" }
+									check_variable = { which = "energy_weight" value > "engineering_research_weight" }
+								}
+							}
+							add_deposit = energy_building_tile
+							#log = "energy_building_tile_deposit"
+						}
+						prev = {
+							change_variable = { which = "energy_weight" value = -0.001 }
+						}
+					}
+					if = {
+						limit = {
+							prev = {
+								check_variable = { which = "minerals_weight" value > 0 }
+							}
+						}
+						prev = {
+							change_variable = { which = "minerals_weight" value = 0.001 }
+						}
+						if = {
+							limit = {
+								prev = {
+									check_variable = { which = "minerals_weight" value > "energy_weight" }
+									check_variable = { which = "minerals_weight" value > "unity_weight" }
+									check_variable = { which = "minerals_weight" value > "society_research_weight" }
+									check_variable = { which = "minerals_weight" value > "physics_research_weight" }
+									check_variable = { which = "minerals_weight" value > "engineering_research_weight" }
+								}
+							}
+							add_deposit = minerals_building_tile
+							#log = "minerals_building_tile_deposit"
+						}
+						prev = {
+							change_variable = { which = "minerals_weight" value = -0.001 }
+						}
+					}
+					if = {
+						limit = {
+							prev = {
+								check_variable = { which = "society_research_weight" value > 0 }
+							}
+						}
+						prev = {
+							change_variable = { which = "society_research_weight" value = 0.001 }
+						}
+						if = {
+							limit = {
+								prev = {
+									check_variable = { which = "society_research_weight" value > "minerals_weight" }
+									check_variable = { which = "society_research_weight" value > "unity_weight" }
+									check_variable = { which = "society_research_weight" value > "energy_weight" }
+									check_variable = { which = "society_research_weight" value > "physics_research_weight" }
+									check_variable = { which = "society_research_weight" value > "engineering_research_weight" }
+								}
+							}
+							add_deposit = society_research_building_tile
+							#log = "society_research_building_tile_deposit"
+						}
+						prev = {
+							change_variable = { which = "society_research_weight" value = -0.001 }
+						}
+					}
+					if = {
+						limit = {
+							prev = {
+								check_variable = { which = "physics_research_weight" value > 0 }
+							}
+						}
+						prev = {
+							change_variable = { which = "physics_research_weight" value = 0.001 }
+						}
+						if = {
+							limit = {
+								prev = {
+									check_variable = { which = "physics_research_weight" value > "minerals_weight" }
+									check_variable = { which = "physics_research_weight" value > "unity_weight" }
+									check_variable = { which = "physics_research_weight" value > "energy_weight" }
+									check_variable = { which = "physics_research_weight" value > "society_research_weight" }
+									check_variable = { which = "physics_research_weight" value > "engineering_research_weight" }
+								}
+							}
+							add_deposit = physics_research_building_tile
+							#log = "physics_research_building_tile_deposit"
+						}
+						prev = {
+							change_variable = { which = "physics_research_weight" value = -0.001 }
+						}
+					}
+					if = {
+						limit = {
+							prev = {
+								check_variable = { which = "engineering_research_weight" value > 0 }
+							}
+						}
+						prev = {
+							change_variable = { which = "engineering_research_weight" value = 0.001 }
+						}
+						if = {
+							limit = {
+								prev = {
+									check_variable = { which = "engineering_research_weight" value > "minerals_weight" }
+									check_variable = { which = "engineering_research_weight" value > "unity_weight" }
+									check_variable = { which = "engineering_research_weight" value > "energy_weight" }
+									check_variable = { which = "engineering_research_weight" value > "society_research_weight" }
+									check_variable = { which = "engineering_research_weight" value > "physics_research_weight" }
+								}
+							}
+							add_deposit = engineering_research_building_tile
+							#log = "engineering_research_building_tile_deposit"
+						}
+						prev = {
+							change_variable = { which = "engineering_research_weight" value = -0.001 }
+						}
+					}
+					if = {
+						limit = {
+							prev = {
+								check_variable = { which = "unity_weight" value > 0 }
+							}
+						}
+						prev = {
+							change_variable = { which = "unity_weight" value = 0.001 }
+						}
+						if = {
+							limit = {
+								prev = {
+									check_variable = { which = "unity_weight" value > "minerals_weight" }
+									check_variable = { which = "unity_weight" value > "energy_weight" }
+									check_variable = { which = "unity_weight" value > "engineering_research_weight" }
+									check_variable = { which = "unity_weight" value > "society_research_weight" }
+									check_variable = { which = "unity_weight" value > "physics_research_weight" }
+								}
+							}
+							add_deposit = unity_building_tile
+							#log = "unity_building_tile_deposit"
+						}
+						prev = {
+							change_variable = { which = "unity_weight" value = -0.001 }
+						}
+					}
+				}
+			}
+		}
+	}
+}
+calculate_tile_weight = {
+	if = {
+		limit = {
+			OR = {
+				has_deposit = yes
+				any_neighboring_tile = {
+					OR = { has_building = yes has_blocker = yes }
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_resource = { type = energy amount > 0 }
+			}
+			check_energy_deposit = yes
+			else = {
+				prev = {
+					change_variable = { which = energy_weight value = 0 }
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_resource = { type = minerals amount > 0 }
+			}
+			check_minerals_deposit = yes
+			else = {
+				prev = {
+					change_variable = { which = minerals_weight value = 0 }
+				}
+			}
+		}
+		if = {
+			limit = {
+				prev.owner = {
+					OR = { is_machine_empire = no is_servitor = yes }
+				}
+				has_resource = { type = food amount > 0 }
+			}
+			check_food_deposit = yes
+			else = {
+				prev = {
+					change_variable = { which = food_weight value = 0 }
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_resource = { type = unity amount > 0 }
+			}
+			check_unity_deposit = yes
+			else = {
+				prev = {
+					change_variable = { which = unity_weight value = 0 }
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_resource = { type = society_research amount > 0 }
+			}
+			check_society_research_deposit = yes
+			else = {
+				prev = {
+					change_variable = { which = society_research_weight value = 0 }
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_resource = { type = engineering_research amount > 0 }
+			}
+			check_engineering_research_deposit = yes
+			else = {
+				prev = {
+					change_variable = { which = engineering_research_weight value = 0 }
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_resource = { type = physics_research amount > 0 }
+			}
+			check_physics_research_deposit = yes
+			else = {
+				prev = {
+					change_variable = { which = physics_research_weight value = 0 }
+				}
+			}
+		}
+		if = {
+			limit = {
+				any_neighboring_tile = { has_building = yes }
+			}
+			check_neighboring_adj_bonus_buildings = yes
+		}
+		if = {
+			limit = {
+				any_neighboring_tile = { has_blocker = yes }
+			}
+			check_adj_bonus_blockers = yes
+		}
+	}
+}
+check_energy_deposit = {
+	if = {
+		limit = {
+			has_resource = { type = energy amount = 1 }
+		}
+		prev = {
+			change_variable = { which = energy_weight value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = energy amount = 2 }
+				}
+				prev = {
+					change_variable = { which = energy_weight value = 4 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = energy amount = 3 }
+						}
+						prev = {
+							change_variable = { which = energy_weight value = 9 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = energy amount = 4 }
+								}
+								prev = {
+									change_variable = { which = energy_weight value = 16 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = energy amount = 5 }
+										}
+										prev = {
+											change_variable = { which = energy_weight value = 25 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = energy amount = 6 }
+												}
+												prev = {
+													change_variable = { which = energy_weight value = 36 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = energy amount = 7 }
+														}
+														prev = {
+															change_variable = { which = energy_weight value = 49 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = energy amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = energy_weight value = 64 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = energy amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = energy_weight value = 81 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = energy amount > 9 }
+																				}
+																				prev = {
+																					change_variable = { which = energy_weight value = 101 }
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+check_minerals_deposit = {
+	if = {
+		limit = {
+			has_resource = { type = minerals amount = 1 }
+		}
+		prev = {
+			change_variable = { which = minerals_weight value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = minerals amount = 2 }
+				}
+				prev = {
+					change_variable = { which = minerals_weight value = 4 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = minerals amount = 3 }
+						}
+						prev = {
+							change_variable = { which = minerals_weight value = 9 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = minerals amount = 4 }
+								}
+								prev = {
+									change_variable = { which = minerals_weight value = 16 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = minerals amount = 5 }
+										}
+										prev = {
+											change_variable = { which = minerals_weight value = 25 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = minerals amount = 6 }
+												}
+												prev = {
+													change_variable = { which = minerals_weight value = 36 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = minerals amount = 7 }
+														}
+														prev = {
+															change_variable = { which = minerals_weight value = 49 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = minerals amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = minerals_weight value = 64 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = minerals amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = minerals_weight value = 81 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = minerals amount > 9 }
+																				}
+																				prev = {
+																					change_variable = { which = minerals_weight value = 101 }
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+check_food_deposit = {
+	if = {
+		limit = {
+			has_resource = { type = food amount = 1 }
+		}
+		prev = {
+			change_variable = { which = food_weight value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = food amount = 2 }
+				}
+				prev = {
+					change_variable = { which = food_weight value = 4 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = food amount = 3 }
+						}
+						prev = {
+							change_variable = { which = food_weight value = 9 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = food amount = 4 }
+								}
+								prev = {
+									change_variable = { which = food_weight value = 16 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = food amount = 5 }
+										}
+										prev = {
+											change_variable = { which = food_weight value = 25 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = food amount = 6 }
+												}
+												prev = {
+													change_variable = { which = food_weight value = 36 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = food amount = 7 }
+														}
+														prev = {
+															change_variable = { which = food_weight value = 49 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = food amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = food_weight value = 64 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = food amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = food_weight value = 81 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = food amount > 9 }
+																				}
+																				prev = {
+																					change_variable = { which = food_weight value = 101 }
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+check_unity_deposit = {
+	if = {
+		limit = {
+			has_resource = { type = unity amount = 1 }
+		}
+		prev = {
+			change_variable = { which = unity_weight value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = unity amount = 2 }
+				}
+				prev = {
+					change_variable = { which = unity_weight value = 4 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = unity amount = 3 }
+						}
+						prev = {
+							change_variable = { which = unity_weight value = 9 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = unity amount = 4 }
+								}
+								prev = {
+									change_variable = { which = unity_weight value = 16 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = unity amount = 5 }
+										}
+										prev = {
+											change_variable = { which = unity_weight value = 25 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = unity amount = 6 }
+												}
+												prev = {
+													change_variable = { which = unity_weight value = 36 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = unity amount = 7 }
+														}
+														prev = {
+															change_variable = { which = unity_weight value = 49 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = unity amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = unity_weight value = 64 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = unity amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = unity_weight value = 81 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = unity amount > 9 }
+																				}
+																				prev = {
+																					change_variable = { which = unity_weight value = 101 }
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+check_society_research_deposit = {
+	if = {
+		limit = {
+			has_resource = { type = society_research amount = 1 }
+		}
+		prev = {
+			change_variable = { which = society_research_weight value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = society_research amount = 2 }
+				}
+				prev = {
+					change_variable = { which = society_research_weight value = 4 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = society_research amount = 3 }
+						}
+						prev = {
+							change_variable = { which = society_research_weight value = 9 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = society_research amount = 4 }
+								}
+								prev = {
+									change_variable = { which = society_research_weight value = 16 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = society_research amount = 5 }
+										}
+										prev = {
+											change_variable = { which = society_research_weight value = 25 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = society_research amount = 6 }
+												}
+												prev = {
+													change_variable = { which = society_research_weight value = 36 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = society_research amount = 7 }
+														}
+														prev = {
+															change_variable = { which = society_research_weight value = 49 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = society_research amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = society_research_weight value = 64 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = society_research amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = society_research_weight value = 81 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = society_research amount > 9 }
+																				}
+																				prev = {
+																					change_variable = { which = society_research_weight value = 101 }
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+check_physics_research_deposit = {
+	if = {
+		limit = {
+			has_resource = { type = physics_research amount = 1 }
+		}
+		prev = {
+			change_variable = { which = physics_research_weight value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = physics_research amount = 2 }
+				}
+				prev = {
+					change_variable = { which = physics_research_weight value = 4 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = physics_research amount = 3 }
+						}
+						prev = {
+							change_variable = { which = physics_research_weight value = 9 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = physics_research amount = 4 }
+								}
+								prev = {
+									change_variable = { which = physics_research_weight value = 16 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = physics_research amount = 5 }
+										}
+										prev = {
+											change_variable = { which = physics_research_weight value = 25 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = physics_research amount = 6 }
+												}
+												prev = {
+													change_variable = { which = physics_research_weight value = 36 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = physics_research amount = 7 }
+														}
+														prev = {
+															change_variable = { which = physics_research_weight value = 49 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = physics_research amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = physics_research_weight value = 64 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = physics_research amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = physics_research_weight value = 81 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = physics_research amount > 9 }
+																				}
+																				prev = {
+																					change_variable = { which = physics_research_weight value = 101 }
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+check_engineering_research_deposit = {
+	if = {
+		limit = {
+			has_resource = { type = engineering_research amount = 1 }
+		}
+		prev = {
+			change_variable = { which = engineering_research_weight value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = engineering_research amount = 2 }
+				}
+				prev = {
+					change_variable = { which = engineering_research_weight value = 4 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = engineering_research amount = 3 }
+						}
+						prev = {
+							change_variable = { which = engineering_research_weight value = 9 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = engineering_research amount = 4 }
+								}
+								prev = {
+									change_variable = { which = engineering_research_weight value = 16 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = engineering_research amount = 5 }
+										}
+										prev = {
+											change_variable = { which = engineering_research_weight value = 25 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = engineering_research amount = 6 }
+												}
+												prev = {
+													change_variable = { which = engineering_research_weight value = 36 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = engineering_research amount = 7 }
+														}
+														prev = {
+															change_variable = { which = engineering_research_weight value = 49 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = engineering_research amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = engineering_research_weight value = 64 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = engineering_research amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = engineering_research_weight value = 81 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = engineering_research amount > 9 }
+																				}
+																				prev = {
+																					change_variable = { which = engineering_research_weight value = 101 }
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+check_neighboring_adj_bonus_buildings = {
+	if = {
+		limit = { planets_enhanced_enabled = yes }
+		check_neighboring_adj_bonus_buildings_pe = yes
+	}
+	if = {
+		limit = { alphamod_enabled = yes }
+		check_neighboring_adj_bonus_buildings_am = yes
+	}
+	if = {
+		limit = { eutab_enabled = yes }
+		check_neighboring_adj_bonus_buildings_eutab = yes
+	}
+	if = {
+		limit = { astrogeology_enabled = yes }
+		check_neighboring_adj_bonus_buildings_ag = yes
+	}
+	every_neighboring_tile = {
+		if = {
+			limit = { has_building = building_hyperstorage_facility_1 }
+			prevprev = {
+				change_variable = { which = minerals_weight value = @hyperstorage_t1_adjacency_bonus }
+				change_variable = { which = food_weight value = @hyperstorage_t1_adjacency_bonus }
+				change_variable = { which = energy_weight value = @hyperstorage_t1_adjacency_bonus }
+			}
+			else = {
+				if = {
+					limit = { has_building_hyperstorage_facility_2 = yes }
+					prevprev = {
+						change_variable = { which = minerals_weight value = @hyperstorage_t2_adjacency_bonus }
+						change_variable = { which = food_weight value = @hyperstorage_t2_adjacency_bonus }
+						change_variable = { which = energy_weight value = @hyperstorage_t2_adjacency_bonus }
+					}
+					else = {
+						if = {
+							limit = { has_building_hyperstorage_facility_3 = yes }
+							prevprev = {
+								change_variable = { which = minerals_weight value = @hyperstorage_t3_adjacency_bonus }
+								change_variable = { which = food_weight value = @hyperstorage_t3_adjacency_bonus }
+								change_variable = { which = energy_weight value = @hyperstorage_t3_adjacency_bonus }
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			prev = { is_habitat = no }
+		}
+		if = {
+			limit = {
+				prev.owner = { is_machine_empire = no }
+			}
+			every_neighboring_tile = {
+				if = {
+					limit = { has_building_capital_1 = yes }
+					prevprev = {
+						change_variable = { which = minerals_weight value = 1 }
+						change_variable = { which = food_weight value = 1 }
+						change_variable = { which = energy_weight value = 1 }
+						change_variable = { which = engineering_research_weight value = 1 }
+						change_variable = { which = society_research_weight value = 1 }
+						change_variable = { which = physics_research_weight value = 1 }
+					}
+					else = {
+						if = {
+							limit = { has_building_capital_2 = yes }
+							prevprev = {
+								change_variable = { which = minerals_weight value = 2 }
+								change_variable = { which = food_weight value = 2 }
+								change_variable = { which = energy_weight value = 2 }
+								change_variable = { which = engineering_research_weight value = 2 }
+								change_variable = { which = society_research_weight value = 2 }
+								change_variable = { which = physics_research_weight value = 2 }
+							}
+							else = {
+								if = {
+									limit = { has_building_capital_3 = yes }
+									prevprev = {
+										change_variable = { which = minerals_weight value = 3 }
+										change_variable = { which = food_weight value = 3 }
+										change_variable = { which = energy_weight value = 3 }
+										change_variable = { which = engineering_research_weight value = 3 }
+										change_variable = { which = society_research_weight value = 3 }
+										change_variable = { which = physics_research_weight value = 3 }
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			else = {
+				if = {
+					every_neighboring_tile = {
+						if = {
+							limit = { has_building_machine_capital_1 = yes }
+							prevprev = {
+								change_variable = { which = minerals_weight value = 1 }
+								change_variable = { which = food_weight value = 1 }
+								change_variable = { which = energy_weight value = 1 }
+								change_variable = { which = engineering_research_weight value = 1 }
+								change_variable = { which = society_research_weight value = 1 }
+								change_variable = { which = physics_research_weight value = 1 }
+							}
+							else = {
+								if = {
+									limit = { has_building_machine_capital_2 = yes }
+									prevprev = {
+										change_variable = { which = minerals_weight value = 2 }
+										change_variable = { which = food_weight value = 2 }
+										change_variable = { which = energy_weight value = 2 }
+										change_variable = { which = engineering_research_weight value = 2 }
+										change_variable = { which = society_research_weight value = 2 }
+										change_variable = { which = physics_research_weight value = 2 }
+									}
+									else = {
+										if = {
+											limit = { has_building_machine_capital_3 = yes }
+											prevprev = {
+												change_variable = { which = minerals_weight value = 3 }
+												change_variable = { which = food_weight value = 3 }
+												change_variable = { which = energy_weight value = 3 }
+												change_variable = { which = engineering_research_weight value = 3 }
+												change_variable = { which = society_research_weight value = 3 }
+												change_variable = { which = physics_research_weight value = 3 }
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		else = {
+			if = {
+				limit = { has_building = building_hab_capital }
+				prevprev = {
+					change_variable = { which = minerals_weight value = 1 }
+					change_variable = { which = food_weight value = 1 }
+					change_variable = { which = energy_weight value = 1 }
+					change_variable = { which = engineering_research_weight value = 1 }
+					change_variable = { which = society_research_weight value = 1 }
+					change_variable = { which = physics_research_weight value = 1 }
+				}
+				else = {
+					if = {
+						limit = { has_building_machine_capital_3 = yes }
+						prevprev = {
+							change_variable = { which = minerals_weight value = 3 }
+							change_variable = { which = food_weight value = 3 }
+							change_variable = { which = energy_weight value = 3 }
+							change_variable = { which = engineering_research_weight value = 3 }
+							change_variable = { which = society_research_weight value = 3 }
+							change_variable = { which = physics_research_weight value = 3 }
+						}
+						else = {
+							if = {
+								limit = { has_building_capital_3 = yes }
+								prevprev = {
+									change_variable = { which = minerals_weight value = 3 }
+									change_variable = { which = food_weight value = 3 }
+									change_variable = { which = energy_weight value = 3 }
+									change_variable = { which = engineering_research_weight value = 3 }
+									change_variable = { which = society_research_weight value = 3 }
+									change_variable = { which = physics_research_weight value = 3 }
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			prev = { is_artificial = yes }
+		}
+		every_neighboring_tile = {
+			limit = {
+				has_resource = { type = sr_megastructure_node amount > 0 }
+			}
+			if = {
+				limit = {
+					has_resource = { type = sr_megastructure_node amount = 1 }
+				}
+				if = {
+					limit = { has_building = building_energy_matter_converter_1_1 }
+					prevprev = {
+						change_variable = { which = minerals_weight value = @megastructure_unique_t1_1_adjacency_bonus }
+					}
+					else = {
+						if = {
+							limit = { has_building_energy_matter_converter_2_1 = yes }
+							prevprev = {
+								change_variable = { which = minerals_weight value = @megastructure_unique_t2_1_adjacency_bonus }
+							}
+							else = {
+								if = {
+									limit = { has_building_energy_matter_converter_3_1 = yes }
+									prevprev = {
+										change_variable = { which = minerals_weight value = @megastructure_unique_t3_1_adjacency_bonus }
+									}
+									else = {
+										if = {
+											limit = { has_building = building_energy_conduit_1_1 }
+											prevprev = {
+												change_variable = { which = energy_weight value = @megastructure_unique_t1_1_adjacency_bonus }
+											}
+											else = {
+												if = {
+													limit = { has_building_energy_conduit_2_1 = yes }
+													prevprev = {
+														change_variable = { which = energy_weight value = @megastructure_unique_t2_1_adjacency_bonus }
+													}
+													else = {
+														if = {
+															limit = { has_building_energy_conduit_3_1 = yes }
+															prevprev = {
+																change_variable = { which = energy_weight value = @megastructure_unique_t2_1_adjacency_bonus }
+															}
+															else = {
+																if = {
+																	limit = { has_building = building_food_replicator_1_1 }
+																	prevprev = {
+																		change_variable = { which = food_weight value = @megastructure_unique_t1_1_adjacency_bonus }
+																	}
+																	else = {
+																		if = {
+																			limit = { has_building_food_replicator_2_1 = yes }
+																			prevprev = {
+																				change_variable = { which = food_weight value = @megastructure_unique_t2_1_adjacency_bonus }
+																			}
+																			else = {
+																				if = {
+																					limit = { has_building_food_replicator_3_1 = yes }
+																					prevprev = {
+																						change_variable = { which = food_weight value = @megastructure_unique_t3_1_adjacency_bonus }
+																					}
+																					else = {
+																						if = {
+																							limit = { has_building = building_computational_array_1_1 }
+																							prevprev = {
+																								change_variable = { which = society_research_weight value = @megastructure_unique_t1_1_adjacency_bonus }
+																								change_variable = { which = physics_research_weight value = @megastructure_unique_t1_1_adjacency_bonus }
+																								change_variable = { which = engineering_research_weight value = @megastructure_unique_t1_1_adjacency_bonus }
+																							}
+																							else = {
+																								if = {
+																									limit = { has_building_computational_array_2_1 = yes }
+																									prevprev = {
+																										change_variable = { which = society_research_weight value = @megastructure_unique_t2_1_adjacency_bonus }
+																										change_variable = { which = physics_research_weight value = @megastructure_unique_t2_1_adjacency_bonus }
+																										change_variable = { which = engineering_research_weight value = @megastructure_unique_t2_1_adjacency_bonus }
+																									}
+																									else = {
+																										if = {
+																											limit = { has_building_computational_array_3_1 = yes }
+																											prevprev = {
+																												change_variable = { which = society_research_weight value = @megastructure_unique_t3_1_adjacency_bonus }
+																												change_variable = { which = physics_research_weight value = @megastructure_unique_t3_1_adjacency_bonus }
+																												change_variable = { which = engineering_research_weight value = @megastructure_unique_t3_1_adjacency_bonus }
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = sr_megastructure_node amount = 2 }
+						}
+						if = {
+							limit = { has_building = building_energy_matter_converter_1_2 }
+							prevprev = {
+								change_variable = { which = minerals_weight value = @megastructure_unique_t1_2_adjacency_bonus }
+							}
+							else = {
+								if = {
+									limit = { has_building_energy_matter_converter_2_2 = yes }
+									prevprev = {
+										change_variable = { which = minerals_weight value = @megastructure_unique_t2_2_adjacency_bonus }
+									}
+									else = {
+										if = {
+											limit = { has_building_energy_matter_converter_3_2 = yes }
+											prevprev = {
+												change_variable = { which = minerals_weight value = @megastructure_unique_t3_2_adjacency_bonus }
+											}
+											else = {
+												if = {
+													limit = { has_building = building_energy_conduit_1_2 }
+													prevprev = {
+														change_variable = { which = energy_weight value = @megastructure_unique_t1_2_adjacency_bonus }
+													}
+													else = {
+														if = {
+															limit = { has_building_energy_conduit_2_2 = yes }
+															prevprev = {
+																change_variable = { which = energy_weight value = @megastructure_unique_t2_2_adjacency_bonus }
+															}
+															else = {
+																if = {
+																	limit = { has_building_energy_conduit_3_2 = yes }
+																	prevprev = {
+																		change_variable = { which = energy_weight value = @megastructure_unique_t3_2_adjacency_bonus }
+																	}
+																	else = {
+																		if = {
+																			limit = { has_building = building_food_replicator_1_2 }
+																			prevprev = {
+																				change_variable = { which = food_weight value = @megastructure_unique_t1_2_adjacency_bonus }
+																			}
+																			else = {
+																				if = {
+																					limit = { has_building_food_replicator_2_2 = yes }
+																					prevprev = {
+																						change_variable = { which = food_weight value = @megastructure_unique_t2_2_adjacency_bonus }
+																					}
+																					else = {
+																						if = {
+																							limit = { has_building_food_replicator_3_2 = yes }
+																							prevprev = {
+																								change_variable = { which = food_weight value = @megastructure_unique_t3_2_adjacency_bonus }
+																							}
+																							else = {
+																								if = {
+																									limit = { has_building = building_computational_array_1_2 }
+																									prevprev = {
+																										change_variable = { which = society_research_weight value = @megastructure_unique_t1_2_adjacency_bonus }
+																										change_variable = { which = physics_research_weight value = @megastructure_unique_t1_2_adjacency_bonus }
+																										change_variable = { which = engineering_research_weight value = @megastructure_unique_t1_2_adjacency_bonus }
+																									}
+																									else = {
+																										if = {
+																											limit = { has_building_computational_array_2_2 = yes }
+																											prevprev = {
+																												change_variable = { which = society_research_weight value = @megastructure_unique_t2_2_adjacency_bonus }
+																												change_variable = { which = physics_research_weight value = @megastructure_unique_t2_2_adjacency_bonus }
+																												change_variable = { which = engineering_research_weight value = @megastructure_unique_t2_2_adjacency_bonus }
+																											}
+																											else = {
+																												if = {
+																													limit = { has_building_computational_array_3_2 = yes }
+																													prevprev = {
+																														change_variable = { which = society_research_weight value = @megastructure_unique_t3_2_adjacency_bonus }
+																														change_variable = { which = physics_research_weight value = @megastructure_unique_t3_2_adjacency_bonus }
+																														change_variable = { which = engineering_research_weight value = @megastructure_unique_t3_2_adjacency_bonus }
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = sr_megastructure_node amount = 3 }
+								}
+								if = {
+									limit = { has_building = building_energy_matter_converter_1_3 }
+									prevprev = {
+										change_variable = { which = minerals_weight value = @megastructure_unique_t1_3_adjacency_bonus }
+									}
+									else = {
+										if = {
+											limit = { has_building_energy_matter_converter_2_3 = yes }
+											prevprev = {
+												change_variable = { which = minerals_weight value = @megastructure_unique_t2_3_adjacency_bonus }
+											}
+											else = {
+												if = {
+													limit = { has_building_energy_matter_converter_3_3 = yes }
+													prevprev = {
+														change_variable = { which = minerals_weight value = @megastructure_unique_t3_3_adjacency_bonus }
+													}
+													else = {
+														if = {
+															limit = { has_building = building_energy_conduit_1_3 }
+															prevprev = {
+																change_variable = { which = energy_weight value = @megastructure_unique_t1_3_adjacency_bonus }
+															}
+															else = {
+																if = {
+																	limit = { has_building_energy_conduit_2_3 = yes }
+																	prevprev = {
+																		change_variable = { which = energy_weight value = @megastructure_unique_t2_3_adjacency_bonus }
+																	}
+																	else = {
+																		if = {
+																			limit = { has_building_energy_conduit_3_3 = yes }
+																			prevprev = {
+																				change_variable = { which = energy_weight value = @megastructure_unique_t3_3_adjacency_bonus }
+																			}
+																			else = {
+																				if = {
+																					limit = { has_building = building_food_replicator_1_3 }
+																					prevprev = {
+																						change_variable = { which = food_weight value = @megastructure_unique_t1_3_adjacency_bonus }
+																					}
+																					else = {
+																						if = {
+																							limit = { has_building_food_replicator_2_3 = yes }
+																							prevprev = {
+																								change_variable = { which = food_weight value = @megastructure_unique_t2_3_adjacency_bonus }
+																							}
+																							else = {
+																								if = {
+																									limit = { has_building_food_replicator_3_3 = yes }
+																									prevprev = {
+																										change_variable = { which = food_weight value = @megastructure_unique_t3_3_adjacency_bonus }
+																									}
+																									else = {
+																										if = {
+																											limit = { has_building = building_computational_array_1_3 }
+																											prevprev = {
+																												change_variable = { which = society_research_weight value = @megastructure_unique_t1_3_adjacency_bonus }
+																												change_variable = { which = physics_research_weight value = @megastructure_unique_t1_3_adjacency_bonus }
+																												change_variable = { which = engineering_research_weight value = @megastructure_unique_t1_3_adjacency_bonus }
+																											}
+																											else = {
+																												if = {
+																													limit = { has_building_computational_array_2_3 = yes }
+																													prevprev = {
+																														change_variable = { which = society_research_weight value = @megastructure_unique_t2_3_adjacency_bonus }
+																														change_variable = { which = physics_research_weight value = @megastructure_unique_t2_3_adjacency_bonus }
+																														change_variable = { which = engineering_research_weight value = @megastructure_unique_t2_3_adjacency_bonus }
+																													}
+																													else = {
+																														if = {
+																															limit = { has_building_computational_array_3_3 = yes }
+																															prevprev = {
+																																change_variable = { which = society_research_weight value = @megastructure_unique_t3_3_adjacency_bonus }
+																																change_variable = { which = physics_research_weight value = @megastructure_unique_t3_3_adjacency_bonus }
+																																change_variable = { which = engineering_research_weight value = @megastructure_unique_t3_3_adjacency_bonus }
+																															}
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+check_adj_bonus_blockers = {
+	if = {
+		limit = { alphamod_enabled = yes }
+		check_adj_bonus_blockers_am = yes
+	}
+	if = {
+		limit = { gpm_enabled = yes }
+		check_adj_bonus_blockers_gpm = yes
+	}
+	if = {
+		limit = { stellar_expedition_enabled = yes }
+		check_adj_bonus_blockers_se = yes
+	}
+	every_neighboring_tile = {
+		limit = { has_blocker = tb_wandering_forest_reserve }
+		prev = {
+			change_variable = { which = society_research_weight value = 9 }
+		}
+	}
+	every_neighboring_tile = {
+		limit = { has_blocker = tb_tribal_settlement }
+		prev = {
+			change_variable = { which = society_research_weight value = 1 }
+		}
+	}
+}
+convert_deposits = {
+	if = {
+		limit = {
+			has_resource = { type = energy amount = 1 }
+		}
+		prev = {
+			change_variable = { which = energy_tile_resource value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = energy amount = 2 }
+				}
+				prev = {
+					change_variable = { which = energy_tile_resource value = 2 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = energy amount = 3 }
+						}
+						prev = {
+							change_variable = { which = energy_tile_resource value = 3 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = energy amount = 4 }
+								}
+								prev = {
+									change_variable = { which = energy_tile_resource value = 4 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = energy amount = 5 }
+										}
+										prev = {
+											change_variable = { which = energy_tile_resource value = 5 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = energy amount = 6 }
+												}
+												prev = {
+													change_variable = { which = energy_tile_resource value = 6 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = energy amount = 7 }
+														}
+														prev = {
+															change_variable = { which = energy_tile_resource value = 7 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = energy amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = energy_tile_resource value = 8 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = energy amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = energy_tile_resource value = 9 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = energy amount = 10 }
+																				}
+																				prev = {
+																					change_variable = { which = energy_tile_resource value = 10 }
+																				}
+																				else = {
+																					if = {
+																						limit = {
+																							has_resource = { type = energy amount = 11 }
+																						}
+																						prev = {
+																							change_variable = { which = energy_tile_resource value = 11 }
+																						}
+																						else = {
+																							if = {
+																								limit = {
+																									has_resource = { type = energy amount = 12 }
+																								}
+																								prev = {
+																									change_variable = { which = energy_tile_resource value = 12 }
+																								}
+																								else = {
+																									if = {
+																										limit = {
+																											has_resource = { type = energy amount = 13 }
+																										}
+																										prev = {
+																											change_variable = { which = energy_tile_resource value = 13 }
+																										}
+																										else = {
+																											if = {
+																												limit = {
+																													has_resource = { type = energy amount = 14 }
+																												}
+																												prev = {
+																													change_variable = { which = energy_tile_resource value = 14 }
+																												}
+																												else = {
+																													if = {
+																														limit = {
+																															has_resource = { type = energy amount > 14 }
+																														}
+																														prev = {
+																															change_variable = { which = energy_tile_resource value = 15 }
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_resource = { type = minerals amount = 1 }
+		}
+		prev = {
+			change_variable = { which = minerals_tile_resource value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = minerals amount = 2 }
+				}
+				prev = {
+					change_variable = { which = minerals_tile_resource value = 2 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = minerals amount = 3 }
+						}
+						prev = {
+							change_variable = { which = minerals_tile_resource value = 3 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = minerals amount = 4 }
+								}
+								prev = {
+									change_variable = { which = minerals_tile_resource value = 4 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = minerals amount = 5 }
+										}
+										prev = {
+											change_variable = { which = minerals_tile_resource value = 5 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = minerals amount = 6 }
+												}
+												prev = {
+													change_variable = { which = minerals_tile_resource value = 6 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = minerals amount = 7 }
+														}
+														prev = {
+															change_variable = { which = minerals_tile_resource value = 7 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = minerals amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = minerals_tile_resource value = 8 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = minerals amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = minerals_tile_resource value = 9 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = minerals amount = 10 }
+																				}
+																				prev = {
+																					change_variable = { which = minerals_tile_resource value = 10 }
+																				}
+																				else = {
+																					if = {
+																						limit = {
+																							has_resource = { type = minerals amount = 11 }
+																						}
+																						prev = {
+																							change_variable = { which = minerals_tile_resource value = 11 }
+																						}
+																						else = {
+																							if = {
+																								limit = {
+																									has_resource = { type = minerals amount = 12 }
+																								}
+																								prev = {
+																									change_variable = { which = minerals_tile_resource value = 12 }
+																								}
+																								else = {
+																									if = {
+																										limit = {
+																											has_resource = { type = minerals amount = 13 }
+																										}
+																										prev = {
+																											change_variable = { which = minerals_tile_resource value = 13 }
+																										}
+																										else = {
+																											if = {
+																												limit = {
+																													has_resource = { type = minerals amount = 14 }
+																												}
+																												prev = {
+																													change_variable = { which = minerals_tile_resource value = 14 }
+																												}
+																												else = {
+																													if = {
+																														limit = {
+																															has_resource = { type = minerals amount > 14 }
+																														}
+																														prev = {
+																															change_variable = { which = minerals_tile_resource value = 15 }
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_resource = { type = food amount = 1 }
+		}
+		prev = {
+			change_variable = { which = food_tile_resource value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = food amount = 2 }
+				}
+				prev = {
+					change_variable = { which = food_tile_resource value = 2 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = food amount = 3 }
+						}
+						prev = {
+							change_variable = { which = food_tile_resource value = 3 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = food amount = 4 }
+								}
+								prev = {
+									change_variable = { which = food_tile_resource value = 4 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = food amount = 5 }
+										}
+										prev = {
+											change_variable = { which = food_tile_resource value = 5 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = food amount = 6 }
+												}
+												prev = {
+													change_variable = { which = food_tile_resource value = 6 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = food amount = 7 }
+														}
+														prev = {
+															change_variable = { which = food_tile_resource value = 7 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = food amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = food_tile_resource value = 8 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = food amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = food_tile_resource value = 9 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = food amount = 10 }
+																				}
+																				prev = {
+																					change_variable = { which = food_tile_resource value = 10 }
+																				}
+																				else = {
+																					if = {
+																						limit = {
+																							has_resource = { type = food amount = 11 }
+																						}
+																						prev = {
+																							change_variable = { which = food_tile_resource value = 11 }
+																						}
+																						else = {
+																							if = {
+																								limit = {
+																									has_resource = { type = food amount = 12 }
+																								}
+																								prev = {
+																									change_variable = { which = food_tile_resource value = 12 }
+																								}
+																								else = {
+																									if = {
+																										limit = {
+																											has_resource = { type = food amount = 13 }
+																										}
+																										prev = {
+																											change_variable = { which = food_tile_resource value = 13 }
+																										}
+																										else = {
+																											if = {
+																												limit = {
+																													has_resource = { type = food amount = 14 }
+																												}
+																												prev = {
+																													change_variable = { which = food_tile_resource value = 14 }
+																												}
+																												else = {
+																													if = {
+																														limit = {
+																															has_resource = { type = food amount > 14 }
+																														}
+																														prev = {
+																															change_variable = { which = food_tile_resource value = 15 }
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_resource = { type = unity amount = 1 }
+		}
+		prev = {
+			change_variable = { which = unity_tile_resource value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = unity amount = 2 }
+				}
+				prev = {
+					change_variable = { which = unity_tile_resource value = 2 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = unity amount = 3 }
+						}
+						prev = {
+							change_variable = { which = unity_tile_resource value = 3 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = unity amount = 4 }
+								}
+								prev = {
+									change_variable = { which = unity_tile_resource value = 4 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = unity amount = 5 }
+										}
+										prev = {
+											change_variable = { which = unity_tile_resource value = 5 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = unity amount = 6 }
+												}
+												prev = {
+													change_variable = { which = unity_tile_resource value = 6 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = unity amount = 7 }
+														}
+														prev = {
+															change_variable = { which = unity_tile_resource value = 7 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = unity amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = unity_tile_resource value = 8 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = unity amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = unity_tile_resource value = 9 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = unity amount = 10 }
+																				}
+																				prev = {
+																					change_variable = { which = unity_tile_resource value = 10 }
+																				}
+																				else = {
+																					if = {
+																						limit = {
+																							has_resource = { type = unity amount = 11 }
+																						}
+																						prev = {
+																							change_variable = { which = unity_tile_resource value = 11 }
+																						}
+																						else = {
+																							if = {
+																								limit = {
+																									has_resource = { type = unity amount = 12 }
+																								}
+																								prev = {
+																									change_variable = { which = unity_tile_resource value = 12 }
+																								}
+																								else = {
+																									if = {
+																										limit = {
+																											has_resource = { type = unity amount = 13 }
+																										}
+																										prev = {
+																											change_variable = { which = unity_tile_resource value = 13 }
+																										}
+																										else = {
+																											if = {
+																												limit = {
+																													has_resource = { type = unity amount = 14 }
+																												}
+																												prev = {
+																													change_variable = { which = unity_tile_resource value = 14 }
+																												}
+																												else = {
+																													if = {
+																														limit = {
+																															has_resource = { type = unity amount > 14 }
+																														}
+																														prev = {
+																															change_variable = { which = unity_tile_resource value = 15 }
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_resource = { type = society_research amount = 1 }
+		}
+		prev = {
+			change_variable = { which = society_research_tile_resource value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = society_research amount = 2 }
+				}
+				prev = {
+					change_variable = { which = society_research_tile_resource value = 2 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = society_research amount = 3 }
+						}
+						prev = {
+							change_variable = { which = society_research_tile_resource value = 3 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = society_research amount = 4 }
+								}
+								prev = {
+									change_variable = { which = society_research_tile_resource value = 4 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = society_research amount = 5 }
+										}
+										prev = {
+											change_variable = { which = society_research_tile_resource value = 5 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = society_research amount = 6 }
+												}
+												prev = {
+													change_variable = { which = society_research_tile_resource value = 6 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = society_research amount = 7 }
+														}
+														prev = {
+															change_variable = { which = society_research_tile_resource value = 7 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = society_research amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = society_research_tile_resource value = 8 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = society_research amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = society_research_tile_resource value = 9 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = society_research amount = 10 }
+																				}
+																				prev = {
+																					change_variable = { which = society_research_tile_resource value = 10 }
+																				}
+																				else = {
+																					if = {
+																						limit = {
+																							has_resource = { type = society_research amount = 11 }
+																						}
+																						prev = {
+																							change_variable = { which = society_research_tile_resource value = 11 }
+																						}
+																						else = {
+																							if = {
+																								limit = {
+																									has_resource = { type = society_research amount = 12 }
+																								}
+																								prev = {
+																									change_variable = { which = society_research_tile_resource value = 12 }
+																								}
+																								else = {
+																									if = {
+																										limit = {
+																											has_resource = { type = society_research amount = 13 }
+																										}
+																										prev = {
+																											change_variable = { which = society_research_tile_resource value = 13 }
+																										}
+																										else = {
+																											if = {
+																												limit = {
+																													has_resource = { type = society_research amount = 14 }
+																												}
+																												prev = {
+																													change_variable = { which = society_research_tile_resource value = 14 }
+																												}
+																												else = {
+																													if = {
+																														limit = {
+																															has_resource = { type = society_research amount > 14 }
+																														}
+																														prev = {
+																															change_variable = { which = society_research_tile_resource value = 15 }
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_resource = { type = physics_research amount = 1 }
+		}
+		prev = {
+			change_variable = { which = physics_research_tile_resource value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = physics_research amount = 2 }
+				}
+				prev = {
+					change_variable = { which = physics_research_tile_resource value = 2 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = physics_research amount = 3 }
+						}
+						prev = {
+							change_variable = { which = physics_research_tile_resource value = 3 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = physics_research amount = 4 }
+								}
+								prev = {
+									change_variable = { which = physics_research_tile_resource value = 4 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = physics_research amount = 5 }
+										}
+										prev = {
+											change_variable = { which = physics_research_tile_resource value = 5 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = physics_research amount = 6 }
+												}
+												prev = {
+													change_variable = { which = physics_research_tile_resource value = 6 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = physics_research amount = 7 }
+														}
+														prev = {
+															change_variable = { which = physics_research_tile_resource value = 7 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = physics_research amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = physics_research_tile_resource value = 8 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = physics_research amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = physics_research_tile_resource value = 9 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = physics_research amount = 10 }
+																				}
+																				prev = {
+																					change_variable = { which = physics_research_tile_resource value = 10 }
+																				}
+																				else = {
+																					if = {
+																						limit = {
+																							has_resource = { type = physics_research amount = 11 }
+																						}
+																						prev = {
+																							change_variable = { which = physics_research_tile_resource value = 11 }
+																						}
+																						else = {
+																							if = {
+																								limit = {
+																									has_resource = { type = physics_research amount = 12 }
+																								}
+																								prev = {
+																									change_variable = { which = physics_research_tile_resource value = 12 }
+																								}
+																								else = {
+																									if = {
+																										limit = {
+																											has_resource = { type = physics_research amount = 13 }
+																										}
+																										prev = {
+																											change_variable = { which = physics_research_tile_resource value = 13 }
+																										}
+																										else = {
+																											if = {
+																												limit = {
+																													has_resource = { type = physics_research amount = 14 }
+																												}
+																												prev = {
+																													change_variable = { which = physics_research_tile_resource value = 14 }
+																												}
+																												else = {
+																													if = {
+																														limit = {
+																															has_resource = { type = physics_research amount > 14 }
+																														}
+																														prev = {
+																															change_variable = { which = physics_research_tile_resource value = 15 }
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_resource = { type = engineering_research amount = 1 }
+		}
+		prev = {
+			change_variable = { which = engineering_research_tile_resource value = 1 }
+		}
+		else = {
+			if = {
+				limit = {
+					has_resource = { type = engineering_research amount = 2 }
+				}
+				prev = {
+					change_variable = { which = engineering_research_tile_resource value = 2 }
+				}
+				else = {
+					if = {
+						limit = {
+							has_resource = { type = engineering_research amount = 3 }
+						}
+						prev = {
+							change_variable = { which = engineering_research_tile_resource value = 3 }
+						}
+						else = {
+							if = {
+								limit = {
+									has_resource = { type = engineering_research amount = 4 }
+								}
+								prev = {
+									change_variable = { which = engineering_research_tile_resource value = 4 }
+								}
+								else = {
+									if = {
+										limit = {
+											has_resource = { type = engineering_research amount = 5 }
+										}
+										prev = {
+											change_variable = { which = engineering_research_tile_resource value = 5 }
+										}
+										else = {
+											if = {
+												limit = {
+													has_resource = { type = engineering_research amount = 6 }
+												}
+												prev = {
+													change_variable = { which = engineering_research_tile_resource value = 6 }
+												}
+												else = {
+													if = {
+														limit = {
+															has_resource = { type = engineering_research amount = 7 }
+														}
+														prev = {
+															change_variable = { which = engineering_research_tile_resource value = 7 }
+														}
+														else = {
+															if = {
+																limit = {
+																	has_resource = { type = engineering_research amount = 8 }
+																}
+																prev = {
+																	change_variable = { which = engineering_research_tile_resource value = 8 }
+																}
+																else = {
+																	if = {
+																		limit = {
+																			has_resource = { type = engineering_research amount = 9 }
+																		}
+																		prev = {
+																			change_variable = { which = engineering_research_tile_resource value = 9 }
+																		}
+																		else = {
+																			if = {
+																				limit = {
+																					has_resource = { type = engineering_research amount = 10 }
+																				}
+																				prev = {
+																					change_variable = { which = engineering_research_tile_resource value = 10 }
+																				}
+																				else = {
+																					if = {
+																						limit = {
+																							has_resource = { type = engineering_research amount = 11 }
+																						}
+																						prev = {
+																							change_variable = { which = engineering_research_tile_resource value = 11 }
+																						}
+																						else = {
+																							if = {
+																								limit = {
+																									has_resource = { type = engineering_research amount = 12 }
+																								}
+																								prev = {
+																									change_variable = { which = engineering_research_tile_resource value = 12 }
+																								}
+																								else = {
+																									if = {
+																										limit = {
+																											has_resource = { type = engineering_research amount = 13 }
+																										}
+																										prev = {
+																											change_variable = { which = engineering_research_tile_resource value = 13 }
+																										}
+																										else = {
+																											if = {
+																												limit = {
+																													has_resource = { type = engineering_research amount = 14 }
+																												}
+																												prev = {
+																													change_variable = { which = engineering_research_tile_resource value = 14 }
+																												}
+																												else = {
+																													if = {
+																														limit = {
+																															has_resource = { type = engineering_research amount > 14 }
+																														}
+																														prev = {
+																															change_variable = { which = engineering_research_tile_resource value = 15 }
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	clear_deposits = yes
+	while = {
+		limit = {
+			prev = {
+				check_variable = { which = energy_tile_resource value > 0 }
+			}
+		}
+		add_deposit = 1_energy
+		prev = {
+			change_variable = { which = energy_tile_resource value = -1 }
+		}
+	}
+	while = {
+		limit = {
+			prev = {
+				check_variable = { which = minerals_tile_resource value > 0 }
+			}
+		}
+		add_deposit = 1_minerals
+		prev = {
+			change_variable = { which = minerals_tile_resource value = -1 }
+		}
+	}
+	while = {
+		limit = {
+			prev = {
+				check_variable = { which = food_tile_resource value > 0 }
+			}
+		}
+		add_deposit = 1_food
+		prev = {
+			change_variable = { which = food_tile_resource value = -1 }
+		}
+	}
+	while = {
+		limit = {
+			prev = {
+				check_variable = { which = unity_tile_resource value > 0 }
+			}
+		}
+		add_deposit = 1_unity
+		prev = {
+			change_variable = { which = unity_tile_resource value = -1 }
+		}
+	}
+	while = {
+		limit = {
+			prev = {
+				check_variable = { which = society_research_tile_resource value > 0 }
+			}
+		}
+		add_deposit = 1_society_research
+		prev = {
+			change_variable = { which = society_research_tile_resource value = -1 }
+		}
+	}
+	while = {
+		limit = {
+			prev = {
+				check_variable = { which = physics_research_tile_resource value > 0 }
+			}
+		}
+		add_deposit = 1_physics_research
+		prev = {
+			change_variable = { which = physics_research_tile_resource value = -1 }
+		}
+	}
+	while = {
+		limit = {
+			prev = {
+				check_variable = { which = engineering_research_tile_resource value > 0 }
+			}
+		}
+		add_deposit = 1_engineering_research
+		prev = {
+			change_variable = { which = engineering_research_tile_resource value = -1 }
+		}
+	}
+}
