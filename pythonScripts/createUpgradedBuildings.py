@@ -652,7 +652,7 @@ def main(args, argv):
         modFile.write(line)
         
     buildingArgs=copy.deepcopy(args)
-    buildingArgs.buildingFileNames=[path+"/common/buildings/*"]
+    buildingArgs.buildingFileNames=[path+"/common/buildings/*.txt"]
     readAndConvert(buildingArgs,1)
     with open(args.copiedBuildingsFileName) as file:
         args.copiedBuildings=[line.strip() for line in file]

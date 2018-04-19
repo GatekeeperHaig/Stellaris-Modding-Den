@@ -1,4 +1,4 @@
-name="!!Core Game Mechanics: Buildings (Script Source)_direct_build"
+name="!!Core Game Mechanics: Buildings"
 path="mod/exo_mod_rework/CGM_full"
 tags={
 	"Balance"

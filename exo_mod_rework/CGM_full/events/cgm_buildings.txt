@@ -14,7 +14,7 @@ event = {
 				OR = {
 					is_colonizable = yes
 					is_colony = yes
-					any_tile = { has_deposit = yes has_special_resource_deposit = no }
+					any_tile = { has_deposit = yes has_any_tile_strategic_resource = no }
 				}
 			}
 			set_variable = { which = energy_tile_resource value = 0 }
@@ -25,7 +25,7 @@ event = {
 			set_variable = { which = physics_research_tile_resource value = 0 }
 			set_variable = { which = engineering_research_tile_resource value = 0 }
 			every_tile = {
-				limit = { has_deposit = yes has_special_resource_deposit = no }
+				limit = { has_deposit = yes has_any_tile_strategic_resource = no }
 				convert_deposits = yes
 			}
 			set_planet_flag = deposits_converted
@@ -91,9 +91,10 @@ event = {
 							set_timed_planet_flag = { flag = multipliers_updated days = 1 }
 						}
 						else = {
+							#the check below is a failsafe, since there is no way to check if amount of modifiers has been changed
 							if = {
 								limit = {
-									num_modifiers > 0 #the check below is a failsafe, since there is no way to check if amount of modifiers has been changed
+									num_modifiers > 0
 									NOR = {
 										AND = {
 											num_modifiers = 1
@@ -135,6 +136,30 @@ event = {
 											num_modifiers = 10
 											check_variable = { which = pm_num value = 10 }
 										}
+										AND = {
+											num_modifiers = 11
+											check_variable = { which = pm_num value = 11 }
+										}
+										AND = {
+											num_modifiers = 12
+											check_variable = { which = pm_num value = 12 }
+										}
+										AND = {
+											num_modifiers = 13
+											check_variable = { which = pm_num value = 13 }
+										}
+										AND = {
+											num_modifiers = 14
+											check_variable = { which = pm_num value = 14 }
+										}
+										AND = {
+											num_modifiers = 15
+											check_variable = { which = pm_num value = 15 }
+										}
+										AND = {
+											num_modifiers > 15
+											check_variable = { which = pm_num value = 15 }
+										}
 									}
 								}
 								switch = {
@@ -169,6 +194,24 @@ event = {
 									10 = {
 										set_variable = { which = pm_num value = 10 }
 									}
+									11 = {
+										set_variable = { which = pm_num value = 11 }
+									}
+									12 = {
+										set_variable = { which = pm_num value = 12 }
+									}
+									13 = {
+										set_variable = { which = pm_num value = 13 }
+									}
+									14 = {
+										set_variable = { which = pm_num value = 14 }
+									}
+									15 = {
+										set_variable = { which = pm_num value = 15 }
+									}
+									15 < {
+										set_variable = { which = pm_num value = 15 }
+									}
 								}
 								set_variable = { which = energy_mult_planet_base value = 1 }
 								set_variable = { which = minerals_mult_planet_base value = 1 }
@@ -177,13 +220,13 @@ event = {
 								set_variable = { which = society_research_mult_planet_base value = 1 }
 								set_variable = { which = physics_research_mult_planet_base value = 1 }
 								set_variable = { which = engineering_research_mult_planet_base value = 1 }
-								check_planet_modifiers = yes
+								check_vanilla_planet_modifiers = yes
 								if = {
 									limit = { planets_enhanced_enabled = yes }
 									check_planet_modifiers_pe = yes
 								}
 								if = {
-									limit = { guillis_planet_modifiers_enabled = yes }
+									limit = { gpm_enabled = yes }
 									check_planet_modifiers_gpm = yes
 								}
 								if = {
@@ -193,6 +236,10 @@ event = {
 								if = {
 									limit = { alphamod_enabled = yes }
 									check_planet_modifiers_am = yes
+								}
+								if = {
+									limit = { stellar_expedition_enabled = yes }
+									check_planet_modifiers_se = yes
 								}
 								if = {
 									#this flag is used later on to gate some calculations
@@ -229,6 +276,14 @@ event = {
 						limit = { alphamod_enabled = yes }
 						check_planet_bonus_buildings_am = yes
 					}
+					if = {
+						limit = { eutab_enabled = yes }
+						check_planet_bonus_buildings_eutab = yes
+					}
+					if = {
+						limit = { astrogeology_enabled = yes }
+						check_planet_bonus_buildings_ag = yes
+					}
 					set_planet_flag = planet_bonus_building_check_performed
 					if = {
 						#this flag is used later on to gate some calculations
@@ -247,6 +302,7 @@ event = {
 								OR = {
 									is_being_purged = no
 									has_purge_type = { type = purge_displacement }
+									has_purge_type = { type = purge_labor_camps }
 								}
 								OR = { is_sapient = yes is_robot_pop = yes }
 								NOT = { has_pop_flag = pop_checked }
@@ -266,10 +322,13 @@ event = {
 							OR = {
 								is_being_purged = no
 								has_purge_type = { type = purge_displacement }
+								has_purge_type = { type = purge_labor_camps }
 							}
 							OR = { is_sapient = yes is_robot_pop = yes }
 						}
-						change_variable = { which = pop_num value = 1 }
+						PREV = {
+							change_variable = { which = pop_num value = 1 }
+						}
 					}
 					### pop variables - these are factored alongside the planet multiplier using an average number
 					set_variable = { which = energy_mult_planet_pop value = 1 }
@@ -291,7 +350,7 @@ event = {
 						if = {
 							limit = {
 								NOT = {
-									any_owned_pop = { is_growing = no is_being_purged = no }
+									any_owned_pop = { is_being_purged = no }
 								}
 							}
 							#this makes sure that if the planet's pops are all being purged and cannot produce anything, the planet doesn't build anything.
@@ -354,7 +413,7 @@ planet_event = {
 			}
 			while = {
 				limit = {
-					any_tile = { has_blocker = no has_ai_null_deposit = no has_special_resource_deposit = no }
+					any_tile = { has_blocker = no has_ai_null_deposit = no has_any_tile_strategic_resource = no }
 				}
 				set_variable = { which = energy_weight value = 0 }
 				set_variable = { which = minerals_weight value = 0 }
@@ -366,18 +425,18 @@ planet_event = {
 				random_tile = {
 					### change to tile scope
 					#see the scripted effects file cgm_tile_scope_effects.txt
-					limit = { has_blocker = no has_ai_null_deposit = no has_special_resource_deposit = no }
+					limit = { has_blocker = no has_ai_null_deposit = no has_any_tile_strategic_resource = no }
 					set_tile_building_weight = yes
 				}
 			}
 			else = {
 				every_tile = {
-					limit = { has_deposit = yes has_special_resource_deposit = no }
+					limit = { has_deposit = yes has_any_tile_strategic_resource = no }
 					convert_deposits = yes
 				}
 				while = {
 					limit = {
-						any_tile = { has_blocker = no has_ai_null_deposit = no has_special_resource_deposit = no }
+						any_tile = { has_blocker = no has_ai_null_deposit = no has_any_tile_strategic_resource = no }
 					}
 					set_variable = { which = energy_weight value = owner }
 					set_variable = { which = minerals_weight value = owner }
@@ -387,7 +446,7 @@ planet_event = {
 					set_variable = { which = physics_research_weight value = 0 }
 					set_variable = { which = engineering_research_weight value = 0 }
 					random_tile = {
-						limit = { has_blocker = no has_ai_null_deposit = no has_special_resource_deposit = no }
+						limit = { has_blocker = no has_ai_null_deposit = no has_any_tile_strategic_resource = no }
 						set_tile_building_weight = yes
 					}
 				}

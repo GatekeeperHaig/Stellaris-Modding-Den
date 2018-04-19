@@ -12,11 +12,17 @@ shipyard = {
 	ai_build_at_chokepoint = no
 	ai_build_outside_chokepoint = yes
 	ai_weight = {
-		weight = 30
-		#	modifier = {
-		#		factor = 100
-		#		NOT = { has_starbase_module = shipyard }
-		#	}
+		weight = 15
+		modifier = {
+			factor = 2
+			solar_system = { has_star_flag = colonized_system }
+			count_starbase_modules = { type = shipyard count < 2 }
+		}
+		modifier = {
+			factor = 2
+			solar_system = { has_star_flag = capital_system }
+			count_starbase_modules = { type = shipyard count < 3 }
+		}
 	}
 }
 anchorage = {
@@ -33,10 +39,27 @@ anchorage = {
 	ai_build_at_chokepoint = no
 	ai_build_outside_chokepoint = yes
 	ai_weight = {
-		weight = 20
+		weight = 0
+		modifier = {
+			weight = 25
+			owner = { has_country_flag = nav_cap_focus_1 }
+		}
+		modifier = {
+			weight = 50
+			owner = { has_country_flag = nav_cap_focus_2 }
+		}
+		modifier = {
+			weight = 100
+			owner = { has_country_flag = nav_cap_focus_3 }
+		}
+		modifier = {
+			factor = 1.5
+			solar_system = { has_star_flag = core_sector_starbase_system }
+		}
+		modifier = { factor = 2 has_starbase_building = naval_logistics_office }
 		modifier = {
 			factor = 2
-			count_starbase_modules = { type = anchorage count < 2 }
+			count_starbase_modules = { type = anchorage count < 3 }
 		}
 	}
 }
@@ -49,7 +72,9 @@ gun_battery = {
 	ai_build_at_chokepoint = yes
 	ai_build_outside_chokepoint = no
 	ai_weight = {
-		weight = 10
+		weight = 0
+		modifier = { weight = 15 has_starbase_size > starbase_starport }
+		modifier = { factor = 2 has_starbase_size > starbase_starhold }
 		modifier = {
 			factor = 2
 			exists = owner
@@ -70,7 +95,9 @@ missile_battery = {
 	ai_build_at_chokepoint = yes
 	ai_build_outside_chokepoint = no
 	ai_weight = {
-		weight = 10
+		weight = 0
+		modifier = { weight = 15 has_starbase_size > starbase_starport }
+		modifier = { factor = 2 has_starbase_size > starbase_starhold }
 		modifier = {
 			factor = 2
 			exists = owner
@@ -92,7 +119,9 @@ hangar_bay = {
 	upkeep_resources = { energy = 1 }
 	ai_build_outside_chokepoint = yes
 	ai_weight = {
-		weight = 10
+		weight = 0
+		modifier = { weight = 15 has_starbase_size > starbase_starport }
+		modifier = { factor = 2 has_starbase_size > starbase_starhold }
 		modifier = {
 			factor = 2
 			exists = owner
@@ -105,30 +134,8 @@ trading_hub = {
 	icon = "GFX_starbase_trading_hub"
 	section = "REFINERY_STARBASE_SECTION"
 	construction_days = 180
-	potential = {
-		exists = owner
-		#owner = { NOT = { has_ethic = ethic_gestalt_consciousness } }
-	}
-	possible = {
-		custom_tooltip = {
-			fail_text = "requires_trade_planet"
-			solar_system = {
-				OR = {
-					any_planet = {
-						exists = owner
-						owner = { is_country_type = default }
-					}
-					AND = {
-						has_star_flag = enclave
-						any_ship_in_system = {
-							exists = owner
-							owner = { has_country_flag = trader_enclave_country }
-						}
-					}
-				}
-			}
-		}
-	}
+	potential = { exists = owner }
+	possible = { requires_trade_planet = yes }
 	cost = { minerals = 100 }
 	produced_resources = { energy = 4 }
 	produced_resource_trigger = {
@@ -147,7 +154,29 @@ trading_hub = {
 			owner = { has_non_swapped_tradition = tr_prosperity_trans_stellar_corporations }
 			resources = { energy = 1 }
 		}
+		modifier = {
+			hidden_trigger = { exists = this }
+			overhauled_building_stats_enabled = yes
+			solar_system = {
+				has_star_flag = enclave
+				any_ship_in_system = {
+					exists = owner
+					owner = { has_country_flag = trader_enclave_country }
+				}
+			}
+			resources = { energy = 4 }
+		}
 	}
 	ai_build_at_chokepoint = no
-	ai_weight = { weight = 15 }
+	ai_weight = {
+		weight = 25
+		modifier = {
+			factor = 5
+			owner = { has_country_flag = energy_focus_factor_1 }
+		}
+		modifier = {
+			factor = 10
+			owner = { has_country_flag = energy_focus_factor_2 }
+		}
+	}
 }
