@@ -12,16 +12,24 @@ shipyard = {
 	ai_build_at_chokepoint = no
 	ai_build_outside_chokepoint = yes
 	ai_weight = {
-		weight = 15
+		weight = 50
 		modifier = {
-			factor = 2
-			solar_system = { has_star_flag = colonized_system }
-			count_starbase_modules = { type = shipyard count < 2 }
+			factor = 0.2
+			solar_system = {
+				NOR = { has_star_flag = shipyard_system has_star_flag = capital_system }
+			}
+			count_starbase_modules = { type = shipyard count > 0 }
 		}
 		modifier = {
-			factor = 2
-			solar_system = { has_star_flag = capital_system }
-			count_starbase_modules = { type = shipyard count < 3 }
+			factor = 0
+			solar_system = {
+				NOT = { has_star_flag = shipyard_system }
+			}
+			count_starbase_modules = { type = shipyard count > 1 }
+		}
+		modifier = {
+			factor = 200
+			solar_system = { has_star_flag = shipyard_system }
 		}
 	}
 }
@@ -39,28 +47,29 @@ anchorage = {
 	ai_build_at_chokepoint = no
 	ai_build_outside_chokepoint = yes
 	ai_weight = {
-		weight = 0
+		weight = 10
 		modifier = {
-			weight = 25
+			factor = 5
 			owner = { has_country_flag = nav_cap_focus_1 }
+			solar_system = {
+				NOR = { has_star_flag = shipyard_system has_star_flag = trade_hub_system }
+			}
 		}
 		modifier = {
-			weight = 50
+			factor = 10
 			owner = { has_country_flag = nav_cap_focus_2 }
+			solar_system = {
+				NOR = { has_star_flag = shipyard_system has_star_flag = trade_hub_system }
+			}
 		}
 		modifier = {
-			weight = 100
+			factor = 15
 			owner = { has_country_flag = nav_cap_focus_3 }
+			solar_system = {
+				NOR = { has_star_flag = shipyard_system has_star_flag = trade_hub_system }
+			}
 		}
-		modifier = {
-			factor = 1.5
-			solar_system = { has_star_flag = core_sector_starbase_system }
-		}
-		modifier = { factor = 2 has_starbase_building = naval_logistics_office }
-		modifier = {
-			factor = 2
-			count_starbase_modules = { type = anchorage count < 3 }
-		}
+		modifier = { factor = 100 has_starbase_building = naval_logistics_office }
 	}
 }
 gun_battery = {
@@ -82,6 +91,11 @@ gun_battery = {
 				OR = { is_preferred_weapons = weapon_type_energy is_preferred_weapons = weapon_type_kinetic }
 			}
 		}
+		modifier = {
+			factor = 0
+			solar_system = { has_star_flag = shipyard_system }
+			count_starbase_modules = { type = shipyard count > 1 }
+		}
 	}
 	show_in_tech = "tech_mass_drivers_1"
 }
@@ -102,6 +116,11 @@ missile_battery = {
 			factor = 2
 			exists = owner
 			owner = { is_preferred_weapons = weapon_type_explosive }
+		}
+		modifier = {
+			factor = 0
+			solar_system = { has_star_flag = shipyard_system }
+			count_starbase_modules = { type = shipyard count > 1 }
 		}
 	}
 	show_in_tech = "tech_missiles_1"
@@ -126,6 +145,11 @@ hangar_bay = {
 			factor = 2
 			exists = owner
 			owner = { is_preferred_weapons = weapon_type_strike_craft }
+		}
+		modifier = {
+			factor = 0
+			solar_system = { has_star_flag = shipyard_system }
+			count_starbase_modules = { type = shipyard count > 1 }
 		}
 	}
 	show_in_tech = "tech_strike_craft_1"
@@ -169,7 +193,7 @@ trading_hub = {
 	}
 	ai_build_at_chokepoint = no
 	ai_weight = {
-		weight = 25
+		weight = 100
 		modifier = {
 			factor = 5
 			owner = { has_country_flag = energy_focus_factor_1 }
@@ -177,6 +201,15 @@ trading_hub = {
 		modifier = {
 			factor = 10
 			owner = { has_country_flag = energy_focus_factor_2 }
+		}
+		modifier = {
+			factor = 10
+			solar_system = { has_star_flag = trade_hub_system }
+		}
+		modifier = {
+			factor = 0
+			solar_system = { has_star_flag = shipyard_system }
+			count_starbase_modules = { type = shipyard count > 1 }
 		}
 	}
 }

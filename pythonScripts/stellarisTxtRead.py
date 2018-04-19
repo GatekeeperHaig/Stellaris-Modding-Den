@@ -254,30 +254,34 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     for i in range(len(self.names)):
       if isinstance(self.vals[i], TagList):
         self.vals[i].replaceAllHasBuildings(args)
-      elif self.names[i]=="has_building" and self.vals[i]!="no":
+      elif self.names[i]=="has_building" and self.vals[i]!="no" and self.vals[i]!="yes":
         if self.vals[i].strip('"') in args.copiedBuildings:
           self.names[i]="has_"+(self.vals[i].replace('"',''))
           self.vals[i]="yes"
-      else: #find hidden "has_building"
-        index=0
-        while index>=0 and (self.vals[i].find("has_building ",index)!=-1 or self.vals[i].find("has_building=",index)!=-1):# and self.vals[i].find("has_building = no")==-1:
-          index=max(self.vals[i].find("has_building ",index),self.vals[i].find("has_building=",index))        #find one that is not -1
-          #hidden one must have two brackets around. find those
-          leftBracked=self.vals[i].rfind("{",0,index)
-          rightBracked=self.vals[i].find("}",index)
-          toBeReplaced=self.vals[i][leftBracked:rightBracked+1]
-          # print(leftBracked)
-          # print(rightBracked)
-          # print(self.vals[i])
-          # print(index)
-          # print(self.vals[i][index])
-          # print(toBeReplaced)
-          tagName=toBeReplaced.split("=")[1].replace("}","").replace('"','').strip()
-          if tagName in args.copiedBuildings:
-            self.vals[i]=self.vals[i].replace(toBeReplaced,"{ has_"+tagName+" = yes }")
-            # print(toBeReplaced)
+      elif self.names[i]=="has_prev_building" and self.vals[i]!="no" and self.vals[i]!="yes":
+        if self.vals[i].strip('"') in args.copiedBuildings:
+          self.names[i]="has_prev_"+(self.vals[i].replace('"',''))
+          self.vals[i]="yes"
+      # else: #find hidden "has_building"
+      #   index=0
+      #   while index>=0 and (self.vals[i].find("has_building ",index)!=-1 or self.vals[i].find("has_building=",index)!=-1):# and self.vals[i].find("has_building = no")==-1:
+      #     index=max(self.vals[i].find("has_building ",index),self.vals[i].find("has_building=",index))        #find one that is not -1
+      #     #hidden one must have two brackets around. find those
+      #     leftBracked=self.vals[i].rfind("{",0,index)
+      #     rightBracked=self.vals[i].find("}",index)
+      #     toBeReplaced=self.vals[i][leftBracked:rightBracked+1]
+      #     # print(leftBracked)
+      #     # print(rightBracked)
+      #     # print(self.vals[i])
+      #     # print(index)
+      #     # print(self.vals[i][index])
+      #     # print(toBeReplaced)
+      #     tagName=toBeReplaced.split("=")[1].replace("}","").replace('"','').strip()
+      #     if tagName in args.copiedBuildings:
+      #       self.vals[i]=self.vals[i].replace(toBeReplaced,"{ has_"+tagName+" = yes }")
+      #       # print(toBeReplaced)
             
-          index+=1 #prevent finding the same has_building again!
+      #     index+=1 #prevent finding the same has_building again!
   def removeDuplicatesRec(self):
     # try :
       # print(self.tagName)
@@ -419,6 +423,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         #bracket level decrease
         elif word=="}":
           if expectingVal or bracketLevel==0:
+            self.printAll()
             raise ParseError("ERROR: Too many '}' found. Beware that the one that triggered this error is most likely not the incorrect one!")
           bracketLevel-=1
           objectList.pop()
@@ -469,7 +474,11 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     with open(fileName,'r') as inputFile:
       print("Start reading "+fileName)
       for lineI,line in enumerate(inputFile):
-        _,bracketLevel, expectingVal=self.readString(line, expectingVal,objectList,args, bracketLevel, useNamedTagList, lineI)
+        try:
+          _,bracketLevel, expectingVal=self.readString(line, expectingVal,objectList,args, bracketLevel, useNamedTagList, lineI)
+        except:
+          print("In file: "+fileName)
+          raise
         # lineSplit=re.split(splitPattern,line)
         # countEmpty=0
         # for wordI, word in enumerate(lineSplit):
