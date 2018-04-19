@@ -1,6 +1,7 @@
-#this in this effect is solar_system scope
-#root in this effect is country
-#prev in this effect is starbase scope
+#this in this file is solar_system scope
+#root in this file is country
+#prev in this file is starbase scope
+
 set_shipyard_weight = {
 	if = {
 		limit = {
@@ -142,11 +143,24 @@ set_shipyard_weight = {
 				set_variable = { which = shipyard_weight value = num_of_shipyard_modules }
 			}
 			if = {
-				limit = { has_star_flag = gateway_system }
-				event_target:starbase_system_star = {
-					change_variable = { which = shipyard_weight value = 4 }
+				limit = { 
+					any_planet = {
+						is_colony = yes
+						exists = owner
+						owner = { is_same_value = root }
+					}
+				}	
+				every_system_planet = {
+					limit = { 
+						is_colony = yes
+						exists = owner
+						owner = { is_same_value = root }
+					}	
+					event_target:starbase_system_star = {
+						change_variable = { which = shipyard_weight value = -1 }				
+					}	
 				}
-			}
+			}				
 			every_neighbor_system = {
 				ignore_hyperlanes = no
 				limit = {
@@ -160,6 +174,12 @@ set_shipyard_weight = {
 					change_variable = { which = shipyard_weight value = 1 }
 				}
 			}
+			if = {
+				limit = { has_star_flag = gateway_system }
+				event_target:starbase_system_star = {
+					change_variable = { which = shipyard_weight value = 4 }
+				}
+			}			
 			every_neighbor_system = {
 				ignore_hyperlanes = no
 				limit = { has_star_flag = gateway_system is_within_borders_of = root }
@@ -174,7 +194,7 @@ set_shipyard_weight = {
 			if = {
 				limit = {
 					event_target:starbase_system_star = {
-						check_variable = { which = shipyard_weight value > 2 }
+						check_variable = { which = shipyard_weight value > 0 }
 					}
 				}
 				set_timed_star_flag = { flag = shipyard_candidate_system days = 3600 }
@@ -185,3 +205,39 @@ set_shipyard_weight = {
 		}
 	}
 }
+
+check_and_assign_shipyard_system_flag = {
+	random_system_planet = { 
+		limit = { has_planet_flag = system_variable_repository }		
+		save_event_target = system_check_target
+	}	
+	root = { 
+		every_system_within_border = {
+			limit = {				
+				NOT = { is_same_value = event_target:system_check_target.solar_system }
+				distance = { source = event_target:system_check_target type = hyperlane max_jumps = 4 }				
+				has_star_flag = shipyard_candidate_system
+			}
+			if = { 
+				limit = { 
+					NOR = { 
+						any_planet = { check_variable = { which = shipyard_weight value > event_target:system_check_target } } 
+						has_star_flag = shipyard_system
+					}	
+				}
+				event_target:system_check_target.solar_system = { 
+					remove_star_flag = shipyard_candidate_system
+					set_star_flag = shipyard_system					
+				}
+				root = { 
+					change_variable = { which = num_existing_shipyard_systems value = 1 }
+					change_variable = { which = required_shipyard_systems value = -1 }
+				}
+				else = {
+					remove_star_flag = shipyard_candidate_system
+					set_timed_star_flag = { flag = shipyard_check_delay days = 3589 }
+				}				
+			}
+		}
+	}
+}	
