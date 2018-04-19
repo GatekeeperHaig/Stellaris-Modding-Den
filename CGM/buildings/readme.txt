@@ -1,9 +1,6 @@
-#Overhauled Content
+### Coded by ExNihil
 
-## When choosing Vanilla stats in the mod options menu all building have their vanilla stats on them. Below is a list of changes for the Overhauled Content menu option:
-
-#Military Academy- changed to +2 unity (was engineering + society research)
-#War Factory- changed to +2 unity (was engineering + society research), removed the -0.1 unrest and replaced it with -0.25 army build cost.
-#Planetary Shield- changed to +2 unity (was engineering + physics research)
-#power hub buildings: added +1 energy adj. bonus
-#Spiral Power Hub (horizon Signal)- added the pursuit of profit +2 unity to it as well. 
+#readme
+#
+#for details regarding the content of this mod please see:
+#https://docs.google.com/spreadsheets/d/e/2PACX-1vQovqtpMoFzMRE0AgiZ-Ps4mFScs27pXnWbRuNN0MKqg9H3uPP6s5v5nnN8Vj7MgmTt-K_r9ws6QWWD/pubhtml

@@ -1,5 +1,5 @@
-name="!!Core Game Mechanics: Buildings (Script Source)"
-path="mod/cgm_buildings_script_source/"
+name="!Core Game Mechanics: Buildings"
+path="mod/CGM/buildings"
 tags={
 	"Balance"
 }
