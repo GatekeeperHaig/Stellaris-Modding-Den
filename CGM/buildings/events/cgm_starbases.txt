@@ -1,0 +1,215 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+namespace = cgm_starbase
+#this event is fires on game start and on a monthly pulse but only once.
+#it stores data regarding number of hyperlane connections in every system, so this number can be used later
+event = {
+	id = cgm_starbase.0
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	immediate = {
+		every_system = {
+			system_star = {
+				set_variable = { which = num_of_hyperlane_connections value = 0 }
+				save_event_target_as = hyperlane_check_star
+				set_planet_flag = system_variable_repository
+			}
+			every_neighbor_system = {
+				ignore_hyperlanes = no
+				event_target:hyperlane_check_star = {
+					change_variable = { which = num_of_hyperlane_connections value = 1 }
+				}
+			}
+		}
+	}
+}
+event = {
+	#this event is fires on game start and on a monthly pulse.
+	id = cgm_starbase.1
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		every_country = {
+			limit = { is_country_type = default is_country_type = awakened_fallen_empire }
+			if = {
+				limit = { used_naval_capacity_percent > 0.75 }
+				if = {
+					limit = { used_naval_capacity_percent > 0.74 used_naval_capacity_percent < 0.9 }
+					set_timed_country_flag = { flag = nav_cap_focus_1 days = 359 }
+				}
+				if = {
+					limit = { used_naval_capacity_percent > 0.89 used_naval_capacity_percent < 1 }
+					set_timed_country_flag = { flag = nav_cap_focus_2 days = 359 }
+				}
+				if = {
+					limit = { used_naval_capacity_percent > 1 }
+					set_timed_country_flag = { flag = nav_cap_focus_3 days = 359 }
+				}
+			}
+			calculate_number_of_required_shipyard_systems = yes #see the cgm_country_scope_effects.txt in common/scripted_effects.
+			every_system_within_border = {
+				if = {
+					limit = {
+						exists = sector
+						sector = { is_core_sector = no }
+					}
+					if = {
+						limit = { has_star_flag = core_sector_starbase_system }
+						remove_star_flag = core_sector_starbase_system
+					}
+					set_star_flag = sector_controlled_starbase_system
+					else = {
+						if = {
+							limit = { has_star_flag = sector_controlled_starbase_system }
+							remove_star_flag = sector_controlled_starbase_system
+						}
+						set_star_flag = core_sector_starbase_system
+					}
+				}
+				if = {
+					limit = {
+						any_planet = { is_owned_by = root }
+					}
+					set_star_flag = colonized_system
+					if = {
+						limit = {
+							any_planet = { is_capital = yes }
+						}
+						if = {
+							limit = {
+								NOT = { has_star_flag = capital_system }
+							}
+							set_star_flag = capital_system
+						}
+						else = {
+							if = {
+								limit = { has_star_flag = capital_system }
+								remove_star_flag = capital_system
+							}
+						}
+					}
+				}
+				if = {
+					limit = {
+						root = { is_exterminator = no }
+						OR = {
+							AND = {
+								has_star_flag = enclave
+								any_ship_in_system = {
+									exists = owner
+									owner = { has_country_flag = trader_enclave_country }
+								}
+							}
+							AND = {
+								has_star_flag = enclave
+								any_ship_in_system = {
+									exists = owner
+									owner = { is_same_value = event_target:artist_enclave_country }
+								}
+								root = { has_country_flag = art_college }
+							}
+							AND = {
+								has_star_flag = enclave
+								any_ship_in_system = {
+									exists = owner
+									owner = { has_country_flag = curator_enclave_country }
+								}
+								root = { has_country_flag = think_tank }
+							}
+						}
+					}
+					set_star_flag = trade_hub_system
+				}
+				if = {
+					limit = {
+						root = { has_technology = "tech_gateway_activation" }
+						OR = { has_megastructure = gateway_restored has_megastructure = gateway_final }
+					}
+					set_star_flag = gateway_system
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { which = required_shipyard_systems value > 0 }
+				}
+				country_event = { id = cgm_starbase.2 }
+				every_owned_starbase = {
+					solar_system = {
+						random_system_planet = {
+							limit = { has_planet_flag = system_variable_repository }
+							set_variable = { which = starbase_level_record value = 0 }
+							save_event_target_as = starbase_system_star
+						}
+						if = {
+							limit = {
+								prev = { has_starbase_size = starbase_outpost }
+							}
+							event_target:starbase_system_star = {
+								change_variable = { which = starbase_level_record value = 1 }
+							}
+							else = {
+								if = {
+									limit = {
+										prev = { has_starbase_size = starbase_starport }
+									}
+									event_target:starbase_system_star = {
+										change_variable = { which = starbase_level_record value = 2 }
+									}
+									else = {
+										if = {
+											limit = {
+												prev = { has_starbase_size = starbase_starhold }
+											}
+											event_target:starbase_system_star = {
+												change_variable = { which = starbase_level_record value = 3 }
+											}
+											else = {
+												if = {
+													limit = {
+														prev = { has_starbase_size = starbase_starfortress }
+													}
+													event_target:starbase_system_star = {
+														change_variable = { which = starbase_level_record value = 4 }
+													}
+													else = {
+														if = {
+															limit = {
+																prev = { has_starbase_size = starbase_citadel }
+															}
+															event_target:starbase_system_star = {
+																change_variable = { which = starbase_level_record value = 5 }
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+						set_shipyard_weight = yes
+					}
+				}
+			}
+		}
+	}
+}
+country_event = {
+	#this event is fires from the previous event.
+	id = cgm_starbase.2
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		every_owned_starbase = {
+			if = {
+				limit = {
+					solar_system = { has_star_flag = shipyard_candidate_system }
+				}
+				solar_system = { check_and_assign_shipyard_system_flag = yes }
+			}
+		}
+	}
+}

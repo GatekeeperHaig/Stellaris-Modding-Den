@@ -1,0 +1,157 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+namespace = core_game_mechanics_and_ai_base
+country_event = {
+	id = core_game_mechanics_and_ai_base.0
+	hide_window = yes
+	fire_only_once = yes
+	trigger = {
+		NOT = { has_global_flag = core_game_mechanics_and_ai }
+		is_ai = no
+	}
+	immediate = {
+		set_global_flag = core_game_mechanics_and_ai
+		set_country_flag = cgm_game_host
+		if = {
+			limit = {
+				NOT = { has_global_flag = cgm_game_start }
+			}
+			every_system = {
+				system_star = {
+					set_variable = { which = num_of_hyperlane_connections value = 0 }
+					save_event_target_as = hyperlane_check_star
+					set_planet_flag = system_variable_repository
+				}
+				every_neighbor_system = {
+					ignore_hyperlanes = no
+					event_target:hyperlane_check_star = {
+						change_variable = { which = num_of_hyperlane_connections value = 1 }
+					}
+				}
+			}
+			every_planet = {
+				limit = {
+					NOT = { has_planet_flag = deposits_converted }
+					OR = {
+						is_colonizable = yes
+						is_colony = yes
+						any_tile = { has_deposit = yes has_any_tile_strategic_resource = no }
+					}
+				}
+				set_variable = { which = energy_tile_resource value = 0 }
+				set_variable = { which = minerals_tile_resource value = 0 }
+				set_variable = { which = food_tile_resource value = 0 }
+				set_variable = { which = unity_tile_resource value = 0 }
+				set_variable = { which = society_research_tile_resource value = 0 }
+				set_variable = { which = physics_research_tile_resource value = 0 }
+				set_variable = { which = engineering_research_tile_resource value = 0 }
+				every_tile = {
+					limit = { has_deposit = yes has_any_tile_strategic_resource = no }
+					convert_deposits = yes
+				}
+				set_planet_flag = deposits_converted
+			}
+			random_country = {
+				limit = { has_country_flag = cgm_game_host }
+				country_event = { id = core_game_mechanics_and_ai_base.1 }
+			}
+		}
+	}
+}
+#the event below opens the main menu for CGM - each CGM mod gets a unique option
+country_event = {
+	id = core_game_mechanics_and_ai_base.1
+	is_triggered_only = yes
+	title = cgm.main_menu.title
+	desc = cgm.main_menu.desc
+	diplomatic = yes
+	custom_gui = "cgm_main_menu"
+	force_open = yes
+	picture_event_data = { room = cgm_menu_room }
+	trigger = {
+		is_ai = no
+		OR = {
+			is_multiplayer = no
+			AND = { is_multiplayer = yes has_country_flag = cgm_game_host }
+		}
+	}
+	immediate = { set_global_flag = direct_build_enabled }
+	option = {
+		name = cgm_buildings_preset.enable_new_building_content.name
+		custom_gui = "cgm_option"
+		custom_tooltip = cgm_buildings_preset.enable_new_building_content.desc
+		trigger = {
+			#has_global_flag = cgm_game_start
+			NOT = { has_global_flag = new_building_content_active }
+		}
+		hidden_effect = {
+			set_global_flag = new_building_content_active
+			set_global_flag = overhauled_building_stats_active
+			hidden_effect = {
+				every_country = {
+					limit = {
+						OR = { is_country_type = default is_country_type = fallen_empire is_country_type = awakened_fallen_empire }
+					}
+					country_event = { id = cgm_building_operations.1 }
+				}
+				country_event = { id = core_game_mechanics_and_ai_base.1 }
+			}
+		}
+	}
+	option = {
+		name = cgm_buildings_preset.keep_vanilla_building_content.name
+		custom_gui = "cgm_option"
+		custom_tooltip = cgm_buildings_preset.keep_vanilla_building_content.desc
+		trigger = {
+			#has_global_flag = cgm_game_start
+			NOR = { has_global_flag = new_building_content_active has_global_flag = vanilla_building_content_active }
+		}
+		hidden_effect = {
+			set_global_flag = vanilla_building_content_active
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
+	}
+	option = {
+		name = cgm_buildings_option.enable_overhauled_vanilla_building_stats.name
+		custom_gui = "cgm_option"
+		custom_tooltip = cgm_buildings_option.enable_overhauled_vanilla_building_stats.desc
+		trigger = {
+			has_global_flag = vanilla_building_content_active
+			NOT = { has_global_flag = overhauled_building_stats_active }
+		}
+		hidden_effect = {
+			set_global_flag = overhauled_building_stats_active
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
+	}
+	option = {
+		name = cgm_buildings_option.disable_overhauled_vanilla_building_stats.name
+		custom_gui = "cgm_option"
+		custom_tooltip = cgm_buildings_option.disable_overhauled_vanilla_building_stats.desc
+		trigger = { has_global_flag = vanilla_building_content_active has_global_flag = overhauled_building_stats_active }
+		hidden_effect = {
+			remove_global_flag = overhauled_building_stats_active
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
+	}
+	option = {
+		name = cgm_buildings_option.advanced_building_configuration.name
+		custom_gui = "cgm_option"
+		custom_tooltip = cgm_buildings_option.advanced_building_configuration.desc
+		trigger = {
+			OR = { has_global_flag = vanilla_building_content_active has_global_flag = new_building_content_active }
+		}
+		hidden_effect = {
+			country_event = { id = core_game_mechanics_and_ai_base.10 } ### gratak - this is where the configuration menu should be called. You can insert it in this file using this namespace or in another file.
+		}
+	}
+	option = {
+		name = cgm_main_menu.close.name
+		custom_gui = "cgm_option"
+		custom_tooltip = cgm_main_menu.close.desc
+		trigger = {
+			OR = { has_global_flag = vanilla_building_content_active has_global_flag = new_building_content_active }
+		}
+	}
+}
