@@ -295,6 +295,12 @@ def readAndConvert(args, allowRestart=1):
               newList.getOrCreate("OR").add("has_building",upgradeName+"_rw") #creates the "OR" and fills it with the first entry
               newList.get("OR").add("has_building",upgradeName+"_rw_direct_build") #second entry to "OR"
               triggers.add("has_"+upgradeName+"_rw", newList)
+
+              newListPrev=TagList(1)
+              newList.getOrCreate("OR").add("has_prev_building",upgradeName+"_rw") #creates the "OR" and fills it with the first entry
+              newList.get("OR").add("has_prev_building",upgradeName+"_rw_direct_build") #second entry to "OR"
+              triggers.add("has_prev_"+upgradeName+"_rw", newList)
+
               if not args.test_run:
                 copiedBuildingsFile.write(upgradeName+"_rw"+"\n")
               for adI in range(len(adjacency_bonus.vals)):
@@ -312,6 +318,10 @@ def readAndConvert(args, allowRestart=1):
               newList.getOrCreate("OR").add("has_building",upgradeName) #creates the "OR" and fills it with the first entry
               newList.get("OR").add("has_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
               triggers.add("has_"+upgradeName, newList)
+              newList=TagList(1)
+              newList.getOrCreate("OR").add("has_prev_building",upgradeName) #creates the "OR" and fills it with the first entry
+              newList.get("OR").add("has_prev_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
+              triggers.add("has_prev_"+upgradeName, newList)
               if not args.test_run:
                 copiedBuildingsFile.write(upgradeName+"\n")
             
@@ -522,7 +532,7 @@ def readAndConvert(args, allowRestart=1):
         # for b in buildingNameToData.vals:
           # b.replaceAllHasBuildings(args)
       
-      if args.create_standalone_mod_from_mod and args.just_copy_and_check:
+      if args.create_standalone_mod_from_mod:
         outputFileName=args.outPath+prioFile+outfileBaseName
       else:
         if args.load_order_priority and "events" in args.outPath: #events prefers low ascii. might be more for which this is true. Triggers prefer high ascii
