@@ -141,42 +141,43 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
           break
 
   lastOutFile=""
+  outFile=args.output_folder+"/locs/"+fileName.replace(".yml",".py")
+  lastOutFile=outFile
   if not args.test_run:
-    outFile=args.output_folder+"/locs/"+fileName.replace(".yml",".py")
-    lastOutFile=outFile
     with open(outFile, "w") as file:
       # file.write("def locs(locList):\n")
       for entry in outArray:
         file.write(entry+"\n")
         # file.write("\t"+entry+"\n")
-    if args.create_main_file:
-      simpleName=fileName.replace(".yml","").replace("_l_"+languageInFile, "")
-      outFile=args.output_folder+"/"+simpleName+"_main.py"
-      # outFile=args.output_folder+"/"+fileName.replace(".yml","_main.py").replace("_l_"+languageInFile, "")
-      lastOutFile=outFile
-      with open(outFile, "w") as file:
-        absPath=os.path.abspath(args.output_folder)
-        commonPath=os.path.commonprefix([absPath, sys.path[0]])
-        # print(commonPath)
-        relPath=os.path.relpath(commonPath,absPath)
-        if commonPath!=sys.path[0]:
-          relPath+="/"+os.path.relpath(sys.path[0],commonPath)
-        # print(relPath)
-        file.write("#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nimport os,sys,glob\n")
-        file.write("os.chdir(os.path.dirname(__file__))\n")
-        file.write("sys.path.insert(1, '"+relPath+"')\n")
-        file.write("from locList import LocList\nlocList=LocList()\n")
-        # file.write("import allModules,importlib\n")
-        file.write("for fileName in glob.glob('locs/*.py'):\n")
-        file.write("\twith open(fileName) as file:\n")
-        file.write("\t\t exec(file.read())\n")
-        for entry in trivialAssignment:
-          file.write(entry+"\n")
-        file.write('for language in locList.languages:\n'+
-                    '\toutFolderLoc=language\n'+
-                    '\tif not os.path.exists(outFolderLoc):\n'+
-                      '\t\tos.makedirs(outFolderLoc)\n'+
-                    '\tlocList.write(outFolderLoc+"/'+simpleName+'_l_"+language+".yml",language)')
+  if args.create_main_file:
+    simpleName=fileName.replace(".yml","").replace("_l_"+languageInFile, "")
+    outFile=args.output_folder+"/"+simpleName+"_main.py"
+    # outFile=args.output_folder+"/"+fileName.replace(".yml","_main.py").replace("_l_"+languageInFile, "")
+    lastOutFile=outFile
+  if not args.test_run:
+    with open(outFile, "w") as file:
+      absPath=os.path.abspath(args.output_folder)
+      commonPath=os.path.commonprefix([absPath, sys.path[0]])
+      # print(commonPath)
+      relPath=os.path.relpath(commonPath,absPath)
+      if commonPath!=sys.path[0]:
+        relPath+="/"+os.path.relpath(sys.path[0],commonPath)
+      # print(relPath)
+      file.write("#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nimport os,sys,glob\n")
+      file.write("os.chdir(os.path.dirname(__file__))\n")
+      file.write("sys.path.insert(1, '"+relPath+"')\n")
+      file.write("from locList import LocList\nlocList=LocList()\n")
+      # file.write("import allModules,importlib\n")
+      file.write("for fileName in glob.glob('locs/*.py'):\n")
+      file.write("\twith open(fileName) as file:\n")
+      file.write("\t\t exec(file.read())\n")
+      for entry in trivialAssignment:
+        file.write(entry+"\n")
+      file.write('for language in locList.languages:\n'+
+                  '\toutFolderLoc=language\n'+
+                  '\tif not os.path.exists(outFolderLoc):\n'+
+                    '\t\tos.makedirs(outFolderLoc)\n'+
+                  '\tlocList.write(outFolderLoc+"/'+simpleName+'_l_"+language+".yml",language)')
   return lastOutFile
 
 

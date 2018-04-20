@@ -14,6 +14,7 @@ ET = "event_target:cgm_var_storage"
 eventNameSpace="core_game_mechanics_and_ai_base.{!s}"
 eventNames="core_game_mechanics_and_ai_base_{!s}"
 def main():
+  os.chdir(os.path.dirname(__file__))
   debugMode=True
 
   changeSteps = [50, 20, 10]
