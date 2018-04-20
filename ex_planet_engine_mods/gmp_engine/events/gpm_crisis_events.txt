@@ -1,0 +1,221 @@
+
+namespace = gpm_crisis
+
+
+### HIDDEN SWARM FUNCTIONALITY
+
+# Infested to Barren after Orbital Bombardment
+planet_event = {
+	id = gpm_crisis.1
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	# trigger = {
+	# 	is_planet_class = pc_infested
+	# }
+	
+	immediate = {
+		log = "---- Fired Event gpm_crisis.1 ----"
+		log = "---- Turning infested into barren world ----"
+		remove_modifier = capital
+		# we also remove wondrous planet modifier and make sure the colour is set to default.
+		if = {
+			limit = { has_modifier = Planet_Wonder_Discovered }
+			remove_modifier = Planet_Wonder_Discovered
+		}
+		gpm_reset_planet_name = yes
+		gpm_colour_planet_name = yes
+#		if = {
+#			limit = { has_planet_flag = "gpm_is_wondrous_world" }
+#			set_name = "color_default_white"
+#			#set_name = random 		# setting the name to default doesnt work :<
+#			remove_planet_flag = "gpm_is_wondrous_world"
+#			remove_planet_flag = "gpm_is_wondrous_world_colour"
+#		}
+		
+		gpm_crisis_purge_modifiers = yes
+		random_list = {
+			50 = { change_pc = pc_barren }
+			50 = { change_pc = pc_barren_cold }
+			25 = { change_pc = pc_molten }
+			25 = { change_pc = pc_frozen }
+			10 = { change_pc = pc_nuked }
+		}
+		random_list = {
+			35 = {
+				if = {
+					limit = { NOT = { has_modifier = Hiveworld } }
+					add_modifier = { modifier = Hiveworld days = -1 } 
+				}
+			}
+			50 = { }
+		}
+		gpm_random_modifier_crisis_purge = yes
+		gpm_random_modifier_crisis_purge = yes
+#		set_name = "color_default_white"
+#		remove_planet_flag = gpm_is_infested_world
+#		if = {
+#			limit = { has_planet_flag = "gpm_is_precursor_world" }
+#			set_name = "color_precursor"
+#		}
+	}
+}
+
+# Purge Complete
+planet_event = {
+	id = gpm_crisis.2
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		log = "---- Fired Event gpm_crisis.2 ----"
+		log = "---- Purging world (scourge) ----"
+		if = {
+			limit = {
+				NOR = {
+					is_planet_class = pc_ringworld_habitable
+					is_planet_class = pc_habitat # habitats are currently uninfestable
+				}
+			}
+			if = {
+				limit = { 
+					OR = {
+						has_modifier = Planet_Wonder_Discovered 
+						has_planet_flag = gpm_is_wondrous_world
+					}
+				}
+				remove_modifier = Planet_Wonder_Discovered
+				set_name = "gpm_infested"
+				set_planet_flag = gpm_is_infested_world
+				remove_planet_flag = gpm_is_wondrous_world
+			}
+			if = {
+				limit = {
+					NOR = {
+						has_planet_flag = gpm_is_precursor_world
+						has_planet_flag = gpm_is_wondrous_world
+						has_planet_flag = gpm_is_infested_world
+					}
+				}
+				set_name = "color_red"
+				set_planet_flag = gpm_is_infested_world
+			}
+			gpm_crisis_purge_modifiers = yes
+			gpm_random_modifier_crisis_purge = yes
+			gpm_random_modifier_crisis_purge = yes
+		}
+	}
+}
+
+# Planet Colonized
+planet_event = {
+	id = gpm_crisis.3
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		log = "---- Fired Event gpm_crisis.3 ----"
+		log = "---- Colonized world (scourge) ----"
+		if = {
+			limit = {
+				NOR = {
+					is_planet_class = pc_ringworld_habitable
+					is_planet_class = pc_habitat # habitats are currently uninfestable
+				}
+			}
+			if = {
+				limit = { 
+					OR = {
+						has_modifier = Planet_Wonder_Discovered 
+						has_planet_flag = gpm_is_wondrous_world
+					}
+				}
+				remove_modifier = Planet_Wonder_Discovered
+				set_name = "gpm_infested"
+				set_planet_flag = gpm_is_infested_world
+				remove_planet_flag = gpm_is_wondrous_world
+			}
+			if = {
+				limit = {
+					NOR = {
+						has_planet_flag = gpm_is_precursor_world
+						has_planet_flag = gpm_is_wondrous_world
+						has_planet_flag = gpm_is_infested_world
+					}
+				}
+				set_name = "color_red"
+				set_planet_flag = gpm_is_infested_world
+			}
+			gpm_crisis_purge_modifiers = yes
+			gpm_random_modifier_crisis_purge = yes
+			gpm_random_modifier_crisis_purge = yes
+		}
+	}
+}
+
+
+
+### HIDDEN UNBIDDEN FUNCTIONALITY
+
+# Colony Bombarded
+planet_event = {
+	id = gpm_crisis.10
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	#trigger = {
+	#	FROM = {
+	#		OR = {
+	#			is_country_type = extradimensional 
+	#			is_country_type = extradimensional_2
+	#			is_country_type = extradimensional_3
+	#		}
+	#	}
+	#}
+	
+	immediate = {
+		log = "---- Fired Event gpm_crisis.10 ----"
+		log = "---- Bombarded world (unbidden) turn to random world ----"
+		if = {
+			limit = {
+				NOR = {
+					is_planet_class = pc_ringworld_habitable
+					is_planet_class = pc_habitat
+				}
+			}
+			remove_modifier = capital
+			# we also remove wondrous planet modifier and make sure the colour is set to default.
+			if = {
+				limit = { has_modifier = Planet_Wonder_Discovered }
+				remove_modifier = Planet_Wonder_Discovered
+			}
+			gpm_reset_planet_name = yes
+			gpm_colour_planet_name = yes
+#			if = {
+#				limit = { has_planet_flag = "gpm_is_wondrous_world" }
+#				set_name = "color_default_white"
+#				#set_name = "[Root.GetName]" 		# setting the name to default doesnt work :<
+#				remove_planet_flag = "gpm_is_wondrous_world"
+#				remove_planet_flag = "gpm_is_wondrous_world_colour"
+#				if = {
+#					limit = { has_planet_flag = "gpm_is_precursor_world" }
+#					set_name = "color_precursor"
+#				}
+#			}
+			gpm_crisis_purge_modifiers = yes
+			random_list = {
+				30 = { change_pc = pc_barren }
+				30 = { change_pc = pc_barren_cold }
+				50 = { change_pc = pc_molten }
+				25 = { change_pc = pc_frozen }
+				10 = { change_pc = pc_nuked }
+			}
+			gpm_random_modifier_crisis_purge = yes
+			gpm_random_modifier_crisis_purge = yes
+		}
+	}
+}

@@ -1,0 +1,2077 @@
+@tier1influencecontact = 7
+@tier1influencecontactxenophile = 8
+@tier1influencecontactmin = 20
+@tier1influencecontactmax = 80
+
+@tier2influencecontact = 10
+@tier2influencecontactxenophile = 12
+@tier2influencecontactmin = 40
+@tier2influencecontactmax = 100
+
+@tier1materialreward = 6
+@tier1materialmin = 100
+@tier1materialmax = 500
+@tier2materialreward = 12
+@tier2materialmin = 150
+@tier2materialmax = 1000
+@tier3materialreward = 18
+@tier3materialmin = 250
+@tier3materialmax = 1500
+@tier4materialreward = 24
+@tier4materialmin = 350
+@tier4materialmax = 2000
+@tier5materialreward = 48
+@tier5materialmin = 700
+@tier5materialmax = 4000
+
+@tier1influencereward = 6
+@tier1influencemin = 40
+@tier1influencemax = 100
+@tier2influencereward = 12
+@tier2influencemin = 80
+@tier2influencemax = 175
+@tier3influencereward = 18
+@tier3influencemin = 125
+@tier3influencemax = 250
+@tier4influencereward = 24
+@tier4influencemin = 150
+@tier4influencemax = 300
+@tier5influencereward = 36
+@tier5influencemin = 250
+@tier5influencemax = 500
+@tier6influencereward = 48
+@tier6influencemin = 300
+@tier6influencemax = 600
+
+@tier1researchreward = 25
+@tier1researchmin = 50
+@tier1researchmax = 75
+
+@tier2researchreward = 35
+@tier2researchmin = 70
+@tier2researchmax = 140
+
+@tier3researchreward = 50
+@tier3researchmin = 100
+@tier3researchmax = 150
+
+@tier1unityreward = 5
+@tier1unitymin = 3
+@tier1unitymax = 10
+
+@tier2unityreward = 15
+@tier2unitymin = 10
+@tier2unitymax = 15
+
+@tier3unityreward = 25
+@tier3unitymin = 15
+@tier3unitymax = 25
+
+
+namespace = gpm_survey
+
+# ROOT = ship scope
+# FROM = planet scope
+
+# find hot core -> give bonus to terraforming. First find.  100% bonus
+ship_event = {
+	id = gpm_survey.1
+	hide_window = yes
+	location = ROOT
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Very_Hot_Core"
+				root = {
+					owner = {
+						NOT = {
+							has_modifier = gpm_terraform_speed_three
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.1 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: hot core found ----"	
+		owner = {
+			if = {
+				limit = { has_modifier = gpm_terraform_speed_two }
+				country_event = { id = gpm_survey.4 }	
+			}
+			if = {
+				limit = { has_modifier = gpm_terraform_speed_one }
+				country_event = { id = gpm_survey.3 }	
+			}
+			if = {
+				limit = {
+					NOR = {
+						has_modifier = gpm_terraform_speed_one
+						has_modifier = gpm_terraform_speed_two
+						has_modifier = gpm_terraform_speed_three
+					}
+				}
+				country_event = { id = gpm_survey.2 }
+			}	
+		}
+	}
+}
+
+# give terraform 1/3 bonus
+country_event = {
+	id = gpm_survey.2
+	title = "gpm_survey.2.name"
+	desc = "gpm_survey.2.desc"
+	picture = GFX_evt_gpm_hot_core
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.2 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: hot core 1/3 ----"
+		add_modifier = {
+			modifier = "gpm_terraform_speed_one"
+			days = -1
+		}
+	}
+	
+	option = {
+		name = gpm_survey.INTERESTING
+		custom_tooltip = gpm_survey.2.b
+	}
+}
+
+# give terraform 2/3 bonus
+country_event = {
+	id = gpm_survey.3
+	title = "gpm_survey.3.name"
+	desc = "gpm_survey.3.desc"
+	picture = GFX_evt_gpm_hot_core
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	immediate = {	
+		log = "---- Fired Event gpm_survey.3 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: hot core 2/3 ----"
+		remove_modifier = gpm_terraform_speed_one
+		add_modifier = {
+			modifier = "gpm_terraform_speed_two"
+			days = -1
+		}
+	}
+
+	option = {
+		name = gpm_survey.FASCINATING
+		custom_tooltip = gpm_survey.3.b
+	}
+}
+
+# give terraform 3/3 bonus
+country_event = {
+	id = gpm_survey.4
+	title = "gpm_survey.4.name"
+	desc = "gpm_survey.4.desc"
+	picture = GFX_evt_gpm_hot_core
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	immediate = {	
+		log = "---- Fired Event gpm_survey.4 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: hot core 3/3 ----"
+		remove_modifier = gpm_terraform_speed_two
+		add_modifier = {
+			modifier = "gpm_terraform_speed_three"
+			days = -1
+		}
+	}
+
+	option = {
+		name = gpm_survey.4.a
+		custom_tooltip = gpm_survey.4.b
+	}
+}
+
+# Precursor_Remnants discovery
+ship_event = {
+	id = gpm_survey.5
+	title = "gpm_survey.5.name"
+	desc = "gpm_survey.5.desc"
+	picture = GFX_evt_gpm_precursor_remnants
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Precursor_Remnants"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_precursor_remnants
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.5 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: precursor remnants ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_precursor_remnants
+			}
+		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_precursor"
+				gpm_colour_planet_name = yes
+				set_planet_flag = "gpm_is_surveyed"
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.UNBELIEVABLE
+		root = {
+			owner = {
+				add_modifier = { modifier = "Precursor_Remnants_Discovery" days = -1 }
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier3unityreward
+					min = @tier3unitymin
+					max = @tier3unitymax
+				}
+			}
+		}
+	}
+}
+# Precursor_Energy_Grid discovery
+ship_event = {
+	id = gpm_survey.6
+	title = "gpm_survey.6.name"
+	desc = "gpm_survey.6.desc"
+	picture = GFX_evt_gpm_precursor_energy_grid
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Precursor_Energy_Grid"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_precursor_energy_grid
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.6 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: precursor energy grid ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_precursor_energy_grid
+			}
+		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_precursor"
+				gpm_colour_planet_name = yes
+				set_planet_flag = "gpm_is_surveyed"
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.FASCINATING
+		root = {
+			owner = {
+				add_modifier = { modifier = "Precursor_Energy_Grid_Discovery" days = -1 }
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier3unityreward
+					min = @tier3unitymin
+					max = @tier3unitymax
+				}
+			}
+		}
+	}
+}
+# Precursor_Satellite_Grid discovery
+ship_event = {
+	id = gpm_survey.7
+	title = "gpm_survey.7.name"
+	desc = "gpm_survey.7.desc"
+	picture = GFX_evt_gpm_precursor_satelite_grid
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Precursor_Satalite_Grid"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_precursor_satelite_grid
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.7 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: precursor satellite grid ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_precursor_satelite_grid
+			}
+		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_precursor"
+				gpm_colour_planet_name = yes
+				set_planet_flag = "gpm_is_surveyed"
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.AMAZING
+		root = {
+			owner = {
+				add_modifier = { modifier = "Precursor_Satellite_Grid_Discovery" days = -1 }
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier3unityreward
+					min = @tier3unitymin
+					max = @tier3unitymax
+				}
+			}
+		}
+	}
+}
+# Precursor_City discovery
+ship_event = {
+	id = gpm_survey.8
+	title = "gpm_survey.8.name"
+	desc = "gpm_survey.8.desc"
+	picture = GFX_evt_gpm_precursor_city
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Precursor_City"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_precursor_city
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.8 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: precursor city ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_precursor_city
+			}
+		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_precursor"
+				gpm_colour_planet_name = yes
+				set_planet_flag = "gpm_is_surveyed"
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.UNBELIEVABLE
+		root = {
+			owner = {
+				add_modifier = { modifier = "Precursor_City_Discovery" days = -1 }
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier3unityreward
+					min = @tier3unitymin
+					max = @tier3unitymax
+				}
+			}
+		}
+	}
+}
+# Precursor_Shipyards discovery
+ship_event = {
+	id = gpm_survey.9
+	title = "gpm_survey.9.name"
+	desc = "gpm_survey.9.desc"
+	picture = GFX_evt_gpm_precursor_shipyards
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Precursor_Shipyards"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_precursor_shipyards
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.9 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: precursor shipyards ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_precursor_shipyards
+			}
+		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_precursor"
+				gpm_colour_planet_name = yes
+				set_planet_flag = "gpm_is_surveyed"
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.INSPIRING
+		root = {
+			owner = {
+				add_modifier = { modifier = "Precursor_Shipyards_Discovery" days = -1 }
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier3unityreward
+					min = @tier3unitymin
+					max = @tier3unitymax
+				}
+			}
+		}
+	}
+}
+# Precursor_Planetary_Gun discovery
+ship_event = {
+	id = gpm_survey.10
+	title = "gpm_survey.10.name"
+	desc = "gpm_survey.10.desc"
+	picture = GFX_evt_gpm_precursor_planetary_gun
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Precursor_Planetary_Gun"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_precursor_planetary_gun
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.10 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: precursor planetary gun ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_precursor_planetary_gun
+			}
+		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_precursor"
+				gpm_colour_planet_name = yes
+				set_planet_flag = "gpm_is_surveyed"
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.AMAZING
+		root = {
+			owner = {
+				add_modifier = { modifier = "Precursor_Planetary_Gun_Discovery" days = -1 }
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier3unityreward
+					min = @tier3unitymin
+					max = @tier3unitymax
+				}
+			}
+		}
+	}
+}
+# Precursor_Bunker_Grid discovery
+ship_event = {
+	id = gpm_survey.11
+	title = "gpm_survey.11.name"
+	desc = "gpm_survey.11.desc"
+	picture = GFX_evt_gpm_precursor_bunker_grid
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Precursor_Bunker_Grid"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_precursor_bunker_grid
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.11 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: precursor bunker grid ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_precursor_bunker_grid
+			}
+		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_precursor"
+				gpm_colour_planet_name = yes
+				set_planet_flag = "gpm_is_surveyed"
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.UNBELIEVABLE
+		root = {
+			owner = {
+				add_modifier = { modifier = "Precursor_Bunker_Grid_Discovery" days = -1 }
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier3unityreward
+					min = @tier3unitymin
+					max = @tier3unitymax
+				}
+			}
+		}
+	}
+}
+# Precursor_Mechs discovery
+ship_event = {
+	id = gpm_survey.12
+	title = "gpm_survey.12.name"
+	desc = "gpm_survey.12.desc"
+	picture = GFX_evt_gpm_precursor_mechs
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Precursor_Mechs"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_precursor_mechs
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.12 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: precursor mechs ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_precursor_mechs
+			}
+		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_precursor"
+				gpm_colour_planet_name = yes
+				set_planet_flag = "gpm_is_surveyed"
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.AMAZING
+		root = {
+			owner = {
+				add_modifier = { modifier = "Precursor_Mechs_Discovery" days = -1 }
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier3unityreward
+					min = @tier3unitymin
+					max = @tier3unitymax
+				}
+			}
+		}
+	}
+}
+# Precursor_Planetary_Shield discovery
+ship_event = {
+	id = gpm_survey.13
+	title = "gpm_survey.13.name"
+	desc = "gpm_survey.13.desc"
+	picture = GFX_evt_gpm_precursor_planetary_shield
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Precursor_Planetary_Shield"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_precursor_planetary_shield
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.13 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: precursor planetary shields ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_precursor_planetary_shield
+			}
+		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_precursor"
+				gpm_colour_planet_name = yes
+				set_planet_flag = "gpm_is_surveyed"
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.INSPIRING
+		root = {
+			owner = {
+				add_modifier = { modifier = "Precursor_Planetary_Shield_Discovery" days = -1 }
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier3unityreward
+					min = @tier3unitymin
+					max = @tier3unitymax
+				}
+			}
+		}
+	}
+}
+# Precursor_Floating_City discovery
+ship_event = {
+	id = gpm_survey.14
+	title = "gpm_survey.14.name"
+	desc = "gpm_survey.14.desc"
+	picture = GFX_evt_gpm_precursor_floating_city
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Precursor_Floating_City"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_precursor_floating_city
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.14 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: precursor floating city ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_precursor_floating_city
+			}
+		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_precursor"
+				gpm_colour_planet_name = yes
+				set_planet_flag = "gpm_is_surveyed"
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.UNBELIEVABLE
+		root = {
+			owner = {
+				add_modifier = { modifier = "Precursor_Floating_City_Discovery" days = -1 }
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier3unityreward
+					min = @tier3unitymin
+					max = @tier3unitymax
+				}
+			}
+		}
+	}
+}
+# Precursor_Capital_Complex discovery
+ship_event = {
+	id = gpm_survey.15
+	title = "gpm_survey.15.name"
+	desc = "gpm_survey.15.desc"
+	picture = GFX_evt_gpm_precursor_capital_complex
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Precursor_Capital_Complex"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_precursor_capital_complex
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.15 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: precursor capital complex ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_precursor_capital_complex
+			}
+		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_precursor"
+				gpm_colour_planet_name = yes
+				set_planet_flag = "gpm_is_surveyed"
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.FASCINATING
+		root = {
+			owner = {
+				add_modifier = { modifier = "Precursor_Capital_Complex_Discovery" days = -1 }
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier3unityreward
+					min = @tier3unitymin
+					max = @tier3unitymax
+				}
+			}
+		}
+	}
+}
+# Precursor_Communication_Hub discovery
+ship_event = {
+	id = gpm_survey.16
+	title = "gpm_survey.16.name"
+	desc = "gpm_survey.16.desc"
+	picture = GFX_evt_gpm_precursor_communication_hub
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Precursor_Communication_Hub"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_precursor_communication_hub
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.16 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: precursor communication hub ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_precursor_communication_hub
+			}
+		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_precursor"
+				gpm_colour_planet_name = yes
+				set_planet_flag = "gpm_is_surveyed"
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.INTERESTING
+		root = {
+			owner = {
+				add_modifier = { modifier = "Precursor_Communication_Hub_Discovery" days = -1 }
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier3unityreward
+					min = @tier3unitymin
+					max = @tier3unitymax
+				}
+			}
+		}
+	}
+}
+# Precursor_Singularity_Drive discovery
+ship_event = {
+	id = gpm_survey.17
+	title = "gpm_survey.17.name"
+	desc = "gpm_survey.17.desc"
+	picture = GFX_evt_gpm_precursor_singularity_drive
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Precursor_Singularity_Drive"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_precursor_singularity_drive
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.17 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: precursor singularity drive ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_precursor_singularity_drive
+			}
+		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_precursor"
+				gpm_colour_planet_name = yes
+				set_planet_flag = "gpm_is_surveyed"
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.FASCINATING
+		root = {
+			owner = {
+				add_modifier = { modifier = "Precursor_Singularity_Drive_Discovery" days = -1 }
+				add_monthly_resource_mult = {
+					resource = unity
+					value = @tier3unityreward
+					min = @tier3unitymin
+					max = @tier3unitymax
+				}
+			}
+		}
+	}
+}
+
+# gaia_world
+ship_event = {
+	id = gpm_survey.18
+	title = "gpm_survey.18.name"
+	desc = "gpm_survey.18.desc"
+	picture = GFX_evt_gpm_gaia_world
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				is_planet_class = pc_gaia
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_gaia
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.18 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: gaia world ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_gaia
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.BEAUTY
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# holy_planet
+ship_event = {
+	id = gpm_survey.19
+	title = "gpm_survey.19.name"
+	desc = "gpm_survey.19.desc"
+	picture = GFX_evt_gpm_holy_world
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "holy_planet"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_holy_world
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.19 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: holy planet ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_holy_world
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.OMEN
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Floating_Islands
+ship_event = {
+	id = gpm_survey.20
+	title = "gpm_survey.20.name"
+	desc = "gpm_survey.20.desc"
+	picture = GFX_evt_gpm_floating_islands
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Floating_Islands"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_floating_islands
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.20 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: floating islands ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_floating_islands
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.UNBELIEVABLE
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Ruined_Battlefield
+ship_event = {
+	id = gpm_survey.21
+	title = "gpm_survey.21.name"
+	desc = "gpm_survey.21.desc"
+	picture = GFX_evt_gpm_ruined_battlefield
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Ruined_Battlefield"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_ruined_battlefield
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.21 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: ruined battlefield ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_ruined_battlefield
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.HORROR
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Spaceship_Graveyard
+ship_event = {
+	id = gpm_survey.22
+	title = "gpm_survey.22.name"
+	desc = "gpm_survey.22.desc"
+	picture = GFX_evt_gpm_spaceship_graveyard2
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Spaceship_Graveyard"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_spaceship_graveyard
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.22 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: spaceship graveyard ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_spaceship_graveyard
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.MASSIVE
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Artificial_Water
+ship_event = {
+	id = gpm_survey.23
+	title = "gpm_survey.23.name"
+	desc = "gpm_survey.23.desc"
+	picture = GFX_evt_gpm_artificial_water
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Artificial_Water"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_artificial_water
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.23 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: artificial water ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_artificial_water
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.FASCINATING
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Android_Pleasure_Palace
+ship_event = {
+	id = gpm_survey.24
+	title = "gpm_survey.24.name"
+	desc = "gpm_survey.24.desc"
+	picture = GFX_evt_gpm_pleasure_palace
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Android_Pleasure_Palace"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_pleasure_palace
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.24 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: android pleasure palace ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_pleasure_palace
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.NEAT
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Ancient_Temple
+ship_event = {
+	id = gpm_survey.25
+	title = "gpm_survey.25.name"
+	desc = "gpm_survey.25.desc"
+	picture = GFX_evt_gpm_ancient_temple
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Ancient_Temple"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_ancient_temple
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.25 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: ancient temple ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_ancient_temple
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.INSPIRING
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Crystal_Moon_Palace
+ship_event = {
+	id = gpm_survey.26
+	title = "gpm_survey.26.name"
+	desc = "gpm_survey.26.desc"
+	picture = GFX_evt_gpm_moon_palace
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Crystal_Moon_Palace"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_moon_palace
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.26 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: crystal moon palace ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_moon_palace
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.AMAZING
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Plasmoid_Life
+ship_event = {
+	id = gpm_survey.27
+	title = "gpm_survey.27.name"
+	desc = "gpm_survey.27.desc"
+	picture = GFX_evt_gpm_plasmoid_life
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Plasmoid_Life"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_plasmoid_life
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.27 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: plasmoid life ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_plasmoid_life
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.UNBELIEVABLE
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Temple_of_the_Ancient_One
+ship_event = {
+	id = gpm_survey.28
+	title = "gpm_survey.28.name"
+	desc = "gpm_survey.28.desc"
+	picture = GFX_evt_gpm_ancient_one
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Temple_of_the_Ancient_One"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_ancient_one
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.28 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: temple of the ancient one ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_ancient_one
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.LEAVE
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Proto_Forests
+ship_event = {
+	id = gpm_survey.29
+	title = "gpm_survey.29.name"
+	desc = "gpm_survey.29.desc"
+	picture = GFX_evt_gpm_proto_forest
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Proto_Forests"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_proto_forest
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.29 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: proto forests ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_proto_forest
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.INTERESTING
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Hiveworld
+ship_event = {
+	id = gpm_survey.30
+	title = "gpm_survey.30.name"
+	desc = "gpm_survey.30.desc"
+	picture = GFX_evt_gpm_hive_world
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Hiveworld"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_hive_world
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.30 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: hive world ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_hive_world
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.HORRIFYING
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Arachnophobia
+ship_event = {
+	id = gpm_survey.31
+	title = "gpm_survey.31.name"
+	desc = "gpm_survey.31.desc"
+	picture = GFX_evt_gpm_spiders
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Arachnophobia"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_spiders
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.31 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: arachnophobia ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_spiders
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.HELL
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Giant_Worm
+ship_event = {
+	id = gpm_survey.32
+	title = "gpm_survey.32.name"
+	desc = "gpm_survey.32.desc"
+	picture = GFX_evt_gpm_giant_worm
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Giant_Worm"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_giant_worm
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.32 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: giant worm ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_giant_worm
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.MASSIVE
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Artificial_Core
+ship_event = {
+	id = gpm_survey.33
+	title = "gpm_survey.33.name"
+	desc = "gpm_survey.33.desc"
+	picture = GFX_evt_gpm_artificial_core
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Artificial_Core"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_artificial_core
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.33 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: artificial core ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_artificial_core
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.UNBELIEVABLE
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Surface_Of_Bones
+ship_event = {
+	id = gpm_survey.34
+	title = "gpm_survey.34.name"
+	desc = "gpm_survey.34.desc"
+	picture = GFX_evt_gpm_surface_of_bones
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Surface_Of_Bones"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_surface_of_bones
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.34 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: surface of bones ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_surface_of_bones
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.HORRIFYING
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Strange_Alien_Eggs
+ship_event = {
+	id = gpm_survey.35
+	title = "gpm_survey.35.name"
+	desc = "gpm_survey.35.desc"
+	picture = GFX_evt_gpm_alien_eggs
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Strange_Alien_Eggs"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_alien_eggs
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.35 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: strange alien eggs ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_alien_eggs
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.SEEN
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Mushroom_Forest
+ship_event = {
+	id = gpm_survey.36
+	title = "gpm_survey.36.name"
+	desc = "gpm_survey.36.desc"
+	picture = GFX_evt_gpm_mushroom_forest
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			AND = {
+				has_modifier = "Mushroom_Forest"
+				root = {
+					owner = {
+						NOT = {
+							has_country_flag = gpm_discover_mushroom_forest
+						}
+					}
+				}
+			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.36 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: mushroom forest ----"
+		root = {
+			owner = {
+				set_country_flag = gpm_discover_mushroom_forest
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.INTERESTING
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier1researchreward
+					min = @tier1researchmin
+					max = @tier1researchmax
+				}
+			}
+		}
+	}
+}
+
+# Planet Wonder
+ship_event = {
+	id = gpm_survey.700
+	title = "gpm_survey.700.name"
+	desc = "gpm_survey.700.desc"
+	picture = GFX_evt_gpm_wondrous_world
+	show_sound = event_scanner
+	location = FROM
+
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+#			AND = {
+				has_modifier = "Planet_Wonder_Discovered"
+#				root = {
+#					owner = {
+#						NOT = {
+#							has_country_flag = gpm_discover_planet_wonder
+#						}
+#					}
+#				}
+#			}
+		}
+	}
+
+	immediate = {	
+		log = "---- Fired Event gpm_survey.700 ----"
+		log = "---- From Ship: [This.GetName] ----"
+		log = "---- Survey Discovery: planet wonder ----"
+#		root = {
+#			owner = {
+#				set_country_flag = gpm_discover_planet_wonder
+#			}
+#		}
+		FROM = {
+			if = { 
+				limit = {
+					NOT = { has_planet_flag = "gpm_is_surveyed" }
+				}
+				# set_name = "color_planet_wonder"
+				set_planet_flag = "gpm_is_surveyed"
+				set_planet_flag = "gpm_is_wondrous_planet"
+				gpm_colour_planet_name = yes
+			}
+		}
+	}
+	
+	option = {
+		name = gpm_survey.UNBELIEVABLE
+		root = {
+			owner = {
+				add_monthly_resource_mult = {
+					resource = physics_research
+					value = @tier3researchreward
+					min = @tier3researchmin
+					max = @tier3researchmax
+				}
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = @tier3researchreward
+					min = @tier3researchmin
+					max = @tier3researchmax
+				}
+				add_monthly_resource_mult = {
+					resource = engineering_research
+					value = @tier3researchreward
+					min = @tier3researchmin
+					max = @tier3researchmax
+				}
+			}
+		}
+	}
+}

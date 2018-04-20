@@ -16,6 +16,7 @@ import convertCSV_TXT
 import createUpgradedBuildings
 import copySubTag
 import createAIVarsFromModifiers
+import locList
 import pickle
 
 class Logger(object):
@@ -271,14 +272,18 @@ class TabClass:
     for i in range(len(self.options)):
       if self.checkVars[i].get():
         argList+=self.options[i][1].split()
-    if self.singleEntryCheck=="Helper File":
-      argList.append("--helper_file_list")
-      argList.append("")
-      for line in reversed(self.lines):
+    if self.singleEntryCheck!="":
+      if self.singleEntryCheck=="Helper File":
+        argList.append("--helper_file_list")
+        argList.append("")
+        for line in reversed(self.lines):
+          if line.lineCheckVar.get():
+            argList[-1]+="1"
+          else:
+            argList[-1]+="0"
+      elif self.singleEntryCheck!="Source File":
         if line.lineCheckVar.get():
-          argList[-1]+="1"
-        else:
-          argList[-1]+="0"
+          argList.append("--"+self.singleEntryCheck.replace(" ","_").lower())
   def checkValid(self):
     self.setSize()
     for line in self.lines:
@@ -604,6 +609,11 @@ class TabControlClass:
     self.tabClasses[-1].separateStart=False
     self.tabClasses[-1].helpText="Creates weight files to be used in AI buiding weights. Since options are global, it's best to create one 'project' for different tpyes, e.g. one for planet modifiers, one for buildings, one for blocker"
 
+    self.newTab("Loc Converter",locList,("yaml and ods files","*.yml"),[],[of],"")
+    self.tabClasses[-1].separateStart=True
+    self.tabClasses[-1].helpText="Converts yaml files into a python script to create multi-language yaml files the game can use. Missing things are replaced by the english locs."
+    self.tabClasses[-1].singleEntryCheck="Create Main File"
+
 
     nb.pack(expand=1, fill="both")  # Pack to make visible
   def newTab(self,name, command, fileFilter, fixedOptions, options, extraAddButton):
@@ -637,7 +647,7 @@ def about():
   print("Feel free to use for your mod project but please mention me including the links to my mods ")
   print("http://steamcommunity.com/profiles/76561198087073498/myworkshopfiles")
   print("and our git repository:")
-  print("https://github.com/Goldziher/ExOverhaul")
+  print("https://github.com/Goldziher/Stellaris-Modding-Den")
   
 def help(tabControl):
   #window=tk.Toplevel(root)

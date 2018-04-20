@@ -1,0 +1,643 @@
+# A Megastructure has been built
+# Root = Country
+# From = Megastructure
+# FromFrom = System
+# FromFromFrom = Fleet
+
+namespace = gpm_habitat
+
+### Habitat Finish -> roll habitat modifiers
+event = {
+	id = gpm_habitat.78870
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		
+		from.planet = {
+			every_moon = {
+				limit = {
+					AND = {
+						NOT = {
+							has_planet_flag = new_habitat_flag
+						}
+						gpm_is_planet_habitat = yes
+					}
+				}
+				log = "---- Fired Event gpm_habitat.78870 ----"
+				log = "---- rolling modifiers on habitat ----"
+				
+				# First we try to apply a construction bonus modifier (low chance)
+				random_list = {
+					95 = {}
+					5 = { gpm_spawn_habitat_tier_modifier = yes }
+				}
+				
+				#  Bonus additional modifier
+				if = {
+					limit = { num_modifiers < 3 }
+					random_list = {
+						50 = {}
+						50 = { gpm_spawn_habitat_modifier = yes }
+					}
+				}
+				if = {
+					limit = { num_modifiers < 2 }
+					random_list = {
+						50 = {}
+						50 = { gpm_spawn_habitat_modifier = yes }
+					}
+				}
+				set_planet_flag = new_habitat_flag
+			}
+		}
+	}
+}
+
+### Habitat Finish -> check parent planet for modifiers and give matching habitat modifiers
+event = {
+	id = gpm_habitat.78871
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		# this part checks number of planets with X modifier used to match X habitat modifier later on
+		# set this variable back to 0 to avoid issues with multiple habitats
+		set_variable = {
+			which = "gpm_number_rich_asteroids"
+			value = 0
+		}
+		FROMFROM = {
+			every_system_planet = {
+				# if the planet has an asteroid property
+				if = {
+					limit = {
+						OR = {
+							has_modifier = Large_Asteroid 
+							has_modifier = Asteroid_Moon
+							has_modifier = Metal_Asteroid 
+							has_modifier = Dense_Core 
+							has_modifier = Abandoned_Mining_Platforms 
+						}
+					}
+					prev = {
+						#we add +1 to variable
+						change_variable = {
+							which = "gpm_number_rich_asteroids" 
+							value = 1
+						}
+					}
+				}
+			}
+		}
+		
+		from.planet = {
+			every_moon = {
+				limit = {
+					AND = {
+						NOT = {
+							has_planet_flag = gpm_habitat_flag_parent_modifiers
+						}
+						gpm_is_planet_habitat = yes
+					}
+				}
+				
+				
+				save_event_target_as = gpm_habitat
+				
+				log = "---- Fired Event gpm_habitat.78871 ----"
+				log = "---- rolling modifiers on habitat ----"
+				
+				# Habitat_Asteroid_Belt_Mining
+				# Habitat_Frequent_Thunderstorms_Research 
+				# Habitat_Radioactive_Mantle_Mining 
+				# Habitat_Frequent_Asteroid_Flybys 
+				# Habitat_Highly_Charged_Particle_Collection 
+				# Habitat_Ancient_Temple_Expeditions
+				# Habitat_Time_Displaced_Planet_Research
+				# Habitat_Surface_Mining
+				# Habitat_Surface_Expeditions
+				# Habitat_Android_Pleasure_Palace_Tourism
+				# Habitat_Delicious_Ingredients_Trade (spice must flow!)
+				# Habitat_Flat_Terrain_Racing (chance based)
+				# Habitat_Strange_Alien_Eggs_Restriction
+				# Habitat_Hydrogen_Extraction
+				# Habitat_Nitrogen_Extraction
+				# Habitat_Chlorine_Extraction
+				# Habitat_Phosphorus_Extraction
+				# Habitat_Sulfur_Extraction
+				# Habitat_Iron_Extraction
+				# Habitat_Titanium_Extraction
+				# Habitat_Gold_Extraction
+				# Habitat_Platinum_Extraction
+				# Habitat_Mercury_Extraction
+				# Habitat_Cobalt_Extraction
+				# Habitat_Lithium_Extraction
+				
+				
+				# if specific asteroid variabe > 2 we add asteroid mining bonus to habitat
+				prev = {
+					if = {
+						limit = {
+							check_variable = {
+								which = "gpm_number_rich_asteroids" 
+								value > 2
+							}
+						}
+						prev = {
+							event_target:gpm_habitat.planet = {
+								add_modifier = { modifier = Habitat_Asteroid_Belt_Mining days = -1 }
+								#planet_resource_minerals_add = 20  #check at 2.0 update to make it work
+								
+							}
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = extensive_moon_system
+								any_moon = {
+									has_modifier = extensive_moon_system
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Extensive_Moon_Mining days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Frequent_Thunderstorms 
+								has_modifier = Global_Thunderstorms
+								any_moon = {
+									OR = {
+										has_modifier = Frequent_Thunderstorms 
+										has_modifier = Global_Thunderstorms
+									}
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Frequent_Thunderstorms_Research days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Radioactive_Mantle
+								any_moon = {
+									has_modifier = Radioactive_Mantle
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Radioactive_Mantle_Mining days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Periodic_Meteor_Showers
+								any_moon = {
+									has_modifier = Periodic_Meteor_Showers
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Frequent_Asteroid_Flybys days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Crystal_Moon_Palace 
+								has_modifier = Temple_of_the_Ancient_One 
+								has_modifier = Ancient_Temple 
+								any_moon = {
+									OR = {
+										has_modifier = Crystal_Moon_Palace 
+										has_modifier = Temple_of_the_Ancient_One 
+										has_modifier = Ancient_Temple 
+									}
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Ancient_Temple_Expeditions days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Highly_Charged_Air_Particles
+								any_moon = {
+									has_modifier = Highly_Charged_Air_Particles
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Highly_Charged_Particle_Collection days = -1 } 
+						}
+					}
+				}
+				
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Time_Displaced_Planet
+								any_moon = {
+									has_modifier = Time_Displaced_Planet
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Time_Displaced_Planet_Research days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = ultra_rich_2
+								has_modifier = mineral_rich_2
+								has_modifier = ultra_rich
+								has_modifier = mineral_rich
+								has_modifier = Extensive_Cavern_System
+								any_moon = {
+									OR = {
+										has_modifier = ultra_rich_2
+										has_modifier = mineral_rich_2
+										has_modifier = ultra_rich
+										has_modifier = mineral_rich
+										has_modifier = Extensive_Cavern_System
+									}
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Surface_Mining days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Ruined_Battlefield 
+								has_modifier = Spaceship_Graveyard 
+								has_modifier = Old_World
+								has_modifier = Hiveworld
+								has_modifier = Surface_Of_Bones
+								has_modifier = Floating_Islands
+								has_modifier = Sunken_Cities
+								gpm_has_precursor_modifiers = yes
+								any_moon = {
+									OR = {
+										has_modifier = Ruined_Battlefield 
+										has_modifier = Spaceship_Graveyard 
+										has_modifier = Old_World
+										has_modifier = Hiveworld
+										has_modifier = Surface_Of_Bones
+										has_modifier = Floating_Islands
+										has_modifier = Sunken_Cities
+										gpm_has_precursor_modifiers = yes
+									}
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Surface_Expeditions days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Android_Pleasure_Palace
+								any_moon = {
+									has_modifier = Android_Pleasure_Palace
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Android_Pleasure_Palace_Tourism days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Delicious_Ingredients
+								any_moon = {
+									has_modifier = Delicious_Ingredients
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Delicious_Ingredients_Trade days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Flat_Terrain
+								any_moon = {
+									has_modifier = Flat_Terrain
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						random_list = {
+							50 = {
+								event_target:gpm_habitat.planet = {
+									add_modifier = { modifier = Habitat_Flat_Terrain_Racing days = -1 } 
+								}
+							}
+							500 = {}
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Strange_Alien_Eggs
+								any_moon = {
+									has_modifier = Strange_Alien_Eggs
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Strange_Alien_Eggs_Restriction days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Hydrogen_Mist
+								has_modifier = Hydrogen_Ice
+								any_moon = {
+									OR = {
+										has_modifier = Hydrogen_Mist
+										has_modifier = Hydrogen_Ice
+									}
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Hydrogen_Extraction days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Nitrogen_Ice
+								any_moon = {
+									has_modifier = Nitrogen_Ice
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Nitrogen_Extraction days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Chlorine_Planet
+								any_moon = {
+									has_modifier = Chlorine_Planet
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Chlorine_Extraction days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Phosphorus_Planet
+								any_moon = {
+									has_modifier = Phosphorus_Planet
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Phosphorus_Extraction days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Sulfur_Planet
+								any_moon = {
+									has_modifier = Sulfur_Planet
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Sulfur_Extraction days = -1 } 
+						}
+					}
+				}				
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Iron_Planet 
+								has_modifier = Iron_Rich 
+								any_moon = {
+									OR = {
+										has_modifier = Iron_Planet 
+										has_modifier = Iron_Rich 
+									}
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Iron_Extraction days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Titanium_Rich
+								any_moon = {
+									has_modifier = Titanium_Rich
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Titanium_Extraction days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Gold_Rich
+								any_moon = {
+									has_modifier = Gold_Rich
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Gold_Extraction days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Platinum_Rich
+								any_moon = {
+									has_modifier = Platinum_Rich
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Platinum_Extraction days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Mercury_Atmosphere
+								any_moon = {
+									has_modifier = Mercury_Atmosphere
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Mercury_Extraction days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Cobalt_Rich
+								any_moon = {
+									has_modifier = Cobalt_Rich
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Cobalt_Extraction days = -1 } 
+						}
+					}
+				}
+				# check if parent planet has X modifier:
+				prev = {
+					if = {
+						limit = {
+							OR = {
+								has_modifier = Lithium_Rich
+								any_moon = {
+									has_modifier = Lithium_Rich
+								}
+							}
+						}
+						# spawn matching X habitat modifier
+						event_target:gpm_habitat.planet = {
+							add_modifier = { modifier = Habitat_Lithium_Extraction days = -1 } 
+						}
+					}
+				}
+				set_planet_flag = gpm_habitat_flag_parent_modifiers
+			}
+		}
+	
+		# this correctly scopes to parent planet
+		#from.planet = {
+		#	add_modifier = { modifier = Habitat_Highly_Charged_Particle_Collection days = -1 }
+		#}
+	}
+}
+
