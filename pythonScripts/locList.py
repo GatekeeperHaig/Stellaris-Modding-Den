@@ -120,10 +120,20 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
       # print(line)
       outArray.append("")
       if ":" in line:
+        locContent=lineArray[1]
+        pureRef=False
+        if locContent.count("$")==2 and locContent[0]=="$" and locContent[-1]=="$":
+          pureRef=True
         key=lineArray[0].split(":")[0]
-        outArray[-1]+='locList.addLoc("{}","{}","{}")'.format(key.replace(".","_"), lineArray[1],langCodeInFile)
+        if pureRef:
+          del outArray[-1]
+        else:
+          outArray[-1]+='locList.addLoc("{}","{}","{}")'.format(key.replace(".","_"), lineArray[1],langCodeInFile)
         if args.create_main_file:
-          trivialAssignment.append('locList.addEntry("{}","@{}")'.format(key,key.replace(".","_")))
+          if pureRef:
+            trivialAssignment.append('locList.addEntry("{}","{}")'.format(key,locContent))
+          else:
+            trivialAssignment.append('locList.addEntry("{}","@{}")'.format(key,key.replace(".","_")))
         # contents.append(lineArray[1])
       for i,entry in enumerate(lineArray):
         if entry[0]=="#":
@@ -160,27 +170,6 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
         file.write("for fileName in glob.glob('locs/*.py'):\n")
         file.write("\twith open(fileName) as file:\n")
         file.write("\t\t exec(file.read())\n")
-        # file.write("\t\t for line in file:\n")
-        # file.write("\t\t\t try:\n")
-        # file.write("\t\t\t\t eval(line)\n")
-        # file.write("\t\t\t except:\n")
-        # file.write("\t\t\t\t pass\n")
-
-        # file.write('sys.path.insert(1, "test/locs/")\n')
-        # file.write('packages=[]\n')
-        # file.write('modules=[]\n')
-        # file.write("allModules.load_all_modules_from_dir('test/locs/',modules,packages)\n")
-        # file.write('for module,package in zip(modules,packages):\n')
-        # file.write("\timportlib.import_module(module)\n")
-        # file.write("\teval(package).locs(locList)\n")
-        # for language in locList.languages:
-        #   file.write("try:\n")
-        #   file.write("\timport test_"+language+"\n")
-        #   file.write("\ttest_"+language+".locs(locList)\n")
-        #   file.write("except:\n")
-        #   file.write("\tprint('No localisation given for {}')\n".format(language))
-        # for entry in outArray:
-        #   file.write(entry+"\n")
         for entry in trivialAssignment:
           file.write(entry+"\n")
         file.write('for language in locList.languages:\n'+
