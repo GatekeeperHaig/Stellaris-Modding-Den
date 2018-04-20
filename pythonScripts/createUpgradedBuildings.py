@@ -333,7 +333,7 @@ def readAndConvert(args, allowRestart=1):
             upgradeData.costChangeUpgradeToDirectBuild(buildingData,args, varsToValue)
 
             #Make sure you cannot replace a building by itself (i.e. upgraded version by same tier direct build)
-            upgradeData.getOrCreate("potential").add("NOT",TagList().add("tile",TagList().add("has_building",origUpgradeData.tagName))) #Prevent self replace") #Since has_building is hidden in the name of the data, no replace of has_building will take place. Should be a minimal performance improvement.
+            upgradeData.getOrCreate("potential").add("NOT",TagList().add("has_building",origUpgradeData.tagName)) #Prevent self replace") #Since has_building is hidden in the name of the data, no replace of has_building will take place. Should be a minimal performance improvement.
             if args.make_optional:
               upgradeData.get("potential").add("direct_build_enabled", "yes")
               
