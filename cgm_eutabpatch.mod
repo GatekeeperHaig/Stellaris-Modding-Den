@@ -1,4 +1,4 @@
-name="!(Patch) Core Game Mechanics and EUTAB"
+name="!!(Patch) Core Game Mechanics and EUTAB"
 path="mod/CGM/cgmeutabpatch"
 tags={
 	"Fixes"
