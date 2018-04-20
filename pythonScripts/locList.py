@@ -89,7 +89,7 @@ import glob
 def parse(argv, returnParser=False):
   parser = argparse.ArgumentParser(description="")
   parser.add_argument('inputFileNames', nargs = '*' )
-  parser.add_argument('--output_folder',default="test" )
+  parser.add_argument('--output_folder',default="test/localisation/" )
   parser.add_argument('--create_main_file', action="store_true")
   if returnParser:
     return parser
@@ -148,21 +148,19 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
         # print(commonPath)
         relPath=os.path.relpath(commonPath,absPath)
         # print(relPath)
-        file.write("#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nimport os,sys,glob,ast\n")
+        file.write("#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nimport os,sys,glob\n")
         file.write("os.chdir(os.path.dirname(__file__))\n")
         file.write("sys.path.insert(1, '"+relPath+"')\n")
         file.write("from locList import LocList\nlocList=LocList()\n")
-        file.write("import allModules,importlib\n")
+        # file.write("import allModules,importlib\n")
         file.write("for fileName in glob.glob('locs/*.py'):\n")
         file.write("\twith open(fileName) as file:\n")
-        file.write("\t\t for line in file:\n")
-        file.write("\t\t\t try:\n")
-        # file.write("\t\t\t\t print(line.strip())\n")
-        # file.write("\t\t\t\t ast.literal_eval(line)\n")
-        file.write("\t\t\t\t eval(line)\n")
-        file.write("\t\t\t except:\n")
-        file.write("\t\t\t\t pass\n")
-        # file.write("print(locList.dicts)\n")
+        file.write("\t\t exec(file.read())\n")
+        # file.write("\t\t for line in file:\n")
+        # file.write("\t\t\t try:\n")
+        # file.write("\t\t\t\t eval(line)\n")
+        # file.write("\t\t\t except:\n")
+        # file.write("\t\t\t\t pass\n")
 
         # file.write('sys.path.insert(1, "test/locs/")\n')
         # file.write('packages=[]\n')
@@ -182,7 +180,7 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
         for entry in trivialAssignment:
           file.write(entry+"\n")
         file.write('for language in locList.languages:\n'+
-                    '\toutFolderLoc="testOut2/localisation/"+language\n'+
+                    '\toutFolderLoc=language\n'+
                     '\tif not os.path.exists(outFolderLoc):\n'+
                       '\t\tos.makedirs(outFolderLoc)\n'+
                     '\tlocList.write(outFolderLoc+"/cgm_building_customize_l_"+language+".yml",language)')
