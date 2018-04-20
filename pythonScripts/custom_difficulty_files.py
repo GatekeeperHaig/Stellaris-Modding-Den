@@ -52,7 +52,7 @@ t_backMainOption=TagList("name","custom_difficulty_back").add("hidden_effect", T
 t_closeOption=TagList("name", "custom_difficulty_close.name").add("hidden_effect", TagList("country_event", t_rootUpdateEvent))
 
 def main():
-
+  os.chdir(os.path.dirname(__file__))
   debugMode=False
 
   changeStepYears=[5,4,3,2,1]
@@ -142,7 +142,7 @@ def main():
   locClass.addLoc("commodore", "$DIFFICULTY_COMMODORE$","all")
   locClass.addLoc("admiral", "$DIFFICULTY_ADMIRAL$","all")
   locClass.addLoc("grandAdmiral", "$DIFFICULTY_GRAND_ADMIRAL$","all")
-  locClass.addLoc("scaling", "$FE_SCALING_DIFFICULTY$","all")
+  locClass.addLoc("scaling", "$FE_SCALING_DIFFICULTY$$DIFFICULTY_SCALING$","all")
 
 
 

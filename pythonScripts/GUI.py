@@ -5,6 +5,7 @@ import sys, argparse, subprocess,os
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
+from tkinter import simpledialog
 from tkinter import *
 #from tkinter.tix import *
 from tkinter import ttk
@@ -53,24 +54,6 @@ class Logger(object):
  
   
 
-def startEditor(filename, forceEditor=False):
-  if not os.path.exists(filename):
-    with open(filename,'w') as file:
-      pass
-  if platform.system()=='Windows':
-    if forceEditor:
-      subprocess.Popen("notepad "+filename, shell=True)
-    else:
-      subprocess.Popen('"'+filename+'"', shell=True)
-  else:
-    if (filename.find(".ods")!=-1):
-      subprocess.Popen("xdg-open "+filename, shell=True)
-    else:
-      editor = os.getenv('EDITOR')
-      if editor:
-          subprocess.Popen(editor + ' ' + filename, shell=True)
-      else:
-          webbrowser.open(filename)
 
 class Line:
   def openFile(self):
@@ -120,6 +103,7 @@ class Line:
     line= tk.Frame(root.mainFrame)
     self.lineFrame=line
     self.root=root
+    # print(root.tabControl.menuBar.txtEditors[-1].name)
     #root.lines.append(line)
     line.pack(side=tk.TOP)
     self.lineCheckVar = IntVar()
@@ -134,9 +118,9 @@ class Line:
         
     self.bConv = tk.Button(line, text="Convert", command=self.convert)
     #self.bConv = tk.Button(line, text="Convert", command=lambda:webbrowser.open_new(self.getTxt()))
-    self.bEditS = tk.Button(line, text="Edit Source", command=lambda:startEditor(self.getTxt()))
-    self.bEditF = tk.Button(line, text="Edit Filter", command=lambda:startEditor(self.getTxt().replace(".txt",".filter"),True))
-    self.bEditR = tk.Button(line, text="Edit Result", command=lambda:startEditor(self.getResultFileName()))
+    self.bEditS = tk.Button(line, text="Edit Source", command=lambda:root.tabControl.startEditor(self.getTxt()))
+    self.bEditF = tk.Button(line, text="Edit Filter", command=lambda:root.tabControl.startEditor(self.getTxt().replace(".txt",".filter"),True))
+    self.bEditR = tk.Button(line, text="Edit Result", command=lambda:root.tabControl.startEditor(self.getResultFileName()))
     self.bFile = tk.Button(line, text="...", command=self.openFile)
     self.bDel = tk.Button(line, fg="red", text="X", command=lambda:root.removeLineByReference(line))
     if self.root.separateStart:
@@ -393,7 +377,8 @@ class TabClass:
     except EOFError:
       print("Warning: File ended earlir than expected. File might be older version but still work perfectly or stuff is actually missing")
 
-  def __init__(self,name,tab,root,command, fixedOptions, defaultFileFilter,optionWindow=0,extraAddButton=""):
+  def __init__(self,name,tab,root,command, fixedOptions, defaultFileFilter,optionWindow,extraAddButton, tabControl):
+    self.tabControl=tabControl
     self.name=name
     self.root=root
     self.tab=tab
@@ -623,7 +608,7 @@ class TabControlClass:
     for option in options:
       optionClasses.append(Option(option))
     optionWindow=OptionWindow(self.root,name+" Options",optionClasses,command)
-    self.tabClasses.append(TabClass(name,frame,self.root,command,fixedOptions, fileFilter,optionWindow,extraAddButton))
+    self.tabClasses.append(TabClass(name,frame,self.root,command,fixedOptions, fileFilter,optionWindow,extraAddButton,self))
 
   def getActiveTabClass(self):
     return self.tabClasses[self.nb.index(self.nb.select())]
@@ -635,6 +620,32 @@ class TabControlClass:
       self.getActiveTabClass().load()  
   def loadAdd(self):
     self.getActiveTabClass().loadAdd()
+
+  def startEditor(self,filename, forceEditor=False):
+    if not os.path.exists(filename):
+      with open(filename,'w') as file:
+        pass
+    editorType="txtEditors"
+    if filename[-4:]==".ods" or filename[-4:]==".csv":
+      editorType="OdsEditors"
+    editor=self.menuBar.getEditor(editorType)
+    if editor=="":
+      if platform.system()=='Windows':
+        if forceEditor or filename[-3:]==".py":
+          subprocess.Popen('notepad '+filename, shell=True)
+        else:
+          subprocess.Popen('"'+filename+'"', shell=True)
+      else:
+        if (filename.find(".ods")!=-1):
+          subprocess.Popen("xdg-open "+filename, shell=True)
+        else:
+          editor = os.getenv('EDITOR')
+          if editor:
+              subprocess.Popen(editor + ' ' + filename, shell=True)
+          else:
+              webbrowser.open(filename)
+    else:
+      subprocess.Popen('"{}" "{}"'.format(editor,filename), shell=True)
 
 def repeatedChecks(tabClasses, root):
   for tab in tabClasses:
@@ -664,44 +675,161 @@ def help(tabControl):
   #   tabControl.getActiveTabClass().command.parse(["-h"])
   # except:
   #   pass
+class Editor:
+  def __init__(self,name,command=""):
+    self.name=name
+    self.command=command
+    self.active=tk.BooleanVar()
+    self.active.set(False)
+  def toPickle(self):
+    return [self.name, self.command, self.active.get()]
+  def fromPickle(self,data):
+    self.name=data[0]
+    self.command=data[1]
+    self.active.set(data[2])
+
+# import tkSimpleDialog
+
+# class AskName(tkSimpleDialog.Dialog):
+
+#     def body(self, master):
+
+#         Label(master, text="Name:").grid(row=0)
+
+#         self.e1 = Entry(master)
+
+#         self.e1.grid(row=0, column=1)
+#         return self.e1 # initial focus
+
+#     def apply(self):
+#         self.result = int(self.e1.get())
+
+class MenuBar:
+  def __init__(self, root, tabControl):
+    self.root=root
+    menubar = Menu(root)
+    self.menubar=menubar
+
+    # create a pulldown menu, and add it to the menu bar
+    filemenu = Menu(menubar, tearoff=0)
+    
+    
+    filemenu.add_command(label="Load Current Tab", command=tabControl.load)
+    filemenu.add_command(label="Load Current Tab (add files, no options changed)", command=tabControl.loadAdd)
+    filemenu.add_command(label="Save Current Tab", command=tabControl.save)
+    filemenu.add_separator()
+    filemenu.add_command(label="Exit", command=root.quit)
+    menubar.add_cascade(label="File", menu=filemenu)
+
+    # create more pulldown menus
+    #editmenu = Menu(menubar, tearoff=0)
+    #editmenu.add_command(label="Cut", command=hello)
+    #editmenu.add_command(label="Copy", command=hello)
+    #editmenu.add_command(label="Paste", command=hello)
+    #menubar.add_cascade(label="Edit", menu=editmenu)
+
+    helpmenu = Menu(menubar, tearoff=0)
+    helpmenu.add_command(label="About", command=about)
+    helpmenu.add_command(label="Help", command=lambda:help(tabControl))  
+    # helpmenu.add_command(label="About", command=lambda:about(root))
+    # helpmenu.add_cascade(label="Help", command=lambda:help(root))
+    menubar.add_cascade(label="Help", menu=helpmenu)
+
+    settingsMenu = Menu(menubar, tearoff=0)
+    self.chooseEditor=Menu(settingsMenu, tearoff=0)
+    self.removeEditor=Menu(settingsMenu, tearoff=0)
+
+    self.chooseOdsEditor=Menu(settingsMenu, tearoff=0)
+    self.removeOdsEditor=Menu(settingsMenu, tearoff=0)
+
+    self.txtEditors=[Editor("Default")]
+    self.txtEditors[0].active.set(True)
+    self.OdsEditors=[Editor("Default")]
+    self.OdsEditors[0].active.set(True)
+    self.loadEditors()
+    self.createEditorMenu()
+    self.createEditorMenu("chooseOdsEditor","removeOdsEditor","OdsEditors")
+
+    settingsMenu.add_cascade(label="Choose Editor", menu=self.chooseEditor)
+    settingsMenu.add_cascade(label="Remove Editor", menu=self.removeEditor)
+    settingsMenu.add_cascade(label="Choose Ods Editor", menu=self.chooseOdsEditor)
+    settingsMenu.add_cascade(label="Remove Ods Editor", menu=self.removeOdsEditor)
+    menubar.add_cascade(label="Settings", menu=settingsMenu)
+
+    # display the menu
+    root.config(menu=menubar)
+
+  def saveEditors(self):
+    with open(".gratak_gui_data.pkl2", 'wb') as f:
+      for editorList in ["txtEditors","OdsEditors"]:
+        # pickle.dump(len(getattr(self,editorList)),f)
+        editorOut=[]
+        for editor in getattr(self,editorList):
+          editorOut.append(editor.toPickle())
+        pickle.dump(editorOut,f)
+  def loadEditors(self):
+    if not os.path.exists(".gratak_gui_data.pkl2"):
+      return False
+    with open(".gratak_gui_data.pkl2", 'rb') as f:
+      for editorList in ["txtEditors","OdsEditors"]:
+        editorIn=pickle.load(f)
+        getattr(self,editorList).clear()
+        for editor in editorIn:
+          getattr(self,editorList).append(Editor("tmp"))
+          getattr(self,editorList)[-1].fromPickle(editor)
+    return True
+  def deleteEditor(self, i,choose, remove, editorList):
+    if getattr(self,editorList)[i].active.get()==True:
+      self.makeActive(0,choose, remove, editorList, False)
+    del getattr(self,editorList)[i]
+    getattr(self,choose).delete(0,tk.END)
+    getattr(self,remove).delete(0,tk.END)
+    self.createEditorMenu(choose, remove, editorList)
+  def addEditor(self,choose, remove, editorList):
+    fileName=filedialog.askopenfilename(title = "Select Editor")
+    name=simpledialog.askstring("Editor Name", "Cancel to use file name",parent=self.root)
+    if not name:
+      name=os.path.basename(fileName)
+    getattr(self,editorList).append(Editor(name, fileName))
+    getattr(self,choose).delete(0,tk.END)
+    getattr(self,remove).delete(0,tk.END)
+    self.createEditorMenu(choose, remove, editorList)
+    self.saveEditors()
+  def getEditor(self, editorList):
+    for editor in getattr(self,editorList):
+      if editor.active.get():
+        return editor.command
+
+  def createEditorMenu(self, choose="chooseEditor", remove="removeEditor", editorList="txtEditors"):
+    # self.chooseEditor.add_checkbutton(label="Default", variable=editor.active, command=about)
+    for i,editor in enumerate(getattr(self,editorList)):
+      getattr(self,choose).add_checkbutton(label=editor.name, variable=editor.active,onvalue=True, offvalue=False, command=lambda i=i: self.makeActive(i,choose, remove, editorList))
+      if i!=0:
+        getattr(self,remove).add_command(label=editor.name, command=lambda i=i: self.deleteEditor(i,choose, remove, editorList))
+    getattr(self,choose).add_command(label="Add Editor", command=lambda: self.addEditor(choose, remove, editorList))
+  def makeActive(self,i,choose, remove, editorList, save=True):
+    # print(i)
+    if i!=0 and getattr(self,editorList)[i].active.get()==False: #false because clicking it already disabled it
+      getattr(self,editorList)[0].active.set(True)
+      # self.txtEditors[i].active.set(False)
+    else:
+      for editor in getattr(self,editorList):
+        editor.active.set(False)
+      getattr(self,editorList)[i].active.set(True)
+    if save:
+      self.saveEditors()
+
+
   
 def main():
+  os.chdir(os.path.dirname(__file__))
   root = Tk()
   root.title("Stellaris Python Script Helper")
   screen_width = root.winfo_screenwidth()
   screen_height = root.winfo_screenheight()
   root.geometry("{!s}x{!s}".format(1400,screen_height*2//3))
   # create a toplevel menu
-  menubar = Menu(root)
-
-  # create a pulldown menu, and add it to the menu bar
-  filemenu = Menu(menubar, tearoff=0)
-  tabControl=TabControlClass(root)
   
-  
-  filemenu.add_command(label="Load Current Tab", command=tabControl.load)
-  filemenu.add_command(label="Load Current Tab (add files, no options changed)", command=tabControl.loadAdd)
-  filemenu.add_command(label="Save Current Tab", command=tabControl.save)
-  filemenu.add_separator()
-  filemenu.add_command(label="Exit", command=root.quit)
-  menubar.add_cascade(label="File", menu=filemenu)
-
-  # create more pulldown menus
-  #editmenu = Menu(menubar, tearoff=0)
-  #editmenu.add_command(label="Cut", command=hello)
-  #editmenu.add_command(label="Copy", command=hello)
-  #editmenu.add_command(label="Paste", command=hello)
-  #menubar.add_cascade(label="Edit", menu=editmenu)
-
-  helpmenu = Menu(menubar, tearoff=0)
-  helpmenu.add_command(label="About", command=about)
-  helpmenu.add_cascade(label="Help", command=lambda:help(tabControl))  
-  # helpmenu.add_command(label="About", command=lambda:about(root))
-  # helpmenu.add_cascade(label="Help", command=lambda:help(root))
-  menubar.add_cascade(label="Help", menu=helpmenu)
-
-  # display the menu
-  root.config(menu=menubar)
 
   if os.path.exists("python.ico") and platform.system()=='Windows':
     root.iconbitmap('python.ico')
@@ -710,6 +838,9 @@ def main():
 
 
   
+  tabControl=TabControlClass(root)
+  menuBar=MenuBar(root, tabControl)
+  tabControl.menuBar=menuBar
   #b = tk.Button(tabClasses[0].scrollFrame, text="hide", command=optionWindow.window.withdraw)
   #b.pack(side=tk.TOP)
   #b = tk.Button(tabClasses[0].scrollFrame, text="show", command=optionWindow.window.deiconify)
