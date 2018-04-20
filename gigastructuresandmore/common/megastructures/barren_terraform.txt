@@ -1,0 +1,179 @@
+barren_terraform_0 = {
+	entity = "construction_platform_entity"
+	construction_entity = "construction_platform_entity"
+	portrait = "GFX_megastructure_construction_background"
+	construction_blocks_others = no
+	place_entity_on_planet_plane = no
+	entity_offset = { x = -5 y = -5 }
+	build_time = 1800
+	build_cost = {
+		minerals = 10000
+		influence = 75
+	}
+
+	maintenance = {
+		energy = 5
+	}
+
+	potential = {
+		has_technology = tech_fix_barren
+	}
+	
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_inside_border"
+			is_inside_border = from
+		}
+	}
+	
+	placement_rules = {
+		planet_possible = {
+			custom_tooltip = {
+				fail_text = "must_build_around_barren"
+				OR = {
+					is_planet_class = pc_barren
+					is_planet_class = pc_barren_cold
+					is_planet_class = pc_frozen
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_anomaly"
+				NOT = { has_anomaly = yes }
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				#can_build_megastructure_on_planet = yes
+				NOR = {
+					has_planet_flag = megastructure
+					has_planet_flag = has_megastructure
+					solar_system = {
+						has_star_flag = ring_world_built
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_orbital_station"
+				has_orbital_station = no
+			}
+			custom_tooltip = {
+				fail_text = "requires_survey_not_habitable"
+				is_surveyed = {	
+					who = prev.from
+					status = yes
+				}
+				colonizeable_planet = no
+			}
+
+ 			# balance for habitats
+			custom_tooltip = {
+				fail_text = "requires_not_asteroid"
+				NOT = {
+					is_asteroid = yes
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_not_star"
+				is_star = no
+			}
+		} # use these for all non-star megastructures
+	}
+	
+	ai_weight = {
+		factor = 15
+		
+		modifier = {
+			factor = 0.1
+			has_any_megastructure_in_empire = yes
+		}
+		
+		modifier = {
+			factor = 0.1
+			any_system_within_border = {
+				OR = {
+					has_megastructure = barren_terraform_1
+					has_megastructure = barren_terraform_2
+					has_megastructure = barren_terraform_3
+				}
+			}
+		}
+	}
+	
+	on_build_start = {}
+	on_build_cancel = {}
+	on_build_complete = {
+	}
+}
+
+barren_terraform_1 = {
+	entity = "barren_terraform_1_entity"
+	construction_entity = "barren_terraform_1_entity"
+	portrait = "GFX_megastructure_barren"
+	construction_blocks_others = no
+	upgrade_from = {
+		barren_terraform_0
+	}
+	build_time = 1800
+	build_cost = {
+		minerals = 10000
+	}
+	
+	maintenance = {
+		energy = 25
+		minerals = 25
+	}
+	
+	potential = {
+		has_technology = tech_fix_barren
+	}
+}
+
+barren_terraform_2 = {
+	entity = "barren_terraform_2_entity"
+	construction_entity = "barren_terraform_2_construction_entity"
+	portrait = "GFX_megastructure_barren"
+	construction_blocks_others = no
+	upgrade_from = {
+		barren_terraform_1
+	}
+	build_time = 1800
+	build_cost = {
+		minerals = 10000
+	}
+	
+	maintenance = {
+		energy = 50
+		minerals = 50
+	}
+	
+	potential = {
+		has_technology = tech_fix_barren
+	}
+}
+
+barren_terraform_3 = {
+	entity = "barren_terraform_3_entity"
+	construction_entity = ""
+	portrait = "GFX_megastructure_barren"
+	construction_blocks_others = no
+	upgrade_from = {
+		barren_terraform_2
+	}
+	build_time = 3600
+	build_cost = {
+		energy = 5000
+	}
+	
+	potential = {
+		has_technology = tech_fix_barren
+	}
+	
+	on_build_complete = {
+		fromfrom.planet = {
+		    change_pc = pc_ll_temperate
+			add_modifier = { modifier = lifeless_temperate }
+			
+			remove_planet = no 			
+		}
+		remove_megastructure = fromfrom
+	}
+}

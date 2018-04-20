@@ -1,0 +1,141 @@
+blackhole_generator_0 = {
+	entity = "construction_platform_entity"
+	construction_entity = "construction_platform_entity"
+	portrait = "GFX_megastructure_construction_background"
+	construction_blocks_others = no
+	place_entity_on_planet_plane = no
+	entity_offset = { x = -5 y = -5 }
+	build_time = 1800
+	build_cost = {
+		minerals = 7500
+		influence = 50
+	}
+
+	maintenance = {
+		energy = 5
+	}
+
+	potential = {
+		has_technology = tech_kugelblitz_generator
+	}
+	
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_inside_border"
+			is_inside_border = from
+		}
+	}
+	
+	placement_rules = {
+		planet_possible = {
+			custom_tooltip = {
+				fail_text = "requires_no_anomaly"
+				NOT = { has_anomaly = yes }
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				#can_build_megastructure_on_planet = yes
+				NOR = {
+					has_planet_flag = megastructure
+					has_planet_flag = has_megastructure
+					solar_system = {
+						has_star_flag = ring_world_built
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_orbital_station"
+				has_orbital_station = no
+			}
+			custom_tooltip = {
+				fail_text = "requires_not_star"
+				is_star = no
+			}
+		} # use these for all non-star megastructures
+	}
+	
+	ai_weight = {
+		factor = 1
+		
+		modifier = {
+			factor = 0.1
+			has_any_megastructure_in_empire = yes
+		}
+		
+		modifier = {
+			factor = 0
+			any_system_within_border = {
+				OR = {
+					has_megastructure = blackhole_generator_0
+					has_megastructure = blackhole_generator_1
+					has_megastructure = blackhole_generator_2
+				}
+			}
+		}
+	}
+	
+	on_build_start = {}
+	on_build_cancel = {}
+	on_build_complete = {
+		fromfrom.planet = {
+			set_planet_flag = has_megastructure
+		}
+	}
+}
+
+blackhole_generator_1 = {
+	entity = "blackhole_generator_empty_entity"
+	construction_entity = "blackhole_generator_empty_entity"
+	portrait = "GFX_megastructure_construction_background"
+	construction_blocks_others = no
+	place_entity_on_planet_plane = no
+	upgrade_from = {
+		blackhole_generator_0
+	}
+	build_time = 1800
+	build_cost = {
+		minerals = 20000
+	}
+	
+	maintenance = {
+		minerals = 5
+	}
+	
+	potential = {
+		has_technology = tech_kugelblitz_generator
+	}
+}
+
+blackhole_generator_2 = {
+	entity = "blackhole_generator_full_entity"
+	construction_entity = ""
+	portrait = "GFX_megastructure_black_hole"
+	construction_blocks_others = no
+	place_entity_on_planet_plane = no
+	upgrade_from = {
+		blackhole_generator_1
+	}
+	build_time = 800
+	build_cost = {
+		minerals = 5000
+		energy = 25000
+	}
+	
+	maintenance = {
+		minerals = 50
+	}
+	
+	country_modifier = {
+		max_minerals = 15000
+		max_energy = 16500
+	}
+	
+	monthly_production = {
+		energy = 150
+		sr_kugelblitz = 1
+	}
+	
+	potential = {
+		has_technology = tech_kugelblitz_generator
+	}
+}
