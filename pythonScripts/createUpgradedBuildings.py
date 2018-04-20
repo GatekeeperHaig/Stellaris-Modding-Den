@@ -609,7 +609,9 @@ def main(args, argv):
   
     
   if args.create_standalone_mod_from_mod:
-    rerunName="_".join(os.path.split(os.path.dirname(args.output_folder)))+"_rerun.py" #foldername, not path!
+    rerunName=os.path.split(os.path.dirname(args.output_folder))[1]+"_rerun.py" #foldername, not path!
+    print(os.path.split(os.path.dirname(args.output_folder))[1])
+    print(os.path.dirname(args.output_folder))
   elif args.just_copy_and_check:
     rerunName=args.output_folder+"/rerun_just_copy_and_check.py"
   else:
@@ -682,6 +684,7 @@ def main(args, argv):
     # otherFilesArgs.replacement_file=''
     for root, dirs, files in os.walk(path):
       # if len(files)>0:
+      # print(files)
       rootWithoutPath=root.rstrip(".").replace(path,"",1)
       if not os.path.exists(args.output_folder+rootWithoutPath):
         os.mkdir(args.output_folder+rootWithoutPath)

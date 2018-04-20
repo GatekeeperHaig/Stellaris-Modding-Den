@@ -1,5 +1,5 @@
 name="!Core Game Mechanics: Buildings Script Source"
-path="buildings_script_source"
+path="mod/buildings_script_source/"
 tags={
 	"Balance"
 }
