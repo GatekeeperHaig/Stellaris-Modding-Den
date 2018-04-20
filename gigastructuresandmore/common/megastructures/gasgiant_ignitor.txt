@@ -1,0 +1,239 @@
+gasgiant_ignitor_0 = {
+	entity = "construction_platform_entity"
+	construction_entity = "construction_platform_entity"
+	portrait = "GFX_megastructure_construction_background"
+	construction_blocks_others = no
+	place_entity_on_planet_plane = no
+	entity_offset = { x = -5 y = -5 }
+	build_time = 2700
+	build_cost = {
+		minerals = 15000
+		influence = 75
+	}
+
+	maintenance = {
+		energy = 5
+	}
+
+	potential = {
+		has_technology = tech_ignite_browndwarf
+	}
+	
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_inside_border"
+			is_inside_border = from
+		}
+	}
+	
+	placement_rules = {
+		planet_possible = {
+			custom_tooltip = {
+				fail_text = "must_build_around_dwarf"
+				is_planet_class = pc_gigabrown_dwarf
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_anomaly"
+				NOT = { has_anomaly = yes }
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				#can_build_megastructure_on_planet = yes
+				NOR = {
+					has_planet_flag = megastructure
+					has_planet_flag = has_megastructure
+					solar_system = {
+						has_star_flag = ring_world_built
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_orbital_station"
+				has_orbital_station = no
+			}
+			custom_tooltip = {
+				fail_text = "requires_survey_not_habitable"
+				is_surveyed = {	
+					who = prev.from
+					status = yes
+				}
+				colonizeable_planet = no
+			}
+
+ 			# balance for habitats
+			custom_tooltip = {
+				fail_text = "requires_not_minor_planetary_body"
+				NOR = {
+					is_asteroid = yes
+					is_moon = yes
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_not_star"
+				is_star = no
+			}
+		} # use these for all non-star megastructures
+	}
+	
+	ai_weight = {
+		factor = 15
+		
+		modifier = {
+			factor = 0.1
+			has_any_megastructure_in_empire = yes
+		}
+		
+		modifier = {
+			factor = 0.1
+			any_system_within_border = {
+				OR = {
+					has_megastructure = gasgiant_ignitor_0
+					has_megastructure = gasgiant_ignitor_1
+					has_megastructure = gasgiant_ignitor_2
+					has_megastructure = gasgiant_ignitor_3
+					has_megastructure = gasgiant_ignitor_4
+					has_megastructure = gasgiant_ignitor_5
+				}
+			}
+		}
+	}
+	
+	on_build_start = {}
+	on_build_cancel = {}
+	on_build_complete = {
+		fromfrom.planet = {
+			set_planet_flag = has_megastructure
+		}
+	}
+}
+
+gasgiant_ignitor_1 = {
+	entity = "gasignitor_phase_01_entity"
+	construction_entity = "gasignitor_phase_01_entity"
+	portrait = "GFX_megastructure_gas_giant"
+	construction_blocks_others = no
+	upgrade_from = {
+		gasgiant_ignitor_0
+	}
+	build_time = 2700
+	build_cost = {
+		minerals = 20000
+	}
+	
+	maintenance = {
+		minerals = 10
+		energy = 5
+	}
+	
+	potential = {
+		has_technology = tech_ignite_browndwarf
+	}
+}
+
+gasgiant_ignitor_2 = {
+	entity = "gasignitor_phase_02_entity"
+	construction_entity = "gasignitor_phase_02_entity"
+	portrait = "GFX_megastructure_gas_giant"
+	construction_blocks_others = no
+	upgrade_from = {
+		gasgiant_ignitor_1
+	}
+	build_time = 2700
+	build_cost = {
+		minerals = 10000
+	}
+	
+	maintenance = {
+		minerals = 25
+		energy = 10
+	}
+	
+	potential = {
+		has_technology = tech_ignite_browndwarf
+	}
+}
+
+gasgiant_ignitor_4 = {
+	entity = "gasignitor_phase_04_entity"
+	construction_entity = "gasignitor_compression_phase_entity"
+	portrait = "GFX_megastructure_gas_giant"
+	construction_blocks_others = no
+	upgrade_from = {
+		gasgiant_ignitor_2
+	}
+	build_time = 7200
+	build_cost = {
+		minerals = 15000
+		energy = 30000
+	}
+	
+	maintenance = {
+		minerals = 25
+		energy = 50
+	}
+	
+	monthly_production = {
+		physics_research = 50
+	}
+	
+	on_build_complete = {
+		fromfrom.planet = {
+			change_planet_size = -10
+		}
+	}
+	
+	potential = {
+		has_technology = tech_ignite_browndwarf
+	}
+}
+
+gasgiant_ignitor_5 = {
+	entity = "gasignitor_phase_02_entity"
+	construction_entity = ""
+	portrait = "GFX_megastructure_gas_giant"
+	construction_blocks_others = no
+	upgrade_from = {
+		gasgiant_ignitor_4
+	}
+	build_time = 360
+	build_cost = {
+		energy = 5000
+	}
+	
+	on_build_complete = {
+		fromfrom.planet = {
+			change_planet_size = -2
+			change_pc = pc_gigaignited_star
+			set_planet_flag = ignited_star
+		}
+	}
+	
+	potential = {
+		has_technology = tech_ignite_browndwarf
+	}
+}
+
+gasgiant_ignitor_6 = {
+	entity = "gasignitor_phase_02_entity"
+	construction_entity = ""
+	portrait = "GFX_megastructure_gas_giant"
+	construction_blocks_others = no
+	upgrade_from = {
+		gasgiant_ignitor_5
+	}
+	build_time = 0
+	
+	maintenance = {
+		minerals = 25
+	}
+	
+	monthly_production = {
+		energy = 350
+		physics_research = 150
+	}
+	
+	upgrade_desc = hide	
+	potential = {
+		always = no
+	}
+}

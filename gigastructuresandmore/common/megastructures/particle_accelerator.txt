@@ -1,0 +1,134 @@
+particle_accelerator_0 = {
+	entity = "construction_platform_entity"
+	construction_entity = "construction_platform_entity"
+	portrait = "GFX_megastructure_construction_background"
+	construction_blocks_others = no
+	place_entity_on_planet_plane = no
+	entity_offset = { x = -7 y = -7 }
+	build_time = 1800
+	build_cost = {
+		minerals = 10000
+		influence = 75
+	}
+
+	maintenance = {
+		energy = 5
+	}
+
+	potential = {
+		has_technology = tech_big_star_particle_accelerator
+	}
+	
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_inside_border"
+			is_inside_border = from
+		}
+		custom_tooltip = {
+			fail_text = "requires_surveyed_system"
+			NOT = {
+				any_planet = {
+					is_surveyed = {
+						who = prev.from
+						status = no
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_black_hole_neutron_star_pulsar_crusher"
+			NOT = {
+				is_star_class = sc_black_hole
+				is_star_class = sc_neutron_star
+				is_star_class = sc_pulsar
+			}
+		}
+	}
+	
+	placement_rules = {
+		planet_possible = {
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				NOT = {
+					solar_system = {
+						has_star_flag = has_giga
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "must_build_around_star"
+				is_star = yes
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_anomaly"
+				NOT = { has_anomaly = yes }
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				#can_build_megastructure_on_planet = yes
+				NOR = {
+					solar_system = {
+						has_star_flag = particle_accelerator_built
+					}
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 1
+		
+		modifier = {
+			factor = 0.1
+			has_any_megastructure_in_empire = yes
+		}
+		
+		modifier = {
+			factor = 0
+			any_system_within_border = {
+				OR = {
+					has_megastructure = particle_accelerator_0
+					has_megastructure = particle_accelerator_1
+				}
+			}
+		}
+	}
+	
+	on_build_start = {}	
+	on_build_cancel = {}
+	on_build_complete = {
+		set_star_flag = particle_accelerator_built
+		set_star_flag = has_giga
+	}
+}
+
+particle_accelerator_1 = {
+	entity = "particle_accelerator_1"
+	construction_entity = "particle_accelerator_1"
+	portrait = "GFX_megastructure_physics_research"
+	construction_blocks_others = no
+	upgrade_from = {
+		particle_accelerator_0
+	}
+	build_time = 1800
+	build_cost = {
+		minerals = 10000
+	}
+	
+	maintenance = {
+		energy = 25
+		minerals = 25
+		unity = 10
+	}
+	
+	monthly_production = {
+		physics_research = 80
+		sr_improved_shields = 1
+	}
+	
+	potential = {
+		has_technology = tech_big_star_particle_accelerator
+	}
+}
+
+

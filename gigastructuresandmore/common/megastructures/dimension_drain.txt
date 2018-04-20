@@ -1,0 +1,191 @@
+dimension_drain_0 = {
+	entity = "construction_platform_entity"
+	construction_entity = "construction_platform_entity"
+	portrait = "GFX_megastructure_construction_background"
+	construction_blocks_others = no
+	place_entity_on_planet_plane = no
+	entity_offset = { x = -7 y = -7 }
+	build_time = 1800
+	build_cost = {
+		minerals = 10000
+		influence = 150
+	}
+
+	maintenance = {
+		energy = 10
+	}
+	
+	potential = {
+		has_ascension_perk = ap_transcendence
+		has_technology = tech_shroud_vortex
+	}
+	
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_inside_border"
+			is_inside_border = from
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_existing_dimension_drain"
+			from = { NOT = { has_country_flag = shroud_drain_built } }
+		}
+		custom_tooltip = {
+			fail_text = "requires_surveyed_system"
+			NOT = {
+				any_planet = {
+					is_surveyed = {
+						who = prev.from
+						status = no
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_black_hole_neutron_star_pulsar_crusher"
+			NOT = {
+				is_star_class = sc_black_hole
+				is_star_class = sc_neutron_star
+				is_star_class = sc_pulsar
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_existing_megastructure"
+			has_no_non_gate_megastructure = yes
+		}
+	}
+	
+	placement_rules = {
+		planet_possible = {
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				NOT = {
+					solar_system = {
+						has_star_flag = has_giga
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "must_build_around_star"
+				is_star = yes
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_anomaly"
+				NOT = { has_anomaly = yes }
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_orbital_station"
+				has_orbital_station = no
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 15
+		
+		modifier = {
+			factor = 0.1
+			has_any_megastructure_in_empire = yes
+		}
+		
+		modifier = {
+			factor = 0.1
+			any_system_within_border = {
+				OR = {
+					has_megastructure = dimension_drain_1
+					has_megastructure = dimension_drain_2
+					has_megastructure = dimension_drain_3
+				}
+			}
+		}
+	}
+	
+	on_build_start = {}
+	on_build_cancel = {}
+	on_build_complete = {
+		set_star_flag = dimension_drain_built
+		set_country_flag = shroud_drain_built
+		set_star_flag = has_giga
+	}
+}
+
+
+dimension_drain_1 = {
+	entity = "dimension_drain_1_entity"
+	construction_entity = "dimension_drain_1_entity"
+	portrait = "GFX_megastructure_construction_background"
+	construction_blocks_others = no
+	upgrade_from = {
+		dimension_drain_0
+	}
+	build_time = 2700
+	build_cost = {
+		minerals = 50000
+	}
+	
+	maintenance = {
+		energy = 25
+		minerals = 50
+	}
+	
+	potential = {
+		has_technology = tech_shroud_vortex
+	}
+}
+
+dimension_drain_2 = {
+	entity = "dimension_drain_2_entity"
+	construction_entity = "dimension_drain_2_construction_entity"
+	portrait = "GFX_megastructure_construction_background"
+	construction_blocks_others = no
+	upgrade_from = {
+		dimension_drain_1
+	}
+	build_time = 2700
+	build_cost = {
+		minerals = 65000
+	}
+	
+	maintenance = {
+		energy = 150
+		minerals = 100
+	}
+	
+	potential = {
+		has_technology = tech_shroud_vortex
+	}
+}
+
+dimension_drain_3 = {
+	entity = "dimension_drain_3_entity"
+	portrait = "GFX_megastructure_shroud_wormhole"
+	construction_blocks_others = no
+	upgrade_from = {
+		dimension_drain_2
+	}
+	build_time = 2700
+	build_cost = {
+		minerals = 30000
+		energy = 20000
+	}
+	
+	maintenance = {
+		minerals = 500
+	}
+	
+	monthly_production = {
+		physics_research = 500
+		society_research = 500
+		energy = 2000
+		sr_shroud_energy = 1
+	}
+	
+	potential = {
+		has_technology = tech_shroud_vortex
+	}
+	
+	on_build_start = {}
+	on_build_cancel = {}
+	on_build_complete = {
+		set_country_flag = shroud_drain_built
+	}
+}

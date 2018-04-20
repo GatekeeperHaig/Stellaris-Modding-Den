@@ -1,0 +1,123 @@
+# see README.txt for example
+
+r_square_world_ruined = {
+	entity = "cubeworld_rotated_entity"
+	portrait = "GFX_megastructure_construction_background"
+
+	potential = {
+		always = no
+	}
+}
+
+r_square_world_restored = {
+	entity = "cubeworld_2_rotated_entity"
+	construction_entity = "cubeworld_2_rotated_entity"
+	portrait = "GFX_megastructure_construction_background"
+	construction_blocks_others = no
+	upgrade_from = {
+		r_square_world_ruined
+	}
+	build_time = 1
+	build_cost = {
+		minerals = 1
+	}
+
+	potential = {
+		has_technology = tech_fix_squareworld
+		has_country_flag = knows_squareworld
+	}
+	
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_surveyed_system"
+			NOT = {
+				any_planet = {
+					is_surveyed = {
+						who = prev.from
+						status = no
+					}
+				}
+			}
+		}
+	}
+
+	monthly_production = {
+		sr_quberine = 1
+	}
+	
+	ai_weight = {
+		weight = 300
+		modifier = {
+			weight = 0
+			from = { is_country_type = fallen_empire }
+		}
+	}
+
+	on_build_start = {
+		fromfrom = {
+			set_graphical_culture = root.from
+		}
+	}
+
+	on_build_complete = {
+		every_system_ambient_object = { destroy_ambient_object = this }
+		spawn_planet = {
+			class = "pc_squareworld_habitable"
+			orbit_angle_offset = 10
+			orbit_distance_offset = 10
+			location = fromfrom
+			init_effect = {
+				set_name = "Squareworld Habitat"
+				surveyed = {
+					set_surveyed = yes
+					surveyor = FROM
+				}
+				set_all_comms_surveyed = yes
+				while = {
+					limit = {
+						any_tile = { has_blocker = yes }
+					}
+					random_tile = {
+						limit = { has_blocker = yes }
+						remove_blocker = yes
+					}
+				}
+				while = { 
+					limit = { 
+						planet_size < 25
+					} 
+					change_planet_size = +1			
+				}
+			}
+		}
+		spawn_planet = {
+			class = "pc_squareworld_habitable"
+			orbit_angle_offset = -10
+			orbit_distance_offset = 10
+			location = fromfrom
+			init_effect = {
+				set_name = "Squareworld Habitat"
+				surveyed = {
+					set_surveyed = yes
+					surveyor = FROM
+				}
+				set_all_comms_surveyed = yes
+				while = {
+					limit = {
+						any_tile = { has_blocker = yes }
+					}
+					random_tile = {
+						limit = { has_blocker = yes }
+						remove_blocker = yes
+					}
+				}
+				while = { 
+					limit = { 
+						planet_size < 25
+					} 
+					change_planet_size = +1			
+				}
+			}
+		}
+	}
+}
