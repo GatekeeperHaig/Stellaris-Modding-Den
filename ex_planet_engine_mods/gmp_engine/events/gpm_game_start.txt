@@ -1,0 +1,549 @@
+
+namespace = gpm_game_start
+
+### Initialiser
+# if multiplayer -> spawn engine with default settings
+# if not multiplayer -> show menu and let user decide
+event = {
+	id = gpm_game_start.0
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = {
+				is_multiplayer = yes
+			}
+			set_global_flag = gpm_modifier_amount_normal
+			random_country = {
+				country_event = { id = gpm_spawn_engine.0 }
+			}
+		}
+		if = {
+			limit = {
+				is_multiplayer = no
+			}
+			random_country = {
+				limit = { is_ai = no }
+				country_event = { id = gpm_start_menu.1 }
+			}
+		}
+	}
+}
+
+### Death World civic gamestart
+country_event = {
+	id = gpm_game_start.1
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = { 
+		has_civic = civic_gpm_death_world 
+	}
+
+	immediate = {
+		set_country_flag = gpm_fallen_empire_lost_colony
+		random_owned_planet ={
+			limit = { is_capital = yes }
+			set_planet_flag = gpm_civic_start_planet
+			remove_modifier = "capital"
+			add_modifier = { modifier = "gpm_Death_world" days = -1	}
+			every_tile = {
+				remove_blocker = yes
+			}
+			random_list = {
+				10 = { set_planet_size = 18 }
+				10 = { set_planet_size = 19 }
+				10 = { set_planet_size = 20 }
+				10 = { set_planet_size = 21 }
+				10 = { set_planet_size = 22 }
+				10 = { set_planet_size = 23 }
+				10 = { set_planet_size = 24 }
+				10 = { set_planet_size = 25 }
+			}
+			gpm_random_dangerous_modifiers = yes
+			gpm_random_dangerous_modifiers = yes
+			gpm_random_dangerous_modifiers = yes
+			while = {
+				limit = {
+					count_tile = {
+						limit = { has_blocker = no has_building = no has_pop = no }
+						count > 2
+					}
+				}
+				random_list = {
+					30 = { gpm_spawn_tile_blockers = yes }
+					70 = {
+						random_list = {
+							10 = { random_tile = { limit = { has_blocker = no has_building = no has_pop = no } set_blocker = "tb_active_volcano" } }
+							60 = { random_tile = { limit = { has_blocker = no has_building = no has_pop = no } set_blocker = "tb_dangerous_wildlife" } }
+							30 = { gpm_spawn_vanilla_tileblockers = yes }
+						}
+					}
+				}
+			}
+			# We guarantee these show up to avoid the player being stuck by RNG too much.
+			if = {
+				limit = { any_tile = { has_blocker = gpm_tb_Arachnophobia }	}
+				owner = {
+					add_research_option = tech_gpm_tb_Arachnophobia
+				}
+			}
+			if = {
+				limit = { any_tile = { has_blocker = tb_dangerous_wildlife }	}
+				owner = {
+					add_research_option = tech_tb_dangerous_wildlife
+				}
+			}
+		}
+	}
+}
+### Precursor civic gamestart
+country_event = {
+	id = gpm_game_start.2
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = { 
+		has_civic = civic_gpm_precursor_world 
+	}
+
+	immediate = {
+		random_owned_planet ={
+			limit = { is_capital = yes }
+			set_planet_flag = gpm_civic_start_planet
+			owner = {
+				add_food = 100
+			}
+			random_list = {
+				10 = { set_planet_size = 18 }
+				10 = { set_planet_size = 19 }
+				10 = { set_planet_size = 20 }
+				10 = { set_planet_size = 21 }
+				10 = { set_planet_size = 22 }
+				10 = { set_planet_size = 23 }
+				10 = { set_planet_size = 24 }
+				10 = { set_planet_size = 25 }
+			}
+			every_tile = {
+				remove_blocker = yes
+				if = {
+					limit = {
+						has_building = yes
+						NOT = { has_building = building_capital_1 }
+					}
+					kill_pop = yes
+					remove_building = yes
+				}
+			}
+			random_tile = {
+				limit = {
+					has_building = no
+				}
+				clear_deposits = yes
+				set_building = building_ancient_factory
+			}
+			random_tile = {
+				limit = {
+					has_building = no
+				}
+				clear_deposits = yes
+				set_building = building_dark_matter_power_plant
+			}
+			random_tile = {
+				limit = {
+					has_building = no
+				}
+				clear_deposits = yes
+				set_building = building_agri_processing_complex
+			}
+			while = {
+				limit = {
+					count_tile = {
+						limit = { has_blocker = no has_building = no has_pop = no }
+						count > 4
+					}
+				}
+				random_list = {
+					50 = { 
+						random_tile = {
+							limit = { has_blocker = no has_building = no has_pop = no }
+							set_blocker = "tb_ancient_ruins"
+						}
+					}
+					40 = { 
+						random_tile = {
+							limit = { has_blocker = no has_building = no has_pop = no }
+							set_blocker = "tb_ancient_cryo_chambers"
+						}
+					}
+					10 = { 
+						random_tile = {
+							limit = { has_blocker = no has_building = no has_pop = no }
+							set_blocker = "tb_crater"
+						}
+					}
+				}
+			}
+			random_list = {
+				100 = {
+					add_modifier = { days = -1 modifier = "Precursor_Remnants" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Precursor_Remnants" }
+					set_planet_flag = "gpm_is_precursor_world"
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Precursor_Satalite_Grid" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Precursor_Satalite_Grid" }
+					set_planet_flag = "gpm_is_precursor_world"
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Precursor_City" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Precursor_City" }
+					set_planet_flag = "gpm_is_precursor_world"
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Precursor_Floating_City" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Precursor_Floating_City" }
+					set_planet_flag = "gpm_is_precursor_world"
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Precursor_Communication_Hub" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Precursor_Communication_Hub" }
+					set_planet_flag = "gpm_is_precursor_world"
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Precursor_Planetary_Gun" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Precursor_Planetary_Gun" }
+					set_planet_flag = "gpm_is_precursor_world"
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Precursor_Bunker_Grid" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Precursor_Bunker_Grid" }
+					set_planet_flag = "gpm_is_precursor_world"
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Precursor_Mechs" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Precursor_Mechs" }
+					set_planet_flag = "gpm_is_precursor_world"
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Precursor_Eternal_Fortress" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Precursor_Eternal_Fortress" }
+					set_planet_flag = "gpm_is_precursor_world"
+				}
+			}
+			add_modifier = { days = -1 modifier = "Precursor_Planetary_Shield" }
+			gpm_set_precursor_planetary_shields = yes
+		}
+	}
+}
+
+### Fallen Empire Colony civic gamestart
+country_event = {
+	id = gpm_game_start.3
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_civic = civic_gpm_fallen_empire_colony 
+	}
+
+	immediate = {
+		random_owned_planet ={
+			limit = { is_capital = yes }
+			set_planet_flag = gpm_civic_start_planet
+			random_list = {
+				10 = { set_planet_size = 18 }
+				10 = { set_planet_size = 19 }
+				10 = { set_planet_size = 20 }
+				10 = { set_planet_size = 21 }
+				10 = { set_planet_size = 22 }
+				10 = { set_planet_size = 23 }
+				10 = { set_planet_size = 24 }
+				10 = { set_planet_size = 25 }
+			}
+			every_tile = {
+				remove_blocker = yes
+			}
+			hidden_effect = {
+				random_tile = {
+					limit = {
+						has_building = building_power_plant_1
+					}
+					kill_pop = yes
+					set_building = building_dark_matter_power_plant
+					set_ruined = yes
+				}
+				random_tile = {
+					limit = {
+						has_building = building_mining_network_1
+					}
+					kill_pop = yes
+					set_building = building_ancient_factory
+					set_ruined = yes
+				}
+			}
+			every_tile = {
+				limit = {
+					has_building = building_power_plant_1
+				}
+				kill_pop = yes
+				remove_building = yes
+			}
+			every_tile = {
+				limit = {
+					has_building = building_mining_network_1
+				}
+				kill_pop = yes
+				remove_building = yes
+			}
+			random_tile = {
+				limit = {
+					has_building = building_hydroponics_farm_1
+				}
+				kill_pop = yes
+				remove_building = yes
+			}
+			while = {
+				limit = {
+					count_tile = {
+						limit = { has_blocker = no has_building = no has_pop = no }
+						count > 8
+					}
+				}
+				random_list = {
+					50 = { 
+						random_tile = {
+							limit = { has_blocker = no has_building = no has_pop = no }
+							set_blocker = "tb_ancient_ruins"
+						}
+					}
+					40 = { 
+						random_tile = {
+							limit = { has_blocker = no has_building = no has_pop = no }
+							set_blocker = "tb_ancient_cryo_chambers"
+						}
+					}
+					10 = { 
+						random_tile = {
+							limit = { has_blocker = no has_building = no has_pop = no }
+							set_blocker = "tb_crater"
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					is_planet_class =  pc_desert
+				}
+				random_list = {
+					15 = { change_pc = pc_tropical }
+					15 = { change_pc = pc_arid }
+					15 = { change_pc = pc_continental }
+					15 = { change_pc = pc_ocean }
+					15 = { change_pc = pc_tundra }
+					15 = { change_pc = pc_arctic }
+					15 = { change_pc = pc_alpine }
+					15 = { change_pc = pc_savannah }
+				}
+			}
+			if = { 
+				limit = {
+					is_planet_class =  pc_arid
+				}
+				random_list = {
+					15 = { change_pc = pc_desert }
+					15 = { change_pc = pc_tropical }
+					15 = { change_pc = pc_continental }
+					15 = { change_pc = pc_ocean }
+					15 = { change_pc = pc_tundra }
+					15 = { change_pc = pc_arctic }
+					15 = { change_pc = pc_alpine }
+					15 = { change_pc = pc_savannah }
+				}
+			}
+			if = { 
+				limit = {
+					is_planet_class =  pc_savannah
+				}
+				random_list = {
+					15 = { change_pc = pc_tropical }
+					15 = { change_pc = pc_arid }
+					15 = { change_pc = pc_continental }
+					15 = { change_pc = pc_ocean }
+					15 = { change_pc = pc_tundra }
+					15 = { change_pc = pc_arctic }
+					15 = { change_pc = pc_alpine }
+					15 = { change_pc = pc_desert }
+				}
+			}
+			if = { 
+				limit = {
+					is_planet_class =  pc_tropical
+				}
+				random_list = {
+					15 = { change_pc = pc_desert }
+					15 = { change_pc = pc_arid }
+					15 = { change_pc = pc_continental }
+					15 = { change_pc = pc_ocean }
+					15 = { change_pc = pc_tundra }
+					15 = { change_pc = pc_arctic }
+					15 = { change_pc = pc_alpine }
+					15 = { change_pc = pc_savannah }
+				}
+			}
+			if = { 
+				limit = {
+					is_planet_class =  pc_ocean
+				}
+				random_list = {
+					15 = { change_pc = pc_desert }
+					15 = { change_pc = pc_tropical }
+					15 = { change_pc = pc_continental }
+					15 = { change_pc = pc_arid }
+					15 = { change_pc = pc_tundra }
+					15 = { change_pc = pc_arctic }
+					15 = { change_pc = pc_alpine }
+					15 = { change_pc = pc_savannah }
+				}
+			}
+			if = { 
+				limit = {
+					is_planet_class =  pc_continental
+				}
+				random_list = {
+					15 = { change_pc = pc_desert }
+					15 = { change_pc = pc_tropical }
+					15 = { change_pc = pc_arid }
+					15 = { change_pc = pc_ocean }
+					15 = { change_pc = pc_tundra }
+					15 = { change_pc = pc_arctic }
+					15 = { change_pc = pc_alpine }
+					15 = { change_pc = pc_savannah }
+				}
+			}
+			if = { 
+				limit = {
+					is_planet_class =  pc_tundra
+				}
+				random_list = {
+					15 = { change_pc = pc_desert }
+					15 = { change_pc = pc_tropical }
+					15 = { change_pc = pc_arid }
+					15 = { change_pc = pc_ocean }
+					15 = { change_pc = pc_continental }
+					15 = { change_pc = pc_arctic }
+					15 = { change_pc = pc_alpine }
+					15 = { change_pc = pc_savannah }
+				}
+			}
+			if = { 
+				limit = {
+					is_planet_class =  pc_arctic
+				}
+				random_list = {
+					15 = { change_pc = pc_desert }
+					15 = { change_pc = pc_tropical }
+					15 = { change_pc = pc_arid }
+					15 = { change_pc = pc_ocean }
+					15 = { change_pc = pc_tundra }
+					15 = { change_pc = pc_continental }
+					15 = { change_pc = pc_alpine }
+					15 = { change_pc = pc_savannah }
+				}
+			}
+			if = { 
+				limit = {
+					is_planet_class =  pc_alpine
+				}
+				random_list = {
+					15 = { change_pc = pc_tropical }
+					15 = { change_pc = pc_arid }
+					15 = { change_pc = pc_continental }
+					15 = { change_pc = pc_ocean }
+					15 = { change_pc = pc_tundra }
+					15 = { change_pc = pc_arctic }
+					15 = { change_pc = pc_desert }
+					15 = { change_pc = pc_savannah }
+				}
+			}
+			if = {
+				limit = {
+					NOT = {  		# Check if it's a modded planet class
+						habitable_planet = yes
+						gpm_is_planet_ringworld = yes
+						gpm_is_planet_habitat = yes
+					}
+				}
+				random_list = {
+					15 = { change_pc = pc_desert }
+					15 = { change_pc = pc_tropical }
+					15 = { change_pc = pc_arid }
+					15 = { change_pc = pc_ocean }
+					15 = { change_pc = pc_continental }
+					15 = { change_pc = pc_tundra }
+					15 = { change_pc = pc_arctic }
+					15 = { change_pc = pc_alpine }
+					15 = { change_pc = pc_savannah }
+				}
+			}
+			while = {
+				limit = {
+					count_tile = {
+						limit = { has_blocker = no has_building = no has_pop = no }
+						count > 6
+					}
+				}
+				random_list = {
+					50 = { 
+						random_tile = {
+							limit = { has_blocker = no has_building = no has_pop = no }
+							set_blocker = "tb_ancient_ruins"
+						}
+					}
+					40 = { 
+						random_tile = {
+							limit = { has_blocker = no has_building = no has_pop = no }
+							set_blocker = "tb_ancient_cryo_chambers"
+						}
+					}
+					10 = { 
+						random_tile = {
+							limit = { has_blocker = no has_building = no has_pop = no }
+							set_blocker = "tb_crater"
+						}
+					}
+				}
+			}
+			add_modifier = { days = -1 modifier = Living_Infrastructure }
+			gpm_spawn_fallen_empire_modifier = yes
+		}
+	}
+}

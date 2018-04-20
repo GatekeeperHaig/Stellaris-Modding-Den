@@ -1,0 +1,838 @@
+@tier1unityreward = 6
+@tier1unitymin = 100
+@tier1unitymax = 500
+@tier2unityreward = 12
+@tier2unitymin = 150
+@tier2unitymax = 1000
+@tier3unityreward = 18
+@tier3unitymin = 250
+@tier3unitymax = 1500
+@tier4unityreward = 24
+@tier4unitymin = 350
+@tier4unitymax = 2000
+@tier5unityreward = 48
+@tier5unitymin = 700
+@tier5unitymax = 4000
+
+namespace = crisis
+
+# Scourge overwrites
+# Infested to Barren after Orbital Bombardment
+planet_event = {
+	id = crisis.200
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		is_planet_class = pc_infested
+	}
+	
+	immediate = {
+		set_planet_flag = previously_infested
+		destroy_colony = yes
+		random_list = {
+			50 = { change_pc = pc_barren }
+			50 = { change_pc = pc_barren_cold }
+		}
+		add_modifier = { modifier = "terraforming_candidate" days = -1 }
+		planet_event = { id = crisis.216 }
+		planet_event = { id = gpm_crisis.1 }
+	}
+}
+
+# Purge Complete
+planet_event = {
+	id = crisis.202
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		num_pops = 1 # Last Pop is still alive when this event is fired
+		controller = { is_country_type = "swarm" }
+	}
+	
+	immediate = {
+		if = {
+			limit = {
+				NOR = {
+					is_planet_class = pc_ringworld_habitable
+					is_planet_class = pc_habitat # habitats are currently uninfestable
+				}
+			}
+			change_pc = pc_infested
+			set_owner = controller
+			else = {
+				if = { # Habitable Ring Worlds can't be infested... they are destroyed instead
+					limit = { is_planet_class = pc_ringworld_habitable }
+					destroy_colony = yes
+					change_pc = pc_ringworld_habitable_damaged
+					reset_planet = yes
+				}
+				if = {
+					limit = { is_planet_class = pc_habitat }
+					remove_planet = yes
+				}
+			}
+			planet_event = { id = crisis.215 }
+			planet_event = { id = gpm_crisis.2 }
+		}
+	}
+}
+
+# Planet Colonized
+planet_event = {
+	id = crisis.203
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		owner = { is_country_type = "swarm" }
+	}
+	
+	immediate = {
+		every_owned_pop = { kill_pop = yes }
+		if = {
+			limit = {
+				NOR = {
+					is_planet_class = pc_ringworld_habitable
+					is_planet_class = pc_habitat # habitats are currently uninfestable
+				}
+			}
+			change_pc = pc_infested
+			reset_planet = yes
+			else = {
+				if = { # Habitable Ring Worlds can't be infested... they are destroyed instead
+					limit = { is_planet_class = pc_ringworld_habitable }
+					change_pc = pc_ringworld_habitable_damaged
+					reset_planet = yes
+				}
+				if = {
+					limit = { is_planet_class = pc_habitat }
+					remove_planet = yes
+				}
+			}
+			planet_event = { id = crisis.215 }
+			planet_event = { id = gpm_crisis.3 }
+		}
+	}
+}
+
+# Extra Dimensional overwrites
+# Colony Bombarded
+planet_event = {
+	id = crisis.1011
+	title = "crisis.1011.name"
+	desc = "crisis.1011.desc"
+	picture = GFX_evt_city_ruins
+	show_sound = event_ghost_town
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		FROM = {
+			OR = {
+				is_country_type = extradimensional 
+				is_country_type = extradimensional_2
+				is_country_type = extradimensional_3
+			}
+		}
+	}
+	
+	immediate = {
+		add_threat = { who = from amount = 2 }
+		while = {
+			limit = {
+				any_tile = { has_blocker = tb_tribal_settlement }
+			}
+			random_tile = {
+				limit = { has_blocker = tb_tribal_settlement }
+				remove_blocker = yes
+			}
+		}
+		destroy_colony = yes
+		if = {
+			limit = {
+				NOR = {
+					is_planet_class = pc_ringworld_habitable
+					is_planet_class = pc_habitat
+				}
+			}
+			random_list = {
+				50 = { change_pc = pc_barren }
+				50 = { change_pc = pc_barren_cold }
+			}
+			reset_planet = yes
+			add_modifier = {
+				modifier = "terraforming_candidate"
+				days = -1
+			}
+			
+			planet_event = { id = gpm_crisis.10 }
+			else = {
+				if = {
+					limit = { is_planet_class = pc_ringworld_habitable }
+					change_pc = pc_ringworld_habitable_damaged
+				}
+				if = {
+					limit = { is_planet_class = pc_habitat }
+					remove_planet = yes
+				}
+			}
+		}
+		if = {
+			limit = { FROM = { is_country_type = extradimensional } }
+			every_country = {
+				limit = { has_event_chain = "extradimensional_invasion_chain" }
+				add_event_chain_counter = { 
+					event_chain = "extradimensional_invasion_chain" 
+					counter = "extradimensional_planets_1" 
+					amount = 1 
+				}
+			}
+			break = yes
+		}
+		if = {
+			limit = { FROM = { is_country_type = extradimensional_2 } }
+			every_country = {
+				limit = { has_event_chain = "extradimensional_invasion_chain_2" }
+				add_event_chain_counter = { 
+					event_chain = "extradimensional_invasion_chain_2" 
+					counter = "extradimensional_planets_2" 
+					amount = 1 
+				}
+			}
+			break = yes
+		}
+		if = {
+			limit = { FROM = { is_country_type = extradimensional_3 } }
+			every_country = {
+				limit = { has_event_chain = "extradimensional_invasion_chain_3" }
+				add_event_chain_counter = { 
+					event_chain = "extradimensional_invasion_chain_3" 
+					counter = "extradimensional_planets_3" 
+					amount = 1 
+				}
+			}
+			break = yes
+		}
+	}
+	
+	option = {
+		name = crisis.1011.a
+	}
+}
+
+# AI Crisis overwrites
+# First Machine World (HIDDEN)
+planet_event = {
+	id = crisis.2025
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {	
+		set_crisis_sound = ai_empire_ambient_stage_1
+		set_crisis_stage_1 = yes	
+		create_species = {
+			name = "NAME_Custodian_Bot"
+			class = "ROBOT"
+			portrait = "hum_robot_red"
+			traits = {
+				trait = "trait_mechanical"
+				trait = "trait_robotic_2"
+			}
+		}
+		last_created_species = { save_global_event_target_as = custodian_bot }
+		create_species = {
+			name = "NAME_Contingency"
+			class = "ROBOT"
+			portrait = "ai_crisis_1"
+			immortal = yes
+		}
+		create_country = {
+			name = NAME_Contingency
+			species = last_created
+			authority = auth_ancient_machine_intelligence
+			ethos = {
+				ethic = ethic_gestalt_consciousness
+			}
+			civics = {
+				civic = civic_machine_terminator
+				civic = civic_machine_warbots
+			}
+			type = "ai_empire"
+			species = ROBOT_POP_SPECIES_3
+			name_list = "AI"
+			flag = {
+				icon= {
+					category = "special"
+					file = "ai_01.dds"
+				}
+				background= {
+					category = "backgrounds"
+					file = "circle.dds"
+				}
+				colors={
+					"black"
+					"red"
+					"null"
+					"null"
+				}
+			}
+			effect = {
+				create_ship_design = { design = "NAME_AI_Transport" }
+				add_ship_design = last_created_design
+				create_ship_design = { design = "NAME_AI_Constructor" }
+				add_ship_design = last_created_design
+				create_ship_design = { design = "NAME_AI_1" }
+				add_ship_design = last_created_design
+				create_ship_design = { design = "NAME_AI_2" }
+				add_ship_design = last_created_design
+				create_ship_design = { design = "NAME_AI_STARBASE" }
+				add_ship_design = last_created_design			
+			}
+		}
+		last_created_country = { 
+			save_event_target_as = AI_crisis 
+		}
+		every_owned_pop = { kill_pop = yes }
+		change_pc = pc_ai
+		reset_planet = yes
+		gpm_crisis_purge_modifiers = yes		# -guilli
+		set_name = "NAME_Sterilization_Hub_1"
+		set_owner = event_target:AI_crisis
+		set_controller = event_target:AI_crisis
+		create_ai_planet_defense = yes
+		create_ai_fleet = yes
+		create_ai_fleet = yes
+		gpm_spawn_machine_modifier = yes				# -guilli
+		every_country = {
+			limit = { is_ai = no }
+			country_event = { id = crisis.2030 }
+		}
+		every_country = {
+			limit = {
+				OR = {
+					is_country_type = default
+					is_country_type = fallen_empire
+					is_country_type = awakened_fallen_empire
+				}
+			}
+			establish_communications_no_message = event_target:AI_crisis
+		}
+		planet_event = { id = crisis.2050 } # Start Fleet reinforcement cycle
+		planet_event = { id = crisis.2052 } # Start Army reinforcement cycle
+		every_country = {
+			limit = { has_event_chain = "ai_crisis_chain" }
+			add_event_chain_counter = {
+				event_chain = "ai_crisis_chain"
+				counter = "active_machine_worlds"
+				amount = 1 
+			}
+		}
+		awaken_guardians_of_the_galaxy = yes
+		awaken_fallen_machine_empire = yes
+		set_global_flag = ai_invasion_ongoing
+		set_global_flag = synth_terror
+		
+		solar_system = {
+			if = {
+				limit = { exists = starbase }
+				starbase = {
+					fleet = {
+						destroy_fleet = this
+					}
+				}
+			}
+			create_contingency_starbase = yes
+		}
+	}
+}
+
+
+# Second Machine World (HIDDEN)
+planet_event = {
+	id = crisis.2026
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		random_country = {
+			limit = { is_country_type = ai_empire }
+			save_event_target_as = AI_crisis
+		}
+		change_pc = pc_ai
+		reset_planet = yes
+		gpm_crisis_purge_modifiers = yes
+		set_name = "NAME_Sterilization_Hub_2"
+		set_owner = event_target:AI_crisis
+		set_controller = event_target:AI_crisis
+		create_ai_planet_defense = yes
+		create_ai_fleet = yes
+		create_ai_fleet = yes
+		gpm_spawn_machine_modifier = yes
+		every_country = {
+			limit = { is_ai = no }
+			country_event = { id = crisis.2031 }
+		}
+		planet_event = { id = crisis.2050 } # Start Fleet reinforcement cycle
+		planet_event = { id = crisis.2052 } # Start Army reinforcement cycle
+		every_country = {
+			limit = { has_event_chain = "ai_crisis_chain" }
+			add_event_chain_counter = {
+				event_chain = "ai_crisis_chain"
+				counter = "active_machine_worlds"
+				amount = 1 
+			}
+		}
+		solar_system = {
+			if = {
+				limit = { exists = starbase }
+				starbase = {
+					fleet = {
+						destroy_fleet = this
+					}
+				}
+			}
+			create_contingency_starbase = yes
+		}
+	}
+}
+
+# Third Machine World (HIDDEN)
+planet_event = {
+	id = crisis.2027
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		random_country = {
+			limit = { is_country_type = ai_empire }
+			save_event_target_as = AI_crisis
+		}
+		change_pc = pc_ai
+		reset_planet = yes
+		gpm_crisis_purge_modifiers = yes
+		change_planet_size = 20
+		set_name = "NAME_Sterilization_Hub_3"
+		set_owner = event_target:AI_crisis
+		set_controller = event_target:AI_crisis
+		create_ai_planet_defense = yes
+		create_ai_fleet = yes
+		create_ai_fleet = yes
+		gpm_spawn_machine_modifier = yes
+		every_country = {
+			limit = { is_ai = no }
+			country_event = { id = crisis.2032 }
+		}
+		planet_event = { id = crisis.2050 } # Start Fleet reinforcement cycle
+		planet_event = { id = crisis.2052 } # Start Army reinforcement cycle
+		every_country = {
+			limit = { has_event_chain = "ai_crisis_chain" }
+			add_event_chain_counter = {
+				event_chain = "ai_crisis_chain"
+				counter = "active_machine_worlds"
+				amount = 1 
+			}
+		}
+		solar_system = {
+			if = {
+				limit = { exists = starbase }
+				starbase = {
+					fleet = {
+						destroy_fleet = this
+					}
+				}
+			}
+			create_contingency_starbase = yes
+		}
+	}
+}
+
+# Fourth Machine World (HIDDEN)
+planet_event = {
+	id = crisis.2028
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		random_country = {
+			limit = { is_country_type = ai_empire }
+			save_event_target_as = AI_crisis
+		}
+		change_pc = pc_ai
+		reset_planet = yes
+		gpm_crisis_purge_modifiers = yes
+		set_name = "NAME_Sterilization_Hub_4"
+		set_owner = event_target:AI_crisis
+		set_controller = event_target:AI_crisis
+		create_ai_planet_defense = yes
+		create_ai_fleet = yes
+		create_ai_fleet = yes
+		gpm_spawn_machine_modifier = yes
+		every_country = {
+			limit = { is_ai = no }
+			country_event = { id = crisis.2033 }
+		}
+		planet_event = { id = crisis.2050 } # Start Fleet reinforcement cycle
+		planet_event = { id = crisis.2052 } # Start Army reinforcement cycle
+		every_country = {
+			limit = { has_event_chain = "ai_crisis_chain" }
+			add_event_chain_counter = {
+				event_chain = "ai_crisis_chain"
+				counter = "active_machine_worlds"
+				amount = 1 
+			}
+		}
+		solar_system = {
+			if = {
+				limit = { exists = starbase }
+				starbase = {
+					fleet = {
+						destroy_fleet = this
+					}
+				}
+			}
+			create_contingency_starbase = yes
+		}
+	}
+}
+
+# Machine World Destroyed
+planet_event = {
+	id = crisis.2040
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		is_planet_class = pc_ai
+		NOT = { has_planet_flag = machine_lair }
+	}
+	
+	immediate = {
+		if = {
+			limit = { has_planet_flag = machine_world_1 }
+			every_country = {
+				limit = { has_event_chain = "ai_crisis_chain" }
+				remove_point_of_interest = ai_crisis_poi.1
+			}
+		}
+		if = {
+			limit = { has_planet_flag = machine_world_2 }
+			every_country = {
+				limit = { has_event_chain = "ai_crisis_chain" }
+				remove_point_of_interest = ai_crisis_poi.2
+			}
+		}
+		if = {
+			limit = { has_planet_flag = machine_world_3 }
+			every_country = {
+				limit = { has_event_chain = "ai_crisis_chain" }
+				remove_point_of_interest = ai_crisis_poi.3
+			}
+		}
+		if = {
+			limit = { has_planet_flag = machine_world_4 }
+			every_country = {
+				limit = { has_event_chain = "ai_crisis_chain" }
+				remove_point_of_interest = ai_crisis_poi.4
+			}
+		}
+		destroy_colony = yes
+		change_pc = pc_broken
+		reset_planet = yes
+		#set_planet_entity = { entity = "barren_planet_01_destroyed_entity" }
+		gpm_crisis_purge_modifiers = yes
+		orbital_deposit_tile = {
+			hidden_effect = { clear_deposits = yes }
+			add_deposit = d_living_metal_deposit
+			add_deposit = d_vast_mineral_deposit
+			add_deposit = d_vast_energy_deposit
+		}
+
+
+		every_country = {
+			limit = { has_event_chain = "ai_crisis_chain" }
+			add_event_chain_counter = {
+				event_chain = "ai_crisis_chain"
+				counter = "active_machine_worlds"
+				amount = -1 
+			}
+		}
+		random_country = {
+			limit = { is_country_type = "ai_empire" }
+			change_variable = { 
+				which = "machine_worlds_destroyed" 
+				value = 1
+			}
+			if = {
+				limit = {
+					check_variable = { 
+						which = "machine_worlds_destroyed" 
+						value = 1 
+					}
+				}
+				remove_global_flag = ghost_signal_5_flag
+				set_global_flag = ghost_signal_4_flag
+				every_country = {
+					limit = { has_notification_modifier = ghost_signal_5 }
+					remove_notification_modifier = ghost_signal_5
+					add_notification_modifier = ghost_signal_4
+					every_owned_pop = {
+						limit = { has_modifier = pop_ghost_signal_5 }
+						remove_modifier = "pop_ghost_signal_5"
+						add_modifier = { modifier = "pop_ghost_signal_4" days = -1 }
+					}
+					every_owned_ship = {
+						limit = {
+							has_sapient_combat_computer = yes
+						}
+						remove_modifier = "ship_ghost_signal_5"
+						add_modifier = { modifier = "ship_ghost_signal_4" days = -1 }
+					}
+				}
+				every_country = {
+					limit = { has_notification_modifier = ghost_signal_5_machine }
+					remove_notification_modifier = ghost_signal_5_machine
+					add_notification_modifier = ghost_signal_4_machine
+					every_owned_pop = {
+						limit = { has_trait = trait_machine_unit }
+						remove_modifier = "pop_ghost_signal_5_machine"
+						add_modifier = { modifier = "pop_ghost_signal_4_machine" days = -1 }
+					}
+					every_owned_ship = {
+						limit = {
+							has_sapient_combat_computer = yes
+						}
+						remove_modifier = "ship_ghost_signal_5"
+						add_modifier = { modifier = "ship_ghost_signal_4" days = -1 }
+					}
+				}
+				every_country = {
+					limit = { is_ai = no }
+					country_event = { id = crisis.2037 }
+				}
+				break = yes
+			}
+			if = {
+				limit = {
+					check_variable = { 
+						which = "machine_worlds_destroyed" 
+						value = 2 
+					}
+				}
+				set_global_flag = first_machine_world_destroyed
+				remove_global_flag = ghost_signal_4_flag
+				set_global_flag = ghost_signal_3_flag
+				every_country = {
+					limit = { has_notification_modifier = ghost_signal_4 }
+					remove_notification_modifier = ghost_signal_4
+					add_notification_modifier = ghost_signal_3
+					every_owned_pop = {
+						limit = { has_modifier = "pop_ghost_signal_4" }
+						remove_modifier = "pop_ghost_signal_4"
+						add_modifier = { modifier = "pop_ghost_signal_3" days = -1 }
+					}
+					every_owned_ship = {
+						limit = {
+							has_sapient_combat_computer = yes
+						}
+						remove_modifier = "ship_ghost_signal_4"
+						add_modifier = { modifier = "ship_ghost_signal_3" days = -1 }
+					}
+				}
+				every_country = {
+					limit = { has_notification_modifier = ghost_signal_4_machine }
+					remove_notification_modifier = ghost_signal_4_machine
+					every_owned_pop = {
+						limit = { has_trait = trait_machine_unit }
+						remove_modifier = "pop_ghost_signal_4_machine"
+					}
+					every_owned_ship = {
+						limit = {
+							has_sapient_combat_computer = yes
+						}
+						remove_modifier = "ship_ghost_signal_4"
+					}
+				}
+
+				every_country = {
+					limit = { has_special_project = AI_CRISIS_PROJECT }
+					abort_special_project = { type = AI_CRISIS_PROJECT }
+				}
+					
+				every_country = {
+					limit = { is_ai = no }
+					country_event = { id = crisis.2037 }
+				}
+				break = yes
+			}
+			if = {
+				limit = {
+					check_variable = { 
+						which = "machine_worlds_destroyed" 
+						value = 3 
+					}
+				}
+				remove_global_flag = ghost_signal_3_flag
+				set_global_flag = ghost_signal_2_flag
+				every_country = {
+					limit = { has_notification_modifier = ghost_signal_3 }
+					remove_notification_modifier = ghost_signal_3
+					add_notification_modifier = ghost_signal_2
+					every_owned_pop = {
+						limit = { has_modifier = pop_ghost_signal_3 }
+						remove_modifier = "pop_ghost_signal_3"
+						add_modifier = { modifier = "pop_ghost_signal_2" days = -1 }
+					}
+					every_owned_ship = {
+						limit = {
+							has_sapient_combat_computer = yes
+						}
+						remove_modifier = "ship_ghost_signal_3"
+						add_modifier = { modifier = "ship_ghost_signal_2" days = -1 }
+					}
+				}
+				every_country = {
+					limit = { is_ai = no }
+					country_event = { id = crisis.2037 }
+				}
+				break = yes
+			}
+			if = {
+				limit = {
+					check_variable = { 
+						which = "machine_worlds_destroyed" 
+						value = 4 
+					}
+				}
+				remove_global_flag = ghost_signal_2_flag
+				every_country = {
+					limit = { has_notification_modifier = ghost_signal_2 }
+					remove_notification_modifier = ghost_signal_2
+					add_notification_modifier = ghost_signal_1
+					every_owned_pop = {
+						limit = { has_modifier = pop_ghost_signal_2 }
+						remove_modifier = "pop_ghost_signal_2"
+						add_modifier = { modifier = "pop_ghost_signal_1" days = -1 }
+					}
+					every_owned_ship = {
+						limit = {
+							has_sapient_combat_computer = yes
+						}
+						remove_modifier = "ship_ghost_signal_2"
+						add_modifier = { modifier = "ship_ghost_signal_1" days = -1 }
+					}
+				}
+				country_event = { id = crisis.2035 }
+				break = yes
+			}
+		}
+	}
+}
+
+# Final Machine World Destroyed
+planet_event = {
+	id = crisis.2043
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		is_planet_class = pc_ai
+		has_planet_flag = machine_lair
+	}
+	
+	immediate = {
+		from = { set_country_flag = does_not_compute }
+		remove_global_flag = synth_terror
+		remove_global_flag = ai_ghost_signal
+		remove_global_flag = ai_invasion_ongoing
+		destroy_colony = yes
+		change_pc = pc_barren
+		reset_planet = yes
+		#set_planet_entity = { entity = "barren_planet_01_destroyed_entity" }
+		gpm_crisis_purge_modifiers = yes
+		every_country = {
+			limit = { has_notification_modifier = ghost_signal_1 }
+			remove_notification_modifier = ghost_signal_1
+			every_owned_pop = {
+				limit = { has_modifier = "pop_ghost_signal_1" }
+				remove_modifier = "pop_ghost_signal_1"
+			}
+			every_owned_ship = {
+				limit = {
+					has_sapient_combat_computer = yes
+				}
+				remove_modifier = "ship_ghost_signal_1"
+			}
+		}
+		every_country = {
+			limit = { has_event_chain = "ai_crisis_chain" }
+			end_event_chain = "ai_crisis_chain"
+		}
+		every_country = {
+			limit = { has_special_project = SYNTH_INFILTRATION_PROJECT }
+			abort_special_project = { type = SYNTH_INFILTRATION_PROJECT }
+		}
+		every_country = {
+			limit = { has_modifier = unity_reduction_crisis_2204 }
+			remove_modifier = unity_reduction_crisis_2204
+		}
+		every_country = {
+			limit = {
+				OR = {
+					is_country_type = default
+					is_country_type = fallen_empire
+					is_country_type = awakened_fallen_empire
+				}
+			}
+			country_event = { id = crisis.2038 }
+			every_owned_planet = {
+				limit = { has_modifier = synth_planet_paranoia }
+				remove_modifier = synth_planet_paranoia
+			}
+		}
+		every_country = {
+			limit = {
+				is_fallen_machine_empire = yes
+			}
+			country_event = { id = fallen_machine_empire.3 days = 1 }
+		}
+		random_country = {
+			limit = { is_country_type = ai_empire }
+			every_controlled_planet = { purge = no } # Stop purging any occupied worlds
+			destroy_country = yes # Destroy the Contingency
+		}
+
+		FROM = { set_country_flag = final_machine_world_destroyed }
+
+		# Cybrex
+		if = {
+			limit = {
+				has_global_flag = cybrex_resurface
+				NOT = { has_global_flag = cybrex_destroyed }
+			}
+			random_country = {
+				limit = { is_country_type = cybrex_empire }
+
+				# Cybrex recall expeditionary fleets
+				every_country = {
+					limit = { has_country_flag = cybrex_donation }
+					country_event = { id = crisis.2474 days = 20 random = 30 }
+				}
+
+				# Cybrex Depart Galaxy
+				country_event = { id = crisis.2406 days = 365 random = 800 }
+
+			}
+		}
+	}
+}

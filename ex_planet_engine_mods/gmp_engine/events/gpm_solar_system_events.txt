@@ -1,0 +1,110 @@
+namespace = gpm_solar
+# Solar_Storm
+# Violent_Sun
+# Increased_Solar_Output
+# Decreased_Solar_Output
+# Increased_Solar_Activity
+# Decreased_Solar_Activity
+
+# Solar Storms
+event = {
+	id = gpm_solar.10
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		log = "---- Fired Event gpm_solar.10 ----"
+		random_system = {
+			limit = { NOR = { has_star_flag = gpm_solar_event exists = capital_scope } }
+			random_system_planet = {
+				limit = {
+					AND = {
+						is_star = yes
+						gpm_is_planet_star = yes
+					}
+				}
+				add_modifier = { modifier = "Violent_Sun" days = 180 }
+			}
+			every_system_planet = {
+				limit = { NOT = { is_star = yes	} }
+				add_modifier = { modifier = "Solar_Storm" days = 180 }
+			}
+			set_timed_star_flag = { flag = gpm_solar_event days = 360 }
+		}
+	}
+}
+# Increased Solar Activity
+event = {
+	id = gpm_solar.20
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		log = "---- Fired Event gpm_solar.20 ----"
+		random_system = {
+			limit = { NOT = { has_star_flag = gpm_solar_event } }
+			random_system_planet = {
+				limit = {
+					AND = {
+						is_star = yes
+						gpm_is_planet_star = yes
+					}
+				}
+				add_modifier = { modifier = "Increased_Solar_Activity" days = 1800 }
+			}
+			every_system_planet = {
+				limit = { NOT = { is_star = yes	} }
+				add_modifier = { modifier = "Increased_Solar_Output" days = 1800 }
+			}
+			set_timed_star_flag = { flag = gpm_solar_event days = 2400 }
+		}
+	}
+}
+# Decreased Solar Activity
+event = {
+	id = gpm_solar.30
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		log = "---- Fired Event gpm_solar.30 ----"
+		random_system = {
+			limit = { NOR = { has_star_flag = gpm_solar_event exists = capital_scope } }
+			random_system_planet = {
+				limit = {
+					AND = {
+						is_star = yes
+						gpm_is_planet_star = yes
+					}
+				}
+				add_modifier = { modifier = "Decreased_Solar_Activity" days = 1800 }
+			}
+			every_system_planet = {
+				limit = { NOT = { is_star = yes	} }
+				add_modifier = { modifier = "Decreased_Solar_Output" days = 1800 }
+			}
+			set_timed_star_flag = { flag = gpm_solar_event days = 2400 }
+		}
+	}
+}
+# Meteor Shower
+event = {
+	id = gpm_solar.40
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		log = "---- Fired Event gpm_solar.40 ----"
+		random_planet = {
+			limit = {
+				NOT = {
+					AND = {
+						has_modifier = Periodic_Meteor_Showers 
+						is_star = no 
+					}
+				}
+			}
+			add_modifier = { modifier = "Periodic_Meteor_Showers" days = 60 }
+		}
+	}
+}

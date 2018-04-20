@@ -1,0 +1,208 @@
+
+namespace = gpm_army
+
+#  Count spider armies and allow building new ones if dead.
+event = {
+	id = gpm_army.78870
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		every_country = {
+		
+			if = {
+				limit = {
+					check_variable = {
+						which = "gpm_giant_arachnid_count" 
+						value > 5
+					}
+				}
+				set_variable = {
+					which = "gpm_giant_arachnid_count" 
+					value = 5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = "gpm_giant_arachnid_count" 
+						value < 0
+					}
+				}
+				set_variable = {
+					which = "gpm_giant_arachnid_count" 
+					value = 0
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = "gpm_giant_arachnid_count_queued" 
+						value > 5
+					}
+				}
+				set_variable = {
+					which = "gpm_giant_arachnid_count_queued" 
+					value = 5
+				}
+			}
+			if = {
+				limit = {
+					check_variable = {
+						which = "gpm_giant_arachnid_count_queued" 
+						value < 0
+					}
+				}
+				set_variable = {
+					which = "gpm_giant_arachnid_count_queued" 
+					value = 0
+				}
+			}
+		
+		
+			if = {
+				limit = {
+					count_armies = {
+						limit = { army_type = gpm_giant_arachnid_army }
+						count = 0
+					}
+				}
+				set_variable = {
+					which = "gpm_giant_arachnid_count" 
+					value = 0
+				}
+
+				
+			}
+			
+			
+			if = {
+				limit = {
+					AND = {
+						count_armies = {
+							limit = { army_type = gpm_giant_arachnid_army }
+							count < 5
+						}
+						NOT = {
+							check_variable = {
+								which = "gpm_giant_arachnid_count_queued" 
+								value > 0
+							}
+						}
+					}
+				}
+				change_variable = {
+					which = "gpm_giant_arachnid_count" 
+					value = -1
+				}
+			}
+			
+			if = {
+				limit = {
+					AND = {
+						count_armies = {
+							limit = { army_type = gpm_giant_arachnid_army }
+							count < 4
+						}
+						NOT = {
+							check_variable = {
+								which = "gpm_giant_arachnid_count_queued" 
+								value > 1
+							}
+						}
+					}
+				}
+				change_variable = {
+					which = "gpm_giant_arachnid_count" 
+					value = -1
+				}
+			}
+			
+			if = {
+				limit = {
+					AND = {
+						count_armies = {
+							limit = { army_type = gpm_giant_arachnid_army }
+							count < 3
+						}
+						NOT = {
+							check_variable = {
+								which = "gpm_giant_arachnid_count_queued" 
+								value > 2
+							}
+						}
+					}
+				}
+				change_variable = {
+					which = "gpm_giant_arachnid_count" 
+					value = -1
+				}
+			}
+			
+			if = {
+				limit = {
+					AND = {
+						count_armies = {
+							limit = { army_type = gpm_giant_arachnid_army }
+							count < 2
+						}
+						NOT = {
+							check_variable = {
+								which = "gpm_giant_arachnid_count_queued" 
+								value > 3
+							}
+						}
+					}
+				}
+				change_variable = {
+					which = "gpm_giant_arachnid_count" 
+					value = -1
+				}
+			}
+			
+			if = {
+				limit = {
+					AND = {
+						count_armies = {
+							limit = { army_type = gpm_giant_arachnid_army }
+							count < 1
+						}
+						NOT = {
+							check_variable = {
+								which = "gpm_giant_arachnid_count_queued" 
+								value > 4
+							}
+						}
+					}
+				}
+				change_variable = {
+					which = "gpm_giant_arachnid_count" 
+					value = -1
+				}
+			}
+		}	
+	}
+}
+
+#  reduced queue variable by 1 if spider army has been recruited
+event = {
+	id = gpm_army.78871
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = {
+				From = { army_type = gpm_giant_arachnid_army }
+			}
+			ROOT = { 
+				space_owner = {
+					change_variable = {
+						which = "gpm_giant_arachnid_count_queued" 
+						value = -1
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,145 @@
+
+namespace = gpm_terraform
+
+### Terraform Finish (NEW)
+planet_event = {
+	id = gpm_terraform.78871
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	
+	
+	immediate = {
+		log = "---- Fired Event gpm_terraform.78871 ----"
+		log = "---- Terraform finish event  ----"
+		THIS = {
+
+			# if special unique blockers were removed, put them back somewhere.
+			gpm_spawn_special_blockers = yes
+			
+			# if this world has a specific modifier, apply matching planet graphics
+			if = { 
+				limit = { has_modifier = Precursor_Energy_Grid } 
+				gpm_set_precursor_energy_grid = yes
+			}
+			
+			# Remove bad modifiers where is makes sense
+			gpm_remove_negative_modifiers = yes
+			
+			# Remove neutral modifiers where it makes sense
+			gpm_remove_neutral_modifiers = yes
+			
+			# Remove good modifiers where it makes sense
+			gpm_remove_positive_modifiers = yes
+			
+			# Death World Civic Start; If we terraform the death world capital, it removed the modifier and replaces it with the capital modifier
+			if = {
+				limit = { has_modifier = "gpm_Death_world" }
+				remove_modifier = "gpm_Death_world"
+				add_modifier = { modifier = "capital" days = -1	}
+			}
+			
+			# Remove valuable world modifier backup (this gets removed trough the terraform links, but in some edge cases it doesn't, so this way it does get removed).
+			if = {
+				limit = { has_modifier = terraforming_candidate_precursor }
+				remove_modifier = terraforming_candidate_precursor
+			}
+			
+			# If world was a wondrous world, remove modifier and replace with ruins modifier
+			if = {
+				limit = { has_modifier = Planet_Wonder_Discovered }
+				remove_modifier = Planet_Wonder_Discovered
+				add_modifier = { modifier = Planet_Wonder_Ruined days = -1 } 
+			}
+			# For safety we check with flag instead of modifier to reset colour
+			if = {
+				limit = { 
+					OR = {
+						has_planet_flag = "gpm_is_wondrous_world" 
+						has_planet_flag = "gpm_is_wondrous_world_colour" 
+					}
+				}
+				set_name = "color_default_white_col"
+				remove_planet_flag = "gpm_is_wondrous_world_colour"
+				remove_planet_flag = "gpm_is_wondrous_world"
+			}	
+			
+			# Planetary Computer/AI worlds interaction
+			# Wipe everything from worlds that isn't a planet trait (like gravity or rotation or magnetic field)
+			# Chance to spawn a machine modifier.
+			if = {
+				limit = { gpm_is_planet_machine = yes }
+				gpm_crisis_purge_modifiers = yes
+				remove_modifier = chthonian_planet
+				remove_modifier = carbon_world
+				random_list = {
+					66 = { }
+					33 = { gpm_spawn_machine_modifier = yes }
+				}
+			}
+
+			
+			# We try to apply a unique terraform bonus modifier (not always)
+			# But not if the world is a computer planet or AI planet or anything like that
+			if = {
+				limit = { 
+					NOR = { 
+						num_modifiers < 4 
+						gpm_is_planet_machine = yes
+					}						
+				}
+				random_list = {
+					95 = {}
+					5 = { gpm_spawn_terraform_tier_modifier = yes }
+				}
+			}
+			
+			# Guaranteed reroll if less than 4 modifiers is found
+			if = {
+				limit = { 
+					num_modifiers < 4 
+					NOT = { gpm_is_planet_machine = yes }
+				}
+				gpm_spawn_terraform_modifier = yes
+			}
+			
+			
+			# chance for extra modifiers if less than 2 modifiers
+			if = {
+				limit = { 
+					num_modifiers < 2
+					NOT = { gpm_is_planet_machine = yes }
+				}
+				random_list = {
+					75 = {}
+					25 = { gpm_spawn_terraform_modifier = yes }
+				}
+			}
+			
+			# chance for extra modifiers if less than 3 modifiers
+			if = {
+				limit = { 
+					num_modifiers < 3
+					NOT = { gpm_is_planet_machine = yes }
+				}
+				random_list = {
+					75 = {}
+					25 = { gpm_spawn_terraform_modifier = yes }
+				}
+			}
+			
+			# chance for extra modifiers if less than 4 modifiers
+			if = {
+				limit = { 
+					num_modifiers < 4
+					NOT = { gpm_is_planet_machine = yes }
+				}
+				random_list = {
+					75 = {}
+					25 = { gpm_spawn_terraform_modifier = yes }
+				}
+			}
+		}
+	}
+}

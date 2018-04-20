@@ -90,6 +90,7 @@ def parse(argv, returnParser=False):
   parser = argparse.ArgumentParser(description="")
   parser.add_argument('inputFileNames', nargs = '*' )
   parser.add_argument('--output_folder',default="test" )
+  parser.add_argument('--create_main_file', action="store_true")
   if returnParser:
     return parser
   parser.add_argument('--test_run', action="store_true", help="No Output.")
@@ -99,26 +100,29 @@ def parse(argv, returnParser=False):
   
   return(args)
 
-def readYMLCreatePy(args,fileName="../cgm_buildings_script_source/localisation/english/cgm_building_l_english.yml",createMain=True):
-  languageInFile=0
+def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/english/cgm_building_l_english.yml"):
+  fileName=os.path.basename(filePath)
+  print(fileName)
+  langCodeInFile=0
   locList=LocList()
   outArray=[]
   trivialAssignment=[]
-  with io.open(fileName,'r', encoding="utf-8") as file:
+  with io.open(filePath,'r', encoding="utf-8") as file:
     for line in file:
       lineArray=shlex.split(line)
-      if not languageInFile and len(lineArray)!=0:
+      if not langCodeInFile and len(lineArray)!=0:
         for lang, langCode in zip(locList.languages, locList.languageCodes):
           if "l_"+lang in lineArray[0]:
-            languageInFile=langCode
+            langCodeInFile=langCode
+            languageInFile=lang
             break
         continue
       # print(line)
       outArray.append("")
       if ":" in line:
         key=lineArray[0].split(":")[0]
-        outArray[-1]+='locList.addLoc("{}","{}","{}")'.format(key.replace(".","_"), lineArray[1],languageInFile)
-        if createMain:
+        outArray[-1]+='locList.addLoc("{}","{}","{}")'.format(key.replace(".","_"), lineArray[1],langCodeInFile)
+        if args.create_main_file:
           trivialAssignment.append('locList.addEntry("{}","@{}")'.format(key,key.replace(".","_")))
         # contents.append(lineArray[1])
       for i,entry in enumerate(lineArray):
@@ -126,38 +130,82 @@ def readYMLCreatePy(args,fileName="../cgm_buildings_script_source/localisation/e
           outArray[-1]+=" ".join(lineArray[i:])
           break
 
-  if createMain:
-    with open("test.py", "w") as file:
-      file.write("#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nimport os\n")
-      file.write("from locList import LocList\nlocList=LocList()\n")
-      for language in locList.languages:
-        file.write("try:\n")
-        file.write("\timport test_"+language+"\n")
-        file.write("\ttest_"+language+".locs(locList)\n")
-        file.write("except:\n")
-        file.write("\tprint('No localisation given for {}')\n".format(language))
-      # for entry in outArray:
-      #   file.write(entry+"\n")
-      for entry in trivialAssignment:
+  lastOutFile=""
+  if not args.test_run:
+    outFile=args.output_folder+"/locs/"+fileName.replace(".yml",".py")
+    lastOutFile=outFile
+    with open(outFile, "w") as file:
+      # file.write("def locs(locList):\n")
+      for entry in outArray:
         file.write(entry+"\n")
-      file.write('for language in locList.languages:\n'+
-                  '\toutFolderLoc="testOut2/localisation/"+language\n'+
-                  '\tif not os.path.exists(outFolderLoc):\n'+
-                    '\t\tos.makedirs(outFolderLoc)\n'+
-                  '\tlocList.write(outFolderLoc+"/cgm_building_customize_l_"+language+".yml",language)')
-  with open("test_"+languageInFile+".py", "w") as file:
-    file.write("def locs(locList):\n")
-    for entry in outArray:
-      file.write("\t"+entry+"\n")
+        # file.write("\t"+entry+"\n")
+    if args.create_main_file:
+      outFile=args.output_folder+"/"+fileName.replace(".yml","_main.py").replace("_l_"+languageInFile, "")
+      lastOutFile=outFile
+      with open(outFile, "w") as file:
+        absPath=os.path.abspath(args.output_folder)
+        commonPath=os.path.commonprefix([absPath, sys.path[0]])
+        # print(commonPath)
+        relPath=os.path.relpath(commonPath,absPath)
+        # print(relPath)
+        file.write("#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nimport os,sys,glob,ast\n")
+        file.write("os.chdir(os.path.dirname(__file__))\n")
+        file.write("sys.path.insert(1, '"+relPath+"')\n")
+        file.write("from locList import LocList\nlocList=LocList()\n")
+        file.write("import allModules,importlib\n")
+        file.write("for fileName in glob.glob('locs/*.py'):\n")
+        file.write("\twith open(fileName) as file:\n")
+        file.write("\t\t for line in file:\n")
+        file.write("\t\t\t try:\n")
+        # file.write("\t\t\t\t print(line.strip())\n")
+        # file.write("\t\t\t\t ast.literal_eval(line)\n")
+        file.write("\t\t\t\t eval(line)\n")
+        file.write("\t\t\t except:\n")
+        file.write("\t\t\t\t pass\n")
+        # file.write("print(locList.dicts)\n")
+
+        # file.write('sys.path.insert(1, "test/locs/")\n')
+        # file.write('packages=[]\n')
+        # file.write('modules=[]\n')
+        # file.write("allModules.load_all_modules_from_dir('test/locs/',modules,packages)\n")
+        # file.write('for module,package in zip(modules,packages):\n')
+        # file.write("\timportlib.import_module(module)\n")
+        # file.write("\teval(package).locs(locList)\n")
+        # for language in locList.languages:
+        #   file.write("try:\n")
+        #   file.write("\timport test_"+language+"\n")
+        #   file.write("\ttest_"+language+".locs(locList)\n")
+        #   file.write("except:\n")
+        #   file.write("\tprint('No localisation given for {}')\n".format(language))
+        # for entry in outArray:
+        #   file.write(entry+"\n")
+        for entry in trivialAssignment:
+          file.write(entry+"\n")
+        file.write('for language in locList.languages:\n'+
+                    '\toutFolderLoc="testOut2/localisation/"+language\n'+
+                    '\tif not os.path.exists(outFolderLoc):\n'+
+                      '\t\tos.makedirs(outFolderLoc)\n'+
+                    '\tlocList.write(outFolderLoc+"/cgm_building_customize_l_"+language+".yml",language)')
+  return lastOutFile
 
 
+def main(args,*unused): #for gui compatibility
 
-if __name__== "__main__":
-  args=parse(sys.argv[1:])
+  if not os.path.exists(args.output_folder+"/locs"):
+    os.makedirs(args.output_folder+"/locs")
+    with open(args.output_folder+"/locs/__init__.py","w") as file:
+      file.write(" ")
   globbedList=[]
   for b in args.inputFileNames:
     globbedList+=glob.glob(b)
 
+  lastOutFile=""
   for inputFileName in globbedList:
     if inputFileName[-4:].lower()==".yml":
-      readYMLCreatePy(args, inputFileName)
+      lastOutFile=readYMLCreatePy(args, inputFileName)
+  return lastOutFile
+
+if __name__== "__main__":
+  args=parse(sys.argv[1:])
+  main(args)
+  

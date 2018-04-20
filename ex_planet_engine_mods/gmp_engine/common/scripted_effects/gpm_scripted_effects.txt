@@ -1,0 +1,386 @@
+# Abundancy Settings and factors used for tweaking
+@rare = 0.05
+@uncommon = 0.7
+@default = 1
+@plenty = 2.2
+@everywhere = 3
+
+# To spawn special blockers after terraforming world with special modifier. Ensures the blockers are pressent. 
+
+# Colour planet name based on requirements and give it an icon (
+# happens on survey
+gpm_colour_planet_name = {
+	if = {
+		limit = {
+			AND = {
+				has_planet_flag = "gpm_is_precursor_world"
+				NOT = { has_planet_flag = "gpm_is_precursor_world_colour" }
+			}
+		} 
+		set_name = "color_precursor"
+		set_planet_flag = "gpm_is_precursor_world_colour"
+		log = "***- Planet given a blue colour and icon----"
+
+	}
+	if = {
+		limit = {
+			AND = {
+				has_planet_flag = "gpm_is_wondrous_planet"
+				NOT = { has_planet_flag = "gpm_is_wondrous_world_colour" }
+			}
+		} 
+		set_name = "color_planet_wonder"
+		set_planet_flag = "gpm_is_wondrous_world_colour"
+		log = "***- Planet given an orange colour and icon----"
+
+	}
+}
+
+# Remove planet name and icon and reset name to something that makes sense
+gpm_reset_planet_name = {
+	if = { 
+		limit = {
+			OR = {
+				has_planet_flag = "gpm_is_precursor_world"
+				has_planet_flag = "gpm_is_wondrous_planet"
+				has_planet_flag = "gpm_is_infested_world"
+			}
+		}
+		set_name = random
+		set_name = "color_default_white"
+		if = {
+			limit = {
+				has_planet_flag = "gpm_is_precursor_world"
+			}
+			# remove_planet_flag = "gpm_is_precursor_world"   #never remove because these are always kept
+			remove_planet_flag = "gpm_is_precursor_world_colour"
+		}
+		if = {
+			limit = {
+				has_planet_flag = "gpm_is_wondrous_planet"
+			}
+			remove_planet_flag = "gpm_is_wondrous_planet"
+			remove_planet_flag = "gpm_is_wondrous_world_colour"
+		}
+		if = {
+			limit = {
+				has_planet_flag = "gpm_is_infested_world"
+			}
+			remove_planet_flag = "gpm_is_infested_world"
+		}
+	}	
+}
+
+gpm_random_dangerous_modifiers = {
+	random_list = {
+		100 = {
+			add_modifier = { days = -1 modifier = "Strong_Volcanism" }
+			modifier = { factor = @default }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_tomb = yes 
+					gpm_is_planet_dry_hot = yes
+					gpm_is_planet_dry_cold = yes
+					gpm_is_planet_wet_hot = yes
+					gpm_is_planet_wet_cold = yes
+					gpm_is_planet_uninhabitable = yes
+				}
+			}
+			# TWeaks #
+			modifier = { factor = 0 is_planet_class = pc_gaia }
+			modifier = { factor = 0.2 is_moon = yes }
+			# Not with these modifiers #
+			modifier = { factor = 0
+				OR = {
+					has_modifier = "Strong_Volcanism"
+					has_modifier = "Solidified_Core"
+					has_modifier = "Flat_Terrain"
+				}
+			}
+		}
+		200 = {
+			add_modifier = { days = -1 modifier = "Hostile_Flora" }
+			modifier = { factor = @default }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_tomb = yes 
+					gpm_is_planet_dry_hot = yes
+					gpm_is_planet_dry_cold = yes
+					gpm_is_planet_wet_hot = yes
+					gpm_is_planet_wet_cold = yes
+				}
+			}
+			# TWeaks #
+			modifier = { factor = 0 is_planet_class = pc_gaia }
+			modifier = { factor = 0	solar_system = { has_star_flag = sol } }
+			# Not with these modifiers #
+			modifier = { factor = 0 has_modifier = "Hostile_Flora" }
+		}
+		200 = {
+			add_modifier = { days = -1 modifier = "Titanic_Predators" }
+			modifier = { factor = @uncommon }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_tomb = yes 
+					gpm_is_planet_dry_hot = yes
+					gpm_is_planet_dry_cold = yes
+					gpm_is_planet_wet_hot = yes
+					gpm_is_planet_wet_cold = yes
+				}
+			}
+			# TWeaks #
+			modifier = { factor = 0	solar_system = { has_star_flag = sol } }
+			# Not with these modifiers #
+			modifier = { factor = 0
+				OR = {
+					has_modifier = "Titanic_Predators"
+					has_modifier = "Simple_Organisms"
+				}
+			}
+		}
+		100 = {
+			add_modifier = { days = -1 modifier = "Living_Planet" }
+			modifier = { factor = @default }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_dry_hot = yes
+					gpm_is_planet_dry_cold = yes
+					gpm_is_planet_wet_hot = yes
+					gpm_is_planet_wet_cold = yes
+				}
+			}
+			# TWeaks #
+			modifier = { factor = 0 is_planet_class = pc_arctic }
+			modifier = { factor = 0	solar_system = { has_star_flag = sol } }
+			# Not with these modifiers #
+			modifier = { factor = 0 has_modifier = "Living_Planet" }
+		}
+		100 = {
+			add_modifier = { days = -1 modifier = "Acidic_Seas" }
+			modifier = { factor = @uncommon }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_tomb = yes 
+					gpm_is_planet_wet_hot = yes
+					gpm_is_planet_wet_cold = yes
+				}
+			}
+			# TWeaks #
+			# Not with these modifiers #
+			modifier = { factor = 0 has_modifier = "Acidic_Seas" }
+		}
+		200 = {
+			add_modifier = { days = -1 modifier = "Resilent_parasites" }
+			modifier = { factor = @default }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_tomb = yes 
+					gpm_is_planet_habitable = yes 
+				}
+			}
+			# TWeaks #
+			modifier = { factor = 0	solar_system = { has_star_flag = sol } }
+			# Not with these modifiers #
+			modifier = { factor = 0
+				OR = {
+					has_modifier = "Resilent_parasites"
+					has_modifier = "Simple_Organisms"
+				}
+			}
+		}
+		500 = {
+			add_modifier = { days = -1 modifier = "Arachnophobia" }
+			modifier = { factor = @uncommon }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_tomb = yes 
+					gpm_is_planet_dry_hot = yes
+					gpm_is_planet_dry_cold = yes
+					gpm_is_planet_wet_hot = yes
+					gpm_is_planet_wet_cold = yes
+				}
+			}
+			# TWeaks #
+			modifier = { factor = 2 is_moon = yes }
+			modifier = { factor = 0
+				OR = {
+					is_planet_class = pc_ocean
+					gpm_is_planet_toxic = yes
+					is_planet_class = pc_gaia
+				}
+			}
+			modifier = { factor = 0	solar_system = { has_star_flag = sol } }
+			# Not with these modifiers #
+			modifier = { factor = 0	has_modifier = "Arachnophobia" }
+		}
+		500 = {
+			add_modifier = { days = -1 modifier = "Giant_Worm" }
+			modifier = { factor = @uncommon }
+			# On these planets #
+			modifier = { factor = 0 NOT = { gpm_is_planet_dry_hot = yes } }
+			# TWeaks #
+			# Not with these modifiers #
+			modifier = { factor = 0	has_modifier = "Giant_Worm" }
+		}
+		100 = {
+			add_modifier = { days = -1 modifier = "Sandstorms" }
+			modifier = { factor = @default }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_tomb = yes 
+					gpm_is_planet_dry_hot = yes
+				}
+			}
+			# TWeaks #
+			# Not with these modifiers #
+			modifier = { factor = 0	has_modifier = "Sandstorms" }
+		}
+		200 = {
+			add_modifier = { days = -1 modifier = "Furry_Packs" }
+			modifier = { factor = @default }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_tomb = yes 
+					gpm_is_planet_dry_cold = yes
+					gpm_is_planet_wet_cold = yes
+				}
+			}
+			# TWeaks #
+			modifier = { factor = 0	solar_system = { has_star_flag = sol } }
+			# Not with these modifiers #
+			modifier = { factor = 0	has_modifier = "Furry_Packs" }
+		}
+		100 = {
+			add_modifier = { days = -1 modifier = "Blizzards" }
+			modifier = { factor = @default }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_tomb = yes 
+					gpm_is_planet_dry_cold = yes
+					gpm_is_planet_wet_cold = yes
+				}
+			}
+			# TWeaks #
+			# Not with these modifiers #
+			modifier = { factor = 0	
+				OR = {
+					has_modifier = "Blizzards"
+					has_modifier = "Perfect_Seasons" 
+				}
+			}
+		}
+		300 = {
+			add_modifier = { days = -1 modifier = "Abominable_Predators" }
+			modifier = { factor = @default }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_tomb = yes 
+					gpm_is_planet_dry_cold = yes
+					gpm_is_planet_wet_cold = yes
+				}
+			}
+			# TWeaks #
+			modifier = { factor = 0	solar_system = { has_star_flag = sol } }
+			# Not with these modifiers #
+			modifier = { factor = 0	has_modifier = "Abominable_Predators" }
+		}
+		100 = {
+			add_modifier = { days = -1 modifier = "Ecological_Nervous_System" }
+			modifier = { factor = @default }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_dry_hot = yes
+					gpm_is_planet_dry_cold = yes
+					gpm_is_planet_wet_hot = yes
+					gpm_is_planet_wet_cold = yes
+				}
+			}
+			# TWeaks #
+			# Not with these modifiers #
+			modifier = { factor = 0 has_modifier = "Ecological_Nervous_System" }
+		}
+		300 = {
+			add_modifier = { days = -1 modifier = "Carnivorous_Flies" }
+			modifier = { factor = @uncommon }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_tomb = yes 
+					gpm_is_planet_dry_hot = yes
+					gpm_is_planet_dry_cold = yes
+					gpm_is_planet_wet_hot = yes
+					gpm_is_planet_wet_cold = yes
+				}
+			}
+			# TWeaks #
+			modifier = { factor = 2 gpm_is_planet_tomb = yes }
+			# Not with these modifiers #
+			modifier = { factor = 0 has_modifier = "Carnivorous_Flies" }
+		}
+		200 = {
+			add_modifier = { days = -1 modifier = "Dark_Skies" }
+			modifier = { factor = @uncommon }
+			# On these planets #
+			modifier = { factor = 0 NOT = { gpm_is_planet_tomb = yes } }
+			# TWeaks #
+			# Not with these modifiers #
+			modifier = { factor = 2 has_modifier = "Dense_Atmospheres" }
+			modifier = { factor = 0
+				OR = {
+					has_modifier = "Dark_Skies"
+					has_modifier = "Thin_Atmospheres"
+				}
+			}
+		}
+		100 = {
+			add_modifier = { days = -1 modifier = "Colossal_Cliffs" }
+			modifier = { factor = @default }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_tomb = yes 
+					gpm_is_planet_dry_hot = yes
+					gpm_is_planet_dry_cold = yes
+					gpm_is_planet_wet_hot = yes
+					gpm_is_planet_wet_cold = yes
+				}
+			}
+			# TWeaks #
+			modifier = { factor = 0.2 is_moon = yes }
+			# Not with these modifiers #
+			modifier = { factor = 0 has_modifier = "Colossal_Cliffs" }
+		}
+		300 = {
+			add_modifier = { days = -1 modifier = "Strange_Alien_Eggs" }
+			modifier = { factor = @rare }
+			# On these planets #
+			modifier = { factor = 0
+				NOR = {
+					gpm_is_planet_tomb = yes 
+					gpm_is_planet_dry_hot = yes
+					gpm_is_planet_dry_cold = yes
+					gpm_is_planet_wet_hot = yes
+					gpm_is_planet_wet_cold = yes
+				}
+			}
+			# TWeaks #
+			modifier = { factor = 2 is_moon = yes }
+			modifier = { factor = 4 gpm_is_planet_tomb = yes }
+			modifier = { factor = 2	has_modifier = "Temple_of_the_Ancient_One" }
+			# Not with these modifiers #
+			modifier = { factor = 0 has_modifier = "Strange_Alien_Eggs" }
+		}
+	}
+}
