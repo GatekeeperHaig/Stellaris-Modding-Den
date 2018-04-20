@@ -140,13 +140,17 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
         file.write(entry+"\n")
         # file.write("\t"+entry+"\n")
     if args.create_main_file:
-      outFile=args.output_folder+"/"+fileName.replace(".yml","_main.py").replace("_l_"+languageInFile, "")
+      simpleName=fileName.replace(".yml","").replace("_l_"+languageInFile, "")
+      outFile=args.output_folder+"/"+simpleName+"_main.py"
+      # outFile=args.output_folder+"/"+fileName.replace(".yml","_main.py").replace("_l_"+languageInFile, "")
       lastOutFile=outFile
       with open(outFile, "w") as file:
         absPath=os.path.abspath(args.output_folder)
         commonPath=os.path.commonprefix([absPath, sys.path[0]])
         # print(commonPath)
         relPath=os.path.relpath(commonPath,absPath)
+        if commonPath!=sys.path[0]:
+          relPath+="/"+os.path.relpath(sys.path[0],commonPath)
         # print(relPath)
         file.write("#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nimport os,sys,glob\n")
         file.write("os.chdir(os.path.dirname(__file__))\n")
@@ -183,7 +187,7 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
                     '\toutFolderLoc=language\n'+
                     '\tif not os.path.exists(outFolderLoc):\n'+
                       '\t\tos.makedirs(outFolderLoc)\n'+
-                    '\tlocList.write(outFolderLoc+"/cgm_building_customize_l_"+language+".yml",language)')
+                    '\tlocList.write(outFolderLoc+"/'+simpleName+'_l_"+language+".yml",language)')
   return lastOutFile
 
 
