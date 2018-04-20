@@ -387,7 +387,7 @@ def readAndConvert(args, allowRestart=1):
     #buildingNameToData.printAll()
         
     if args.replacement_file!='': #todo rework!
-      print("CURRENTLY NOT WORKING!")
+      print("REPLACEMENT FILE CURRENTLY NOT WORKING!")
       # equalConditions=[]
       # inConditions=[]
       # allConditions=[] #allConditions[i][j] will be an array consisting of: negation bool, condition type, keyword 1, keyword 2, 
@@ -609,7 +609,7 @@ def main(args, argv):
   
     
   if args.create_standalone_mod_from_mod:
-    rerunName=os.path.split(os.path.dirname(args.output_folder))[-1]+"_rerun.py" #foldername, not path!
+    rerunName="_".join(os.path.split(os.path.dirname(args.output_folder)))+"_rerun.py" #foldername, not path!
   elif args.just_copy_and_check:
     rerunName=args.output_folder+"/rerun_just_copy_and_check.py"
   else:
