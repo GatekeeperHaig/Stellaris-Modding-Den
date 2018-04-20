@@ -1,0 +1,296 @@
+namespace = gpm_guardian
+
+@tier1influencecontact = 7
+@tier1influencecontactxenophile = 8
+@tier1influencecontactmin = 20
+@tier1influencecontactmax = 80
+
+@tier2influencecontact = 10
+@tier2influencecontactxenophile = 12
+@tier2influencecontactmin = 40
+@tier2influencecontactmax = 100
+
+@tier1materialreward = 6
+@tier1materialmin = 100
+@tier1materialmax = 500
+@tier2materialreward = 12
+@tier2materialmin = 150
+@tier2materialmax = 1000
+@tier3materialreward = 18
+@tier3materialmin = 250
+@tier3materialmax = 1500
+@tier4materialreward = 24
+@tier4materialmin = 350
+@tier4materialmax = 2000
+@tier5materialreward = 48
+@tier5materialmin = 700
+@tier5materialmax = 4000
+
+@tier1influencereward = 6
+@tier1influencemin = 40
+@tier1influencemax = 100
+@tier2influencereward = 12
+@tier2influencemin = 80
+@tier2influencemax = 175
+@tier3influencereward = 18
+@tier3influencemin = 125
+@tier3influencemax = 250
+@tier4influencereward = 24
+@tier4influencemin = 150
+@tier4influencemax = 300
+@tier5influencereward = 36
+@tier5influencemin = 250
+@tier5influencemax = 500
+@tier6influencereward = 48
+@tier6influencemin = 300
+@tier6influencemax = 600
+
+@tier1researchreward = 6
+@tier1researchmin = 60
+@tier1researchmax = 150
+@tier2researchreward = 12
+@tier2researchmin = 90
+@tier2researchmax = 250
+@tier3researchreward = 18
+@tier3researchmin = 120
+@tier3researchmax = 350
+@tier4researchreward = 24
+@tier4researchmin = 150
+@tier4researchmax = 500
+@tier5researchreward = 48
+@tier5researchmin = 300
+@tier5researchmax = 1000
+
+# Ego, the living planet
+# spawning of "planet"
+planet_event = {
+	id = gpm_guardian.1
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		solar_system = {
+			has_star_flag = gpm_guardians_ego_system
+			OR = {
+				NOT = { has_star_flag = gpm_ego_spawned }
+				any_ship = { is_ship_size = gpm_ego }
+			}
+		}
+	}
+	
+	immediate = {
+		if = {
+			limit = {
+				solar_system = {
+					NOT = { has_star_flag = gpm_ego_spawned }
+				}
+			}
+			solar_system = {
+				set_star_flag = gpm_ego_spawned
+				save_event_target_as = gpm_ego_system
+				random_system_planet = {
+					limit = { is_star = yes }
+					create_country = {
+						name = "NAME_gpm_ego"
+						type = guardian_horror
+						flag = {
+							icon = {
+								category = "zoological"
+								file = "flag_zoological_3.dds"
+							}
+							background = {
+								category = "backgrounds"
+								file = "00_solid.dds"
+							}
+							colors={
+								"red"
+								"red"
+								"null"
+								"null"
+							}
+						}
+					}
+					last_created_country = {
+						guardian_difficulty = yes
+						save_global_event_target_as = gpm_ego_country
+						set_country_flag = gpm_ego_country
+					}
+					create_fleet = {
+						name = "NAME_gpm_ego_ship"
+						settings = {
+							spawn_debris = no
+							is_boss = yes
+						}
+						effect = {
+							set_owner = event_target:gpm_ego_country
+							save_global_event_target_as = gpm_ego
+							create_ship = {
+								name = "NAME_gpm_ego_ship"
+								design = "gpm_ego"
+								effect = { set_disabled = yes }
+							}
+							set_location = {
+								target = PREV
+								distance = 70
+								angle = random
+							}
+						}
+						#save_event_target_as = gpm_ego_location
+					}
+					
+					last_created_fleet = {
+						create_ambient_object = {
+							type = "gpm_ego_spawn_object"
+							location = THIS
+							# use_3d_location = yes
+							
+						}
+						last_created_ambient_object = {
+							set_ambient_object_flag = gpm_ambient_ego_flag
+						}
+						fleet_event = { id = guardian.3220 days = 1 }
+					}
+				}
+			}
+		}
+		solar_system = { save_event_target_as = gpm_ego_system }
+	}
+}
+
+# Ego Destroyed (HIDDEN)
+country_event = {
+	id = gpm_guardian.2
+	hide_window = yes
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		THIS = {
+			is_country_type = guardian_horror
+			has_country_flag = gpm_ego_country
+			FROMFROM = { is_ship_size = gpm_ego }
+		}
+	}
+	
+	immediate = {
+		FROMFROM = {
+			solar_system = {
+				save_event_target_as = gpm_guardians_ego_system
+				event_target:gpm_ego = { destroy_ambient_object = this }
+				random_ambient_object = {
+					limit = { has_ambient_object_flag = gpm_ambient_ego_flag }
+					destroy_ambient_object = this
+				}
+				spawn_planet = {
+					class = "pc_gaia"
+					location = event_target:gpm_ego
+					orbit_location = no
+					orbit_angle_offset = 5
+					orbit_distance_offset = -4.0
+					size = 25
+					has_ring = no
+					
+					init_effect = {
+						set_name = "Nu-Xandar"
+						set_planet_entity = {
+							entity = "gaia_planet"
+						}
+						surveyed = {
+							set_surveyed = no
+						}
+						reroll_deposits = yes
+						gpm_remove_precursor_modifiers = yes
+						gpm_crisis_purge_modifiers = yes
+						add_modifier = { days = -1 modifier = "lush_planet" }
+						add_modifier = { days = -1 modifier = "Ideal_for_Life" }
+						
+						random_tile = {
+							limit = { has_deposit = no }
+							clear_deposits = yes
+							add_deposit = gpm_enormous3_food_deposit
+						}
+						random_tile = {
+							limit = { has_deposit = no }
+							clear_deposits = yes
+							add_deposit = d_enormous2_mineral_deposit
+						}
+						random_tile = {
+							limit = { has_deposit = no }
+							clear_deposits = yes
+							add_deposit = d_enormous2_energy_deposit
+						}
+						random_tile = {
+							clear_deposits = yes
+							add_deposit = gpm_enormous3_food_deposit
+						}
+						random_tile = {
+							clear_deposits = yes
+							add_deposit = d_enormous2_mineral_deposit
+						}
+						random_tile = {
+							clear_deposits = yes
+							add_deposit = d_enormous2_energy_deposit
+						}
+						orbital_deposit_tile = {
+							clear_deposits = yes
+							add_deposit = d_enormous3_physics_deposit
+							add_deposit = d_enormous3_society_deposit
+						}
+						
+						set_planet_flag = gpm_ego_gaia_planet
+					}
+				}
+			}
+		}
+		destroy_country = yes
+	}
+}
+
+# # Ego Destroyed
+# ship_event = {
+	# id = gpm_guardian.3
+	# hide_window = yes
+
+	# fire_only_once = yes
+	# is_triggered_only = yes
+	
+	# immediate = {
+		# destroy_ambient_object = this
+		# solar_system = {
+			# random_ambient_object = {
+				# limit = { has_ambient_object_flag = gpm_ambient_ego_flag }
+				# destroy_ambient_object = this
+			# }
+			# spawn_planet = {
+				# class = "pc_gaia"
+				# location = event_target:gpm_ego
+				# orbit_location = no
+				# orbit_angle_offset = 5
+				# orbit_distance_offset = -4.0
+				# size = 25
+				# has_ring = no
+				
+				# init_effect = {
+					# set_name = pc_gaia
+					# set_planet_entity = {
+						# entity = "gaia_planet"
+					# }
+					# surveyed = {
+						# set_surveyed = no
+					# }
+					# reroll_planet = yes
+					# gpm_remove_precursor_modifiers = yes
+					# gpm_crisis_purge_modifiers = yes
+					# add_modifier = { days = -1 modifier = "lush_planet" }
+					# add_modifier = { days = -1 modifier = "Living_Planet" }
+					# add_modifier = { days = -1 modifier = "Ideal_for_Life" }
+					# add_modifier = { days = -1 modifier = "gaia_world" }
+					
+					# set_planet_flag = gpm_ego_gaia_planet
+				# }
+			# }
+		# }
+	# }
+# }

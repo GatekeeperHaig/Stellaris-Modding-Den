@@ -1,0 +1,116 @@
+
+namespace = gpm_ringworld
+
+### Ringworld Finish
+event = {
+	id = gpm_ringworld.78870
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		FROMFROM = {
+			every_system_planet = {
+				if = {
+					limit = {
+						AND = {
+							NOT = {
+								has_planet_flag = gpm_new_ringworld_flag
+							}
+							gpm_is_planet_ringworld = yes
+						}
+					}
+					log = "---- Fired Event gpm.ringworld.78870 ----"
+					log = "---- rolling modifiers on ringworld ----"
+					
+					# IDEA: wipe all deposits and do something else with ringworld tiles/deposits
+					every_tile = {
+						limit = {
+							has_deposit = yes
+						}
+						clear_deposits = yes
+					}
+					
+					# First we try to apply a construction bonus modifier (low chance)
+					random_list = {
+						95 = {}
+						5 = { gpm_spawn_ringworld_tier_modifier = yes }
+					}
+					
+					#  Bonus additional modifier
+					random_list = {
+						50 = {}
+						50 = { gpm_spawn_ringworld_modifier = yes }
+					}
+					random_list = {
+						55 = {}
+						45 = { gpm_spawn_ringworld_modifier = yes }
+					}
+					random_list = {
+						60 = {}
+						40 = { gpm_spawn_ringworld_modifier = yes }
+					}
+					set_planet_flag = gpm_new_ringworld_flag
+				}
+				if = {
+					limit = {
+						OR = {
+							is_planet_class = pc_ringworld_seam
+							is_planet_class = pc_ringworld_tech
+						}
+					}
+					set_planet_flag = is_constructed_ringworld_part
+				}
+			}
+		}
+	}
+}
+
+### Cybrex Ringworld Finish
+event = {
+	id = gpm_ringworld.78871
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		FROMFROM = { has_star_flag = cybrex }
+	}
+	
+	immediate = {
+		FROMFROM = {
+			every_system_planet = {
+				if = {
+					limit = {
+						AND = {
+							NOT = {
+								has_planet_flag = gpm_new_ringworld_flag
+							}
+							gpm_is_planet_ringworld = yes
+						}
+					}
+					# Colour the ringworld section
+					if = { 
+						limit = { 
+							NOT = { has_planet_flag = "gpm_is_precursor_world_colour" }
+						}
+						set_name = "color_precursor"
+					}
+					
+					# IDEA: wipe all deposits and do something else with ringworld tiles/deposits
+					every_tile = {
+						limit = {
+							has_deposit = yes
+						}
+						clear_deposits = yes
+					}
+					
+					# Random precursor modifiers 
+					gpm_random_precursor_modifier = yes
+					gpm_random_precursor_modifier = yes
+					set_planet_flag = gpm_new_ringworld_flag
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,707 @@
+
+@tier1influencecontact = 7
+@tier1influencecontactxenophile = 8
+@tier1influencecontactmin = 20
+@tier1influencecontactmax = 80
+
+@tier2influencecontact = 10
+@tier2influencecontactxenophile = 12
+@tier2influencecontactmin = 40
+@tier2influencecontactmax = 100
+
+@tier1materialreward = 6
+@tier1materialmin = 100
+@tier1materialmax = 500
+@tier2materialreward = 12
+@tier2materialmin = 150
+@tier2materialmax = 1000
+@tier3materialreward = 18
+@tier3materialmin = 250
+@tier3materialmax = 1500
+@tier4materialreward = 24
+@tier4materialmin = 350
+@tier4materialmax = 2000
+@tier5materialreward = 48
+@tier5materialmin = 700
+@tier5materialmax = 4000
+
+@tier1influencereward = 6
+@tier1influencemin = 40
+@tier1influencemax = 100
+@tier2influencereward = 12
+@tier2influencemin = 80
+@tier2influencemax = 175
+@tier3influencereward = 18
+@tier3influencemin = 125
+@tier3influencemax = 250
+@tier4influencereward = 24
+@tier4influencemin = 150
+@tier4influencemax = 300
+@tier5influencereward = 36
+@tier5influencemin = 250
+@tier5influencemax = 500
+@tier6influencereward = 48
+@tier6influencemin = 300
+@tier6influencemax = 600
+
+@tier1researchreward = 6
+@tier1researchmin = 60
+@tier1researchmax = 150
+@tier2researchreward = 12
+@tier2researchmin = 90
+@tier2researchmax = 250
+@tier3researchreward = 18
+@tier3researchmin = 120
+@tier3researchmax = 350
+@tier4researchreward = 24
+@tier4researchmin = 150
+@tier4researchmax = 500
+@tier5researchreward = 48
+@tier5researchmin = 300
+@tier5researchmax = 1000
+
+namespace = colony
+
+# Earthquakes 1				-- overwriting to stop clearing planet wonder blockers
+planet_event = {
+	id = colony.68
+	title = "colony.68.name"
+	desc = "colony.68.desc"
+	picture = GFX_evt_burning_settlement
+	show_sound = event_air_raid_siren
+	location = ROOT
+	
+	trigger = {
+		has_planet_flag = seismic_disturbance_destroyed
+		NOT = { has_planet_flag = seismic_disturbance_quake }
+		has_owner = yes
+		original_owner = yes
+		is_homeworld = no
+		has_ground_combat = no
+		num_pops > 0
+	}
+	
+	mean_time_to_happen = {
+		months = 240
+	}
+	
+	immediate = {
+		set_planet_flag = seismic_disturbance_quake
+		
+	}
+	
+	option = {
+		name = UNFORTUNATE 
+		random_tile = {
+			limit = {
+				NOR = {
+					has_building = "building_colony_shelter"
+					has_building = "building_capital_1"
+					has_building = "building_capital_2"
+					has_building = "building_capital_3"
+					# -guilli
+					gpm_has_gpm_special_blocker = yes
+				}
+			}
+			set_blocker = "tb_sinkhole_subterraneans"
+		}
+	}
+}
+
+# Earthquakes 2				-- overwriting to stop clearing planet wonder blockers
+planet_event = {
+	id = colony.73
+	title = "colony.68.name"
+	desc = "colony.73.desc"
+	picture = GFX_evt_underground_civilization
+	show_sound = event_air_raid_siren
+	location = ROOT
+	
+	trigger = {
+		has_planet_flag = seismic_disturbance_friendly
+		NOT = { has_planet_flag = seismic_disturbance_quake2 }
+		has_owner = yes
+		original_owner = yes
+		is_homeworld = no
+		has_ground_combat = no
+		num_pops > 0
+	}
+	
+	mean_time_to_happen = {
+		months = 240
+	}
+	
+	immediate = {
+		set_planet_flag = seismic_disturbance_quake2
+	}
+	
+	option = {
+		name = colony.73.a
+		hidden_effect = {
+			random_tile = {
+				limit = {
+					NOR = {
+						has_building = "building_colony_shelter"
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+						# -guilli
+						gpm_has_gpm_special_blocker = yes
+					}
+				}
+				set_blocker = "tb_sinkhole_subterraneans"
+			}
+		}
+		every_owned_pop = {
+			add_modifier = {
+				modifier = "pop_angry_subterranean"
+				days = 3600
+			}
+		}
+	}
+	option = {
+		name = colony.73.b
+		hidden_effect = {
+			random_tile = {
+				limit = {
+					NOR = {
+						has_building = "building_colony_shelter"
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+						# -guilli
+						gpm_has_gpm_special_blocker = yes
+					}
+				}
+				set_blocker = "tb_sinkhole_subterraneans"
+			}
+			change_variable = {
+				which = "angry_subterraneans"
+				value = 1
+			}
+		}
+		custom_tooltip = subterraneans_displeased
+	}
+}
+
+### Abandoned Terraforming Equipment		-- overwriting to prevent on wondrous worlds
+planet_event = {
+	id = colony.100
+	title = "colony.100.name"
+	desc = "colony.100.desc"
+	picture = GFX_evt_underground_civilization
+	show_sound = event_mystic_reveal
+	location = ROOT
+	
+	trigger = {
+		has_owner = yes
+		original_owner = yes
+		is_homeworld = no
+		owner = { is_ai = no }
+		has_ground_combat = no
+		is_occupied_flag = no
+		num_pops > 0
+		is_capital = no
+		NOR = {
+			has_planet_flag = gpm_is_wondrous_world # -guilli
+			has_planet_flag = abandoned_terraforming_planet
+			has_planet_flag = colony_event
+			is_planet_class = pc_nuked
+			is_planet_class = pc_gaia
+			is_planet_class = pc_ringworld_habitable
+			is_planet_class = pc_habitat
+			owner = { has_country_flag = abandoned_terraforming_country }
+			owner = { has_authority = auth_machine_intelligence }
+			AND = {
+				owner = { ideal_planet_class = pc_arid }
+				is_planet_class = pc_arid
+			}
+			AND = {
+				owner = { ideal_planet_class = pc_desert }
+				is_planet_class = pc_desert
+			}
+			AND = {
+				owner = { ideal_planet_class = pc_tropical }
+				is_planet_class = pc_tropical
+			}
+			AND = {
+				owner = { ideal_planet_class = pc_continental }
+				is_planet_class = pc_continental
+			}
+			AND = {
+				owner = { ideal_planet_class = pc_ocean }
+				is_planet_class = pc_ocean
+			}
+			AND = {
+				owner = { ideal_planet_class = pc_tundra }
+				is_planet_class = pc_tundra
+			}
+			AND = {
+				owner = { ideal_planet_class = pc_arctic }
+				is_planet_class = pc_arctic
+			}
+			AND = {
+				owner = { ideal_planet_class = pc_alpine }
+				is_planet_class = pc_alpine
+			}
+			AND = {
+				owner = { ideal_planet_class = pc_savannah }
+				is_planet_class = pc_savannah
+			}
+		}
+	}
+	
+	is_triggered_only = yes
+	#mean_time_to_happen = {
+	#	months = 640
+	#}
+	
+	immediate = {
+		set_planet_flag = abandoned_terraforming_planet
+		set_planet_flag = colony_event
+		owner = { set_country_flag = abandoned_terraforming_country }
+	}
+	
+	option = {
+		name = colony.100.a
+		hidden_effect = {
+			add_modifier = {
+				modifier = "abandoned_terraforming"
+				days = 3600 # changed from -1 -guilli
+			}
+		}
+		begin_event_chain = {
+			event_chain = "abandoned_terraforming_chain"
+			target = ROOT
+		}
+		enable_special_project = {
+			name = "ABANDONED_TERRAFORMING_1_PROJECT"
+			location = this
+			owner = root
+		}
+		enable_special_project = {
+			name = "ABANDONED_TERRAFORMING_2_PROJECT"
+			location = this
+			owner = root
+		}
+	}
+}
+
+# Special Project Completed 1		-- overwriting to apply correct planet modifiers
+planet_event = {
+	id = colony.104
+	title = "PROJECT_COMPLETE"
+	desc = "colony.104.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_activating_unknown_technology
+	location = ROOT
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = colony.104.a
+		custom_tooltip = abandoned_terraforming_completed
+		hidden_effect = {
+			remove_modifier = "abandoned_terraforming"
+			switch = {
+				trigger = is_planet_class
+				pc_desert = {
+					random_list = {
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_arid = {
+					random_list = {
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_savannah = {
+					random_list = {
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_desert }
+					}
+				}
+				pc_tropical = {
+					random_list = {
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_ocean = {
+					random_list = {
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_continental = {
+					random_list = {
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_tundra = {
+					random_list = {
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_arctic = {
+					random_list = {
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_alpine = {
+					random_list = {
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+			}
+			if = {									# -guilli
+				limit = {
+					NOT = {
+						gpm_has_precursor_modifiers = yes
+					}
+				}
+				reroll_planet_modifiers = yes		# -guilli
+				gpm_remove_precursor_modifiers = yes 	# -guilli
+			}
+		}
+	}
+}
+
+# Special Project Completed 2 (Mutated Creatures)	-- overwriting to apply correct planet modifiers
+planet_event = {
+	id = colony.105
+	title = "PROJECT_COMPLETE"
+	desc = "colony.105.desc"
+	picture = GFX_evt_ground_combat
+	show_sound = event_ground_battle
+	location = ROOT
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+			switch = {
+				trigger = is_planet_class
+				pc_desert = {
+					random_list = {
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_arid = {
+					random_list = {
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_savannah = {
+					random_list = {
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_desert }
+					}
+				}
+				pc_tropical = {
+					random_list = {
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_ocean = {
+					random_list = {
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_continental = {
+					random_list = {
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_tundra = {
+					random_list = {
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_arctic = {
+					random_list = {
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_alpine }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+				pc_alpine = {
+					random_list = {
+						15 = { change_pc = pc_tropical }
+						15 = { change_pc = pc_arid }
+						15 = { change_pc = pc_continental }
+						15 = { change_pc = pc_ocean }
+						15 = { change_pc = pc_tundra }
+						15 = { change_pc = pc_arctic }
+						15 = { change_pc = pc_desert }
+						15 = { change_pc = pc_savannah }
+					}
+				}
+			}
+			remove_modifier = "abandoned_terraforming"
+			owner = { set_country_flag = terraforming_mutants_invade_country }
+			set_planet_flag = terraforming_mutants_invade_planet
+			create_country = {
+				name = "NAME_Deformed_Creatures"
+				type = faction
+				effect = {
+					establish_communications_no_message = root.owner
+				}
+			}
+			create_army = {
+				name = "NAME_Deformed_Creatures"
+				owner = last_created
+				type = "mutant_army"
+			}
+			create_army = {
+				name = "NAME_Twisted_Beasts"
+				owner = last_created
+				type = "mutant_army"
+			}
+			create_army = {
+				name = "NAME_Mutated_Horrors"
+				owner = last_created
+				type = "mutant_army"
+			}
+			if = {									# -guilli
+				limit = {
+					NOT = {
+						gpm_has_precursor_modifiers = yes
+					}
+				}
+				reroll_planet_modifiers = yes		# -guilli
+				gpm_remove_precursor_modifiers = yes 	# -guilli
+			}
+		}
+	}
+	
+	option = {
+		name = colony.105.a
+		custom_tooltip = terraforming_mutants_attack
+	}
+}
+
+# Special Project Completed 3 (Gaia World)	-- overwriting to apply correct planet modifiers
+planet_event = {
+	id = colony.106
+	title = "PROJECT_COMPLETE"
+	desc = "colony.106.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_activating_unknown_technology
+	location = ROOT
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = MARVELOUS
+		change_pc = pc_gaia
+		add_modifier = {
+			modifier = "gaia_world"
+			days = -1
+		}
+		hidden_effect = {
+			remove_modifier = "abandoned_terraforming"
+			if = {									# -guilli
+				limit = {
+					NOT = {
+						gpm_has_precursor_modifiers = yes
+					}
+				}
+				reroll_planet_modifiers = yes		# -guilli
+				gpm_remove_precursor_modifiers = yes 	# -guilli
+			}
+		}
+	}
+}
+
+# Special Project Completed 4 (Ammonia)	-- overwriting to apply correct planet modifiers
+planet_event = {
+	id = colony.107
+	title = "PROJECT_COMPLETE"
+	desc = "colony.107.desc"
+	picture = GFX_evt_dead_city
+	show_sound = event_activating_unknown_technology
+	location = ROOT
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = colony.107.a
+		change_pc = pc_toxic
+		destroy_colony = yes
+		add_modifier = {
+			modifier = "ammonia_biosphere"
+			days = -1
+		}
+		orbital_deposit_tile = { 
+			add_deposit = d_vast_society_deposit
+		}
+		hidden_effect = {
+			remove_modifier = "abandoned_terraforming"
+			if = {									# -guilli
+				limit = {
+					NOT = {
+						gpm_has_precursor_modifiers = yes
+					}
+				}
+				reroll_planet_modifiers = yes		# -guilli
+				gpm_remove_precursor_modifiers = yes 	# -guilli
+			}
+			if = {
+				limit = { has_planet_flag = gpm_is_wondrous_world }
+				remove_planet_flag = gpm_is_wondrous_world
+				remove_planet_flag = gpm_is_wondrous_world_colour
+				remove_modifier = Planet_Wonder_Discovered
+				set_name = color_default_white
+			}
+			if = {
+				limit = { has_planet_flag = gpm_is_precursor_world }
+				add_modifier = { modifier = terraforming_candidate_precursor days = -1 } 
+				set_name = color_precursor_col
+			}
+		}
+	}
+}
+
+# Third event, drones awaken and remove a random Blocker from the planet's surface  -- overwriting to stop clearing planet wonder blockers
+planet_event = {
+	id = colony.1502
+	title = "colony.1502.name"
+	desc = "colony.1502.desc"
+	picture = GFX_evt_atmospheric_entry
+	location = ROOT
+	
+	is_triggered_only = yes
+
+	trigger = { owner = { has_country_flag = FLDrone_country } }
+
+	option = {
+		name = colony.1502.a
+		custom_tooltip = colony.1502.a.tooltip
+		random_tile = {
+			limit = {
+				AND = {
+					has_blocker = yes
+					NOT = {
+						gpm_has_gpm_special_blocker = yes
+					}
+				}
+			}
+			remove_blocker = yes
+		}
+		planet_event = { id = colony.1503 days = 360 }
+	}
+}
