@@ -610,8 +610,8 @@ def main(args, argv):
     
   if args.create_standalone_mod_from_mod:
     rerunName=os.path.split(os.path.dirname(args.output_folder))[1]+"_rerun.py" #foldername, not path!
-    print(os.path.split(os.path.dirname(args.output_folder))[1])
-    print(os.path.dirname(args.output_folder))
+    # print(os.path.split(os.path.dirname(args.output_folder))[1])
+    # print(os.path.dirname(args.output_folder))
   elif args.just_copy_and_check:
     rerunName=args.output_folder+"/rerun_just_copy_and_check.py"
   else:
