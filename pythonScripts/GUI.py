@@ -51,6 +51,9 @@ class Logger(object):
         #you might want to specify some extra behavior here.
         pass  
       
+# class test():
+#   def __init__(self):
+#     self.test="!"
  
   
 def outPreviousPath(name, fileName=".GUI_last_path"):
@@ -444,7 +447,7 @@ class TabClass:
       self.tabControl.menuBar.lastFolder=os.path.dirname(fileName.strip())
       self.tabControl.menuBar.storeData()
       with open(fileName, 'wb') as f:
-        pickle.dump([var.get() for var in self.checkVars],f)
+        pickle.dump([],f) #empty stop for old checkVars
         if self.optionWindow:
           pickle.dump([var.get() for var in self.optionWindow.vals],f)
         else:
@@ -452,6 +455,7 @@ class TabClass:
         pickle.dump([line.txt.get() for line in self.lines], f)
         pickle.dump([line.subfolderTxt.get() for line in self.lines], f)
         pickle.dump([line.lineCheckVar.get() for line in self.lines], f)
+        # pickle.dump(test(),f)
       # print("save")
   def load(self):
     fileName=filedialog.askopenfilename(initialdir = self.tabControl.menuBar.lastFolder,title = "Select file to load from",filetypes = (("pickle files","*.pkl"), ("all files","*")))
