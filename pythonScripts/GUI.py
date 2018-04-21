@@ -454,7 +454,7 @@ class TabClass:
         pickle.dump([line.lineCheckVar.get() for line in self.lines], f)
       # print("save")
   def load(self):
-    fileName=filedialog.askopenfilename(initialdir = self.tabControl.menuBar.lastFolder,title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
+    fileName=filedialog.askopenfilename(initialdir = self.tabControl.menuBar.lastFolder,title = "Select file to load from",filetypes = (("pickle files","*.pkl"), ("all files","*")))
     if fileName:
       self.tabControl.menuBar.lastFolder=os.path.dirname(fileName.strip())
       self.tabControl.menuBar.storeData()
@@ -474,7 +474,7 @@ class TabClass:
           pickle.load(f)
         self.loadLines(f)
   def loadAdd(self):
-    fileName=filedialog.askopenfilename(initialdir = self.tabControl.menuBar.lastFolder,title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
+    fileName=filedialog.askopenfilename(initialdir = self.tabControl.menuBar.lastFolder,title = "Select file to load from",filetypes = (("pickle files","*.pkl"), ("all files","*")))
     if fileName:
       self.tabControl.menuBar.lastFolder=os.path.dirname(fileName.strip())
       self.tabControl.menuBar.storeData()
