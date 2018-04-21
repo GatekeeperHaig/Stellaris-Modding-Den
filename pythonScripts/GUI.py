@@ -53,52 +53,22 @@ class Logger(object):
       
  
   
+def outPreviousPath(name, fileName=".GUI_last_path"):
+  contents=[]
+  if os.path.exists(fileName):
+    with open(fileName, "r") as file:
+      for line in file:
+        contents.append(line.strip())
+  if len(contents)>15:
+    contents=contents[-15:]
+  if not name in contents:
+    contents.append(name)
+  with open(fileName, "w") as file:
+    for line in contents:
+      file.write(line+"\n")
 
 
 class Line:
-  def openFile(self):
-    current=self.getTxt()
-    if current=='' or not os.path.exists(current):
-      fileName=filedialog.askopenfilename(initialdir = self.root.lastPath,title = "Select file",filetypes = (self.root.defaultFileFilter, ("all files","*")))
-    else:
-      fileName=filedialog.askopenfilename(initialdir = os.path.dirname(current),title = "Select file",filetypes = (self.root.defaultFileFilter, ("all files","*")))
-    if fileName:
-      self.setTxt(fileName.strip())
-      #txt.delete("1.0",END)
-      #txt.insert("1.0", fileName.strip())
-      self.root.lastPath=os.path.dirname(fileName.strip())
-      with open(".GUI_last_path",'w') as file:
-        file.write(self.root.lastPath)
-  def convert(self):
-    argList=[self.getTxt()]
-    self.root.addArguments(argList, self)
-    # argList+=self.root.fixedOptions
-    # # +" "+" ".join(self.root.fixedOptions)
-    
-    # if self.root.optionWindow:
-      # argList+=self.root.optionWindow.getOptions()
-    # for i in range(len(self.root.options)):
-      # if self.root.checkVars[i].get():
-        # argList.append(self.root.options[i][1])
-    # print(argList)
-    # return 
-    args=self.root.command.parse(argList)
-    # args.buildingFileNames=[self.getTxt()]
-    # args.fileNames=[self.getTxt()]
-    self.result=self.root.command.main(args, argList)
-    print(self.result)
-  def getResultFileName(self):
-    return self.result
-  def focusNextTxt(self,event):
-    txt=self.root.lines[(self.root.lines.index(self)+1)%len(self.root.lines)].txt
-    txt.focus_set()
-    txt.selection_range(0, END) 
-    return "break"  
-  def focusNextSubfolderTxt(self,event):
-    txt=self.root.lines[(self.root.lines.index(self)+1)%len(self.root.lines)].subfolderTxt
-    txt.focus_set()
-    txt.selection_range(0, END) 
-    return "break"
   def __init__(self,root):
     line= tk.Frame(root.mainFrame)
     self.lineFrame=line
@@ -164,9 +134,155 @@ class Line:
     #args=convertCSV_TXT.parse(self.getTxt2()+" --test_run")
     #args.fileNames=[self.getTxt()]
     #self.result=convertCSV_TXT.main(args)
+  def openFile(self):
+    current=self.getTxt()
+    if current=='' or not os.path.exists(current):
+      fileName=filedialog.askopenfilename(initialdir = self.root.lastPath,title = "Select file",filetypes = (self.root.defaultFileFilter, ("all files","*")))
+    else:
+      fileName=filedialog.askopenfilename(initialdir = os.path.dirname(current),title = "Select file",filetypes = (self.root.defaultFileFilter, ("all files","*")))
+    if fileName:
+      self.setTxt(fileName.strip())
+      #txt.delete("1.0",END)
+      #txt.insert("1.0", fileName.strip())
+      self.root.lastPath=os.path.dirname(fileName.strip())
+      outPreviousPath(self.root.lastPath)
+      # with open(".GUI_last_path",'a+') as file:
+      #   file.write("\n"+self.root.lastPath)
+  def convert(self):
+    argList=[self.getTxt()]
+    self.root.addArguments(argList, self)
+    # argList+=self.root.fixedOptions
+    # # +" "+" ".join(self.root.fixedOptions)
+    
+    # if self.root.optionWindow:
+      # argList+=self.root.optionWindow.getOptions()
+    # for i in range(len(self.root.options)):
+      # if self.root.checkVars[i].get():
+        # argList.append(self.root.options[i][1])
+    # print(argList)
+    # return 
+    args=self.root.command.parse(argList)
+    # args.buildingFileNames=[self.getTxt()]
+    # args.fileNames=[self.getTxt()]
+    self.result=self.root.command.main(args, argList)
+    print(self.result)
+  def getResultFileName(self):
+    return self.result
+  def focusNextTxt(self,event):
+    txt=self.root.lines[(self.root.lines.index(self)+1)%len(self.root.lines)].txt
+    txt.focus_set()
+    txt.selection_range(0, END) 
+    return "break"  
+  def focusNextSubfolderTxt(self,event):
+    txt=self.root.lines[(self.root.lines.index(self)+1)%len(self.root.lines)].subfolderTxt
+    txt.focus_set()
+    txt.selection_range(0, END) 
+    return "break"
     
 
 class TabClass:
+  def __init__(self,name,tab,root,command, fixedOptions, defaultFileFilter,optionWindow,extraAddButton, tabControl):
+    self.tabControl=tabControl
+    self.name=name
+    self.root=root
+    self.tab=tab
+    self.lines=[]
+    self.lineFrame = tk.Frame(tab)
+    self.lineFrame.pack()
+    self.scrollFrame=ScrollFrame(self.lineFrame)
+    self.scrollFrame.pack(side="top", fill="both", expand=True)
+    self.mainFrame=self.scrollFrame.frame
+    self.optionWindow=optionWindow
+    self.lastPath="."
+    self.separateStart=True
+    self.subfolder=False
+    self.singleEntryCheck=""
+    self.extraAddButton=extraAddButton
+    # if name == "createUpgradedBuildings":
+    #   self.helperFileCheck=True
+    # else:
+    #   self.helperFileCheck=False
+    if os.path.exists(".GUI_last_path"):
+      with open(".GUI_last_path") as file:
+        self.lastPath=file.readlines()[-1].strip()
+        # print(self.lastPath)
+    self.options=[]#options
+    self.command=command
+    if platform.system()=="Linux":
+      if ";" in defaultFileFilter[1]:
+        splitList=defaultFileFilter[1].split(";")
+        outString=""
+        for entry in zip(*splitList):
+          equal=1
+          for e in entry:
+            if e!=entry[0]:
+              equal=0
+          if equal:
+            outString+=entry[0]
+          else:
+            outString+="["
+            for e in entry:
+              outString+=e
+            outString+="]"
+        defaultFileFilter=(defaultFileFilter[0],outString)
+          # print(b)
+          # if splitList[0][i]=="*" or splitList[0][i]==".":
+            # outString+=spltL
+    self.defaultFileFilter=defaultFileFilter
+    self.checkVars=[]
+    self.fixedOptions=fixedOptions
+    
+    
+    #self.mainFrame=tk.Frame(self.lineFrame)
+    #self.mainFrame.pack(side="top", fill="both", expand=True)
+    #self.mainFrame.bind( '<Configure>', maxsize )
+    self.extraLineMain=tk.Frame(self.mainFrame)
+    self.extraLineMain.pack(side=tk.TOP)
+    # for option in options:
+    #   self.checkVars.append(IntVar())
+    #   check=Checkbutton(self.extraLineMain, text=option[0], variable=self.checkVars[-1])
+    #   check.pack(side=tk.RIGHT)
+    #   CreateToolTip(check, option[2])
+    #b = tk.Button(self.extraLineMain, text="(Un-)check all", command=self.checkAll)
+    #b.pack(side=tk.RIGHT)
+    #b = tk.Button(self.extraLineMain, text="Add line", command=self.addLine)
+    #b.pack(side=tk.RIGHT)
+    if optionWindow:
+      b= tk.Button(self.extraLineMain, text="Options", command=self.optionWindow.window.deiconify)
+      b.pack(side=tk.RIGHT)
+    b = tk.Button(self.extraLineMain, text="Add file(s)", command=self.addFiles)
+    b.pack(side=tk.RIGHT)
+    if self.extraAddButton!="":
+      b = tk.Button(self.extraLineMain, text=self.extraAddButton, command=self.addMarkedFiles)
+      b.pack(side=tk.RIGHT)
+    b = tk.Button(self.extraLineMain, text="Convert All", command=self.invokeAll)
+    b.pack(side=tk.LEFT)
+
+    txt_frm = tk.Frame(tab, width=600, height=600)
+    txt_frm.pack(fill="both", expand=True)
+    # ensure a consistent GUI size
+    txt_frm.grid_propagate(False)
+    # implement stretchability
+    txt_frm.grid_rowconfigure(0, weight=1)
+    txt_frm.grid_columnconfigure(0, weight=1)
+    
+    # create a Text widget
+    self.txt = tk.Text(txt_frm, borderwidth=3,bg="light grey", relief="sunken")
+    self.txt.config(state=DISABLED)
+    #self.txt.config(font=("consolas", 12), undo=True, wrap='word')
+    self.txt.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
+
+    # create a Scrollbar and associate it with txt
+    scrollb = tk.Scrollbar(txt_frm, command=self.txt.yview)
+    scrollb.grid(row=0, column=1, sticky='nsew')
+    self.txt['yscrollcommand'] = scrollb.set
+#def maxsize( event=None ):
+    #if(event.height>200):
+      #print(event.height)
+      #event.widget.grid_propagate(False)
+      #event.widget.grid_rowconfigure(0, weight=1)
+      #event.widget.grid_columnconfigure(0, weight=1)
+    #scrollbar.ScrolledWindow(self.mainFrame)
   def addLine(self):
     self.lines.append(Line(self))
   def addFile(self):
@@ -176,8 +292,9 @@ class TabClass:
     files=filedialog.askopenfilenames(initialdir = self.lastPath,title = "Select file(s)",filetypes = (self.defaultFileFilter, ("all files","*")))
     if files:
       self.lastPath=os.path.dirname(files[0].strip())
-      with open(".GUI_last_path",'w') as file:
-        file.write(self.lastPath)
+      outPreviousPath(self.lastPath)
+      # with open(".GUI_last_path",'a+') as file:
+      #   file.write("\n"+self.lastPath)
     for fileName in files:
       self.lines.append(Line(self))
       self.lines[-1].setTxt(fileName)
@@ -322,8 +439,10 @@ class TabClass:
     #os.W_OK Value to include in the mode parameter of access() to test the writability of path.
     #os.X_OK Value to include in the mode parameter of access() to determine if path can be executed.
   def save(self):
-    fileName=filedialog.asksaveasfilename(defaultextension=".pkl",initialdir = ".",title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
+    fileName=filedialog.asksaveasfilename(defaultextension=".pkl",initialdir = self.tabControl.menuBar.lastFolder,title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
     if fileName:
+      self.tabControl.menuBar.lastFolder=os.path.dirname(fileName.strip())
+      self.tabControl.menuBar.storeData()
       with open(fileName, 'wb') as f:
         pickle.dump([var.get() for var in self.checkVars],f)
         if self.optionWindow:
@@ -335,8 +454,10 @@ class TabClass:
         pickle.dump([line.lineCheckVar.get() for line in self.lines], f)
       # print("save")
   def load(self):
-    fileName=filedialog.askopenfilename(initialdir = ".",title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
+    fileName=filedialog.askopenfilename(initialdir = self.tabControl.menuBar.lastFolder,title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
     if fileName:
+      self.tabControl.menuBar.lastFolder=os.path.dirname(fileName.strip())
+      self.tabControl.menuBar.storeData()
       for i in range(len(self.lines)):
         self.removeLineByIndex(0)
       with open(fileName, 'rb') as f:
@@ -353,8 +474,10 @@ class TabClass:
           pickle.load(f)
         self.loadLines(f)
   def loadAdd(self):
-    fileName=filedialog.askopenfilename(initialdir = ".",title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
+    fileName=filedialog.askopenfilename(initialdir = self.tabControl.menuBar.lastFolder,title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
     if fileName:
+      self.tabControl.menuBar.lastFolder=os.path.dirname(fileName.strip())
+      self.tabControl.menuBar.storeData()
       with open(fileName, 'rb') as f:
         pickle.load(f)
         pickle.load(f)
@@ -377,108 +500,7 @@ class TabClass:
     except EOFError:
       print("Warning: File ended earlir than expected. File might be older version but still work perfectly or stuff is actually missing")
 
-  def __init__(self,name,tab,root,command, fixedOptions, defaultFileFilter,optionWindow,extraAddButton, tabControl):
-    self.tabControl=tabControl
-    self.name=name
-    self.root=root
-    self.tab=tab
-    self.lines=[]
-    self.lineFrame = tk.Frame(tab)
-    self.lineFrame.pack()
-    self.scrollFrame=ScrollFrame(self.lineFrame)
-    self.scrollFrame.pack(side="top", fill="both", expand=True)
-    self.mainFrame=self.scrollFrame.frame
-    self.optionWindow=optionWindow
-    self.lastPath="."
-    self.separateStart=True
-    self.subfolder=False
-    self.singleEntryCheck=""
-    self.extraAddButton=extraAddButton
-    # if name == "createUpgradedBuildings":
-    #   self.helperFileCheck=True
-    # else:
-    #   self.helperFileCheck=False
-    if os.path.exists(".GUI_last_path"):
-      with open(".GUI_last_path") as file:
-        self.lastPath=file.read().strip()
-        #print(self.lastPath)
-    self.options=[]#options
-    self.command=command
-    if platform.system()=="Linux":
-      if ";" in defaultFileFilter[1]:
-        splitList=defaultFileFilter[1].split(";")
-        outString=""
-        for entry in zip(*splitList):
-          equal=1
-          for e in entry:
-            if e!=entry[0]:
-              equal=0
-          if equal:
-            outString+=entry[0]
-          else:
-            outString+="["
-            for e in entry:
-              outString+=e
-            outString+="]"
-        defaultFileFilter=(defaultFileFilter[0],outString)
-          # print(b)
-          # if splitList[0][i]=="*" or splitList[0][i]==".":
-            # outString+=spltL
-    self.defaultFileFilter=defaultFileFilter
-    self.checkVars=[]
-    self.fixedOptions=fixedOptions
-    
-    
-    #self.mainFrame=tk.Frame(self.lineFrame)
-    #self.mainFrame.pack(side="top", fill="both", expand=True)
-    #self.mainFrame.bind( '<Configure>', maxsize )
-    self.extraLineMain=tk.Frame(self.mainFrame)
-    self.extraLineMain.pack(side=tk.TOP)
-    # for option in options:
-    #   self.checkVars.append(IntVar())
-    #   check=Checkbutton(self.extraLineMain, text=option[0], variable=self.checkVars[-1])
-    #   check.pack(side=tk.RIGHT)
-    #   CreateToolTip(check, option[2])
-    #b = tk.Button(self.extraLineMain, text="(Un-)check all", command=self.checkAll)
-    #b.pack(side=tk.RIGHT)
-    #b = tk.Button(self.extraLineMain, text="Add line", command=self.addLine)
-    #b.pack(side=tk.RIGHT)
-    if optionWindow:
-      b= tk.Button(self.extraLineMain, text="Options", command=self.optionWindow.window.deiconify)
-      b.pack(side=tk.RIGHT)
-    b = tk.Button(self.extraLineMain, text="Add file(s)", command=self.addFiles)
-    b.pack(side=tk.RIGHT)
-    if self.extraAddButton!="":
-      b = tk.Button(self.extraLineMain, text=self.extraAddButton, command=self.addMarkedFiles)
-      b.pack(side=tk.RIGHT)
-    b = tk.Button(self.extraLineMain, text="Convert All", command=self.invokeAll)
-    b.pack(side=tk.LEFT)
-
-    txt_frm = tk.Frame(tab, width=600, height=600)
-    txt_frm.pack(fill="both", expand=True)
-    # ensure a consistent GUI size
-    txt_frm.grid_propagate(False)
-    # implement stretchability
-    txt_frm.grid_rowconfigure(0, weight=1)
-    txt_frm.grid_columnconfigure(0, weight=1)
-    
-    # create a Text widget
-    self.txt = tk.Text(txt_frm, borderwidth=3,bg="light grey", relief="sunken")
-    self.txt.config(state=DISABLED)
-    #self.txt.config(font=("consolas", 12), undo=True, wrap='word')
-    self.txt.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
-
-    # create a Scrollbar and associate it with txt
-    scrollb = tk.Scrollbar(txt_frm, command=self.txt.yview)
-    scrollb.grid(row=0, column=1, sticky='nsew')
-    self.txt['yscrollcommand'] = scrollb.set
-#def maxsize( event=None ):
-    #if(event.height>200):
-      #print(event.height)
-      #event.widget.grid_propagate(False)
-      #event.widget.grid_rowconfigure(0, weight=1)
-      #event.widget.grid_columnconfigure(0, weight=1)
-    #scrollbar.ScrolledWindow(self.mainFrame)
+  
 
 class Option:
   def __init__(self,  name='',description='', val=''):
@@ -718,6 +740,8 @@ class MenuBar:
     filemenu.add_command(label="Load Current Tab (add files, no options changed)", command=tabControl.loadAdd)
     filemenu.add_command(label="Save Current Tab", command=tabControl.save)
     filemenu.add_separator()
+    filemenu.add_command(label="Print Previous Paths", command=lambda: self.printPrevPaths())
+    # filemenu.add_command(label="Clear Previous Paths", command=root.quit)
     filemenu.add_command(label="Exit", command=root.quit)
     menubar.add_cascade(label="File", menu=filemenu)
 
@@ -746,7 +770,7 @@ class MenuBar:
     self.txtEditors[0].active.set(True)
     self.OdsEditors=[Editor("Default")]
     self.OdsEditors[0].active.set(True)
-    self.loadEditors()
+    self.loadStoredData()
     self.createEditorMenu()
     self.createEditorMenu("chooseOdsEditor","removeOdsEditor","OdsEditors")
 
@@ -759,7 +783,7 @@ class MenuBar:
     # display the menu
     root.config(menu=menubar)
 
-  def saveEditors(self):
+  def storeData(self):
     with open(".gratak_gui_data.pkl2", 'wb') as f:
       for editorList in ["txtEditors","OdsEditors"]:
         # pickle.dump(len(getattr(self,editorList)),f)
@@ -767,7 +791,9 @@ class MenuBar:
         for editor in getattr(self,editorList):
           editorOut.append(editor.toPickle())
         pickle.dump(editorOut,f)
-  def loadEditors(self):
+      pickle.dump(self.lastFolder,f)
+  def loadStoredData(self):
+    self.lastFolder="."
     if not os.path.exists(".gratak_gui_data.pkl2"):
       return False
     with open(".gratak_gui_data.pkl2", 'rb') as f:
@@ -777,6 +803,10 @@ class MenuBar:
         for editor in editorIn:
           getattr(self,editorList).append(Editor("tmp"))
           getattr(self,editorList)[-1].fromPickle(editor)
+      try:
+        self.lastFolder=pickle.load(f)
+      except EOFError:
+        pass
     return True
   def deleteEditor(self, i,choose, remove, editorList):
     if getattr(self,editorList)[i].active.get()==True:
@@ -794,11 +824,17 @@ class MenuBar:
     getattr(self,choose).delete(0,tk.END)
     getattr(self,remove).delete(0,tk.END)
     self.createEditorMenu(choose, remove, editorList)
-    self.saveEditors()
+    self.storeData()
   def getEditor(self, editorList):
     for editor in getattr(self,editorList):
       if editor.active.get():
         return editor.command
+  def printPrevPaths(self):
+    if os.path.exists(".GUI_last_path"):
+      print("Previous Paths:")
+      with open(".GUI_last_path") as file:
+        for line in file:
+          print(line.strip())
 
   def createEditorMenu(self, choose="chooseEditor", remove="removeEditor", editorList="txtEditors"):
     # self.chooseEditor.add_checkbutton(label="Default", variable=editor.active, command=about)
@@ -817,7 +853,7 @@ class MenuBar:
         editor.active.set(False)
       getattr(self,editorList)[i].active.set(True)
     if save:
-      self.saveEditors()
+      self.storeData()
 
 
   
