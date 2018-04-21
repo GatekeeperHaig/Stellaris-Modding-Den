@@ -264,8 +264,22 @@ def readAndConvert(args, allowRestart=1):
               poss[0].vals[eI]='{ has_technology ='+' {} '.format(poss[0].names[eI])+'}'
               poss[0].names[eI]='owner'
             for p in poss:
+              # addP=True
+              # for pExist in buildingData.getOrCreate("potential"):
+              #   print(p)
+              #   print(pExist)
+              #   if p==pExist:
+              #     addP=False
+              #     break
+              # if addP:
               for name,val in p.getNameVal():
-                newRequirements.add(name,val)
+                addNameVal=True
+                for nameExist, valExists in buildingData.getOrCreate("potential").getNameVal():
+                  if name==nameExist and val==valExists:
+                    addNameVal=False
+                    break
+                if addNameVal:
+                  newRequirements.add(name,val)
             
             
             
