@@ -26,7 +26,7 @@ locList.addLoc("cgm_main_menu_desc","In this menu you can choose whether you'd l
 locList.addLoc("cgm_main_menu_header","Core Game Mechanics","en")
 locList.addLoc("cgm_main_menu_close_name","Close Menu","en")
 
-#Allow Stuff
+#Allow
 
 locList.addLoc("requires_non_machine_empire_capital","Requires empire capital building.","en")
 locList.addLoc("requires_building_capital_0","Requires any planetary capital building.","en")
@@ -40,6 +40,8 @@ locList.addLoc("requires_engineering_research_tile","Requires Engineering £engin
 locList.addLoc("requires_physics_research_tile","Requires Physics £physics on the tile.","en")
 locList.addLoc("requires_society_research_tile","Requires Society £society on the tile.","en")
 locList.addLoc("requires_megastructure_node_tile","Requires Megastructure Node £megastructure_node on the tile.","en")
+
+#Tech
 
 locList.addLoc("tech_biofuel_refining_1_desc","Complex organic matter can be converted into a cheap fuel source. Although not as efficient as radio-active isotope synthesis, organic matter is significantly more common.","en")
 locList.addLoc("tech_biofuel_refining_1","$basic$ Biofuel Refining","en")
@@ -100,7 +102,9 @@ locList.addLoc("special_resource_building_build_cost_mult","Special Resource Bui
 locList.addLoc("special_resource_building_construction_speed_mult","Special Resource Buildings Construction Speed Multiplier","en")
 locList.addLoc("replicator_building_build_cost_mult","Replicator Buildings Build Cost Multiplier","en")
 locList.addLoc("replicator_building_construction_speed_mult","Replicator Buildings Construction Speed Multiplier","en")
-
+locList.addLoc("static_planet_resource_physics_add","Monthly Physics Research","en")
+locList.addLoc("static_planet_resource_engineering_add","Monthly Engineering Research","en")
+locList.addLoc("static_planet_resource_society_add","Monthly Society Research","en")
 ### Triggered Planet Modifiers Keys
 
 locList.addLoc("capital_3_resource_bonus_modifier","T5 Empire Capital Bonus","en")
@@ -131,7 +135,7 @@ locList.addLoc("biofuel_refinery_desc","Biofuel Refineries are §Htile restricted
 locList.addLoc("society_lab","Society Lab","en")
 locList.addLoc("society_lab_desc","Society Labs are §Htile restricted§! buildings that can only be built on a tile containing society research £society.\n They have a base produced resource output that is dependent on the building's specific tier §H+200%§! the amount of society research £society on the tile on which they are built.","en")
 locList.addLoc("physics_lab","Physics Lab","en")
-locList.addLoc("physics_lab_desc","Society Labs are §Htile restricted§! buildings that can only be built on a tile containing society research £society.\n They have a base produced resource output that is dependent on the building's specific tier §H+200%§! the amount of society research £society on the tile on which they are built.","en")
+locList.addLoc("physics_lab_desc","Physics Labs are §Htile restricted§! buildings that can only be built on a tile containing physics research £physics.\n They have a base produced resource output that is dependent on the building's specific tier §H+200%§! the amount of physics research £physics on the tile on which they are built.","en")
 locList.addLoc("engineering_lab","Engineering Lab","en")
 locList.addLoc("engineering_lab_desc","Engineering Labs are §Htile restricted§! buildings that can only be built on a tile containing engineering research £engineering.\n They have a base produced resource output that is dependent on the building's specific tier §H+200%§! the amount of engineering research £engineering on the tile on which they are built.","en")
 locList.addLoc("energy_matter_converter","Energy-Matter Converter","en")
