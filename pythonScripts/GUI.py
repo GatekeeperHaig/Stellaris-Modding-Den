@@ -229,7 +229,7 @@ class TabClass:
           # if splitList[0][i]=="*" or splitList[0][i]==".":
             # outString+=spltL
     self.defaultFileFilter=defaultFileFilter
-    self.checkVars=[]
+    # self.checkVars=[]
     self.fixedOptions=fixedOptions
     
     
@@ -370,9 +370,9 @@ class TabClass:
     argList+=self.fixedOptions   
     if self.optionWindow:
       argList+=self.optionWindow.getOptions(line)
-    for i in range(len(self.options)):
-      if self.checkVars[i].get():
-        argList+=self.options[i][1].split()
+    # for i in range(len(self.options)):
+    #   if self.checkVars[i].get():
+    #     argList+=self.options[i][1].split()
     if self.singleEntryCheck!="":
       if self.singleEntryCheck=="Helper File":
         argList.append("--helper_file_list")
@@ -465,8 +465,9 @@ class TabClass:
         # print(pickle.load(f))
         # print(pickle.load(f))
         # print(pickle.load(f))
-        for i,val in enumerate(pickle.load(f)):
-          self.checkVars[i].set(val)
+        pickle.load(f) #dump checkVars
+        # for i,val in enumerate(pickle.load(f)):
+        #   self.checkVars[i].set(val)
         if self.optionWindow:
           for i,val in enumerate(pickle.load(f)):
             self.optionWindow.vals[i].set(val)
