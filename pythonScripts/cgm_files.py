@@ -95,6 +95,30 @@ def main():
 
 
 
+  locList.addLoc("build_speed_mult", "Velocidade de Construção","pt")
+  locList.addLoc("build_cost_mult", "Custos de Construção","pt")
+  locList.addLoc("capital_building","Construção de Capital","pt")
+  locList.addLoc("empire_unique_building","Construções únicas do Império","pt")
+  locList.addLoc("planet_unique_building","Construções únicas do Planeta","pt")
+  locList.addLoc("military_building","Construções Militares","pt")
+  locList.addLoc("standard_resource_building","Construções de Recursos Básicas","pt")
+  locList.addLoc("research_resource_building","Construções de Pesquisa","pt")
+  locList.addLoc("unity_resource_building","Construções de Unidade","pt")
+  locList.addLoc("special_resource_building","Construções de Recursos Especiais","pt")
+  locList.addLoc("replicator_building","Construções de Replicadores","pt")
+  locList.addLoc("all","Todas as Construções","pt")
+  locList.addLoc("planet_building","Todas as Construções","pt")
+
+  locList.addLoc("mainTitle","Configuração Avançada de Construções","pt")
+  locList.addLoc("mainDesc","Aqui você pode alterar os custos globais e velocidade de construção dos grupos de construções (ou de todas as construções)","pt")
+  locList.addLoc("changeDesc1", "Aqui você pode mudar a global","pt")
+  locList.addLoc("changeDesc2", "dos grupos de construções (ou de todas as construções)","pt")
+  locList.addLoc("change", "Alterar","pt")
+  locList.addLoc("changeBy", "Alterar por","pt")
+  locList.addLoc("enableBU", "Ativar a construção direta de edifícios de alto nível","pt")
+  locList.addLoc("disableBU", "Desativar a construção direta de edifícios de alto nível","pt")
+
+
 
 
 
