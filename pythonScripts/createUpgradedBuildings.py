@@ -350,6 +350,9 @@ def readAndConvert(args, allowRestart=1):
             upgradeData.getOrCreate("potential").add("NOT",TagList().add("has_building",origUpgradeData.tagName)) #Prevent self replace") #Since has_building is hidden in the name of the data, no replace of has_building will take place. Should be a minimal performance improvement.
             if args.make_optional:
               upgradeData.get("potential").add("direct_build_enabled", "yes")
+            # if "ai_replace" in upgradeData.names:
+            #   upgradeData.remove("ai_replace")
+              # print(upgradeData)
               
             if "upgrades" in upgradeData.names:
               buildingDataList.append(upgradeData)
@@ -593,7 +596,7 @@ def main(args, argv):
     os.makedirs(args.output_folder)
     
   copiedBuildingsFileFolder=args.output_folder
-  print(copiedBuildingsFileFolder)
+  # print(copiedBuildingsFileFolder)
   args.copiedBuildingsFileName="/copiedBuildings.txt"
   levelsToCheck=4
   if not args.just_copy_and_check:
@@ -691,6 +694,7 @@ def main(args, argv):
     readAndConvert(buildingArgs,1)
     with open(args.copiedBuildingsFileName) as file:
         args.copiedBuildings=[line.strip() for line in file]
+    createConvertEvent(args)
     otherFilesArgs=copy.deepcopy(args)
     otherFilesArgs.buildingFileNames=[]    
     otherFilesArgs.just_copy_and_check=True
@@ -722,7 +726,36 @@ def main(args, argv):
     # readAndConvert(buildingArgs,0)
   else:
     return readAndConvert(args)
-  
+
+def createConvertEvent(args):
+  onActionTagList=TagList("on_building_complete", TagList("events", TagList("direct_build.1",""))).add("on_building_replaced", TagList("events", TagList("direct_build.1","")))
+  eventTagList=TagList("namespace", "direct_build")
+  convertEvent=TagList("id", "direct_build.1")
+  eventTagList.add("planet_event", convertEvent)
+  convertEvent.add("hide_window", "yes")
+  convertEvent.add("is_triggered_only","yes")
+  triggerOr=TagList()
+  convertEvent.add("trigger", TagList("from", TagList("or", triggerOr)))
+  immediateSwitch=TagList("trigger", "has_building")
+  convertEvent.add("immediate", TagList("from", TagList("switch", immediateSwitch)))
+  for building in args.copiedBuildings:
+    triggerOr.add("has_building", building+"_direct_build")
+    immediateSwitch.add(building+"_direct_build", TagList("remove_building","yes").add("set_building", building))
+  convertPlanetEvent=TagList("id", "direct_build.3")
+  eventTagList.add("planet_event", convertPlanetEvent)
+  convertPlanetEvent.add("hide_window", "yes")
+  convertPlanetEvent.add("is_triggered_only","yes")
+  convertPlanetEvent.add("immediate", TagList("every_tile", TagList("limit", TagList("has_building","yes")).add("switch", immediateSwitch)))
+  convertAllEvent=TagList("id","direct_build.2")
+  eventTagList.add("country_event", convertAllEvent)
+  convertAllEvent.add("hide_window", "yes").add("fire_only_once","yes")
+  convertAllEvent.add("immediate", TagList("every_playable_country", TagList("every_owned_planet", TagList("planet_event", TagList("id", "direct_build.3")))))
+
+  with open(args.output_folder+"/common/on_actions/direct_build.txt",'w') as file:
+    onActionTagList.writeAll(file,args)
+  with open(args.output_folder+"/events/direct_build.txt",'w') as file:
+    eventTagList.writeAll(file,args)
+  # print(eventTagList)
 if __name__ == "__main__":
   preprocess(sys.argv[1:])
   

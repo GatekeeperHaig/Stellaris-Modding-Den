@@ -244,6 +244,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         return False
     if args.one_line_level<=1.5 and len(self.vals)>1:
       return False
+    if len(self.vals)>5:
+      return False
     for val in self.vals:
       if isinstance(val,TagList):
         return False

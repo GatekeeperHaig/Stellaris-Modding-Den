@@ -34,7 +34,7 @@ locList.addLoc("requires_building_capital_0_or_hab","Requires any capital buildi
 locList.addLoc("requires_building_hab_capital","Requires any habitat capital building or empire capital building.","en")
 locList.addLoc("requires_building_capital_2_or_hab","Requires any habitat capital building.","en")
 locList.addLoc("requires_energy_tile","Requires Energy £energy on the tile.","en")
-locList.addLoc("requires_minerals_tile","Requires Mineralsy £minerals on the tile.","en")
+locList.addLoc("requires_minerals_tile","Requires Minerals £minerals on the tile.","en")
 locList.addLoc("requires_food_tile","Requires Food £food on the tile.","en")
 locList.addLoc("requires_engineering_research_tile","Requires Engineering £engineering on the tile.","en")
 locList.addLoc("requires_physics_research_tile","Requires Physics £physics on the tile.","en")
