@@ -7,3 +7,4 @@ subprocess.call('python ../pythonScripts/locList.py --create_main_file --output_
 subprocess.call('python ../pythonScripts/locList.py --output_folder "buildings/localisation/" buildings_script_source/localisation/french/cgm_building_l_french.yml', shell=True)
 subprocess.call('python buildings_rerun.py', shell=True)
 subprocess.call('python buildings/localisation/cgm_building_main.py', shell=True)
+input("Press Enter to continue...")
