@@ -65,8 +65,9 @@ def outPreviousPath(name, fileName=".GUI_last_path"):
         contents.append(line.strip())
   if len(contents)>15:
     contents=contents[-15:]
-  if not name in contents:
-    contents.append(name)
+  if name in contents:
+    del contents[contents.index(name)]
+  contents.append(name)
   with open(fileName, "w") as file:
     for line in contents:
       file.write(line+"\n")
@@ -148,7 +149,7 @@ class Line:
     # self.txt.delete(0,END)
     # self.txt.insert(0, string.strip())
     # self.txt.xview_moveto(1)
-    self.setTxt(self, string, "txt")
+    self.setTxt(string, "txt")
     self.root.fixedOptions.append("--test_run")
     self.convert()
     self.root.fixedOptions=self.root.fixedOptions[:-1]
@@ -470,16 +471,19 @@ class TabClass:
     #os.R_OK − Value to include in the mode parameter of access() to test the readability of path.
     #os.W_OK Value to include in the mode parameter of access() to test the writability of path.
     #os.X_OK Value to include in the mode parameter of access() to determine if path can be executed.
-  def askForPkl(self, titleInput):
-    fileName=filedialog.asksaveasfilename(defaultextension=".pkl",initialdir = self.tabControl.menuBar.lastFolder,title = titleInput,filetypes = (("pickle files","*.pkl"), ("all files","*")))
+  def askForPkl(self, type="asksaveasfilename", titleInput="Select file to save to"):
+    fileName=getattr(filedialog, type)(defaultextension=".pkl",initialdir = self.tabControl.menuBar.lastFolder,title = titleInput,filetypes = (("pickle files","*.pkl"), ("all files","*")))
     if fileName:
       self.tabControl.menuBar.lastFolder=os.path.dirname(fileName.strip())
       self.tabControl.menuBar.storeData()
     return fileName
-  def save(self):
-    fileName=self.askForPkl("Select file to save to")
+  def save(self, appendToFile=False):
+    fileKey="wb"
+    if appendToFile:
+      fileKey="a+b"
+    fileName=self.askForPkl("asksaveasfilename","Select file to save to")
     if fileName:
-      with open("test.pkl", 'wb') as f:
+      with open(fileName, fileKey) as f:
         pickle.dump(TabClass.copyNonGUI(self),f)
 
 
@@ -498,51 +502,42 @@ class TabClass:
     #     pickle.dump([line.lineCheckVar.get() for line in self.lines], f)
         # pickle.dump(test(),f)
       # print("save")
-  def load(self):
-    #TODO!
-    for i in range(len(self.lines)):
-      self.removeLineByIndex(0)
-    with open("test.pkl", 'rb') as f:
-      tabClassLoaded=pickle.load(f)
+  def newLoadingMethod(self, tabClassLoaded, onlyAddLines):
+    if not onlyAddLines:
       self.optionWindow.setVals(tabClassLoaded.optionWindow.options, tabClassLoaded.optionWindow.vals)
-      for line in tabClassLoaded.lines:
-        self.lines.append(Line(self, True, line))
-    #   print(c)
-    #   print(c.name)
-    #   c.checkValid()
-    #   print(c.root)
-    # return
-
-    fileName=filedialog.askopenfilename(initialdir = self.tabControl.menuBar.lastFolder,title = "Select file to load from",filetypes = (("pickle files","*.pkl"), ("all files","*")))
+    for line in tabClassLoaded.lines:
+      self.lines.append(Line(self, True, line))
+  def load(self, onlyAddLines=False, fittingTabs=False):
+    fileName=self.askForPkl("askopenfilename","Select file to load from")
     if fileName:
-      self.tabControl.menuBar.lastFolder=os.path.dirname(fileName.strip())
-      self.tabControl.menuBar.storeData()
-      for i in range(len(self.lines)):
-        self.removeLineByIndex(0)
+      if not onlyAddLines:
+        for i in range(len(self.lines)):
+          self.removeLineByIndex(0)
       with open(fileName, 'rb') as f:
-        # print(pickle.load(f))
-        # print(pickle.load(f))
-        # print(pickle.load(f))
-        # print(pickle.load(f))
-        pickle.load(f) #dump checkVars
-        # for i,val in enumerate(pickle.load(f)):
-        #   self.checkVars[i].set(val)
-        if self.optionWindow:
-          for i,val in enumerate(pickle.load(f)):
-            self.optionWindow.vals[i].set(val)
-        else:
-          pickle.load(f)
-        self.loadLines(f)
-  def loadAdd(self):
-    fileName=filedialog.askopenfilename(initialdir = self.tabControl.menuBar.lastFolder,title = "Select file to load from",filetypes = (("pickle files","*.pkl"), ("all files","*")))
-    if fileName:
-      self.tabControl.menuBar.lastFolder=os.path.dirname(fileName.strip())
-      self.tabControl.menuBar.storeData()
-      with open(fileName, 'rb') as f:
-        pickle.load(f)
-        pickle.load(f)
-        self.loadLines(f)
-  def loadLines(self,f):
+        tabClassLoaded=pickle.load(f)
+        if isinstance(tabClassLoaded, TabClass):
+          if fittingTabs:
+            while 1:
+              self.tabControl.getTabByName(tabClassLoaded.name).newLoadingMethod(tabClassLoaded, onlyAddLines)
+              try:
+                tabClassLoaded=pickle.load(f)
+              except EOFError:
+                break
+          else:
+            if tabClassLoaded.name==self.name or messagebox.askquestion("Different Tab", "The data you are trying to load is created form a different Tab. Only identical options will be loaded and lines may be incomplete. It should work though. Continue?", icon='warning') == 'yes':
+              # print("Warning:")
+              self.newLoadingMethod(tabClassLoaded, onlyAddLines)
+        else: #old format. the first entry is useless anyway since it was even there not used anymore
+          if fittingTabs:
+            print("Error: This only works with the new save format! Doing normal load instead!")
+          if self.optionWindow:
+            for i,val in enumerate(pickle.load(f)):
+              if not onlyAddLines:
+                self.optionWindow.vals[i].set(val)
+          else:
+            pickle.load(f)
+          self.loadLines(f)
+  def loadLines(self,f): #old format only!
     try:
       i=len(self.lines)
       for entry in pickle.load(f):
@@ -702,6 +697,12 @@ class TabControlClass:
 
   def getActiveTabClass(self):
     return self.tabClasses[self.nb.index(self.nb.select())]
+  def getTabByName(self, name):
+    for i,tab in enumerate(self.tabClasses):
+      if tab.name==name:
+        self.nb.select(i)
+        return tab
+    print("Error: Tab by name not found!")
   def save(self):
     self.getActiveTabClass().save()
   def load(self):
@@ -709,7 +710,11 @@ class TabControlClass:
     if (len(tab.lines)==0) or messagebox.askquestion("Overwrite", "This will overwrite current content. Are you sure?", icon='warning') == 'yes':
       self.getActiveTabClass().load()  
   def loadAdd(self):
-    self.getActiveTabClass().loadAdd()
+    self.getActiveTabClass().load(True)
+  def loadTabs(self):
+    self.getActiveTabClass().load(False, True)
+  def saveAdd(self):
+    self.getActiveTabClass().save(True)
 
   def startEditor(self,filename, forceEditor=False):
     if not os.path.exists(filename):
@@ -804,9 +809,11 @@ class MenuBar:
     filemenu = Menu(menubar, tearoff=0)
     
     
+    filemenu.add_command(label="Load Tab(s)", command=tabControl.loadTabs)
     filemenu.add_command(label="Load Current Tab", command=tabControl.load)
     filemenu.add_command(label="Load Current Tab (add files, no options changed)", command=tabControl.loadAdd)
     filemenu.add_command(label="Save Current Tab", command=tabControl.save)
+    filemenu.add_command(label="Add Current Tab to File", command=tabControl.saveAdd)
     filemenu.add_separator()
     filemenu.add_command(label="Print Previous Paths", command=lambda: self.printPrevPaths())
     # filemenu.add_command(label="Clear Previous Paths", command=root.quit)
