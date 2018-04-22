@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import sys, os, io
-from googletrans import Translator
 import re
 
 
@@ -40,6 +39,7 @@ class LocList:
     else:
       languageCode=self.languageCodes[self.languages.index(language)]
     if self.translateRest:
+      from googletrans import Translator
       translator=Translator()
 
     localDict=self.dicts[languageCode]
