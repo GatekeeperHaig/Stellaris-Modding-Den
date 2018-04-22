@@ -231,9 +231,7 @@ class TabClass:
       #   self.helperFileCheck=True
       # else:
       #   self.helperFileCheck=False
-      if os.path.exists(".GUI_last_path"):
-        with open(".GUI_last_path") as file:
-          self.lastPath=file.readlines()[-1].strip()
+      self.updatePath()
           # print(self.lastPath)
       self.options=[]#options
       self.command=command
@@ -279,6 +277,8 @@ class TabClass:
       if optionWindow:
         b= tk.Button(self.extraLineMain, text="Options", command=self.optionWindow.window.deiconify)
         b.pack(side=tk.RIGHT)
+      b = tk.Button(self.extraLineMain, text="Update Path", command=self.updatePath)
+      b.pack(side=tk.RIGHT)
       b = tk.Button(self.extraLineMain, text="Add file(s)", command=self.addFiles)
       b.pack(side=tk.RIGHT)
       if self.extraAddButton!="":
@@ -340,6 +340,10 @@ class TabClass:
       # for line in self.lines:
         # print(line.subfolderTxt.get())
         # line.subfolderTxt.lower()
+  def updatePath(self):
+    if os.path.exists(".GUI_last_path"):
+      with open(".GUI_last_path") as file:
+        self.lastPath=file.readlines()[-1].strip()
   def addMarkedFiles(self):
     curLine=len(self.lines)
     self.addFiles()
