@@ -117,6 +117,7 @@ def main():
   locList.addLoc("changeBy", "Alterar por","pt")
   locList.addLoc("enableBU", "Ativar a construção direta de edifícios de alto nível","pt")
   locList.addLoc("disableBU", "Desativar a construção direta de edifícios de alto nível","pt")
+  # print(locList.dicts['ru'])
 
 
 
@@ -319,7 +320,7 @@ def main():
 
 
   for language in locList.languages:
-    outFolderLoc="../cgm_buildings_script_source/localisation/"+language
+    outFolderLoc="../CGM/buildings_script_source/localisation/"+language
     if not os.path.exists(outFolderLoc):
       os.makedirs(outFolderLoc)
     locList.write(outFolderLoc+"/cgm_building_customize_l_"+language+".yml",language)

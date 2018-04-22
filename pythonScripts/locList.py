@@ -144,7 +144,8 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
   outFile=args.output_folder+"/locs/"+fileName.replace(".yml",".py")
   lastOutFile=outFile
   if not args.test_run:
-    with open(outFile, "w") as file:
+    with io.open(outFile, "w", encoding='utf-8') as file:
+      # file.write(u'\ufeff')
       # file.write("def locs(locList):\n")
       for entry in outArray:
         file.write(entry+"\n")
@@ -163,13 +164,13 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
         if commonPath!=sys.path[0]:
           relPath+="/"+os.path.relpath(sys.path[0],commonPath)
         # print(relPath)
-        file.write("#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nimport os,sys,glob\n")
+        file.write("#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nimport os,sys,glob,io\n")
         file.write("os.chdir(os.path.dirname(__file__))\n")
         file.write("sys.path.insert(1, '"+relPath+"')\n")
         file.write("from locList import LocList\nlocList=LocList()\n")
         # file.write("import allModules,importlib\n")
         file.write("for fileName in glob.glob('locs/*.py'):\n")
-        file.write("\twith open(fileName) as file:\n")
+        file.write("\twith io.open(fileName,'r', encoding='utf-8') as file:\n")
         file.write("\t\t exec(file.read())\n")
         for entry in trivialAssignment:
           file.write(entry+"\n")

@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os,sys,glob
+import os,sys,glob,io
 os.chdir(os.path.dirname(__file__))
 sys.path.insert(1, '..\..\../pythonScripts')
 from locList import LocList
 locList=LocList()
 for fileName in glob.glob('locs/*.py'):
-	with open(fileName) as file:
+	with io.open(fileName,'r', encoding='utf-8') as file:
 		 exec(file.read())
 locList.addEntry("basic","@basic")
 locList.addEntry("improved","@improved")
