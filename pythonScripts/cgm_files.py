@@ -119,6 +119,29 @@ def main():
   locList.addLoc("disableBU", "Desativar a construção direta de edifícios de alto nível","pt")
   # print(locList.dicts['ru'])
 
+  locList.addLoc("build_speed_mult", "Baugeschwindigkeit Gebäude","de")
+  locList.addLoc("build_cost_mult", "Gebäudekosten","de")
+  locList.addLoc("capital_building","Verwaltungsgebäude","de")
+  locList.addLoc("empire_unique_building","Reichseinzigartige Gebäude","de")
+  locList.addLoc("planet_unique_building","Einzigartige Gebäude","de")
+  locList.addLoc("military_building","Militärische Gebäude","de")
+  locList.addLoc("standard_resource_building","Gewöhnliche Ressourcengebäude","de")
+  locList.addLoc("research_resource_building","Forschungsgebäude","de")
+  locList.addLoc("unity_resource_building","Einheitsgebäude","de")
+  locList.addLoc("special_resource_building","Spezielle Ressourcengebäude","de")
+  locList.addLoc("replicator_building","Replikator Gebäude","de")
+  locList.addLoc("all","Alle Gebäude","de")
+  locList.addLoc("planet_building","Alle Gebäude","de")
+
+
+  locList.addLoc("mainTitle","Fortgeschrittne Gebäude Konfiguration","de")
+  locList.addLoc("mainDesc","Hier können globale Kosten und Baugeschwindigkeiten von Gebäudegruppen (oder allen Gebäuden) verändert werden.","de")
+  locList.addLoc("changeDesc1", "Hier können globale","de")
+  locList.addLoc("changeDesc2", "von Gebäudegruppen (oder allen Gebäude) verändert werden.","de")
+  locList.addLoc("change", "Ändern:","de")
+  locList.addLoc("changeBy", "Ändern um","de")
+  locList.addLoc("enableBU", "Direktes Bauen von hochstufigen Gebäuden aktivieren","de")
+  locList.addLoc("disableBU", "Direktes Bauen von hochstufigen Gebäuden deaktivieren","de")
 
 
 
@@ -172,7 +195,7 @@ def main():
       bonusMenu.add("is_triggered_only", "yes")
       bonusMenu.add("custom_gui","cgm_buildings_advanced_configuration").add("diplomatic","yes").add("force_open", "no")
       bonusMenu.add("title", locList.append(eventNames.format("{}_{}_event.name".format(cat, bonusName)), "@change @{}".format(bonusName)))
-      bonusMenu.add("desc", locList.append(eventNames.format("{}_{}_event.desc".format(cat, bonusName)), "@changeDesc1 @{} of @{}".format(cat,bonusName)))
+      bonusMenu.add("desc", locList.append(eventNames.format("{}_{}_event.desc".format(cat, bonusName)), "@change @{}: @{}".format(cat,bonusName)))
       bonusMenu.add("picture_event_data", TagList("room","cgm_menu_room"))
       buildingOptionsFile.addComment(bonusName+" "+cat)
       buildingOptionsFile.add("country_event", bonusMenu)
