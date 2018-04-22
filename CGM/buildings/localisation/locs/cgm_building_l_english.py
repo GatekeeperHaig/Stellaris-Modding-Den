@@ -102,9 +102,9 @@ locList.addLoc("special_resource_building_build_cost_mult","Special Resource Bui
 locList.addLoc("special_resource_building_construction_speed_mult","Special Resource Buildings Construction Speed Multiplier","en")
 locList.addLoc("replicator_building_build_cost_mult","Replicator Buildings Build Cost Multiplier","en")
 locList.addLoc("replicator_building_construction_speed_mult","Replicator Buildings Construction Speed Multiplier","en")
-locList.addLoc("static_planet_resource_physics_add","Monthly Physics Research","en")
-locList.addLoc("static_planet_resource_engineering_add","Monthly Engineering Research","en")
-locList.addLoc("static_planet_resource_society_add","Monthly Society Research","en")
+locList.addLoc("static_planet_resource_physics_research_add","Monthly Physics Research","en")
+locList.addLoc("static_planet_resource_engineering_research_add","Monthly Engineering Research","en")
+locList.addLoc("static_planet_resource_society_research_add","Monthly Society Research","en")
 ### Triggered Planet Modifiers Keys
 
 locList.addLoc("capital_3_resource_bonus_modifier","T5 Empire Capital Bonus","en")
