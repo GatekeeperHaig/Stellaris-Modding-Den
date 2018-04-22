@@ -279,6 +279,7 @@ class TabClass:
         b.pack(side=tk.RIGHT)
       b = tk.Button(self.extraLineMain, text="Update Path", command=self.updatePath)
       b.pack(side=tk.RIGHT)
+      CreateToolTip(b, "Update the Path that is open when adding files to the last used one of any Tab in the GUI. Useful when doing stuff that requires two tabs, like Txt To Ods and Ods To Txt")
       b = tk.Button(self.extraLineMain, text="Add file(s)", command=self.addFiles)
       b.pack(side=tk.RIGHT)
       if self.extraAddButton!="":
