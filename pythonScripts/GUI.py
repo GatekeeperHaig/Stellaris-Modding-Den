@@ -9,6 +9,7 @@ from tkinter import simpledialog
 from tkinter import *
 #from tkinter.tix import *
 from tkinter import ttk
+# from PIL import ImageTk, Image
 from tooltip import CreateToolTip
 from scrollframe import ScrollFrame
 import webbrowser
@@ -274,6 +275,16 @@ class TabClass:
       #b.pack(side=tk.RIGHT)
       #b = tk.Button(self.extraLineMain, text="Add line", command=self.addLine)
       #b.pack(side=tk.RIGHT)
+      # img = ImageTk.PhotoImage(Image.open("Load-icon.png"))
+      # img = ImageTk.PhotoImage(Image.open("Save-icon.png"))
+      self.saveImg = PhotoImage(file="Save-icon.gif")
+      b = tk.Button(self.extraLineMain, text="",image=self.saveImg, command=self.save)
+      b.pack(side=tk.RIGHT)
+      CreateToolTip(b, "Save Current Tab")
+      self.loadImg = PhotoImage(file="Load-icon.gif")
+      b = tk.Button(self.extraLineMain, text="",image=self.loadImg, command=lambda : self.load(False,True))
+      b.pack(side=tk.RIGHT)
+      CreateToolTip(b, "Load Tab(s)")
       if optionWindow:
         b= tk.Button(self.extraLineMain, text="Options", command=self.optionWindow.window.deiconify)
         b.pack(side=tk.RIGHT)
