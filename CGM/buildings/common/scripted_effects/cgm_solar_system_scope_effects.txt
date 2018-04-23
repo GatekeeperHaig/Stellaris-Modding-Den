@@ -1,9 +1,7 @@
-#This file was created by script!
-#Instead of editing it, you should change the origin files or the script and rerun the script!
-#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
 #this in this file is solar_system scope
 #root in this file is country
 #prev in this file is starbase scope
+
 set_shipyard_weight = {
 	if = {
 		limit = {
@@ -11,7 +9,7 @@ set_shipyard_weight = {
 				has_star_flag = shipyard_candidate_system
 				has_star_flag = shipyard_check_delay
 				star = { is_star_class = sc_black_hole }
-				any_planet = { is_planet_class = pc_pulsar }
+				any_planet = { is_planet_class = pc_pulsar }				
 			}
 		}
 		if = {
@@ -29,7 +27,7 @@ set_shipyard_weight = {
 							distance = { source = event_target:starbase_system_star type = hyperlane min_jumps = 3 }
 							has_star_flag = shipyard_system
 						}
-					}
+					}					
 					NOR = {
 						has_star_flag = shipyard_system
 						AND = {
@@ -55,14 +53,7 @@ set_shipyard_weight = {
 						}
 					}
 					any_country = {
-						OR = {
-							is_at_war_with = root
-							is_rival = root
-							is_hostile_to = root
-							is_threatened_to = root
-							is_angry_to = root
-							is_domineering_to = root
-						}
+						OR = { is_at_war_with = root is_rival = root is_hostile_to = root is_threatened_to = root is_angry_to = root is_domineering_to = root }
 						any_system_within_border = {
 							distance = { source = event_target:starbase_system_star type = hyperlane min_jumps = 4 }
 						}
@@ -74,7 +65,7 @@ set_shipyard_weight = {
 						}
 					}
 				}
-			}
+			}	
 			if = {
 				limit = {
 					prev = {
@@ -152,24 +143,24 @@ set_shipyard_weight = {
 				set_variable = { which = shipyard_weight value = num_of_shipyard_modules }
 			}
 			if = {
-				limit = {
+				limit = { 
 					any_planet = {
 						is_colony = yes
 						exists = owner
 						owner = { is_same_value = root }
 					}
-				}
+				}	
 				every_system_planet = {
-					limit = {
+					limit = { 
 						is_colony = yes
 						exists = owner
 						owner = { is_same_value = root }
-					}
+					}	
 					event_target:starbase_system_star = {
-						change_variable = { which = shipyard_weight value = -1 }
-					}
+						change_variable = { which = shipyard_weight value = -1 }				
+					}	
 				}
-			}
+			}				
 			every_neighbor_system = {
 				ignore_hyperlanes = no
 				limit = {
@@ -188,7 +179,7 @@ set_shipyard_weight = {
 				event_target:starbase_system_star = {
 					change_variable = { which = shipyard_weight value = 4 }
 				}
-			}
+			}			
 			every_neighbor_system = {
 				ignore_hyperlanes = no
 				limit = { has_star_flag = gateway_system is_within_borders_of = root }
@@ -214,37 +205,39 @@ set_shipyard_weight = {
 		}
 	}
 }
+
 check_and_assign_shipyard_system_flag = {
-	random_system_planet = {
-		limit = { has_planet_flag = system_variable_repository }
+	random_system_planet = { 
+		limit = { has_planet_flag = system_variable_repository }		
 		save_event_target_as = system_check_target
-	}
-	root = {
+	}	
+	root = { 
 		every_system_within_border = {
-			limit = {
+			limit = {				
 				NOT = { is_same_value = event_target:system_check_target.solar_system }
-				distance = { source = event_target:system_check_target type = hyperlane max_jumps = 4 }
+				distance = { source = event_target:system_check_target type = hyperlane max_jumps = 4 }				
 				has_star_flag = shipyard_candidate_system
 			}
-			if = {
-				limit = {
-					NOR = {
-						any_planet = {
-							check_variable = { which = shipyard_weight value > event_target:system_check_target }
-						}
+			if = { 
+				limit = { 
+					NOR = { 
+						any_planet = { check_variable = { which = shipyard_weight value > event_target:system_check_target } } 
 						has_star_flag = shipyard_system
-					}
+					}	
 				}
-				event_target:system_check_target.solar_system = { remove_star_flag = shipyard_candidate_system set_star_flag = shipyard_system }
-				root = {
+				event_target:system_check_target.solar_system = { 
+					remove_star_flag = shipyard_candidate_system
+					set_star_flag = shipyard_system					
+				}
+				root = { 
 					change_variable = { which = num_existing_shipyard_systems value = 1 }
 					change_variable = { which = required_shipyard_systems value = -1 }
 				}
 				else = {
 					remove_star_flag = shipyard_candidate_system
 					set_timed_star_flag = { flag = shipyard_check_delay days = 3589 }
-				}
+				}				
 			}
 		}
 	}
-}
+}	

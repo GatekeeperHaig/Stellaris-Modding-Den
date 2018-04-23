@@ -606,13 +606,13 @@ def main(args, argv):
         os.mkdir(args.output_folder+rootWithoutPath)
       if not root[-16:]=="common"+os.sep+"buildings":
         for file in files:
-          if file[-4:]==".txt" and rootWithoutPath!="":
-            # print(rootWithoutPath)
-            # sys.exit(0)
-            otherFilesArgs.output_folder=args.output_folder+rootWithoutPath+"/"
-            otherFilesArgs.buildingFileNames=[root+"/"+file]
-            readAndConvert(otherFilesArgs,0)
-          else:
+          # if file[-4:]==".txt" and rootWithoutPath!="":
+          #   # print(rootWithoutPath)
+          #   # sys.exit(0)
+          #   otherFilesArgs.output_folder=args.output_folder+rootWithoutPath+"/"
+          #   otherFilesArgs.buildingFileNames=[root+"/"+file]
+          #   readAndConvert(otherFilesArgs,0)
+          # else:
             # print(root)
             # print(file)
             copyfile(root+"/"+file, args.output_folder+"/"+rootWithoutPath+"/"+file)
