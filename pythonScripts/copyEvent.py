@@ -26,7 +26,6 @@ def parse(argv):
         
 def main(args):
   args.just_copy_and_check=True
-  args.preventLinePrint=[]
   varsToValue=TagList(0)
   eventNameToData=TagList(0)
   eventNameToData.readFile(args.inputfileName,args, varsToValue)

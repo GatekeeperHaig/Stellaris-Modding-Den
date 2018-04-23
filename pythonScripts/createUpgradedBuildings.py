@@ -32,9 +32,8 @@ def parse(argv, returnParser=False):
   parser.add_argument('--load_order_priority', action="store_true", help="If enabled, mod will be placed first in mod priority by adding '!' to the mod name and a 'z' to building building and trigger file names. This allows the construction of mod extensions. Alternatively, you can create a standalone version , see '--create_standalone_mod_from_mod'.")
   parser.add_argument('-m','--create_standalone_mod_from_mod', action="store_true", help="If this flag is set, the script will create a copy of a mod folder, changing the building files and has_building triggers. Main input of the script should now be the .mod file.")
   parser.add_argument('--custom_mod_name', default='', help="If set, this will be the name of the new mod")
-  # parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help="ExOverhaul specific. If there are upgrade shortcuts (i.e. tn->tn+2 upgrades) they will be removed here (as this contratics with my pricing policy). This does not apply to tree branches that later join again!")
-  # parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)
-  # parser.add_argument('--test_run', action="store_true", help="No Output.")
+  parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help="ExOverhaul specific. If there are upgrade shortcuts (i.e. tn->tn+2 upgrades) they will be removed here (as this contratics with my pricing policy). This does not apply to tree branches that later join again!")
+  parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)
   parser.add_argument('--helper_file_list', default="", help="Non-separated list of zeros and ones. N-th number defines whether file number n is a helper file (1 helperfile, 0 standard file)")
   parser.add_argument('--make_optional', action="store_true", help="Adds 'direct_build_enabled = yes' as potential to all direct build buildings. IMPORTANT: Make sure to set 'set_global_flag = display_low_tier_flag' and 'set_global_flag = do_no_remove_low_tier_flag' whenever 'direct_build_enabled == no' as otherwise buildings will disappear..." )
   parser.add_argument('--scripted_variables', default="", help="Comma separated list of files that contain scripted variables used in the building files. This option is mandatory if you building costs use any of those variables. Recognizable at the spam of missing variable errors you get if not doing this!")
@@ -71,13 +70,13 @@ def readAndConvert(args, allowRestart=1):
      os.mkdir(args.output_folder+"/common/scripted_triggers")
     
  
-  # print(args.copiedBuildings)
   if not args.just_copy_and_check and not args.test_run:
-    #copyfile(os.path.abspath(__file__), args.output_folder+"/"+ntpath.basename(__file__)+".txt")
     copiedBuildingsFile=open(args.copiedBuildingsFileName,'w')
   globbedList=[]
   for b in args.buildingFileNames:
-    globbedList[0:0]=glob.glob(b)
+    globbedList+=glob.glob(b)
+
+  #helper files: Needed when a mod only provides upgrades, without changing the lower tier buildings. Those lower tiers are needed for the script, thus they have to be given as helper files. Entries from helper files are not written later.
   isHelperFileItList=[] #list later used in main iteration
   if "1" in args.helper_file_list:
     origGlobbedList=globbedList
@@ -86,7 +85,8 @@ def readAndConvert(args, allowRestart=1):
     lHFL=len(args.helper_file_list)
     lFL=len(globbedList)
     if lHFL!=lFL:
-      print("Warning: Invalid helper_file_list got {!s}, expected {!s}".format(lHFL,lFL))
+      if not args.test_run:
+        print("Warning: Invalid helper_file_list got {!s}, expected {!s}".format(lHFL,lFL))
       for i in range(lHFL,lFL):
         args.helper_file_list+="0"
 
@@ -103,9 +103,9 @@ def readAndConvert(args, allowRestart=1):
         isHelperFileItList.append(False)
         if args.join_files: #with join files, only one run of the helper files is needed
           helperList=[]
-  fileIndex=-1
-  for buildingFileName in globbedList:#args.buildingFileNames:
-    fileIndex+=1
+
+
+  for fileIndex,buildingFileName in enumerate(globbedList):
     if isHelperFileItList and isHelperFileItList[fileIndex]:
       thisFileIsAHelper=True
     else:
@@ -119,14 +119,13 @@ def readAndConvert(args, allowRestart=1):
       with open(args.outPath+os.path.basename(buildingFileName),'w') as outputFile:
         outputFile.write(args.scriptDescription)
         outputFile.write("#overwrite\n")
-    if fileIndex==0 or (not args.join_files) and (not isHelperFileItList): #create empty lists. Do only in first iteration when args.join_files is active as we add to the lists in each iteration here
+    if fileIndex==0 or (not args.join_files) and (not isHelperFileItList): #create empty lists. Do only in first iteration when args.join_files is active as we add to the lists in each iteration here #TODO: I think it should be no thisFileIsAHelper- need to check with an example
       varsToValue=TagList(0)
       if args.scripted_variables!="":
         for scriptVarFile in args.scripted_variables.split(","):
           scriptVarFile=scriptVarFile.strip()
           varsToValue.readFile(scriptVarFile)
       buildingNameToData=TagList(0)
-      args.preventLinePrint=[]
     prevLen=len(buildingNameToData.vals)
     buildingNameToData.readFile(buildingFileName,args, varsToValue,True)
     if isHelperFileItList: #mark helper buildings
@@ -134,24 +133,6 @@ def readAndConvert(args, allowRestart=1):
         for b in buildingNameToData[prevLen:]:
           if isinstance(b,TagList):
             b.helper=True
-            # print(b.helper)
-            # print(b.tagName)
-      # else:
-      #   for b in buildingNameToData[prevLen:]:
-      #     if isinstance(b,TagList):
-      #       b.helper=False
-      # for b in buildingNameToData:
-      #   if isinstance(b,TagList):
-      #     try:
-      #       print(b.helper)
-      #     except:
-      #       print("missing")
-      #       print(b.tagName)
-
-        # for i in range(prevLen:len(buildingNameToData)):
-        #   if isinstance(buildingNameToData[i],TagList):
-        #     buildingNameToData[i]
-
     
     if args.join_files:
       if fileIndex<len(globbedList)-1:
@@ -163,34 +144,6 @@ def readAndConvert(args, allowRestart=1):
         continue
       else:
         buildingNameToData.removeDuplicateNames(True) #remove duplicate buildings. Last file that has been read has highest priority (won't be deleted). Thus lowest priority for the helper files.
-        
-    if args.remove_reduntant_upgrades: #ExOverhaul specific. If there are upgrade shortcuts (i.e. tn->tn+2 upgrades) they will be removed here (as this contratics with my pricing policy). This does not apply to tree branches that later join again!
-      for buildingData in buildingNameToData.vals:
-        if not isinstance(buildingData, NamedTagList):
-          continue
-        upgrades=buildingData.splitToListIfString("upgrades")
-        upgradeIndex=-1
-        while 1:
-          upgradeIndex+=1
-          if upgradeIndex>=len(upgrades.names):
-            break
-          if len(upgrades.names[upgradeIndex])>0:
-            upgradeList=[buildingNameToData.get(upgrades.names[upgradeIndex])]
-            upgrade=upgradeList[0]
-            while len(upgradeList)>0:
-              upgradeList=upgradeList[1:]
-              for upgradeName in upgrade.splitToListIfString("upgrades").names:
-                if len(upgradeName)>0:
-                  upgradeList.append(buildingNameToData.get(upgradeName))
-              if len(upgradeList)==0:
-                break
-              upgrade=upgradeList[0]
-              if upgrade.tagName in upgrades.names:
-                upgrades.names.remove(upgrade.tagName)
-              
-              
-            
-      
     
     if not args.just_copy_and_check:  
       #COPY AND MODIFY WHERE NEEDED       
@@ -201,10 +154,8 @@ def readAndConvert(args, allowRestart=1):
         baseBuildingData=buildingNameToDataOrigVals[origBuildI] #data of the lowest tier building
         if not isinstance(baseBuildingData,NamedTagList):
           continue
-        if "is_listed" in baseBuildingData.names and baseBuildingData.get("is_listed")=="no":
+        if baseBuildingData.attemptGet("is_listed")=="no":
           continue
-        #triggers.add("has_"+baseBuildingData.tagName,"{ has_building = "+baseBuildingData.tagName+" }")   #redundant but simplifies later replaces
-        triggerIndexAtStart=len(triggers.names) #later used together with "baseBuildingData" to determine what buildings are checked for if planet_unique
         
         #ITERATE THROUGH WHOLE BUILDING TREE/LINE
         buildingDataList=[baseBuildingData]
@@ -216,10 +167,7 @@ def readAndConvert(args, allowRestart=1):
 
           
           #new building requirements to ensure that only the highest currently available is buildable. Keep the building list as short as possible. Done via "potential" to compeltely remove them from the list (not even greyed out)
-          newRequirements=TagList(2)
-          if len(upgrades.names)>0 and not args.keep_lower_tier and not buildingData.tagName in args.t0_buildings:
-            buildingData.getOrCreate("potential")
-            buildingData.splitToListIfString("potential").add("NAND", newRequirements)
+          newRequirements=TagList()
            
           #iterate through all upgrades: Create a copy of each upgrade, compute costs. Finish requirements for current building and add the copies to the todo-list
           for upgradeName in upgrades.names:
@@ -231,15 +179,12 @@ def readAndConvert(args, allowRestart=1):
                 print("EXTRA WARNING: The problematic building is planet_unique. This error might destroy uniqueness!")
               continue
             if upgradeData.wasVisited:
-              print("Script tried to visit "+upgradeData.tagName +" twice (second time via "+buildingData.tagName+"). This is to be expected if different buildings upgrade into this building, but could also indicate an error in ordering: Of all 'is_listed=yes' buildings in a tree, the lowest tier must always be first!")
+              print("Script tried to visit "+upgradeData.tagName +" twice (second time via "+buildingData.tagName+"). This is to be expected if different buildings upgrade into this building, but could also indicate an error in ordering: Of all 'is_listed=yes' buildings in a tree, the lowest tier must always be first!") #TODO is it ok that the script still continues to do everything? 
             elif buildingData.tagName in args.t0_buildings: #don't do if visited twice!
               upgradeData.costChangeUpgradeToDirectBuild(buildingData, args, varsToValue, True) #fix t0-t1 costs
               
             #this is a higher tier building. If there is no pure upgrade version yet, create it now. A direct build one will be created anyway!
-            if not "is_listed" in upgradeData.names:
-              upgradeData.add("is_listed","no")
-            if upgradeData.get("is_listed")=="yes":
-              upgradeData.replace("is_listed","no")
+            upgradeData.replace("is_listed","no") #creates if does not exist
             upgradeData.wasVisited=1
             
               
@@ -387,11 +332,9 @@ def readAndConvert(args, allowRestart=1):
               fakeIndex=buildingNameToData.names.index(baseBuildingData.tagName)
               buildingNameToData.insert(fakeIndex,fakeBuilding.tagName,fakeBuilding) #insert the fake before 'baseBuilding'. upgradeBuildingIndex is now shifted but shouldn't be used anymore
             
-          if isinstance(buildingData.splitToListIfString("potential").vals[-1], TagList) and len(buildingData.get("potential").vals[-1].names)<=0:
-            buildingData.get("potential").removeIndex(-1)   #remove potentially empty entry thanks to empire_unique buildings that cannot be copied.
-          elif len(newRequirements.vals)>0:
-            newRequirements.add("NOT", TagList("has_global_flag","display_low_tier_flag"))
-          # newRequirements.increaseLevelRec() #push them to correct level. list will always exist, might be empty if unused.
+          if len(newRequirements.vals)>0 and not buildingData.tagName in args.t0_buildings:
+              buildingData.getOrCreate("potential").add("NAND", newRequirements)
+              newRequirements.add("NOT", TagList("has_global_flag","display_low_tier_flag"))
     #END OF COPY AND MODIFY        
 
     if args.simplify_upgrade_AI_allow:
