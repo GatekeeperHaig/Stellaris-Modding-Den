@@ -880,7 +880,6 @@ class NamedTagList(TagList): #derived from TagList with four extra variables and
     self.comments=[]
     self.seperators=[] #"=" by default
     self.bracketLevel=1
-    self.lowerTier=0
     self.tagName=tagName
     self.wasVisited=0
     self.helper=False

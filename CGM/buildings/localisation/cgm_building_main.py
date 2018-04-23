@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import os,sys,glob,io
 os.chdir(os.path.dirname(__file__))
-sys.path.insert(1, '..\..\../pythonScripts')
+sys.path.insert(1, '../../../pythonScripts')
 from locList import LocList
 locList=LocList()
 for fileName in glob.glob('locs/*.py'):

@@ -32,8 +32,8 @@ def parse(argv, returnParser=False):
   parser.add_argument('--load_order_priority', action="store_true", help="If enabled, mod will be placed first in mod priority by adding '!' to the mod name and a 'z' to building building and trigger file names. This allows the construction of mod extensions. Alternatively, you can create a standalone version , see '--create_standalone_mod_from_mod'.")
   parser.add_argument('-m','--create_standalone_mod_from_mod', action="store_true", help="If this flag is set, the script will create a copy of a mod folder, changing the building files and has_building triggers. Main input of the script should now be the .mod file.")
   parser.add_argument('--custom_mod_name', default='', help="If set, this will be the name of the new mod")
-  parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help="ExOverhaul specific. If there are upgrade shortcuts (i.e. tn->tn+2 upgrades) they will be removed here (as this contratics with my pricing policy). This does not apply to tree branches that later join again!")
-  parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)
+  parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help="ExOverhaul specific. If there are upgrade shortcuts (i.e. tn->tn+2 upgrades) they will be removed here (as this contratics with my pricing policy). This does not apply to tree branches that later join again!")#todo remove
+  parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)#todo remove
   parser.add_argument('--helper_file_list', default="", help="Non-separated list of zeros and ones. N-th number defines whether file number n is a helper file (1 helperfile, 0 standard file)")
   parser.add_argument('--make_optional', action="store_true", help="Adds 'direct_build_enabled = yes' as potential to all direct build buildings. IMPORTANT: Make sure to set 'set_global_flag = display_low_tier_flag' and 'set_global_flag = do_no_remove_low_tier_flag' whenever 'direct_build_enabled == no' as otherwise buildings will disappear..." )
   parser.add_argument('--scripted_variables', default="", help="Comma separated list of files that contain scripted variables used in the building files. This option is mandatory if you building costs use any of those variables. Recognizable at the spam of missing variable errors you get if not doing this!")
@@ -199,24 +199,17 @@ def readAndConvert(args, allowRestart=1):
                 
             
             if "empire_unique" in upgradeData.names and upgradeData.get("empire_unique")=="yes":
-              #triggers.add("has_"+upgradeName,"{ has_building = "+upgradeName+" }")   #redundant but simplifies later replaces
-              continue #do not copy empire_unique buildings EVER. Impossible to keep them unique otherwise, for some reason even if capital only
+              continue #todo: remove! not reason anymore afaik -> check for "planet_unique checks and add empire unique there"
 
             #new requirements: Only buildable if one of the conditions of the next higher tier is not satisfied.
-            poss=copy.deepcopy([upgradeData.splitToListIfString("prerequisites"),upgradeData.splitToListIfString("potential"),upgradeData.splitToListIfString("allow")])
-            for eI in range(len(poss[0].names)):
+            poss=copy.deepcopy([upgradeData.attemptGet("prerequisites"),upgradeData.attemptGet("potential"),upgradeData.attemptGet("allow")])
+            for eI in range(len(poss[0].names)): #convert prerequ to potential
               poss[0].vals[eI]='{ has_technology ='+' {} '.format(poss[0].names[eI])+'}'
               poss[0].names[eI]='owner'
+
             for p in poss:
-              # addP=True
-              # for pExist in buildingData.getOrCreate("potential"):
-              #   print(p)
-              #   print(pExist)
-              #   if p==pExist:
-              #     addP=False
-              #     break
-              # if addP:
               for name,val in p.getNameVal():
+                #check if some potential of the upgrade is also a potential of the base, if so, do not use that in the newRequirement
                 addNameVal=True
                 for nameExist, valExists in buildingData.getOrCreate("potential").getNameVal():
                   if name==nameExist and val==valExists:
@@ -230,73 +223,33 @@ def readAndConvert(args, allowRestart=1):
             upgradeBuildingIndex=buildingNameToData.names.index(upgradeName) #index of 'upgradeData' building in the list of all buildings (including already copied buildings)
             buildingNameToData.insert(upgradeBuildingIndex,upgradeName,upgradeData) #insert the copy before 'upgradeData'. upgradeBuildingIndex is now the index of the copy!
             buildingNameToData.vals[upgradeBuildingIndex].remove("is_listed") #removing "is_listed = no"
-            if args.create_tier5_enhanced and buildingData.tagName.replace("_direct_build","")[-3:]=="_rw":
-              rw_upgrade_building=copy.deepcopy(buildingNameToData.get(upgradeName))
-              rw_upgrade_building.tagName+="_rw"
-              adjacency_bonus=rw_upgrade_building.splitToListIfString("adjacency_bonus")
-              potential_rw=rw_upgrade_building.splitToListIfString("potential")
-              potential_rw.add("planet", TagList(0).add("is_ringworld_or_machine_world","yes"))
-              for adI in range(len(adjacency_bonus.vals)):
-                adjacency_bonus.vals[adI]=str(int(adjacency_bonus.vals[adI])+1)
-              buildingData.splitToListIfString("upgrades").remove(upgradeName)
-              buildingData.splitToListIfString("upgrades").add(rw_upgrade_building.tagName)
-              buildingData_no_direct_build=buildingNameToData.get(buildingData.tagName.replace("_direct_build",""))
-              buildingData_no_direct_build.splitToListIfString("upgrades").remove(upgradeName)
-              buildingData_no_direct_build.splitToListIfString("upgrades").add(rw_upgrade_building.tagName)
-              
-              buildingNameToData.names[upgradeBuildingIndex]+="_rw"
-              adjacency_bonus=buildingNameToData.vals[upgradeBuildingIndex].splitToListIfString("adjacency_bonus")
-              potential_rw=buildingNameToData.vals[upgradeBuildingIndex].splitToListIfString("potential")
-              potential_rw.add("planet", TagList(0).add("is_ringworld_or_machine_world","yes"))
-              
-              newList=TagList(1)
-              newList.getOrCreate("OR").add("has_building",upgradeName+"_rw") #creates the "OR" and fills it with the first entry
-              newList.get("OR").add("has_building",upgradeName+"_rw_direct_build") #second entry to "OR"
-              triggers.add("has_"+upgradeName+"_rw", newList)
-
-              newListPrev=TagList(1)
-              newList.getOrCreate("OR").add("has_prev_building",upgradeName+"_rw") #creates the "OR" and fills it with the first entry
-              newList.get("OR").add("has_prev_building",upgradeName+"_rw_direct_build") #second entry to "OR"
-              triggers.add("has_prev_"+upgradeName+"_rw", newList)
-
-              if not args.test_run:
-                copiedBuildingsFile.write(upgradeName+"_rw"+"\n")
-              for adI in range(len(adjacency_bonus.vals)):
-                adjacency_bonus.vals[adI]=str(int(adjacency_bonus.vals[adI])+1)
-                
-              buildingNameToData.insert(upgradeBuildingIndex+1,rw_upgrade_building.tagName, rw_upgrade_building) #insert after _direct_build_rw version
               
             buildingNameToData.names[upgradeBuildingIndex]+="_direct_build" #renaming (as internal name needs to be unique. Not visible in-game
             buildingNameToData.vals[upgradeBuildingIndex].tagName=buildingNameToData.names[upgradeBuildingIndex]
-            buildingNameToData.vals[upgradeBuildingIndex].lowerTier=buildingData #lower Tier will later be used to ensure uniqueness of unique buildings
             
             #create a new scripted_trigger, consisting of both the original upgrade and the copy that can be directly build
-            if not args.create_tier5_enhanced or buildingData.tagName.replace("_direct_build","")[-3:]!="_rw":
-              newList=TagList(1)
-              newList.getOrCreate("OR").add("has_building",upgradeName) #creates the "OR" and fills it with the first entry
-              newList.get("OR").add("has_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
-              triggers.add("has_"+upgradeName, newList)
-              newList=TagList(1)
-              newList.getOrCreate("OR").add("has_prev_building",upgradeName) #creates the "OR" and fills it with the first entry
-              newList.get("OR").add("has_prev_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
-              triggers.add("has_prev_"+upgradeName, newList)
-              if not args.test_run:
-                copiedBuildingsFile.write(upgradeName+"\n")
+            # newList=TagList(1)
+            # newList.getOrCreate("OR").add("has_building",upgradeName) #creates the "OR" and fills it with the first entry
+            # newList.get("OR").add("has_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
+            # triggers.add("has_"+upgradeName, newList)
+            # newList=TagList(1)
+            # newList.getOrCreate("OR").add("has_prev_building",upgradeName) #creates the "OR" and fills it with the first entry
+            # newList.get("OR").add("has_prev_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
+            # triggers.add("has_prev_"+upgradeName, newList)
+            if not args.test_run:
+              copiedBuildingsFile.write(upgradeName+"\n")
             
-            #REMOVE COPY FROM TECH TREE. Seems to remove the copy completely :( Pretty useless trigger...
-            if "show_tech_unlock_if" in buildingNameToData.vals[upgradeBuildingIndex].names:
+            #REMOVE COPY FROM TECH TREE.
+            while "show_tech_unlock_if" in buildingNameToData.vals[upgradeBuildingIndex].names:
               buildingNameToData.vals[upgradeBuildingIndex].remove("show_tech_unlock_if")
             buildingNameToData.vals[upgradeBuildingIndex].add("show_tech_unlock_if", TagList().add("always","no"))
-            
+
             upgradeData.costChangeUpgradeToDirectBuild(buildingData,args, varsToValue)
 
             #Make sure you cannot replace a building by itself (i.e. upgraded version by same tier direct build)
-            upgradeData.getOrCreate("potential").add("NOT",TagList().add("has_building",origUpgradeData.tagName)) #Prevent self replace") #Since has_building is hidden in the name of the data, no replace of has_building will take place. Should be a minimal performance improvement.
+            upgradeData.getOrCreate("potential").add("NOT",TagList().add("has_building",origUpgradeData.tagName)) #Prevent self replace") 
             if args.make_optional:
               upgradeData.get("potential").add("direct_build_enabled", "yes")
-            # if "ai_replace" in upgradeData.names:
-            #   upgradeData.remove("ai_replace")
-              # print(upgradeData)
               
             if "upgrades" in upgradeData.names:
               buildingDataList.append(upgradeData)
@@ -305,22 +258,14 @@ def readAndConvert(args, allowRestart=1):
             
             #ICON AND LOCALIZATION:
             nameExtra="_direct_build"
-            nameStringExtra=""
-            if args.create_tier5_enhanced and buildingData.tagName.replace("_direct_build","")[-3:]=="_rw":
-              nameExtra+="_rw"
-              nameStringExtra=" Enhanced"
-              if not "icon" in buildingNameToData.vals[upgradeBuildingIndex+1].names: #if icon was already a link in the original building, we can leave it
-                buildingNameToData.vals[upgradeBuildingIndex+1].add("icon",upgradeName) #otherwise create an icon link to the original building
-              locData.append(upgradeName+'_rw:0 "$'+upgradeName+'$'+nameStringExtra+'"') #localisation link. If anyone knows what the number behind the colon means, please PN me (@Gratak in Paradox forum)
-              locData.append(upgradeName+'_rw_desc:0 "$'+upgradeName+'_desc$"') #localisation link
               
             if not "icon" in buildingNameToData.vals[upgradeBuildingIndex].names: #if icon was already a link in the original building, we can leave it
               buildingNameToData.vals[upgradeBuildingIndex].add("icon",upgradeName) #otherwise create an icon link to the original building
-            locData.append(upgradeName+nameExtra+':0 "$'+upgradeName+'$'+nameStringExtra+'"') #localisation link. If anyone knows what the number behind the colon means, please PN me (@Gratak in Paradox forum)
+            locData.append(upgradeName+nameExtra+':0 "$'+upgradeName+'$"') #localisation link. If anyone knows what the number behind the colon means, please PN me (@Gratak in Paradox forum)
             locData.append(upgradeName+nameExtra+'_desc:0 "$'+upgradeName+'_desc$"') #localisation link
               
             #MAKE UNIQUE VIA INTRODUCING A FAKE MAX TIER BUILDING
-            if not "upgrades" in upgradeData.names and "planet_unique" in upgradeData.names and upgradeData.get("planet_unique")=="yes": #Max tier unique
+            if not "upgrades" in upgradeData.names and upgradeData.attemptGet("planet_unique")=="yes": #Max tier unique
               fakeBuilding=NamedTagList(baseBuildingData.tagName+"_hidden_tree_root")
               fakeBuilding.add("potential", TagList().add("always","no"))
               fakeBuilding.add("planet_unique", "yes")
@@ -335,6 +280,8 @@ def readAndConvert(args, allowRestart=1):
           if len(newRequirements.vals)>0 and not buildingData.tagName in args.t0_buildings:
               buildingData.getOrCreate("potential").add("NAND", newRequirements)
               newRequirements.add("NOT", TagList("has_global_flag","display_low_tier_flag"))
+              # if args.make_optional:#todo activate after having done "no change" check
+              #   newRequirements.add("has_global_flag","direct_build_enabled")
     #END OF COPY AND MODIFY        
 
     if args.simplify_upgrade_AI_allow:
