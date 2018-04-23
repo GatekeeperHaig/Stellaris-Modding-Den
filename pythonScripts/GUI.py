@@ -18,6 +18,7 @@ import convertCSV_TXT
 import createUpgradedBuildings
 import copySubTag
 import createAIVarsFromModifiers
+import parseAndWrite
 import locList
 import pickle
 # from copy import deepcopy
@@ -534,7 +535,11 @@ class TabClass:
         if isinstance(tabClassLoaded, TabClass):
           if fittingTabs:
             while 1:
-              self.tabControl.getTabByName(tabClassLoaded.name).newLoadingMethod(tabClassLoaded, onlyAddLines)
+              try:
+                self.tabControl.getTabByName(tabClassLoaded.name).newLoadingMethod(tabClassLoaded, onlyAddLines)
+              except:
+                print("Skipping tab for load")
+                pass
               try:
                 tabClassLoaded=pickle.load(f)
               except EOFError:
@@ -683,10 +688,10 @@ class TabControlClass:
     self.tabClasses[-1].separateStart=False
     self.tabClasses[-1].singleEntryCheck="Helper File"
 
-    self.newTab("Create Upgraded Buildings - Trigger files",createUpgradedBuildings,("text files","*.txt"),["--just_copy_and_check"]
-      ,BUOptions,"")
-    self.tabClasses[-1].helpText='Add any files that have "has_building" in your mod here. Give them each the right path to go to. And convert. This has to be done AFTER the main BU and into the same folder!'
-    self.tabClasses[-1].subfolder=True
+    # self.newTab("Create Upgraded Buildings - Trigger files",createUpgradedBuildings,("text files","*.txt"),["--just_copy_and_check"]
+    #   ,BUOptions,"")
+    # self.tabClasses[-1].helpText='Add any files that have "has_building" in your mod here. Give them each the right path to go to. And convert. This has to be done AFTER the main BU and into the same folder!'
+    # self.tabClasses[-1].subfolder=True
 
     self.newTab("Copy Subtag To Other Mod",copySubTag,("text files","*.txt"),[],[of,"tag_to_be_copied",oll],"Add Source File(s)")
     self.tabClasses[-1].helpText="Not finished yet!" #createUpgradedBuildings - Trigger files
@@ -702,6 +707,10 @@ class TabControlClass:
     self.tabClasses[-1].helpText="Converts yaml files into a python script to create multi-language yaml files the game can use. Missing things are replaced by the english locs."
     self.tabClasses[-1].singleEntryCheck="Create Main File"
 
+
+    self.newTab("Parse and Write",parseAndWrite,("text files",'*.txt;*.gfx'),[],["remove_tags",jf,oll],"")
+    self.tabClasses[-1].separateStart=False
+    self.tabClasses[-1].helpText="Parses a Stellaris Format File and writes it again with a given style. In between, one can optionally delete all occurences of a certain tag, apply some replacement routine. Furthermore, in addition to simply writing each file again, this also allows you to merge them and write multiple files to a single one."
 
     nb.pack(expand=1, fill="both")  # Pack to make visible
   def newTab(self,name, command, fileFilter, fixedOptions, options, extraAddButton):
@@ -871,6 +880,8 @@ class MenuBar:
     settingsMenu.add_cascade(label="Remove Editor", menu=self.removeEditor)
     settingsMenu.add_cascade(label="Choose Ods Editor", menu=self.chooseOdsEditor)
     settingsMenu.add_cascade(label="Remove Ods Editor", menu=self.removeOdsEditor)
+    settingsMenu.add_command(label="Set Stellaris Documents Path (WIP)", command=lambda: self.printPrevPaths())
+    settingsMenu.add_command(label="Set Stellaris Game Path (WIP)", command=lambda: self.printPrevPaths())
     menubar.add_cascade(label="Settings", menu=settingsMenu)
 
     # display the menu
