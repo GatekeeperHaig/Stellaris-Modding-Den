@@ -13,7 +13,7 @@ for sign in splitSigns:
 splitPattern=splitPattern[:-1]+")"
 
 def addCommonArgs(parser):
-  parser.add_argument("--one_line_level", type= float, default=.0, help="How much the script tries to create one-liners on output: 0 - never, only keeping some existing one-liners. 1 - whenever only one text subtag exists. 2 - whenever only text subtags exist")
+  parser.add_argument("--one_line_level", type= float, default=2.0, help="How much the script tries to create one-liners on output: 0 - never, only keeping some existing one-liners. 1 - whenever only one text subtag exists. 2 (default) - maximum two 'subtags' (that means three in a line). 3 - maximum three subtags. 4 - whenever only text subtags exist")
   parser.add_argument('--test_run', action="store_true", help="No Output.")
 
 
@@ -220,7 +220,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     else:
       file.write(" {!s} ".format(self.seperators[i]))
       if self.vals[i].oneLineWriteCheck(args):
-        self.vals[i].writeLine(file)
+        file.write(self.vals[i]._toLine())
+        # self.vals[i].writeLine(file)
       else:
         file.write("{\n")
         self.vals[i].writeAll(file,args)
@@ -244,11 +245,17 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         return False
     if args.one_line_level<=1.5 and len(self.vals)>1:
       return False
-    if len(self.vals)>5:
+    subTags=self.countSubTags()
+    if args.one_line_level<=2.5 and subTags>3: #self is also counted as one
       return False
-    for val in self.vals:
-      if isinstance(val,TagList):
-        return False
+    if args.one_line_level<=3.5 and subTags>4: #self is also counted as one
+      return False
+    # if len(self.vals)>5:
+    #   return False
+    if args.one_line_level>=3.5:
+      for val in self.vals:
+        if isinstance(val,TagList):
+          return False
     return True
 
   def replaceAllHasBuildings(self, args): #"has_building=" fails working if different version of the same building exist (Paradox should have realised this on creation of machine empire capital buildings but they didn't... They simply created very lengthy conditions. Shame...). We replace them by scripted_triggers. Due to cross-reference in between files I do this for EVERY building, even the ones I did not copy.
@@ -568,6 +575,14 @@ class TagList: #Basically everything is stored recursively in objects of this cl
             tagEntry.addFront("OCCNUM",TagList(self.bracketLevel+1))
       # else:
         # tagList.replace(name,"")
+  def countSubTags(self):
+    count=1
+    for val in self.vals:
+      if isinstance(val, TagList):
+        count+=val.countSubTags()
+      else:
+        count+=1
+    return count
   def countDeepestLevelEntries(self,args, active=False):
     if len(self.names)==0:
       return 1
