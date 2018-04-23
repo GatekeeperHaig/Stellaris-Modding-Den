@@ -614,7 +614,9 @@ def main(args, argv):
     
     # readAndConvert(buildingArgs,0)
   else:
-    return readAndConvert(args)
+    out= readAndConvert(args)
+    createConvertEvent(args)
+    return out
 
 def createConvertEvent(args):
   onActionTagList=TagList("on_building_complete", TagList("events", TagList("direct_build.1",""))).add("on_building_replaced", TagList("events", TagList("direct_build.1","")))
