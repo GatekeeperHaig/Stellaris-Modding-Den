@@ -179,8 +179,10 @@ def readAndConvert(args, allowRestart=1):
               if "planet_unique" in buildingData.names:
                 print("EXTRA WARNING: The problematic building is planet_unique. This error might destroy uniqueness!")
               continue
+            secondVisit=False
             if upgradeData.wasVisited:
               print("Script tried to visit "+upgradeData.tagName +" twice (second time via "+buildingData.tagName+"). This is to be expected if different buildings upgrade into this building, but could also indicate an error in ordering: Of all 'is_listed=yes' buildings in a tree, the lowest tier must always be first!") #TODO is it ok that the script still continues to do everything? 
+              secondVisit=True
             elif buildingData.tagName in args.t0_buildings: #don't do if visited twice!
               upgradeData.costChangeUpgradeToDirectBuild(buildingData, args, varsToValue, True) #fix t0-t1 costs
               
@@ -192,11 +194,12 @@ def readAndConvert(args, allowRestart=1):
               
             origUpgradeData=upgradeData  
             upgradeData=copy.deepcopy(buildingNameToData.get(upgradeName)) #now copy to prevent further editing
-            if not args.custom_direct_build_AI_allow:
-              try:
-                upgradeData.replace("ai_allow", baseBuildingData.get("ai_allow"))
-              except ValueError:
-                pass
+            if not secondVisit:
+              if not args.custom_direct_build_AI_allow:
+                try:
+                  upgradeData.replace("ai_allow", baseBuildingData.get("ai_allow"))
+                except ValueError:
+                  pass
                 
             
             if "empire_unique" in upgradeData.names and upgradeData.get("empire_unique")=="yes":
@@ -220,63 +223,63 @@ def readAndConvert(args, allowRestart=1):
                   newRequirements.add(name,val)
             
             
-            
-            upgradeBuildingIndex=buildingNameToData.names.index(upgradeName) #index of 'upgradeData' building in the list of all buildings (including already copied buildings)
-            buildingNameToData.insert(upgradeBuildingIndex,upgradeName,upgradeData) #insert the copy before 'upgradeData'. upgradeBuildingIndex is now the index of the copy!
-            buildingNameToData.vals[upgradeBuildingIndex].remove("is_listed") #removing "is_listed = no"
+            if not secondVisit:
+              upgradeBuildingIndex=buildingNameToData.names.index(upgradeName) #index of 'upgradeData' building in the list of all buildings (including already copied buildings)
+              buildingNameToData.insert(upgradeBuildingIndex,upgradeName,upgradeData) #insert the copy before 'upgradeData'. upgradeBuildingIndex is now the index of the copy!
+              buildingNameToData.vals[upgradeBuildingIndex].remove("is_listed") #removing "is_listed = no"
+                
+              buildingNameToData.names[upgradeBuildingIndex]+="_direct_build" #renaming (as internal name needs to be unique. Not visible in-game
+              buildingNameToData.vals[upgradeBuildingIndex].tagName=buildingNameToData.names[upgradeBuildingIndex]
               
-            buildingNameToData.names[upgradeBuildingIndex]+="_direct_build" #renaming (as internal name needs to be unique. Not visible in-game
-            buildingNameToData.vals[upgradeBuildingIndex].tagName=buildingNameToData.names[upgradeBuildingIndex]
-            
-            #create a new scripted_trigger, consisting of both the original upgrade and the copy that can be directly build
-            # newList=TagList(1)
-            # newList.getOrCreate("OR").add("has_building",upgradeName) #creates the "OR" and fills it with the first entry
-            # newList.get("OR").add("has_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
-            # triggers.add("has_"+upgradeName, newList)
-            # newList=TagList(1)
-            # newList.getOrCreate("OR").add("has_prev_building",upgradeName) #creates the "OR" and fills it with the first entry
-            # newList.get("OR").add("has_prev_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
-            # triggers.add("has_prev_"+upgradeName, newList)
-            if not args.test_run:
-              copiedBuildingsFile.write(upgradeName+"\n")
-            
-            #REMOVE COPY FROM TECH TREE.
-            while "show_tech_unlock_if" in buildingNameToData.vals[upgradeBuildingIndex].names:
-              buildingNameToData.vals[upgradeBuildingIndex].remove("show_tech_unlock_if")
-            buildingNameToData.vals[upgradeBuildingIndex].add("show_tech_unlock_if", TagList().add("always","no"))
+              #create a new scripted_trigger, consisting of both the original upgrade and the copy that can be directly build
+              # newList=TagList(1)
+              # newList.getOrCreate("OR").add("has_building",upgradeName) #creates the "OR" and fills it with the first entry
+              # newList.get("OR").add("has_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
+              # triggers.add("has_"+upgradeName, newList)
+              # newList=TagList(1)
+              # newList.getOrCreate("OR").add("has_prev_building",upgradeName) #creates the "OR" and fills it with the first entry
+              # newList.get("OR").add("has_prev_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
+              # triggers.add("has_prev_"+upgradeName, newList)
+              if not args.test_run:
+                copiedBuildingsFile.write(upgradeName+"\n")
+              
+              #REMOVE COPY FROM TECH TREE.
+              while "show_tech_unlock_if" in buildingNameToData.vals[upgradeBuildingIndex].names:
+                buildingNameToData.vals[upgradeBuildingIndex].remove("show_tech_unlock_if")
+              buildingNameToData.vals[upgradeBuildingIndex].add("show_tech_unlock_if", TagList().add("always","no"))
 
-            upgradeData.costChangeUpgradeToDirectBuild(buildingData,args, varsToValue)
+              upgradeData.costChangeUpgradeToDirectBuild(buildingData,args, varsToValue)
 
-            #Make sure you cannot replace a building by itself (i.e. upgraded version by same tier direct build)
-            upgradeData.getOrCreate("potential").add("NOT",TagList().add("has_building",origUpgradeData.tagName)) #Prevent self replace") 
-            if args.make_optional:
-              upgradeData.get("potential").add("direct_build_enabled", "yes")
+              #Make sure you cannot replace a building by itself (i.e. upgraded version by same tier direct build)
+              upgradeData.getOrCreate("potential").add("NOT",TagList().add("has_building",origUpgradeData.tagName)) #Prevent self replace") 
+              if args.make_optional:
+                upgradeData.get("potential").add("direct_build_enabled", "yes")
+                
+              if "upgrades" in upgradeData.names:
+                buildingDataList.append(upgradeData)
+                
+          
               
-            if "upgrades" in upgradeData.names:
-              buildingDataList.append(upgradeData)
-              
-        
-            
-            #ICON AND LOCALIZATION:
-            nameExtra="_direct_build"
-              
-            if not "icon" in buildingNameToData.vals[upgradeBuildingIndex].names: #if icon was already a link in the original building, we can leave it
-              buildingNameToData.vals[upgradeBuildingIndex].add("icon",upgradeName) #otherwise create an icon link to the original building
-            locData.append(upgradeName+nameExtra+':0 "$'+upgradeName+'$"') #localisation link. If anyone knows what the number behind the colon means, please PN me (@Gratak in Paradox forum)
-            locData.append(upgradeName+nameExtra+'_desc:0 "$'+upgradeName+'_desc$"') #localisation link
-              
-            #MAKE UNIQUE VIA INTRODUCING A FAKE MAX TIER BUILDING
-            if not "upgrades" in upgradeData.names and upgradeData.attemptGet("planet_unique")=="yes": #Max tier unique
-              fakeBuilding=NamedTagList(baseBuildingData.tagName+"_hidden_tree_root")
-              fakeBuilding.add("potential", TagList().add("always","no"))
-              fakeBuilding.add("planet_unique", "yes")
-              fakeBuilding.add("icon",baseBuildingData.tagName)
-              locData.append(fakeBuilding.tagName+':0 "$'+baseBuildingData.tagName+'$"')
-              locData.append(fakeBuilding.tagName+'_desc:0 "$'+baseBuildingData.tagName+'_desc$"')
-              upgradeData.getOrCreate("upgrades").add(fakeBuilding.tagName,"")
-              origUpgradeData.getOrCreate("upgrades").add(fakeBuilding.tagName,"")
-              fakeIndex=buildingNameToData.names.index(baseBuildingData.tagName)
-              buildingNameToData.insert(fakeIndex,fakeBuilding.tagName,fakeBuilding) #insert the fake before 'baseBuilding'. upgradeBuildingIndex is now shifted but shouldn't be used anymore
+              #ICON AND LOCALIZATION:
+              nameExtra="_direct_build"
+                
+              if not "icon" in buildingNameToData.vals[upgradeBuildingIndex].names: #if icon was already a link in the original building, we can leave it
+                buildingNameToData.vals[upgradeBuildingIndex].add("icon",upgradeName) #otherwise create an icon link to the original building
+              locData.append(upgradeName+nameExtra+':0 "$'+upgradeName+'$"') #localisation link. If anyone knows what the number behind the colon means, please PN me (@Gratak in Paradox forum)
+              locData.append(upgradeName+nameExtra+'_desc:0 "$'+upgradeName+'_desc$"') #localisation link
+                
+              #MAKE UNIQUE VIA INTRODUCING A FAKE MAX TIER BUILDING
+              if not "upgrades" in upgradeData.names and upgradeData.attemptGet("planet_unique")=="yes": #Max tier unique
+                fakeBuilding=NamedTagList(baseBuildingData.tagName+"_hidden_tree_root")
+                fakeBuilding.add("potential", TagList().add("always","no"))
+                fakeBuilding.add("planet_unique", "yes")
+                fakeBuilding.add("icon",baseBuildingData.tagName)
+                locData.append(fakeBuilding.tagName+':0 "$'+baseBuildingData.tagName+'$"')
+                locData.append(fakeBuilding.tagName+'_desc:0 "$'+baseBuildingData.tagName+'_desc$"')
+                upgradeData.getOrCreate("upgrades").add(fakeBuilding.tagName,"")
+                origUpgradeData.getOrCreate("upgrades").add(fakeBuilding.tagName,"")
+                fakeIndex=buildingNameToData.names.index(baseBuildingData.tagName)
+                buildingNameToData.insert(fakeIndex,fakeBuilding.tagName,fakeBuilding) #insert the fake before 'baseBuilding'. upgradeBuildingIndex is now shifted but shouldn't be used anymore
             
           if len(newRequirements.vals)>0 and not buildingData.tagName in args.t0_buildings:
               buildingData.getOrCreate("potential").add("NAND", newRequirements)
