@@ -276,21 +276,34 @@ class TabClass:
       #b.pack(side=tk.RIGHT)
       #b = tk.Button(self.extraLineMain, text="Add line", command=self.addLine)
       #b.pack(side=tk.RIGHT)
+
       self.saveImg = ImageTk.PhotoImage(Image.open("Save-icon.png"))
       # self.saveImg = PhotoImage(file="Save-icon.gif")
       b = tk.Button(self.extraLineMain,text="",image=self.saveImg, command=self.save)
       b.pack(side=tk.RIGHT,expand=YES, fill="y")
       CreateToolTip(b, "Save Current Tab")
+
       self.loadImg = ImageTk.PhotoImage(Image.open("Load-icon.png"))
       # self.loadImg = PhotoImage(file="Load-icon.gif")
       b = tk.Button(self.extraLineMain,text="",image=self.loadImg, command=lambda : self.load(False,True))
       b.pack(side=tk.RIGHT,expand=YES, fill="y")
       CreateToolTip(b, "Load Tab(s)")
+
+      self.DocImg = ImageTk.PhotoImage(Image.open("StellarisDocumentIcon.png"))
+      b = tk.Button(self.extraLineMain,text="",image=self.DocImg, command=lambda : self.load(False,True))
+      b.pack(side=tk.RIGHT,expand=YES, fill="y")
+      CreateToolTip(b, "Load Tab(s)")
+
+      self.StellImg = ImageTk.PhotoImage(Image.open("StellarisIcon.png"))
+      b = tk.Button(self.extraLineMain,text="",image=self.StellImg, command=lambda : self.load(False,True))
+      b.pack(side=tk.RIGHT,expand=YES, fill="y")
+      CreateToolTip(b, "Load Tab(s)")
+
+      b = tk.Button(self.extraLineMain,text="Update Path", command=self.updatePath)
+      b.pack(side=tk.RIGHT,expand=YES, fill="y")
       if optionWindow:
         b= tk.Button(self.extraLineMain,text="Options", command=self.optionWindow.window.deiconify)
         b.pack(side=tk.RIGHT,expand=YES, fill="y")
-      b = tk.Button(self.extraLineMain,text="Update Path", command=self.updatePath)
-      b.pack(side=tk.RIGHT,expand=YES, fill="y")
       CreateToolTip(b, "Update the Path that is open when adding files to the last used one of any Tab in the GUI. Useful when doing stuff that requires two tabs, like Txt To Ods and Ods To Txt")
       b = tk.Button(self.extraLineMain,text="Add file(s)", command=self.addFiles)
       b.pack(side=tk.RIGHT,expand=YES, fill="y")
