@@ -67,14 +67,35 @@ country_event = {
 		}
 		set_variable = { which = minerals_reserve value = 0 }
 		while = { 
-			limit = { minerals > 0 }
-			add_minerals = -1
+			limit = { minerals > 1000 }
+			add_minerals = -1000
 			change_variable = { which = minerals_reserve value = 1 }
 		}
 		while = { 
+			limit = { minerals > 100 }
+			add_minerals = -100
+			change_variable = { which = minerals_reserve value = 1 }
+		}		
+		while = { 
+			limit = { minerals > 10 }
+			add_minerals = -10
+			change_variable = { which = minerals_reserve value = 1 }
+		}				
+		while = { 
+			limit = { minerals > 1 }
+			add_minerals = -1
+			change_variable = { which = minerals_reserve value = 1 }
+		}						
+		while = { 
 			count = minerals_reserve
 			add_minerals = 1			
-		}			
+		}	
+		set_variable = { which = food_buildings_constructions_added value = 0 }	
+		set_variable = { which = energy_buildings_constructions_added value = 0 }
+		set_variable = { which = minerals_buildings_constructions_added value = 0 }
+		set_variable = { which = society_research_buildings_constructions_added value = 0 }
+		set_variable = { which = physics_research_buildings_constructions_added value = 0 }
+		set_variable = { which = engineering_research_buildings_constructions_added value = 0 }
 		while = { 
 			limit = { check_variable = { which = building_construction_budget value > 199 } }
 			### Prioritize Food Buildings
@@ -101,47 +122,1107 @@ country_event = {
 						has_country_flag = food_focus_factor_3
 						has_country_flag = food_focus_factor_4
 					}
+					check_variable = { which = food_buildings_constructions_added value < 4 }
 				}	
 				### find best food building candidate
 				random_owned_planet = { 
 					limit = { 
 						NOT = { has_planet_flag = purged_planet } 
 						has_building_construction = no
-						any_tile = { 
-							has_building = no 
-							has_blocker = no
-						}
 						any_owned_pop = { 
 							is_colony_pop = yes
 							is_unemployed = yes							
-						}	
-						check_variable = { which = food_mult_planet_tile value > 0.9 } #really avoid building food buildings on anything worse						
-						AND = { 
-							owner = { 
+						}							
+						owner = { 
+							NOT = { 
 								any_owned_planet = {
 									NOR = { 
 										is_same_value = prevprev  
 										has_planet_flag = purged_planet
 									} 
 									has_building_construction = no
-									any_tile = { 
-										has_building = no 
-										has_blocker = no
-									}
 									any_owned_pop = { 
 										is_colony_pop = yes
 										is_unemployed = yes							
+									}									
+									any_tile = { 
+										has_deposit = food_building_tile
+										has_any_tile_strategic_resource = no 										
+										has_building = no 
+										has_blocker = no										
+									}
+									check_variable = { which = food_mult_planet_tile value > prevprev } 
+								}
+							}						
+						}	
+						OR = { 
+							any_tile = { 
+								has_deposit = food_building_tile
+								has_building = no 
+								has_blocker = no
+							}
+							AND = { 
+								any_tile = { 
+									has_deposit = no									
+									has_building = no 
+									has_blocker = no
+								}							
+								owner = { 
+									NOT = { 
+										any_owned_planet = {
+											NOR = { 
+												is_same_value = prevprev  
+												has_planet_flag = purged_planet
+											} 
+											has_building_construction = no
+											any_owned_pop = { 
+												is_colony_pop = yes
+												is_unemployed = yes							
+											}											
+											any_tile = { 
+												has_deposit = food_building_tile			
+												has_building = no 
+												has_blocker = no										
+											}
+											OR = { 
+												check_variable = { which = food_mult_planet_tile value = prevprev }
+												check_variable = { which = food_mult_planet_tile value > prevprev }
+											}
+										}
+									}							
+								}	
+							}									
+						}	
+					}
+					random_tile = { 
+						limit = { 
+							has_building = no 
+							has_blocker = no
+							OR = { 
+								has_deposit = food_building_tile
+								AND = { 
+									has_deposit = no
+									prev = { 
+										NOT = { 
+											any_tile = { 
+												has_deposit = food_building_tile
+												has_building = no 
+												has_blocker = no												
+											}
+										}
+									}
+								}
+							}
+						}	
+						set_food_building_construction = yes	
+					}	
+					change_variable = { which = food_buildings_constructions_added value = 1 }	
+				}	
+				else = { 
+					### Energy Buildings are next
+					if = { 
+						limit = { 
+							OR = { 
+								AND = { 
+									income < 100
+									OR = { 
+										is_machine_empire = no
+										is_synth_empire = no
+									}
+								}	
+								AND = { 
+									income < 200
+									OR = { 
+										is_machine_empire = yes
+										is_synth_empire = yes
+									}
+								}								
+								AND = { 
+									has_country_flag = energy_focus_factor_1
+									NOR = { 
+										has_country_flag = society_research_focus_factor_2
+										has_country_flag = physics_research_focus_factor_2
+										has_country_flag = engineering_research_focus_factor_2
+									}
+								}	
+								has_country_flag = energy_focus_factor_2
+							}
+							check_variable = { which = energy_buildings_constructions_added value < 4 }
+						}
+						random_owned_planet = { 
+							limit = { 
+								NOT = { has_planet_flag = purged_planet } 
+								has_building_construction = no
+								any_owned_pop = { 
+									is_colony_pop = yes
+									is_unemployed = yes							
+								}							
+								owner = { 
+									NOT = { 
+										any_owned_planet = {
+											NOR = { 
+												is_same_value = prevprev  
+												has_planet_flag = purged_planet
+											} 
+											has_building_construction = no
+											any_owned_pop = { 
+												is_colony_pop = yes
+												is_unemployed = yes							
+											}									
+											any_tile = { 
+												has_deposit = energy_building_tile
+												has_any_tile_strategic_resource = no 										
+												has_building = no 
+												has_blocker = no										
+											}
+											check_variable = { which = energy_mult_planet_tile value > prevprev } 
+										}
+									}						
+								}	
+								OR = { 
+									any_tile = { 
+										has_deposit = energy_building_tile
+										has_building = no 
+										has_blocker = no
+									}
+									AND = { 
+										any_tile = { 
+											has_deposit = no														
+											has_building = no 
+											has_blocker = no
+										}							
+										owner = { 
+											NOT = { 
+												any_owned_planet = {
+													NOR = { 
+														is_same_value = prevprev  
+														has_planet_flag = purged_planet
+													} 
+													has_building_construction = no
+													any_owned_pop = { 
+														is_colony_pop = yes
+														is_unemployed = yes							
+													}											
+													any_tile = { 
+														has_deposit = energy_building_tile			
+														has_building = no 
+														has_blocker = no										
+													}
+													OR = { 
+														check_variable = { which = energy_mult_planet_tile value = prevprev }
+														check_variable = { which = energy_mult_planet_tile value > prevprev }
+													}
+												}
+											}							
+										}	
+									}									
+								}	
+							}
+							random_tile = { 
+								limit = { 
+									has_building = no 
+									has_blocker = no
+									OR = { 
+										has_deposit = energy_building_tile
+										AND = { 
+											has_deposit = no
+											prev = { 
+												NOT = { 
+													any_tile = { 
+														has_deposit = energy_building_tile
+														has_building = no 
+														has_blocker = no												
+													}
+												}
+											}
+										}					
+										AND = {
+											has_resource = { type = food amount > 0 }
+											NOR = { 
+												has_deposit = minerals_building_tile
+												has_deposit = society_research_building_tile
+												has_deposit = physics_research_building_tile
+												has_deposit = engineering_research_building_tile
+											}	
+											has_any_tile_strategic_resource = no											
+											prev.owner = { has_country_flag = food_delimited }			
+										}
+										AND = {
+											has_resource = { type = food amount = 1 }
+											NOR = { 
+												has_deposit = minerals_building_tile
+												has_deposit = society_research_building_tile
+												has_deposit = physics_research_building_tile
+												has_deposit = engineering_research_building_tile
+											}												
+											has_any_tile_strategic_resource = no
+											prev.owner = { NOR = { has_country_flag = food_focus_factor_1 has_country_flag = food_focus_factor_2 has_country_flag = food_focus_factor_3 has_country_flag = food_focus_factor_4 } }
+										}	
+									}
+								}	
+								set_energy_building_construction = yes	
+							}	
+							change_variable = { which = energy_buildings_constructions_added value = 1 }	
+						}					
+						else = { 
+							### Minerals Buildings are next
+							if = { 
+								limit = { 
+									NOR = { 
+										has_country_flag = society_research_focus_factor_2
+										has_country_flag = physics_research_focus_factor_2
+										has_country_flag = engineering_research_focus_factor_2
+									}								
+									OR = { 
+										has_monthly_income = { resource = minerals amount < 200 }
+										has_country_flag = minerals_focus_factor_1
+										has_country_flag = minerals_focus_factor_2
 									}	
-									check_variable = { which = food_mult_planet_tile value > prevprev } #really avoid building food buildings on anything worse									
-									
-								
-					
+									check_variable = { which = minerals_buildings_constructions_added value < 4 }
+								}	
+								random_owned_planet = { 
+									limit = { 
+										NOT = { has_planet_flag = purged_planet } 
+										has_building_construction = no
+										any_owned_pop = { 
+											is_colony_pop = yes
+											is_unemployed = yes							
+										}							
+										owner = { 
+											NOT = { 
+												any_owned_planet = {
+													NOR = { 
+														is_same_value = prevprev  
+														has_planet_flag = purged_planet
+													} 
+													has_building_construction = no
+													any_owned_pop = { 
+														is_colony_pop = yes
+														is_unemployed = yes							
+													}									
+													any_tile = { 
+														has_deposit = minerals_building_tile
+														has_any_tile_strategic_resource = no 										
+														has_building = no 
+														has_blocker = no										
+													}
+													check_variable = { which = minerals_mult_planet_tile value > prevprev } 
+												}
+											}						
+										}	
+										OR = { 
+											any_tile = { 
+												has_deposit = minerals_building_tile
+												has_building = no 
+												has_blocker = no
+											}
+											AND = { 
+												any_tile = { 
+													has_deposit = no														
+													has_building = no 
+													has_blocker = no
+												}							
+												owner = { 
+													NOT = { 
+														any_owned_planet = {
+															NOR = { 
+																is_same_value = prevprev  
+																has_planet_flag = purged_planet
+															} 
+															has_building_construction = no
+															any_owned_pop = { 
+																is_colony_pop = yes
+																is_unemployed = yes							
+															}											
+															any_tile = { 
+																has_deposit = minerals_building_tile			
+																has_building = no 
+																has_blocker = no										
+															}
+															OR = { 
+																check_variable = { which = minerals_mult_planet_tile value = prevprev }
+																check_variable = { which = minerals_mult_planet_tile value > prevprev }
+															}
+														}
+													}							
+												}	
+											}									
+										}	
+									}
+									random_tile = { 
+										limit = { 
+											has_building = no 
+											has_blocker = no
+											OR = { 
+												has_deposit = minerals_building_tile
+												AND = { 
+													has_deposit = no
+													prev = { 
+														NOT = { 
+															any_tile = { 
+																has_deposit = minerals_building_tile
+																has_building = no 
+																has_blocker = no												
+															}
+														}
+													}
+												}					
+												AND = {
+													has_resource = { type = food amount > 0 }
+													NOR = { 
+														has_deposit = energy_building_tile
+														has_deposit = society_research_building_tile
+														has_deposit = physics_research_building_tile
+														has_deposit = engineering_research_building_tile
+													}	
+													has_any_tile_strategic_resource = no											
+													prev.owner = { has_country_flag = food_delimited }			
+												}
+												AND = {
+													has_resource = { type = food amount = 1 }
+													NOR = { 
+														has_deposit = energy_building_tile
+														has_deposit = society_research_building_tile
+														has_deposit = physics_research_building_tile
+														has_deposit = engineering_research_building_tile
+													}												
+													has_any_tile_strategic_resource = no
+													prev.owner = { NOR = { has_country_flag = food_focus_factor_1 has_country_flag = food_focus_factor_2 has_country_flag = food_focus_factor_3 has_country_flag = food_focus_factor_4 } }
+												}	
+											}
+										}	
+										set_minerals_building_construction = yes	
+									}	
+									change_variable = { which = minerals_buildings_constructions_added value = 1 }	
+								}								
+								else = { 
+									### Society Buildings are next
+									if = { 
+										limit = { 
+											OR = { 
+												has_country_flag = society_research_focus_factor_1
+												has_country_flag = society_research_focus_factor_2
+											}	
+											check_variable = { which = society_research_buildings_constructions_added value < 4 }
+										}	
+										random_owned_planet = { 
+											limit = { 
+												NOT = { has_planet_flag = purged_planet } 
+												has_building_construction = no
+												any_owned_pop = { 
+													is_colony_pop = yes
+													is_unemployed = yes							
+												}							
+												OR = { 
+													AND = {
+														new_building_content_enabled = no
+														owner = { 
+															NOT = { 
+																any_owned_planet = {
+																	NOR = { 
+																		is_same_value = prevprev  
+																		has_planet_flag = purged_planet
+																	} 
+																	has_building_construction = no
+																	any_owned_pop = { 
+																		is_colony_pop = yes
+																		is_unemployed = yes							
+																	}									
+																	any_tile = { 
+																		OR = { 
+																			has_deposit = society_research_building_tile
+																			has_deposit = physics_research_building_tile
+																			has_deposit = engineering_research_building_tile
+																		}	
+																		has_any_tile_strategic_resource = no 										
+																		has_building = no 
+																		has_blocker = no										
+																	}
+																	check_variable = { which = society_research_mult_planet_tile value > prevprev } 
+																}
+															}						
+														}	
+													}	
+													AND = {
+														new_building_content_enabled = yes
+														owner = { 
+															NOT = { 
+																any_owned_planet = {
+																	NOR = { 
+																		is_same_value = prevprev  
+																		has_planet_flag = purged_planet
+																	} 
+																	has_building_construction = no
+																	any_owned_pop = { 
+																		is_colony_pop = yes
+																		is_unemployed = yes							
+																	}									
+																	any_tile = { 
+																		has_deposit = society_research_building_tile
+																		has_any_tile_strategic_resource = no 										
+																		has_building = no 
+																		has_blocker = no										
+																	}
+																	check_variable = { which = society_research_mult_planet_tile value > prevprev } 
+																}
+															}						
+														}	
+													}	
+												}	
+												OR = { 
+													AND = { 
+														new_building_content_enabled = no														
+														OR = { 
+															any_tile = { 
+																has_deposit = society_research_building_tile
+																has_deposit = physics_research_building_tile
+																has_deposit = engineering_research_building_tile
+																has_building = no 
+																has_blocker = no
+															}
+															AND = { 
+																any_tile = { 
+																	has_deposit = no														
+																	has_building = no 
+																	has_blocker = no
+																}							
+																owner = { 
+																	NOT = { 
+																		any_owned_planet = {
+																			NOR = { 
+																				is_same_value = prevprev  
+																				has_planet_flag = purged_planet
+																			} 
+																			has_building_construction = no
+																			any_owned_pop = { 
+																				is_colony_pop = yes
+																				is_unemployed = yes							
+																			}											
+																			any_tile = { 
+																				has_deposit = society_research_building_tile
+																				has_deposit = physics_research_building_tile
+																				has_deposit = engineering_research_building_tile			
+																				has_building = no 
+																				has_blocker = no										
+																			}
+																			OR = { 
+																				check_variable = { which = society_research_mult_planet_tile value = prevprev }
+																				check_variable = { which = society_research_mult_planet_tile value > prevprev }
+																			}
+																		}
+																	}							
+																}	
+															}									
+														}	
+													}													
+													AND = { 
+														new_building_content_enabled = yes														
+														OR = {		
+															any_tile = { 
+																has_deposit = society_research_building_tile
+																has_building = no 
+																has_blocker = no
+															}
+															AND = { 
+																any_tile = { 
+																	has_deposit = no														
+																	has_building = no 
+																	has_blocker = no
+																}							
+																owner = { 
+																	NOT = { 
+																		any_owned_planet = {
+																			NOR = { 
+																				is_same_value = prevprev  
+																				has_planet_flag = purged_planet
+																			} 
+																			has_building_construction = no
+																			any_owned_pop = { 
+																				is_colony_pop = yes
+																				is_unemployed = yes							
+																			}											
+																			any_tile = { 
+																				has_deposit = society_research_building_tile
+																				has_building = no 
+																				has_blocker = no										
+																			}
+																			OR = { 
+																				check_variable = { which = society_research_mult_planet_tile value = prevprev }
+																				check_variable = { which = society_research_mult_planet_tile value > prevprev }
+																			}
+																		}
+																	}							
+																}	
+															}									
+														}	
+													}	
+												}	
+											}	
+											random_tile = { 
+												limit = { 
+													has_building = no 
+													has_blocker = no
+													OR = { 
+														has_deposit = society_research_building_tile
+														AND = { 
+															has_deposit = no
+															prev = { 
+																NOT = { 
+																	any_tile = { 
+																		has_deposit = society_research_building_tile
+																		has_building = no 
+																		has_blocker = no												
+																	}
+																}
+															}
+														}					
+														OR = { 
+															AND = { 
+																new_building_content_enabled = no
+																OR = { 
+																	AND = {
+																		has_resource = { type = food amount > 0 }
+																		NOR = { 
+																			has_deposit = energy_building_tile
+																			has_deposit = minerals_building_tile
+																		}	
+																		has_any_tile_strategic_resource = no											
+																		prev.owner = { has_country_flag = food_delimited }			
+																	}
+																	AND = {
+																		has_resource = { type = food amount = 1 }
+																		NOR = { 
+																			has_deposit = energy_building_tile
+																			has_deposit = minerals_building_tile
+																		}												
+																		has_any_tile_strategic_resource = no
+																		prev.owner = { NOR = { has_country_flag = food_focus_factor_1 has_country_flag = food_focus_factor_2 has_country_flag = food_focus_factor_3 has_country_flag = food_focus_factor_4 } }
+																	}																	
+																}
+															}	
+															AND = { 
+																new_building_content_enabled = yes
+																OR = { 
+																	AND = {
+																		has_resource = { type = food amount > 0 }
+																		NOR = { 
+																			has_deposit = energy_building_tile
+																			has_deposit = minerals_building_tile
+																			has_deposit = physics_research_building_tile
+																			has_deposit = engineering_research_building_tile																			
+																		}	
+																		has_any_tile_strategic_resource = no											
+																		prev.owner = { has_country_flag = food_delimited }			
+																	}
+																	AND = {
+																		has_resource = { type = food amount = 1 }
+																		NOR = { 
+																			has_deposit = energy_building_tile
+																			has_deposit = minerals_building_tile
+																			has_deposit = physics_research_building_tile
+																			has_deposit = engineering_research_building_tile
+																		}												
+																		has_any_tile_strategic_resource = no
+																		prev.owner = { NOR = { has_country_flag = food_focus_factor_1 has_country_flag = food_focus_factor_2 has_country_flag = food_focus_factor_3 has_country_flag = food_focus_factor_4 } }
+																	}	
+																}
+															}	
+														}	
+													}
+												}	
+												set_society_research_building_construction = yes	
+											}	
+											change_variable = { which = society_research_buildings_constructions_added value = 1 }	
+										}	
+										else = { 
+											### Physics Buildings are next
+											if = { 
+												limit = { 
+													OR = { 
+														has_country_flag = physics_research_focus_factor_1
+														has_country_flag = physics_research_focus_factor_2
+													}	
+													check_variable = { which = physics_research_buildings_constructions_added value < 4 }
+												}	
+												random_owned_planet = { 
+													limit = { 
+														NOT = { has_planet_flag = purged_planet } 
+														has_building_construction = no
+														any_owned_pop = { 
+															is_colony_pop = yes
+															is_unemployed = yes							
+														}							
+														OR = { 
+															AND = {
+																new_building_content_enabled = no
+																owner = { 
+																	NOT = { 
+																		any_owned_planet = {
+																			NOR = { 
+																				is_same_value = prevprev  
+																				has_planet_flag = purged_planet
+																			} 
+																			has_building_construction = no
+																			any_owned_pop = { 
+																				is_colony_pop = yes
+																				is_unemployed = yes							
+																			}									
+																			any_tile = { 
+																				OR = { 
+																					has_deposit = physics_research_building_tile
+																					has_deposit = physics_research_building_tile
+																					has_deposit = engineering_research_building_tile
+																				}	
+																				has_any_tile_strategic_resource = no 										
+																				has_building = no 
+																				has_blocker = no										
+																			}
+																			check_variable = { which = physics_research_mult_planet_tile value > prevprev } 
+																		}
+																	}						
+																}	
+															}	
+															AND = {
+																new_building_content_enabled = yes
+																owner = { 
+																	NOT = { 
+																		any_owned_planet = {
+																			NOR = { 
+																				is_same_value = prevprev  
+																				has_planet_flag = purged_planet
+																			} 
+																			has_building_construction = no
+																			any_owned_pop = { 
+																				is_colony_pop = yes
+																				is_unemployed = yes							
+																			}									
+																			any_tile = { 
+																				has_deposit = physics_research_building_tile
+																				has_any_tile_strategic_resource = no 										
+																				has_building = no 
+																				has_blocker = no										
+																			}
+																			check_variable = { which = physics_research_mult_planet_tile value > prevprev } 
+																		}
+																	}						
+																}	
+															}	
+														}	
+														OR = { 
+															AND = { 
+																new_building_content_enabled = no														
+																OR = { 
+																	any_tile = { 
+																		has_deposit = physics_research_building_tile
+																		has_deposit = physics_research_building_tile
+																		has_deposit = engineering_research_building_tile
+																		has_building = no 
+																		has_blocker = no
+																	}
+																	AND = { 
+																		any_tile = { 
+																			has_deposit = no														
+																			has_building = no 
+																			has_blocker = no
+																		}							
+																		owner = { 
+																			NOT = { 
+																				any_owned_planet = {
+																					NOR = { 
+																						is_same_value = prevprev  
+																						has_planet_flag = purged_planet
+																					} 
+																					has_building_construction = no
+																					any_owned_pop = { 
+																						is_colony_pop = yes
+																						is_unemployed = yes							
+																					}											
+																					any_tile = { 
+																						has_deposit = physics_research_building_tile
+																						has_deposit = physics_research_building_tile
+																						has_deposit = engineering_research_building_tile			
+																						has_building = no 
+																						has_blocker = no										
+																					}
+																					OR = { 
+																						check_variable = { which = physics_research_mult_planet_tile value = prevprev }
+																						check_variable = { which = physics_research_mult_planet_tile value > prevprev }
+																					}
+																				}
+																			}							
+																		}	
+																	}									
+																}	
+															}													
+															AND = { 
+																new_building_content_enabled = yes														
+																OR = {		
+																	any_tile = { 
+																		has_deposit = physics_research_building_tile
+																		has_building = no 
+																		has_blocker = no
+																	}
+																	AND = { 
+																		any_tile = { 
+																			has_deposit = no														
+																			has_building = no 
+																			has_blocker = no
+																		}							
+																		owner = { 
+																			NOT = { 
+																				any_owned_planet = {
+																					NOR = { 
+																						is_same_value = prevprev  
+																						has_planet_flag = purged_planet
+																					} 
+																					has_building_construction = no
+																					any_owned_pop = { 
+																						is_colony_pop = yes
+																						is_unemployed = yes							
+																					}											
+																					any_tile = { 
+																						has_deposit = physics_research_building_tile
+																						has_building = no 
+																						has_blocker = no										
+																					}
+																					OR = { 
+																						check_variable = { which = physics_research_mult_planet_tile value = prevprev }
+																						check_variable = { which = physics_research_mult_planet_tile value > prevprev }
+																					}
+																				}
+																			}							
+																		}	
+																	}									
+																}	
+															}	
+														}	
+													}	
+													random_tile = { 
+														limit = { 
+															has_building = no 
+															has_blocker = no
+															OR = { 
+																has_deposit = physics_research_building_tile
+																AND = { 
+																	has_deposit = no
+																	prev = { 
+																		NOT = { 
+																			any_tile = { 
+																				has_deposit = physics_research_building_tile
+																				has_building = no 
+																				has_blocker = no												
+																			}
+																		}
+																	}
+																}					
+																OR = { 
+																	AND = { 
+																		new_building_content_enabled = no
+																		OR = { 
+																			AND = {
+																				has_resource = { type = food amount > 0 }
+																				NOR = { 
+																					has_deposit = energy_building_tile
+																					has_deposit = minerals_building_tile
+																				}	
+																				has_any_tile_strategic_resource = no											
+																				prev.owner = { has_country_flag = food_delimited }			
+																			}
+																			AND = {
+																				has_resource = { type = food amount = 1 }
+																				NOR = { 
+																					has_deposit = energy_building_tile
+																					has_deposit = minerals_building_tile
+																				}												
+																				has_any_tile_strategic_resource = no
+																				prev.owner = { NOR = { has_country_flag = food_focus_factor_1 has_country_flag = food_focus_factor_2 has_country_flag = food_focus_factor_3 has_country_flag = food_focus_factor_4 } }
+																			}																	
+																		}
+																	}	
+																	AND = { 
+																		new_building_content_enabled = yes
+																		OR = { 
+																			AND = {
+																				has_resource = { type = food amount > 0 }
+																				NOR = { 
+																					has_deposit = energy_building_tile
+																					has_deposit = minerals_building_tile
+																					has_deposit = society_research_building_tile
+																					has_deposit = engineering_research_building_tile																					
+																				}	
+																				has_any_tile_strategic_resource = no											
+																				prev.owner = { has_country_flag = food_delimited }			
+																			}
+																			AND = {
+																				has_resource = { type = food amount = 1 }
+																				NOR = { 
+																					has_deposit = energy_building_tile
+																					has_deposit = minerals_building_tile
+																					has_deposit = society_research_building_tile
+																					has_deposit = engineering_research_building_tile
+																				}												
+																				has_any_tile_strategic_resource = no
+																				prev.owner = { NOR = { has_country_flag = food_focus_factor_1 has_country_flag = food_focus_factor_2 has_country_flag = food_focus_factor_3 has_country_flag = food_focus_factor_4 } }
+																			}	
+																		}
+																	}	
+																}	
+															}
+														}	
+														set_physics_research_building_construction = yes	
+													}	
+													change_variable = { which = physics_research_buildings_constructions_added value = 1 }	
+												}	
+												else = { 
+													### Engineering Buildings are next
+													if = { 
+														limit = { 
+															OR = { 
+																has_country_flag = engineering_research_focus_factor_1
+																has_country_flag = engineering_research_focus_factor_2
+															}	
+															check_variable = { which = engineering_research_buildings_constructions_added value < 4 }
+														}	
+														random_owned_planet = { 
+															limit = { 
+																NOT = { has_planet_flag = purged_planet } 
+																has_building_construction = no
+																any_owned_pop = { 
+																	is_colony_pop = yes
+																	is_unemployed = yes							
+																}							
+																OR = { 
+																	AND = {
+																		new_building_content_enabled = no
+																		owner = { 
+																			NOT = { 
+																				any_owned_planet = {
+																					NOR = { 
+																						is_same_value = prevprev  
+																						has_planet_flag = purged_planet
+																					} 
+																					has_building_construction = no
+																					any_owned_pop = { 
+																						is_colony_pop = yes
+																						is_unemployed = yes							
+																					}									
+																					any_tile = { 
+																						OR = { 
+																							has_deposit = engineering_research_building_tile
+																							has_deposit = engineering_research_building_tile
+																							has_deposit = engineering_research_building_tile
+																						}	
+																						has_any_tile_strategic_resource = no 										
+																						has_building = no 
+																						has_blocker = no										
+																					}
+																					check_variable = { which = engineering_research_mult_planet_tile value > prevprev } 
+																				}
+																			}						
+																		}	
+																	}	
+																	AND = {
+																		new_building_content_enabled = yes
+																		owner = { 
+																			NOT = { 
+																				any_owned_planet = {
+																					NOR = { 
+																						is_same_value = prevprev  
+																						has_planet_flag = purged_planet
+																					} 
+																					has_building_construction = no
+																					any_owned_pop = { 
+																						is_colony_pop = yes
+																						is_unemployed = yes							
+																					}									
+																					any_tile = { 
+																						has_deposit = engineering_research_building_tile
+																						has_any_tile_strategic_resource = no 										
+																						has_building = no 
+																						has_blocker = no										
+																					}
+																					check_variable = { which = engineering_research_mult_planet_tile value > prevprev } 
+																				}
+																			}						
+																		}	
+																	}	
+																}	
+																OR = { 
+																	AND = { 
+																		new_building_content_enabled = no														
+																		OR = { 
+																			any_tile = { 
+																				has_deposit = engineering_research_building_tile
+																				has_deposit = engineering_research_building_tile
+																				has_deposit = engineering_research_building_tile
+																				has_building = no 
+																				has_blocker = no
+																			}
+																			AND = { 
+																				any_tile = { 
+																					has_deposit = no														
+																					has_building = no 
+																					has_blocker = no
+																				}							
+																				owner = { 
+																					NOT = { 
+																						any_owned_planet = {
+																							NOR = { 
+																								is_same_value = prevprev  
+																								has_planet_flag = purged_planet
+																							} 
+																							has_building_construction = no
+																							any_owned_pop = { 
+																								is_colony_pop = yes
+																								is_unemployed = yes							
+																							}											
+																							any_tile = { 
+																								has_deposit = engineering_research_building_tile
+																								has_deposit = engineering_research_building_tile
+																								has_deposit = engineering_research_building_tile			
+																								has_building = no 
+																								has_blocker = no										
+																							}
+																							OR = { 
+																								check_variable = { which = engineering_research_mult_planet_tile value = prevprev }
+																								check_variable = { which = engineering_research_mult_planet_tile value > prevprev }
+																							}
+																						}
+																					}							
+																				}	
+																			}									
+																		}	
+																	}													
+																	AND = { 
+																		new_building_content_enabled = yes														
+																		OR = {		
+																			any_tile = { 
+																				has_deposit = engineering_research_building_tile
+																				has_building = no 
+																				has_blocker = no
+																			}
+																			AND = { 
+																				any_tile = { 
+																					has_deposit = no														
+																					has_building = no 
+																					has_blocker = no
+																				}							
+																				owner = { 
+																					NOT = { 
+																						any_owned_planet = {
+																							NOR = { 
+																								is_same_value = prevprev  
+																								has_planet_flag = purged_planet
+																							} 
+																							has_building_construction = no
+																							any_owned_pop = { 
+																								is_colony_pop = yes
+																								is_unemployed = yes							
+																							}											
+																							any_tile = { 
+																								has_deposit = engineering_research_building_tile
+																								has_building = no 
+																								has_blocker = no										
+																							}
+																							OR = { 
+																								check_variable = { which = engineering_research_mult_planet_tile value = prevprev }
+																								check_variable = { which = engineering_research_mult_planet_tile value > prevprev }
+																							}
+																						}
+																					}							
+																				}	
+																			}									
+																		}	
+																	}	
+																}	
+															}	
+															random_tile = { 
+																limit = { 
+																	has_building = no 
+																	has_blocker = no
+																	OR = { 
+																		has_deposit = engineering_research_building_tile
+																		AND = { 
+																			has_deposit = no
+																			prev = { 
+																				NOT = { 
+																					any_tile = { 
+																						has_deposit = engineering_research_building_tile
+																						has_building = no 
+																						has_blocker = no												
+																					}
+																				}
+																			}
+																		}					
+																		OR = { 
+																			AND = { 
+																				new_building_content_enabled = no
+																				OR = { 
+																					AND = {
+																						has_resource = { type = food amount > 0 }
+																						NOR = { 
+																							has_deposit = energy_building_tile
+																							has_deposit = minerals_building_tile
+																						}	
+																						has_any_tile_strategic_resource = no											
+																						prev.owner = { has_country_flag = food_delimited }			
+																					}
+																					AND = {
+																						has_resource = { type = food amount = 1 }
+																						NOR = { 
+																							has_deposit = energy_building_tile
+																							has_deposit = minerals_building_tile
+																						}												
+																						has_any_tile_strategic_resource = no
+																						prev.owner = { NOR = { has_country_flag = food_focus_factor_1 has_country_flag = food_focus_factor_2 has_country_flag = food_focus_factor_3 has_country_flag = food_focus_factor_4 } }
+																					}																	
+																				}
+																			}	
+																			AND = { 
+																				new_building_content_enabled = yes
+																				OR = { 
+																					AND = {
+																						has_resource = { type = food amount > 0 }
+																						NOR = { 
+																							has_deposit = energy_building_tile
+																							has_deposit = minerals_building_tile
+																							has_deposit = society_research_building_tile
+																							has_deposit = physics_research_building_tile																					
+																						}	
+																						has_any_tile_strategic_resource = no											
+																						prev.owner = { has_country_flag = food_delimited }			
+																					}
+																					AND = {
+																						has_resource = { type = food amount = 1 }
+																						NOR = { 
+																							has_deposit = energy_building_tile
+																							has_deposit = minerals_building_tile
+																							has_deposit = society_research_building_tile
+																							has_deposit = physics_research_building_tile
+																						}												
+																						has_any_tile_strategic_resource = no
+																						prev.owner = { NOR = { has_country_flag = food_focus_factor_1 has_country_flag = food_focus_factor_2 has_country_flag = food_focus_factor_3 has_country_flag = food_focus_factor_4 } }
+																					}	
+																				}
+																			}	
+																		}	
+																	}
+																}	
+																set_engineering_research_building_construction = yes	
+															}	
+															change_variable = { which = engineering_research_buildings_constructions_added value = 1 }	
+														}				
+													}	
+												}
+											}	
+										}
+									}
+								}			
+							}
+						}
+					}
+				}	
+			}	
+		}						
 	}	
 }	
-
-planet_event = { 
-	
-	
-	
-has_building_construction = yes	
-					
