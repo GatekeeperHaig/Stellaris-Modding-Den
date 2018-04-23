@@ -176,12 +176,12 @@ def readAndConvert(args, allowRestart=1):
               upgradeData=buildingNameToData.get(upgradeName) #allow editing
             except ValueError:
               print("WARNING: Upgrade building {} not found for {}. Either missing or in different file. Cannot apply script to this! In different file will work with '--join_files' option.".format(upgradeName, buildingData.tagName))
-              if "planet_unique" in buildingData.names:
-                print("EXTRA WARNING: The problematic building is planet_unique. This error might destroy uniqueness!")
+              if "planet_unique" in buildingData.names or "empire_unique" in buildingData.names:
+                print("EXTRA WARNING: The problematic building is planet_unique or empire_unique. This error might destroy uniqueness!")
               continue
             secondVisit=False
             if upgradeData.wasVisited:
-              print("Script tried to visit "+upgradeData.tagName +" twice (second time via "+buildingData.tagName+"). This is to be expected if different buildings upgrade into this building, but could also indicate an error in ordering: Of all 'is_listed=yes' buildings in a tree, the lowest tier must always be first!") #TODO is it ok that the script still continues to do everything? 
+              print("Script tried to visit "+upgradeData.tagName +" twice (second time via "+buildingData.tagName+"). This is to be expected if different buildings upgrade into this building, but could also indicate an error in ordering: Of all 'is_listed=yes' buildings in a tree, the lowest tier must always be first!")
               secondVisit=True
             elif buildingData.tagName in args.t0_buildings: #don't do if visited twice!
               upgradeData.costChangeUpgradeToDirectBuild(buildingData, args, varsToValue, True) #fix t0-t1 costs
@@ -202,8 +202,8 @@ def readAndConvert(args, allowRestart=1):
                   pass
                 
             
-            if "empire_unique" in upgradeData.names and upgradeData.get("empire_unique")=="yes":
-              continue #todo: remove! not reason anymore afaik -> check for "planet_unique checks and add empire unique there"
+            # if "empire_unique" in upgradeData.names and upgradeData.get("empire_unique")=="yes":
+            #   continue #todo: remove! not reason anymore afaik -> check for "planet_unique checks and add empire unique there"
 
             #new requirements: Only buildable if one of the conditions of the next higher tier is not satisfied.
             poss=copy.deepcopy([upgradeData.attemptGet("prerequisites"),upgradeData.attemptGet("potential"),upgradeData.attemptGet("allow")])
@@ -269,7 +269,7 @@ def readAndConvert(args, allowRestart=1):
               locData.append(upgradeName+nameExtra+'_desc:0 "$'+upgradeName+'_desc$"') #localisation link
                 
               #MAKE UNIQUE VIA INTRODUCING A FAKE MAX TIER BUILDING
-              if not "upgrades" in upgradeData.names and upgradeData.attemptGet("planet_unique")=="yes": #Max tier unique
+              if not "upgrades" in upgradeData.names and (upgradeData.attemptGet("planet_unique")=="yes" or upgradeData.attemptGet("empire_unique")=="yes"):  #Max tier unique
                 fakeBuilding=NamedTagList(baseBuildingData.tagName+"_hidden_tree_root")
                 fakeBuilding.add("potential", TagList().add("always","no"))
                 fakeBuilding.add("planet_unique", "yes")
@@ -284,7 +284,7 @@ def readAndConvert(args, allowRestart=1):
           if len(newRequirements.vals)>0 and not buildingData.tagName in args.t0_buildings:
               buildingData.getOrCreate("potential").add("NAND", newRequirements)
               newRequirements.add("NOT", TagList("has_global_flag","display_low_tier_flag"))
-              if args.make_optional:#todo activate after having done "no change" check
+              if args.make_optional:
                 newRequirements.add("has_global_flag","direct_build_enabled")
     #END OF COPY AND MODIFY        
 
