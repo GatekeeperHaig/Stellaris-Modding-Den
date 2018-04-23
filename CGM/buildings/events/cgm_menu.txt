@@ -30,29 +30,6 @@ country_event = {
 					}
 				}
 			}
-			every_planet = {
-				limit = {
-					NOT = { has_planet_flag = deposits_converted }
-					OR = { is_colonizable = yes is_colony = yes }
-					any_tile = { has_deposit = yes has_any_tile_strategic_resource = no }
-				}
-				set_variable = { which = energy_tile_resource value = 0 }
-				set_variable = { which = minerals_tile_resource value = 0 }
-				set_variable = { which = food_tile_resource value = 0 }
-				set_variable = { which = unity_tile_resource value = 0 }
-				set_variable = { which = society_research_tile_resource value = 0 }
-				set_variable = { which = physics_research_tile_resource value = 0 }
-				set_variable = { which = engineering_research_tile_resource value = 0 }
-				every_tile = {
-					limit = { has_deposit = yes has_any_tile_strategic_resource = no }
-					convert_deposits = yes
-				}
-				set_planet_flag = deposits_converted
-			}
-			random_country = {
-				limit = { has_country_flag = cgm_game_host }
-				country_event = { id = core_game_mechanics_and_ai_base.1 }
-			}
 		}
 	}
 }
@@ -73,7 +50,34 @@ country_event = {
 			AND = { is_multiplayer = yes has_country_flag = cgm_game_host }
 		}
 	}
-	immediate = { set_global_flag = direct_build_enabled }
+	immediate = {
+		set_global_flag = direct_build_enabled
+		if = {
+			limit = {
+				NOT = { has_global_flag = deposits_converted }
+			}
+			every_planet = {
+				limit = {
+					NOT = { has_planet_flag = deposits_converted }
+					OR = { is_colonizable = yes is_colony = yes }
+					any_tile = { has_deposit = yes has_any_tile_strategic_resource = no }
+				}
+				set_variable = { which = energy_tile_resource value = 0 }
+				set_variable = { which = minerals_tile_resource value = 0 }
+				set_variable = { which = food_tile_resource value = 0 }
+				set_variable = { which = unity_tile_resource value = 0 }
+				set_variable = { which = society_research_tile_resource value = 0 }
+				set_variable = { which = physics_research_tile_resource value = 0 }
+				set_variable = { which = engineering_research_tile_resource value = 0 }
+				every_tile = {
+					limit = { has_deposit = yes has_any_tile_strategic_resource = no }
+					convert_deposits = yes
+				}
+				set_planet_flag = deposits_converted
+			}
+			set_global_flag = cgm_resources_converted
+		}
+	}
 	option = {
 		name = cgm_buildings_preset.enable_new_building_content.name
 		custom_gui = "cgm_option"

@@ -23,7 +23,39 @@ country_event = {
 					ignore_hyperlanes = no 
 					event_target:hyperlane_check_star = { change_variable = { which = num_of_hyperlane_connections value = 1 } }
 				}				
-			}		
+			}
+		}
+	}
+}	
+
+#the event below opens the main menu for CGM - each CGM mod gets a unique option
+
+country_event = { 
+	id = core_game_mechanics_and_ai_base.1	
+	is_triggered_only = yes
+	title = cgm.main_menu.title
+	desc = cgm.main_menu.desc
+	diplomatic = yes
+	custom_gui = "cgm_main_menu"
+	force_open = yes
+
+	picture_event_data = { room = cgm_menu_room }	
+
+	trigger = { 		
+		is_ai = no
+		OR = {
+			is_multiplayer = no
+			AND = { 
+				is_multiplayer = yes				
+				has_country_flag = cgm_game_host
+			}	
+		}				
+	}	
+	
+	immediate = { 
+		set_global_flag = direct_build_enabled
+		if = {
+			limit = { NOT = { has_global_flag = deposits_converted } } 
 			every_planet = {
 				limit = { 
 					NOT = { has_planet_flag = deposits_converted }
@@ -52,40 +84,9 @@ country_event = {
 				}	
 				set_planet_flag = deposits_converted
 			}			
-			random_country = { 
-				limit = { has_country_flag = cgm_game_host }
-				country_event = { id = core_game_mechanics_and_ai_base.1 }
-			}
-		}	
-	}
-}
-
-#the event below opens the main menu for CGM - each CGM mod gets a unique option
-
-country_event = { 
-	id = core_game_mechanics_and_ai_base.1	
-	is_triggered_only = yes
-	title = cgm.main_menu.title
-	desc = cgm.main_menu.desc
-	diplomatic = yes
-	custom_gui = "cgm_main_menu"
-	force_open = yes
-
-	picture_event_data = { room = cgm_menu_room }	
-
-	trigger = { 		
-		is_ai = no
-		OR = {
-			is_multiplayer = no
-			AND = { 
-				is_multiplayer = yes				
-				has_country_flag = cgm_game_host
-			}	
-		}				
+			set_global_flag = cgm_resources_converted
+		}			
 	}	
-	
-	immediate = { set_global_flag = direct_build_enabled }
-	
 	option = {
 		name = cgm_buildings_preset.enable_new_building_content.name
 		custom_gui = "cgm_option"
