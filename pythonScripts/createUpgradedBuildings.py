@@ -57,17 +57,15 @@ def parse(argv, returnParser=False):
 def readAndConvert(args, allowRestart=1):   
   lastOutPutFileName=""
 
-  prioFile=""
-  if args.load_order_priority:
-    prioFile="z_"
+
 
   if not args.just_copy_and_check and not args.test_run:
     if not os.path.exists(args.output_folder+"/common"):
       os.mkdir(args.output_folder+"/common")
     if not os.path.exists(args.output_folder+"/common/buildings"):
       os.mkdir(args.output_folder+"/common/buildings")
-    if not os.path.exists(args.output_folder+"/common/scripted_triggers"): #folder always needed parallel to build_upgraded building output!
-     os.mkdir(args.output_folder+"/common/scripted_triggers")
+    # if not os.path.exists(args.output_folder+"/common/scripted_triggers"): #folder always needed parallel to build_upgraded building output!
+    #  os.mkdir(args.output_folder+"/common/scripted_triggers")
     
  
   if not args.just_copy_and_check and not args.test_run:
@@ -106,6 +104,10 @@ def readAndConvert(args, allowRestart=1):
 
 
   for fileIndex,buildingFileName in enumerate(globbedList):
+    prioFile=""
+    if args.load_order_priority:
+      prioFile="z_"
+    buildingFileNameWithoutPath=os.path.basename(buildingFileName)
     if isHelperFileItList and isHelperFileItList[fileIndex]:
       thisFileIsAHelper=True
     else:
@@ -116,16 +118,17 @@ def readAndConvert(args, allowRestart=1):
     else:
       args.outPath=args.output_folder+"/common/buildings/"
     if not args.test_run and (not args.just_copy_and_check or not args.create_standalone_mod_from_mod):
-      with open(args.outPath+os.path.basename(buildingFileName),'w') as outputFile:
+      with open(args.outPath+buildingFileNameWithoutPath,'w') as outputFile:
         outputFile.write(args.scriptDescription)
         outputFile.write("#overwrite\n")
-    if fileIndex==0 or (not args.join_files) and (not isHelperFileItList): #create empty lists. Do only in first iteration when args.join_files is active as we add to the lists in each iteration here #TODO: I think it should be no thisFileIsAHelper- need to check with an example
+    if fileIndex==0 or (not args.join_files) and (not isHelperFileItList): #create empty lists. Do only in first iteration when args.join_files is active as we add to the lists in each iteration here. helper stuff is deleted renewed after writing output file
       varsToValue=TagList(0)
+      buildingNameToData=TagList(0)
+    if (fileIndex==0 or (not args.join_files) and (not isHelperFileItList)) or (isHelperFileItList and thisFileIsAHelper==False):
       if args.scripted_variables!="":
         for scriptVarFile in args.scripted_variables.split(","):
           scriptVarFile=scriptVarFile.strip()
           varsToValue.readFile(scriptVarFile)
-      buildingNameToData=TagList(0)
     prevLen=len(buildingNameToData.vals)
     buildingNameToData.readFile(buildingFileName,args, varsToValue,True)
     if isHelperFileItList: #mark helper buildings
@@ -408,62 +411,65 @@ def readAndConvert(args, allowRestart=1):
         modfile.write('supported_version="{}"\n'.format(args.game_version))
         if args.picture_file:
           modfile.write('picture="{}"'.format(args.picture_file))
-    with open(buildingFileName,'r') as inputFile:
-      if args.join_files:
-        outfileBaseName="JOINED"+os.path.basename(inputFile.name)+".txt"
-      else:
-        outfileBaseName=os.path.basename(inputFile.name)
-      if not args.just_copy_and_check and not args.test_run:
-        #LOCALISATION OUTPUT
-        if not os.path.exists(args.output_folder+"/localisation"):
-          os.mkdir(args.output_folder+"/localisation")
-        for language in args.languages.split(","):
-          if not os.path.exists(args.output_folder+"/localisation/"+language):
-            os.mkdir(args.output_folder+"/localisation/"+language)
-          with codecs.open(args.output_folder+"/localisation/{}/build_upgraded_{}_l_{}.yml".format(language,outfileBaseName.replace(".txt",""),language),'w', "utf-8") as locOutPutFile:
-            locOutPutFile.write(u'\ufeff')
-            locOutPutFile.write("l_"+language+":"+"\n")
-            locOutPutFile.write(args.scriptDescription)
-            for line in locData:
-              locOutPutFile.write(" "+line+"\n")
-        
-        #scripted_triggers OUTPUT
-        if len(triggers)>0:
-          triggerFile=open(args.output_folder+"/common/scripted_triggers/{}build_upgraded_".format(prioFile)+outfileBaseName.replace(".txt","")+"_triggers.txt",'w')
-          triggerFile.write(args.scriptDescription)
-          triggers.writeAll(triggerFile,args)
+
+
+    if args.join_files:
+      outfileBaseName="JOINED"+buildingFileNameWithoutPath+".txt"
+    else:
+      outfileBaseName=buildingFileNameWithoutPath
+    if not args.just_copy_and_check and not args.test_run:
+      #LOCALISATION OUTPUT
+      if not os.path.exists(args.output_folder+"/localisation"):
+        os.mkdir(args.output_folder+"/localisation")
+      for language in args.languages.split(","):
+        if not os.path.exists(args.output_folder+"/localisation/"+language):
+          os.mkdir(args.output_folder+"/localisation/"+language)
+        with codecs.open(args.output_folder+"/localisation/{}/build_upgraded_{}_l_{}.yml".format(language,outfileBaseName.replace(".txt",""),language),'w', "utf-8") as locOutPutFile:
+          locOutPutFile.write(u'\ufeff')
+          locOutPutFile.write("l_"+language+":"+"\n")
+          locOutPutFile.write(args.scriptDescription)
+          for line in locData:
+            locOutPutFile.write(" "+line+"\n")
       
-      #BUILDING OUTPUT
-      if len(args.copiedBuildings)>0:
-        buildingNameToData.replaceAllHasBuildings(args)
-        # for b in buildingNameToData.vals:
-          # b.replaceAllHasBuildings(args)
-      
-      if args.create_standalone_mod_from_mod:
-        outputFileName=args.outPath+prioFile+outfileBaseName
-      else:
-        if args.load_order_priority and "events" in args.outPath: #events prefers low ascii. might be more for which this is true. Triggers prefer high ascii
-          prioFile="!_"
-        outputFileName=args.outPath+prioFile+"build_upgraded_"+outfileBaseName
-      lastOutPutFileName=outputFileName
-      if args.test_run:
-        continue
-      with open(outputFileName,'w') as outputFile:
-        outputFile.write(args.scriptDescription)
-        buildingNameToData.writeAll(outputFile,args,len(isHelperFileItList))
+      # #scripted_triggers OUTPUT
+      # if len(triggers)>0:
+      #   triggerFile=open(args.output_folder+"/common/scripted_triggers/{}build_upgraded_".format(prioFile)+outfileBaseName.replace(".txt","")+"_triggers.txt",'w')
+      #   triggerFile.write(args.scriptDescription)
+      #   triggers.writeAll(triggerFile,args)
+    
+    # if len(args.copiedBuildings)>0: #TODO remove after "no change check"!
+    #   buildingNameToData.replaceAllHasBuildings(args)
+ 
+    
+    #BUILDING OUTPUT
+    if args.create_standalone_mod_from_mod:
+      outputFileName=args.outPath+prioFile+outfileBaseName
+    else:
+      if args.load_order_priority and "events" in args.outPath: #events prefers low ascii. might be more for which this is true. Triggers prefer high ascii
+        prioFile="!_"
+      outputFileName=args.outPath+prioFile+"build_upgraded_"+outfileBaseName
+    lastOutPutFileName=outputFileName
+    if args.test_run:
+      continue
+    with open(outputFileName,'w') as outputFile:
+      outputFile.write(args.scriptDescription)
+      buildingNameToData.writeAll(outputFile,args,len(isHelperFileItList))
+
     if isHelperFileItList and not args.join_files:  #reset after doing a file
       varsToValue=TagList(0)
       buildingNameToData=TagList(0)
+
+
   if not args.just_copy_and_check and not args.test_run:
     copiedBuildingsFile.close()
     with open(args.copiedBuildingsFileName) as file:
       newCopiedBuilings=[line.strip() for line in file]
     if newCopiedBuilings!=args.copiedBuildings and not args.just_copy_and_check:
       args.copiedBuildings=newCopiedBuilings
-      if allowRestart:
-        readAndConvert(copy.deepcopy(args),0)
-  if lastOutPutFileName and lastOutPutFileName[0]!="." and lastOutPutFileName[0]!=os.sep and lastOutPutFileName[0]!="/":
-    lastOutPutFileName="./"+lastOutPutFileName
+      # if allowRestart: #todo remove after checks!
+      #   readAndConvert(copy.deepcopy(args),0)
+  # if lastOutPutFileName and lastOutPutFileName[0]!="." and lastOutPutFileName[0]!=os.sep and lastOutPutFileName[0]!="/":
+  #   lastOutPutFileName="./"+lastOutPutFileName
   return lastOutPutFileName
   
 def killWindowsBackSlashesWithFire(string):
@@ -522,6 +528,7 @@ def main(args, argv):
     rerunName=args.output_folder+"/rerun_just_copy_and_check.py"
   else:
     rerunName=args.output_folder+"/rerun.py" 
+
   if not args.test_run:
     with open(rerunName, 'w') as file:
       file.write("#!/usr/bin/env python\n")
@@ -542,6 +549,7 @@ def main(args, argv):
         file.write("\tfor filename in fnmatch.filter(filenames,'rerun_just_copy_and_check.py'):\n")
         file.write("\t\tsubprocess.call('python {}'+{}+'{}', shell=True)\n".format('"',"os.path.join(root,filename)",'"'))
         # file.write("\t\tsubprocess.call('python "+'+"'+'filename'+'"'+"', shell=True)\n")
+
   if args.create_standalone_mod_from_mod:
     modFileName=args.buildingFileNames[0]
     # print(modFileName)
@@ -584,6 +592,7 @@ def main(args, argv):
     with open(args.copiedBuildingsFileName) as file:
         args.copiedBuildings=[line.strip() for line in file]
     createConvertEvent(args)
+    
     otherFilesArgs=copy.deepcopy(args)
     otherFilesArgs.buildingFileNames=[]    
     otherFilesArgs.just_copy_and_check=True
