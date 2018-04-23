@@ -9,7 +9,7 @@ from tkinter import simpledialog
 from tkinter import *
 #from tkinter.tix import *
 from tkinter import ttk
-# from PIL import ImageTk, Image
+from PIL import ImageTk, Image
 from tooltip import CreateToolTip
 from scrollframe import ScrollFrame
 import webbrowser
@@ -264,7 +264,7 @@ class TabClass:
       #self.mainFrame=tk.Frame(self.lineFrame)
       #self.mainFrame.pack(side="top", fill="both", expand=True)
       #self.mainFrame.bind( '<Configure>', maxsize )
-      self.extraLineMain=tk.Frame(self.mainFrame)
+      self.extraLineMain=tk.Frame(self.mainFrame, height=24)
       self.extraLineMain.pack(side=tk.TOP)
       # for option in options:
       #   self.checkVars.append(IntVar())
@@ -275,29 +275,29 @@ class TabClass:
       #b.pack(side=tk.RIGHT)
       #b = tk.Button(self.extraLineMain, text="Add line", command=self.addLine)
       #b.pack(side=tk.RIGHT)
-      # img = ImageTk.PhotoImage(Image.open("Load-icon.png"))
-      # img = ImageTk.PhotoImage(Image.open("Save-icon.png"))
-      self.saveImg = PhotoImage(file="Save-icon.gif")
-      b = tk.Button(self.extraLineMain, text="",image=self.saveImg, command=self.save)
-      b.pack(side=tk.RIGHT)
+      self.saveImg = ImageTk.PhotoImage(Image.open("Save-icon.png"))
+      # self.saveImg = PhotoImage(file="Save-icon.gif")
+      b = tk.Button(self.extraLineMain,text="",image=self.saveImg, command=self.save)
+      b.pack(side=tk.RIGHT,expand=YES, fill="y")
       CreateToolTip(b, "Save Current Tab")
-      self.loadImg = PhotoImage(file="Load-icon.gif")
-      b = tk.Button(self.extraLineMain, text="",image=self.loadImg, command=lambda : self.load(False,True))
-      b.pack(side=tk.RIGHT)
+      self.loadImg = ImageTk.PhotoImage(Image.open("Load-icon.png"))
+      # self.loadImg = PhotoImage(file="Load-icon.gif")
+      b = tk.Button(self.extraLineMain,text="",image=self.loadImg, command=lambda : self.load(False,True))
+      b.pack(side=tk.RIGHT,expand=YES, fill="y")
       CreateToolTip(b, "Load Tab(s)")
       if optionWindow:
-        b= tk.Button(self.extraLineMain, text="Options", command=self.optionWindow.window.deiconify)
-        b.pack(side=tk.RIGHT)
-      b = tk.Button(self.extraLineMain, text="Update Path", command=self.updatePath)
-      b.pack(side=tk.RIGHT)
+        b= tk.Button(self.extraLineMain,text="Options", command=self.optionWindow.window.deiconify)
+        b.pack(side=tk.RIGHT,expand=YES, fill="y")
+      b = tk.Button(self.extraLineMain,text="Update Path", command=self.updatePath)
+      b.pack(side=tk.RIGHT,expand=YES, fill="y")
       CreateToolTip(b, "Update the Path that is open when adding files to the last used one of any Tab in the GUI. Useful when doing stuff that requires two tabs, like Txt To Ods and Ods To Txt")
-      b = tk.Button(self.extraLineMain, text="Add file(s)", command=self.addFiles)
-      b.pack(side=tk.RIGHT)
+      b = tk.Button(self.extraLineMain,text="Add file(s)", command=self.addFiles)
+      b.pack(side=tk.RIGHT,expand=YES, fill="y")
       if self.extraAddButton!="":
         b = tk.Button(self.extraLineMain, text=self.extraAddButton, command=self.addMarkedFiles)
-        b.pack(side=tk.RIGHT)
-      b = tk.Button(self.extraLineMain, text="Convert All", command=self.invokeAll)
-      b.pack(side=tk.LEFT)
+        b.pack(side=tk.RIGHT,expand=YES, fill="y")
+      b = tk.Button(self.extraLineMain,text="Convert All", command=self.invokeAll)
+      b.pack(side=tk.LEFT,expand=YES, fill="y")
 
       txt_frm = tk.Frame(tab, width=600, height=600)
       txt_frm.pack(fill="both", expand=True)
@@ -674,7 +674,9 @@ class TabControlClass:
     self.tabClasses[-1].helpText="Uses an ods file to changes the accordingly named .txt file: Entries that are in the ods file are written into the txt file at the right place (overwriting what was there before or written directly in the header instead of overwriting a variable. \nEmpty or missing entries in the ods file remain unchanged! \n To delete something from the txt file, write '#delete' in the according cell in the ods file. If all subtags of a supertag are deleted, the supertag will also be deleted. Never delete a 'key'! It suffices to delete all other tags to delete a top-level tag (e.g. a whole component)"
 
 
-    BUOptions=[of,"custom_mod_name","game_version","t0_buildings","languages","replacement_file","time_discount","cost_discount","remove_reduntant_upgrades","keep_lower_tier","custom_direct_build_AI_allow","simplify_upgrade_AI_allow","load_order_priority","make_optional",jf,oll]
+    BUOptions=[of,"custom_mod_name","game_version","t0_buildings","languages",
+    #"replacement_file",
+    "time_discount","cost_discount","custom_direct_build_AI_allow","simplify_upgrade_AI_allow","load_order_priority","make_optional",jf,oll]
     self.newTab("Create Upgraded Buildings",createUpgradedBuildings,("text files","*.txt"),[]
       ,BUOptions,"Add Helper File(s)")
     self.tabClasses[-1].helpText='1. "Add file(s)": "Stellaris/common/buildings/00_buildings.txt" (unless you have no dependence on vanilla buildings at all, not even capital building requirements. Check "Helper file". Contents of such a file will be used, but the buildings wont be output.\n1b. If your buildings depend on any other buildings (other mods, other vanilla buildings): Add them the same way.\n2. Add all building files of the mod you want to make compatible. Do *not* check the "Helper file" checkbox\n3. In "Options", set a output folder, mod name and check "load order priority" and "join files".\n4. Convert All'
