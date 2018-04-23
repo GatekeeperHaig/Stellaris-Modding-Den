@@ -1,0 +1,147 @@
+namespace = cgm_automation
+
+country_event = {
+	id = cgm_automation.1
+	is_triggered_only = yes
+	hide_window = yes
+	
+	trigger = { 
+		OR = {
+			is_ai = yes
+			has_policy_flag = building_automation_enabled 
+		}
+	}
+	
+	immediate = { 
+		country_event = { id = cgm_automation.1 days = 90 } 
+		if = { 
+			limit = { 
+				is_ai = no
+				has_policy_flag = budget_preset_1 #10% of income is removed into the building budget			
+				minerals > 499
+				has_monthly_income = { resource = minerals amount > 50 }
+			}	
+			set_variable = { which = building_construction_budget value = energy_income }
+			multiply_variable = { which = building_construction_budget value = 0.1 }
+			while = {
+				count = building_construction_budget
+				add_minerals = -1
+			}			
+			else = { 	
+				if = { 
+					limit = { 
+						OR = { 
+							is_ai = yes
+							AND = { 
+								is_ai = no
+								has_policy_flag = budget_preset_2 #20% of income is removed into the building budget
+							}
+						}
+						minerals > 499
+						has_monthly_income = { resource = minerals amount > 50 }
+					}	
+					set_variable = { which = building_construction_budget value = energy_income }
+					multiply_variable = { which = building_construction_budget value = 0.2 }
+					while = {
+						count = building_construction_budget
+						add_minerals = -1
+					}	
+				}	
+				else = { 
+					if = { 
+						limit = { 
+							is_ai = no
+							has_policy_flag = budget_preset_3 #30% of income is removed into the building budget
+							minerals > 499
+							has_monthly_income = { resource = minerals amount > 50 }
+						}	
+						set_variable = { which = building_construction_budget value = energy_income }
+						multiply_variable = { which = building_construction_budget value = 0.3 }
+						while = {
+							count = building_construction_budget
+							add_minerals = -1
+						}	
+					}			
+				}
+			}
+		}
+		set_variable = { which = minerals_reserve value = 0 }
+		while = { 
+			limit = { minerals > 0 }
+			add_minerals = -1
+			change_variable = { which = minerals_reserve value = 1 }
+		}
+		while = { 
+			count = minerals_reserve
+			add_minerals = 1			
+		}			
+		while = { 
+			limit = { check_variable = { which = building_construction_budget value > 199 } }
+			### Prioritize Food Buildings
+			if = { 
+				limit = { 
+					NOT = { has_country_flag = food_delimited }
+					OR = { 
+						AND = { 
+							has_country_flag = food_focus_factor_1
+							NOR = { 
+								has_country_flag = energy_focus_factor_1
+								has_country_flag = minerals_focus_factor_1
+								has_country_flag = energy_focus_factor_2
+								has_country_flag = minerals_focus_factor_2
+							}
+						}	
+						AND = { 
+							has_country_flag = food_focus_factor_2
+							NOR = { 
+								has_country_flag = energy_focus_factor_2
+								has_country_flag = minerals_focus_factor_2
+							}
+						}						
+						has_country_flag = food_focus_factor_3
+						has_country_flag = food_focus_factor_4
+					}
+				}	
+				### find best food building candidate
+				random_owned_planet = { 
+					limit = { 
+						NOT = { has_planet_flag = purged_planet } 
+						has_building_construction = no
+						any_tile = { 
+							has_building = no 
+							has_blocker = no
+						}
+						any_owned_pop = { 
+							is_colony_pop = yes
+							is_unemployed = yes							
+						}	
+						check_variable = { which = food_mult_planet_tile value > 0.9 } #really avoid building food buildings on anything worse						
+						AND = { 
+							owner = { 
+								any_owned_planet = {
+									NOR = { 
+										is_same_value = prevprev  
+										has_planet_flag = purged_planet
+									} 
+									has_building_construction = no
+									any_tile = { 
+										has_building = no 
+										has_blocker = no
+									}
+									any_owned_pop = { 
+										is_colony_pop = yes
+										is_unemployed = yes							
+									}	
+									check_variable = { which = food_mult_planet_tile value > prevprev } #really avoid building food buildings on anything worse									
+									
+								
+					
+	}	
+}	
+
+planet_event = { 
+	
+	
+	
+has_building_construction = yes	
+					
