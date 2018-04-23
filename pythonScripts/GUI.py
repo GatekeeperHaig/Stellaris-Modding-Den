@@ -290,14 +290,14 @@ class TabClass:
       CreateToolTip(b, "Load Tab(s)")
 
       self.DocImg = ImageTk.PhotoImage(Image.open("StellarisDocumentIcon.png"))
-      b = tk.Button(self.extraLineMain,text="",image=self.DocImg, command=lambda : self.load(False,True))
+      b = tk.Button(self.extraLineMain,text="",image=self.DocImg, command=lambda : self.setPath("StellarisDocPath"))
       b.pack(side=tk.RIGHT,expand=YES, fill="y")
-      CreateToolTip(b, "Load Tab(s)")
+      CreateToolTip(b, "Stellaris Documents Path")
 
       self.StellImg = ImageTk.PhotoImage(Image.open("StellarisIcon.png"))
-      b = tk.Button(self.extraLineMain,text="",image=self.StellImg, command=lambda : self.load(False,True))
+      b = tk.Button(self.extraLineMain,text="",image=self.StellImg, command=lambda : self.setPath("StellarisPath"))
       b.pack(side=tk.RIGHT,expand=YES, fill="y")
-      CreateToolTip(b, "Load Tab(s)")
+      CreateToolTip(b, "Stellaris Main Game Path")
 
       b = tk.Button(self.extraLineMain,text="Update Path", command=self.updatePath)
       b.pack(side=tk.RIGHT,expand=YES, fill="y")
@@ -370,6 +370,8 @@ class TabClass:
     if os.path.exists(".GUI_last_path"):
       with open(".GUI_last_path") as file:
         self.lastPath=file.readlines()[-1].strip()
+  def setPath(self, key):
+    self.lastPath=self.tabControl.pathWindow.txts[key].get().strip()
   def addMarkedFiles(self):
     curLine=len(self.lines)
     self.addFiles()
@@ -502,9 +504,9 @@ class TabClass:
     #os.W_OK Value to include in the mode parameter of access() to test the writability of path.
     #os.X_OK Value to include in the mode parameter of access() to determine if path can be executed.
   def askForPkl(self, type="asksaveasfilename", titleInput="Select file to save to"):
-    fileName=getattr(filedialog, type)(defaultextension=".pkl",initialdir = self.tabControl.menuBar.lastFolder,title = titleInput,filetypes = (("pickle files","*.pkl"), ("all files","*")))
+    fileName=getattr(filedialog, type)(defaultextension=".pkl",initialdir = self.tabControl.menuBar.lastPklFolder,title = titleInput,filetypes = (("pickle files","*.pkl"), ("all files","*")))
     if fileName:
-      self.tabControl.menuBar.lastFolder=os.path.dirname(fileName.strip())
+      self.tabControl.menuBar.lastPklFolder=os.path.dirname(fileName.strip())
       self.tabControl.menuBar.storeData()
     return fileName
   def save(self, appendToFile=False):
@@ -517,9 +519,9 @@ class TabClass:
         pickle.dump(TabClass.copyNonGUI(self),f)
 
 
-    # filedialog.asksaveasfilename(defaultextension=".pkl",initialdir = self.tabControl.menuBar.lastFolder,title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
+    # filedialog.asksaveasfilename(defaultextension=".pkl",initialdir = self.tabControl.menuBar.lastPklFolder,title = "Select file to save to",filetypes = (("pickle files","*.pkl"), ("all files","*")))
     # if fileName:
-    #   self.tabControl.menuBar.lastFolder=os.path.dirname(fileName.strip())
+    #   self.tabControl.menuBar.lastPklFolder=os.path.dirname(fileName.strip())
     #   self.tabControl.menuBar.storeData()
     #   with open(fileName, 'wb') as f:
     #     pickle.dump([],f) #empty stop for old checkVars
@@ -600,6 +602,53 @@ class Option:
       self.description=description
     self.val=val #boolean or string
 
+class PathWindow:
+  def __init__(self,root,name, imageFiles,labelTexts, names,tabClass):
+    self.root=root
+    self.window=tk.Toplevel(root)
+    self.window.withdraw()
+    self.window.title(name)   
+    self.window.protocol('WM_DELETE_WINDOW', self.window.withdraw)  # root is your root window
+    # self.lines=[]
+    self.imgs=[]
+    self.txts=dict()
+    for i, (imageFile, labelText, pathName) in enumerate(zip(imageFiles, labelTexts,names)):
+      # line=tk.Frame(self.window, height=24)
+      # self.lines.append(line)
+      # line.pack(side=tk.TOP)
+      img=ImageTk.PhotoImage(Image.open(imageFile))
+      self.imgs.append(img)
+      l=Label(self.window,image=img, text="")
+      l.grid(row=i, column=0)
+      l=Label(self.window, text=labelText)
+      l.grid(row=i, column=1)
+      sv = StringVar()
+      sv.trace("w", lambda name, index, mode, sv=sv: tabClass.saveMain())
+      txt= tk.Entry(self.window, bg="white",width=85,textvariable=sv)
+      self.txts[pathName]=sv
+      txt.grid(row=i, column=2)
+      self.bFile = tk.Button(self.window, text="...", command=lambda pathName=pathName:self.getPath(pathName,self))
+      self.bFile.grid(row=i, column=3)
+    # self.window.grab_set()
+  def getPath(self,key,parent):
+    current=self.getTxt(key)
+    parent.window.grab_set()
+    # if current=='' or not os.path.exists(current):
+
+    fileName=filedialog.askdirectory(initialdir = current,title = "Select file")
+    # parent.window.iconify(); 
+    # parent.window.iconify(); 
+    parent.root.grab_set()
+    if fileName:
+      self.setTxt(fileName, key)
+  def getTxt(self,name):
+    return self.txts[name].get().strip()
+  def setTxt(self, string, key,fieldName="txts"):
+    getattr(self, fieldName)[key].set(string)
+    # field.delete(0,END)
+    # field.insert(0, string.strip())
+    # field.xview_moveto(1)
+
 class OptionWindow:
   def __init__(self,root,name, options,script, createGUI=True, copyFrom=None):
     self.vals=[]
@@ -678,6 +727,9 @@ class TabControlClass:
     self.root=root
     self.tabClasses=[]
 
+    self.pathWindow=PathWindow(root, "Set Paths", ["StellarisIcon.png","StellarisDocumentIcon.png"],["Stellaris Main Game Path","Stellaris Documents Path"],["StellarisPath", "StellarisDocPath"], self)
+    # self.pathWindow.window.deiconify()
+
     #def newTab(name, command, fileFilter, fixedOptions, options, extraAddButton, frame):
 
     of="output_folder"
@@ -755,6 +807,11 @@ class TabControlClass:
     self.getActiveTabClass().load(False, True)
   def saveAdd(self):
     self.getActiveTabClass().save(True)
+  def saveMain(self):
+    try:
+      self.menuBar.storeData()
+    except: #won't work on gui init
+      pass
 
   def startEditor(self,filename, forceEditor=False):
     if not os.path.exists(filename):
@@ -839,11 +896,20 @@ class Editor:
 #     def apply(self):
 #         self.result = int(self.e1.get())
 
+class GuiMainStorage:
+  def __init__(self):
+    # self.editorTypes=[]
+    self.editor=dict()
+    self.lastPklFolder=None
+    self.txts=dict()
+
+
 class MenuBar:
   def __init__(self, root, tabControl):
     self.root=root
     menubar = Menu(root)
     self.menubar=menubar
+    self.tabControl=tabControl
 
     # create a pulldown menu, and add it to the menu bar
     filemenu = Menu(menubar, tearoff=0)
@@ -893,37 +959,62 @@ class MenuBar:
     settingsMenu.add_cascade(label="Remove Editor", menu=self.removeEditor)
     settingsMenu.add_cascade(label="Choose Ods Editor", menu=self.chooseOdsEditor)
     settingsMenu.add_cascade(label="Remove Ods Editor", menu=self.removeOdsEditor)
-    settingsMenu.add_command(label="Set Stellaris Documents Path (WIP)", command=lambda: self.printPrevPaths())
-    settingsMenu.add_command(label="Set Stellaris Game Path (WIP)", command=lambda: self.printPrevPaths())
+    # settingsMenu.add_command(label="Set Stellaris Documents Path (WIP)", command=lambda: self.printPrevPaths())
+    # settingsMenu.add_command(label="Set Stellaris Game Path (WIP)", command=lambda: self.printPrevPaths())
+    settingsMenu.add_command(label="Set Paths ", command=lambda: tabControl.pathWindow.window.deiconify())
     menubar.add_cascade(label="Settings", menu=settingsMenu)
 
     # display the menu
     root.config(menu=menubar)
 
   def storeData(self):
-    with open(".gratak_gui_data.pkl2", 'wb') as f:
-      for editorList in ["txtEditors","OdsEditors"]:
-        # pickle.dump(len(getattr(self,editorList)),f)
-        editorOut=[]
-        for editor in getattr(self,editorList):
-          editorOut.append(editor.toPickle())
-        pickle.dump(editorOut,f)
-      pickle.dump(self.lastFolder,f)
+    guiMainStorage=GuiMainStorage()
+    for editorList in ["txtEditors","OdsEditors"]:
+      # pickle.dump(len(getattr(self,editorList)),f)
+      # guiMainStorage.editor.append([])
+      guiMainStorage.editor[editorList]=[]
+      for editor in getattr(self,editorList):
+        guiMainStorage.editor[editorList].append(editor.toPickle())
+      # .append(editorOut)
+      # pickle.dump(editorOut,f)
+    guiMainStorage.lastPklFolder=self.lastPklFolder
+    for txtKey,txt in self.tabControl.pathWindow.txts.items():
+      guiMainStorage.txts[txtKey]=txt.get().strip()
+    with open(".gratak_gui_data.pkl", 'wb') as f:
+      pickle.dump(guiMainStorage,f)
   def loadStoredData(self):
-    self.lastFolder="."
+    self.lastPklFolder="."
     if not os.path.exists(".gratak_gui_data.pkl2"):
       return False
-    with open(".gratak_gui_data.pkl2", 'rb') as f:
-      for editorList in ["txtEditors","OdsEditors"]:
-        editorIn=pickle.load(f)
-        getattr(self,editorList).clear()
-        for editor in editorIn:
-          getattr(self,editorList).append(Editor("tmp"))
-          getattr(self,editorList)[-1].fromPickle(editor)
-      try:
-        self.lastFolder=pickle.load(f)
-      except EOFError:
-        pass
+    with open(".gratak_gui_data.pkl", 'rb') as f:
+      pickleIn=pickle.load(f)
+      if isinstance(pickleIn, GuiMainStorage):
+        try:
+          guiMainStorage=pickleIn
+          # print(guiMainStorage.editorTypes)
+          for editorListNames,editorList in guiMainStorage.editor.items():
+            getattr(self,editorListNames).clear()
+            for editor in editorList:
+              # print(editor)
+              getattr(self,editorListNames).append(Editor("tmp"))
+              getattr(self,editorListNames)[-1].fromPickle(editor)
+          self.lastPklFolder=guiMainStorage.lastPklFolder
+          for txtKey,txt in guiMainStorage.txts.items():
+            self.tabControl.pathWindow.setTxt(txt,txtKey)
+        except:
+          print("Error loading gui main storage")
+      else:
+        editorIn=pickleIn
+        for editorList in ["txtEditors","OdsEditors"]:
+          getattr(self,editorList).clear()
+          for editor in editorIn:
+            getattr(self,editorList).append(Editor("tmp"))
+            getattr(self,editorList)[-1].fromPickle(editor)
+          editorIn=pickle.load(f)
+        try:
+          self.lastPklFolder=pickle.load(f)
+        except EOFError:
+          pass
     return True
   def deleteEditor(self, i,choose, remove, editorList):
     if getattr(self,editorList)[i].active.get()==True:
