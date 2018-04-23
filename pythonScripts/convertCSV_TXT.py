@@ -59,7 +59,6 @@ def main(args,unused=0):
     tableFileEnding=".csv"
   else:
     tableFileEnding=".ods"
-  args.just_copy_and_check=False
   lastOutFile=""
   fileIndex=-1
   globbedList=[]
@@ -339,7 +338,7 @@ def main(args,unused=0):
     # nameToData[0].printAll()
     subFolderTable=os.path.join(os.path.dirname(fileName),"ods/")#++os.path.basename(fileName))
     # print(subFolderTable)
-    if not args.just_copy_and_check and not os.path.exists(subFolderTable):
+    if not args.test_run and not os.path.exists(subFolderTable):
       os.mkdir(subFolderTable)
     if args.join_files:
       tableFileNameName=os.path.join(subFolderTable,os.path.basename(fileName)+"JOINED"+tableFileEnding)

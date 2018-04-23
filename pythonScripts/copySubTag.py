@@ -51,7 +51,6 @@ def parse(argv, returnParser=False):
 
         
 def main(args,unused=0):
-  args.just_copy_and_check=False
   lastOutFile=""
   if not args.test_run:
     fileIndex=-1
