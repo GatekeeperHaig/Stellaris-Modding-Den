@@ -592,7 +592,7 @@ def main(args, argv):
     with open(args.copiedBuildingsFileName) as file:
         args.copiedBuildings=[line.strip() for line in file]
     createConvertEvent(args)
-    
+
     otherFilesArgs=copy.deepcopy(args)
     otherFilesArgs.buildingFileNames=[]    
     otherFilesArgs.just_copy_and_check=True
@@ -649,6 +649,10 @@ def createConvertEvent(args):
   convertAllEvent.add("hide_window", "yes").add("fire_only_once","yes")
   convertAllEvent.add("immediate", TagList("every_playable_country", TagList("every_owned_planet", TagList("planet_event", TagList("id", "direct_build.3")))))
 
+  if not os.path.exists(args.output_folder+"/common/on_actions/"):
+     os.mkdir(args.output_folder+"/common/on_actions")
+  if not os.path.exists(args.output_folder+"/events/"):
+     os.mkdir(args.output_folder+"/events")
   with open(args.output_folder+"/common/on_actions/direct_build.txt",'w') as file:
     onActionTagList.writeAll(file,args)
   with open(args.output_folder+"/events/direct_build.txt",'w') as file:
