@@ -32,8 +32,6 @@ def parse(argv, returnParser=False):
   parser.add_argument('--load_order_priority', action="store_true", help="If enabled, mod will be placed first in mod priority by adding '!' to the mod name and a 'z' to building building and trigger file names. This allows the construction of mod extensions. Alternatively, you can create a standalone version , see '--create_standalone_mod_from_mod'.")
   parser.add_argument('-m','--create_standalone_mod_from_mod', action="store_true", help="If this flag is set, the script will create a copy of a mod folder, changing the building files and has_building triggers. Main input of the script should now be the .mod file.")
   parser.add_argument('--custom_mod_name', default='', help="If set, this will be the name of the new mod")
-  parser.add_argument('-r','--remove_reduntant_upgrades', action="store_true", help="ExOverhaul specific. If there are upgrade shortcuts (i.e. tn->tn+2 upgrades) they will be removed here (as this contratics with my pricing policy). This does not apply to tree branches that later join again!")#todo remove
-  parser.add_argument('--create_tier5_enhanced',action='store_true', help=argparse.SUPPRESS)#todo remove
   parser.add_argument('--helper_file_list', default="", help="Non-separated list of zeros and ones. N-th number defines whether file number n is a helper file (1 helperfile, 0 standard file)")
   parser.add_argument('--make_optional', action="store_true", help="Adds 'direct_build_enabled = yes' as potential to all direct build buildings. IMPORTANT: Make sure to set 'set_global_flag = display_low_tier_flag' and 'set_global_flag = do_no_remove_low_tier_flag' whenever 'direct_build_enabled == no' as otherwise buildings will disappear..." )
   parser.add_argument('--scripted_variables', default="", help="Comma separated list of files that contain scripted variables used in the building files. This option is mandatory if you building costs use any of those variables. Recognizable at the spam of missing variable errors you get if not doing this!")
@@ -163,7 +161,7 @@ def readAndConvert(args, allowRestart=1):
         #ITERATE THROUGH WHOLE BUILDING TREE/LINE
         buildingDataList=[baseBuildingData]
         while len(buildingDataList)>0 and "upgrades" in buildingDataList[0].names: #starting with the lowest tier building we iterate through every single descendent. Upgrade loops would obviously kill the script at this point :P
-          #take first element to work with and remove it from todo-list
+          #take first element to work with and remove it from to-use-list
           buildingData=buildingDataList[0]
           buildingDataList=buildingDataList[1:]
           upgrades=buildingData.splitToListIfString("upgrades")
@@ -172,7 +170,7 @@ def readAndConvert(args, allowRestart=1):
           #new building requirements to ensure that only the highest currently available is buildable. Keep the building list as short as possible. Done via "potential" to compeltely remove them from the list (not even greyed out)
           newRequirements=TagList()
            
-          #iterate through all upgrades: Create a copy of each upgrade, compute costs. Finish requirements for current building and add the copies to the todo-list
+          #iterate through all upgrades: Create a copy of each upgrade, compute costs. Finish requirements for current building and add the copies to the to-use-list
           for upgradeName in upgrades.names:
             try:
               upgradeData=buildingNameToData.get(upgradeName) #allow editing
@@ -283,8 +281,8 @@ def readAndConvert(args, allowRestart=1):
           if len(newRequirements.vals)>0 and not buildingData.tagName in args.t0_buildings:
               buildingData.getOrCreate("potential").add("NAND", newRequirements)
               newRequirements.add("NOT", TagList("has_global_flag","display_low_tier_flag"))
-              # if args.make_optional:#todo activate after having done "no change" check
-              #   newRequirements.add("has_global_flag","direct_build_enabled")
+              if args.make_optional:#todo activate after having done "no change" check
+                newRequirements.add("has_global_flag","direct_build_enabled")
     #END OF COPY AND MODIFY        
 
     if args.simplify_upgrade_AI_allow:
@@ -431,14 +429,6 @@ def readAndConvert(args, allowRestart=1):
           for line in locData:
             locOutPutFile.write(" "+line+"\n")
       
-      # #scripted_triggers OUTPUT
-      # if len(triggers)>0:
-      #   triggerFile=open(args.output_folder+"/common/scripted_triggers/{}build_upgraded_".format(prioFile)+outfileBaseName.replace(".txt","")+"_triggers.txt",'w')
-      #   triggerFile.write(args.scriptDescription)
-      #   triggers.writeAll(triggerFile,args)
-    
-    # if len(args.copiedBuildings)>0: #TODO remove after "no change check"!
-    #   buildingNameToData.replaceAllHasBuildings(args)
  
     
     #BUILDING OUTPUT
@@ -466,8 +456,6 @@ def readAndConvert(args, allowRestart=1):
       newCopiedBuilings=[line.strip() for line in file]
     if newCopiedBuilings!=args.copiedBuildings and not args.just_copy_and_check:
       args.copiedBuildings=newCopiedBuilings
-      # if allowRestart: #todo remove after checks!
-      #   readAndConvert(copy.deepcopy(args),0)
   # if lastOutPutFileName and lastOutPutFileName[0]!="." and lastOutPutFileName[0]!=os.sep and lastOutPutFileName[0]!="/":
   #   lastOutPutFileName="./"+lastOutPutFileName
   return lastOutPutFileName
