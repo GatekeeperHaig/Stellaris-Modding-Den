@@ -910,14 +910,15 @@ class MenuBar:
     self.createEditorMenu(choose, remove, editorList)
   def addEditor(self,choose, remove, editorList):
     fileName=filedialog.askopenfilename(title = "Select Editor")
-    name=simpledialog.askstring("Editor Name", "Cancel to use file name",parent=self.root)
-    if not name:
-      name=os.path.basename(fileName)
-    getattr(self,editorList).append(Editor(name, fileName))
-    getattr(self,choose).delete(0,tk.END)
-    getattr(self,remove).delete(0,tk.END)
-    self.createEditorMenu(choose, remove, editorList)
-    self.storeData()
+    if fileName:
+      name=simpledialog.askstring("Editor Name", "Cancel to use file name",parent=self.root)
+      if not name:
+        name=os.path.basename(fileName)
+      getattr(self,editorList).append(Editor(name, fileName))
+      getattr(self,choose).delete(0,tk.END)
+      getattr(self,remove).delete(0,tk.END)
+      self.createEditorMenu(choose, remove, editorList)
+      self.storeData()
   def getEditor(self, editorList):
     for editor in getattr(self,editorList):
       if editor.active.get():
