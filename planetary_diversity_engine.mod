@@ -1,5 +1,5 @@
 name="!!!Planetary Diversity Engine"
-path="mod/ex_planet_engine_mods/planetary_diversity"
+path="mod/planet_engine_mods/planetary_diversity"
 tags={
 	"Galaxy Generation"
 	"Gameplay"
