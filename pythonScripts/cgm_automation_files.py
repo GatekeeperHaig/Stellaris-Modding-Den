@@ -85,9 +85,9 @@ def main():
   planetFindBestEventImmediate.add("every_tile", everyTileSearch)
   curPrev=everyTileSearch.addReturn("prev")
   curPrev.variableOp("change", "cgm_curTile", 1)
-  curPrev.variableOp("set", "cgm_curWeight", 0)
-  for weight in weightTypes:
-    curPrev.variableOp("set", weight+"_weight", 0)
+  # curPrev.variableOp("set", "cgm_curWeight", 0)
+  # for weight in weightTypes:
+  #   curPrev.variableOp("set", weight+"_weight", 0)
 
   everyTileSearch.addComment("doCALC! test:")
   testif=everyTileSearch.createReturnIf(TagList("prev", variableOp(TagList(), "check", "cgm_curTile", 5)))
@@ -123,6 +123,10 @@ def main():
     # variableOp("set", "cgm_bestWeight_{!s}".format(i),"cgm_curWeight").variableOp("set", "cgm_bestTile_{!s}".format(i),"cgm_curTile").variableOp("set", "cgm_bestType_{!s}".format(i),"cgm_curType","=")
     curLevel=TagList()
     locIf.add("else", curLevel)
+  curPrev=everyTileSearch.addReturn("prev")
+  curPrev.variableOp("set", "cgm_curWeight", 0)
+  for weight in weightTypes:
+    curPrev.variableOp("set", weight+"_weight", 0)
 
   # outTag.deleteOnLowestLevel(checkEmpty)
   outTag.deleteOnLowestLevel(checkTotallyEmpty)
