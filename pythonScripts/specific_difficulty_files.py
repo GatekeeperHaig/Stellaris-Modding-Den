@@ -41,11 +41,11 @@ def main():
   testEvent.add("option", TagList("name", "sd_DOWN").add("hidden_effect", TagList("change_variable",  TagList("which", "sd_orig").add("value", 10)).add("country_event", TagList("id", "sd_test.0"))).add("trigger", TagList("check_variable",TagList("which", "sd_count").add("value", "sd_orig_{!s}".format(i),"",">"))))
 
 
-  outputToFolderAndFile(testEventFile, "events", "sd_test.txt", level=2, modFolder="../../mod/test")
+  outputToFolderAndFile(testEventFile, "events", "sd_test.txt", level=2, modFolder="../gratak_mods/specific_difficulty")
   # print(testEventFile)
 
   for language in locList.languages:
-    outFolderLoc="../../mod/test/localisation/"+language
+    outFolderLoc="../gratak_mods/specific_difficulty/localisation/"+language
     if not os.path.exists(outFolderLoc):
       os.makedirs(outFolderLoc)
     locList.write(outFolderLoc+"/sd_l_"+language+".yml",language)
