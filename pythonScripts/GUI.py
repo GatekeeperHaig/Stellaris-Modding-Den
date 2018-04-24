@@ -289,15 +289,23 @@ class TabClass:
       b.pack(side=tk.RIGHT,expand=YES, fill="y")
       CreateToolTip(b, "Load Tab(s)")
 
-      self.DocImg = ImageTk.PhotoImage(Image.open("StellarisDocumentIcon.png"))
-      b = tk.Button(self.extraLineMain,text="",image=self.DocImg, command=lambda : self.setPath("StellarisDocPath"))
-      b.pack(side=tk.RIGHT,expand=YES, fill="y")
-      CreateToolTip(b, "Stellaris Documents Path")
+      pathWindow=self.tabControl.pathWindow
 
-      self.StellImg = ImageTk.PhotoImage(Image.open("StellarisIcon.png"))
-      b = tk.Button(self.extraLineMain,text="",image=self.StellImg, command=lambda : self.setPath("StellarisPath"))
-      b.pack(side=tk.RIGHT,expand=YES, fill="y")
-      CreateToolTip(b, "Stellaris Main Game Path")
+      # for img, ( pathName,txt), desc , in zip(pathWindow.imgs.values(), path.items()
+      for pathName in pathWindow.txts.keys():
+        b = tk.Button(self.extraLineMain,text="",image=pathWindow.imgs[pathName], command=lambda pathName=pathName: self.setPath(pathName))
+        b.pack(side=tk.RIGHT,expand=YES, fill="y")
+        CreateToolTip(b, pathWindow.descs[pathName])
+
+      # self.DocImg = ImageTk.PhotoImage(Image.open("StellarisDocumentIcon.png"))
+      # b = tk.Button(self.extraLineMain,text="",image=self.DocImg, command=lambda : self.setPath("StellarisDocPath"))
+      # b.pack(side=tk.RIGHT,expand=YES, fill="y")
+      # CreateToolTip(b, "Stellaris Documents Path")
+
+      # self.StellImg = ImageTk.PhotoImage(Image.open("StellarisIcon.png"))
+      # b = tk.Button(self.extraLineMain,text="",image=self.StellImg, command=lambda : self.setPath("StellarisPath"))
+      # b.pack(side=tk.RIGHT,expand=YES, fill="y")
+      # CreateToolTip(b, "Stellaris Main Game Path")
 
       b = tk.Button(self.extraLineMain,text="Update Path", command=self.updatePath)
       b.pack(side=tk.RIGHT,expand=YES, fill="y")
@@ -610,14 +618,16 @@ class PathWindow:
     self.window.title(name)   
     self.window.protocol('WM_DELETE_WINDOW', self.window.withdraw)  # root is your root window
     # self.lines=[]
-    self.imgs=[]
+    self.imgs=dict()
     self.txts=dict()
+    self.descs=dict()
     for i, (imageFile, labelText, pathName) in enumerate(zip(imageFiles, labelTexts,names)):
       # line=tk.Frame(self.window, height=24)
       # self.lines.append(line)
       # line.pack(side=tk.TOP)
       img=ImageTk.PhotoImage(Image.open(imageFile))
-      self.imgs.append(img)
+      self.imgs[pathName]=img
+      self.descs[pathName]=labelText
       l=Label(self.window,image=img, text="")
       l.grid(row=i, column=0)
       l=Label(self.window, text=labelText)
