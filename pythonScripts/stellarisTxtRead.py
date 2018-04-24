@@ -68,6 +68,10 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def add(self,name,val='', comment='', seperator="="): #add via two separate pre-formated variables
     self._apply(lambda x,y:x.append(y),name,val,comment,seperator)
     return self
+  def addReturn(self,name):
+    val=TagList()
+    self.add(name,val)
+    return val
   def addComment(self, comment):
     self.add("","","#"+comment)
     return self
@@ -1024,3 +1028,24 @@ def readVal(line): #string needs to start with a "{"
 
 def readFile(fileName):
   return TagList().readFile(fileName)
+
+def checkEmpty(item):
+  name=item[0]
+  val=item[1]
+  if name=="if":
+    for subName in val.names[1:]:
+      if subName!="":
+        return False
+    return True
+  if isinstance(val, TagList) and len(val)==0:
+    return True
+  else:
+    return False
+
+def checkTotallyEmpty(item):
+  name=item[0]
+  val=item[1]
+  if isinstance(val, TagList) and len(val)==0:
+    return True
+  else:
+    return False

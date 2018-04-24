@@ -1307,6 +1307,38 @@ class args:
     self.one_line_level=level
 
 
+def triggeredHidden(self=None):
+  if self==None:
+    self=TagList()
+  self.add("is_triggered_only", "yes")
+  self.add("hide_window","yes")
+  return self
+TagList.triggeredHidden=triggeredHidden
+
+def variableOpNew(opName, varName, val, sep="=",comment=""):
+  self=TagList()
+  self.add(opName+"_variable", TagList("which", varName).add("value", val, comment,sep))
+  return self
+def variableOp(self, opName, varName, val, sep="=",comment=""):
+  if self==None:
+    self=TagList()
+  self.add(opName+"_variable", TagList("which", varName).add("value", val, comment,sep))
+  return self
+TagList.variableOp=variableOp
+
+def createEvent(self, id, name="country_event"):
+  self.add(name, TagList("id", id))
+  return self
+TagList.createEvent=createEvent
+
+def createReturnIf(self, limit):
+  if not isinstance(limit, TagList):
+    print("Invalid use of createReturnIf")
+    return 0
+  ifLoc=TagList("limit", limit)
+  self.add("if", ifLoc)
+  return ifLoc
+TagList.createReturnIf=createReturnIf
 
 def createModifierEvents(inDict, outDict, eventTaglist, id, addBool, eventNameSpace="custom_difficulty.{!s}"):
   for i,item in enumerate(inDict.items()):
