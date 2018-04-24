@@ -1,6 +1,7 @@
 namespace = cgm_automation
 
-@spending_threshold = 249
+@automation_threshold = 499
+@spending_threshold = 149
 
 country_event = {
 	id = cgm_automation.1
@@ -12,16 +13,94 @@ country_event = {
 			is_ai = yes
 			has_policy_flag = building_automation_enabled 
 		}
-		check_variable = { which = building_construction_budget value > @spending_threshold }
+		check_variable = { which = building_construction_budget value > @automation_threshold }
 		minerals > 0
 	}
 	
 	immediate = { 
-			if = { 
-				limit = {
-					any_owned_planet = { 					
+		add_modifier = automation_reserve_size_failsafe
+		#first we remove all minerals from the reserve, this number is already stored elsewhere so we can return it later
+		while = { 
+			limit = { minerals > 9999 } 
+			add_minerals = 10000			
+		}
+		while = { 
+			limit = { minerals > 999 } 
+			add_minerals = 1000			
+		}		
+		while = { 
+			limit = { minerals > 99 } 
+			add_minerals = 100			
+		}		
+		while = { 
+			limit = { minerals > 9 } 
+			add_minerals = 10			
+		}		
+		while = { 
+			limit = { minerals > 0 } 
+			add_minerals = 1
+		}		
+		#now we add the building budget funds
+		while = { 
+			limit = { check_variable = { which = building_construction_budget value > 9999 } }
+			add_minerals = 10000			
+			change_variable = { which = building_construction_budget value = -10000 }
+		}
+		while = { 
+			limit = { check_variable = { which = building_construction_budget value > 999 } }
+			add_minerals = 1000			
+			change_variable = { which = building_construction_budget value = -1000 }
+		}		
+		while = { 
+			limit = { check_variable = { which = building_construction_budget value > 99 } }
+			add_minerals = 100			
+			change_variable = { which = building_construction_budget value = -100 }
+		}		
+		while = { 
+			limit = { check_variable = { which = building_construction_budget value > 9 } }			
+			add_minerals = 10			
+			change_variable = { which = building_construction_budget value = -10 }
+		}		
+		while = { 
+			limit = { check_variable = { which = building_construction_budget value > 0 } }			
+			add_minerals = 1
+			change_variable = { which = building_construction_budget value = -1 }
+		}				
+		if = { 
+			limit = {
+				any_owned_planet = { 					
+					NOT = { has_country_flag = purged_planet } 
+					OR = { 
+						is_capital = yes
+						sector = { is_core_sector = yes }
+					}	
+					has_building_construction = no
+					free_building_tiles > 0
+					any_pop = { 
+						is_colony_pop = yes
+						OR = { 
+							is_growing = yes
+							is_unemployed = yes
+						}
+					}
+					NOT = { 
+						any_tile = { 	
+							has_building = yes
+							is_ruined = no
+							has_pop = no
+						}
+					}
+				}
+			}
+			while = { 
+				limit = { 
+					minerals > @spending_threshold
+					any_owned_planet = { 
 						NOT = { has_country_flag = purged_planet } 
-						is_core_sector = yes
+						OR = { 
+							is_capital = yes
+							sector = { is_core_sector = yes }
+						}
 						has_building_construction = no
 						free_building_tiles > 0
 						any_pop = { 
@@ -38,94 +117,198 @@ country_event = {
 								has_pop = no
 							}
 						}
-					}
+					}				
 				}
-				while = { 
+				random_planet = { 
 					limit = { 
-						check_variable = { which = spending_reserve value > 0 }
-						any_owned_planet = { 
-							NOT = { has_country_flag = purged_planet } 
-							is_core_sector = yes
-							has_building_construction = no
-							free_building_tiles > 0
-							any_pop = { 
-								is_colony_pop = yes
-								OR = { 
-									is_growing = yes
-									is_unemployed = yes
-								}
-							}
-							NOT = { 
-								any_tile = { 	
-									has_building = yes
-									is_ruined = no
-									has_pop = no
-								}
-							}
-						}				
-					}
-					random_planet = { 
-						limit = { 
-							NOT = { has_country_flag = purged_planet } 
-							is_core_sector = yes
-							has_building_construction = no
-							free_building_tiles > 0
-							any_pop = { 
-								is_colony_pop = yes
-								OR = { 
-									is_growing = yes
-									is_unemployed = yes
-								}
-							}
-							NOT = { 
-								any_tile = { 	
-									has_building = yes
-									is_ruined = no
-									has_pop = no
-								}
-							}						
+						NOT = { has_country_flag = purged_planet } 
+						OR = { 
+							is_capital = yes
+							sector = { is_core_sector = yes }
 						}
-						check_and_set_building_construction = yes
+						has_building_construction = no
+						free_building_tiles > 0
+						any_pop = { 
+							is_colony_pop = yes
+							OR = { 
+								is_growing = yes
+								is_unemployed = yes
+							}
+						}
+						NOT = { 
+							any_tile = { 	
+								has_building = yes
+								is_ruined = no
+								has_pop = no
+							}
+						}						
+					}
+					check_and_set_building_construction = yes
+				}	
+			}
+			else = { 
+				if = { 
+					limit = { 
+						any_owned_planet = {
+							NOT = { has_country_flag = purged_planet } 
+							OR = { 
+								is_capital = yes
+								sector = { is_core_sector = yes }
+							}
+							has_building_construction = no
+							can_upgrade_building = yes
+						}	
 					}	
-				}
-				else = { 
-					if = { 
-						limit = { 
+					while = { 
+						limit = {
+							minerals > @spending_threshold
 							any_owned_planet = {
 								NOT = { has_country_flag = purged_planet } 
-								is_core_sector = yes
+								OR = { 
+									is_capital = yes
+									sector = { is_core_sector = yes }
+								}
 								has_building_construction = no
 								can_upgrade_building = yes
 							}	
-						}	
-						while = { 
+						}
+						random_owned_planet = {
+							limit = { 
+								NOT = { has_country_flag = purged_planet } 
+								OR = { 
+									is_capital = yes
+									sector = { is_core_sector = yes }
+								}
+								has_building_construction = no
+								can_upgrade_building = yes
+							}	
+							check_and_set_building_upgrade = yes
+						}
+					}	
+					else = { 	
+						if = { 
 							limit = {
-								check_variable = { which = spending_reserve value > 0 }
-								any_owned_planet = {
+								any_owned_planet = { 					
 									NOT = { has_country_flag = purged_planet } 
-									is_core_sector = yes
+									sector_controlled = yes
+									sector = { is_core_sector = no }
 									has_building_construction = no
-									can_upgrade_building = yes
-								}	
+									free_building_tiles > 0
+									any_pop = { 
+										is_colony_pop = yes
+										OR = { 
+											is_growing = yes
+											is_unemployed = yes
+										}
+									}
+									NOT = { 
+										any_tile = { 	
+											has_building = yes
+											is_ruined = no
+											has_pop = no
+										}
+									}
+								}
 							}
-							random_owned_planet = {
+							while = { 
 								limit = { 
-									NOT = { has_country_flag = purged_planet } 
-									is_core_sector = yes
-									has_building_construction = no
-									can_upgrade_building = yes
-								}	
-								check_and_set_building_upgrade = yes
-							}
-						}	
-						else = { 	
-					any_pop = { is_unemployed = yes }
-					NOT = { any_tile = { has_building = yes has_pop = no is_ruined = no } 
-				}
-			}	
-		}
-	} 
-				
+									minerals > @spending_threshold
+									any_owned_planet = { 
+										NOT = { has_country_flag = purged_planet } 
+										sector_controlled = yes
+										sector = { is_core_sector = no }
+										has_building_construction = no
+										free_building_tiles > 0
+										any_pop = { 
+											is_colony_pop = yes
+											OR = { 
+												is_growing = yes
+												is_unemployed = yes
+											}
+										}
+										NOT = { 
+											any_tile = { 	
+												has_building = yes
+												is_ruined = no
+												has_pop = no
+											}
+										}
+									}				
+								}
+								random_planet = { 
+									limit = { 
+										NOT = { has_country_flag = purged_planet } 
+										sector = { is_core_sector = yes }
+										has_building_construction = no
+										free_building_tiles > 0
+										any_pop = { 
+											is_colony_pop = yes
+											OR = { 
+												is_growing = yes
+												is_unemployed = yes
+											}
+										}
+										NOT = { 
+											any_tile = { 	
+												has_building = yes
+												is_ruined = no
+												has_pop = no
+											}
+										}						
+									}
+									check_and_set_building_construction = yes
+								}								
+								else = { 
+									if = { 
+										limit = { 
+											any_owned_planet = {
+												NOT = { has_country_flag = purged_planet } 
+												OR = { 
+													is_capital = yes
+													sector = { is_core_sector = yes }
+												}
+												has_building_construction = no
+												can_upgrade_building = yes
+											}	
+										}	
+										while = { 
+											limit = {
+												minerals > @spending_threshold
+												any_owned_planet = {
+													NOT = { has_country_flag = purged_planet } 
+													OR = { 
+														is_capital = yes
+														sector = { is_core_sector = yes }
+													}
+													has_building_construction = no
+													can_upgrade_building = yes
+												}	
+											}
+											random_owned_planet = {
+												limit = { 
+													NOT = { has_country_flag = purged_planet } 
+													OR = { 
+														is_capital = yes
+														sector = { is_core_sector = yes }
+													}
+													has_building_construction = no
+													can_upgrade_building = yes
+												}	
+												check_and_set_building_upgrade = yes
+											}
+										}								
+									}
+								}
+							}	
+						}
+					}
+				}	
+			}
+		}	
+	}
+}	
+ 
+			
 		
 		while = { 
 			limit = { check_variable = { which = building_construction_budget value > @spending_threshold } }
