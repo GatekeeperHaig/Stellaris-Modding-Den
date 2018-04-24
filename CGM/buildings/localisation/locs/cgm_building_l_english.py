@@ -347,6 +347,12 @@ locList.addLoc("sr_null_u","Unity Building Tile","en")
 
 ### Deposits - these do not actually require a localisation. The localisations below are just placeholder to remove error messages in CWTools
 
+locList.addLoc("1_energy","REPLACE_ME","en")
+locList.addLoc("1_minerals","REPLACE_ME","en")
+locList.addLoc("1_food","REPLACE_ME","en")
+locList.addLoc("1_unity","REPLACE_ME","en")
+locList.addLoc("1_society_research","REPLACE_ME","en")
+locList.addLoc("1_physics_research","REPLACE_ME","en")
 locList.addLoc("1_mining_station_energy","REPLACE_ME","en")
 locList.addLoc("1_mining_station_minerals","REPLACE_ME","en")
 locList.addLoc("1_mining_station_food","REPLACE_ME","en")
