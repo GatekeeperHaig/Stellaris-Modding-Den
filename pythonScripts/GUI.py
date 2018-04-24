@@ -739,7 +739,10 @@ class TabControlClass:
 
     self.predefinedPaths=["StellarisPath", "StellarisDocPath", "WorkshopPath"]
 
-    self.pathWindow=PathWindow(root, "Set Paths", ["StellarisIcon.png","StellarisDocumentIcon.png", "steam-workshop-logo.png"],["Stellaris Main Game Path","Stellaris Documents Path", "Stellaris Steam Workshop Path"],self.predefinedPaths, self)
+    self.pathWindow=PathWindow(root, "Set Paths", ["StellarisIcon.png","StellarisDocumentIcon.png", 
+      # "steam-workshop-logo.png"
+      "StellarisDocumentIcon.png"
+      ],["Stellaris Main Game Path","Stellaris Documents Path", "Stellaris Steam Workshop Path"],self.predefinedPaths, self)
     # self.pathWindow.window.deiconify()
 
     #def newTab(name, command, fileFilter, fixedOptions, options, extraAddButton, frame):
