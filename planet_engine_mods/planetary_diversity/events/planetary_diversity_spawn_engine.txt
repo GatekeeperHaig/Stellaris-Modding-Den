@@ -1,0 +1,197 @@
+###### Written by ExNihil 
+#
+#	This mod uses a configurable spawn engine. If you'd like to integrate a version of this engine please join our discord server The Stellaris Modding Den
+#	Server invite: https://discord.gg/ZhvBXhh
+
+namespace = spawn_engine_1
+
+event = { #this event triggers on game start and monthly pulse
+	id = spawn_engine_1.0
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	#This event fires only once.
+		
+	immediate = {	
+		set_global_flag = planetary_diversity_active #this sets a global flag for this mod, to be used by other mods and the engine
+		#spawn_unique_planets = yes
+		if = {
+			limit = { new_worlds_enabled = no } #if New Worlds is enabled, all Planetary Diversity planets are seeded through it's engine instead.
+			else = { break = yes } 
+			every_planet = { 
+				if = { 
+					limit = { is_star = yes }		
+					if = { 
+						limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_1 } } } }
+						set_planet_flag = system_star_1				
+						else = {
+							if = { 
+								limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_2 } } } }
+								set_planet_flag = system_star_2						
+								else = {
+									if = { 
+										limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_3 } } } }
+										set_planet_flag = system_star_3						
+									}
+								}
+							}
+						}				
+					}	
+					else = { 		
+						if = { #this adds a unique flag to gas giant moons, which is checked through a scripted trigger (see common/scripted_triggers/engine_triggers.txt )
+							limit = {
+								is_planet_class = pc_gas_giant
+								has_moon = yes
+								any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
+							}
+							every_moon = { 
+								limit = { NOT = { has_planet_flag = gas_giant_moon } }
+								set_planet_flag = gas_giant_moon 
+							}
+						}	
+						if = {
+							limit = {				
+								solar_system = { 
+									starting_system = no
+									NOR = {
+										has_star_flag = sol_system
+										has_star_flag = sol
+										has_star_flag = deneb_system
+										has_star_flag = custom_system
+										has_star_flag = crystal_system
+										has_star_flag = floating_system
+									}					
+								}
+								is_capital = no
+								is_homeworld = no
+							}	
+							# these events occur one after the other. 
+							planet_event = { id = spawn_engine_1.1 }
+							planet_event = { id = spawn_engine_1.2 }
+						}
+					}
+				}				
+			}				
+		}	
+	}
+}
+
+
+
+planet_event = { 
+	id = spawn_engine_1.1
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = { is_vanilla_habitable_planet = yes }
+			if = { 
+				limit = { 
+					OR = { 
+						AND = { 
+							exists = owner
+							OR = { 
+								owner = { is_country_type = primitive }
+								any_pop = {
+									has_regular_vanilla_habitability_trait = yes
+									OR = {
+										is_subspecies = yes
+										NOT = { species = { is_same_value = owner.species }	}																		
+									}
+								}
+							}
+						}
+						AND = {
+							any_tile = { has_pop = yes }		
+							any_pop = { 
+								is_presapient_pop = yes
+								has_regular_vanilla_habitability_trait = yes
+							}	
+						}
+					}
+				}	
+				every_owned_pop = {
+					limit = { has_regular_vanilla_habitability_trait = yes }
+					check_habitability_trait_correspondence = yes
+				}	
+			}	
+			planetary_diversity_habitable_planets_spawn_table = yes			
+			while = {
+				limit = { any_tile = { has_blocker = yes has_regular_vanilla_blocker = yes } }
+				random_tile = {
+					limit = { has_blocker = yes has_regular_vanilla_blocker = yes }
+					remove_blocker = yes
+					random_list = {
+						50 = { }
+						50 = { planetary_diversity_tile_blocker_spawn_table = yes }
+					}	
+				}	
+			}
+			if = { 
+				limit = { 
+					num_modifiers > 0 
+					has_regular_vanilla_planet_modifier = yes
+				}
+				remove_regular_planet_modifiers = yes 
+				planet_modifier_spawn_table = yes
+			}	
+			reroll_deposits = yes	
+			else = { 
+				if = {
+					limit = { is_vanilla_uninhabitable_planet = yes	}
+					planetary_diversity_uninhabitable_planets_spawn_table = yes	
+					if = { 
+						limit = { 
+							num_modifiers > 0 
+							has_regular_vanilla_planet_modifier = yes
+						}
+						remove_regular_planet_modifiers = yes 
+						planet_modifier_spawn_table = yes
+					}	
+					reroll_deposits = yes	
+				}	
+			}
+		}	
+	}
+}
+
+planet_event = { 
+	id = spawn_engine_1.2
+	hide_window = yes
+	is_triggered_only = yes
+	
+	trigger = { planetary_diversity_habitable_planet = yes }	
+	
+	immediate = {
+		if = { 
+			limit = { 
+				OR = { 
+					AND = { 
+						exists = owner
+						OR = { 
+							owner = { is_country_type = primitive }
+							any_pop = {
+								has_regular_vanilla_habitability_trait = yes
+								OR = {
+									is_subspecies = yes
+									NOT = { species = { is_same_value = owner.species }	}																		
+								}
+							}
+						}
+					}
+					AND = {
+						any_tile = { has_pop = yes }		
+						any_pop = { 
+							is_presapient_pop = yes
+							has_regular_vanilla_habitability_trait = yes
+						}	
+					}
+				}
+			}	
+			change_habitability_trait_correspondence = yes
+			planetary_diversity_species_change_table = yes
+		}										
+	}	
+}
