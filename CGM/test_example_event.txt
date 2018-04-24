@@ -1,0 +1,39 @@
+
+
+
+#compute and store vars
+planet_event = {
+  immediate = {
+    setPlanetVar(tileCount=0)
+    setPlanetVar(bestVar=0)
+    setPlanetVar(bestType=none)
+    setPlanetVar(bestTileID=-1)
+    every_tile = {
+      energyVar=doTileCalcs()
+      mineralVar=doTileCalcs()
+      foodVar=doTileCalcs()
+      bestTileVar=max(energy, mineral, foodVar)
+      if bestTileVar>bestVar:
+        setPlanetVar(bestTileID=tileCount)
+        setPlanetVar(bestType=argmax(energy, mineral, foodVar))
+        setPlanetVar(bestVar=bestTileVar)
+      changePlanetVar(tileCount+=1)
+    }
+  }
+
+}
+
+
+#usevars:
+planet_event = { #planet was chosen for having highest bestVar of all planets
+  immediate = {
+    setPlanetVar(tileCount=0)
+    every_tile = {
+      if tileCount == bestTileID:
+        build on this tile a building from category bestType
+      (assuming we defined more than one "good tile" per planet):
+      bestVar,type,id = second_bestVar,type,id
+    }
+  }
+
+}
