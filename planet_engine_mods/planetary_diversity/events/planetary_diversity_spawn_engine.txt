@@ -177,12 +177,14 @@ planet_event = {
 				OR = { 
 					AND = { 
 						is_colonizable = no
+						is_colony = no
 						NOR = { 
 							has_strategic_resource = yes
-							has_vanilla_strategic_resource = no
+							has_vanilla_orbital_strategic_resource = no
 						} 
 					}						
 					AND = { 
+						has_strategic_resource = no
 						OR = { 
 							is_colonizable = yes
 							is_colony = yes
@@ -197,7 +199,17 @@ planet_event = {
 			reroll_deposits = yes	
 			else = { 
 				if = { 
-					limit = { is_colony = yes owner = { is_ai = no } }
+					limit = { 
+						OR = { 
+							AND = { 
+								is_colonizable = yes
+								NOT = { exists = owner }
+							}	
+							AND = { 
+								is_colony = yes owner = { is_ai = no }
+							}	
+						}	
+					}
 					every_tile = {
 						limit = { has_regular_vanilla_deposit = yes	has_building = no }
 						clear_deposits = yes
