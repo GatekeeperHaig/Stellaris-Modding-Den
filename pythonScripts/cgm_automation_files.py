@@ -26,6 +26,7 @@ def main():
   weightTypes=["energy", "minerals", "food", "base_res_adjacency", "society_research", "physics_research", "engineering_research", "science_adjacency"]
   exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_hyperstorage_facility_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
   varsToMove=["Weight","Tile","Type"]
+  pseudoInf=99999
 
   name_empire_main_build_event=eventNameSpace.format(0)
   name_empire_build_event=eventNameSpace.format(10)
@@ -34,7 +35,7 @@ def main():
   outTag=TagList("namespace", eventNameSpace.format("")[:-1])
   storedValsRange=range(1,4)
 
-  outTag.addComment('there are 2*3 types of important variables used in these events:\n# "cur" is always for the tile we are currently in,\n# "best_" is previously found best tiles.\n#Each can be combined with\n# "Type", which is a number assigned to the different weight-type\n# "weight", which is the actual weight value\n# "Tile", which is the "id" of a tile')
+  outTag.addComment('there are 3*3 types of important variables used in these events:\n# "cur_" is always for the tile we are currently in,\n# "best_" is previously found best tiles.\n# "worst_" is previously found worst tiles -> to be used with special buildings who do not requre special tiles.\n#Each can be combined with\n# "Type", which is a number assigned to the different weight-type\n# "weight", which is the actual weight value\n# "Tile", which is the "id" of a tile')
 
   empireMainBuildEvent=TagList("id",name_empire_main_build_event)
   outTag.add("country_event", empireMainBuildEvent)
@@ -45,13 +46,12 @@ def main():
   empireMainBuildEventImmediate.addComment("TODO search for special building!")
   empireMainBuildEventImmediate.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
   empireMainBuildEventImmediate.variableOp("set","cgm_special_bestWeight_1", 20, "=", " #TODO just a test!")
-  empireMainBuildEventImmediate.variableOp("set","cgm_bestWeight_1", 0)
   empireMainBuildEventImmediate.createEvent(name_empire_build_event)
   sectorBuild=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_auto_built")))
   sectorBuild.add("remove_country_flag", "cgm_core_world_auto", "#searching sector worlds for standard buildings")
   sectorBuild.addComment("TODO search for special building!")
   sectorBuild.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
-  sectorBuild.variableOp("set","cgm_bestWeight_1", 0)
+  # sectorBuild.variableOp("set","cgm_bestWeight_1", 0)
   sectorBuild.createEvent(name_empire_build_event)
 
   empireBuildEvent=TagList("id",name_empire_build_event)
@@ -72,9 +72,8 @@ def main():
   empireBuildEvent.triggeredHidden()
   empireBuildEventImmediate=TagList()
   empireBuildEvent.add("immediate", empireBuildEventImmediate)
-  # empireBuildEventImmediate.add("set_variable", TagList("which", "cgm_currentEmpireMax").add("value", 0))
-  # empireBuildEventImmediate.add("set_country_flag", "cgm_core_world_auto", " #TODO: remove. just for testing the event")
-  # empireBuildEventImmediate.add("set_variable", TagList("which", "cgm_bestWeight_1").add("value", 0))
+
+  empireBuildEventImmediate.variableOp("set","cgm_bestWeight_1", 0) #TODO move to buttom of event to leave less trash
   findBestPlanet=TagList()
   findBestPlanetLimit=findBestPlanet.addReturn("limit")
   findBestPlanetLimit.add("has_building_construction","no")
@@ -139,6 +138,9 @@ def main():
   planetFindBestEventImmediate.add("every_tile", everyTileSearch)
   curPrev=everyTileSearch.addReturn("prev")
   curPrev.variableOp("change", "cgm_curTile", 1)
+  everyTileSearch=everyTileSearch.createReturnIf(TagList("has_building","no"))
+  everyTileSearch.addComment("set worst value to very large number, such that any found tile is initially worse")
+  everyTileSearch.variableOp("set", "cgm_worstWeight".format(varToMove),pseudoInf)
   # curPrev.variableOp("set", "cgm_curWeight", 0)
   # for weight in weightTypes:
   #   curPrev.variableOp("set", weight+"_weight", 0)
@@ -190,6 +192,12 @@ def main():
     # variableOp("set", "cgm_bestWeight_{!s}".format(i),"cgm_curWeight").variableOp("set", "cgm_bestTile_{!s}".format(i),"cgm_curTile").variableOp("set", "cgm_bestType_{!s}".format(i),"cgm_curType","=")
     curLevel=TagList()
     locIf.add("else", curLevel)
+
+  #finding the worst of the best: best over weightTypes, worst over tiles
+  locIf=everyTileSearch.createReturnIf(TagList("prev",variableOp(TagList(), "check", "cgm_curWeight", "cgm_worstWeight", "<")))
+  for varToMove in varsToMove[:-1]: #:-1 as type is not needed. Don't care about type here
+    locIf.variableOp("set", "cgm_worst{}".format(varToMove),"cgm_cur{}".format(varToMove))
+
   curPrev=everyTileSearch.addReturn("prev")
   curPrev.variableOp("set", "cgm_curWeight", 0)
   for weight in weightTypes:
