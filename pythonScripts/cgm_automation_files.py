@@ -42,7 +42,7 @@ def main():
   empireMainBuildEventImmediate=empireMainBuildEvent.addReturn("immediate")
   empireMainBuildEventImmediate.add("remove_country_flag", "cgm_auto_built")
   empireMainBuildEventImmediate.addComment("TODO search for special building!")
-  empireMainBuildEventImmediate.variableOp("set","cgm_special_bestWeight_1", 20, "", " #TODO just a test!")
+  empireMainBuildEventImmediate.variableOp("set","cgm_special_bestWeight_1", 20, "=", " #TODO just a test!")
   empireMainBuildEventImmediate.add("set_country_flag", "cgm_core_world_auto", "#searching core worlds for standard buildings")
   empireMainBuildEventImmediate.variableOp("set","cgm_bestWeight_1", 0)
   empireMainBuildEventImmediate.createEvent(name_empire_build_event)
@@ -57,7 +57,7 @@ def main():
   outTriggers=TagList()
   outEffects=TagList()
 
-  empireBuildEvent.triggeredHidden
+  empireBuildEvent.triggeredHidden()
   empireBuildEventImmediate=TagList()
   empireBuildEvent.add("immediate", empireBuildEventImmediate)
   # empireBuildEventImmediate.add("set_variable", TagList("which", "cgm_currentEmpireMax").add("value", 0))
