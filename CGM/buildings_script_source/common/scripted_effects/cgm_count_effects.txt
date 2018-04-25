@@ -2834,3 +2834,316 @@ restore_engineering_research_reserve = {
   }
 }
 
+#check_income ={
+# if = { 
+	# limit = { 
+		# OR = {
+			# is_machine_empire = no
+			# is_servitor = yes
+		# }
+	# }	
+	# if = {
+		# limit = { 
+			# food > 0
+			# has_monthly_income = { resource = food value > 0 }
+		# }			
+		# if = { 
+			# limit = { check_variable = { which = positive_food_reserve_month value > 0 } }
+			# change_variable = { which = positive_food_reserve_month value = 1 }
+			# else = { set_variable = { which = positive_food_reserve_month value = 1 } }
+		# }			
+		# if = { 
+			# limit = { has_country_flag = is_food_starved }
+			# remove_country_flag = is_food_starved
+		# }		
+		# #count full reserve
+		# set_variable = { which = food_reserve value = 0 }		
+		# set_variable = { which = food_income value = 0 }
+		# count_food_reserve = yes
+		# if = { 
+			# limit = { food > 0.999 }
+			# log = "food count error"
+		# }			
+		# #count last month's income - only do this if previous month at least was non-negative, to avoid alerts
+		# if = { 
+			# limit = { 
+				# check_variable = { which = positive_food_reserve_month value > 1 }
+				# has_monthly_income = { resource = food value > 4 }
+			# }					
+			# add_monthly_resource_mult = { resource = food value = 1.0}
+			# count_food_income = yes
+			# if = {
+				# limit = { food > 0.999 }
+				# log = "food count error"
+			# }
+		# }	
+		# #restore reserve
+		# restore_food_reserve = yes		
+		# else = { 
+			# if = { 
+				# limit = { food < 1 }
+				# set_variable = { which = positive_food_reserve_month value = 0 } 
+				# set_country_flag = is_food_starved
+			# }					
+			# if = { 
+				# limit = { has_monthly_income = { resource = food value < 5 } }
+				# change_variable = { which = food_weight value = 3 }
+				# if = { 
+					# limit = { 
+						# has_monthly_income = { resource = food value < 1 }
+						# OR = { 
+							# food < 1
+							# any_owned_planet = { 
+								# has_modifier = starvation
+								# has_orbital_bombardment = no
+								# has_ground_combat = no
+								# is_occupied_flag = no
+							# }	
+						# }							
+					# }	
+					# set_country_flag = is_food_starved
+					# change_variable = { which = food_weight value = 10 }
+				# }	
+				# if = {
+					# limit = { has_monthly_income = { resource = food value < -10 } }
+					# change_variable = { which = food_weight value = 4 }
+				# }
+				# if = {
+					# limit = { has_monthly_income = { resource = food value < -20 } }
+					# change_variable = { which = food_weight value = 5 }
+				# }	
+			# }
+		# }
+	# }
+# }	
+# if = {
+	# limit = { 
+		# energy > 0
+		# has_monthly_income = { resource = energy value > 0 }
+	# }			
+	# if = { 
+		# limit = { check_variable = { which = positive_energy_reserve_month value > 0 } }
+		# change_variable = { which = positive_energy_reserve_month value = 1 }
+		# else = { set_variable = { which = positive_energy_reserve_month value = 1 } }
+	# }			
+	# if = { 
+		# limit = { has_country_flag = is_energy_starved }
+		# remove_country_flag = is_energy_starved
+	# }		
+	# #count full reserve
+	# set_variable = { which = energy_reserve value = 0 }		
+	# set_variable = { which = energy_income value = 0 }
+	# count_energy_reserve = yes
+	# if = { 
+		# limit = { energy > 0.999 }
+		# log = "energy count error"
+	# }						
+	# #count last month's income - only do this if previous month at least was non-negative, to avoid alerts
+	# if = { 
+		# limit = { 
+			# check_variable = { which = positive_energy_reserve_month value > 1 }
+			# has_monthly_income = { resource = energy value > 4 }
+		# }					
+		# add_monthly_resource_mult = { resource = energy value = 1.0}
+		# count_energy_income = yes
+		# if = { 
+			# limit = { energy > 0.999 }
+			# log = "energy count error"
+		# }
+	# }	
+	# #restore reserve
+	# restore_energy_reserve = yes				
+	# else = { 
+		# if = { 
+			# limit = { energy < 1 }
+			# set_variable = { which = positive_energy_reserve_month value = 0 } 
+			# set_country_flag = is_energy_starved
+		# }					
+		# if = { 
+			# limit = { has_monthly_income = { resource = energy value < 5 } }
+			# change_variable = { which = energy_weight value = 3 }
+			# if = { 
+				# limit = { 
+					# has_monthly_income = { resource = energy value < 1 }
+					# OR = { 
+						# energy < 1
+						# has_modifier = energy_deficit
+					# }							
+				# }	
+				# set_country_flag = is_energy_starved
+				# change_variable = { which = energy_weight value = 10 }
+			# }	
+			# if = {
+				# limit = { has_monthly_income = { resource = energy value < -10 } }
+				# change_variable = { which = energy_weight value = 4 }
+			# }
+			# if = {
+				# limit = { has_monthly_income = { resource = energy value < -20 } }
+				# change_variable = { which = energy_weight value = 5 }
+			# }	
+		# }
+	# }
+# }
+# if = {
+	# limit = { 
+		# minerals > 0
+		# has_monthly_income = { resource = minerals value > 0 }
+	# }			
+	# if = { 
+		# limit = { check_variable = { which = positive_minerals_reserve_month value > 0 } }
+		# change_variable = { which = positive_minerals_reserve_month value = 1 }
+		# else = { set_variable = { which = positive_minerals_reserve_month value = 1 } }
+	# }			
+	# if = { 
+		# limit = { has_country_flag = is_minerals_starved }
+		# remove_country_flag = is_minerals_starved
+	# }		
+	# #count full reserve
+	# set_variable = { which = minerals_reserve value = 0 }		
+	# set_variable = { which = minerals_income value = 0 }
+	# count_minerals_reserve = yes
+	# if = { 
+		# limit = { minerals > 0.999 }
+		# log = "minerals count error"
+	# }						
+	# #count last month's income - only do this if previous month at least was non-negative, to avoid alerts
+	# if = { 
+		# limit = { 
+			# check_variable = { which = positive_minerals_reserve_month value > 1 }
+			# has_monthly_income = { resource = minerals value > 4 }
+		# }					
+		# add_monthly_resource_mult = { resource = minerals value = 1.0}
+		# count_minerals_income = yes
+		# if = { 
+			# limit = { minerals > 0.999 }
+			# log = "minerals count error"
+		# }
+	# }	
+	# #restore reserve
+	# restore_minerals_reserve = yes			
+	# #if = { 
+	# #	limit = { 
+	# #		OR = {
+	# #			is_ai = yes
+	# #			has_policy_flag = building_automation_enabled 
+	# #		}
+	# #		has_monthly_income = { resource = minerals value > 49 } 
+	# #		check_variable = { which = positive_minerals_reserve_month value > 2 }
+	# #	}	
+	# #	set_variable = { which = building_construction_budget value = minerals_income }
+	# #	if = { 
+	# #		limit = { is_ai = yes }
+	# #		multiply_variable = { which = building_construction_budget value = 0.2 }
+	# #		else = { 
+	# #			if = { 
+	# #				limit = { has_policy_flag = budget_preset_1 }
+	# #				multiply_variable = { which = building_construction_budget value = 0.1 }
+	# #				else = { 
+	# #					if = { 
+	# #						limit = { has_policy_flag = budget_preset_2 }
+	# #						multiply_variable = { which = building_construction_budget value = 0.2 }					
+	# #						else = { 
+	# #							if = { 
+	# #								limit = { has_policy_flag = budget_preset_3 }
+	# #								multiply_variable = { which = building_construction_budget value = 0.3 }												
+	# #							}
+	# #						}
+	# #					}
+	# #				}
+	# #			}
+	# #		}
+	# #	}
+	# #}	
+	# else = { 
+		# if = { 
+			# limit = { minerals < 1 }
+			# set_variable = { which = positive_minerals_reserve_month value = 0 } 
+			# set_country_flag = is_minerals_starved
+		# }					
+		# if = { 
+			# limit = { has_monthly_income = { resource = minerals value < 5 } }
+			# change_variable = { which = minerals_weight value = 3 }
+			# if = { 
+				# limit = { 
+					# has_monthly_income = { resource = minerals value < 1 }
+					# OR = { 
+						# minerals < 1
+						# has_modifier = mineral_deficit
+					# }							
+				# }	
+				# set_country_flag = is_minerals_starved
+				# change_variable = { which = minerals_weight value = 10 }
+			# }	
+			# if = {
+				# limit = { has_monthly_income = { resource = minerals value < -10 } }
+				# change_variable = { which = minerals_weight value = 4 }
+			# }
+			# if = {
+				# limit = { has_monthly_income = { resource = minerals value < -20 } }
+				# change_variable = { which = minerals_weight value = 5 }
+			# }	
+		# }
+	# }
+# }
+# #count stored society research and check income
+# set_variable = { which = society_research_reserve value = 0 }		
+# set_variable = { which = society_research_income value = 0 }
+# count_society_research_reserve = yes
+# if = { 
+	# limit = { stored_society_points > 0.999 }
+	# log = "society count error"
+# }					
+# add_monthly_resource_mult = { resource = society_research value = 1.0}
+# count_society_research_income = yes
+# if = { 
+	# limit = { stored_society_points > 0.999 }
+	# log = "society count error"
+# }		
+# #restore reserve
+# restore_society_research_reserve = yes		
+
+# #count stored physics research and check income
+# set_variable = { which = physics_research_reserve value = 0 }		
+# set_variable = { which = physics_research_income value = 0 }
+# count_physics_research_reserve = yes
+# if = { 
+	# limit = { stored_physics_points > 0.999 }
+	# log = "physics count error"
+# }						
+# add_monthly_resource_mult = { resource = physics_research value = 1.0}
+# count_physics_research_income = yes
+# if = { 
+	# limit = { stored_physics_points > 0.999 }
+	# log = "physics count error"
+# }		
+# #restore reserve
+# restore_physics_research_reserve = yes	
+# #count stored engineering research and check income
+# set_variable = { which = engineering_research_reserve value = 0 }		
+# set_variable = { which = engineering_research_income value = 0 }
+# count_engineering_research_reserve = yes
+# if = { 
+	# limit = { stored_engineering_points > 0.999 }
+	# log = "engineering count error"
+# }	
+# add_monthly_resource_mult = { resource = engineering_research value = 1.0}
+# count_engineering_research_income = yes
+# if = { 
+	# limit = { stored_engineering_points > 0.999 }
+	# log = "engineering count error"
+# }			
+# #restore reserve
+# restore_engineering_research_reserve = yes
+# log = "food_reserve: [This.food_reserve]"
+# log = "food_income: [This.food_income]"
+# log = "energy_reserve: [This.energy_reserve]"
+# log = "energy_income: [This.energy_income]"
+# log = "minerals_reserve: [This.minerals_reserve]"
+# log = "minerals_income: [This.minerals_income]"
+# log = "society_research_reserve: [This.society_research_reserve]"
+# log = "society_research_income: [This.society_research_income]"
+# log = "physics_research_reserve: [This.physics_research_reserve]"
+# log = "physics_research_income: [This.physics_research_income]"
+# log = "engineering_research_reserve: [This.engineering_research_reserve]"
+# log = "engineering_research_income: [This.engineering_research_income]"
+#}
