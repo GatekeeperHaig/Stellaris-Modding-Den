@@ -88,6 +88,7 @@ event = {
 										has_star_flag = custom_system
 										has_star_flag = crystal_system
 										has_star_flag = floating_system
+										has_star_flag = city_system
 									}
 								}
 								is_capital = no
@@ -139,35 +140,30 @@ planet_event = {
 				}
 			}
 			planetary_diversity_habitable_planets_spawn_table = yes
-			while = {
-				limit = {
-					any_tile = { has_blocker = yes has_regular_vanilla_blocker = yes }
-				}
-				random_tile = {
-					limit = { has_blocker = yes has_regular_vanilla_blocker = yes }
-					remove_blocker = yes
-					planetary_diversity_tile_blocker_spawn_table = yes
-				}
-			}
-			if = {
-				limit = { num_modifiers > 0 has_regular_vanilla_planet_modifier = yes }
-				remove_regular_planet_modifiers = yes
-				planet_modifier_spawn_table = yes
-			}
-			reroll_deposits = yes
 			else = {
 				if = {
 					limit = { is_vanilla_uninhabitable_planet = yes }
-					planetary_diversity_uninhabitable_planets_spawn_table = yes
-					if = {
-						limit = { num_modifiers > 0 has_regular_vanilla_planet_modifier = yes }
-						remove_regular_planet_modifiers = yes
-						planet_modifier_spawn_table = yes
-					}
-					reroll_deposits = yes
+					planetary_diversity_uninhabitable_planets_spawn_table = yes					
 				}
 			}
 		}
+		if = {
+			limit = { 
+				OR = { 
+					is_vanilla_uninhabitable_planet = yes
+					is_vanilla_habitable_planet = yes
+				}	
+				has_regular_vanilla_planet_modifier = yes
+			}
+			remove_regular_planet_modifiers = yes
+			while = {
+				limit = {
+					check_variable = { which = "pm_points" value > 0 }
+				}
+				planet_modifier_spawn_table = yes
+				change_variable = { which = "pm_points" value = -1 }
+			}
+		}			
 	}
 }
 planet_event = {
@@ -176,6 +172,93 @@ planet_event = {
 	is_triggered_only = yes
 	trigger = { planetary_diversity_habitable_planet = yes }
 	immediate = {
+		if = { 
+			limit = { 
+				OR = { 
+					AND = { 
+						is_colonizable = no
+						NOR = { 
+							has_strategic_resource = yes
+							has_vanilla_strategic_resource = no
+						} 
+					}						
+					AND = { 
+						OR = { 
+							is_colonizable = yes
+							is_colony = yes
+						}	
+						OR = { 
+							NOT = { exists = owner }
+							owner = { is_ai = yes }
+						}
+					}
+				}						
+			}
+			reroll_deposits = yes	
+			else = { 
+				if = { 
+					limit = { is_colony = yes owner = { is_ai = no } }
+					every_tile = {
+						limit = { has_regular_vanilla_deposit = yes	has_building = no }
+						clear_deposits = yes
+						planetary_diversity_planetary_resource_spawn_table = yes
+					}
+				}	
+			}	
+		}	
+		if = {
+			limit = { any_tile = { has_blocker = yes has_regular_vanilla_blocker = yes } }
+			every_tile = {
+				limit = { has_blocker = yes has_regular_vanilla_blocker = yes }
+				remove_blocker = yes
+				planetary_diversity_tile_blocker_spawn_table = yes
+			}	
+			else = { 
+				if = { 
+					limit = { NOT = { any_tile = { has_blocker = yes has_regular_vanilla_blocker = yes } } }
+					while = {
+						limit = {
+							OR = {
+								AND = {
+									planet_size > 19
+									count_tile = {
+										limit = { has_blocker = yes }
+										count < 6
+									}
+								}
+								AND = {
+									planet_size > 15
+									planet_size < 19
+									count_tile = {
+										limit = { has_blocker = yes }
+										count < 5
+									}
+								}
+								AND = {
+									planet_size > 10
+									planet_size < 16
+									count_tile = {
+										limit = { has_blocker = yes }
+										count < 4
+									}
+								}
+								AND = {
+									planet_size < 11
+									count_tile = {
+										limit = { has_blocker = yes }
+										count < 3
+									}
+								}
+							}
+						}
+						random_tile = {
+							limit = { has_blocker = no }
+							planetary_diversity_tile_blocker_spawn_table = yes
+						}
+					}						
+				}
+			}	
+		}			
 		if = {
 			limit = {
 				OR = {
@@ -206,6 +289,7 @@ planet_event = {
 	id = spawn_engine_1.3
 	hide_window = yes
 	is_triggered_only = yes
+	
 	trigger = {
 		is_colonizable = yes
 		OR = { 
