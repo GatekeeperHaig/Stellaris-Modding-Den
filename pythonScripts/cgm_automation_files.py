@@ -40,7 +40,14 @@ def main():
   # empireBuildEventImmediate.add("set_variable", TagList("which", "cgm_currentEmpireMax").add("value", 0))
   empireBuildEventImmediate.add("set_country_flag", "cgm_core_world_auto", " #TODO: remove. just for testing the event")
   empireBuildEventImmediate.add("set_variable", TagList("which", "cgm_bestWeight_1").add("value", 0))
-  findBestPlanet=TagList("limit",TagList("has_building_construction","no").add("free_building_tiles", "0", "", ">").add("or", TagList("and", TagList("sector_controlled","no").add("prev", TagList("has_country_flag", "cgm_core_world_auto"))).add("and", TagList("sector_controlled","yes").add("not", TagList("prev", TagList("has_country_flag", "cgm_core_world_auto"))))))
+  findBestPlanet=TagList()
+  findBestPlanetLimit=findBestPlanet.addReturn("limit")
+  findBestPlanetLimit.add("has_building_construction","no")
+  findBestPlanetLimit.add("free_building_tiles", "0", "", ">")
+  findBestPlanetLimit.add("not",TagList("has_planet_flag", "purged_planet"))
+  findBestPlanetLimit.add("or", TagList("and", TagList("sector_controlled","no").add("prev", TagList("has_country_flag", "cgm_core_world_auto"))).add("and", TagList("sector_controlled","yes").add("not", TagList("prev", TagList("has_country_flag", "cgm_core_world_auto")))))
+  # findBestPlanetLimit.
+  # findBestPlanetLimit.
   empireBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
   findBestPlanet.add("if",TagList("limit", TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value", "0","","="))).createEvent(name_planet_find_best, "planet_event"))
   findBestPlanetIf=TagList("limit", TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value", "prev","",">")))
