@@ -29,7 +29,7 @@ def main():
 
   name_empire_main_build_event=eventNameSpace.format(0)
   name_empire_standard_build_event=eventNameSpace.format(10)
-  name_empire_special_build_event=eventNameSpace.format(10)
+  name_empire_special_build_event=eventNameSpace.format(11)
   name_planet_find_best=eventNameSpace.format(20)
 
   outTag=TagList("namespace", eventNameSpace.format("")[:-1])
@@ -43,20 +43,17 @@ def main():
   empireMainBuildEventImmediate=empireMainBuildEvent.addReturn("immediate")
   empireMainBuildEventImmediate.add("remove_country_flag", "cgm_auto_built")
   empireMainBuildEventImmediate.add("set_country_flag", "cgm_core_world_auto", "#searching core worlds for standard buildings")
-  empireMainBuildEventImmediate.addComment("TODO search for special building!")
-  empireMainBuildEventImmediate.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
-  empireMainBuildEventImmediate.variableOp("set","cgm_special_bestWeight_1", 20, "=", " #TODO just a test!")
-  empireMainBuildEventImmediate.add("random_owned_planet",TagList("save_global_event_target_as", "cgm_best_planet_for_special")," #TODO just a test!")
+  empireMainBuildEventImmediate.addComment("Search for possible Special buildings:")
+  empireMainBuildEventImmediate.createEvent(name_empire_special_build_event)
+  empireMainBuildEventImmediate.addComment("Search for possible Standard buildings. Build best out of standard/special:")
   empireMainBuildEventImmediate.createEvent(name_empire_standard_build_event)
   sectorBuild=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_auto_built")))
   sectorBuild.add("remove_country_flag", "cgm_core_world_auto", "#searching sector worlds for standard buildings")
-  sectorBuild.addComment("TODO search for special building!")
-  sectorBuild.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
-  # sectorBuild.variableOp("set","cgm_bestWeight_1", 0)
+  sectorBuild.addComment("Search for possible Special buildings:")
+  sectorBuild.createEvent(name_empire_standard_build_event)
+  sectorBuild.addComment("Search for possible Standard buildings. Build best out of standard/special:")
   sectorBuild.createEvent(name_empire_standard_build_event)
 
-  empireStandardBuildEvent=TagList("id",name_empire_standard_build_event)
-  outTag.add("country_event", empireStandardBuildEvent)
 
   outTriggers=TagList()
   outTriggers.addComment("this = planet")
@@ -70,6 +67,8 @@ def main():
   outEffects.addComment("Check if unique buildings of that category can be build first and do so if possible")
   outEffects.addComment("Leave the 'succesful ->set flag' at the end as it is")
 
+  empireStandardBuildEvent=TagList("id",name_empire_standard_build_event)
+  outTag.add("country_event", empireStandardBuildEvent)
   empireStandardBuildEvent.triggeredHidden()
   empireStandardBuildEventImmediate=TagList()
   empireStandardBuildEvent.add("immediate", empireStandardBuildEventImmediate)
@@ -94,7 +93,7 @@ def main():
   findBestPlanetIf.add("save_event_target_as", "cgm_best_planet")
   findBestPlanetIf.add("prev", TagList("set_variable", TagList("which", "cgm_bestWeight_1").add("value", "prev")))
 
-  buildSomeThing=TagList("limit",TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value","cgm_special_bestWeight_1", "", ">")))
+  buildSomeThing=TagList("limit",TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value","cgm_special_bestWeight", "", ">")))
   empireStandardBuildEventImmediate.add("if", buildSomeThing)
   planetBuildSomeThing=TagList()
   buildSomeThing.add("event_target:cgm_best_planet", planetBuildSomeThing)
@@ -139,6 +138,36 @@ def main():
     curSubLevel=TagList()
     locSubIf.add("else", curSubLevel)
     # ifTypeBest.add("Find correct tile and build")
+
+
+  empireSpecialBuildEvent=TagList("id",name_empire_special_build_event)
+  outTag.add("country_event", empireSpecialBuildEvent)
+  empireSpecialBuildEvent.triggeredHidden()
+  empireSpecialBuildEventImmediate=TagList()
+  empireSpecialBuildEvent.add("immediate", empireSpecialBuildEventImmediate)
+
+  empireSpecialBuildEventImmediate.variableOp("set","cgm_special_bestWeight", 0) #don't move to button as this is later used!
+  findBestPlanet=TagList()
+  findBestPlanetLimit=findBestPlanet.addReturn("limit")
+  findBestPlanetLimit.add("has_building_construction","no")
+  findBestPlanetLimit.add("free_building_tiles", "0", "", ">")
+  findBestPlanetLimit.add("not",TagList("has_planet_flag", "purged_planet"))
+  findBestPlanetLimit.add("or", TagList("and", TagList("sector_controlled","no").add("prev", TagList("has_country_flag", "cgm_core_world_auto"))).add("and", TagList("sector_controlled","yes").add("not", TagList("prev", TagList("has_country_flag", "cgm_core_world_auto")))))
+  # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("or", TagList("is_growing", "yes").add("is_unemployed","yes")))
+  # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("is_unemployed","yes")) #seems not to work
+  findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("NOR",TagList("tile",TagList("has_building","yes").add("has_building_construction","yes"))))
+  # findBestPlanetLimit.
+  empireSpecialBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
+  if debug:
+    findBestPlanet.add("log", '"searching for special buildings on planet [this.getName]"')
+
+    findBestPlanet.addComment("TODO search for special building!")
+    findBestPlanet.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
+    (findBestPlanet.addReturn("prev")).variableOp("set","cgm_special_bestWeight", 20, "=", " #TODO just a test!")
+    findBestPlanet.add("save_global_event_target_as", "cgm_best_planet_for_special"," #TODO just a test!")
+
+
+
 
 
   planetFindBestEvent=TagList("id", name_planet_find_best)
