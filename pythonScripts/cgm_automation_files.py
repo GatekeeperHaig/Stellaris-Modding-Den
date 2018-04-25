@@ -108,7 +108,7 @@ def main():
 
   buildSpecialTile.add("cgm_add_special_building","yes")
   effect=outEffects.addReturn("cgm_add_special_building")
-  effect.add("add_building_construction", "building_heritage_site")
+  effect.add("add_building_construction", "building_autochthon_monument")
   effect.createReturnIf(TagList("or", TagList("has_building","yes").add("has_building_construction", "yes"))).add("prevprev",TagList("set_country_flag", "cgm_auto_built"))
   buildSpecial.variableOp("set", "cgm_worstTile", pseudoInf)
 
