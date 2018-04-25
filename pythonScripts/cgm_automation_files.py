@@ -13,7 +13,7 @@ from functools import reduce
 
 #TODO: Prio List how to use this:
 # 1. Core world important+medium important new building 2. Core world upgrades 3. Core world not so important building 4. Sector new buildings 5. Sector upgrades
-# ET = "event_target:cgm_var_storage"
+#possible far away todo: Replace worst existing building with (empire) unique
 eventNameSpace="cgm_auto.{!s}"
 nameBase="cgm_auto_{!s}"
 def main():
@@ -97,7 +97,8 @@ def main():
   empireBuildEventImmediate.add("if", buildSomeThing)
   planetBuildSomeThing=TagList()
   buildSomeThing.add("event_target:cgm_best_planet", planetBuildSomeThing)
-  buildSomeThing.add("else", TagList("","","#build the special one! Set cgm_auto_built flag if we do") )
+  buildSpecial=buildSomeThing.addReturn("else")#, 
+  buildSpecial.add("","","#build the special one! Set cgm_auto_built flag if we do")
   # buildSomeThing.add("else", TagList("set_country_flag", "cgm_noAutobuildPlanetFound"))
   for i, weightType in enumerate(weightTypes):
     ifTypeBest=TagList("limit", TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1))) #todo maybe do else -> when everything is done
