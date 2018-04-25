@@ -94,6 +94,9 @@ def main():
   findBestPlanetIf.add("save_event_target_as", "cgm_best_planet")
   findBestPlanetIf.add("prev", TagList("set_variable", TagList("which", "cgm_bestWeight_1").add("value", "prev")))
 
+  if debug:
+    empireStandardBuildEventImmediate.add("log",'"bestStandard:[this.cgm_bestWeight_1]"')
+    empireStandardBuildEventImmediate.add("log",'"bestSpecial:[this.cgm_special_bestWeight]"')
   buildSomeThing=TagList("limit",TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value","cgm_special_bestWeight", "", ">")))
   empireStandardBuildEventImmediate.add("if", buildSomeThing)
   planetBuildSomeThing=TagList()
@@ -102,6 +105,8 @@ def main():
   buildSpecial=buildSpecial.addReturn("event_target:cgm_best_planet_for_special")
   redoCalcForWorstTile=buildSpecial.createReturnIf(variableOpNew("check","cgm_worstWeight",pseudoInf))
   redoCalcForWorstTile.createEvent(name_planet_find_best,"planet_event")
+  if debug:
+    buildSpecial.add("log",'"worst tile::[this.cgm_worstTile]"')
   buildSpecial.variableOp("set", "cgm_curTile",0)
   buildSpecialTile=buildSpecial.addReturn("every_tile")
   buildSpecialTile.addReturn("prev").variableOp("change", "cgm_curTile",1)
@@ -140,6 +145,7 @@ def main():
       for varToMove in varsToMove:
         locSubIf.variableOp("set", "cgm_best"+varToMove+"_{!s}".format(k-1),"cgm_best"+varToMove+"_{!s}".format(k))
       # locSubIf.variableOp("set", "cgm_bestWeight_{!s}".format(k-1),"cgm_bestWeight_{!s}".format(k)).variableOp("set", "cgm_bestTile_{!s}".format(k-1),"cgm_bestTile_{!s}".format(k)) #todo: move other vars
+    locSubIf.variableOp("set", "cgm_bestWeight_{!s}".format(j), 0)
     curSubLevel=TagList()
     locSubIf.add("else", curSubLevel)
     # ifTypeBest.add("Find correct tile and build")
