@@ -58,7 +58,16 @@ def main():
   outTag.add("country_event", empireBuildEvent)
 
   outTriggers=TagList()
+  outTriggers.addComment("this = planet")
+  outTriggers.addComment("prev = country")
+  outTriggers.addComment("Check if any building of the type is available, including tech requ check. Can be left empty if there are non-unique buildings without tech requ in the category. ")
   outEffects=TagList()
+  outEffects.addComment("this = tile")
+  outEffects.addComment("prev = planet")
+  outEffects.addComment("prevprev = country")
+  outEffects.addComment("Build the building that fits the category defined in the name of each trigger.")
+  outEffects.addComment("Check if unique buildings of that category can be build first and do so if possible")
+  outEffects.addComment("Leave the 'succesful ->set flag' at the end as it is")
 
   empireBuildEvent.triggeredHidden()
   empireBuildEventImmediate=TagList()
@@ -98,7 +107,10 @@ def main():
     everyTileBuild=ifTypeBest.addReturn("every_tile")
     everyTileBuild.addReturn("prev").variableOp("change", "cgm_curTile",1)
     everyTileBuild.createReturnIf(TagList("prev",variableOpNew("check", "cgm_curTile", "cgm_bestTile_1"))).add("add_"+weightType+"_building","yes" )
-    outEffects.add("add_"+weightType+"_building",TagList("add_building_construction",exampleBuildings[i]).createReturnIf(TagList("or", TagList("has_building","yes").add("has_building_construction", "yes"))).addReturn("prev").add("set_country_flag", "cgm_auto_built"))
+    
+    effect=outEffects.addReturn("add_"+weightType+"_building")
+    effect.add("add_building_construction",exampleBuildings[i])
+    effect.createReturnIf(TagList("or", TagList("has_building","yes").add("has_building_construction", "yes"))).add("prevprev",TagList("set_country_flag", "cgm_auto_built"))
   curSubLevel=planetBuildSomeThing
   for j in reversed(storedValsRange[1:]):
     locSubIf=curSubLevel.createReturnIf(variableOpNew("check", "cgm_bestWeight_{!s}".format(j), 0, ">"))
