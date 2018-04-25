@@ -23,7 +23,7 @@ def main():
   
   # weightTypes=["energy", "minerals", "food", "unity", "society_research", "physics_research", "engineering_research"]
   weightTypes=["energy", "minerals", "food", "base_res_adjacency", "society_research", "physics_research", "engineering_research", "science_adjacency"]
-  exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_hyperstorage_facility_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
+  exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_power_hub_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
   varsToMove=["Weight","Tile","Type"]
   pseudoInf=99999
 
@@ -132,7 +132,7 @@ def main():
     
     effect=outEffects.addReturn("add_"+weightType+"_building")
     if debug:
-      effect.add("log", '"trying to build special on tile [prev.cgm_curTile]"')
+      effect.add("log", '"trying to build standard on tile [prev.cgm_curTile]"')
     effect.add("add_building_construction",exampleBuildings[i])
     effect.createReturnIf(TagList("or", TagList("has_building","yes").add("has_building_construction", "yes"))).add("prevprev",TagList("set_country_flag", "cgm_auto_built"))
   curSubLevel=planetBuildSomeThing
@@ -148,6 +148,7 @@ def main():
     locSubIf.variableOp("set", "cgm_bestWeight_{!s}".format(j), 0)
     curSubLevel=TagList()
     locSubIf.add("else", curSubLevel)
+  curSubLevel.variableOp("set", "cgm_bestWeight_1".format(j), 0)
     # ifTypeBest.add("Find correct tile and build")
 
 
@@ -196,7 +197,7 @@ def main():
   curPrev.variableOp("change", "cgm_curTile", 1)
   everyTileSearch=everyTileSearch.createReturnIf(TagList("has_building","no"))
   everyTileSearch.addComment("set worst value to very large number, such that any found tile is initially worse")
-  everyTileSearch.variableOp("set", "cgm_worstWeight".format(varToMove),pseudoInf)
+  everyTileSearch.add("prev",variableOpNew("set", "cgm_worstWeight".format(varToMove),pseudoInf))
   # curPrev.variableOp("set", "cgm_curWeight", 0)
   # for weight in weightTypes:
   #   curPrev.variableOp("set", weight+"_weight", 0)
@@ -222,7 +223,7 @@ def main():
     ifWeightHigher=everyTileSearch.createReturnIf(TagList("prev",variableOp(TagList(), "check", weight+"_weight", "cgm_curWeight", ">")).add(weight+"_any_building_available", "yes")) #TODO the avaiable check should probably be done on planet, s.t. we only check a variable here!
     # if "adjacency" in weight:
     if weight=="base_res_adjacency":
-      outTriggers.add(weight+"_any_building_available", TagList("not", TagList("prev", TagList("has_building","building_hyperstorage_facility_1"))))
+      outTriggers.add(weight+"_any_building_available", TagList("not", TagList("prev", TagList("has_building","building_power_hub_1"))))
     else:
       outTriggers.add(weight+"_any_building_available", TagList())
     ifWeightHigher.addReturn("prev").variableOp("set", "cgm_curWeight",weight+"_weight").variableOp("set", "cgm_curType",i+1)
