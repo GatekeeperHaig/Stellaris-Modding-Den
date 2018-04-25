@@ -46,7 +46,8 @@ def main():
   findBestPlanetLimit.add("free_building_tiles", "0", "", ">")
   findBestPlanetLimit.add("not",TagList("has_planet_flag", "purged_planet"))
   findBestPlanetLimit.add("or", TagList("and", TagList("sector_controlled","no").add("prev", TagList("has_country_flag", "cgm_core_world_auto"))).add("and", TagList("sector_controlled","yes").add("not", TagList("prev", TagList("has_country_flag", "cgm_core_world_auto")))))
-  # findBestPlanetLimit.
+  # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("or", TagList("is_growing", "yes").add("is_unemployed","yes")))
+  findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("is_unemployed","yes"))
   # findBestPlanetLimit.
   empireBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
   findBestPlanet.add("if",TagList("limit", TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value", "0","","="))).createEvent(name_planet_find_best, "planet_event"))
