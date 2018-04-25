@@ -1,21 +1,31 @@
 namespace = cgm_auto
+ #there are 2*3 types of important variables used in these events:
+# "cur" is always for the tile we are currently in,
+# "best_" is previously found best tiles.
+#Each can be combined with
+# "Type", which is a number assigned to the different weight-type
+# "weight", which is the actual weight value
+# "Tile", which is the "id" of a tile
 country_event = {
 	id = cgm_auto.0
 	is_triggered_only = yes
 	hide_window = yes
 	immediate = {
 		remove_country_flag = cgm_auto_built
+		set_country_flag = cgm_core_world_auto #searching core worlds for standard buildings
 		 #TODO search for special building!
+		 #define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one
 		set_variable = {
 			which = cgm_special_bestWeight_1
 			value = 20  #TODO just a test!
 		}
-		set_country_flag = cgm_core_world_auto #searching core worlds for standard buildings
 		set_variable = { which = cgm_bestWeight_1 value = 0 }
 		country_event = { id = cgm_auto.10 }
 		if = {
 			limit = { not = { has_country_flag = cgm_auto_built } }
 			remove_country_flag = cgm_core_world_auto #searching sector worlds for standard buildings
+			 #TODO search for special building!
+			 #define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one
 			set_variable = { which = cgm_bestWeight_1 value = 0 }
 			country_event = { id = cgm_auto.10 }
 		}
@@ -245,7 +255,7 @@ country_event = {
 				}
 			}
 			else = {
-				 #build the special one!
+				 #build the special one! Set cgm_auto_built flag if we do
 			}
 		}
 	}

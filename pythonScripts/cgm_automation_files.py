@@ -34,20 +34,23 @@ def main():
   outTag=TagList("namespace", eventNameSpace.format("")[:-1])
   storedValsRange=range(1,4)
 
-
+  outTag.addComment('there are 2*3 types of important variables used in these events:\n# "cur" is always for the tile we are currently in,\n# "best_" is previously found best tiles.\n#Each can be combined with\n# "Type", which is a number assigned to the different weight-type\n# "weight", which is the actual weight value\n# "Tile", which is the "id" of a tile')
 
   empireMainBuildEvent=TagList("id",name_empire_main_build_event)
   outTag.add("country_event", empireMainBuildEvent)
   empireMainBuildEvent.triggeredHidden()
   empireMainBuildEventImmediate=empireMainBuildEvent.addReturn("immediate")
   empireMainBuildEventImmediate.add("remove_country_flag", "cgm_auto_built")
-  empireMainBuildEventImmediate.addComment("TODO search for special building!")
-  empireMainBuildEventImmediate.variableOp("set","cgm_special_bestWeight_1", 20, "=", " #TODO just a test!")
   empireMainBuildEventImmediate.add("set_country_flag", "cgm_core_world_auto", "#searching core worlds for standard buildings")
+  empireMainBuildEventImmediate.addComment("TODO search for special building!")
+  empireMainBuildEventImmediate.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
+  empireMainBuildEventImmediate.variableOp("set","cgm_special_bestWeight_1", 20, "=", " #TODO just a test!")
   empireMainBuildEventImmediate.variableOp("set","cgm_bestWeight_1", 0)
   empireMainBuildEventImmediate.createEvent(name_empire_build_event)
   sectorBuild=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_auto_built")))
   sectorBuild.add("remove_country_flag", "cgm_core_world_auto", "#searching sector worlds for standard buildings")
+  sectorBuild.addComment("TODO search for special building!")
+  sectorBuild.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
   sectorBuild.variableOp("set","cgm_bestWeight_1", 0)
   sectorBuild.createEvent(name_empire_build_event)
 
@@ -86,7 +89,7 @@ def main():
   empireBuildEventImmediate.add("if", buildSomeThing)
   planetBuildSomeThing=TagList()
   buildSomeThing.add("event_target:cgm_best_planet", planetBuildSomeThing)
-  buildSomeThing.add("else", TagList("","","#build the special one!") )
+  buildSomeThing.add("else", TagList("","","#build the special one! Set cgm_auto_built flag if we do") )
   # buildSomeThing.add("else", TagList("set_country_flag", "cgm_noAutobuildPlanetFound"))
   for i, weightType in enumerate(weightTypes):
     ifTypeBest=TagList("limit", TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1))) #todo maybe do else -> when everything is done
