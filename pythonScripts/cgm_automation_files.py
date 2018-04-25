@@ -86,7 +86,7 @@ def main():
   # findBestPlanetLimit.
   empireStandardBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
   if debug:
-    findBestPlanet.add("log", '"searching on planet [this.getName]"')
+    findBestPlanet.add("log", '"searching on planet [this.GetName]"')
   findBestPlanet.add("if",TagList("limit", TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value", "0","","="))).createEvent(name_planet_find_best, "planet_event"))
   findBestPlanetIf=TagList("limit", TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value", "prev","",">")))
   findBestPlanet.add("if", findBestPlanetIf)
@@ -100,7 +100,7 @@ def main():
   buildSpecial=buildSomeThing.addReturn("else")
   buildSpecial=buildSpecial.addReturn("event_target:cgm_best_planet_for_special")
   redoCalcForWorstTile=buildSpecial.createReturnIf(variableOpNew("check","cgm_worstTile",pseudoInf))
-  redoCalcForWorstTile.createEvent(name_planet_find_best)
+  redoCalcForWorstTile.createEvent(name_planet_find_best,"planet_event")
   buildSpecial.variableOp("set", "cgm_curTile",0)
   buildSpecialTile=buildSpecial.addReturn("every_tile")
   buildSpecialTile.addReturn("prev").variableOp("change", "cgm_curTile",1)
@@ -159,7 +159,7 @@ def main():
   # findBestPlanetLimit.
   empireSpecialBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
   if debug:
-    findBestPlanet.add("log", '"searching for special buildings on planet [this.getName]"')
+    findBestPlanet.add("log", '"searching for special buildings on planet [this.GetName]"')
 
     findBestPlanet.addComment("TODO search for special building!")
     findBestPlanet.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
