@@ -20,6 +20,7 @@ country_event = {
 			which = cgm_special_bestWeight_1
 			value = 20  #TODO just a test!
 		}
+		random_owned_planet = { save_global_event_target_as = cgm_best_planet_for_special }  #TODO just a test!
 		country_event = { id = cgm_auto.10 }
 		if = {
 			limit = { not = { has_country_flag = cgm_auto_built } }
@@ -255,7 +256,29 @@ country_event = {
 				}
 			}
 			else = {
-				 #build the special one! Set cgm_auto_built flag if we do
+				event_target:cgm_best_planet_for_special = {
+					if = {
+						limit = {
+							check_variable = { which = cgm_worstTile value = 99999 }
+						}
+						country_event = { id = cgm_auto.20 }
+					}
+					set_variable = { which = cgm_curTile value = 0 }
+					every_tile = {
+						prev = {
+							change_variable = { which = cgm_curTile value = 1 }
+						}
+						if = {
+							limit = {
+								prev = {
+									check_variable = { which = cgm_curTile value = cgm_worstTile }
+								}
+							}
+							cgm_add_special_building = yes
+						}
+					}
+					set_variable = { which = cgm_worstTile value = 99999 }
+				}
 			}
 		}
 	}
