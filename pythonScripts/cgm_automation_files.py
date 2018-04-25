@@ -19,9 +19,10 @@ nameBase="cgm_auto_{!s}"
 def main():
   os.chdir(os.path.dirname(__file__))
   
-
-  weightTypes=["energy", "minerals", "food", "unity", "society_research", "physics_research", "engineering_research"]
-  exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_heritage_site","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
+#building_heritage_site
+  # weightTypes=["energy", "minerals", "food", "unity", "society_research", "physics_research", "engineering_research"]
+  weightTypes=["energy", "minerals", "food", "base_res_adjacency", "society_research", "physics_research", "engineering_research", "science_adjacency"]
+  exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_hyperstorage_facility_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
   varsToMove=["Weight","Tile","Type"]
 
   name_empire_build_event=eventNameSpace.format(0)
@@ -32,6 +33,9 @@ def main():
 
   empireBuildEvent=TagList("id",name_empire_build_event)
   outTag.add("country_event", empireBuildEvent)
+
+  outTriggers=TagList()
+  outEffects=TagList()
 
   empireBuildEvent.add("is_triggered_only", "yes")
   empireBuildEvent.add("hide_window", "yes")
@@ -67,7 +71,8 @@ def main():
     ifTypeBest.variableOp("set", "cgm_curTile",0)
     everyTileBuild=ifTypeBest.addReturn("every_tile")
     everyTileBuild.addReturn("prev").variableOp("change", "cgm_curTile",1)
-    everyTileBuild.createReturnIf(TagList("prev",variableOpNew("check", "cgm_curTile", "cgm_bestTile_1"))).add( "add_building_construction",exampleBuildings[i])
+    everyTileBuild.createReturnIf(TagList("prev",variableOpNew("check", "cgm_curTile", "cgm_bestTile_1"))).add("add_"+weightType+"_building","yes" )
+    outEffects.add("add_"+weightType+"_building",TagList("add_building_construction",exampleBuildings[i]))
   curSubLevel=planetBuildSomeThing
   for j in reversed(storedValsRange[1:]):
     locSubIf=curSubLevel.createReturnIf(variableOpNew("check", "cgm_bestWeight_{!s}".format(j), 0, ">"))
@@ -108,9 +113,22 @@ def main():
   testif.add("prev", variableOp(TagList(),"set", "minerals_weight", 20))
   testif=everyTileSearch.createReturnIf(TagList("prev", variableOp(TagList(), "check", "cgm_curTile", 7)))
   testif.add("prev", variableOp(TagList(),"set", "food_weight", 5))
+  testif=everyTileSearch.createReturnIf(TagList("prev", variableOp(TagList(), "check", "cgm_curTile", 1)))
+  testif.add("prev", variableOp(TagList(),"set", "base_res_adjacency_weight", 27))
+  testif=everyTileSearch.createReturnIf(TagList("prev", variableOp(TagList(), "check", "cgm_curTile", 2)))
+  testif.add("prev", variableOp(TagList(),"set", "base_res_adjacency_weight", 29))
+  testif=everyTileSearch.createReturnIf(TagList("prev", variableOp(TagList(), "check", "cgm_curTile", 3)))
+  testif.add("prev", variableOp(TagList(),"set", "base_res_adjacency_weight", 29))
+  testif=everyTileSearch.createReturnIf(TagList("prev", variableOp(TagList(), "check", "cgm_curTile", 4)))
+  testif.add("prev", variableOp(TagList(),"set", "base_res_adjacency_weight", 29))
   everyTileSearch.addComment("END OF example")
   for i, weight in enumerate(weightTypes):
-    ifWeightHigher=everyTileSearch.createReturnIf(TagList("prev",variableOp(TagList(), "check", weight+"_weight", "cgm_curWeight", ">")))
+    ifWeightHigher=everyTileSearch.createReturnIf(TagList("prev",variableOp(TagList(), "check", weight+"_weight", "cgm_curWeight", ">")).add(weight+"_any_building_available", "yes"))
+    # if "adjacency" in weight:
+    if weight=="base_res_adjacency":
+      outTriggers.add(weight+"_any_building_available", TagList("not", TagList("prev", TagList("has_building","building_hyperstorage_facility_1"))))
+    else:
+      outTriggers.add(weight+"_any_building_available", TagList())
     ifWeightHigher.addReturn("prev").variableOp("set", "cgm_curWeight",weight+"_weight").variableOp("set", "cgm_curType",i+1)
   curLevel=everyTileSearch
   for i in storedValsRange:
@@ -144,8 +162,13 @@ def main():
 
 
   outputToFolderAndFile(outTag, "events", "cgm_auto.txt",2, "../CGM/buildings_script_source")
-  with open("test.txt", "w") as file:
-    outTag.writeAll(file,args())
+  outputToFolderAndFile(outTriggers, "common/scripted_triggers", "cgm_auto_trigger.txt",2, "../CGM/buildings_script_source")
+  outputToFolderAndFile(outEffects, "common/scripted_effects", "cgm_auto_effects.txt",2, "../CGM/buildings_script_source")
+  # with open("test.txt", "w") as file:
+  #   outTag.writeAll(file,args())
+
+
+
 
 
 if __name__ == "__main__":
