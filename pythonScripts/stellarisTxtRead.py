@@ -231,7 +231,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         self.vals[i].writeAll(file,args)
         self._writeTabs(file)
         file.write("}")
-    file.write(self.comments[i])
+    if self.comments[i].strip()!="":
+      file.write(" "+self.comments[i])
     file.write("\n")
   def writeLine(self, file):
     file.write("{ ")

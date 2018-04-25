@@ -17,6 +17,8 @@ from functools import reduce
 eventNameSpace="cgm_auto.{!s}"
 nameBase="cgm_auto_{!s}"
 def main():
+
+  debug=True
   os.chdir(os.path.dirname(__file__))
   
 #building_heritage_site
@@ -25,11 +27,29 @@ def main():
   exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_hyperstorage_facility_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
   varsToMove=["Weight","Tile","Type"]
 
-  name_empire_build_event=eventNameSpace.format(0)
-  name_planet_find_best=eventNameSpace.format(10)
+  name_empire_main_build_event=eventNameSpace.format(0)
+  name_empire_build_event=eventNameSpace.format(10)
+  name_planet_find_best=eventNameSpace.format(20)
 
   outTag=TagList("namespace", eventNameSpace.format("")[:-1])
   storedValsRange=range(1,4)
+
+
+
+  empireMainBuildEvent=TagList("id",name_empire_main_build_event)
+  outTag.add("country_event", empireMainBuildEvent)
+  empireMainBuildEvent.triggeredHidden()
+  empireMainBuildEventImmediate=empireMainBuildEvent.addReturn("immediate")
+  empireMainBuildEventImmediate.add("remove_country_flag", "cgm_auto_built")
+  empireMainBuildEventImmediate.addComment("TODO search for special building!")
+  empireMainBuildEventImmediate.variableOp("set","cgm_special_bestWeight_1", 20, "", " #TODO just a test!")
+  empireMainBuildEventImmediate.add("set_country_flag", "cgm_core_world_auto", "#searching core worlds for standard buildings")
+  empireMainBuildEventImmediate.variableOp("set","cgm_bestWeight_1", 0)
+  empireMainBuildEventImmediate.createEvent(name_empire_build_event)
+  sectorBuild=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_auto_built")))
+  sectorBuild.add("remove_country_flag", "cgm_core_world_auto", "#searching sector worlds for standard buildings")
+  sectorBuild.variableOp("set","cgm_bestWeight_1", 0)
+  sectorBuild.createEvent(name_empire_build_event)
 
   empireBuildEvent=TagList("id",name_empire_build_event)
   outTag.add("country_event", empireBuildEvent)
@@ -37,13 +57,12 @@ def main():
   outTriggers=TagList()
   outEffects=TagList()
 
-  empireBuildEvent.add("is_triggered_only", "yes")
-  empireBuildEvent.add("hide_window", "yes")
+  empireBuildEvent.triggeredHidden
   empireBuildEventImmediate=TagList()
   empireBuildEvent.add("immediate", empireBuildEventImmediate)
   # empireBuildEventImmediate.add("set_variable", TagList("which", "cgm_currentEmpireMax").add("value", 0))
-  empireBuildEventImmediate.add("set_country_flag", "cgm_core_world_auto", " #TODO: remove. just for testing the event")
-  empireBuildEventImmediate.add("set_variable", TagList("which", "cgm_bestWeight_1").add("value", 0))
+  # empireBuildEventImmediate.add("set_country_flag", "cgm_core_world_auto", " #TODO: remove. just for testing the event")
+  # empireBuildEventImmediate.add("set_variable", TagList("which", "cgm_bestWeight_1").add("value", 0))
   findBestPlanet=TagList()
   findBestPlanetLimit=findBestPlanet.addReturn("limit")
   findBestPlanetLimit.add("has_building_construction","no")
@@ -51,20 +70,24 @@ def main():
   findBestPlanetLimit.add("not",TagList("has_planet_flag", "purged_planet"))
   findBestPlanetLimit.add("or", TagList("and", TagList("sector_controlled","no").add("prev", TagList("has_country_flag", "cgm_core_world_auto"))).add("and", TagList("sector_controlled","yes").add("not", TagList("prev", TagList("has_country_flag", "cgm_core_world_auto")))))
   # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("or", TagList("is_growing", "yes").add("is_unemployed","yes")))
-  findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("is_unemployed","yes"))
+  # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("is_unemployed","yes")) #seems not to work
+  findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("NOR",TagList("tile",TagList("has_building","yes").add("has_building_construction","yes"))))
   # findBestPlanetLimit.
   empireBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
+  if debug:
+    findBestPlanet.add("log", '"searching on planet [this.getName]"')
   findBestPlanet.add("if",TagList("limit", TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value", "0","","="))).createEvent(name_planet_find_best, "planet_event"))
   findBestPlanetIf=TagList("limit", TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value", "prev","",">")))
   findBestPlanet.add("if", findBestPlanetIf)
   findBestPlanetIf.add("save_event_target_as", "cgm_best_planet")
   findBestPlanetIf.add("prev", TagList("set_variable", TagList("which", "cgm_bestWeight_1").add("value", "prev")))
 
-  buildSomeThing=TagList("limit",TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value",0, "", ">")))
+  buildSomeThing=TagList("limit",TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value","cgm_special_bestWeight_1", "", ">")))
   empireBuildEventImmediate.add("if", buildSomeThing)
   planetBuildSomeThing=TagList()
   buildSomeThing.add("event_target:cgm_best_planet", planetBuildSomeThing)
-  buildSomeThing.add("else", TagList("set_country_flag", "cgm_noAutobuildPlanetFound"))
+  buildSomeThing.add("else", TagList("","","#build the special one!") )
+  # buildSomeThing.add("else", TagList("set_country_flag", "cgm_noAutobuildPlanetFound"))
   for i, weightType in enumerate(weightTypes):
     ifTypeBest=TagList("limit", TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1))) #todo maybe do else -> when everything is done
     planetBuildSomeThing.add("if", ifTypeBest)
@@ -72,7 +95,7 @@ def main():
     everyTileBuild=ifTypeBest.addReturn("every_tile")
     everyTileBuild.addReturn("prev").variableOp("change", "cgm_curTile",1)
     everyTileBuild.createReturnIf(TagList("prev",variableOpNew("check", "cgm_curTile", "cgm_bestTile_1"))).add("add_"+weightType+"_building","yes" )
-    outEffects.add("add_"+weightType+"_building",TagList("add_building_construction",exampleBuildings[i]))
+    outEffects.add("add_"+weightType+"_building",TagList("add_building_construction",exampleBuildings[i]).createReturnIf(TagList("or", TagList("has_building","yes").add("has_building_construction", "yes"))).addReturn("prev").add("set_country_flag", "cgm_auto_built"))
   curSubLevel=planetBuildSomeThing
   for j in reversed(storedValsRange[1:]):
     locSubIf=curSubLevel.createReturnIf(variableOpNew("check", "cgm_bestWeight_{!s}".format(j), 0, ">"))
@@ -123,7 +146,7 @@ def main():
   testif.add("prev", variableOp(TagList(),"set", "base_res_adjacency_weight", 29))
   everyTileSearch.addComment("END OF example")
   for i, weight in enumerate(weightTypes):
-    ifWeightHigher=everyTileSearch.createReturnIf(TagList("prev",variableOp(TagList(), "check", weight+"_weight", "cgm_curWeight", ">")).add(weight+"_any_building_available", "yes"))
+    ifWeightHigher=everyTileSearch.createReturnIf(TagList("prev",variableOp(TagList(), "check", weight+"_weight", "cgm_curWeight", ">")).add(weight+"_any_building_available", "yes")) #TODO the avaiable check should probably be done on planet, s.t. we only check a variable here!
     # if "adjacency" in weight:
     if weight=="base_res_adjacency":
       outTriggers.add(weight+"_any_building_available", TagList("not", TagList("prev", TagList("has_building","building_hyperstorage_facility_1"))))
