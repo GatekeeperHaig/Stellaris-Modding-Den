@@ -57,8 +57,9 @@ def main():
 
 
   outTriggers=TagList()
-  outTriggers.addComment("this = planet")
-  outTriggers.addComment("prev = country")
+  outEffects.addComment("this = tile")
+  outTriggers.addComment("prev = planet")
+  outTriggers.addComment("prevprev = country")
   outTriggers.addComment("Check if any building of the type is available, including tech requ check. Can be left empty if there are non-unique buildings without tech requ in the category. ")
   outEffects=TagList()
   outEffects.addComment("this = tile")
@@ -196,69 +197,70 @@ def main():
   curPrev=everyTileSearch.addReturn("prev")
   curPrev.variableOp("change", "cgm_curTile", 1)
   everyTileSearch=everyTileSearch.createReturnIf(TagList("has_building","no"))
-  everyTileSearch.addComment("set worst value to very large number, such that any found tile is initially worse")
-  everyTileSearch.add("prev",variableOpNew("set", "cgm_worstWeight".format(varToMove),pseudoInf))
   # curPrev.variableOp("set", "cgm_curWeight", 0)
   # for weight in weightTypes:
   #   curPrev.variableOp("set", weight+"_weight", 0)
 
   everyTileSearch.addComment("doCALC! test:")
-  testif=everyTileSearch.createReturnIf(TagList("prev", variableOp(TagList(), "check", "cgm_curTile", 5)))
-  testif.add("prev", variableOp(TagList(),"set", "energy_weight", 25))
-  testif.add("prev", variableOp(TagList(),"set", "minerals_weight", 21))
-  testif=everyTileSearch.createReturnIf(TagList("prev", variableOp(TagList(), "check", "cgm_curTile", 9)))
-  testif.add("prev", variableOp(TagList(),"set", "minerals_weight", 20))
-  testif=everyTileSearch.createReturnIf(TagList("prev", variableOp(TagList(), "check", "cgm_curTile", 7)))
-  testif.add("prev", variableOp(TagList(),"set", "food_weight", 5))
-  testif=everyTileSearch.createReturnIf(TagList("prev", variableOp(TagList(), "check", "cgm_curTile", 1)))
-  testif.add("prev", variableOp(TagList(),"set", "base_res_adjacency_weight", 27))
-  testif=everyTileSearch.createReturnIf(TagList("prev", variableOp(TagList(), "check", "cgm_curTile", 2)))
-  testif.add("prev", variableOp(TagList(),"set", "base_res_adjacency_weight", 29))
-  testif=everyTileSearch.createReturnIf(TagList("prev", variableOp(TagList(), "check", "cgm_curTile", 3)))
-  testif.add("prev", variableOp(TagList(),"set", "base_res_adjacency_weight", 29))
-  testif=everyTileSearch.createReturnIf(TagList("prev", variableOp(TagList(), "check", "cgm_curTile", 4)))
-  testif.add("prev", variableOp(TagList(),"set", "base_res_adjacency_weight", 29))
+  everyTileSearch=everyTileSearch.addReturn("prev")
+  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 5))
+  testif.variableOp("set", "energy_weight", 25)
+  testif.variableOp("set", "minerals_weight", 21)
+  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 9))
+  testif.variableOp("set", "minerals_weight", 20)
+  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 7))
+  testif.variableOp("set", "food_weight", 5)
+  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 1))
+  testif.variableOp("set", "base_res_adjacency_weight", 27)
+  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 2))
+  testif.variableOp("set", "base_res_adjacency_weight", 29)
+  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 3))
+  testif.variableOp("set", "base_res_adjacency_weight", 29)
+  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 4))
+  testif.variableOp("set", "base_res_adjacency_weight", 29)
   everyTileSearch.addComment("END OF example")
+  everyTileSearch.addComment("set worst value to very large number, such that any found tile is initially worse")
+  everyTileSearch.variableOp("set", "cgm_worstWeight".format(varToMove),pseudoInf)
   for i, weight in enumerate(weightTypes):
-    ifWeightHigher=everyTileSearch.createReturnIf(TagList("prev",variableOp(TagList(), "check", weight+"_weight", "cgm_curWeight", ">")).add(weight+"_any_building_available", "yes")) #TODO the avaiable check should probably be done on planet, s.t. we only check a variable here!
+    ifWeightHigher=everyTileSearch.createReturnIf(variableOp(TagList(), "check", weight+"_weight", "cgm_curWeight", ">").add("prev", TagList(weight+"_any_building_available", "yes")))
     # if "adjacency" in weight:
     if weight=="base_res_adjacency":
-      outTriggers.add(weight+"_any_building_available", TagList("not", TagList("prev", TagList("has_building","building_power_hub_1"))))
+      outTriggers.add(weight+"_any_building_available", TagList("prev", TagList("not",  TagList("has_building","building_power_hub_1"))))
     else:
       outTriggers.add(weight+"_any_building_available", TagList())
-    ifWeightHigher.addReturn("prev").variableOp("set", "cgm_curWeight",weight+"_weight").variableOp("set", "cgm_curType",i+1)
+    ifWeightHigher.variableOp("set", "cgm_curWeight",weight+"_weight").variableOp("set", "cgm_curType",i+1)
   curLevel=everyTileSearch
   for i in storedValsRange:
-    locIf=curLevel.createReturnIf(TagList("prev",variableOp(TagList(), "check", "cgm_curWeight", "cgm_bestWeight_{!s}".format(i), ">")))
+    locIf=curLevel.createReturnIf(variableOp(TagList(), "check", "cgm_curWeight", "cgm_bestWeight_{!s}".format(i), ">"))
     curSubLevel=locIf
     for j in reversed(storedValsRange[i:]):
-      locSubIf=curSubLevel.createReturnIf(TagList("prev", variableOpNew("check", "cgm_bestWeight_{!s}".format(j-1), 0, ">")))
+      locSubIf=curSubLevel.createReturnIf(variableOpNew("check", "cgm_bestWeight_{!s}".format(j-1), 0, ">"))
       # if i==1 and curSubLevel==locIf:
       #   planetBuildSomeThing.add("if", locSubIf)
-      locPrev=locSubIf.addReturn("prev")
+      # locPrev=locSubIf.addReturn("prev")
       for k in reversed(storedValsRange[i:j]):
         for varToMove in varsToMove:
-          locPrev.variableOp("set", "cgm_best"+varToMove+"_{!s}".format(k),"cgm_best"+varToMove+"_{!s}".format(k-1))
+          locSubIf.variableOp("set", "cgm_best"+varToMove+"_{!s}".format(k),"cgm_best"+varToMove+"_{!s}".format(k-1))
         # locPrev.variableOp("set", "cgm_bestWeight_{!s}".format(k),"cgm_bestWeight_{!s}".format(k-1)).variableOp("set", "cgm_bestTile_{!s}".format(k),"cgm_bestTile_{!s}".format(k-1)).variableOp("set", "cgm_bestTile_{!s}".format(k),"cgm_bestTile_{!s}".format(k-1)) #todo: move other vars
       curSubLevel=TagList()
       locSubIf.add("else", curSubLevel)
-    locPrev=locIf.addReturn("prev")
+    # locPrev=locIf.addReturn("prev")
     for varToMove in varsToMove:
-      locPrev.variableOp("set", "cgm_best{}_{!s}".format(varToMove,i),"cgm_cur{}".format(varToMove))
+      locIf.variableOp("set", "cgm_best{}_{!s}".format(varToMove,i),"cgm_cur{}".format(varToMove))
 
     # variableOp("set", "cgm_bestWeight_{!s}".format(i),"cgm_curWeight").variableOp("set", "cgm_bestTile_{!s}".format(i),"cgm_curTile").variableOp("set", "cgm_bestType_{!s}".format(i),"cgm_curType","=")
     curLevel=TagList()
     locIf.add("else", curLevel)
 
   #finding the worst of the best: best over weightTypes, worst over tiles
-  locIf=everyTileSearch.createReturnIf(TagList("prev",variableOp(TagList(), "check", "cgm_curWeight", "cgm_worstWeight", "<")))
+  locIf=everyTileSearch.createReturnIf(variableOp(TagList(), "check", "cgm_curWeight", "cgm_worstWeight", "<"))
   for varToMove in varsToMove[:-1]: #:-1 as type is not needed. Don't care about type here
     locIf.variableOp("set", "cgm_worst{}".format(varToMove),"cgm_cur{}".format(varToMove))
 
-  curPrev=everyTileSearch.addReturn("prev")
-  curPrev.variableOp("set", "cgm_curWeight", 0)
+  # curPrev=everyTileSearch.addReturn("prev")
+  everyTileSearch.variableOp("set", "cgm_curWeight", 0)
   for weight in weightTypes:
-    curPrev.variableOp("set", weight+"_weight", 0)
+    everyTileSearch.variableOp("set", weight+"_weight", 0)
 
   # outTag.deleteOnLowestLevel(checkEmpty)
   outTag.deleteOnLowestLevel(checkTotallyEmpty)
