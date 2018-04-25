@@ -208,8 +208,10 @@ def main():
     mainSubMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",name_mainMenuEvent))))
     mainSubMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
   
-  mainMenu.add("option", TagList("name", locList.addEntry("enable_direct_build.name", "@enableBU")).add("custom_gui", "cgm_option").add("trigger", TagList("not", TagList("has_global_flag", "direct_build_enabled"))).add("hidden_effect", TagList("set_global_flag", "direct_build_enabled").add("remove_global_flag", "display_low_tier_flag").add("remove_global_flag", "do_no_remove_low_tier_flag")))
-  mainMenu.add("option", TagList("name", locList.addEntry("disable_direct_build.name", "@disableBU")).add("custom_gui", "cgm_option").add("trigger", TagList("has_global_flag", "direct_build_enabled")).add("hidden_effect", TagList("remove_global_flag", "direct_build_enabled").add("set_global_flag", "display_low_tier_flag").add("set_global_flag", "do_no_remove_low_tier_flag")))
+  mainMenu.add("option", TagList("name", locList.addEntry("enable_direct_build.name", "@enableBU")).add("custom_gui", "cgm_option").add("trigger", TagList("not", TagList("has_global_flag", "direct_build_enabled"))).add("hidden_effect", TagList("set_global_flag", "direct_build_enabled").createEvent(name_mainMenuEvent)))
+  mainMenu.add("option", TagList("name", locList.addEntry("disable_direct_build.name", "@disableBU")).add("custom_gui", "cgm_option").add("trigger", TagList("has_global_flag", "direct_build_enabled")).add("hidden_effect", TagList("remove_global_flag", "direct_build_enabled").createEvent(name_mainMenuEvent)))
+  # mainMenu.add("option", TagList("name", locList.addEntry("enable_direct_build.name", "@enableBU")).add("custom_gui", "cgm_option").add("trigger", TagList("not", TagList("has_global_flag", "direct_build_enabled"))).add("hidden_effect", TagList("set_global_flag", "direct_build_enabled").add("remove_global_flag", "display_low_tier_flag").add("remove_global_flag", "do_no_remove_low_tier_flag").createEvent(name_mainMenuEvent)))
+  # mainMenu.add("option", TagList("name", locList.addEntry("disable_direct_build.name", "@disableBU")).add("custom_gui", "cgm_option").add("trigger", TagList("has_global_flag", "direct_build_enabled")).add("hidden_effect", TagList("remove_global_flag", "direct_build_enabled").add("set_global_flag", "display_low_tier_flag").add("set_global_flag", "do_no_remove_low_tier_flag").createEvent(name_mainMenuEvent)))
   mainMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(1))).add("country_event", TagList("id",name_updateEvent))))
   mainMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
 
@@ -220,7 +222,7 @@ def main():
   updateEvent.add("immediate", TagList("every_country", TagList("country_event", TagList("id", name_countryUpdateEvent))))
 
   # buildingOptionsFile.printAll()
-  outputToFolderAndFile(buildingOptionsFile, "events", "cgm_buildings_modifiers.txt", level=2, modFolder="../cgm_buildings_script_source")
+  outputToFolderAndFile(buildingOptionsFile, "events", "cgm_buildings_modifiers.txt", level=2, modFolder="../CGM/buildings_script_source")
 
 
   removeModifierImmediates=dict()
@@ -336,10 +338,10 @@ def main():
     immediate.addComment("adding {} bonuses".format(cat))
     immediate.add("country_event", TagList("id", name_addModifiers[cat]))
   # immediate.addTagList(after)
-  outputToFolderAndFile(updateFile, "events", "cgm_buildings_modifiers_update.txt", level=2, modFolder="../cgm_buildings_script_source")
-  outputToFolderAndFile(removeEvents, "events", "cgm_buildings_modifiers_remove.txt", level=2, modFolder="../cgm_buildings_script_source")
-  outputToFolderAndFile(addEvents, "events", "cgm_buildings_modifiers_add.txt", level=2, modFolder="../cgm_buildings_script_source")
-  outputToFolderAndFile(staticModifiers, "common/static_modifiers", "cgm_buildings_modifiers.txt", level=2, modFolder="../cgm_buildings_script_source")
+  outputToFolderAndFile(updateFile, "events", "cgm_buildings_modifiers_update.txt", level=2, modFolder="../CGM/buildings_script_source")
+  outputToFolderAndFile(removeEvents, "events", "cgm_buildings_modifiers_remove.txt", level=2, modFolder="../CGM/buildings_script_source")
+  outputToFolderAndFile(addEvents, "events", "cgm_buildings_modifiers_add.txt", level=2, modFolder="../CGM/buildings_script_source")
+  outputToFolderAndFile(staticModifiers, "common/static_modifiers", "cgm_buildings_modifiers.txt", level=2, modFolder="../CGM/buildings_script_source")
 
 
   for language in locList.languages:
