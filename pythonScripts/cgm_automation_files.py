@@ -42,6 +42,7 @@ def main():
   empireMainBuildEventImmediate=empireMainBuildEvent.addReturn("immediate")
   empireMainBuildEventImmediate.add("remove_country_flag", "cgm_auto_built")
   empireMainBuildEventImmediate.addComment("TODO search for special building!")
+  empireMainBuildEventImmediate.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
   empireMainBuildEventImmediate.variableOp("set","cgm_special_bestWeight_1", 20, "=", " #TODO just a test!")
   empireMainBuildEventImmediate.add("set_country_flag", "cgm_core_world_auto", "#searching core worlds for standard buildings")
   empireMainBuildEventImmediate.variableOp("set","cgm_bestWeight_1", 0)
@@ -86,7 +87,7 @@ def main():
   empireBuildEventImmediate.add("if", buildSomeThing)
   planetBuildSomeThing=TagList()
   buildSomeThing.add("event_target:cgm_best_planet", planetBuildSomeThing)
-  buildSomeThing.add("else", TagList("","","#build the special one!") )
+  buildSomeThing.add("else", TagList("","","#build the special one! Set cgm_auto_built flag if we do") )
   # buildSomeThing.add("else", TagList("set_country_flag", "cgm_noAutobuildPlanetFound"))
   for i, weightType in enumerate(weightTypes):
     ifTypeBest=TagList("limit", TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1))) #todo maybe do else -> when everything is done
