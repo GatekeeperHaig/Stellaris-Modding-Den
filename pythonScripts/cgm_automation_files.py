@@ -47,12 +47,13 @@ def main():
   empireMainBuildEventImmediate.createEvent(name_empire_special_build_event)
   empireMainBuildEventImmediate.addComment("Search for possible Standard buildings. Build best out of standard/special:")
   empireMainBuildEventImmediate.createEvent(name_empire_standard_build_event)
-  sectorBuild=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_auto_built")))
-  sectorBuild.add("remove_country_flag", "cgm_core_world_auto", "#searching sector worlds for standard buildings")
-  sectorBuild.addComment("Search for possible Special buildings:")
-  sectorBuild.createEvent(name_empire_standard_build_event)
-  sectorBuild.addComment("Search for possible Standard buildings. Build best out of standard/special:")
-  sectorBuild.createEvent(name_empire_standard_build_event)
+  #todo activate again! disabled for better testing(no deletion of variables)
+  # sectorBuild=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_auto_built")))
+  # sectorBuild.add("remove_country_flag", "cgm_core_world_auto", "#searching sector worlds for standard buildings")
+  # sectorBuild.addComment("Search for possible Special buildings:")
+  # sectorBuild.createEvent(name_empire_standard_build_event)
+  # sectorBuild.addComment("Search for possible Standard buildings. Build best out of standard/special:")
+  # sectorBuild.createEvent(name_empire_standard_build_event)
 
 
   outTriggers=TagList()
@@ -99,7 +100,7 @@ def main():
   buildSomeThing.add("event_target:cgm_best_planet", planetBuildSomeThing)
   buildSpecial=buildSomeThing.addReturn("else")
   buildSpecial=buildSpecial.addReturn("event_target:cgm_best_planet_for_special")
-  redoCalcForWorstTile=buildSpecial.createReturnIf(variableOpNew("check","cgm_worstTile",pseudoInf))
+  redoCalcForWorstTile=buildSpecial.createReturnIf(variableOpNew("check","cgm_worstWeight",pseudoInf))
   redoCalcForWorstTile.createEvent(name_planet_find_best,"planet_event")
   buildSpecial.variableOp("set", "cgm_curTile",0)
   buildSpecialTile=buildSpecial.addReturn("every_tile")
@@ -108,9 +109,11 @@ def main():
 
   buildSpecialTile.add("cgm_add_special_building","yes")
   effect=outEffects.addReturn("cgm_add_special_building")
+  if debug:
+    effect.add("log", '"trying to build special on tile [prev.cgm_curTile]"')
   effect.add("add_building_construction", "building_autochthon_monument")
   effect.createReturnIf(TagList("or", TagList("has_building","yes").add("has_building_construction", "yes"))).add("prevprev",TagList("set_country_flag", "cgm_auto_built"))
-  buildSpecial.variableOp("set", "cgm_worstTile", pseudoInf)
+  buildSpecial.variableOp("set", "cgm_worstWeight", pseudoInf)
 
 
   # buildSomeThing.add("else", TagList("set_country_flag", "cgm_noAutobuildPlanetFound"))
@@ -123,6 +126,8 @@ def main():
     everyTileBuild.createReturnIf(TagList("prev",variableOpNew("check", "cgm_curTile", "cgm_bestTile_1"))).add("add_"+weightType+"_building","yes" )
     
     effect=outEffects.addReturn("add_"+weightType+"_building")
+    if debug:
+      effect.add("log", '"trying to build special on tile [prev.cgm_curTile]"')
     effect.add("add_building_construction",exampleBuildings[i])
     effect.createReturnIf(TagList("or", TagList("has_building","yes").add("has_building_construction", "yes"))).add("prevprev",TagList("set_country_flag", "cgm_auto_built"))
   curSubLevel=planetBuildSomeThing
