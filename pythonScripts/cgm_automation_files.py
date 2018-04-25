@@ -34,7 +34,7 @@ def main():
   outTag=TagList("namespace", eventNameSpace.format("")[:-1])
   storedValsRange=range(1,4)
 
-
+  outTag.addComment('there are 2*3 types of important variables used in these events:\n# "cur" is always for the tile we are currently in,\n# "best_" is previously found best tiles.\n#Each can be combined with\n# "Type", which is a number assigned to the different weight-type\n# "weight", which is the actual weight value\n# "Tile", which is the "id" of a tile')
 
   empireMainBuildEvent=TagList("id",name_empire_main_build_event)
   outTag.add("country_event", empireMainBuildEvent)
