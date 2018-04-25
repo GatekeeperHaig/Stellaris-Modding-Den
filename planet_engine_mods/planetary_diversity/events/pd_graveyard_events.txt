@@ -1,0 +1,359 @@
+namespace = pdgraveyard
+
+#EnterSystem
+ship_event = {
+	id = pdgraveyard.10
+	title = pdgraveyard.10.name
+	desc = pdgraveyard.10.desc
+	picture = GFX_evt_graveyard
+	location = from
+	show_sound = event_ship_bridge
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_star_flag = graveyard_system
+		}
+		owner = {
+			NOT = {
+				has_country_flag = graveyard_encounter
+			}
+			OR = {
+				is_country_type = default
+				is_country_type = fallen_empire
+				is_country_type = awakened_fallen_empire
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = graveyard_encounter
+		}
+	}
+
+	option = {
+		name = pdgraveyard.10.a
+	}
+}
+
+#SurveyPlanet
+ship_event = {
+	id = pdgraveyard.20
+	title = pdgraveyard.20.name
+	desc = pdgraveyard.20.desc
+	picture = GFX_evt_graveyard2
+	location = from
+	show_sound = event_ship_bridge
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_planet_flag = graveyard_planet
+		}
+		owner = {
+			NOT = {
+				has_country_flag = found_graveyard_planet
+			}
+			OR = {
+				is_country_type = default
+				is_country_type = fallen_empire
+				is_country_type = awakened_fallen_empire
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			set_country_flag = found_graveyard_planet
+		}
+	}
+
+	option = {
+		name = pdgraveyard.20.a
+	}
+}
+
+#Tinyanki Falling From the Stars
+planet_event = {
+	id = pdgraveyard.30
+	title = pdgraveyard.30.name
+	desc = pdgraveyard.30.desc
+	picture = GFX_evt_graveyard3
+	show_sound = event_activating_unknown_technology
+	location = root
+
+	trigger = {
+		has_planet_flag = graveyard_planet
+		has_owner = yes
+		is_homeworld = no		
+		owner = {
+			NOT = {
+				has_authority = auth_machine_intelligence
+			}
+		}
+		has_ground_combat = no
+		is_occupied_flag = no
+	}
+
+	is_triggered_only = yes
+	
+	option = {
+		name = pdgraveyard.30.a
+		hidden_effect = {
+			random_list = {
+				55 = {
+					planet_event = { id = pdgraveyard.31 days = 1 random = 30 }
+				}
+				10 = {
+					planet_event = { id = pdgraveyard.32 days = 1 random = 30 }
+				}
+				35 = {
+					planet_event = { id = pdgraveyard.33 days = 1 random = 30 }
+				}
+
+			}
+		}
+	}
+	
+	option = {
+		name = pdgraveyard.30.b
+		hidden_effect = {
+			planet_event = { id = pdgraveyard.34 days = 3600 random = 1800 }
+		}
+	}
+}
+
+# Normal Tiyanki Death
+planet_event = {
+	id = pdgraveyard.31
+	title = "pdgraveyard.31.name"
+	desc = "pdgraveyard.31.desc"
+	picture = GFX_evt_graveyard3
+	show_sound = event_space_whale
+	location = ROOT
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = pdgraveyard.31.a
+		hidden_effect = {
+			remove_modifier = "notiyanki"
+			planet_event = { id = pdgraveyard.30 days = 7200 random = 7200 }
+		}
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = 24
+					min = 150
+					max = 500
+				}
+				add_monthly_resource_mult = {
+					resource = minerals
+					value = 24
+					min = 350
+					max = 2000
+				}
+				add_monthly_resource_mult = {
+					resource = energy
+					value = 24
+					min = 350
+					max = 2000
+				}
+
+			}
+		}
+}
+
+# Big Tiyanki Death
+planet_event = {
+	id = pdgraveyard.32
+	title = "pdgraveyard.32.name"
+	desc = "pdgraveyard.32.desc"
+	picture = GFX_evt_graveyard3
+	show_sound = event_space_whale
+	location = ROOT
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = pdgraveyard.31.a
+		hidden_effect = {
+			remove_modifier = "notiyanki"
+			planet_event = { id = pdgraveyard.30 days = 7200 random = 7200 }
+		}
+			owner = {
+				add_monthly_resource_mult = {
+					resource = society_research
+					value = 36
+					min = 225
+					max = 750
+				}
+				add_monthly_resource_mult = {
+					resource = minerals
+					value = 36
+					min = 525
+					max = 3000
+				}
+				add_monthly_resource_mult = {
+					resource = energy
+					value = 36
+					min = 525
+					max = 3000
+				}
+
+			}
+		}
+}
+
+# Tiyanki lands in populated area
+planet_event = {
+	id = pdgraveyard.33
+	title = "pdgraveyard.33.name"
+	desc = "pdgraveyard.33.desc"
+	picture = GFX_evt_burning_settlement
+	show_sound = event_space_whale
+	location = ROOT
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		random_tile = {
+			limit = { has_grown_pop = yes }
+			kill_pop = yes
+			set_ruined = yes #remove_building = yes
+		}
+	}
+	
+	option = {
+		name = pdgraveyard.33.a
+		hidden_effect = {
+			remove_modifier = "notiyanki"
+			planet_event = { id = pdgraveyard.30 days = 7200 random = 7200 }
+		}
+	}
+}
+
+# No Tinyanki allowed to hit the surface
+planet_event = {
+	id = pdgraveyard.34
+	title = "pdgraveyard.34.name"
+	desc = "pdgraveyard.34.desc"
+	picture = GFX_evt_alien_nature
+	show_sound = event_space_whale
+	location = ROOT
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = pdgraveyard.34.a
+			hidden_effect = {
+			remove_modifier = "notiyanki"
+				planet_event = { id = pdgraveyard.30 days = 7200 random = 7200 }
+				add_modifier = {
+					modifier = "notiyanki"
+					days = -1
+			}
+		}
+	}
+}
+
+#Tinyanki Museum
+planet_event = {
+	id = pdgraveyard.40
+	title = pdgraveyard.40.name
+	desc = pdgraveyard.40.desc
+	picture = GFX_evt_graveyard2
+	show_sound = event_mystic_reveal
+	location = root
+
+	trigger = {
+		has_planet_flag = graveyard_planet
+		has_owner = yes
+		is_homeworld = no		
+		owner = {
+			NOT = {
+				has_authority = auth_machine_intelligence
+			}
+		}
+		has_ground_combat = no
+		is_occupied_flag = no
+	}
+
+	is_triggered_only = yes
+	
+	immediate = {
+		random_tile = {
+			limit = {
+				has_blocker = no
+				has_building = no
+				}
+			clear_deposits = yes
+			add_deposit = d_tiyankifossils_deposit
+		}
+	}
+	
+	option = {
+		name = pdgraveyard.40.a
+		custom_tooltip = pdgraveyard.40.a.tooltip
+		owner = { give_technology = { tech = tech_gyarcheologysite } }	
+	}
+	
+	option = {
+		name = pdgraveyard.40.b
+		custom_tooltip = pdgraveyard.40.b.tooltip
+		trigger = {
+			owner = { 
+			OR = { 
+				has_ethic = ethic_xenophobe
+				has_ethic = ethic_fanatic_xenophobe
+				}
+			}
+		}
+		owner = { give_technology = { tech = tech_gybiolab } }	
+	}
+	
+	option = {
+		name = pdgraveyard.40.c
+		custom_tooltip = pdgraveyard.40.c.tooltip
+		trigger = {
+			owner = { 
+			OR = { 
+				has_ethic = ethic_xenophile
+				has_ethic = ethic_fanatic_xenophile
+				}
+			}
+		}
+		owner = { give_technology = { tech = tech_gymuseum } }	
+	}
+	
+	option = {
+		name = pdgraveyard.40.d
+		custom_tooltip = pdgraveyard.40.d.tooltip
+		trigger = {
+			owner = { 
+			OR = { 
+				has_ethic = ethic_materialist
+				has_ethic = ethic_fanatic_materialist
+				}
+			}
+		}
+		owner = { give_technology = { tech = tech_gyresearchcentre } }	
+	}
+	
+	option = {
+		name = pdgraveyard.40.e
+		custom_tooltip = pdgraveyard.40.e.tooltip
+		trigger = {
+			owner = { 
+			OR = { 
+				has_ethic = ethic_spiritualist 
+				has_ethic = ethic_fanatic_spiritualist 
+				}
+			}
+		}
+		owner = { give_technology = { tech = tech_gytemple } }	
+	}
+}
