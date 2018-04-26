@@ -28,11 +28,84 @@ cgm_add_special_building = {
 cgm_search_for_special_building = {
 	 #TODO search for special building!
 	 #define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one
+	 #cgm_special_bestWeight named like this for easier comparison! Local scope!
 	log = "searching for special buildings on planet [this.GetName]"
-	 #SPECIAL BUILDING NUMBER 1:
+	set_variable = { which = cgm_special_bestWeight value = 10 }	 
 	if = {
 		limit = {
-			NOT = { has_building = building_autochthon_monument }
+			has_planet_flag = fortify_planet
+			multiply_variable = { which = cgm_special_bestWeight value = 4 }
+		}
+	}
+	if = {
+		limit = {
+			check_variable = { which = cgm_special_bestWeight value > prev }
+		}
+		prev = {
+			set_variable = { which = cgm_special_bestWeight value = prev }
+			set_variable = { which = cgm_special_bestBuilding value = 2 }
+		}
+		save_global_event_target_as = cgm_best_planet_for_special
+		break = yes
+	}	
+	if = {
+		limit = { 
+			OR = {
+				AND = { 
+					is_habitat = no
+					OR = { 
+						AND = { 
+							prev = { is_machine_empire = no is_spiritualist = no }
+							NOR = { 
+								has_building = building_autochthon_monument
+								has_building = building_heritage_site
+								has_building = building_hypercomms_forum
+								has_building = building_autocurating_vault
+							}
+						}	
+						AND = { 
+							prev = { is_spiritualist = yes }
+							NOR = { 
+								has_building = building_temple
+								has_building = building_holotemple
+								has_building = building_sacred_nexus
+								has_building = building_citadel_of_faith
+							}
+						}				
+						AND = { 
+							prev = { is_machine_empire = yes }
+							NOR = { 
+								has_building = building_uplink_node
+								has_building = building_network_junction
+								has_building = building_system_conflux
+								has_building = building_alpha_hub
+							}
+						}	
+					}	
+				}
+				AND = { 
+					is_habitat = yes
+					OR = { 
+						AND = { 
+							prev = { is_machine_empire = no }
+							NOR = { 
+								has_building = building_hab_cultural_center
+								has_building = building_autocurating_vault
+								has_building = building_citadel_of_faith
+							}
+						}						
+						AND = { 
+							prev = { is_machine_empire = yes }
+							NOR = { 
+								has_building = building_uplink_node
+								has_building = building_network_junction
+								has_building = building_system_conflux
+								has_building = building_alpha_hub
+							}
+						}	
+					}
+				}
+			}	
 			prev = {
 				check_variable = { which = cgm_special_bestWeight value < 20 }
 			}
@@ -42,7 +115,33 @@ cgm_search_for_special_building = {
 			set_variable = { which = cgm_special_bestBuilding value = 1 }
 		}
 		save_global_event_target_as = cgm_best_planet_for_special
-	}
+		break = yes
+	}	
+	if = {	
+		limit = { 
+			is_capital = yes
+			has_capital_3 = yes
+			OR = { 
+				AND = { 
+					prev = { has_ascension_perk = ap_mind_over_matter }	
+					NOT = { has_building = building_psi_corps }
+				}	
+				AND = { 
+					prev = { is_machine_empire = no has_technology = tech_galactic_benevolence }	
+					NOT = { has_building = building_ministry_benevolence }
+				}				
+			}
+			prev = {
+				check_variable = { which = cgm_special_bestWeight value < 30 }
+			}
+		}
+		prev = {
+			set_variable = { which = cgm_special_bestWeight value = 30 }
+			set_variable = { which = cgm_special_bestBuilding value = 1 }
+		}
+		save_global_event_target_as = cgm_best_planet_for_special		
+		break = yes
+	}			
 }
 
 ### Adjacancy 

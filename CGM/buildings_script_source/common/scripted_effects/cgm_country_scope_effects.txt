@@ -1,695 +1,270 @@
 ### Effects in this file are ran on country scope.
 check_income = {
-	if = { 
-		limit = { 
-			OR = {
-				is_machine_empire = no
-				is_servitor = yes
-			}
-		}	
-		if = {
+	if = {
+		limit = {
+			#NOT = {has_country_flag = ignore_next_check}#maybe we need this some day
+			has_global_flag = cgm_first_month_passed
+			#has_monthly_income gives false results during the first month after game start
+		}
+		#log = "Check started"
+		
+		
+		###FOOD###
+		#update food_reserve, food_income, positive_food_reserve_month variables
+		#set/remove is_food_starved
+		#modify food_weight(country)
+		if = { 
 			limit = { 
-				food > 0
-				has_monthly_income = { resource = food value > 0 }
-			}			
-			if = { 
-				limit = { check_variable = { which = positive_food_reserve_month value > 0 } }
-				change_variable = { which = positive_food_reserve_month value = 1 }
-				else = { set_variable = { which = positive_food_reserve_month value = 1 } }
-			}			
-			if = { 
-				limit = { has_country_flag = is_food_starved }
+				OR = {
+					is_machine_empire = no #machines don't like BANANAS!
+					is_servitor = yes
+				}
+			}	
+			
+			#update reserve_month variable and remove starved flag
+			if = {
+				limit = { 
+					food > 0
+					has_monthly_income = { resource = food value > 0 }
+				}			
+				if = { 
+					limit = { check_variable = { which = positive_food_reserve_month value > 0 } }
+					change_variable = { which = positive_food_reserve_month value = 1 }
+					else = { set_variable = { which = positive_food_reserve_month value = 1 } }
+				}			
 				remove_country_flag = is_food_starved
-			}		
-			#count full reserve
+			}
+			
+			
+			#count full reserve and income
 			set_variable = { which = food_reserve value = 0 }		
 			set_variable = { which = food_income value = 0 }
-			while = { 
-				limit = { food > 9999 }
-				add_food = -10000
-				change_variable = { which = food_reserve value = 10000 }
-			}		
-			while = { 
-				limit = { food > 999 }
-				add_food = -1000
-				change_variable = { which = food_reserve value = 1000 }
-			}
-			while = { 
-				limit = { food > 99 }
-				add_food = -100
-				change_variable = { which = food_reserve value = 100 }
-			}		
-			while = { 
-				limit = { food > 9 }
-				add_food = -10
-				change_variable = { which = food_reserve value = 10 }
-			}				
-			while = { 
-				limit = { food > 0 }
-				add_food = -1
-				change_variable = { which = food_reserve value = 1 }
-			}						
-			#count last month's income - only do this if previous month at least was non-negative, to avoid alerts
+			set_variable = { which = reserve_transport value = 0 }
+			count_food_reserve = yes #ignores decimal places 
+			count_food_income = yes
+			restore_food_reserve = yes
+			
+			
+			#modify weight(country) and set starved flag
 			if = { 
-				limit = { 
-					check_variable = { which = positive_food_reserve_month value > 1 }
-					has_monthly_income = { resource = food value > 4 }
-				}					
-				add_monthly_resource_mult = { resource = food value = 1.0}
-				while = { 
-					limit = { food > 9999 }
-					add_food = -10000
-					change_variable = { which = food_income value = 10000 }
-				}		
-				while = { 
-					limit = { food > 999 }
-					add_food = -1000
-					change_variable = { which = food_income value = 1000 }
-				}
-				while = { 
-					limit = { food > 99 }
-					add_food = -100
-					change_variable = { which = food_income value = 100 }
-				}		
-				while = { 
-					limit = { food > 9 }
-					add_food = -10
-					change_variable = { which = food_income value = 10 }
-				}				
-				while = { 
-					limit = { food > 0 }
-					add_food = -1
-					change_variable = { which = food_income value = 1 }
-				}
-			}	
-			#restore reserve
-			set_variable = { which = reserve_transport value = food_reserve }
-			while = { 		
-				limit = { check_variable = { which = reserve_transport value > 9999 } }
-				add_food = 10000
-				change_variable = { which = reserve_transport value = -10000 }		
-			}	
-			while = { 		
-				limit = { check_variable = { which = reserve_transport value > 999 } }
-				add_food = 1000
-				change_variable = { which = reserve_transport value = -1000 }		
-			}		
-			while = { 		
-				limit = { check_variable = { which = reserve_transport value > 99 } }
-				add_food = 100
-				change_variable = { which = reserve_transport value = -100 }		
-			}		
-			while = { 		
-				limit = { check_variable = { which = reserve_transport value > 9 } }
-				add_food = 10
-				change_variable = { which = reserve_transport value = -10 }		
-			}		
-			while = { 		
-				limit = { check_variable = { which = reserve_transport value > 0 } }
-				add_food = 1
-				change_variable = { which = reserve_transport value = -1 }		
-			}			
-			else = { 
+				limit = {food < 0.001}#limit = {NOT = {food > 0}}
+				set_variable = { which = positive_food_reserve_month value = 0 } 
+				set_country_flag = is_food_starved
+			}
+			if = {
+				limit = {has_monthly_income = { resource = food value < 5 }}
+				change_variable = { which = food_weight value = 3 }
 				if = { 
-					limit = { food < 1 }
-					set_variable = { which = positive_food_reserve_month value = 0 } 
+					limit = { 
+						has_monthly_income = { resource = food value < 1 }
+						OR = { 
+							food < 1
+							any_owned_planet = { 
+								has_modifier = starvation
+								has_orbital_bombardment = no
+								has_ground_combat = no
+								is_occupied_flag = no
+							}	
+						}							
+					}	
 					set_country_flag = is_food_starved
-				}					
-				if = { 
-					limit = { has_monthly_income = { resource = food value < 5 } }
-					change_variable = { which = food_weight value = 3 }
-					if = { 
-						limit = { 
-							has_monthly_income = { resource = food value < 1 }
-							OR = { 
-								food < 1
-								any_owned_planet = { 
-									has_modifier = starvation
-									has_orbital_bombardment = no
-									has_ground_combat = no
-									is_occupied_flag = no
-								}	
-							}							
-						}	
-						set_country_flag = is_food_starved
-						change_variable = { which = food_weight value = 10 }
-					}	
-					if = {
-						limit = { has_monthly_income = { resource = food value < -10 } }
-						change_variable = { which = food_weight value = 4 }
-					}
-					if = {
-						limit = { has_monthly_income = { resource = food value < -20 } }
-						change_variable = { which = food_weight value = 5 }
-					}	
+					change_variable = { which = food_weight value = 10 }
+				}	
+				if = {
+					limit = { has_monthly_income = { resource = food value < -10 } }
+					change_variable = { which = food_weight value = 4 }
+				}
+				if = {
+					limit = { has_monthly_income = { resource = food value < -20 } }
+					change_variable = { which = food_weight value = 5 }
 				}
 			}
 		}
-	}	
-	if = {
-		limit = { 
-			energy > 0
-			has_monthly_income = { resource = energy value > 0 }
-		}			
-		if = { 
-			limit = { check_variable = { which = positive_energy_reserve_month value > 0 } }
-			change_variable = { which = positive_energy_reserve_month value = 1 }
-			else = { set_variable = { which = positive_energy_reserve_month value = 1 } }
-		}			
-		if = { 
-			limit = { has_country_flag = is_energy_starved }
+
+		
+		
+		###ENERGY###
+		#update energy_reserve, energy_income, positive_energy_reserve_month variables
+		#set/remove is_energy_starved
+		#modify energy_weight(country)
+		
+		
+		#update reserve_month variable and remove starved flag
+		if = {
+			limit = { 
+				energy > 0
+				has_monthly_income = { resource = energy value > 0 }
+			}			
+			if = { 
+				limit = { check_variable = { which = positive_energy_reserve_month value > 0 } }
+				change_variable = { which = positive_energy_reserve_month value = 1 }
+				else = { set_variable = { which = positive_energy_reserve_month value = 1 } }
+			}			
 			remove_country_flag = is_energy_starved
-		}		
-		#count full reserve
+		}
+		
+		
+		#count full reserve and income
 		set_variable = { which = energy_reserve value = 0 }		
 		set_variable = { which = energy_income value = 0 }
-		while = { 
-			limit = { energy > 9999 }
-			add_energy = -10000
-			change_variable = { which = energy_reserve value = 10000 }
-		}		
-		while = { 
-			limit = { energy > 999 }
-			add_energy = -1000
-			change_variable = { which = energy_reserve value = 1000 }
-		}
-		while = { 
-			limit = { energy > 99 }
-			add_energy = -100
-			change_variable = { which = energy_reserve value = 100 }
-		}		
-		while = { 
-			limit = { energy > 9 }
-			add_energy = -10
-			change_variable = { which = energy_reserve value = 10 }
-		}				
-		while = { 
-			limit = { energy > 0 }
-			add_energy = -1
-			change_variable = { which = energy_reserve value = 1 }
-		}						
-		#count last month's income - only do this if previous month at least was non-negative, to avoid alerts
+		set_variable = { which = reserve_transport value = 0 }
+		count_energy_reserve = yes #ignores decimal places 
+		count_energy_income = yes
+		restore_energy_reserve = yes
+		
+		
+		#modify weight(country) and set starved flag
 		if = { 
-			limit = { 
-				check_variable = { which = positive_energy_reserve_month value > 1 }
-				has_monthly_income = { resource = energy value > 4 }
-			}					
-			add_monthly_resource_mult = { resource = energy value = 1.0}
-			while = { 
-				limit = { energy > 9999 }
-				add_energy = -10000
-				change_variable = { which = energy_income value = 10000 }
-			}		
-			while = { 
-				limit = { energy > 999 }
-				add_energy = -1000
-				change_variable = { which = energy_income value = 1000 }
-			}
-			while = { 
-				limit = { energy > 99 }
-				add_energy = -100
-				change_variable = { which = energy_income value = 100 }
-			}		
-			while = { 
-				limit = { energy > 9 }
-				add_energy = -10
-				change_variable = { which = energy_income value = 10 }
-			}				
-			while = { 
-				limit = { energy > 0 }
-				add_energy = -1
-				change_variable = { which = energy_income value = 1 }
-			}
-		}	
-		#restore reserve
-		set_variable = { which = reserve_transport value = energy_reserve }
-		while = { 		
-			limit = { check_variable = { which = reserve_transport value > 9999 } }
-			add_energy = 10000
-			change_variable = { which = reserve_transport value = -10000 }		
-		}	
-		while = { 		
-			limit = { check_variable = { which = reserve_transport value > 999 } }
-			add_energy = 1000
-			change_variable = { which = reserve_transport value = -1000 }		
-		}		
-		while = { 		
-			limit = { check_variable = { which = reserve_transport value > 99 } }
-			add_energy = 100
-			change_variable = { which = reserve_transport value = -100 }		
-		}		
-		while = { 		
-			limit = { check_variable = { which = reserve_transport value > 9 } }
-			add_energy = 10
-			change_variable = { which = reserve_transport value = -10 }		
-		}		
-		while = { 		
-			limit = { check_variable = { which = reserve_transport value > 0 } }
-			add_energy = 1
-			change_variable = { which = reserve_transport value = -1 }		
-		}				
-		else = { 
+			limit = {energy < 0.001}
+			set_variable = { which = positive_energy_reserve_month value = 0 } 
+			set_country_flag = is_energy_starved
+		}
+		if = {
+			limit = {has_monthly_income = { resource = energy value < 5 }}
+			change_variable = { which = energy_weight value = 3 }
 			if = { 
-				limit = { energy < 1 }
-				set_variable = { which = positive_energy_reserve_month value = 0 } 
+				limit = { 
+					has_monthly_income = { resource = energy value < 1 }
+					OR = { 
+						energy < 1
+						has_modifier = energy_deficit
+					}							
+				}	
 				set_country_flag = is_energy_starved
-			}					
-			if = { 
-				limit = { has_monthly_income = { resource = energy value < 5 } }
-				change_variable = { which = energy_weight value = 3 }
-				if = { 
-					limit = { 
-						has_monthly_income = { resource = energy value < 1 }
-						OR = { 
-							energy < 1
-							has_modifier = energy_deficit
-						}							
-					}	
-					set_country_flag = is_energy_starved
-					change_variable = { which = energy_weight value = 10 }
-				}	
-				if = {
-					limit = { has_monthly_income = { resource = energy value < -10 } }
-					change_variable = { which = energy_weight value = 4 }
-				}
-				if = {
-					limit = { has_monthly_income = { resource = energy value < -20 } }
-					change_variable = { which = energy_weight value = 5 }
-				}	
+				change_variable = { which = energy_weight value = 10 }
+			}	
+			if = {
+				limit = { has_monthly_income = { resource = food value < -10 } }
+				change_variable = { which = energy_weight value = 4 }
+			}
+			if = {
+				limit = { has_monthly_income = { resource = food value < -20 } }
+				change_variable = { which = energy_weight value = 5 }
 			}
 		}
-	}
-	if = {
-		limit = { 
-			minerals > 0
-			has_monthly_income = { resource = minerals value > 0 }
-		}			
-		if = { 
-			limit = { check_variable = { which = positive_minerals_reserve_month value > 0 } }
-			change_variable = { which = positive_minerals_reserve_month value = 1 }
-			else = { set_variable = { which = positive_minerals_reserve_month value = 1 } }
-		}			
-		if = { 
-			limit = { has_country_flag = is_minerals_starved }
+		
+		
+		
+		###MINERALS###
+		#update minerals_reserve, minerals_income, positive_minerals_reserve_month variables
+		#set/remove is_minerals_starved
+		#modify minerals_weight(country)
+		
+		
+		#update reserve_month variable and remove starved flag
+		if = {
+			limit = { 
+				minerals > 0
+				has_monthly_income = { resource = minerals value > 0 }
+			}			
+			if = { 
+				limit = { check_variable = { which = positive_minerals_reserve_month value > 0 } }
+				change_variable = { which = positive_minerals_reserve_month value = 1 }
+				else = { set_variable = { which = positive_minerals_reserve_month value = 1 } }
+			}			
 			remove_country_flag = is_minerals_starved
-		}		
-		#count full reserve
+		}
+		
+		
+		#count full reserve and income
 		set_variable = { which = minerals_reserve value = 0 }		
 		set_variable = { which = minerals_income value = 0 }
-		while = { 
-			limit = { minerals > 9999 }
-			add_minerals = -10000
-			change_variable = { which = minerals_reserve value = 10000 }
-		}		
-		while = { 
-			limit = { minerals > 999 }
-			add_minerals = -1000
-			change_variable = { which = minerals_reserve value = 1000 }
-		}
-		while = { 
-			limit = { minerals > 99 }
-			add_minerals = -100
-			change_variable = { which = minerals_reserve value = 100 }
-		}		
-		while = { 
-			limit = { minerals > 9 }
-			add_minerals = -10
-			change_variable = { which = minerals_reserve value = 10 }
-		}				
-		while = { 
-			limit = { minerals > 0 }
-			add_minerals = -1
-			change_variable = { which = minerals_reserve value = 1 }
-		}						
-		#count last month's income - only do this if previous month at least was non-negative, to avoid alerts
-		if = { 
-			limit = { 
-				check_variable = { which = positive_minerals_reserve_month value > 1 }
-				has_monthly_income = { resource = minerals value > 4 }
-			}					
-			add_monthly_resource_mult = { resource = minerals value = 1.0}
-			while = { 
-				limit = { minerals > 9999 }
-				add_minerals = -10000
-				change_variable = { which = minerals_income value = 10000 }
-			}		
-			while = { 
-				limit = { minerals > 999 }
-				add_minerals = -1000
-				change_variable = { which = minerals_income value = 1000 }
-			}
-			while = { 
-				limit = { minerals > 99 }
-				add_minerals = -100
-				change_variable = { which = minerals_income value = 100 }
-			}		
-			while = { 
-				limit = { minerals > 9 }
-				add_minerals = -10
-				change_variable = { which = minerals_income value = 10 }
-			}				
-			while = { 
-				limit = { minerals > 0 }
-				add_minerals = -1
-				change_variable = { which = minerals_income value = 1 }
-			}
-		}	
-		#restore reserve
-		set_variable = { which = reserve_transport value = minerals_reserve }
-		while = { 		
-			limit = { check_variable = { which = reserve_transport value > 9999 } }
-			add_minerals = 10000
-			change_variable = { which = reserve_transport value = -10000 }		
-		}	
-		while = { 		
-			limit = { check_variable = { which = reserve_transport value > 999 } }
-			add_minerals = 1000
-			change_variable = { which = reserve_transport value = -1000 }		
-		}		
-		while = { 		
-			limit = { check_variable = { which = reserve_transport value > 99 } }
-			add_minerals = 100
-			change_variable = { which = reserve_transport value = -100 }		
-		}		
-		while = { 		
-			limit = { check_variable = { which = reserve_transport value > 9 } }
-			add_minerals = 10
-			change_variable = { which = reserve_transport value = -10 }		
-		}		
-		while = { 		
-			limit = { check_variable = { which = reserve_transport value > 0 } }
-			add_minerals = 1
-			change_variable = { which = reserve_transport value = -1 }		
-		}			
-		#if = { 
-		#	limit = { 
-		#		OR = {
-		#			is_ai = yes
-		#			has_policy_flag = building_automation_enabled 
-		#		}
-		#		has_monthly_income = { resource = minerals value > 49 } 
-		#		check_variable = { which = positive_minerals_reserve_month value > 2 }
-		#	}	
-		#	set_variable = { which = building_construction_budget value = minerals_income }
-		#	if = { 
-		#		limit = { is_ai = yes }
-		#		multiply_variable = { which = building_construction_budget value = 0.2 }
-		#		else = { 
-		#			if = { 
-		#				limit = { has_policy_flag = budget_preset_1 }
-		#				multiply_variable = { which = building_construction_budget value = 0.1 }
-		#				else = { 
-		#					if = { 
-		#						limit = { has_policy_flag = budget_preset_2 }
-		#						multiply_variable = { which = building_construction_budget value = 0.2 }					
-		#						else = { 
-		#							if = { 
-		#								limit = { has_policy_flag = budget_preset_3 }
-		#								multiply_variable = { which = building_construction_budget value = 0.3 }												
-		#							}
-		#						}
-		#					}
-		#				}
-		#			}
-		#		}
-		#	}
-		#}	
-		else = { 
-			if = { 
-				limit = { minerals < 1 }
-				set_variable = { which = positive_minerals_reserve_month value = 0 } 
-				set_country_flag = is_minerals_starved
-			}					
-			if = { 
-				limit = { has_monthly_income = { resource = minerals value < 5 } }
-				change_variable = { which = minerals_weight value = 3 }
+		set_variable = { which = reserve_transport value = 0 }
+		count_minerals_reserve = yes #ignores decimal places 
+		count_minerals_income = yes
+		restore_minerals_reserve = yes	
+		
+		
+		#modify weight(country) and set starved flag
 				if = { 
-					limit = { 
-						has_monthly_income = { resource = minerals value < 1 }
-						OR = { 
-							minerals < 1
-							has_modifier = mineral_deficit
-						}							
-					}	
-					set_country_flag = is_minerals_starved
-					change_variable = { which = minerals_weight value = 10 }
+			limit = {minerals < 0.001}
+			set_variable = { which = positive_minerals_reserve_month value = 0 } 
+			set_country_flag = is_minerals_starved
+		}
+		if = {
+			limit = {has_monthly_income = { resource = minerals value < 5 }}
+			change_variable = { which = minerals_weight value = 3 }
+			if = { 
+				limit = { 
+					has_monthly_income = { resource = minerals value < 1 }
+					OR = { 
+						minerals < 1
+						has_modifier = mineral_deficit
+					}							
 				}	
-				if = {
-					limit = { has_monthly_income = { resource = minerals value < -10 } }
-					change_variable = { which = minerals_weight value = 4 }
-				}
-				if = {
-					limit = { has_monthly_income = { resource = minerals value < -20 } }
-					change_variable = { which = minerals_weight value = 5 }
-				}	
+				set_country_flag = is_minerals_starved
+				change_variable = { which = minerals_weight value = 10 }
+			}	
+			if = {
+				limit = { has_monthly_income = { resource = food value < -10 } }
+				change_variable = { which = minerals_weight value = 4 }
+			}
+			if = {
+				limit = { has_monthly_income = { resource = food value < -20 } }
+				change_variable = { which = minerals_weight value = 5 }
 			}
 		}
-	}
-	#count stored society research and check income
-	set_variable = { which = society_research_reserve value = 0 }		
-	set_variable = { which = society_research_income value = 0 }
-	while = { 
-		limit = { stored_society_points > 9999 }
-		add_society_research = -10000
-		change_variable = { which = society_research_reserve value = 10000 }
-	}		
-	while = { 
-		limit = { stored_society_points > 999 }
-		add_society_research = -1000
-		change_variable = { which = society_research_reserve value = 1000 }
-	}
-	while = { 
-		limit = { stored_society_points > 99 }
-		add_society_research = -100
-		change_variable = { which = society_research_reserve value = 100 }
-	}		
-	while = { 
-		limit = { stored_society_points > 9 }
-		add_society_research = -10
-		change_variable = { which = society_research_reserve value = 10 }
-	}				
-	while = { 
-		limit = { stored_society_points > 0 }
-		add_society_research = -1
-		change_variable = { which = society_research_reserve value = 1 }
-	}						
-	add_monthly_resource_mult = { resource = society_research value = 1.0}
-	while = { 
-		limit = { stored_society_points > 9999 }
-		add_society_research = -10000
-		change_variable = { which = society_research_income value = 10000 }
-	}		
-	while = { 
-		limit = { stored_society_points > 999 }
-		add_society_research = -1000
-		change_variable = { which = society_research_income value = 1000 }
-	}
-	while = { 
-		limit = { stored_society_points > 99 }
-		add_society_research = -100
-		change_variable = { which = society_research_income value = 100 }
-	}		
-	while = { 
-		limit = { stored_society_points > 9 }
-		add_society_research = -10
-		change_variable = { which = society_research_income value = 10 }
-	}				
-	while = { 
-		limit = { stored_society_points > 0 }
-		add_society_research = -1
-		change_variable = { which = society_research_income value = 1 }
-	}		
-	#restore reserve
-	set_variable = { which = reserve_transport value = society_research_reserve }
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 9999 } }
-		add_society_research = 10000
-		change_variable = { which = reserve_transport value = -10000 }		
-	}	
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 999 } }
-		add_society_research = 1000
-		change_variable = { which = reserve_transport value = -1000 }		
-	}		
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 99 } }
-		add_society_research = 100
-		change_variable = { which = reserve_transport value = -100 }		
-	}		
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 9 } }
-		add_society_research = 10
-		change_variable = { which = reserve_transport value = -10 }		
-	}		
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 0 } }
-		add_society_research = 1
-		change_variable = { which = reserve_transport value = -1 }		
-	}		
 
-	#count stored physics research and check income
-	set_variable = { which = physics_research_reserve value = 0 }		
-	set_variable = { which = physics_research_income value = 0 }
-	while = { 
-		limit = { stored_physics_points > 9999 }
-		add_physics_research = -10000
-		change_variable = { which = physics_research_reserve value = 10000 }
-	}		
-	while = { 
-		limit = { stored_physics_points > 999 }
-		add_physics_research = -1000
-		change_variable = { which = physics_research_reserve value = 1000 }
+		
+		#stored research points will be updated after the on_action on_monthly_pulse
+		#=> the following code will show the stored points of the last month, if called by monthly_pulse
+		###PHYSICS###
+		#update physics_research_reserve, physics_research_income variables
+
+
+		#count stored points and check income
+		set_variable = { which = physics_research_reserve value = 0 }		
+		set_variable = { which = physics_research_income value = 0 }
+		set_variable = { which = reserve_transport value = 0 }
+		count_physics_research_reserve = yes #ignores decimal places 
+		count_physics_research_income = yes
+		restore_physics_research_reserve = yes
+
+		
+		
+		###PHYSICS###
+		#update physics_research_reserve, physics_research_income variables
+
+
+		#count stored points and check income
+		set_variable = { which = society_research_reserve value = 0 }		
+		set_variable = { which = society_research_income value = 0 }
+		set_variable = { which = reserve_transport value = 0 }
+		count_society_research_reserve = yes #ignores decimal places 
+		count_society_research_income = yes
+		restore_society_research_reserve = yes
+
+
+		
+		###PHYSICS###
+		#update physics_research_reserve, physics_research_income variables
+
+
+		#count stored points and check income
+		set_variable = { which = engineering_research_reserve value = 0 }		
+		set_variable = { which = engineering_research_income value = 0 }
+		set_variable = { which = reserve_transport value = 0 }
+		count_engineering_research_reserve = yes #ignores decimal places 
+		count_engineering_research_income = yes
+		restore_engineering_research_reserve = yes
+		
+		#log = "food_reserve: [This.food_reserve]"
+		#log = "food_income: [This.food_income]"
+		#log = "energy_reserve: [This.energy_reserve]"
+		#log = "energy_income: [This.energy_income]"
+		#log = "minerals_reserve: [This.minerals_reserve]"
+		#log = "minerals_income: [This.minerals_income]"
+		#log = "society_research_reserve: [This.society_research_reserve]"
+		#log = "society_research_income: [This.society_research_income]"
+		#log = "physics_research_reserve: [This.physics_research_reserve]"
+		#log = "physics_research_income: [This.physics_research_income]"
+		#log = "engineering_research_reserve: [This.engineering_research_reserve]"
+		#log = "engineering_research_income: [This.engineering_research_income]"
+		else = {
+			#log = "Check ignored"
+		}
 	}
-	while = { 
-		limit = { stored_physics_points > 99 }
-		add_physics_research = -100
-		change_variable = { which = physics_research_reserve value = 100 }
-	}		
-	while = { 
-		limit = { stored_physics_points > 9 }
-		add_physics_research = -10
-		change_variable = { which = physics_research_reserve value = 10 }
-	}				
-	while = { 
-		limit = { stored_physics_points > 0 }
-		add_physics_research = -1
-		change_variable = { which = physics_research_reserve value = 1 }
-	}						
-	add_monthly_resource_mult = { resource = physics_research value = 1.0}
-	while = { 
-		limit = { stored_physics_points > 9999 }
-		add_physics_research = -10000
-		change_variable = { which = physics_research_income value = 10000 }
-	}		
-	while = { 
-		limit = { stored_physics_points > 999 }
-		add_physics_research = -1000
-		change_variable = { which = physics_research_income value = 1000 }
-	}
-	while = { 
-		limit = { stored_physics_points > 99 }
-		add_physics_research = -100
-		change_variable = { which = physics_research_income value = 100 }
-	}		
-	while = { 
-		limit = { stored_physics_points > 9 }
-		add_physics_research = -10
-		change_variable = { which = physics_research_income value = 10 }
-	}				
-	while = { 
-		limit = { stored_physics_points > 0 }
-		add_physics_research = -1
-		change_variable = { which = physics_research_income value = 1 }
-	}		
-	#restore reserve
-	set_variable = { which = reserve_transport value = physics_research_reserve }
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 9999 } }
-		add_physics_research = 10000
-		change_variable = { which = reserve_transport value = -10000 }		
-	}	
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 999 } }
-		add_physics_research = 1000
-		change_variable = { which = reserve_transport value = -1000 }		
-	}		
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 99 } }
-		add_physics_research = 100
-		change_variable = { which = reserve_transport value = -100 }		
-	}		
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 9 } }
-		add_physics_research = 10
-		change_variable = { which = reserve_transport value = -10 }		
-	}		
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 0 } }
-		add_physics_research = 1
-		change_variable = { which = reserve_transport value = -1 }		
-	}	
-	#count stored engineering research and check income
-	set_variable = { which = engineering_research_reserve value = 0 }		
-	set_variable = { which = engineering_research_income value = 0 }
-	while = { 
-		limit = { stored_engineering_points > 9999 }
-		add_engineering_research = -10000
-		change_variable = { which = engineering_research_reserve value = 10000 }
-	}		
-	while = { 
-		limit = { stored_engineering_points > 999 }
-		add_engineering_research = -1000
-		change_variable = { which = engineering_research_reserve value = 1000 }
-	}
-	while = { 
-		limit = { stored_engineering_points > 99 }
-		add_engineering_research = -100
-		change_variable = { which = engineering_research_reserve value = 100 }
-	}		
-	while = { 
-		limit = { stored_engineering_points > 9 }
-		add_engineering_research = -10
-		change_variable = { which = engineering_research_reserve value = 10 }
-	}				
-	while = { 
-		limit = { stored_engineering_points > 0 }
-		add_engineering_research = -1
-		change_variable = { which = engineering_research_reserve value = 1 }
-	}						
-	add_monthly_resource_mult = { resource = engineering_research value = 1.0}
-	while = { 
-		limit = { stored_engineering_points > 9999 }
-		add_engineering_research = -10000
-		change_variable = { which = engineering_research_income value = 10000 }
-	}		
-	while = { 
-		limit = { stored_engineering_points > 999 }
-		add_engineering_research = -1000
-		change_variable = { which = engineering_research_income value = 1000 }
-	}
-	while = { 
-		limit = { stored_engineering_points > 99 }
-		add_engineering_research = -100
-		change_variable = { which = engineering_research_income value = 100 }
-	}		
-	while = { 
-		limit = { stored_engineering_points > 9 }
-		add_engineering_research = -10
-		change_variable = { which = engineering_research_income value = 10 }
-	}				
-	while = { 
-		limit = { stored_engineering_points > 0 }
-		add_engineering_research = -1
-		change_variable = { which = engineering_research_income value = 1 }
-	}		
-	#restore reserve
-	set_variable = { which = reserve_transport value = engineering_research_reserve }
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 9999 } }
-		add_engineering_research = 10000
-		change_variable = { which = reserve_transport value = -10000 }		
-	}	
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 999 } }
-		add_engineering_research = 1000
-		change_variable = { which = reserve_transport value = -1000 }		
-	}		
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 99 } }
-		add_engineering_research = 100
-		change_variable = { which = reserve_transport value = -100 }		
-	}		
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 9 } }
-		add_engineering_research = 10
-		change_variable = { which = reserve_transport value = -10 }		
-	}		
-	while = { 		
-		limit = { check_variable = { which = reserve_transport value > 0 } }
-		add_engineering_research = 1
-		change_variable = { which = reserve_transport value = -1 }		
-	}					
-}		
+}
 ### The effect below checks the resource requrements of the country
 check_resource_requirements = {
 	switch = {
