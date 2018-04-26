@@ -48,12 +48,12 @@ def main():
   empireMainBuildEventImmediate.addComment("Search for possible Standard buildings. Build best out of standard/special:")
   empireMainBuildEventImmediate.createEvent(name_empire_standard_build_event)
   #todo activate again! disabled for better testing(no deletion of variables)
-  # sectorBuild=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_auto_built")))
-  # sectorBuild.add("remove_country_flag", "cgm_core_world_auto", "#searching sector worlds for standard buildings")
-  # sectorBuild.addComment("Search for possible Special buildings:")
-  # sectorBuild.createEvent(name_empire_standard_build_event)
-  # sectorBuild.addComment("Search for possible Standard buildings. Build best out of standard/special:")
-  # sectorBuild.createEvent(name_empire_standard_build_event)
+  sectorBuild=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_auto_built")))
+  sectorBuild.add("remove_country_flag", "cgm_core_world_auto", "#searching sector worlds for standard buildings")
+  sectorBuild.addComment("Search for possible Special buildings:")
+  sectorBuild.createEvent(name_empire_standard_build_event)
+  sectorBuild.addComment("Search for possible Standard buildings. Build best out of standard/special:")
+  sectorBuild.createEvent(name_empire_standard_build_event)
 
 
   outTriggers=TagList()
