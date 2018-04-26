@@ -33,7 +33,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('-m','--create_standalone_mod_from_mod', action="store_true", help="If this flag is set, the script will create a copy of a mod folder, changing the building files and has_building triggers. Main input of the script should now be the .mod file.")
   parser.add_argument('--custom_mod_name', default='', help="If set, this will be the name of the new mod")
   parser.add_argument('--helper_file_list', default="", help="Non-separated list of zeros and ones. N-th number defines whether file number n is a helper file (1 helperfile, 0 standard file)")
-  parser.add_argument('--make_optional', action="store_true", help="Adds 'direct_build_enabled = yes' as potential to all direct build buildings. IMPORTANT: Make sure to set 'set_global_flag = display_low_tier_flag' and 'set_global_flag = do_no_remove_low_tier_flag' whenever 'direct_build_enabled == no' as otherwise buildings will disappear..." )
+  parser.add_argument('--make_optional', action="store_true", help="Adds 'direct_build_enabled = yes' as potential to all direct build buildings." )
   parser.add_argument('--scripted_variables', default="", help="Comma separated list of files that contain scripted variables used in the building files. This option is mandatory if you building costs use any of those variables. Recognizable at the spam of missing variable errors you get if not doing this!")
   addCommonArgs(parser)
 
@@ -283,7 +283,7 @@ def readAndConvert(args, allowRestart=1):
             
           if len(newRequirements.vals)>0 and not buildingData.tagName in args.t0_buildings:
               buildingData.getOrCreate("potential").add("NAND", newRequirements)
-              newRequirements.add("NOT", TagList("has_global_flag","display_low_tier_flag"))
+              newRequirements.add("NOT", TagList("has_country_flag","display_low_tier_flag"))
               if args.make_optional:
                 newRequirements.add("has_global_flag","direct_build_enabled")
     #END OF COPY AND MODIFY        

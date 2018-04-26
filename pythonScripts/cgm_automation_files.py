@@ -37,11 +37,23 @@ def main():
 
   outTag.addComment('there are 3*3 types of important variables used in these events:\n# "cur_" is always for the tile we are currently in,\n# "best_" is previously found best tiles.\n# "worst_" is previously found worst tiles -> to be used with special buildings who do not requre special tiles.\n#Each can be combined with\n# "Type", which is a number assigned to the different weight-type\n# "weight", which is the actual weight value\n# "Tile", which is the "id" of a tile')
 
+#   direct_build_affects_autobuild_init = {
+#     set_global_flag = display_low_tier_flag
+# }
+
+# direct_build_affects_autobuild_finish = {
+#     if = {
+#       limit = { NOT = { has_global_flag = do_no_remove_low_tier_flag } }
+#             remove_global_flag = display_low_tier_flag
+#     }
+# }
+
   empireMainBuildEvent=TagList("id",name_empire_main_build_event)
   outTag.add("country_event", empireMainBuildEvent)
   empireMainBuildEvent.triggeredHidden()
   empireMainBuildEventImmediate=empireMainBuildEvent.addReturn("immediate")
   empireMainBuildEventImmediate.add("remove_country_flag", "cgm_auto_built")
+  empireMainBuildEventImmediate.add("set_country_flag", "display_low_tier_flag", "#The buildings we create are otherwise probably unavaiable due to direct build. Later removed again.")
   empireMainBuildEventImmediate.add("set_country_flag", "cgm_core_world_auto", "#searching core worlds for standard buildings")
   empireMainBuildEventImmediate.addComment("Search for possible Special buildings:")
   empireMainBuildEventImmediate.createEvent(name_empire_special_build_event)
@@ -54,6 +66,7 @@ def main():
   sectorBuild.createEvent(name_empire_standard_build_event)
   sectorBuild.addComment("Search for possible Standard buildings. Build best out of standard/special:")
   sectorBuild.createEvent(name_empire_standard_build_event)
+  empireMainBuildEventImmediate.createReturnIf(TagList("NOT", TagList("has_country_flag", "do_no_remove_low_tier_flag"))).add("remove_country_flag", "display_low_tier_flag")
 
 
   outTriggers=TagList()
