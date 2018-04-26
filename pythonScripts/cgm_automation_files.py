@@ -311,18 +311,20 @@ def main():
     curEffect=checkResourceEffect.addReturn("test"+resource)
     curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("amount",0 ,"", "<")))
     curNegEffect=curEffect
-    for i in range(10):
+    for i in range(8):
       fun= lambda i:-pow(2,i)
       curNegEffect=curNegEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("amount",fun(i) ,"", ">")))
       curNegEffect.variableOp("set", resource+"_income", fun(i-1))
       curNegEffect=curNegEffect.addReturn("else")
+    curNegEffect.variableOp("set", resource+"_income", fun(i))
       # curEffect.variableOp("set", resource+"_income", -1)
     curEffect=curEffect.addReturn("else")
-    for i in range(10):
+    for i in range(15):
       fun= lambda i:pow(2,i)
       curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("amount",fun(i) ,"", "<")))
       curEffect.variableOp("set", resource+"_income", fun(i-1))
       curEffect=curEffect.addReturn("else")
+    curEffect.variableOp("set", resource+"_income", fun(i))
   outputToFolderAndFile(checkResourceEffect, "common/scripted_effects", "cgm_income_count_test.txt",2, "../CGM/buildings_script_source")
 
 
