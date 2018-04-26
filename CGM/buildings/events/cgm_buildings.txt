@@ -2,69 +2,47 @@
 #Instead of editing it, you should change the origin files or the script and rerun the script!
 #Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
 namespace = cgm_buildings
-
 event = {
-	#this event fires on a monthly pulse.
+	#this event fires on a yearly pulse.
 	id = cgm_buildings.0
 	hide_window = yes
 	is_triggered_only = yes
 	
-	immediate = { 
-		every_playable_country = { 
-			set_variable = { which = energy_weight value = 0 }
-			set_variable = { which = minerals_weight value = 0 }
-			set_variable = { which = food_weight value = 0 }
-			set_variable = { which = society_research_weight value = 0 }
-			set_variable = { which = physics_research_weight value = 0 }
-			set_variable = { which = engineering_research_weight value = 0 }
-			check_income = yes
-			check_resource_requirements = yes
-			every_owned_planet = { add_ai_planet_flags = yes }		
+	trigger = { has_global_flag = deposits_converted }
+	
+	immediate = {
+		every_planet = {
+			limit = {
+				NOT = { has_planet_flag = deposits_converted }
+				OR = {
+					is_colonizable = yes
+					is_colony = yes					
+				}
+			}			
+			set_variable = { which = energy_tile_resource value = 0 }
+			set_variable = { which = minerals_tile_resource value = 0 }
+			set_variable = { which = food_tile_resource value = 0 }
+			set_variable = { which = unity_tile_resource value = 0 }
+			set_variable = { which = society_research_tile_resource value = 0 }
+			set_variable = { which = physics_research_tile_resource value = 0 }
+			set_variable = { which = engineering_research_tile_resource value = 0 }
+			every_tile = {
+				limit = { has_deposit = yes has_any_tile_strategic_resource = no }
+				convert_deposits = yes
+			}
+			set_planet_flag = deposits_converted
+		}
+		every_country = { 
+			limit = { 
+				NOT = { has_country_flag = ai_routines_enabled }
+				is_country_type = default 
+				is_country_type = awakened_fallen_empire
+			}
+			country_event = { id = cgm_buildings.1 days = 1 random = 28 } #randomness added to spread performance
+			country_event = { id = cgm_starbase.1 days = 61 random = 28 } #looping event
 		}	
-	}
-}		
-
-#event = {
-	#this event fires on a yearly pulse.
-#	id = cgm_buildings.0
-#	hide_window = yes
-#	is_triggered_only = yes
-	
-#	trigger = { has_global_flag = deposits_converted }
-	
-#	immediate = {
-		#every_planet = {
-		#	limit = {
-		#		NOT = { has_planet_flag = deposits_converted }
-		#		OR = {
-		#			is_colonizable = yes
-		#			is_colony = yes					
-		#		}
-		#	}			
-		#	set_variable = { which = energy_tile_resource value = 0 }
-		#	set_variable = { which = minerals_tile_resource value = 0 }
-		#	set_variable = { which = food_tile_resource value = 0 }
-		#	set_variable = { which = unity_tile_resource value = 0 }
-		#	set_variable = { which = society_research_tile_resource value = 0 }
-		#	set_variable = { which = physics_research_tile_resource value = 0 }
-		#	set_variable = { which = engineering_research_tile_resource value = 0 }
-		#	every_tile = {
-		#		limit = { has_deposit = yes has_any_tile_strategic_resource = no }
-		#		convert_deposits = yes
-		#	}
-		#	set_planet_flag = deposits_converted
-		#}
-#		every_country = { 
-#			limit = { 
-#				NOT = { has_country_flag = ai_routines_enabled }
-#				is_country_type = default 
-#				is_country_type = awakened_fallen_empire
-#			}
-#			country_event = { id = cgm_buildings.1 days = 1 random = 28 } #randomness added to spread performance
-#			country_event = { id = cgm_starbase.1 days = 61 random = 28 } #looping event
-#		}	
-#	}	
-#}
+	}	
+}
 country_event = {
 	#this event is fired from the previous event for any country that does not have the ai_routines_enabled flag, otherwise it is a looping event
 	id = cgm_buildings.1
