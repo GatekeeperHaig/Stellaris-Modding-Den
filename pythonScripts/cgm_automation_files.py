@@ -184,16 +184,17 @@ def main():
   findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("NOR",TagList("tile",TagList("has_building","yes").add("has_building_construction","yes"))))
   # findBestPlanetLimit.
   empireSpecialBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
+    
+  findBestPlanet.add("cgm_search_for_special_building", "yes")
+  outEffects.addComment("Special SEARCH effect:\n# this = planet\n#  prev/owner = country")
+  effect=outEffects.addReturn("cgm_search_for_special_building")
+  effect.addComment("TODO search for special building!")
+  effect.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
   if debug:
-    findBestPlanet.add("log", '"searching for special buildings on planet [this.GetName]"')
-    findBestPlanet.add("cgm_search_for_special_building", "yes")
-    outEffects.addComment("Special SEARCH effect:\n# this = planet\n#  prev/owner = country")
-    effect=outEffects.addReturn("cgm_search_for_special_building")
-    chooseSpecialBuilding=effect.createReturnIf(TagList("NOT", TagList("has_building","building_autochthon_monument").add("prev",variableOpNew("check", "cgm_special_bestWeight", 20, "<"))))
-    chooseSpecialBuilding.addReturn("prev").variableOp("set","cgm_special_bestWeight", 20, "=", " #TODO just a test!")
-    chooseSpecialBuilding.add("save_global_event_target_as", "cgm_best_planet_for_special")
-    findBestPlanet.addComment("TODO search for special building!")
-    findBestPlanet.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
+    effect.add("log", '"searching for special buildings on planet [this.GetName]"')
+  chooseSpecialBuilding=effect.createReturnIf(TagList("NOT", TagList("has_building","building_autochthon_monument").add("prev",variableOpNew("check", "cgm_special_bestWeight", 20, "<"))))
+  chooseSpecialBuilding.addReturn("prev").variableOp("set","cgm_special_bestWeight", 20, "=", " #TODO just a test!")
+  chooseSpecialBuilding.add("save_global_event_target_as", "cgm_best_planet_for_special")
     # (findBestPlanet.addReturn("prev")).variableOp("set","cgm_special_bestWeight", 20, "=", " #TODO just a test!")
     # findBestPlanet.add("save_global_event_target_as", "cgm_best_planet_for_special"," #TODO just a test!")
 
