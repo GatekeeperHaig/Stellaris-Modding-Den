@@ -25,6 +25,7 @@ def main():
   
   # weightTypes=["energy", "minerals", "food", "unity", "society_research", "physics_research", "engineering_research"]
   weightTypes=["energy", "minerals", "food", "base_res_adjacency", "society_research", "physics_research", "engineering_research", "science_adjacency"]
+  resources=["energy", "minerals", "food","unity", "society_research", "physics_research", "engineering_research"]
   exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_power_hub_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
   varsToMove=["Weight","Tile","Type"]
   pseudoInf=99999
@@ -227,6 +228,37 @@ def main():
     planetFindBestEventImmediate.variableOp("set", "cgm_bestWeight_{!s}".format(i), 0) 
   planetFindBestEventImmediate.addComment("set worst value to very large number, such that any found tile is initially worse")
   planetFindBestEventImmediate.variableOp("set", "cgm_worstWeight".format(varToMove),pseudoInf)
+
+
+  planetFindBestEventImmediate=planetFindBestEventImmediate.createReturnIf(TagList("NOT", TagList("any_owned_pop", TagList("is_being_purged", "no")))).add("set_planet_flag", "purged_planet")
+  planetFindBestEventImmediate=planetFindBestEventImmediate.addReturn("else")
+  for resource in resources:
+    planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet_base", 1)
+  planetFindBestEventImmediate.add("check_vanilla_planet_modifiers","yes")
+  planetFindBestEventImmediate.add("check_planet_modifiers_pe","yes")
+  planetFindBestEventImmediate.add("check_planet_modifiers_gpm","yes")
+  planetFindBestEventImmediate.add("check_planet_modifiers_pd","yes")
+  planetFindBestEventImmediate.add("check_planet_modifiers_am","yes")
+  planetFindBestEventImmediate.add("check_planet_modifiers_se","yes")
+  planetFindBestEventImmediate.add("check_planet_modifiers_gse","yes")
+
+  for resource in resources:
+    planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet_building", 1)
+  planetFindBestEventImmediate.add("check_planet_bonus_buildings","yes")
+  planetFindBestEventImmediate.add("check_planet_bonus_buildings_pe","yes")
+  planetFindBestEventImmediate.add("check_planet_bonus_buildings_am","yes")
+  planetFindBestEventImmediate.add("check_planet_bonus_buildings_eutab","yes")
+  planetFindBestEventImmediate.add("check_planet_bonus_buildings_ag","yes")
+
+  for resource in resources:
+    planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet_pop", 1)
+  planetFindBestEventImmediate.add("calculate_average_pop_multipliers","yes")
+
+  for resource in resources:
+    planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet", resource+"_mult_planet_base")
+    planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_building")
+    planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_pop")
+
   everyTileSearch=TagList()
   planetFindBestEventImmediate.add("every_tile", everyTileSearch)
   curPrev=everyTileSearch.addReturn("prev")
@@ -237,9 +269,13 @@ def main():
   #   curPrev.variableOp("set", weight+"_weight", 0)
 
   everyTileSearch.add("calculate_tile_weight","yes")
+  #TODO: adjacecy construction effect!
+  everyTileSearch=everyTileSearch.addReturn("prev")
+  for resource in resources:
+    if resource!="unity":
+      everyTileSearch.variableOp("multiply", resource+"_weight",resource+"_mult_planet")
 
   # everyTileSearch.addComment("doCALC! test:")
-  # everyTileSearch=everyTileSearch.addReturn("prev")
   # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 5))
   # testif.variableOp("set", "energy_weight", 25)
   # testif.variableOp("set", "minerals_weight", 21)
@@ -311,7 +347,6 @@ def main():
   for fun,name in zip([lambda i:pow(2,i)  ,lambda i:i*i*i+1], ["","_cubic"]):
     checkResourceEffect=TagList()
     funNeg= lambda i:-pow(2,i)
-    resources=["energy", "minerals", "food","unity", "society_research", "physics_research", "engineering_research"]
     for resource in resources:
       curEffect=checkResourceEffect.addReturn("test"+resource)
       if resource in ["energy", "minerals", "food"]:
@@ -326,7 +361,13 @@ def main():
         curEffect=curEffect.addReturn("else")
       for i in range(15):
         curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",fun(i) ,"", "<")))
-        curEffect.variableOp("set", resource+"_income", (fun(i-1)+fun(i))/2)
+        if i>3:
+          curSubEffect=curEffect
+          for j in range(1,10):
+            curSubEffect=curSubEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",fun(i-1+j/10) ,"", "<")))
+            curSubEffect.variableOp("set", resource+"_income", (fun(i-1+(j+1)/10)+fun(i-1+j/10))/2)
+            curSubEffect=curSubEffect.addReturn("else")
+          curSubEffect.variableOp("set", resource+"_income", (fun(i+1)+fun(i))/2)
         curEffect=curEffect.addReturn("else")
       curEffect.variableOp("set", resource+"_income", (fun(i+1)+fun(i))/2)
     outputToFolderAndFile(checkResourceEffect, "common/scripted_effects", "cgm_income_count_test{}.txt".format(name),2, "../CGM/buildings_script_source")
