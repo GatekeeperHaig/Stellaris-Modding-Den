@@ -57,9 +57,10 @@ def main():
 
 
   outTriggers=TagList()
-  outEffects.addComment("this = tile")
-  outTriggers.addComment("prev = planet")
-  outTriggers.addComment("prevprev = country")
+  outTriggers.addComment("this = planet")
+  outTriggers.addComment("prev = tile")
+  outTriggers.addComment("prevprev = planet. Don't use this!")
+  outTriggers.addComment("owner = country.")
   outTriggers.addComment("Check if any building of the type is available, including tech requ check. Can be left empty if there are non-unique buildings without tech requ in the category. ")
   outEffects=TagList()
   outEffects.addComment("this = tile")
@@ -192,6 +193,8 @@ def main():
   planetFindBestEventImmediate.variableOp("set", "cgm_curTile", 0) 
   for i in storedValsRange:
     planetFindBestEventImmediate.variableOp("set", "cgm_bestWeight_{!s}".format(i), 0) 
+  planetFindBestEventImmediate.addComment("set worst value to very large number, such that any found tile is initially worse")
+  planetFindBestEventImmediate.variableOp("set", "cgm_worstWeight".format(varToMove),pseudoInf)
   everyTileSearch=TagList()
   planetFindBestEventImmediate.add("every_tile", everyTileSearch)
   curPrev=everyTileSearch.addReturn("prev")
@@ -219,8 +222,6 @@ def main():
   testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 4))
   testif.variableOp("set", "base_res_adjacency_weight", 29)
   everyTileSearch.addComment("END OF example")
-  everyTileSearch.addComment("set worst value to very large number, such that any found tile is initially worse")
-  everyTileSearch.variableOp("set", "cgm_worstWeight".format(varToMove),pseudoInf)
   for i, weight in enumerate(weightTypes):
     ifWeightHigher=everyTileSearch.createReturnIf(variableOp(TagList(), "check", weight+"_weight", "cgm_curWeight", ">").add("prev", TagList(weight+"_any_building_available", "yes")))
     # if "adjacency" in weight:
