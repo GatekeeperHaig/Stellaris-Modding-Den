@@ -236,24 +236,26 @@ def main():
   # for weight in weightTypes:
   #   curPrev.variableOp("set", weight+"_weight", 0)
 
-  everyTileSearch.addComment("doCALC! test:")
-  everyTileSearch=everyTileSearch.addReturn("prev")
-  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 5))
-  testif.variableOp("set", "energy_weight", 25)
-  testif.variableOp("set", "minerals_weight", 21)
-  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 9))
-  testif.variableOp("set", "minerals_weight", 20)
-  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 7))
-  testif.variableOp("set", "food_weight", 5)
-  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 1))
-  testif.variableOp("set", "base_res_adjacency_weight", 27)
-  # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 2)) #removing the test of defining more of these. These lead to strange behavior (special building earlier than it should) in current version, but that would not be a problem in the final version: A new adjacency building would anyway trigger a recomp of weights!
-  # testif.variableOp("set", "base_res_adjacency_weight", 29)
-  # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 3))
-  # testif.variableOp("set", "base_res_adjacency_weight", 29)
-  # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 4))
-  # testif.variableOp("set", "base_res_adjacency_weight", 29)
-  everyTileSearch.addComment("END OF example")
+  everyTileSearch.add("calculate_tile_weight","yes")
+
+  # everyTileSearch.addComment("doCALC! test:")
+  # everyTileSearch=everyTileSearch.addReturn("prev")
+  # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 5))
+  # testif.variableOp("set", "energy_weight", 25)
+  # testif.variableOp("set", "minerals_weight", 21)
+  # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 9))
+  # testif.variableOp("set", "minerals_weight", 20)
+  # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 7))
+  # testif.variableOp("set", "food_weight", 5)
+  # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 1))
+  # testif.variableOp("set", "base_res_adjacency_weight", 27)
+  # # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 2)) #removing the test of defining more of these. These lead to strange behavior (special building earlier than it should) in current version, but that would not be a problem in the final version: A new adjacency building would anyway trigger a recomp of weights!
+  # # testif.variableOp("set", "base_res_adjacency_weight", 29)
+  # # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 3))
+  # # testif.variableOp("set", "base_res_adjacency_weight", 29)
+  # # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 4))
+  # # testif.variableOp("set", "base_res_adjacency_weight", 29)
+  # everyTileSearch.addComment("END OF example")
   for i, weight in enumerate(weightTypes):
     ifWeightHigher=everyTileSearch.createReturnIf(variableOp(TagList(), "check", weight+"_weight", "cgm_curWeight", ">").add(weight+"_any_building_available", "yes"))
     # if "adjacency" in weight:
@@ -313,17 +315,17 @@ def main():
     for resource in resources:
       curEffect=checkResourceEffect.addReturn("test"+resource)
       if resource in ["energy", "minerals", "food"]:
-        curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("amount",0 ,"", "<")))
+        curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",0 ,"", "<")))
         curNegEffect=curEffect
         for i in range(8):
-          curNegEffect=curNegEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("amount",funNeg(i) ,"", ">")))
+          curNegEffect=curNegEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",funNeg(i) ,"", ">")))
           curNegEffect.variableOp("set", resource+"_income", (funNeg(i-1)+funNeg(i))/2)
           curNegEffect=curNegEffect.addReturn("else")
         curNegEffect.variableOp("set", resource+"_income", (funNeg(i+1)+funNeg(i))/2)
           # curEffect.variableOp("set", resource+"_income", -1)
         curEffect=curEffect.addReturn("else")
       for i in range(15):
-        curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("amount",fun(i) ,"", "<")))
+        curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",fun(i) ,"", "<")))
         curEffect.variableOp("set", resource+"_income", (fun(i-1)+fun(i))/2)
         curEffect=curEffect.addReturn("else")
       curEffect.variableOp("set", resource+"_income", (fun(i+1)+fun(i))/2)
