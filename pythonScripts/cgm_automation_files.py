@@ -364,10 +364,10 @@ def main():
         if i>3:
           curSubEffect=curEffect
           for j in range(1,10):
-            curSubEffect=curSubEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",fun(i-1+j/10) ,"", "<")))
-            curSubEffect.variableOp("set", resource+"_income", (fun(i-1+(j+1)/10)+fun(i-1+j/10))/2)
+            curSubEffect=curSubEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",round(fun(i-1+j/10),3) ,"", "<")))
+            curSubEffect.variableOp("set", resource+"_income", round((fun(i-1+(j-1)/10)+fun(i-1+j/10))/2,3))
             curSubEffect=curSubEffect.addReturn("else")
-          curSubEffect.variableOp("set", resource+"_income", (fun(i+1)+fun(i))/2)
+          curSubEffect.variableOp("set", resource+"_income", fun(i))
         curEffect=curEffect.addReturn("else")
       curEffect.variableOp("set", resource+"_income", (fun(i+1)+fun(i))/2)
     outputToFolderAndFile(checkResourceEffect, "common/scripted_effects", "cgm_income_count_test{}.txt".format(name),2, "../CGM/buildings_script_source")
