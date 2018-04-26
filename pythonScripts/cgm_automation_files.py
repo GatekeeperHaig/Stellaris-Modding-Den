@@ -192,7 +192,7 @@ def main():
   effect.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
   if debug:
     effect.add("log", '"searching for special buildings on planet [this.GetName]"')
-  chooseSpecialBuilding=effect.createReturnIf(TagList("NOT", TagList("has_building","building_autochthon_monument").add("prev",variableOpNew("check", "cgm_special_bestWeight", 20, "<"))))
+  chooseSpecialBuilding=effect.createReturnIf(TagList("NOT", TagList("has_building","building_autochthon_monument")).add("prev",variableOpNew("check", "cgm_special_bestWeight", 20, "<")))
   chooseSpecialBuilding.addReturn("prev").variableOp("set","cgm_special_bestWeight", 20, "=", " #TODO just a test!")
   chooseSpecialBuilding.add("save_global_event_target_as", "cgm_best_planet_for_special")
     # (findBestPlanet.addReturn("prev")).variableOp("set","cgm_special_bestWeight", 20, "=", " #TODO just a test!")
