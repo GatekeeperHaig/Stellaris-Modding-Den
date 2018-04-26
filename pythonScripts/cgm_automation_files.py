@@ -14,6 +14,7 @@ from functools import reduce
 #TODO: Prio List how to use this:
 # 1. Core world important+medium important new building 2. Core world upgrades 3. Core world not so important building 4. Sector new buildings 5. Sector upgrades
 #possible far away todo: Replace worst existing building with (empire) unique
+#TODO: add breaks and check if they work correctly
 eventNameSpace="cgm_auto.{!s}"
 nameBase="cgm_auto_{!s}"
 def main():
