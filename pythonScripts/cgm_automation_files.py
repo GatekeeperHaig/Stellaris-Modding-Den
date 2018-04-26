@@ -15,6 +15,7 @@ from functools import reduce
 # 1. Core world important+medium important new building 2. Core world upgrades 3. Core world not so important building 4. Sector new buildings 5. Sector upgrades
 #possible far away todo: Replace worst existing building with (empire) unique
 #TODO: add breaks and check if they work correctly
+#TODO: event target: global -> local
 eventNameSpace="cgm_auto.{!s}"
 nameBase="cgm_auto_{!s}"
 def main():
@@ -302,6 +303,16 @@ def main():
     outputToFolderAndFile(outEffects, "common/scripted_effects", "cgm_auto_effects_template.txt",2, "../CGM/buildings_script_source")
   # with open("test.txt", "w") as file:
   #   outTag.writeAll(file,args())
+
+
+  checkResourceEffect=TagList()
+  resources=["energy", "minerals", "food","unity" "society_research", "physics_research", "engineering_research"]
+  for resource in resources:
+    curEffect=checkResourceEffect.add("test"+resource)
+    for i in range(10):
+      curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("amount", pow(2,i),"", "<")))
+      curEffect=curEffect.addReturn("else")
+  outputToFolderAndFile(checkResourceEffect, "common/scripted_effects", "cgm_income_count_test.txt",2, "../CGM/buildings_script_source")
 
 
 
