@@ -233,12 +233,12 @@ def main():
   testif.variableOp("set", "food_weight", 5)
   testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 1))
   testif.variableOp("set", "base_res_adjacency_weight", 27)
-  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 2))
-  testif.variableOp("set", "base_res_adjacency_weight", 29)
-  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 3))
-  testif.variableOp("set", "base_res_adjacency_weight", 29)
-  testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 4))
-  testif.variableOp("set", "base_res_adjacency_weight", 29)
+  # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 2)) #removing the test of defining more of these. These lead to strange behavior (special building earlier than it should) in current version, but that would not be a problem in the final version: A new adjacency building would anyway trigger a recomp of weights!
+  # testif.variableOp("set", "base_res_adjacency_weight", 29)
+  # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 3))
+  # testif.variableOp("set", "base_res_adjacency_weight", 29)
+  # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 4))
+  # testif.variableOp("set", "base_res_adjacency_weight", 29)
   everyTileSearch.addComment("END OF example")
   for i, weight in enumerate(weightTypes):
     ifWeightHigher=everyTileSearch.createReturnIf(variableOp(TagList(), "check", weight+"_weight", "cgm_curWeight", ">").add(weight+"_any_building_available", "yes"))
