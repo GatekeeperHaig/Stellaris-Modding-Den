@@ -1,24 +1,23 @@
 namespace = cgm_auto
+ #there are 3*3 types of important variables used in these events:
+# "cur_" is always for the tile we are currently in,
+# "best_" is previously found best tiles.
+# "worst_" is previously found worst tiles -> to be used with special buildings who do not requre special tiles.
+#Each can be combined with
+# "Type", which is a number assigned to the different weight-type
+# "weight", which is the actual weight value
+# "Tile", which is the "id" of a tile
 country_event = {
 	id = cgm_auto.0
 	is_triggered_only = yes
 	hide_window = yes
 	immediate = {
 		remove_country_flag = cgm_auto_built
-		 #TODO search for special building!
-		set_variable = {
-			which = cgm_special_bestWeight_1
-			value = 20  #TODO just a test!
-		}
 		set_country_flag = cgm_core_world_auto #searching core worlds for standard buildings
-		set_variable = { which = cgm_bestWeight_1 value = 0 }
+		 #Search for possible Special buildings:
+		country_event = { id = cgm_auto.11 }
+		 #Search for possible Standard buildings. Build best out of standard/special:
 		country_event = { id = cgm_auto.10 }
-		if = {
-			limit = { not = { has_country_flag = cgm_auto_built } }
-			remove_country_flag = cgm_core_world_auto #searching sector worlds for standard buildings
-			set_variable = { which = cgm_bestWeight_1 value = 0 }
-			country_event = { id = cgm_auto.10 }
-		}
 	}
 }
 country_event = {
@@ -26,6 +25,7 @@ country_event = {
 	is_triggered_only = yes
 	hide_window = yes
 	immediate = {
+		set_variable = { which = cgm_bestWeight_1 value = 0 }
 		every_owned_planet = {
 			limit = {
 				has_building_construction = no
@@ -48,7 +48,7 @@ country_event = {
 					}
 				}
 			}
-			log = "searching on planet [this.getName]"
+			log = "searching on planet [this.GetName]"
 			if = {
 				limit = {
 					check_variable = { which = cgm_bestWeight_1 value = 0 }
@@ -65,9 +65,11 @@ country_event = {
 				}
 			}
 		}
+		log = "bestStandard:[this.cgm_bestWeight_1]"
+		log = "bestSpecial:[this.cgm_special_bestWeight]"
 		if = {
 			limit = {
-				check_variable = { which = cgm_bestWeight_1 value > cgm_special_bestWeight_1 }
+				check_variable = { which = cgm_bestWeight_1 value > cgm_special_bestWeight }
 			}
 			event_target:cgm_best_planet = {
 				if = {
@@ -232,6 +234,7 @@ country_event = {
 					set_variable = { which = cgm_bestWeight_2 value = cgm_bestWeight_3 }
 					set_variable = { which = cgm_bestTile_2 value = cgm_bestTile_3 }
 					set_variable = { which = cgm_bestType_2 value = cgm_bestType_3 }
+					set_variable = { which = cgm_bestWeight_3 value = 0 }
 					else = {
 						if = {
 							limit = {
@@ -240,13 +243,81 @@ country_event = {
 							set_variable = { which = cgm_bestWeight_1 value = cgm_bestWeight_2 }
 							set_variable = { which = cgm_bestTile_1 value = cgm_bestTile_2 }
 							set_variable = { which = cgm_bestType_1 value = cgm_bestType_2 }
+							set_variable = { which = cgm_bestWeight_2 value = 0 }
+							else = {
+								set_variable = { which = cgm_bestWeight_1 value = 0 }
+							}
 						}
 					}
 				}
 			}
 			else = {
-				 #build the special one!
+				event_target:cgm_best_planet_for_special = {
+					if = {
+						limit = {
+							check_variable = { which = cgm_worstWeight value = 99999 }
+						}
+						planet_event = { id = cgm_auto.20 }
+					}
+					log = "worst tile::[this.cgm_worstTile]"
+					set_variable = { which = cgm_curTile value = 0 }
+					every_tile = {
+						prev = {
+							change_variable = { which = cgm_curTile value = 1 }
+						}
+						if = {
+							limit = {
+								prev = {
+									check_variable = { which = cgm_curTile value = cgm_worstTile }
+								}
+							}
+							cgm_add_special_building = yes
+						}
+					}
+					set_variable = { which = cgm_worstWeight value = 99999 }
+				}
 			}
+		}
+	}
+}
+country_event = {
+	id = cgm_auto.11
+	is_triggered_only = yes
+	hide_window = yes
+	immediate = {
+		set_variable = { which = cgm_special_bestWeight value = 0 }
+		every_owned_planet = {
+			limit = {
+				has_building_construction = no
+				free_building_tiles > 0
+				not = { has_planet_flag = purged_planet }
+				or = {
+					and = {
+						sector_controlled = no
+						prev = { has_country_flag = cgm_core_world_auto }
+					}
+					and = {
+						sector_controlled = yes
+						not = { prev = { has_country_flag = cgm_core_world_auto } }
+					}
+				}
+				any_pop = {
+					is_colony_pop = yes
+					NOR = {
+						tile = { has_building = yes has_building_construction = yes }
+					}
+				}
+			}
+			log = "searching for special buildings on planet [this.GetName]"
+			 #TODO search for special building!
+			 #define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one
+			prev = {
+				set_variable = {
+					which = cgm_special_bestWeight
+					value = 20  #TODO just a test!
+				}
+			}
+			save_global_event_target_as = cgm_best_planet_for_special  #TODO just a test!
 		}
 	}
 }
@@ -263,268 +334,194 @@ planet_event = {
 			prev = {
 				change_variable = { which = cgm_curTile value = 1 }
 			}
-			 #doCALC! test:
 			if = {
-				limit = {
-					prev = {
-						check_variable = { which = cgm_curTile value = 5 }
-					}
-				}
+				limit = { has_building = no }
+				 #doCALC! test:
 				prev = {
-					set_variable = { which = energy_weight value = 25 }
-				}
-				prev = {
-					set_variable = { which = minerals_weight value = 21 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = cgm_curTile value = 9 }
-					}
-				}
-				prev = {
-					set_variable = { which = minerals_weight value = 20 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = cgm_curTile value = 7 }
-					}
-				}
-				prev = {
-					set_variable = { which = food_weight value = 5 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = cgm_curTile value = 1 }
-					}
-				}
-				prev = {
-					set_variable = { which = base_res_adjacency_weight value = 27 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = cgm_curTile value = 2 }
-					}
-				}
-				prev = {
-					set_variable = { which = base_res_adjacency_weight value = 29 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = cgm_curTile value = 3 }
-					}
-				}
-				prev = {
-					set_variable = { which = base_res_adjacency_weight value = 29 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = cgm_curTile value = 4 }
-					}
-				}
-				prev = {
-					set_variable = { which = base_res_adjacency_weight value = 29 }
-				}
-			}
-			 #END OF example
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = energy_weight value > cgm_curWeight }
-					}
-					energy_any_building_available = yes
-				}
-				prev = {
-					set_variable = { which = cgm_curWeight value = energy_weight }
-					set_variable = { which = cgm_curType value = 1 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = minerals_weight value > cgm_curWeight }
-					}
-					minerals_any_building_available = yes
-				}
-				prev = {
-					set_variable = { which = cgm_curWeight value = minerals_weight }
-					set_variable = { which = cgm_curType value = 2 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = food_weight value > cgm_curWeight }
-					}
-					food_any_building_available = yes
-				}
-				prev = {
-					set_variable = { which = cgm_curWeight value = food_weight }
-					set_variable = { which = cgm_curType value = 3 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = base_res_adjacency_weight value > cgm_curWeight }
-					}
-					base_res_adjacency_any_building_available = yes
-				}
-				prev = {
-					set_variable = { which = cgm_curWeight value = base_res_adjacency_weight }
-					set_variable = { which = cgm_curType value = 4 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = society_research_weight value > cgm_curWeight }
-					}
-					society_research_any_building_available = yes
-				}
-				prev = {
-					set_variable = { which = cgm_curWeight value = society_research_weight }
-					set_variable = { which = cgm_curType value = 5 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = physics_research_weight value > cgm_curWeight }
-					}
-					physics_research_any_building_available = yes
-				}
-				prev = {
-					set_variable = { which = cgm_curWeight value = physics_research_weight }
-					set_variable = { which = cgm_curType value = 6 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = engineering_research_weight value > cgm_curWeight }
-					}
-					engineering_research_any_building_available = yes
-				}
-				prev = {
-					set_variable = { which = cgm_curWeight value = engineering_research_weight }
-					set_variable = { which = cgm_curType value = 7 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = science_adjacency_weight value > cgm_curWeight }
-					}
-					science_adjacency_any_building_available = yes
-				}
-				prev = {
-					set_variable = { which = cgm_curWeight value = science_adjacency_weight }
-					set_variable = { which = cgm_curType value = 8 }
-				}
-			}
-			if = {
-				limit = {
-					prev = {
-						check_variable = { which = cgm_curWeight value > cgm_bestWeight_1 }
-					}
-				}
-				if = {
-					limit = {
-						prev = {
-							check_variable = { which = cgm_bestWeight_2 value > 0 }
-						}
-					}
-					prev = {
-						set_variable = { which = cgm_bestWeight_3 value = cgm_bestWeight_2 }
-						set_variable = { which = cgm_bestTile_3 value = cgm_bestTile_2 }
-						set_variable = { which = cgm_bestType_3 value = cgm_bestType_2 }
-						set_variable = { which = cgm_bestWeight_2 value = cgm_bestWeight_1 }
-						set_variable = { which = cgm_bestTile_2 value = cgm_bestTile_1 }
-						set_variable = { which = cgm_bestType_2 value = cgm_bestType_1 }
-					}
-					else = {
-						if = {
-							limit = {
-								prev = {
-									check_variable = { which = cgm_bestWeight_1 value > 0 }
-								}
-							}
-							prev = {
-								set_variable = { which = cgm_bestWeight_2 value = cgm_bestWeight_1 }
-								set_variable = { which = cgm_bestTile_2 value = cgm_bestTile_1 }
-								set_variable = { which = cgm_bestType_2 value = cgm_bestType_1 }
-							}
-						}
-					}
-				}
-				prev = {
-					set_variable = { which = cgm_bestWeight_1 value = cgm_curWeight }
-					set_variable = { which = cgm_bestTile_1 value = cgm_curTile }
-					set_variable = { which = cgm_bestType_1 value = cgm_curType }
-				}
-				else = {
 					if = {
 						limit = {
-							prev = {
-								check_variable = { which = cgm_curWeight value > cgm_bestWeight_2 }
-							}
+							check_variable = { which = cgm_curTile value = 5 }
+						}
+						set_variable = { which = energy_weight value = 25 }
+						set_variable = { which = minerals_weight value = 21 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = cgm_curTile value = 9 }
+						}
+						set_variable = { which = minerals_weight value = 20 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = cgm_curTile value = 7 }
+						}
+						set_variable = { which = food_weight value = 5 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = cgm_curTile value = 1 }
+						}
+						set_variable = { which = base_res_adjacency_weight value = 27 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = cgm_curTile value = 2 }
+						}
+						set_variable = { which = base_res_adjacency_weight value = 29 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = cgm_curTile value = 3 }
+						}
+						set_variable = { which = base_res_adjacency_weight value = 29 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = cgm_curTile value = 4 }
+						}
+						set_variable = { which = base_res_adjacency_weight value = 29 }
+					}
+					 #END OF example
+					 #set worst value to very large number, such that any found tile is initially worse
+					set_variable = { which = cgm_worstWeight value = 99999 }
+					if = {
+						limit = {
+							check_variable = { which = energy_weight value > cgm_curWeight }
+							prev = { energy_any_building_available = yes }
+						}
+						set_variable = { which = cgm_curWeight value = energy_weight }
+						set_variable = { which = cgm_curType value = 1 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = minerals_weight value > cgm_curWeight }
+							prev = { minerals_any_building_available = yes }
+						}
+						set_variable = { which = cgm_curWeight value = minerals_weight }
+						set_variable = { which = cgm_curType value = 2 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = food_weight value > cgm_curWeight }
+							prev = { food_any_building_available = yes }
+						}
+						set_variable = { which = cgm_curWeight value = food_weight }
+						set_variable = { which = cgm_curType value = 3 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = base_res_adjacency_weight value > cgm_curWeight }
+							prev = { base_res_adjacency_any_building_available = yes }
+						}
+						set_variable = { which = cgm_curWeight value = base_res_adjacency_weight }
+						set_variable = { which = cgm_curType value = 4 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = society_research_weight value > cgm_curWeight }
+							prev = { society_research_any_building_available = yes }
+						}
+						set_variable = { which = cgm_curWeight value = society_research_weight }
+						set_variable = { which = cgm_curType value = 5 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = physics_research_weight value > cgm_curWeight }
+							prev = { physics_research_any_building_available = yes }
+						}
+						set_variable = { which = cgm_curWeight value = physics_research_weight }
+						set_variable = { which = cgm_curType value = 6 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = engineering_research_weight value > cgm_curWeight }
+							prev = { engineering_research_any_building_available = yes }
+						}
+						set_variable = { which = cgm_curWeight value = engineering_research_weight }
+						set_variable = { which = cgm_curType value = 7 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = science_adjacency_weight value > cgm_curWeight }
+							prev = { science_adjacency_any_building_available = yes }
+						}
+						set_variable = { which = cgm_curWeight value = science_adjacency_weight }
+						set_variable = { which = cgm_curType value = 8 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = cgm_curWeight value > cgm_bestWeight_1 }
 						}
 						if = {
 							limit = {
-								prev = {
-									check_variable = { which = cgm_bestWeight_2 value > 0 }
+								check_variable = { which = cgm_bestWeight_2 value > 0 }
+							}
+							set_variable = { which = cgm_bestWeight_3 value = cgm_bestWeight_2 }
+							set_variable = { which = cgm_bestTile_3 value = cgm_bestTile_2 }
+							set_variable = { which = cgm_bestType_3 value = cgm_bestType_2 }
+							set_variable = { which = cgm_bestWeight_2 value = cgm_bestWeight_1 }
+							set_variable = { which = cgm_bestTile_2 value = cgm_bestTile_1 }
+							set_variable = { which = cgm_bestType_2 value = cgm_bestType_1 }
+							else = {
+								if = {
+									limit = {
+										check_variable = { which = cgm_bestWeight_1 value > 0 }
+									}
+									set_variable = { which = cgm_bestWeight_2 value = cgm_bestWeight_1 }
+									set_variable = { which = cgm_bestTile_2 value = cgm_bestTile_1 }
+									set_variable = { which = cgm_bestType_2 value = cgm_bestType_1 }
 								}
 							}
-							prev = {
-								set_variable = { which = cgm_bestWeight_3 value = cgm_bestWeight_2 }
-								set_variable = { which = cgm_bestTile_3 value = cgm_bestTile_2 }
-								set_variable = { which = cgm_bestType_3 value = cgm_bestType_2 }
-							}
 						}
-						prev = {
-							set_variable = { which = cgm_bestWeight_2 value = cgm_curWeight }
-							set_variable = { which = cgm_bestTile_2 value = cgm_curTile }
-							set_variable = { which = cgm_bestType_2 value = cgm_curType }
-						}
+						set_variable = { which = cgm_bestWeight_1 value = cgm_curWeight }
+						set_variable = { which = cgm_bestTile_1 value = cgm_curTile }
+						set_variable = { which = cgm_bestType_1 value = cgm_curType }
 						else = {
 							if = {
 								limit = {
-									prev = {
-										check_variable = { which = cgm_curWeight value > cgm_bestWeight_3 }
-									}
+									check_variable = { which = cgm_curWeight value > cgm_bestWeight_2 }
 								}
-								prev = {
-									set_variable = { which = cgm_bestWeight_3 value = cgm_curWeight }
-									set_variable = { which = cgm_bestTile_3 value = cgm_curTile }
-									set_variable = { which = cgm_bestType_3 value = cgm_curType }
+								if = {
+									limit = {
+										check_variable = { which = cgm_bestWeight_2 value > 0 }
+									}
+									set_variable = { which = cgm_bestWeight_3 value = cgm_bestWeight_2 }
+									set_variable = { which = cgm_bestTile_3 value = cgm_bestTile_2 }
+									set_variable = { which = cgm_bestType_3 value = cgm_bestType_2 }
+								}
+								set_variable = { which = cgm_bestWeight_2 value = cgm_curWeight }
+								set_variable = { which = cgm_bestTile_2 value = cgm_curTile }
+								set_variable = { which = cgm_bestType_2 value = cgm_curType }
+								else = {
+									if = {
+										limit = {
+											check_variable = { which = cgm_curWeight value > cgm_bestWeight_3 }
+										}
+										set_variable = { which = cgm_bestWeight_3 value = cgm_curWeight }
+										set_variable = { which = cgm_bestTile_3 value = cgm_curTile }
+										set_variable = { which = cgm_bestType_3 value = cgm_curType }
+									}
 								}
 							}
 						}
 					}
+					if = {
+						limit = {
+							check_variable = { which = cgm_curWeight value < cgm_worstWeight }
+						}
+						set_variable = { which = cgm_worstWeight value = cgm_curWeight }
+						set_variable = { which = cgm_worstTile value = cgm_curTile }
+					}
+					set_variable = { which = cgm_curWeight value = 0 }
+					set_variable = { which = energy_weight value = 0 }
+					set_variable = { which = minerals_weight value = 0 }
+					set_variable = { which = food_weight value = 0 }
+					set_variable = { which = base_res_adjacency_weight value = 0 }
+					set_variable = { which = society_research_weight value = 0 }
+					set_variable = { which = physics_research_weight value = 0 }
+					set_variable = { which = engineering_research_weight value = 0 }
+					set_variable = { which = science_adjacency_weight value = 0 }
 				}
-			}
-			prev = {
-				set_variable = { which = cgm_curWeight value = 0 }
-				set_variable = { which = energy_weight value = 0 }
-				set_variable = { which = minerals_weight value = 0 }
-				set_variable = { which = food_weight value = 0 }
-				set_variable = { which = base_res_adjacency_weight value = 0 }
-				set_variable = { which = society_research_weight value = 0 }
-				set_variable = { which = physics_research_weight value = 0 }
-				set_variable = { which = engineering_research_weight value = 0 }
-				set_variable = { which = science_adjacency_weight value = 0 }
 			}
 		}
 	}
