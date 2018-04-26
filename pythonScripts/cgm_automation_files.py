@@ -59,7 +59,7 @@ def main():
   empireMainBuildEventImmediate.createEvent(name_empire_special_build_event)
   empireMainBuildEventImmediate.addComment("Search for possible Standard buildings. Build best out of standard/special:")
   empireMainBuildEventImmediate.createEvent(name_empire_standard_build_event)
-  #todo activate again! disabled for better testing(no deletion of variables)
+  #disabl for better testing(no deletion of variables):
   sectorBuild=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_auto_built")))
   sectorBuild.add("remove_country_flag", "cgm_core_world_auto", "#searching sector worlds for standard buildings")
   sectorBuild.addComment("Search for possible Special buildings:")
@@ -159,7 +159,6 @@ def main():
     for k in storedValsRange[1:j]:
       for varToMove in varsToMove:
         locSubIf.variableOp("set", "cgm_best"+varToMove+"_{!s}".format(k-1),"cgm_best"+varToMove+"_{!s}".format(k))
-      # locSubIf.variableOp("set", "cgm_bestWeight_{!s}".format(k-1),"cgm_bestWeight_{!s}".format(k)).variableOp("set", "cgm_bestTile_{!s}".format(k-1),"cgm_bestTile_{!s}".format(k)) #todo: move other vars
     locSubIf.variableOp("set", "cgm_bestWeight_{!s}".format(j), 0)
     curSubLevel=TagList()
     locSubIf.add("else", curSubLevel)
@@ -187,11 +186,16 @@ def main():
   empireSpecialBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
   if debug:
     findBestPlanet.add("log", '"searching for special buildings on planet [this.GetName]"')
-
+    findBestPlanet.add("cgm_search_for_special_building", "yes")
+    outEffects.addComment("Special SEARCH effect:\n# this = planet\n#  prev/owner = country")
+    effect=outEffects.addReturn("cgm_search_for_special_building")
+    chooseSpecialBuilding=effect.createReturnIf(TagList("NOT", TagList("has_building","building_autochthon_monument").add("prev",variableOpNew("check", "cgm_special_bestWeight", 20, "<"))))
+    chooseSpecialBuilding.addReturn("prev").variableOp("set","cgm_special_bestWeight", 20, "=", " #TODO just a test!")
+    chooseSpecialBuilding.add("save_global_event_target_as", "cgm_best_planet_for_special")
     findBestPlanet.addComment("TODO search for special building!")
     findBestPlanet.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
-    (findBestPlanet.addReturn("prev")).variableOp("set","cgm_special_bestWeight", 20, "=", " #TODO just a test!")
-    findBestPlanet.add("save_global_event_target_as", "cgm_best_planet_for_special"," #TODO just a test!")
+    # (findBestPlanet.addReturn("prev")).variableOp("set","cgm_special_bestWeight", 20, "=", " #TODO just a test!")
+    # findBestPlanet.add("save_global_event_target_as", "cgm_best_planet_for_special"," #TODO just a test!")
 
 
 
@@ -255,14 +259,12 @@ def main():
       for k in reversed(storedValsRange[i:j]):
         for varToMove in varsToMove:
           locSubIf.variableOp("set", "cgm_best"+varToMove+"_{!s}".format(k),"cgm_best"+varToMove+"_{!s}".format(k-1))
-        # locPrev.variableOp("set", "cgm_bestWeight_{!s}".format(k),"cgm_bestWeight_{!s}".format(k-1)).variableOp("set", "cgm_bestTile_{!s}".format(k),"cgm_bestTile_{!s}".format(k-1)).variableOp("set", "cgm_bestTile_{!s}".format(k),"cgm_bestTile_{!s}".format(k-1)) #todo: move other vars
       curSubLevel=TagList()
       locSubIf.add("else", curSubLevel)
     # locPrev=locIf.addReturn("prev")
     for varToMove in varsToMove:
       locIf.variableOp("set", "cgm_best{}_{!s}".format(varToMove,i),"cgm_cur{}".format(varToMove))
 
-    # variableOp("set", "cgm_bestWeight_{!s}".format(i),"cgm_curWeight").variableOp("set", "cgm_bestTile_{!s}".format(i),"cgm_curTile").variableOp("set", "cgm_bestType_{!s}".format(i),"cgm_curType","=")
     curLevel=TagList()
     locIf.add("else", curLevel)
 
