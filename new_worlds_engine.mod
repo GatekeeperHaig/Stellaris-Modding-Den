@@ -1,4 +1,4 @@
-name="!!!New Worlds"
+name="!!!New Worlds Engine"
 path="mod/planet_engine_mods/new_worlds"
 tags={
 	"Galaxy Generation"
