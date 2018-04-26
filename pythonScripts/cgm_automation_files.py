@@ -223,10 +223,10 @@ def main():
   testif.variableOp("set", "base_res_adjacency_weight", 29)
   everyTileSearch.addComment("END OF example")
   for i, weight in enumerate(weightTypes):
-    ifWeightHigher=everyTileSearch.createReturnIf(variableOp(TagList(), "check", weight+"_weight", "cgm_curWeight", ">").add("prev", TagList(weight+"_any_building_available", "yes")))
+    ifWeightHigher=everyTileSearch.createReturnIf(variableOp(TagList(), "check", weight+"_weight", "cgm_curWeight", ">").add(weight+"_any_building_available", "yes"))
     # if "adjacency" in weight:
     if weight=="base_res_adjacency":
-      outTriggers.add(weight+"_any_building_available", TagList("prev", TagList("not",  TagList("has_building","building_power_hub_1"))))
+      outTriggers.add(weight+"_any_building_available", TagList("not",  TagList("has_building","building_power_hub_1")))
     else:
       outTriggers.add(weight+"_any_building_available", TagList())
     ifWeightHigher.variableOp("set", "cgm_curWeight",weight+"_weight").variableOp("set", "cgm_curType",i+1)
