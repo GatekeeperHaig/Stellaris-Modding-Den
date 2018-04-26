@@ -344,7 +344,8 @@ def main():
 
 
 
-  for fun,name in zip([lambda i:pow(2,i)  ,lambda i:i*i*i+1], ["","_cubic"]):
+  # for fun,name in zip([lambda i:pow(2,i)  ,lambda i:i*i*i+1], ["","_cubic"]):
+  for fun,name in zip([lambda i:pow(2,i)], [""]):
     checkResourceEffect=TagList()
     funNeg= lambda i:-pow(2,i)
     for resource in resources:
@@ -354,22 +355,28 @@ def main():
         curNegEffect=curEffect
         for i in range(8):
           curNegEffect=curNegEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",funNeg(i) ,"", ">")))
-          curNegEffect.variableOp("set", resource+"_income", (funNeg(i-1)+funNeg(i))/2)
+          curNegEffect.variableOp("set", resource+"_log", -i)
+          curNegEffect.variableOp("set", resource+"_income", round(funNeg(i-0.5),3))
           curNegEffect=curNegEffect.addReturn("else")
-        curNegEffect.variableOp("set", resource+"_income", (funNeg(i+1)+funNeg(i))/2)
+          curNegEffect.variableOp("set", resource+"_log", -i-1)
+        curNegEffect.variableOp("set", resource+"_income", round(funNeg(i+0.5),3))
           # curEffect.variableOp("set", resource+"_income", -1)
         curEffect=curEffect.addReturn("else")
       for i in range(15):
         curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",fun(i) ,"", "<")))
-        if i>3:
+        curEffect.variableOp("set", resource+"_log", i)
+        if i>3 and resource=="minerals":
           curSubEffect=curEffect
           for j in range(1,10):
-            curSubEffect=curSubEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",fun(i-1+j/10) ,"", "<")))
-            curSubEffect.variableOp("set", resource+"_income", (fun(i-1+(j+1)/10)+fun(i-1+j/10))/2)
+            curSubEffect=curSubEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",round(fun(i-1+j/10),3) ,"", "<")))
+            curSubEffect.variableOp("set", resource+"_income", round(fun(i-1+(j-0.5)/10),3))
             curSubEffect=curSubEffect.addReturn("else")
-          curSubEffect.variableOp("set", resource+"_income", (fun(i+1)+fun(i))/2)
+          curSubEffect.variableOp("set", resource+"_income", round(fun(i-1+(j+0.5)/10),3))
+        else:
+          curEffect.variableOp("set", resource+"_income", round(fun(i-0.5),3))
         curEffect=curEffect.addReturn("else")
-      curEffect.variableOp("set", resource+"_income", (fun(i+1)+fun(i))/2)
+      curEffect.variableOp("set", resource+"_log", i+1)
+      curEffect.variableOp("set", resource+"_income", round(fun(i+0.5),3))
     outputToFolderAndFile(checkResourceEffect, "common/scripted_effects", "cgm_income_count_test{}.txt".format(name),2, "../CGM/buildings_script_source")
 
 
