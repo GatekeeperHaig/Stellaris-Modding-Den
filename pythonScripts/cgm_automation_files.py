@@ -133,6 +133,8 @@ def main():
     effect.add("log", '"trying to build special on tile [prev.cgm_curTile]"')
   effect.addComment("SPECIAL BUILDING NUMBER 1:")
   effect.createReturnIf(TagList("prev.owner", variableOpNew("check", "cgm_special_bestBuilding", 1))).add("add_building_construction", "building_autochthon_monument")
+  effect.addComment("SPECIAL BUILDING NUMBER 2:")
+  effect.createReturnIf(TagList("prev.owner", variableOpNew("check", "cgm_special_bestBuilding", 2))).add("add_building_construction", "building_fortress")
   effect.createReturnIf(TagList("or", TagList("has_building","yes").add("has_building_construction", "yes"))).add("prevprev",TagList("set_country_flag", "cgm_auto_built"))
   buildSpecial.variableOp("set", "cgm_worstWeight", pseudoInf)
 
@@ -146,7 +148,8 @@ def main():
     everyTileBuild.addReturn("prev").variableOp("change", "cgm_curTile",1)
     everyTileBuild.createReturnIf(TagList("prev",variableOpNew("check", "cgm_curTile", "cgm_bestTile_1"))).add("add_"+weightType+"_building","yes" )
     
-    effect=outEffects.addReturn("add_"+weightType+"_building")
+    effect=TagList()
+    outEffects.insert(0,"add_"+weightType+"_building",effect)
     if debug:
       effect.add("log", '"trying to build standard on tile [prev.cgm_curTile]"')
     effect.add("add_building_construction",exampleBuildings[i])
@@ -196,6 +199,13 @@ def main():
   effect.addComment("SPECIAL BUILDING NUMBER 1:")
   chooseSpecialBuilding=effect.createReturnIf(TagList("NOT", TagList("has_building","building_autochthon_monument")).add("prev",variableOpNew("check", "cgm_special_bestWeight", 20, "<")))
   chooseSpecialBuilding.addReturn("prev").variableOp("set","cgm_special_bestWeight", 20).variableOp("set","cgm_special_bestBuilding", 1)
+  chooseSpecialBuilding.add("save_global_event_target_as", "cgm_best_planet_for_special")
+  effect.addComment("SPECIAL BUILDING NUMBER 2: FORTRESS")
+  effect.variableOp("set", "cgm_special_bestWeight", 10)
+  effect.addComment("cgm_special_bestWeight named like this for easier comparison! Local scope!")
+  chooseSpecialBuilding=effect.createReturnIf(TagList("has_planet_flag","NEEDS_DEFENSE").variableOp("multiply", "cgm_special_bestWeight", 4))
+  chooseSpecialBuilding=effect.createReturnIf(TagList("prev",variableOpNew("check", "cgm_special_bestWeight", "prev", "<")))
+  chooseSpecialBuilding.addReturn("prev").variableOp("set","cgm_special_bestWeight", "prev").variableOp("set","cgm_special_bestBuilding", 1)
   chooseSpecialBuilding.add("save_global_event_target_as", "cgm_best_planet_for_special")
     # (findBestPlanet.addReturn("prev")).variableOp("set","cgm_special_bestWeight", 20, "=", " #TODO just a test!")
     # findBestPlanet.add("save_global_event_target_as", "cgm_best_planet_for_special"," #TODO just a test!")
@@ -286,8 +296,9 @@ def main():
 
 
   outputToFolderAndFile(outTag, "events", "cgm_auto.txt",2, "../CGM/buildings_script_source")
-  outputToFolderAndFile(outTriggers, "common/scripted_triggers", "cgm_auto_trigger.txt",2, "../CGM/buildings_script_source")
-  outputToFolderAndFile(outEffects, "common/scripted_effects", "cgm_auto_effects.txt",2, "../CGM/buildings_script_source")
+  if debug:
+    outputToFolderAndFile(outTriggers, "common/scripted_triggers", "cgm_auto_trigger_template.txt",2, "../CGM/buildings_script_source")
+    outputToFolderAndFile(outEffects, "common/scripted_effects", "cgm_auto_effects_template.txt",2, "../CGM/buildings_script_source")
   # with open("test.txt", "w") as file:
   #   outTag.writeAll(file,args())
 
