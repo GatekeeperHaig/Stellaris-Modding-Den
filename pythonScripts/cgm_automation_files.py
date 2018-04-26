@@ -306,11 +306,16 @@ def main():
 
 
   checkResourceEffect=TagList()
-  resources=["energy", "minerals", "food","unity" "society_research", "physics_research", "engineering_research"]
+  resources=["energy", "minerals", "food","unity", "society_research", "physics_research", "engineering_research"]
   for resource in resources:
-    curEffect=checkResourceEffect.add("test"+resource)
+    curEffect=checkResourceEffect.addReturn("test"+resource)
+    curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("amount",0 ,"", "<")))
+    curEffect.variableOp("set", resource+"_income", -1)
+    curEffect=curEffect.addReturn("else")
     for i in range(10):
-      curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("amount", pow(2,i),"", "<")))
+      fun= lambda i:pow(2,i)
+      curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("amount",fun(i) ,"", "<")))
+      curEffect.variableOp("set", resource+"_income", fun(i-1))
       curEffect=curEffect.addReturn("else")
   outputToFolderAndFile(checkResourceEffect, "common/scripted_effects", "cgm_income_count_test.txt",2, "../CGM/buildings_script_source")
 
