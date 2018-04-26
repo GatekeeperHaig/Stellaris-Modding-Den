@@ -310,7 +310,13 @@ def main():
   for resource in resources:
     curEffect=checkResourceEffect.addReturn("test"+resource)
     curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("amount",0 ,"", "<")))
-    curEffect.variableOp("set", resource+"_income", -1)
+    curNegEffect=curEffect
+    for i in range(10):
+      fun= lambda i:-pow(2,i)
+      curNegEffect=curNegEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("amount",fun(i) ,"", ">")))
+      curNegEffect.variableOp("set", resource+"_income", fun(i-1))
+      curNegEffect=curNegEffect.addReturn("else")
+      # curEffect.variableOp("set", resource+"_income", -1)
     curEffect=curEffect.addReturn("else")
     for i in range(10):
       fun= lambda i:pow(2,i)
