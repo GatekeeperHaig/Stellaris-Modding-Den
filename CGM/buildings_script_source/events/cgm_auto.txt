@@ -379,24 +379,38 @@ planet_event = {
 				set_variable = { which = energy_mult_planet value = energy_mult_planet_base }
 				change_variable = { which = energy_mult_planet value = energy_mult_planet_building }
 				change_variable = { which = energy_mult_planet value = energy_mult_planet_pop }
+				set_variable = { which = energy_country_weight value = owner }
+				change_variable = { which = energy_mult_planet value = energy_country_weight }
 				set_variable = { which = minerals_mult_planet value = minerals_mult_planet_base }
 				change_variable = { which = minerals_mult_planet value = minerals_mult_planet_building }
 				change_variable = { which = minerals_mult_planet value = minerals_mult_planet_pop }
+				set_variable = { which = minerals_country_weight value = owner }
+				change_variable = { which = minerals_mult_planet value = minerals_country_weight }
 				set_variable = { which = food_mult_planet value = food_mult_planet_base }
 				change_variable = { which = food_mult_planet value = food_mult_planet_building }
 				change_variable = { which = food_mult_planet value = food_mult_planet_pop }
+				set_variable = { which = food_country_weight value = owner }
+				change_variable = { which = food_mult_planet value = food_country_weight }
 				set_variable = { which = unity_mult_planet value = unity_mult_planet_base }
 				change_variable = { which = unity_mult_planet value = unity_mult_planet_building }
 				change_variable = { which = unity_mult_planet value = unity_mult_planet_pop }
+				set_variable = { which = unity_country_weight value = owner }
+				change_variable = { which = unity_mult_planet value = unity_country_weight }
 				set_variable = { which = society_research_mult_planet value = society_research_mult_planet_base }
 				change_variable = { which = society_research_mult_planet value = society_research_mult_planet_building }
 				change_variable = { which = society_research_mult_planet value = society_research_mult_planet_pop }
+				set_variable = { which = society_research_country_weight value = owner }
+				change_variable = { which = society_research_mult_planet value = society_research_country_weight }
 				set_variable = { which = physics_research_mult_planet value = physics_research_mult_planet_base }
 				change_variable = { which = physics_research_mult_planet value = physics_research_mult_planet_building }
 				change_variable = { which = physics_research_mult_planet value = physics_research_mult_planet_pop }
+				set_variable = { which = physics_research_country_weight value = owner }
+				change_variable = { which = physics_research_mult_planet value = physics_research_country_weight }
 				set_variable = { which = engineering_research_mult_planet value = engineering_research_mult_planet_base }
 				change_variable = { which = engineering_research_mult_planet value = engineering_research_mult_planet_building }
 				change_variable = { which = engineering_research_mult_planet value = engineering_research_mult_planet_pop }
+				set_variable = { which = engineering_research_country_weight value = owner }
+				change_variable = { which = engineering_research_mult_planet value = engineering_research_country_weight }
 				every_tile = {
 					prev = {
 						change_variable = { which = cgm_curTile value = 1 }
@@ -552,6 +566,88 @@ planet_event = {
 					}
 				}
 			}
+		}
+	}
+}
+country_event = {
+	id = cgm_auto.30
+	is_triggered_only = yes
+	hide_window = yes
+	immediate = {
+		determine_surplus_energy = yes
+		set_variable = { which = energy_country_weight value = 1 }
+		determine_surplus_minerals = yes
+		set_variable = { which = minerals_country_weight value = 1 }
+		determine_surplus_food = yes
+		set_variable = { which = food_country_weight value = 1 }
+		determine_surplus_unity = yes
+		set_variable = { which = unity_country_weight value = 1 }
+		determine_surplus_society_research = yes
+		set_variable = { which = society_research_country_weight value = 1 }
+		determine_surplus_physics_research = yes
+		set_variable = { which = physics_research_country_weight value = 1 }
+		determine_surplus_engineering_research = yes
+		set_variable = { which = engineering_research_country_weight value = 1 }
+		 #So far assuming all postive here! TODO: consider negative!
+		multiply_variable = { which = energy_country_weight value = minerals_log }
+		set_variable = { which = cgm_tmp value = energy_log }
+		change_variable = { which = cgm_tmp value = 2.0 }
+		divide_variable = { which = energy_country_weight value = cgm_tmp }
+		if = {
+			limit = {
+				check_variable = { which = energy_country_weight value > 2 }
+			}
+			set_variable = { which = energy_country_weight value = 2 }
+		}
+		multiply_variable = { which = food_country_weight value = minerals_log }
+		set_variable = { which = cgm_tmp value = food_log }
+		change_variable = { which = cgm_tmp value = 2.0 }
+		divide_variable = { which = food_country_weight value = cgm_tmp }
+		if = {
+			limit = {
+				check_variable = { which = food_country_weight value > 2 }
+			}
+			set_variable = { which = food_country_weight value = 2 }
+		}
+		multiply_variable = { which = unity_country_weight value = minerals_log }
+		set_variable = { which = cgm_tmp value = unity_log }
+		change_variable = { which = cgm_tmp value = 2.0 }
+		divide_variable = { which = unity_country_weight value = cgm_tmp }
+		if = {
+			limit = {
+				check_variable = { which = unity_country_weight value > 2 }
+			}
+			set_variable = { which = unity_country_weight value = 2 }
+		}
+		multiply_variable = { which = society_research_country_weight value = minerals_log }
+		set_variable = { which = cgm_tmp value = society_research_log }
+		change_variable = { which = cgm_tmp value = 1.0 }
+		divide_variable = { which = society_research_country_weight value = cgm_tmp }
+		if = {
+			limit = {
+				check_variable = { which = society_research_country_weight value > 2 }
+			}
+			set_variable = { which = society_research_country_weight value = 2 }
+		}
+		multiply_variable = { which = physics_research_country_weight value = minerals_log }
+		set_variable = { which = cgm_tmp value = physics_research_log }
+		change_variable = { which = cgm_tmp value = 1.0 }
+		divide_variable = { which = physics_research_country_weight value = cgm_tmp }
+		if = {
+			limit = {
+				check_variable = { which = physics_research_country_weight value > 2 }
+			}
+			set_variable = { which = physics_research_country_weight value = 2 }
+		}
+		multiply_variable = { which = engineering_research_country_weight value = minerals_log }
+		set_variable = { which = cgm_tmp value = engineering_research_log }
+		change_variable = { which = cgm_tmp value = 1.0 }
+		divide_variable = { which = engineering_research_country_weight value = cgm_tmp }
+		if = {
+			limit = {
+				check_variable = { which = engineering_research_country_weight value > 2 }
+			}
+			set_variable = { which = engineering_research_country_weight value = 2 }
 		}
 	}
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys, os, io
+import sys, os, io,math
 from stellarisTxtRead import *
 from copy import deepcopy
 from googletrans import Translator
@@ -26,6 +26,7 @@ def main():
   # weightTypes=["energy", "minerals", "food", "unity", "society_research", "physics_research", "engineering_research"]
   weightTypes=["energy", "minerals", "food", "base_res_adjacency", "society_research", "physics_research", "engineering_research", "science_adjacency"]
   resources=["energy", "minerals", "food","unity", "society_research", "physics_research", "engineering_research"]
+  inverseFactorComparedToMinerals=[4,1,4,4,2,2,2]
   exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_power_hub_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
   varsToMove=["Weight","Tile","Type"]
   pseudoInf=99999
@@ -34,6 +35,7 @@ def main():
   name_empire_standard_build_event=eventNameSpace.format(10)
   name_empire_special_build_event=eventNameSpace.format(11)
   name_planet_find_best=eventNameSpace.format(20)
+  name_empire_weights=eventNameSpace.format(30)
 
   outTag=TagList("namespace", eventNameSpace.format("")[:-1])
   storedValsRange=range(1,4)
@@ -258,6 +260,8 @@ def main():
     planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet", resource+"_mult_planet_base")
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_building")
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_pop")
+    planetFindBestEventImmediate.variableOp("set", resource+"_country_weight", "owner")
+    planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_country_weight")
 
   everyTileSearch=TagList()
   planetFindBestEventImmediate.add("every_tile", everyTileSearch)
@@ -334,6 +338,23 @@ def main():
   # outTag.deleteOnLowestLevel(checkEmpty)
   outTag.deleteOnLowestLevel(checkTotallyEmpty)
 
+  empireWeightsEvent=TagList("id",name_empire_weights)
+  outTag.add("country_event", empireWeightsEvent)
+  empireWeightsEvent.triggeredHidden()
+  empireWeightsEventImmediate=empireWeightsEvent.addReturn("immediate")
+  for resource in resources:
+    empireWeightsEventImmediate.add("determine_surplus_"+resource,"yes")
+    empireWeightsEventImmediate.variableOp("set",resource+"_country_weight",1)
+  empireWeightsEventImmediate.addComment("So far assuming all postive here! TODO: consider negative!")
+  for resource,factor in zip(resources,inverseFactorComparedToMinerals):
+    if resource!="minerals":
+      empireWeightsEventImmediate.variableOp("multiply",resource+"_country_weight", "minerals_log")
+      empireWeightsEventImmediate.variableOp("set","cgm_tmp", resource+"_log")
+      empireWeightsEventImmediate.variableOp("change","cgm_tmp", math.log(factor,2))
+      empireWeightsEventImmediate.variableOp("divide",resource+"_country_weight", "cgm_tmp")
+      empireWeightsEventImmediate.createReturnIf(variableOpNew("check",resource+"_country_weight", 2,">")).variableOp("set",resource+"_country_weight", 2)
+
+
 
   outputToFolderAndFile(outTag, "events", "cgm_auto.txt",2, "../CGM/buildings_script_source")
   if debug:
@@ -349,7 +370,7 @@ def main():
     checkResourceEffect=TagList()
     funNeg= lambda i:-pow(2,i)
     for resource in resources:
-      curEffect=checkResourceEffect.addReturn("test"+resource)
+      curEffect=checkResourceEffect.addReturn("determine_surplus_"+resource)
       if resource in ["energy", "minerals", "food"]:
         curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",0 ,"", "<")))
         curNegEffect=curEffect
@@ -378,7 +399,6 @@ def main():
       curEffect.variableOp("set", resource+"_log", i+1)
       curEffect.variableOp("set", resource+"_income", round(fun(i+0.5),3))
     outputToFolderAndFile(checkResourceEffect, "common/scripted_effects", "cgm_income_count_test{}.txt".format(name),2, "../CGM/buildings_script_source")
-
 
 
 
