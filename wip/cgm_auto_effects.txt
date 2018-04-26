@@ -1,0 +1,386 @@
+ #this = tile
+ #prev = planet
+ #prev.owner = country
+ #Build the building that fits the category defined in the name of each trigger.
+ #Check if unique buildings of that category can be build first and do so if possible
+ #Leave the 'succesful ->set flag' at the end as it is
+cgm_add_special_building = {
+	log = "trying to build special on tile [prev.cgm_curTile]"
+	add_building_construction = building_autochthon_monument
+	if = {
+		limit = {
+			or = { has_building = yes has_building_construction = yes }
+		}
+		prev.owner = { set_country_flag = cgm_auto_built }
+	}
+}
+add_energy_building = {
+	log = "trying to build standard on tile [prev.cgm_curTile]"
+	add_building_construction = building_power_plant_1
+	if = {
+		limit = {
+			or = { has_building = yes has_building_construction = yes }
+		}
+		prev.owner = { set_country_flag = cgm_auto_built }
+	}
+	##### I'm adding my checks below the above since it might need to be removed
+	if = { 
+		limit = { 
+			prev.owner = { 
+				NOT = { has_country_flag = energy_focus_2 } #always prioritize base resource buildings, if the country is in severe need of energy, since they are much cheaper
+			}				
+			OR = { 
+				new_building_content_enabled = no
+				AND = { 
+					new_building_content_enabled = yes
+					has_resource = { type = energy amount < 2 } #we do not want to build on more than 1 energy anything other than tile restricted buildings
+				}
+			}	
+			OR = { 
+				prev = {
+					is_capital = yes
+					has_capital_3 = yes
+					owner = { 
+						OR = { 
+							minerals = @empire_unique_mineral_cost_1
+							minerals > @empire_unique_mineral_cost_1
+						}
+						OR = { 
+							influence = @empire_unique_influence_cost_1
+							influence > @empire_unique_influence_cost_1
+						}					
+					}						
+					OR = { 
+						AND = { 
+							owner = { 
+								is_machine_empire = no
+								has_technology = "tech_galactic_markets"
+							}
+							NOT = { has_building = building_galactic_stock_exchange }
+						}	
+						AND = { 
+							owner = { 
+								is_machine_empire = yes
+								has_technology = "tech_probability_theory"
+							}
+							NOT = { has_building = building_probability_engine }
+						}
+					}
+				}				
+				prev = { 
+					OR = { 
+						owner = { 
+							OR = { 
+								minerals = @planet_unique_cost_1
+								minerals > @planet_unique_cost_1
+							}
+						}				
+						AND = { 
+							NOR = { 
+								has_building = building_power_hub_1	
+								has_building = building_power_hub_2
+								has_building = building_akx_worm_1
+							}						
+							owner = { 	
+								OR = { 
+									has_technology = "tech_power_hub_1"
+									has_technology = "tech_akx_worm_1"
+								}
+							}	
+							OR = {
+								owner = { has_pursuit_of_profit = yes }
+								count_tile = { #no point in building this if the planet has too few energy buildings on it
+									limit = { has_energy_building = yes } #need to make this trigger
+									count > 2
+								}
+							}	
+						}
+						AND = { 
+							owner = { has_diplomacy_alien_tourism = yes	}
+							NOT = { has_building = building_visitor_center }
+						}
+						AND = { 
+							owner = { 
+								has_synchronicity_hive_mind_synapse = yes							
+								OR = { 
+									minerals = @planet_unique_cost_3
+									minerals > @planet_unique_cost_3
+								}
+							}
+							NOT = { has_building = building_hive_synapse }	
+						}
+					}
+				}					
+			}	
+		}
+		if = { 
+			limit = { 
+				prev = {
+					is_capital = yes
+					has_capital_3 = yes
+					owner = { 
+						OR = { 
+							minerals = @empire_unique_mineral_cost_1
+							minerals > @empire_unique_mineral_cost_1
+						}
+						OR = { 
+							influence = @empire_unique_influence_cost_1
+							influence > @empire_unique_influence_cost_1
+						}					
+					}						
+					OR = { 
+						AND = { 
+							owner = { 
+								is_machine_empire = no
+								has_technology = "tech_galactic_markets"
+							}
+							NOT = { has_building = building_galactic_stock_exchange }
+						}	
+						AND = { 
+							owner = { 
+								is_machine_empire = yes
+								has_technology = "tech_probability_theory"
+							}
+							NOT = { has_building = building_probability_engine }
+						}
+					}
+				}	
+			}
+			if = { 
+				limit = { prev.owner = { is_machine_empire = no } }
+				add_building_construction = building_galactic_stock_exchange
+				else = { add_building_construction = building_probability_engine }
+			}		
+			else = { 
+				if = { 
+					limit = { 
+						prev = { 
+							OR = { 
+								owner = { 
+									OR = { 
+										minerals = @planet_unique_cost_1
+										minerals > @planet_unique_cost_1
+									}
+								}				
+								AND = { 
+									NOR = { 
+										has_building = building_power_hub_1	
+										has_building = building_power_hub_2
+										has_building = building_akx_worm_1
+									}						
+									owner = { 	
+										OR = { 
+											has_technology = "tech_power_hub_1"
+											has_technology = "tech_akx_worm_1"
+										}
+									}	
+									OR = {
+										owner = { has_pursuit_of_profit = yes }
+										count_tile = { #no point in building this if the planet has too few energy buildings on it
+											limit = { has_energy_building = yes } #need to make this trigger
+											count > 2
+										}
+									}	
+								}
+								AND = { 
+									owner = { has_diplomacy_alien_tourism = yes	}
+									NOT = { has_building = building_visitor_center }
+								}
+								AND = { 
+									owner = { 
+										has_synchronicity_hive_mind_synapse = yes							
+										OR = { 
+											minerals = @planet_unique_cost_3
+											minerals > @planet_unique_cost_3
+										}
+									}
+									NOT = { has_building = building_hive_synapse }	
+								}
+							}
+						}
+					}
+					if = { 
+						limit = { 
+							prev = { 
+								NOR = { 
+									has_building = building_power_hub_1	
+									has_building = building_power_hub_2
+									has_building = building_akx_worm_1
+								}						
+								owner = { 	
+									OR = { 
+										has_technology = "tech_power_hub_1"
+										has_technology = "tech_akx_worm_1"
+									}
+								}	
+								OR = {
+									owner = { has_pursuit_of_profit = yes }
+									count_tile = { 
+										limit = { has_energy_building = yes } 
+										count > 2
+									}
+								}	
+							}
+						}	
+						if = { 
+							limit = { prev.owner = { has_technology = "tech_akx_worm_1" } }
+							add_building_construction = building_akx_worm_1
+							else = { add_building_construction = building_power_hub_1 }
+						}
+						else = { 	
+							if = { 
+								limit = { 
+									prev = { 
+										owner = { has_diplomacy_alien_tourism = yes	}
+										NOT = { has_building = building_visitor_center }
+									}	
+								}
+								add_building_construction = building_visitor_center
+								else = { add_building_construction = building_hive_synapse }
+							}
+						}
+					}
+				}
+			}
+		}
+		else = { 	
+			if = {
+				limit = { 		
+					new_building_content_enabled = no
+					prev.owner = { 
+						OR = { 
+							minerals = @standard_resource_cost_tier_1
+							minerals > @standard_resource_cost_tier_1
+						}	
+					}	
+				}
+				add_building_construction = building_power_plant_1
+				else = {
+					if = { 
+						limit = { 
+							has_resource = { type = energy amount > 0 }
+							OR = { 
+								prev.owner = { 
+									minerals = @tile_restricted_t1_cost
+									minerals > @tile_restricted_t1_cost
+								}	
+							}						
+						}
+						if = { 
+							limit = { has_resource = { type = energy amount = 1 } }
+							add_building_construction = building_isotope_refinery_1_1
+							else = { 
+								if = { 
+									limit = { has_resource = { type = energy amount = 2 } }
+									add_building_construction = building_isotope_refinery_1_2
+									else = { 
+										if = { 
+											limit = { has_resource = { type = energy amount = 3 } }
+											add_building_construction = building_isotope_refinery_1_3
+											else = { 
+												if = { 
+													limit = { has_resource = { type = energy amount = 4 } }
+													add_building_construction = building_isotope_refinery_1_4									
+													else = { 
+														if = { 
+															limit = { has_resource = { type = energy amount = 5 } }
+															add_building_construction = building_isotope_refinery_1_5
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}	
+						else = { 
+							if = { 
+								limit = { 
+									has_deposit = no
+									prev.owner = { 
+										OR = { 
+											minerals = @non_restricted_t1_cost
+											minerals > @non_restricted_t1_cost
+										}													
+									}	
+								}
+								add_building_construction = building_economic_district_1
+							}
+						}
+					}
+				}
+			}		
+		}
+	}
+}	
+add_minerals_building = {
+	log = "trying to build standard on tile [prev.cgm_curTile]"
+	add_building_construction = building_mining_network_1
+	if = {
+		limit = {
+			or = { has_building = yes has_building_construction = yes }
+		}
+		prev.owner = { set_country_flag = cgm_auto_built }
+	}
+}
+add_food_building = {
+	log = "trying to build standard on tile [prev.cgm_curTile]"
+	add_building_construction = building_hydroponics_farm_1
+	if = {
+		limit = {
+			or = { has_building = yes has_building_construction = yes }
+		}
+		prev.owner = { set_country_flag = cgm_auto_built }
+	}
+}
+add_base_res_adjacency_building = {
+	log = "trying to build standard on tile [prev.cgm_curTile]"
+	add_building_construction = building_power_hub_1
+	if = {
+		limit = {
+			or = { has_building = yes has_building_construction = yes }
+		}
+		prev.owner = { set_country_flag = cgm_auto_built }
+	}
+}
+add_society_research_building = {
+	log = "trying to build standard on tile [prev.cgm_curTile]"
+	add_building_construction = building_basic_science_lab_1
+	if = {
+		limit = {
+			or = { has_building = yes has_building_construction = yes }
+		}
+		prev.owner = { set_country_flag = cgm_auto_built }
+	}
+}
+add_physics_research_building = {
+	log = "trying to build standard on tile [prev.cgm_curTile]"
+	add_building_construction = building_basic_science_lab_1
+	if = {
+		limit = {
+			or = { has_building = yes has_building_construction = yes }
+		}
+		prev.owner = { set_country_flag = cgm_auto_built }
+	}
+}
+add_engineering_research_building = {
+	log = "trying to build standard on tile [prev.cgm_curTile]"
+	add_building_construction = building_basic_science_lab_1
+	if = {
+		limit = {
+			or = { has_building = yes has_building_construction = yes }
+		}
+		prev.owner = { set_country_flag = cgm_auto_built }
+	}
+}
+add_science_adjacency_building = {
+	log = "trying to build standard on tile [prev.cgm_curTile]"
+	add_building_construction = building_basic_science_lab_1
+	if = {
+		limit = {
+			or = { has_building = yes has_building_construction = yes }
+		}
+		prev.owner = { set_country_flag = cgm_auto_built }
+	}
+}
