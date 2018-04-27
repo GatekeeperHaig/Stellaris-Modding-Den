@@ -245,7 +245,7 @@ def main():
   planetFindBestEventImmediate.add("check_planet_modifiers_gse","yes")
 
   for resource in resources:
-    planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet_building", 1)
+    planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet_building", 0)
   planetFindBestEventImmediate.add("check_planet_bonus_buildings","yes")
   planetFindBestEventImmediate.add("check_planet_bonus_buildings_pe","yes")
   planetFindBestEventImmediate.add("check_planet_bonus_buildings_am","yes")
@@ -253,15 +253,16 @@ def main():
   planetFindBestEventImmediate.add("check_planet_bonus_buildings_ag","yes")
 
   for resource in resources:
-    planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet_pop", 1)
+    planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet_pop", 0)
   planetFindBestEventImmediate.add("calculate_average_pop_multipliers","yes")
 
   for resource in resources:
     planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet", resource+"_mult_planet_base")
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_building")
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_pop")
-    planetFindBestEventImmediate.variableOp("set", resource+"_country_weight", "owner")
-    planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_country_weight")
+    # planetFindBestEventImmediate.variableOp("set", resource+"_country_weight", "owner")
+    #TODO! ACTIVATE AGAIN: ALSO MAKE SURE THEY ARE ALWAYS COMPUTED FIRST
+    # planetFindBestEventImmediate.variableOp("multiply", resource+"_mult_planet", resource+"_country_weight")
 
   everyTileSearch=TagList()
   planetFindBestEventImmediate.add("every_tile", everyTileSearch)
