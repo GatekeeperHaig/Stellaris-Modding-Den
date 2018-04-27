@@ -14,7 +14,6 @@ from functools import reduce
 #TODO: Prio List how to use this:
 # 1. Core world important+medium important new building 2. Core world upgrades 3. Core world not so important building 4. Sector new buildings 5. Sector upgrades
 #possible far away todo: Replace worst existing building with (empire) unique
-#TODO: add breaks and check if they work correctly
 #TODO: event target: global -> local
 eventNameSpace="cgm_auto.{!s}"
 nameBase="cgm_auto_{!s}"
@@ -133,6 +132,7 @@ def main():
   redoCalcForWorstTile.createEvent(name_planet_find_best,"planet_event")
   if debug:
     buildSpecial.add("log",'"worst tile::[this.cgm_worstTile]"')
+    buildSpecial.add("log",'"worst weight::[this.cgm_worstWeight]"')
   buildSpecial.variableOp("set", "cgm_curTile",0)
   buildSpecialTile=buildSpecial.addReturn("every_tile")
   buildSpecialTile.addReturn("prev").variableOp("change", "cgm_curTile",1)
@@ -271,7 +271,7 @@ def main():
   planetFindBestEventImmediate.add("every_tile", everyTileSearch)
   curPrev=everyTileSearch.addReturn("prev")
   curPrev.variableOp("change", "cgm_curTile", 1)
-  everyTileSearch=everyTileSearch.createReturnIf(TagList("has_building","no"))
+  everyTileSearch=everyTileSearch.createReturnIf(TagList("has_building","no").add("has_blocker", "no"))
   # curPrev.variableOp("set", "cgm_curWeight", 0)
   # for weight in weightTypes:
   #   curPrev.variableOp("set", weight+"_weight", 0)
@@ -419,7 +419,7 @@ def main():
   outputToFolderAndFile(outTag, "events", "cgm_auto.txt",2, "../CGM/buildings_script_source")
   if debug:
     outputToFolderAndFile(outTriggers, "common/scripted_triggers", "cgm_auto_trigger_template.txt",2, "../CGM/buildings_script_source")
-    outputToFolderAndFile(outEffects, "common/scripted_effects", "cgm_auto_effects_template.txt",2, "../CGM/buildings_script_source")
+    # outputToFolderAndFile(outEffects, "common/scripted_effects", "cgm_auto_effects_template.txt",2, "../CGM/buildings_script_source")
   # with open("test.txt", "w") as file:
   #   outTag.writeAll(file,args())
 
