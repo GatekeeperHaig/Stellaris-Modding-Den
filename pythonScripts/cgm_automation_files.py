@@ -62,6 +62,8 @@ def main():
   empireMainBuildEvent.triggeredHidden()
   empireMainBuildEventImmediate=empireMainBuildEvent.addReturn("immediate")
   empireMainBuildEventImmediate.add("remove_country_flag", "cgm_auto_built")
+  empireMainBuildEventImmediate.addComment("TODO: only redo empire income checks after certain time has passed")
+  empireMainBuildEventImmediate.createEvent(name_empire_weights)
   empireMainBuildEventImmediate.add("set_country_flag", "display_low_tier_flag", "#The buildings we create are otherwise probably unavaiable due to direct build. Later removed again.")
   empireMainBuildEventImmediate.add("set_country_flag", "cgm_core_world_auto", "#searching core worlds for standard buildings")
   empireMainBuildEventImmediate.addComment("Search for possible Special buildings:")
@@ -201,7 +203,7 @@ def main():
   findBestPlanet.add("cgm_search_for_special_building", "yes")
   outEffects.addComment("Special SEARCH effect:\n# this = planet\n#  prev/owner = country")
   effect=outEffects.addReturn("cgm_search_for_special_building")
-  effect.addComment("TODO search for special building!")
+  effect.addComment("Search for special building!")
   effect.addComment("define tmp global event target to the planet we want to build on and a tile specification on that scope. We can later use those to build when this weight is better than the general one")
   if debug:
     effect.add("log", '"searching for special buildings on planet [this.GetName]"')
@@ -216,9 +218,6 @@ def main():
   chooseSpecialBuilding=effect.createReturnIf(variableOpNew("check", "cgm_special_bestWeight", "prev", ">"))
   chooseSpecialBuilding.addReturn("prev").variableOp("set","cgm_special_bestWeight", "prev").variableOp("set","cgm_special_bestBuilding", 2)
   chooseSpecialBuilding.add("save_global_event_target_as", "cgm_best_planet_for_special")
-    # (findBestPlanet.addReturn("prev")).variableOp("set","cgm_special_bestWeight", 20, "=", " #TODO just a test!")
-    # findBestPlanet.add("save_global_event_target_as", "cgm_best_planet_for_special"," #TODO just a test!")
-
 
 
 
@@ -264,9 +263,9 @@ def main():
     planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet", resource+"_mult_planet_base")
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_building")
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_pop")
-    # planetFindBestEventImmediate.variableOp("set", resource+"_country_weight", "owner")
+    planetFindBestEventImmediate.variableOp("set", resource+"_country_weight", "owner")
     #TODO! ACTIVATE AGAIN: ALSO MAKE SURE THEY ARE ALWAYS COMPUTED FIRST
-    # planetFindBestEventImmediate.variableOp("multiply", resource+"_mult_planet", resource+"_country_weight")
+    planetFindBestEventImmediate.variableOp("multiply", resource+"_mult_planet", resource+"_country_weight")
 
   everyTileSearch=TagList()
   planetFindBestEventImmediate.add("every_tile", everyTileSearch)
@@ -352,7 +351,6 @@ def main():
   empireWeightsEventImmediate.add("check_income","yes")
   for resource in resources:
     empireWeightsEventImmediate.variableOp("set",resource+"_country_weight",1)
-  # empireWeightsEventImmediate.addComment("So far assuming all postive here! TODO: consider negative!")
   empireWeightsEventImmediate.addComment("First negative part test:")
   allPosLimit=TagList()
   allPosNor=allPosLimit.addReturn("NOR")
@@ -383,25 +381,49 @@ def main():
     # empireWeightsEventImmediate=empireWeightsEventImmediate.addReturn("else")
 
 
-  empireWeightsEventImmediate=empireWeightsEventImmediate.createReturnIf(allPosLimit)
-  empireWeightsEventImmediate.addComment("All positive weightings:")
+  empireWeightsEventAllPositive=empireWeightsEventImmediate.createReturnIf(allPosLimit)
+  empireWeightsEventAllPositive.addComment("All positive weightings:")
   for resource,factor in zip(resources,inverseFactorComparedToMinerals):
     if resource!="minerals":
-      empireWeightsEventImmediate.addComment(resource.upper())
-      empireWeightsEventImmediate.variableOp("multiply",resource+"_country_weight", "minerals_log")
-      empireWeightsEventImmediate.variableOp("set","cgm_tmp", resource+"_log")
-      empireWeightsEventImmediate.variableOp("change","cgm_tmp", math.log(factor,2))
-      empireWeightsEventImmediate.variableOp("divide",resource+"_country_weight", "cgm_tmp")
-      empireWeightsEventImmediate.createReturnIf(variableOpNew("check",resource+"_country_weight", 2,">")).variableOp("set",resource+"_country_weight", 2)
+      empireWeightsEventAllPositive.addComment(resource.upper())
+      empireWeightsEventAllPositive.variableOp("multiply",resource+"_country_weight", "minerals_log")
+      empireWeightsEventAllPositive.variableOp("set","cgm_tmp", resource+"_log")
+      empireWeightsEventAllPositive.variableOp("change","cgm_tmp", math.log(factor,2))
+      empireWeightsEventAllPositive.variableOp("divide",resource+"_country_weight", "cgm_tmp")
+      empireWeightsEventAllPositive.createReturnIf(variableOpNew("check",resource+"_country_weight", 2,">")).variableOp("set",resource+"_country_weight", 2)
+
+  if debug:
+    for resource in resources:
+      empireWeightsEventImmediate.add("log", '"'+resource+"_country_weight:[this."+resource+'_country_weight]"')
+
+  newTileCheckFile=TagList()
+  tileWeightSummary=newTileCheckFile.addReturn("calculate_tile_weight")
+  # tileWeightSummary.createReturnIf(TagList("OR", TagList("has_deposit", "yes").add("any_neighboring_tile"))) #more efford than gain!
+  for resource in resources:
+    if resource=="unity":
+      tileWeightSummary.addReturn("prev").variableOp("set", resource+"_weight", 0)
+      tileWeightSummary.addComment("Unity is layer subtracted from other weights on this tile as we build unity on the 'worst' tile. Thus it must not have a base value")
+    else:
+      tileWeightSummary.addReturn("prev").variableOp("set", resource+"_weight", 3)
+    tileWeightSummary.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", 0, "", ">"))).add("check_"+resource+"_deposit","yes")
+    curEffect=newTileCheckFile.addReturn("check_"+resource+"_deposit")
+    for i in range(1,10):
+      curEffect=curEffect.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", i, "", "=")))
+      # curEffect.add("prev", variableOpNew("change", resource+"_weight", round(i*math.sqrt(i),3)))
+      curEffect.add("prev", variableOpNew("change", resource+"_weight", 2*i))
+      curEffect=curEffect.addReturn("else")
+  newTileCheckFile.deleteOnLowestLevel(checkEmpty)
 
 
-
+  outputToFolderAndFile(newTileCheckFile, "common/scripted_effects", "cgm_new_tile_checks.txt",2, "../CGM/buildings_script_source")
   outputToFolderAndFile(outTag, "events", "cgm_auto.txt",2, "../CGM/buildings_script_source")
   if debug:
     outputToFolderAndFile(outTriggers, "common/scripted_triggers", "cgm_auto_trigger_template.txt",2, "../CGM/buildings_script_source")
     outputToFolderAndFile(outEffects, "common/scripted_effects", "cgm_auto_effects_template.txt",2, "../CGM/buildings_script_source")
   # with open("test.txt", "w") as file:
   #   outTag.writeAll(file,args())
+
+
 
 
 
