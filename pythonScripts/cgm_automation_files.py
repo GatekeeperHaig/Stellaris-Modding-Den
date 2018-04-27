@@ -30,6 +30,10 @@ def main():
   exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_power_hub_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
   varsToMove=["Weight","Tile","Type"]
   pseudoInf=99999
+  countToNeg=range(8)
+  countToPos=range(15)
+  subCount=range(1,10)
+  starvationWeight=100
 
   name_empire_main_build_event=eventNameSpace.format(0)
   name_empire_standard_build_event=eventNameSpace.format(10)
@@ -345,10 +349,45 @@ def main():
   empireWeightsEventImmediate=empireWeightsEvent.addReturn("immediate")
   for resource in resources:
     empireWeightsEventImmediate.add("determine_surplus_"+resource,"yes")
+  empireWeightsEventImmediate.add("check_income","yes")
+  for resource in resources:
     empireWeightsEventImmediate.variableOp("set",resource+"_country_weight",1)
-  empireWeightsEventImmediate.addComment("So far assuming all postive here! TODO: consider negative!")
+  # empireWeightsEventImmediate.addComment("So far assuming all postive here! TODO: consider negative!")
+  empireWeightsEventImmediate.addComment("First negative part test:")
+  allPosLimit=TagList()
+  allPosNor=allPosLimit.addReturn("NOR")
+  for resource in ["minerals", "energy", "food"]:
+    negativeResourceSub=empireWeightsEventImmediate
+    negativeResourceSub.addComment(resource.upper()+" CHECK NEGATIVE")
+    negCond=variableOpNew("check", resource+"_income", 0, "<")
+    negativeResourceSub=negativeResourceSub.createReturnIf(negCond)
+    allPosNor.addTagList(negCond)
+    negativeResourceSub.variableOp("set", "cgm_tmp",  resource+"_income")
+    negativeResourceSub.variableOp("multiply", "cgm_tmp",  -1)
+    negativeResourceSub.variableOp("set", "cgm_months_to_starvation",  resource+"_reserve")
+    negativeResourceSub.variableOp("divide", "cgm_months_to_starvation",  resource+"_income")
+    negativeResourceSub=negativeResourceSub.createReturnIf(variableOpNew("check", "cgm_months_to_starvation", 2, "<")).variableOp("change", resource+"_country_weight", starvationWeight)
+    negativeResourceSub=negativeResourceSub.addReturn("else")
+    negativeResourceSub.variableOp("set", "cgm_tmp",  starvationWeight)
+    negativeResourceSub.variableOp("divide", "cgm_tmp",  "cgm_months_to_starvation")
+    negativeResourceSub.variableOp("change", resource+"_country_weight", "cgm_tmp")
+    # food_reserve
+
+
+    # empireWeightsEventImmediate=empireWeightsEventImmediate.createReturnIf(variableOpNew("check", resource+"_log", 0, "<"))
+    # empireWeightsEventImmediate.addComment("Give a factor of 2-4 depending on how negative we are.")
+    # empireWeightsEventImmediate.variableOp("set", "cgm_tmp",  resource+"_log")
+    # empireWeightsEventImmediate.variableOp("divide", "cgm_tmp",  (-countToNeg[-1]-1)/2)
+    # empireWeightsEventImmediate.variableOp("change", "cgm_tmp",  1)
+    # empireWeightsEventImmediate.variableOp("change", resource+"_country_weight", "cgm_tmp")
+    # empireWeightsEventImmediate=empireWeightsEventImmediate.addReturn("else")
+
+
+  empireWeightsEventImmediate=empireWeightsEventImmediate.createReturnIf(allPosLimit)
+  empireWeightsEventImmediate.addComment("All positive weightings:")
   for resource,factor in zip(resources,inverseFactorComparedToMinerals):
     if resource!="minerals":
+      empireWeightsEventImmediate.addComment(resource.upper())
       empireWeightsEventImmediate.variableOp("multiply",resource+"_country_weight", "minerals_log")
       empireWeightsEventImmediate.variableOp("set","cgm_tmp", resource+"_log")
       empireWeightsEventImmediate.variableOp("change","cgm_tmp", math.log(factor,2))
@@ -375,7 +414,7 @@ def main():
       if resource in ["energy", "minerals", "food"]:
         curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",0 ,"", "<")))
         curNegEffect=curEffect
-        for i in range(8):
+        for i in countToNeg:
           curNegEffect=curNegEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",funNeg(i) ,"", ">")))
           curNegEffect.variableOp("set", resource+"_log", -i)
           curNegEffect.variableOp("set", resource+"_income", round(funNeg(i-0.5),3))
@@ -384,12 +423,12 @@ def main():
         curNegEffect.variableOp("set", resource+"_income", round(funNeg(i+0.5),3))
           # curEffect.variableOp("set", resource+"_income", -1)
         curEffect=curEffect.addReturn("else")
-      for i in range(15):
+      for i in countToPos:
         curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",fun(i) ,"", "<")))
         curEffect.variableOp("set", resource+"_log", i)
         if i>3 and resource=="minerals":
           curSubEffect=curEffect
-          for j in range(1,10):
+          for j in subCount:
             curSubEffect=curSubEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",round(fun(i-1+j/10),3) ,"", "<")))
             curSubEffect.variableOp("set", resource+"_income", round(fun(i-1+(j-0.5)/10),3))
             curSubEffect=curSubEffect.addReturn("else")
