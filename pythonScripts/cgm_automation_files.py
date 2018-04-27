@@ -153,13 +153,16 @@ def main():
 
 
   # buildSomeThing.add("else", TagList("set_country_flag", "cgm_noAutobuildPlanetFound"))
+  ifTypeBest=planetBuildSomeThing
   for i, weightType in enumerate(weightTypes):
-    ifTypeBest=TagList("limit", TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1))) #todo maybe do else -> when everything is done
-    planetBuildSomeThing.add("if", ifTypeBest)
+    ifTypeBest=ifTypeBest.createReturnIf(TagList("limit", TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1))))
+    # ifTypeBest= 
+    # planetBuildSomeThing.add("if", ifTypeBest)
     ifTypeBest.variableOp("set", "cgm_curTile",0)
     everyTileBuild=ifTypeBest.addReturn("every_tile")
     everyTileBuild.addReturn("prev").variableOp("change", "cgm_curTile",1)
     everyTileBuild.createReturnIf(TagList("prev",variableOpNew("check", "cgm_curTile", "cgm_bestTile_1"))).add("add_"+weightType+"_building","yes" )
+    ifTypeBest=ifTypeBest.addReturn("else")
     
     effect=TagList()
     outEffects.insert(0,"add_"+weightType+"_building",effect)
@@ -167,6 +170,7 @@ def main():
       effect.add("log", '"trying to build standard on tile [prev.cgm_curTile]"')
     effect.add("add_building_construction",exampleBuildings[i])
     effect.createReturnIf(TagList("or", TagList("has_building","yes").add("has_building_construction", "yes"))).add("prevprev",TagList("set_country_flag", "cgm_auto_built"))
+    
   curSubLevel=planetBuildSomeThing
   for j in reversed(storedValsRange[1:]):
     locSubIf=curSubLevel.createReturnIf(variableOpNew("check", "cgm_bestWeight_{!s}".format(j), 0, ">"))
