@@ -23,10 +23,12 @@ def main():
   os.chdir(os.path.dirname(__file__))
   
   # weightTypes=["energy", "minerals", "food", "unity", "society_research", "physics_research", "engineering_research"]
-  weightTypes=["energy", "minerals", "food", "base_res_adjacency", "society_research", "physics_research", "engineering_research", "science_adjacency"]
+  weightTypes=["energy", "minerals", "food", "society_research", "physics_research", "engineering_research"]
+  for weight in deepcopy(weightTypes):
+    weightTypes.append(weight+"_adjacency")
   resources=["energy", "minerals", "food","unity", "society_research", "physics_research", "engineering_research"]
   inverseFactorComparedToMinerals=[4,1,4,4,2,2,2]
-  exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_power_hub_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
+  exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_power_hub_1","building_power_hub_1","building_power_hub_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
   varsToMove=["Weight","Tile","Type"]
   pseudoInf=99999
   countToNeg=range(8)
@@ -419,7 +421,7 @@ def main():
   outputToFolderAndFile(outTag, "events", "cgm_auto.txt",2, "../CGM/buildings_script_source")
   if debug:
     outputToFolderAndFile(outTriggers, "common/scripted_triggers", "cgm_auto_trigger_template.txt",2, "../CGM/buildings_script_source")
-    # outputToFolderAndFile(outEffects, "common/scripted_effects", "cgm_auto_effects_template.txt",2, "../CGM/buildings_script_source")
+    outputToFolderAndFile(outEffects, "common/scripted_effects/WIP/", "cgm_auto_effects_template.txt",2, "../CGM/buildings_script_source")
   # with open("test.txt", "w") as file:
   #   outTag.writeAll(file,args())
 
