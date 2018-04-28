@@ -97,7 +97,9 @@ event = {
 							# these events occur one after the other.
 							planet_event = { id = spawn_engine_1.1 }
 							planet_event = { id = spawn_engine_1.2 }
-							planet_event = { id = spawn_engine_1.3 days = 1 }
+							planet_event = { id = spawn_engine_1.3 days = 1 } #these events are failsafe - in case there was some issue with the deposit/blocker spawn. 
+							planet_event = { id = spawn_engine_1.3 days = 30 } 
+							planet_event = { id = spawn_engine_1.3 days = 60 }
 						}
 					}
 				}
@@ -197,6 +199,50 @@ planet_event = {
 				}						
 			}
 			reroll_deposits = yes	
+			if = { 
+				limit = { NOT = { any_tile = { has_deposit = yes } } }
+				random_tile = { 
+					planetary_diversity_planetary_resource_spawn_table = yes
+				}	
+			}		
+			while = {
+				limit = {
+					OR = {
+						AND = {
+							planet_size > 19
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 6
+							}
+						}
+						AND = {
+							planet_size > 15
+							planet_size < 19
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 5
+							}
+						}
+						AND = {
+							planet_size > 10
+							planet_size < 16
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 4
+							}
+						}
+						AND = {
+							planet_size < 11
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 3
+							}
+						}
+						
+					}
+				}
+				reroll_deposits = yes	
+			}							
 			else = { 
 				if = { 
 					limit = { 
@@ -306,17 +352,14 @@ planet_event = {
 }
 planet_event = {
 	id = spawn_engine_1.3
-	hide_window = yes
+	hide_window = yes	
 	is_triggered_only = yes
 	
-	trigger = {
-		is_colonizable = yes
-		OR = { 
-			is_colony = no
-			owner = { is_ai = yes }
-		}	
+	trigger = {		
+		habitable_planet = yes
 		OR = {
 			NOT = { any_tile = { has_blocker = yes } }
+			NOT = { any_tile = { has_deposit = yes } }
 			AND = {
 				planet_size > 19
 				count_tile = {
@@ -347,6 +390,36 @@ planet_event = {
 					count < 3
 				}
 			}
+			AND = {
+				planet_size > 19
+				count_tile = {
+					limit = { has_deposit = yes }
+					count < 6
+				}
+			}
+			AND = {
+				planet_size > 15
+				planet_size < 19
+				count_tile = {
+					limit = { has_deposit = yes }
+					count < 5
+				}
+			}
+			AND = {
+				planet_size > 10
+				planet_size < 16
+				count_tile = {
+					limit = { has_deposit = yes }
+					count < 4
+				}
+			}
+			AND = {
+				planet_size < 11
+				count_tile = {
+					limit = { has_deposit = yes }
+					count < 3
+				}
+			}			
 		}
 	}
 	immediate = {
@@ -356,7 +429,13 @@ planet_event = {
 				limit = { has_building = no has_pop = no }
 				planetary_diversity_tile_blocker_spawn_table = yes
 			}	
-		}		
+		}	
+		if = { 
+			limit = { NOT = { any_tile = { has_deposit = yes } } }
+			random_tile = { 
+				planetary_diversity_planetary_resource_spawn_table = yes
+			}	
+		}				
 		while = {
 			limit = {
 				OR = {
@@ -390,6 +469,7 @@ planet_event = {
 							count < 3
 						}
 					}
+					
 				}
 			}
 			random_tile = {
@@ -397,5 +477,43 @@ planet_event = {
 				planetary_diversity_tile_blocker_spawn_table = yes
 			}
 		}
+		while = {
+			limit = {
+				OR = {
+					AND = {
+						planet_size > 19
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 6
+						}
+					}
+					AND = {
+						planet_size > 15
+						planet_size < 19
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 5
+						}
+					}
+					AND = {
+						planet_size > 10
+						planet_size < 16
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 4
+						}
+					}
+					AND = {
+						planet_size < 11
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 3
+						}
+					}
+					
+				}
+			}
+			reroll_deposits = yes			
+		}		
 	}
 }
