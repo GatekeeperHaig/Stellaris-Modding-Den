@@ -14,6 +14,7 @@ event = {
 	#This event fires only once.
 	immediate = {
 		set_global_flag = new_worlds_active #this sets a global flag for this mod, to be used by other mods and the engine
+		set_timed_global_flag = { flag = recheck_deposits days = 60 }
 		every_planet = {
 			if = {
 				limit = { is_star = yes }
@@ -100,8 +101,7 @@ planet_event = {
 	
 	immediate = {
 		if = {
-			limit = { is_vanilla_habitable_planet = yes }
-			set_timed_planet_flag = { flag = recheck_deposits days = 60 }
+			limit = { is_vanilla_habitable_planet = yes }			
 			if = {
 				limit = {
 					OR = {
@@ -133,7 +133,7 @@ planet_event = {
 			new_worlds_adjust_inhabitable_planet_size = yes
 			else = { 
 				if = {
-					limit = { is_colonizable = no }
+					limit = { is_colonizable = no }					
 					new_worlds_uninhabitable_planets_spawn_table = yes
 					new_worlds_adjust_uninhabitable_planet_size = yes
 					if = {
@@ -360,11 +360,16 @@ planet_event = {
 	#is_triggered_only = yes
 	
 	trigger = {
-		has_planet_flag = recheck_deposits
-		is_colonizable = yes
+		has_global_flag = recheck_deposits		
 		OR = { 
-			is_colony = no
-			owner = { is_ai = yes }
+			habitable_planet = yes
+			OR = { 
+				is_colony = no
+				AND = { 
+					exists = owner
+					owner = { is_ai = yes }
+				}	
+			}	
 		}	
 		OR = {
 			NOT = { any_tile = { has_blocker = yes } }
