@@ -54,38 +54,6 @@ country_event = {
 	
 	immediate = { 
 		set_global_flag = direct_build_enabled
-		#if = {
-		#	limit = { NOT = { has_global_flag = deposits_converted } } 
-		#	every_planet = {
-		#		limit = { 
-		#			NOT = { has_planet_flag = deposits_converted }
-		#			OR = {
-		#				is_colonizable = yes
-		#				is_colony = yes							
-		#			}	
-		#			any_tile = { 
-		#				has_deposit = yes 
-		#				has_any_tile_strategic_resource = no
-		#			}								
-		#		}
-		#		set_variable = { which = energy_tile_resource value = 0 }	
-		#		set_variable = { which = minerals_tile_resource value = 0 }
-		#		set_variable = { which = food_tile_resource value = 0 }
-		#		set_variable = { which = unity_tile_resource value = 0 }
-		#		set_variable = { which = society_research_tile_resource value = 0 }
-		#		set_variable = { which = physics_research_tile_resource value = 0 }
-		#		set_variable = { which = engineering_research_tile_resource value = 0 }
-		#		every_tile = {
-		#			limit = { 
-		#				has_deposit = yes 
-		#				has_any_tile_strategic_resource = no
-		#			}
-		#			convert_deposits = yes					
-		#		}	
-		#		set_planet_flag = deposits_converted
-		#	}			
-		#	set_global_flag = cgm_resources_converted
-		#}		
 		every_playable_country = { 
 			limit = { NOT = { has_country_flag = ai_routines_enabled } }
 			set_country_flag = ai_routines_enabled
@@ -97,10 +65,7 @@ country_event = {
 		name = cgm_buildings_preset.enable_new_building_content.name
 		custom_gui = "cgm_option"
 		custom_tooltip = cgm_buildings_preset.enable_new_building_content.desc
-		trigger = { 
-			#has_global_flag = cgm_game_start
-			NOT = { has_global_flag = new_building_content_active }
-		}			
+		trigger = { NOT = { has_global_flag = new_building_content_active } }			
 		hidden_effect = { 
 			set_global_flag = new_building_content_active	
 			set_global_flag = overhauled_building_stats_active			
@@ -124,7 +89,6 @@ country_event = {
 		custom_gui = "cgm_option"
 		custom_tooltip = cgm_buildings_preset.keep_vanilla_building_content.desc
 		trigger = { 
-			#has_global_flag = cgm_game_start
 			NOR = { 
 				has_global_flag = new_building_content_active
 				has_global_flag = vanilla_building_content_active
@@ -160,7 +124,55 @@ country_event = {
 			remove_global_flag = overhauled_building_stats_active
 			country_event = { id = core_game_mechanics_and_ai_base.1 }
 		}
-	}			
+	}	
+	option = {
+		name = cgm_ai_preset.cgm_ai_routines.name
+		custom_gui = "cgm_option"
+		custom_tooltip = cgm_ai_preset.cgm_ai_routines.desc
+		trigger = { 
+			OR = { 
+				has_global_flag = new_building_content_active
+				has_global_flag = vanilla_building_content_active
+			}
+			NOT = { has_global_flag = cgm_ai_routines }			
+		}	
+		hidden_effect = { 
+			set_global_flag = cgm_ai_routines			
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
+	}		
+	option = {
+		name = cgm_ai_preset.mixed_ai_routines.name
+		custom_gui = "cgm_option"
+		custom_tooltip = cgm_ai_preset.mixed_ai_routines.desc
+		trigger = { 
+			OR = { 
+				has_global_flag = new_building_content_active
+				has_global_flag = vanilla_building_content_active
+			}
+			NOT = { has_global_flag = mixed_ai_routines }			
+		}	
+		hidden_effect = { 
+			set_global_flag = mixed_ai_routines			
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
+	}
+	option = {
+		name = cgm_ai_preset.vanilla_ai_routines.name
+		custom_gui = "cgm_option"
+		custom_tooltip = cgm_ai_preset.vanilla_ai_routines.desc
+		trigger = { 
+			OR = { 
+				has_global_flag = new_building_content_active
+				has_global_flag = vanilla_building_content_active
+			}
+			NOT = { has_global_flag = vanilla_ai_routines }			
+		}	
+		hidden_effect = { 
+			set_global_flag = vanilla_ai_routines			
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
+	}		
 	option = {
 		name = cgm_buildings_option.advanced_building_configuration.name
 		custom_gui = "cgm_option"
@@ -170,9 +182,14 @@ country_event = {
 				has_global_flag = vanilla_building_content_active
 				has_global_flag = new_building_content_active
 			}	
+			OR = { 
+				has_global_flag = cgm_ai_routines
+				has_global_flag = vanilla_ai_routines
+				has_global_flag = mixed_ai_routines
+			}				
 		}	
 		hidden_effect = { 			
-			country_event = { id = core_game_mechanics_and_ai_base.10 } ### gratak - this is where the configuration menu should be called. You can insert it in this file using this namespace or in another file. 
+			country_event = { id = core_game_mechanics_and_ai_base.10 } 
 		}
 	}					
 	option = {
@@ -184,6 +201,11 @@ country_event = {
 				has_global_flag = vanilla_building_content_active
 				has_global_flag = new_building_content_active
 			}	
+			OR = { 
+				has_global_flag = cgm_ai_routines
+				has_global_flag = vanilla_ai_routines
+				has_global_flag = mixed_ai_routines
+			}				
 		}			
 	}		
 }
