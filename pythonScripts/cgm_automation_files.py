@@ -15,6 +15,7 @@ from functools import reduce
 # 1. Core world important+medium important new building 2. Core world upgrades 3. Core world not so important building 4. Sector new buildings 5. Sector upgrades
 #possible far away todo: Replace worst existing building with (empire) unique
 #TODO: event target: global -> local
+#todo:we need to add a special effect for AI, which optimizes capitals #remove them on placement and instant create them anew 
 eventNameSpace="cgm_auto.{!s}"
 nameBase="cgm_auto_{!s}"
 def main():
@@ -153,13 +154,16 @@ def main():
 
 
   # buildSomeThing.add("else", TagList("set_country_flag", "cgm_noAutobuildPlanetFound"))
+  ifTypeBest=planetBuildSomeThing
   for i, weightType in enumerate(weightTypes):
-    ifTypeBest=TagList("limit", TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1))) #todo maybe do else -> when everything is done
-    planetBuildSomeThing.add("if", ifTypeBest)
+    ifTypeBest=ifTypeBest.createReturnIf(TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1)))
+    # ifTypeBest= 
+    # planetBuildSomeThing.add("if", ifTypeBest)
     ifTypeBest.variableOp("set", "cgm_curTile",0)
     everyTileBuild=ifTypeBest.addReturn("every_tile")
     everyTileBuild.addReturn("prev").variableOp("change", "cgm_curTile",1)
     everyTileBuild.createReturnIf(TagList("prev",variableOpNew("check", "cgm_curTile", "cgm_bestTile_1"))).add("add_"+weightType+"_building","yes" )
+    ifTypeBest=ifTypeBest.addReturn("else")
     
     effect=TagList()
     outEffects.insert(0,"add_"+weightType+"_building",effect)
@@ -167,6 +171,7 @@ def main():
       effect.add("log", '"trying to build standard on tile [prev.cgm_curTile]"')
     effect.add("add_building_construction",exampleBuildings[i])
     effect.createReturnIf(TagList("or", TagList("has_building","yes").add("has_building_construction", "yes"))).add("prevprev",TagList("set_country_flag", "cgm_auto_built"))
+
   curSubLevel=planetBuildSomeThing
   for j in reversed(storedValsRange[1:]):
     locSubIf=curSubLevel.createReturnIf(variableOpNew("check", "cgm_bestWeight_{!s}".format(j), 0, ">"))
@@ -284,6 +289,7 @@ def main():
   for resource in resources:
     if resource!="unity":
       everyTileSearch.variableOp("multiply", resource+"_weight",resource+"_mult_planet")
+      everyTileSearch.variableOp("multiply", resource+"_adjacency_weight",resource+"_mult_planet")
 
   # everyTileSearch.addComment("doCALC! test:")
   # testif=everyTileSearch.createReturnIf(variableOpNew("check", "cgm_curTile", 5))
@@ -414,6 +420,22 @@ def main():
       # curEffect.add("prev", variableOpNew("change", resource+"_weight", round(i*math.sqrt(i),3)))
       curEffect.add("prev", variableOpNew("change", resource+"_weight", 2*i))
       curEffect=curEffect.addReturn("else")
+  #adjacency:
+  for resource in resources:
+    if resource!="unity":
+      tileWeightSummary.addReturn("prev").variableOp("set", resource+"_adjacency_weight", 0)
+      tileWeightSummary.add("check_"+resource+"_adjacency","yes")
+      curEffect=newTileCheckFile.addReturn("check_"+resource+"_adjacency")
+      curEffect=curEffect.addReturn("every_neighboring_tile")
+      buildingAndPop=curEffect.createReturnIf(TagList("has_building","yes").add("has_grown_pop","yes"))
+      buildingAndPop.createReturnIf(TagList("pop", TagList("pop_produces_resource",TagList("type", resource).add("amount",0,"",">")))).add("prevprev",variableOpNew("change", resource+"_adjacency_weight", 4))
+      noBuildingOrPop=buildingAndPop.addReturn("else")
+      noBuildingOrPop.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", 0, "", ">"))).add("prevprev",variableOpNew("change", resource+"_adjacency_weight", 3))
+        # curEffect=curEffect.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", i, "", "=")))
+        # # curEffect.add("prev", variableOpNew("change", resource+"_weight", round(i*math.sqrt(i),3)))
+        # curEffect.add("prev", variableOpNew("change", resource+"_weight", 2*i))
+        # curEffect=curEffect.addReturn("else")
+
   newTileCheckFile.deleteOnLowestLevel(checkEmpty)
 
 
