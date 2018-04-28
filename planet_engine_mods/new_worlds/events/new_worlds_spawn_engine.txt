@@ -101,7 +101,7 @@ planet_event = {
 	immediate = {
 		if = {
 			limit = { is_vanilla_habitable_planet = yes }
-			set_timed_planet_flag = { flag = recheck_deposits days = 60 }
+			#set_timed_planet_flag = { flag = recheck_deposits days = 60 }
 			if = {
 				limit = {
 					OR = {
@@ -280,6 +280,53 @@ planet_event = {
 						}
 					}						
 				}
+				if = { 
+					limit = { NOT = { any_tile = { has_deposit = yes } } }
+					random_tile = { 
+						new_worlds_planetary_resource_spawn_table = yes
+					}	
+				}		
+				while = {
+					limit = {
+						OR = {
+							AND = {
+								planet_size > 19
+								count_tile = {
+									limit = { has_deposit = yes }
+									count < 6
+								}
+							}
+							AND = {
+								planet_size > 15
+								planet_size < 19
+								count_tile = {
+									limit = { has_deposit = yes }
+									count < 5
+								}
+							}
+							AND = {
+								planet_size > 10
+								planet_size < 16
+								count_tile = {
+									limit = { has_deposit = yes }
+									count < 4
+								}
+							}
+							AND = {
+								planet_size < 11
+								count_tile = {
+									limit = { has_deposit = yes }
+									count < 3
+								}
+							}
+							
+						}
+					}
+					random_tile = {
+						limit = { has_deposit = no }
+						new_worlds_tile_deposit_spawn_table = yes
+					}
+				}						
 			}	
 		}				
 		if = {
@@ -315,7 +362,7 @@ planet_event = {
 	hide_window = yes	
 	
 	trigger = {
-		has_planet_flag = recheck_deposits
+		#has_planet_flag = recheck_deposits
 		is_colonizable = yes
 		OR = { 
 			is_colony = no
@@ -323,6 +370,7 @@ planet_event = {
 		}	
 		OR = {
 			NOT = { any_tile = { has_blocker = yes } }
+			NOT = { any_tile = { has_deposit = yes } }
 			AND = {
 				planet_size > 19
 				count_tile = {
@@ -353,6 +401,36 @@ planet_event = {
 					count < 3
 				}
 			}
+			AND = {
+				planet_size > 19
+				count_tile = {
+					limit = { has_deposit = yes }
+					count < 6
+				}
+			}
+			AND = {
+				planet_size > 15
+				planet_size < 19
+				count_tile = {
+					limit = { has_deposit = yes }
+					count < 5
+				}
+			}
+			AND = {
+				planet_size > 10
+				planet_size < 16
+				count_tile = {
+					limit = { has_deposit = yes }
+					count < 4
+				}
+			}
+			AND = {
+				planet_size < 11
+				count_tile = {
+					limit = { has_deposit = yes }
+					count < 3
+				}
+			}			
 		}
 	}
 	immediate = {
@@ -362,7 +440,13 @@ planet_event = {
 				limit = { has_building = no has_pop = no }
 				new_worlds_tile_blocker_spawn_table = yes
 			}	
-		}			
+		}	
+		if = { 
+			limit = { NOT = { any_tile = { has_deposit = yes } } }
+			random_tile = { 
+				new_worlds_planetary_resource_spawn_table = yes
+			}	
+		}				
 		while = {
 			limit = {
 				OR = {
@@ -396,6 +480,7 @@ planet_event = {
 							count < 3
 						}
 					}
+					
 				}
 			}
 			random_tile = {
@@ -403,5 +488,46 @@ planet_event = {
 				new_worlds_tile_blocker_spawn_table = yes
 			}
 		}
+		while = {
+			limit = {
+				OR = {
+					AND = {
+						planet_size > 19
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 6
+						}
+					}
+					AND = {
+						planet_size > 15
+						planet_size < 19
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 5
+						}
+					}
+					AND = {
+						planet_size > 10
+						planet_size < 16
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 4
+						}
+					}
+					AND = {
+						planet_size < 11
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 3
+						}
+					}
+					
+				}
+			}
+			random_tile = {
+				limit = { has_deposit = no }
+				new_worlds_tile_deposit_spawn_table = yes
+			}
+		}		
 	}
 }
