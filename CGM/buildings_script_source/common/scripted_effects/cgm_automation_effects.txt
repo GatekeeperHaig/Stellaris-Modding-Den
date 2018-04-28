@@ -853,7 +853,12 @@ add_food_building = {
 		else = { 
 			if = { 
 				limit = { 
-					prev.owner = { NOT = { has_country_flag = food_focus_2 } }				
+					prev.owner = { 
+						NOR = { 
+							is_food_delimited = yes
+							has_country_flag = food_focus_2 
+						}	
+					}	
 					OR = { 
 						new_building_content_enabled = no
 						AND = { 
@@ -945,45 +950,33 @@ add_food_building = {
 						}
 					}		
 				}
-				else = { 
+				else = {
 					if = {
-						limit = { new_building_content_enabled = no }
-						if = { 
-							limit = { prev = { is_habitat = no } }
-							add_building_construction = building_hydroponic_farms_1
-							add_building_construction = building_nutrient_paste_facility
-							else = { 
-								add_building_construction = building_hab_agri_bay
-								add_building_construction = building_nutrient_paste_facility
-							}
-						}	
+						limit = { prev.owner = { is_food_delimited = yes } }
+						add_building_construction = building_paradise_dome
 						if = {
-							limit = { OR = { has_building_construction = yes has_building = yes } }
-							prev.owner = { set_country_flag = cgm_auto_built }
-							
-						}			
-						else = {
+							limit = { new_building_content_enabled = yes } 
 							if = { 
 								limit = { has_resource = { type = food amount > 0 } }
 								if = { 
 									limit = { has_resource = { type = food amount = 1 } }
-									add_building_construction = building_farming_complex_1_1
+									add_building_construction = building_biofuel_refinery_1_1
 									else = { 
 										if = { 
 											limit = { has_resource = { type = food amount = 2 } }
-											add_building_construction = building_farming_complex_1_2
+											add_building_construction = building_biofuel_refinery_1_2
 											else = { 
 												if = { 
 													limit = { has_resource = { type = food amount = 3 } }
-													add_building_construction = building_farming_complex_1_3
+													add_building_construction = building_biofuel_refinery_1_3
 													else = { 
 														if = { 
 															limit = { has_resource = { type = food amount = 4 } }
-															add_building_construction = building_farming_complex_1_4									
+															add_building_construction = building_biofuel_refinery_1_4									
 															else = { 
 																if = { 
 																	limit = { has_resource = { type = food amount = 5 } }
-																	add_building_construction = building_farming_complex_1_5
+																	add_building_construction = building_biofuel_refinery_1_5
 																}
 															}
 														}
@@ -993,19 +986,74 @@ add_food_building = {
 										}
 									}
 								}	
-								else = { 
-									if = { 
-										limit = { has_deposit = no }
-										add_building_construction = building_hydroponic_farm_1
-									}
-								}					
 							}
 							if = {
 								limit = { OR = { has_building_construction = yes has_building = yes } }
-								prev.owner = { set_country_flag = cgm_auto_built }
-								
-							}					
-						}		
+								prev.owner = { set_country_flag = cgm_auto_built }								
+							}												
+						}	
+						else = { 
+							if = {
+								limit = { new_building_content_enabled = no }
+								if = { 
+									limit = { prev = { is_habitat = no } }
+									add_building_construction = building_hydroponic_farms_1
+									add_building_construction = building_nutrient_paste_facility
+									else = { 
+										add_building_construction = building_hab_agri_bay
+										add_building_construction = building_nutrient_paste_facility
+									}
+								}	
+								if = {
+									limit = { OR = { has_building_construction = yes has_building = yes } }
+									prev.owner = { set_country_flag = cgm_auto_built }
+									
+								}			
+								else = {
+									if = { 
+										limit = { has_resource = { type = food amount > 0 } }
+										if = { 
+											limit = { has_resource = { type = food amount = 1 } }
+											add_building_construction = building_farming_complex_1_1
+											else = { 
+												if = { 
+													limit = { has_resource = { type = food amount = 2 } }
+													add_building_construction = building_farming_complex_1_2
+													else = { 
+														if = { 
+															limit = { has_resource = { type = food amount = 3 } }
+															add_building_construction = building_farming_complex_1_3
+															else = { 
+																if = { 
+																	limit = { has_resource = { type = food amount = 4 } }
+																	add_building_construction = building_farming_complex_1_4									
+																	else = { 
+																		if = { 
+																			limit = { has_resource = { type = food amount = 5 } }
+																			add_building_construction = building_farming_complex_1_5
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}	
+										else = { 
+											if = { 
+												limit = { has_deposit = no }
+												add_building_construction = building_hydroponic_farm_1
+											}
+										}					
+									}
+									if = {
+										limit = { OR = { has_building_construction = yes has_building = yes } }
+										prev.owner = { set_country_flag = cgm_auto_built }								
+									}					
+								}		
+							}
+						}	
 					}
 				}	
 			}
