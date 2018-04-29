@@ -362,250 +362,166 @@ event = {
 	trigger = { has_global_flag = deposit_recheck }
 	
 	immediate = {
-		while = { 
-			count = 10000
-			limit = { 
-				any_planet = {
-					OR = {
-						is_planet_class = pc_greenhouse_hot 
-						is_planet_class = pc_greenhouse_cold
-						is_planet_class = pc_irradiated_terrestrial
-						is_planet_class = pc_irradiated_marginal
+		every_planet = { 
+			limit = {
+				habitable_planet = yes
+				OR = {
+					NOT = { any_tile = { has_blocker = yes } }
+					NOT = { any_tile = { has_deposit = yes } }
+					AND = {
+						planet_size > 19
+						count_tile = {
+							limit = { has_blocker = yes }
+							count < 6
+						}
 					}
-					OR = {
-						NOT = { any_tile = { has_blocker = yes } }
-						NOT = { any_tile = { has_deposit = yes } }
-						AND = {
-							planet_size > 19
-							count_tile = {
-								limit = { has_blocker = yes }
-								count < 6
-							}
+					AND = {
+						planet_size > 15
+						planet_size < 19
+						count_tile = {
+							limit = { has_blocker = yes }
+							count < 5
 						}
-						AND = {
-							planet_size > 15
-							planet_size < 19
-							count_tile = {
-								limit = { has_blocker = yes }
-								count < 5
-							}
-						}
-						AND = {
-							planet_size > 10
-							planet_size < 16
-							count_tile = {
-								limit = { has_blocker = yes }
-								count < 4
-							}
-						}
-						AND = {
-							planet_size < 11
-							count_tile = {
-								limit = { has_blocker = yes }
-								count < 3
-							}
-						}
-						AND = {
-							planet_size > 19
-							count_tile = {
-								limit = { has_deposit = yes }
-								count < 6
-							}
-						}
-						AND = {
-							planet_size > 15
-							planet_size < 19
-							count_tile = {
-								limit = { has_deposit = yes }
-								count < 5
-							}
-						}
-						AND = {
-							planet_size > 10
-							planet_size < 16
-							count_tile = {
-								limit = { has_deposit = yes }
-								count < 4
-							}
-						}
-						AND = {
-							planet_size < 11
-							count_tile = {
-								limit = { has_deposit = yes }
-								count < 3
-							}
-						}			
 					}
-				}			
-			}			
-			random_planet = {
-				limit = {
-					any_planet = {
-						OR = {
-							is_planet_class = pc_greenhouse_hot 
-							is_planet_class = pc_greenhouse_cold
-							is_planet_class = pc_irradiated_terrestrial
-							is_planet_class = pc_irradiated_marginal
+					AND = {
+						planet_size > 10
+						planet_size < 16
+						count_tile = {
+							limit = { has_blocker = yes }
+							count < 4
 						}
-						OR = {
-							NOT = { any_tile = { has_blocker = yes } }
-							NOT = { any_tile = { has_deposit = yes } }
-							AND = {
-								planet_size > 19
-								count_tile = {
-									limit = { has_blocker = yes }
-									count < 6
-								}
-							}
-							AND = {
-								planet_size > 15
-								planet_size < 19
-								count_tile = {
-									limit = { has_blocker = yes }
-									count < 5
-								}
-							}
-							AND = {
-								planet_size > 10
-								planet_size < 16
-								count_tile = {
-									limit = { has_blocker = yes }
-									count < 4
-								}
-							}
-							AND = {
-								planet_size < 11
-								count_tile = {
-									limit = { has_blocker = yes }
-									count < 3
-								}
-							}
-							AND = {
-								planet_size > 19
-								count_tile = {
-									limit = { has_deposit = yes }
-									count < 6
-								}
-							}
-							AND = {
-								planet_size > 15
-								planet_size < 19
-								count_tile = {
-									limit = { has_deposit = yes }
-									count < 5
-								}
-							}
-							AND = {
-								planet_size > 10
-								planet_size < 16
-								count_tile = {
-									limit = { has_deposit = yes }
-									count < 4
-								}
-							}
-							AND = {
-								planet_size < 11
-								count_tile = {
-									limit = { has_deposit = yes }
-									count < 3
-								}
-							}			
+					}
+					AND = {
+						planet_size < 11
+						count_tile = {
+							limit = { has_blocker = yes }
+							count < 3
+						}
+					}
+					AND = {
+						planet_size > 19
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 6
+						}
+					}
+					AND = {
+						planet_size > 15
+						planet_size < 19
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 5
+						}
+					}
+					AND = {
+						planet_size > 10
+						planet_size < 16
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 4
+						}
+					}
+					AND = {
+						planet_size < 11
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 3
 						}
 					}			
+				}
+			}			
+			if = { 
+				limit = { NOT = { any_tile = { has_blocker = yes } } }
+				random_tile = { 
+					limit = { has_building = no has_pop = no }
+					new_worlds_tile_blocker_spawn_table = yes
 				}	
-				if = { 
-					limit = { is_planet_class = pc_greenhouse_hot }
-					save_event_target_as = target_planet
-					remove_planet = yes
-					solar_system = { 
-						spawn_planet = {
-							class = pc_greenhouse_hot
-							location = event_target:target_planet
-							init_effect = { 
-								set_entity_greenhouse_hot = yes
-								reroll_deposits = yes
-								every_tile = { 
-									random_list = { 
-										50 = { new_worlds_tile_blocker_spawn_table = yes }
-										50 = { }
-									}
-								}																		
+			}	
+			if = { 
+				limit = { NOT = { any_tile = { has_deposit = yes } } }
+				random_tile = { 
+					new_worlds_planetary_resource_spawn_table = yes
+				}	
+			}				
+			while = {
+				limit = {
+					OR = {
+						AND = {
+							planet_size > 19
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 6
 							}
 						}
-					}						
-					else = { 
-						if = { 
-							limit = { is_planet_class = pc_greenhouse_cold }
-							save_event_target_as = target_planet
-							remove_planet = yes
-							solar_system = { 
-								spawn_planet = {
-									class = pc_greenhouse_cold
-									location = event_target:target_planet
-									init_effect = { 
-										set_entity_greenhouse_cold = yes
-										reroll_deposits = yes
-										every_tile = { 
-											random_list = { 
-												50 = { new_worlds_tile_blocker_spawn_table = yes }
-												50 = { }
-											}
-										}											
-									}
-								}
-							}		
-							else = { 
-								if = { 
-									limit = { is_planet_class = pc_irradiated_terrestrial }
-									save_event_target_as = target_planet
-									remove_planet = yes
-									solar_system = { 
-										spawn_planet = {
-											class = pc_irradiated_terrestrial
-											location = event_target:target_planet
-											init_effect = { 
-												set_entity_irradiated_terrestrial = yes
-												reroll_deposits = yes
-												every_tile = { 
-													random_list = { 
-														50 = { new_worlds_tile_blocker_spawn_table = yes }
-														50 = { }
-													}
-												}	
-											}
-										}
-									}	
-									else = { 
-										if = { 
-											limit = { is_planet_class = pc_irradiated_marginal }
-											save_event_target_as = target_planet
-											remove_planet = yes
-											solar_system = { 
-												spawn_planet = {
-													class = pc_irradiated_terrestrial
-													location = event_target:target_planet
-													init_effect = { 
-														set_entity_irradiated_marginal = yes
-														reroll_deposits = yes
-														every_tile = { 
-															random_list = { 
-																50 = { new_worlds_tile_blocker_spawn_table = yes }
-																50 = { }
-															}
-														}															
-													}
-												}
-											}											
-										}
-									}
-								}
+						AND = {
+							planet_size > 15
+							planet_size < 19
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 5
 							}
-						}	
-					}	
+						}
+						AND = {
+							planet_size > 10
+							planet_size < 16
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 4
+							}
+						}
+						AND = {
+							planet_size < 11
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 3
+							}
+						}
+						
+					}
+				}
+				random_tile = {
+					limit = { has_blocker = no }
+					new_worlds_tile_blocker_spawn_table = yes
 				}
 			}
+			while = {
+				limit = {
+					OR = {
+						AND = {
+							planet_size > 19
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 6
+							}
+						}
+						AND = {
+							planet_size > 15
+							planet_size < 19
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 5
+							}
+						}
+						AND = {
+							planet_size > 10
+							planet_size < 16
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 4
+							}
+						}
+						AND = {
+							planet_size < 11
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 3
+							}
+						}
+						
+					}
+				}
+				reroll_deposits = yes			
+			}		
 		}
 	}
 }	
-
-				
