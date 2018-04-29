@@ -14,6 +14,7 @@ event = {
 	#This event fires only once.
 	immediate = {
 		set_global_flag = new_worlds_active #this sets a global flag for this mod, to be used by other mods and the engine
+		set_timed_global_flag = { flag = deposit_recheck days = 91 }
 		every_planet = {
 			if = {
 				limit = { is_star = yes }
@@ -85,9 +86,6 @@ event = {
 						# these events occur one after the other.
 						planet_event = { id = spawn_engine_0.1 }
 						planet_event = { id = spawn_engine_0.2 }
-						planet_event = { id = spawn_engine_0.3 days = 1 }
-						planet_event = { id = spawn_engine_0.3 days = 30 }
-						planet_event = { id = spawn_engine_0.3 days = 60 }
 					}
 				}	
 			}
@@ -355,170 +353,174 @@ planet_event = {
 	}
 }
 
-planet_event = {
+event = {
 	id = spawn_engine_0.3
 	hide_window = yes	
 	is_triggered_only = yes
 	
-	trigger = {		
-		habitable_planet = yes
-		OR = {
-			NOT = { any_tile = { has_blocker = yes } }
-			NOT = { any_tile = { has_deposit = yes } }
-			AND = {
-				planet_size > 19
-				count_tile = {
-					limit = { has_blocker = yes }
-					count < 6
-				}
-			}
-			AND = {
-				planet_size > 15
-				planet_size < 19
-				count_tile = {
-					limit = { has_blocker = yes }
-					count < 5
-				}
-			}
-			AND = {
-				planet_size > 10
-				planet_size < 16
-				count_tile = {
-					limit = { has_blocker = yes }
-					count < 4
-				}
-			}
-			AND = {
-				planet_size < 11
-				count_tile = {
-					limit = { has_blocker = yes }
-					count < 3
-				}
-			}
-			AND = {
-				planet_size > 19
-				count_tile = {
-					limit = { has_deposit = yes }
-					count < 6
-				}
-			}
-			AND = {
-				planet_size > 15
-				planet_size < 19
-				count_tile = {
-					limit = { has_deposit = yes }
-					count < 5
-				}
-			}
-			AND = {
-				planet_size > 10
-				planet_size < 16
-				count_tile = {
-					limit = { has_deposit = yes }
-					count < 4
-				}
-			}
-			AND = {
-				planet_size < 11
-				count_tile = {
-					limit = { has_deposit = yes }
-					count < 3
+	trigger = { has_global_flag = deposit_recheck }
+	
+	immediate = {
+		every_planet = { 
+			limit = {
+				habitable_planet = yes
+				OR = {
+					NOT = { any_tile = { has_blocker = yes } }
+					NOT = { any_tile = { has_deposit = yes } }
+					AND = {
+						planet_size > 19
+						count_tile = {
+							limit = { has_blocker = yes }
+							count < 6
+						}
+					}
+					AND = {
+						planet_size > 15
+						planet_size < 19
+						count_tile = {
+							limit = { has_blocker = yes }
+							count < 5
+						}
+					}
+					AND = {
+						planet_size > 10
+						planet_size < 16
+						count_tile = {
+							limit = { has_blocker = yes }
+							count < 4
+						}
+					}
+					AND = {
+						planet_size < 11
+						count_tile = {
+							limit = { has_blocker = yes }
+							count < 3
+						}
+					}
+					AND = {
+						planet_size > 19
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 6
+						}
+					}
+					AND = {
+						planet_size > 15
+						planet_size < 19
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 5
+						}
+					}
+					AND = {
+						planet_size > 10
+						planet_size < 16
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 4
+						}
+					}
+					AND = {
+						planet_size < 11
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 3
+						}
+					}			
 				}
 			}			
-		}
-	}
-	immediate = {
-		if = { 
-			limit = { NOT = { any_tile = { has_blocker = yes } } }
-			random_tile = { 
-				limit = { has_building = no has_pop = no }
-				new_worlds_tile_blocker_spawn_table = yes
+			if = { 
+				limit = { NOT = { any_tile = { has_blocker = yes } } }
+				random_tile = { 
+					limit = { has_building = no has_pop = no }
+					new_worlds_tile_blocker_spawn_table = yes
+				}	
 			}	
-		}	
-		if = { 
-			limit = { NOT = { any_tile = { has_deposit = yes } } }
-			random_tile = { 
-				new_worlds_planetary_resource_spawn_table = yes
-			}	
-		}				
-		while = {
-			limit = {
-				OR = {
-					AND = {
-						planet_size > 19
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 6
+			if = { 
+				limit = { NOT = { any_tile = { has_deposit = yes } } }
+				random_tile = { 
+					new_worlds_planetary_resource_spawn_table = yes
+				}	
+			}				
+			while = {
+				limit = {
+					OR = {
+						AND = {
+							planet_size > 19
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 6
+							}
 						}
-					}
-					AND = {
-						planet_size > 15
-						planet_size < 19
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 5
+						AND = {
+							planet_size > 15
+							planet_size < 19
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 5
+							}
 						}
-					}
-					AND = {
-						planet_size > 10
-						planet_size < 16
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 4
+						AND = {
+							planet_size > 10
+							planet_size < 16
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 4
+							}
 						}
-					}
-					AND = {
-						planet_size < 11
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 3
+						AND = {
+							planet_size < 11
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 3
+							}
 						}
+						
 					}
-					
+				}
+				random_tile = {
+					limit = { has_blocker = no }
+					new_worlds_tile_blocker_spawn_table = yes
 				}
 			}
-			random_tile = {
-				limit = { has_blocker = no }
-				new_worlds_tile_blocker_spawn_table = yes
-			}
-		}
-		while = {
-			limit = {
-				OR = {
-					AND = {
-						planet_size > 19
-						count_tile = {
-							limit = { has_deposit = yes }
-							count < 6
+			while = {
+				limit = {
+					OR = {
+						AND = {
+							planet_size > 19
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 6
+							}
 						}
-					}
-					AND = {
-						planet_size > 15
-						planet_size < 19
-						count_tile = {
-							limit = { has_deposit = yes }
-							count < 5
+						AND = {
+							planet_size > 15
+							planet_size < 19
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 5
+							}
 						}
-					}
-					AND = {
-						planet_size > 10
-						planet_size < 16
-						count_tile = {
-							limit = { has_deposit = yes }
-							count < 4
+						AND = {
+							planet_size > 10
+							planet_size < 16
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 4
+							}
 						}
-					}
-					AND = {
-						planet_size < 11
-						count_tile = {
-							limit = { has_deposit = yes }
-							count < 3
+						AND = {
+							planet_size < 11
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 3
+							}
 						}
+						
 					}
-					
 				}
-			}
-			reroll_deposits = yes			
-		}		
+				reroll_deposits = yes			
+			}		
+		}
 	}
-}
+}	
