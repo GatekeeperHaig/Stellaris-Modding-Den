@@ -1,0 +1,240 @@
+namespace = cgm_ai_routines
+
+#this event is fired on a monthly pulse but only once.
+#it stores data regarding number of hyperlane connections in every system, so this number can be used later
+
+#set default reserve and income for first month
+event = { #game start
+	id = cgm_ai_routines.0
+	hide_window = yes	
+	fire_only_once = yes
+	is_triggered_only = yes
+	immediate = { 
+		set_global_flag = cgm_game_start
+		every_playable_country = { 
+			set_country_flag = reserve_and_income_variables_set
+			if = { 
+				limit = { 
+					OR = {
+						is_machine_empire = no
+						is_servitor = yes
+					}
+				}
+				set_variable = { which = food_reserve value = 100 }
+				set_variable = { which = food_income value = 2 }#check income will incerease food_weight
+			}
+			set_variable = { which = energy_reserve value = 100 }
+			set_variable = { which = energy_income value = 10 }#around 10 
+			set_variable = { which = minerals_reserve value = 200 }
+			set_variable = { which = minerals_income value = 10 }#around 10 
+			set_variable = { which = society_research_reserve value = 0 }
+			set_variable = { which = society_research_income value = 6 }#6 = base(5) + lab(1)# we ignore the points from a deposit
+			set_variable = { which = physics_research_reserve value = 0 }
+			set_variable = { which = physics_research_income value = 6 }
+			set_variable = { which = engineering_research_reserve value = 0 }
+			set_variable = { which = engineering_research_income value = 6 }		
+		}
+		every_system = {
+			system_star = { 
+				set_variable = { which = num_of_hyperlane_connections value = 0 }
+				save_event_target_as = hyperlane_check_star
+				set_planet_flag = system_variable_repository
+			}
+			every_neighbor_system = { 
+				ignore_hyperlanes = no 
+				event_target:hyperlane_check_star = { change_variable = { which = num_of_hyperlane_connections value = 1 } }
+			}				
+		}		
+		random_planet = { save_global_event_target_as = cgm_var_storage }
+	}
+}
+
+event = {  
+	id = cgm_ai_routines.1
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	immediate = {
+		set_global_flag = cgm_first_month_passed #is triggered at the beginning of the second month
+		if = {
+			limit = { NOT = { has_global_flag = cgm_game_start } }
+			every_system = {
+				system_star = { 
+					set_variable = { which = num_of_hyperlane_connections value = 0 }
+					save_event_target_as = hyperlane_check_star
+					set_planet_flag = system_variable_repository
+				}
+				every_neighbor_system = { 
+					ignore_hyperlanes = no 
+					event_target:hyperlane_check_star = { change_variable = { which = num_of_hyperlane_connections value = 1 } }
+				}				
+			}		
+			random_planet = { save_global_event_target_as = cgm_var_storage }
+		}	
+	}	
+}	
+
+@spending_threshold = 149 
+### we should move the spending threshold into a per country variable, so the amount is dynamically calculated given some factors rather than a static sum. 
+### I also did not create different settings for the building construction reserve subtraction. We should decide how to implement this with policies for players. 
+### Currently it subtracts a flat 20% of the minerals income variable value from the minerals reserve pool.  
+
+event = {
+	id = cgm_ai_routines.2
+	is_triggered_only = yes
+	hide_window = yes
+	trigger = { 				
+		OR = { 
+			full_ai_routines = yes
+			mixed_ai_routines = yes
+		}
+	}
+	
+	immediate = { 
+		every_country = { 
+			limit = { 
+				OR = { 
+					is_country_type = default
+					is_country_type = awakened_fallen_empire
+				}
+			}
+			if = { 
+				limit = { NOT = { has_country_flag = reserve_and_income_variables_set } }
+				set_country_flag = reserve_and_income_variables_set
+				if = { 
+					limit = { 
+						OR = {
+							is_machine_empire = no
+							is_servitor = yes
+						}
+					}
+					set_variable = { which = food_reserve value = 0 }
+					set_variable = { which = food_income value = 0 }
+				}
+				set_variable = { which = energy_reserve value = 0 }
+				set_variable = { which = energy_income value = 0 }
+				set_variable = { which = minerals_reserve value = 0 }
+				set_variable = { which = minerals_income value = 0 }
+				set_variable = { which = society_research_reserve value = 0 }
+				set_variable = { which = society_research_income value = 0 }
+				set_variable = { which = physics_research_reserve value = 0 }
+				set_variable = { which = physics_research_income value = 0 }
+				set_variable = { which = engineering_research_reserve value = 0 }
+				set_variable = { which = engineering_research_income value = 0 }		
+			}				
+			check_income = yes
+			check_resource_requirements = yes
+			if = { 
+				limit = { NOT = { has_country_flag = starbase_and_planet_check_delay } }
+				check_and_set_starbase_flags = yes
+				check_and_set_building_flags = yes
+				set_timed_country_flag = { flag = starbase_and_planet_check_delay days = 360 }
+			}	
+			if = { 
+				limit = { 
+					check_variable = { which = minerals_reserve value > 0 } 
+					check_variable = { which = minerals_income value > 0 } 
+				}
+				set_variable = { which = reserve_transport value = minerals_income }
+				multiply_variable = { which = reserve_transport value = 0.2 } 
+				if = { 
+					limit = { check_variable = { which = minerals_reserve value > reserve_transport } }
+					if = { 
+						limit = { check_variable = { which = building_construction_reserve value > 0 } }
+						change_variable = { which = building_construction_reserve value = reserve_transport }						
+						else = { set_variable = { which = building_construction_reserve value = reserve_transport } }					
+					}	
+					while = {
+						limit = {
+							check_variable = { which = reserve_transport value > 2047.999 }
+						}
+						add_minerals = -2048
+						change_variable = { which = reserve_transport value = -2048 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = reserve_transport value > 1023.999 }
+						}
+						add_minerals = -1024
+						change_variable = { which = reserve_transport value = -1024 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = reserve_transport value > 511.999 }
+						}
+						add_minerals = -512
+						change_variable = { which = reserve_transport value = -512 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = reserve_transport value > 255.999 }
+						}
+						add_minerals = -256
+						change_variable = { which = reserve_transport value = -256 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = reserve_transport value > 127.999 }
+						}
+						add_minerals = -128
+						change_variable = { which = reserve_transport value = -128 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = reserve_transport value > 63.999 }
+						}
+						add_minerals = -64
+						change_variable = { which = reserve_transport value = -64 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = reserve_transport value > 31.999 }
+						}
+						add_minerals = -32
+						change_variable = { which = reserve_transport value = -32 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = reserve_transport value > 15.999 }
+						}
+						add_minerals = -16
+						change_variable = { which = reserve_transport value = -16 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = reserve_transport value > 7.999 }
+						}
+						add_minerals = -8
+						change_variable = { which = reserve_transport value = -8 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = reserve_transport value > 3.999 }
+						}
+						add_minerals = -4
+						change_variable = { which = reserve_transport value = -4 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = reserve_transport value > 1.999 }
+						}
+						add_minerals = -2
+						change_variable = { which = reserve_transport value = -2 }
+					}
+					if = {
+						limit = {
+							check_variable = { which = reserve_transport value > 0.999 }
+						}
+						add_minerals = -1
+						change_variable = { which = reserve_transport value = -1 }
+					}											
+					if = { 
+						limit = { check_variable = { which = building_construction_reserve value > @spending_threshold } }
+						country_event = { id = cgm_auto.0 }							
+					}				
+				}	
+			}	
+		}
+	}
+}	

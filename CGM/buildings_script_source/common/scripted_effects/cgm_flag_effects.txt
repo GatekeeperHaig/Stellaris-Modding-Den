@@ -1,0 +1,730 @@
+check_and_set_building_flags = {
+	every_owned_planet = { 
+		if = {
+			#stronghold/fortress
+			limit = {
+				years_passed > 25
+				NOR = {
+					has_planet_flag = fortify_planet
+					AND = {
+						owner = { is_at_war = no }
+						OR = {
+							AND = {
+								is_capital = no
+								count_tile = {
+									limit = {
+										OR = { has_building = building_stronghold has_building = building_fortress has_building = building_planetary_shield_generator }
+									}
+									count > 2
+								}
+							}
+							AND = {
+								is_capital = no
+								count_tile = {
+									limit = {
+										OR = { has_building = building_stronghold has_building = building_fortress has_building = building_planetary_shield_generator }
+									}
+									count > 3
+								}
+							}
+						}
+					}
+				}
+				OR = {
+					AND = {
+						unrest > 40
+						OR = {
+							NOT = {
+								any_owned_pop = { is_enslaved = yes }
+							}
+							has_building = building_slave_processing
+						}
+					}
+					AND = {
+						owner = { is_at_war = yes }
+						OR = {
+							AND = {
+								any_country = {
+									is_at_war_with = root.owner
+									any_owned_planet = {
+										is_colony = yes
+										distance = { source = root min_distance = 70 max_distance = 100 }
+									}
+								}
+								NOT = {
+									count_tile = {
+										limit = {
+											OR = { has_building = building_stronghold has_building = building_fortress }
+										}
+										count > 4
+									}
+								}
+							}
+							AND = {
+								sector_controlled = yes
+								OR = { has_capital_1 = yes has_capital_2 = yes }
+								count_tile = {
+									limit = {
+										OR = { has_building = building_stronghold has_building = building_fortress }
+									}
+									count < 1
+								}
+							}
+							AND = {
+								sector_controlled = no
+								has_capital_1 = yes
+								count_tile = {
+									limit = {
+										OR = { has_building = building_stronghold has_building = building_fortress }
+									}
+									count < 1
+								}
+							}
+							AND = {
+								sector_controlled = no
+								has_capital_2 = yes
+								count_tile = {
+									limit = {
+										OR = { has_building = building_stronghold has_building = building_fortress }
+									}
+									count < 2
+								}
+							}
+							AND = {
+								is_capital = yes
+								count_tile = {
+									limit = {
+										OR = { has_building = building_stronghold has_building = building_fortress }
+									}
+									count < 3
+								}
+							}
+						}
+					}
+				}
+			}
+			set_timed_planet_flag = { flag = fortify_planet days = 359 }
+		}
+		if = {
+			#planetary shield generator
+			limit = {
+				NOR = { has_planet_flag = build_planetary_shield_generator has_building = building_planetary_shield_generator }
+				owner = { has_technology = "tech_planetary_shield_generator" is_subject = no }
+				any_country = {
+					OR = { is_hostile_to = owner is_angry_to = owner is_domineering_to = owner is_rival = owner is_at_war_with = owner }
+				}
+				is_habitat = no
+				OR = {
+					AND = {
+						is_capital = yes
+						count_tile = {
+							limit = {
+								OR = { has_building = building_stronghold has_building = building_fortress }
+							}
+							count > 2
+						}
+					}
+					AND = {
+						is_capital = no
+						sector_controlled = no
+						count_tile = {
+							limit = {
+								OR = { has_building = building_stronghold has_building = building_fortress }
+							}
+							count > 1
+						}
+					}
+				}
+			}
+			if = {
+				limit = { has_planet_flag = fortify_planet }
+				remove_planet_flag = fortify_planet
+			}
+			set_timed_planet_flag = { flag = build_planetary_shield_generator days = 359 }
+		}
+		if = {
+			#military academy
+			limit = {
+				owner = {
+					has_technology = "tech_centralized_command"
+					if = {
+						limit = { overhauled_building_stats_enabled = no }
+						is_machine_empire = no
+					}
+					if = {
+						limit = { overhauled_building_stats_enabled = yes }
+						is_gestalt_consciousness = no
+					}
+					NOT = {
+						any_owned_planet = {
+							NOT = { is_same_value = from }
+							has_building = building_military_academy
+						}
+					}
+				}
+				sector_controlled = no
+				NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_military_academy has_building = building_military_academy }
+				any_owned_pop = {
+					is_warrior_pop = yes
+					OR = {
+						has_military_service_type = { type = military_service_full country = owner }
+						has_military_service_type = { type = military_service_limited country = owner }
+					}
+					OR = {
+						is_enslaved = no
+						AND = {
+							is_enslaved = yes
+							prev = { has_building = building_slave_processing }
+						}
+					}
+				}
+			}
+			set_timed_planet_flag = { flag = build_military_academy days = 359 }
+		}
+		if = {
+			#cloning vats
+			limit = {
+				sector_controlled = no
+				NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_military_academy has_planet_flag = build_clone_vats has_building = building_clone_vats }
+				owner = {
+					is_machine_empire = no
+					is_synth_empire = no
+					has_technology = "tech_gene_banks"
+					OR = {
+						NOT = {
+							any_owned_planet = { has_building = building_military_academy }
+						}
+						prev = { has_building = building_military_academy }
+					}
+				}
+				any_owned_pop = {
+					is_robot_pop = no
+					is_warrior_pop = yes
+					OR = {
+						has_military_service_type = { type = military_service_full country = owner }
+						has_military_service_type = { type = military_service_limited country = owner }
+					}
+				}
+			}
+			set_timed_planet_flag = { flag = build_clone_vats days = 359 }
+		}
+		if = {
+			#war factory
+			limit = {
+				overhauled_building_stats_enabled = yes
+				owner_is_machine_empire = yes
+				sector_controlled = no
+				NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_war_factory has_building = building_war_factory }
+				count_pops = {
+					limit = {
+						is_colony_pop = yes
+						OR = {
+							is_robot_pop = yes
+							AND = {
+								owner = { is_assimilator = yes }
+								has_trait = trait_cybernetic
+							}
+						}
+					}
+					count > 9
+				}
+			}
+			set_timed_planet_flag = { flag = build_war_factory days = 359 }
+		}
+		if = {
+			#pop growth buildings
+			limit = {
+				NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_pop_growth_building has_building = building_clinic has_building = building_hospital has_building = building_spare_parts_depot has_building = building_unit_assembly_plant }
+				owner = {
+					OR = { has_technology = "tech_frontier_health" has_technology = "tech_frontier_hospital" has_technology = "tech_modular_components" has_technology = "tech_intelligent_factories" }
+				}
+				free_pop_tiles > 2
+				OR = {
+					any_owned_pop = { is_robot_pop = no has_population_control = no }
+					AND = {
+						owner = {
+							OR = { has_authority = auth_machine_intelligence has_country_flag = synthethic_age }
+							balance > 250
+						}
+						any_owned_pop = { is_robot_pop = yes }
+					}
+				}
+			}
+			set_timed_planet_flag = { flag = build_pop_growth_building days = 359 }
+		}
+		if = {
+			limit = {
+				NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_slave_processing has_building = building_slave_processing }
+				owner = {
+					has_technology = "tech_neural_implants"
+					OR = {
+						AND = { overhauled_building_stats_enabled = no is_machine_empire = no }
+						AND = { overhauled_building_stats_enabled = yes is_gestalt_consciousness = no }
+					}
+					has_policy_flag = slavery_allowed
+				}
+				any_owned_pop = { is_enslaved = yes }
+				OR = {
+					count_pops = {
+						limit = {
+							OR = {
+								has_slavery_type = { country = owner type = slavery_military }
+								has_slavery_type = { country = owner type = slavery_normal }
+							}
+						}
+						count > 3
+					}
+					unrest > 30
+				}
+			}
+			set_timed_planet_flag = { flag = build_slave_processing days = 359 }
+		}
+		if = {
+			limit = {
+				NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_neuro_electric_amplifier has_building = building_neuro_electric_amplifier }
+				owner = { has_authority = auth_machine_intelligence has_government = gov_machine_assimilator has_swapped_tradition = tr_synchronicity_cyber_comms }
+				count_pops = {
+					limit = { has_trait = trait_cybernetic }
+					count > 3
+				}
+			}
+			set_timed_planet_flag = { flag = build_neuro_electric_amplifier days = 359 }
+		}
+		#### empire unique buildings
+		if = {
+			limit = {
+				NOR = { has_planet_flag = fortify_planet has_planet_flag = build_planetary_shield_generator has_planet_flag = build_ethics_and_unrest_empire_unique }
+				is_capital = yes
+				has_capital_3 = yes
+				owner = {
+					is_machine_empire = no
+					OR = {
+						AND = {
+							has_technology = "tech_galactic_benevolence"
+							prev = {
+								NOT = { has_building = building_ministry_benevolence }
+							}
+						}
+						AND = {
+							has_ascension_perk = ap_mind_over_matter
+							prev = {
+								NOT = { has_building = building_psi_corps }
+							}
+						}
+					}
+					any_owned_planet = {
+						OR = {
+							unrest > 0.3
+							count_pops = {
+								limit = {
+									opposing_ethics_divergence = { steps > 1 who = owner }
+								}
+								count > 3
+							}
+						}
+					}
+					influence > 250
+				}
+			}
+			set_timed_planet_flag = { flag = build_ethics_and_unrest_empire_unique days = 359 }
+		}
+	}
+}
+
+check_and_set_starbase_flags = { 
+	if = { 
+		limit = { used_naval_capacity_percent > 0.75 }
+		if = { 
+			limit = { 
+				used_naval_capacity_percent > 0.74
+				used_naval_capacity_percent < 0.9
+			}	
+			set_timed_country_flag = { flag = nav_cap_focus_1 days = 359 }
+		}	
+		if = { 
+			limit = { 
+				used_naval_capacity_percent > 0.89
+				used_naval_capacity_percent < 1
+			}	
+			set_timed_country_flag = { flag = nav_cap_focus_2 days = 359 }
+		}				
+		if = { 
+			limit = { 
+				used_naval_capacity_percent > 1
+			}	
+			set_timed_country_flag = { flag = nav_cap_focus_3 days = 359 }
+		}								
+	}	
+	calculate_number_of_required_shipyard_systems = yes #see the cgm_country_scope_effects.txt in common/scripted_effects.			
+	every_system_within_border = {
+		if = { 
+			limit = { 
+				exists = sector
+				sector = { is_core_sector = no }
+			}
+			if = { 
+				limit = { has_star_flag = core_sector_starbase_system }
+				remove_star_flag = core_sector_starbase_system
+			}					
+			set_star_flag = sector_controlled_starbase_system
+			else = {
+				if = { 
+					limit = { has_star_flag = sector_controlled_starbase_system }
+					remove_star_flag = sector_controlled_starbase_system
+				}					
+				set_star_flag = core_sector_starbase_system
+			}
+		}	
+		if = { 
+			limit = { 
+				any_planet = { 
+					is_owned_by = root
+				}		
+			}	
+			set_star_flag = colonized_system						
+			if = { 
+				limit = { any_planet = { is_capital = yes } }
+				if = { 
+					limit = { NOT = { has_star_flag = capital_system } }
+					set_star_flag = capital_system
+				}	
+				else = { 							
+					if = { 
+						limit = { has_star_flag = capital_system }
+						remove_star_flag = capital_system										
+					}
+				}								
+			}							
+		}	
+		if = {
+			limit = { 
+				root = { is_exterminator = no } 
+				OR = { 
+					AND = {
+						has_star_flag = enclave
+						any_ship_in_system = {
+							exists = owner
+							owner = { has_country_flag = trader_enclave_country }
+						}
+					}
+					AND = { 
+						has_star_flag = enclave
+						any_ship_in_system = {
+							exists = owner
+							owner = { 
+								is_same_value = event_target:artist_enclave_country
+							}
+						}
+						root = { has_country_flag = art_college }
+					}	
+					AND = { 
+						has_star_flag = enclave
+							any_ship_in_system = {
+								exists = owner
+								owner = { has_country_flag = curator_enclave_country }
+						}
+						root = { has_country_flag = think_tank }
+					}								
+				}	
+			}
+			set_star_flag = trade_hub_system
+		}							
+		if = {
+			limit = { 
+				root = { has_technology = "tech_gateway_activation" } 
+				OR = {
+					has_megastructure = gateway_restored
+					has_megastructure = gateway_final								
+				}						
+			}
+			set_star_flag = gateway_system
+		}
+	}	
+	if = { 
+		limit = { check_variable = { which = required_shipyard_systems value > 0 } }						
+		every_owned_starbase = {
+			solar_system = {
+				random_system_planet = {
+					limit = { has_planet_flag = system_variable_repository }
+					set_variable = { which = starbase_level_record value = 0 }
+					save_event_target_as = starbase_system_star
+				}	
+				if = {
+					limit = { prev = { has_starbase_size = starbase_outpost } }
+					event_target:starbase_system_star = { change_variable = { which = starbase_level_record value = 1 } }
+					else = { 					
+						if = {
+							limit = { prev = { has_starbase_size = starbase_starport } }
+							event_target:starbase_system_star = { change_variable = { which = starbase_level_record value = 2 } }
+							else = { 
+								if = {
+									limit = { prev = { has_starbase_size = starbase_starhold } }
+									event_target:starbase_system_star = { change_variable = { which = starbase_level_record value = 3 } }	
+									else = { 
+										if = {
+											limit = { prev = { has_starbase_size = starbase_starfortress } }
+											event_target:starbase_system_star = { change_variable = { which = starbase_level_record value = 4 } }	
+											else = { 
+												if = {
+													limit = { prev = { has_starbase_size = starbase_citadel } }
+													event_target:starbase_system_star = { change_variable = { which = starbase_level_record value = 5 } }									
+												}
+											}
+										}
+									}
+								}
+							}	
+						}	
+					}
+				}					
+				set_shipyard_weight = yes																																		
+			}									
+		}
+		every_owned_starbase = {			
+			if = { 
+				limit = { solar_system = { has_star_flag = shipyard_candidate_system } }	
+				solar_system = { check_and_assign_shipyard_system_flag = yes }				
+			}			
+		}		
+	}
+}	
+
+set_shipyard_weight = {
+	if = {
+		limit = {
+			NOR = {
+				has_star_flag = shipyard_candidate_system
+				has_star_flag = shipyard_check_delay
+				star = { is_star_class = sc_black_hole }
+				any_planet = { is_planet_class = pc_pulsar }				
+			}
+		}
+		if = {
+			limit = {
+				calc_true_if = {
+					amount = 3
+					event_target:starbase_system_star = {
+						check_variable = { which = num_of_hyperlane_connections value > 1 }
+					}
+					prev = {
+						count_starbase_modules = { type = shipyard count > 2 }
+					}
+					root = {
+						any_system_within_border = {
+							distance = { source = event_target:starbase_system_star type = hyperlane min_jumps = 3 }
+							has_star_flag = shipyard_system
+						}
+					}					
+					NOR = {
+						has_star_flag = shipyard_system
+						AND = {
+							has_star_flag = enclave
+							any_ship_in_system = {
+								exists = owner
+								owner = { has_country_flag = curator_enclave_country }
+							}
+						}
+						AND = {
+							has_star_flag = enclave
+							any_ship_in_system = {
+								exists = owner
+								owner = { is_same_value = event_target:artist_enclave_country }
+							}
+						}
+						AND = {
+							has_star_flag = enclave
+							any_ship_in_system = {
+								exists = owner
+								owner = { has_country_flag = trader_enclave_country }
+							}
+						}
+					}
+					any_country = {
+						OR = { is_at_war_with = root is_rival = root is_hostile_to = root is_threatened_to = root is_angry_to = root is_domineering_to = root }
+						any_system_within_border = {
+							distance = { source = event_target:starbase_system_star type = hyperlane min_jumps = 4 }
+						}
+					}
+					NOT = {
+						any_system = {
+							distance = { source = event_target:starbase_system_star type = hyperlane max_jumps = 2 }
+							NOT = { is_within_borders_of = root }
+						}
+					}
+				}
+			}	
+			if = {
+				limit = {
+					prev = {
+						count_starbase_modules = { type = shipyard count = 1 }
+					}
+				}
+				event_target:starbase_system_star = {
+					set_variable = { which = num_of_shipyard_modules value = 1 }
+				}
+				else = {
+					if = {
+						limit = {
+							prev = {
+								count_starbase_modules = { type = shipyard count = 2 }
+							}
+						}
+						event_target:starbase_system_star = {
+							set_variable = { which = num_of_shipyard_modules value = 2 }
+						}
+						else = {
+							if = {
+								limit = {
+									prev = {
+										count_starbase_modules = { type = shipyard count = 3 }
+									}
+								}
+								event_target:starbase_system_star = {
+									set_variable = { which = num_of_shipyard_modules value = 3 }
+								}
+								else = {
+									if = {
+										limit = {
+											prev = {
+												count_starbase_modules = { type = shipyard count = 4 }
+											}
+										}
+										event_target:starbase_system_star = {
+											set_variable = { which = num_of_shipyard_modules value = 4 }
+										}
+										else = {
+											if = {
+												limit = {
+													prev = {
+														count_starbase_modules = { type = shipyard count = 5 }
+													}
+												}
+												event_target:starbase_system_star = {
+													set_variable = { which = num_of_shipyard_modules value = 5 }
+												}
+												else = {
+													if = {
+														limit = {
+															prev = {
+																OR = {
+																	count_starbase_modules = { type = shipyard count = 6 }
+																	count_starbase_modules = { type = shipyard count > 6 } #failsafe for mods that add more module slots
+																}
+															}
+														}
+														event_target:starbase_system_star = {
+															set_variable = { which = num_of_shipyard_modules value = 6 }
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			event_target:starbase_system_star = {
+				set_variable = { which = shipyard_weight value = num_of_shipyard_modules }
+			}
+			if = {
+				limit = { 
+					any_planet = {
+						is_colony = yes
+						exists = owner
+						owner = { is_same_value = root }
+					}
+				}	
+				every_system_planet = {
+					limit = { 
+						is_colony = yes
+						exists = owner
+						owner = { is_same_value = root }
+					}	
+					event_target:starbase_system_star = {
+						change_variable = { which = shipyard_weight value = -1 }				
+					}	
+				}
+			}				
+			every_neighbor_system = {
+				ignore_hyperlanes = no
+				limit = {
+					is_within_borders_of = root
+					any_planet = {
+						exists = owner
+						owner = { is_same_value = root }
+					}
+				}
+				event_target:starbase_system_star = {
+					change_variable = { which = shipyard_weight value = 1 }
+				}
+			}
+			if = {
+				limit = { has_star_flag = gateway_system }
+				event_target:starbase_system_star = {
+					change_variable = { which = shipyard_weight value = 4 }
+				}
+			}			
+			every_neighbor_system = {
+				ignore_hyperlanes = no
+				limit = { has_star_flag = gateway_system is_within_borders_of = root }
+				event_target:starbase_system_star = {
+					change_variable = { which = shipyard_weight value = 2 }
+				}
+			}
+			event_target:starbase_system_star = {
+				multiply_variable = { which = shipyard_weight value = num_of_hyperlane_connections }
+				change_variable = { which = shipyard_weight value = starbase_level_record }
+			}
+			if = {
+				limit = {
+					event_target:starbase_system_star = {
+						check_variable = { which = shipyard_weight value > 0 }
+					}
+				}
+				set_timed_star_flag = { flag = shipyard_candidate_system days = 3600 }
+				else = {
+					set_timed_star_flag = { flag = shipyard_check_delay days = 3600 }
+				}
+			}
+		}
+	}
+}
+
+check_and_assign_shipyard_system_flag = {
+	random_system_planet = { 
+		limit = { has_planet_flag = system_variable_repository }		
+		save_event_target_as = system_check_target
+	}	
+	root = { 
+		every_system_within_border = {
+			limit = {				
+				NOT = { is_same_value = event_target:system_check_target.solar_system }
+				distance = { source = event_target:system_check_target type = hyperlane max_jumps = 4 }				
+				has_star_flag = shipyard_candidate_system
+			}
+			if = { 
+				limit = { 
+					NOR = { 
+						any_planet = { check_variable = { which = shipyard_weight value > event_target:system_check_target } } 
+						has_star_flag = shipyard_system
+					}	
+				}
+				event_target:system_check_target.solar_system = { 
+					remove_star_flag = shipyard_candidate_system
+					set_star_flag = shipyard_system					
+				}
+				root = { 
+					change_variable = { which = num_existing_shipyard_systems value = 1 }
+					change_variable = { which = required_shipyard_systems value = -1 }
+				}
+				else = {
+					remove_star_flag = shipyard_candidate_system
+					set_timed_star_flag = { flag = shipyard_check_delay days = 3589 }
+				}				
+			}
+		}
+	}
+}	
