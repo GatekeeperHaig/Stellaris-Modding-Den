@@ -11,6 +11,7 @@ event = { #game start
 	is_triggered_only = yes
 	immediate = { 
 		set_global_flag = cgm_game_start
+		set_timed_global_flag = { flag = cgm_game_start_timed days = 31 }
 		every_playable_country = { 
 			set_country_flag = reserve_and_income_variables_set
 			if = { 
@@ -75,7 +76,7 @@ event = {
 	}	
 }	
 
-@spending_threshold = 149 
+@spending_threshold = 99 
 ### we should move the spending threshold into a per country variable, so the amount is dynamically calculated given some factors rather than a static sum. 
 ### I also did not create different settings for the building construction reserve subtraction. We should decide how to implement this with policies for players. 
 ### Currently it subtracts a flat 20% of the minerals income variable value from the minerals reserve pool.  
@@ -123,8 +124,11 @@ event = {
 				set_variable = { which = engineering_research_reserve value = 0 }
 				set_variable = { which = engineering_research_income value = 0 }		
 			}				
-			check_income = yes
-			check_resource_requirements = yes
+			if = { 
+				limit = { NOT = { has_global_flag = cgm_game_start_timed } }				
+				check_income = yes
+				check_resource_requirements = yes
+			}	
 			if = { 
 				limit = { NOT = { has_country_flag = starbase_and_planet_check_delay } }
 				check_and_set_starbase_flags = yes

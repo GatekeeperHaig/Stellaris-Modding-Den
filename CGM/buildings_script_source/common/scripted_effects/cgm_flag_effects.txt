@@ -45,10 +45,10 @@ check_and_set_building_flags = {
 						OR = {
 							AND = {
 								any_country = {
-									is_at_war_with = root.owner
+									is_at_war_with = prev.owner
 									any_owned_planet = {
 										is_colony = yes
-										distance = { source = root min_distance = 70 max_distance = 100 }
+										distance = { source = prevprev min_distance = 70 max_distance = 100 }
 									}
 								}
 								NOT = {
@@ -378,7 +378,7 @@ check_and_set_starbase_flags = {
 		if = { 
 			limit = { 
 				any_planet = { 
-					is_owned_by = root
+					is_owned_by = prevprev
 				}		
 			}	
 			set_star_flag = colonized_system						
@@ -398,7 +398,7 @@ check_and_set_starbase_flags = {
 		}	
 		if = {
 			limit = { 
-				root = { is_exterminator = no } 
+				prev = { is_exterminator = no } 
 				OR = { 
 					AND = {
 						has_star_flag = enclave
@@ -415,7 +415,7 @@ check_and_set_starbase_flags = {
 								is_same_value = event_target:artist_enclave_country
 							}
 						}
-						root = { has_country_flag = art_college }
+						prev = { has_country_flag = art_college }
 					}	
 					AND = { 
 						has_star_flag = enclave
@@ -423,7 +423,7 @@ check_and_set_starbase_flags = {
 								exists = owner
 								owner = { has_country_flag = curator_enclave_country }
 						}
-						root = { has_country_flag = think_tank }
+						prev = { has_country_flag = think_tank }
 					}								
 				}	
 			}
@@ -431,7 +431,7 @@ check_and_set_starbase_flags = {
 		}							
 		if = {
 			limit = { 
-				root = { has_technology = "tech_gateway_activation" } 
+				prev = { has_technology = "tech_gateway_activation" } 
 				OR = {
 					has_megastructure = gateway_restored
 					has_megastructure = gateway_final								
@@ -509,7 +509,7 @@ set_shipyard_weight = {
 					prev = {
 						count_starbase_modules = { type = shipyard count > 2 }
 					}
-					root = {
+					prevprev = {
 						any_system_within_border = {
 							distance = { source = event_target:starbase_system_star type = hyperlane min_jumps = 3 }
 							has_star_flag = shipyard_system
@@ -540,7 +540,7 @@ set_shipyard_weight = {
 						}
 					}
 					any_country = {
-						OR = { is_at_war_with = root is_rival = root is_hostile_to = root is_threatened_to = root is_angry_to = root is_domineering_to = root }
+						OR = { is_at_war_with = prevprev is_rival = prevprev is_hostile_to = prevprev is_threatened_to = prevprev is_angry_to = prevprev is_domineering_to = prevprev }
 						any_system_within_border = {
 							distance = { source = event_target:starbase_system_star type = hyperlane min_jumps = 4 }
 						}
@@ -548,7 +548,7 @@ set_shipyard_weight = {
 					NOT = {
 						any_system = {
 							distance = { source = event_target:starbase_system_star type = hyperlane max_jumps = 2 }
-							NOT = { is_within_borders_of = root }
+							NOT = { is_within_borders_of = prevprev }
 						}
 					}
 				}
@@ -634,14 +634,14 @@ set_shipyard_weight = {
 					any_planet = {
 						is_colony = yes
 						exists = owner
-						owner = { is_same_value = root }
+						owner = { is_same_value = prevprev }
 					}
 				}	
 				every_system_planet = {
 					limit = { 
 						is_colony = yes
 						exists = owner
-						owner = { is_same_value = root }
+						owner = { is_same_value = prevprev }
 					}	
 					event_target:starbase_system_star = {
 						change_variable = { which = shipyard_weight value = -1 }				
@@ -651,10 +651,10 @@ set_shipyard_weight = {
 			every_neighbor_system = {
 				ignore_hyperlanes = no
 				limit = {
-					is_within_borders_of = root
+					is_within_borders_of = prevprev
 					any_planet = {
 						exists = owner
-						owner = { is_same_value = root }
+						owner = { is_same_value = prevprev }
 					}
 				}
 				event_target:starbase_system_star = {
@@ -669,7 +669,7 @@ set_shipyard_weight = {
 			}			
 			every_neighbor_system = {
 				ignore_hyperlanes = no
-				limit = { has_star_flag = gateway_system is_within_borders_of = root }
+				limit = { has_star_flag = gateway_system is_within_borders_of = prevprev }
 				event_target:starbase_system_star = {
 					change_variable = { which = shipyard_weight value = 2 }
 				}
@@ -698,7 +698,7 @@ check_and_assign_shipyard_system_flag = {
 		limit = { has_planet_flag = system_variable_repository }		
 		save_event_target_as = system_check_target
 	}	
-	root = { 
+	prev = { 
 		every_system_within_border = {
 			limit = {				
 				NOT = { is_same_value = event_target:system_check_target.solar_system }
@@ -716,7 +716,7 @@ check_and_assign_shipyard_system_flag = {
 					remove_star_flag = shipyard_candidate_system
 					set_star_flag = shipyard_system					
 				}
-				root = { 
+				prevprev = { 
 					change_variable = { which = num_existing_shipyard_systems value = 1 }
 					change_variable = { which = required_shipyard_systems value = -1 }
 				}
