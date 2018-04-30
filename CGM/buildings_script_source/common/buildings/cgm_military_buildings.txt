@@ -17,14 +17,119 @@ building_stronghold = {
 	planet_modifier = { planet_unrest_add = -30 }
 	#ai restrictions and weights
 	ai_allow = { mixed_or_vanilla_ai_routines = yes unity_buildings_ai_allow = yes }
-	ai_weight = {
+	#ai_weight = {
 		weight = 0
+		#modifier = {
+		#	weight = 1000
+		#	from = { has_planet_flag = fortify_planet }
+		#}
+	#}
+	ai_weight = {
+		weight = 1000
 		modifier = {
-			weight = 1000
-			planet = { has_planet_flag = fortify_planet }
+			factor = 0
+			years_passed < 25
+		}
+		modifier = {
+			factor = 0
+			planet = { 
+				unrest < 50
+				sector_controlled = yes 
+				owner = { is_ai = no }
+			}
+			NOR = { 
+				has_building = "building_stronghold" 
+				has_building = "building_fortress"
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 12
+						OR = {
+							has_building = "building_capital_1"
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"	
+							has_building = "building_machine_capital_1"
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"							
+						}							
+					}				
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 16
+						OR = {
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"	
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"							
+						}						
+					}					
+				}
+				count_tile = {
+					limit = {
+						OR = {
+							has_building = building_stronghold
+							has_building = building_fortress
+						}
+					}
+					count > 0					
+				}				
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 20
+						OR = {
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"	
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"							
+						}						
+					}				
+				}
+				count_tile = {
+					limit = {
+						OR = {
+							has_building = building_stronghold
+							has_building = building_fortress
+						}
+					}
+					count > 1					
+				}				
+			}
+		}	
+		modifier = {
+			factor = 0
+			planet = {
+				count_tile = {
+					limit = {
+						OR = {
+							has_building = building_stronghold
+							has_building = building_fortress
+						}
+					}
+					count > 2					
+				}
+			}
 		}
 	}
-}
+}	
+
 building_fortress = {
 	#building defines
 	tags = { military_building }
@@ -42,15 +147,6 @@ building_fortress = {
 	#resource output and modifiers
 	produced_resources = { unity = 2 }
 	planet_modifier = { planet_unrest_add = -50 }
-	#ai restrictions and weights
-	ai_allow = { mixed_or_vanilla_ai_routines = yes unity_buildings_ai_allow = yes }
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 1000
-			planet = { has_planet_flag = fortify_planet }
-		}
-	}
 }
 building_planetary_shield_generator = {
 	#building defines
@@ -82,11 +178,11 @@ building_planetary_shield_generator = {
 	#ai restrictions and weights
 	ai_allow = { mixed_or_vanilla_ai_routines = yes planetary_shield_ai_allow_conditions = yes }
 	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 100
-			from = { has_planet_flag = build_planetary_shield_generator }
-		}
+		weight = 25
+		#modifier = {
+		#	weight = 100
+		#	from = { has_planet_flag = build_planetary_shield_generator }
+		#}
 	}
 }
 building_military_academy = {
