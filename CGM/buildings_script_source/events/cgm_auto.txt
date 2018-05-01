@@ -66,7 +66,11 @@ country_event = {
 			log = "searching on planet [this.GetName]"
 			if = {
 				limit = {
-					check_variable = { which = cgm_bestWeight_1 value = 0 }
+					OR = {
+						check_variable = { which = cgm_bestWeight_1 value = 0 }
+						has_planet_flag = cgm_redo_planet_calc
+						owner = { has_country_flag = cgm_redo_all_planet_calcs }
+					}
 				}
 				planet_event = { id = cgm_auto.20 }
 			}
@@ -82,6 +86,7 @@ country_event = {
 		}
 		log = "bestStandard:[this.cgm_bestWeight_1]"
 		log = "bestSpecial:[this.cgm_special_bestWeight]"
+		remove_country_flag = cgm_redo_all_planet_calcs
 		if = {
 			limit = {
 				check_variable = { which = cgm_bestWeight_1 value > cgm_special_bestWeight }
@@ -441,6 +446,7 @@ planet_event = {
 	is_triggered_only = yes
 	hide_window = yes
 	immediate = {
+		remove_planet_flag = cgm_redo_planet_calc
 		set_variable = { which = cgm_curTile value = 0 }
 		set_variable = { which = cgm_bestWeight_1 value = 0 }
 		set_variable = { which = cgm_bestWeight_2 value = 0 }
@@ -727,14 +733,6 @@ country_event = {
 	is_triggered_only = yes
 	hide_window = yes
 	immediate = {
-		determine_surplus_energy = yes
-		determine_surplus_minerals = yes
-		determine_surplus_food = yes
-		determine_surplus_unity = yes
-		determine_surplus_society_research = yes
-		determine_surplus_physics_research = yes
-		determine_surplus_engineering_research = yes
-		check_income = yes
 		set_variable = { which = energy_country_weight value = 1 }
 		set_variable = { which = minerals_country_weight value = 1 }
 		set_variable = { which = food_country_weight value = 1 }

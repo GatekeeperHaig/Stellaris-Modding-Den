@@ -116,12 +116,13 @@ def main():
   empireStandardBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
   if debug:
     findBestPlanet.add("log", '"searching on planet [this.GetName]"')
-  findBestPlanet.add("if",TagList("limit", TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value", "0","","="))).createEvent(name_planet_find_best, "planet_event"))
+  findBestPlanet.add("if",TagList("limit", TagList("OR", TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value", "0","","=")).add("has_planet_flag", "cgm_redo_planet_calc").add("owner", TagList("has_country_flag", "cgm_redo_all_planet_calcs")))).createEvent(name_planet_find_best, "planet_event"))
   findBestPlanetIf=TagList("limit", TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value", "prev","",">")))
   findBestPlanet.add("if", findBestPlanetIf)
   findBestPlanetIf.add("save_event_target_as", "cgm_best_planet")
   findBestPlanetIf.add("prev", TagList("set_variable", TagList("which", "cgm_bestWeight_1").add("value", "prev")))
 
+  empireStandardBuildEventImmediate.add("remove_country_flag", "cgm_redo_all_planet_calcs")
   if debug:
     empireStandardBuildEventImmediate.add("log",'"bestStandard:[this.cgm_bestWeight_1]"')
     empireStandardBuildEventImmediate.add("log",'"bestSpecial:[this.cgm_special_bestWeight]"')
@@ -236,6 +237,7 @@ def main():
   # triggeredHidden(planetFindBestEvent)
   planetFindBestEventImmediate=TagList()
   planetFindBestEvent.add("immediate", planetFindBestEventImmediate)
+  planetFindBestEventImmediate.add("remove_planet_flag","cgm_redo_planet_calc")
   planetFindBestEventImmediate.variableOp("set", "cgm_curTile", 0) 
   for i in storedValsRange:
     planetFindBestEventImmediate.variableOp("set", "cgm_bestWeight_{!s}".format(i), 0) 
@@ -272,7 +274,6 @@ def main():
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_building")
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_pop")
     planetFindBestEventImmediate.variableOp("set", resource+"_country_weight", "owner")
-    #TODO! ACTIVATE AGAIN: ALSO MAKE SURE THEY ARE ALWAYS COMPUTED FIRST
     planetFindBestEventImmediate.variableOp("multiply", resource+"_mult_planet", resource+"_country_weight")
 
   everyTileSearch=TagList()
@@ -285,7 +286,6 @@ def main():
   #   curPrev.variableOp("set", weight+"_weight", 0)
 
   everyTileSearch.add("calculate_tile_weight","yes")
-  #TODO: adjacecy construction effect!
   everyTileSearch=everyTileSearch.addReturn("prev")
   for resource in resources:
     if resource!="unity":
@@ -355,9 +355,9 @@ def main():
   outTag.add("country_event", empireWeightsEvent)
   empireWeightsEvent.triggeredHidden()
   empireWeightsEventImmediate=empireWeightsEvent.addReturn("immediate")
-  for resource in resources:
-    empireWeightsEventImmediate.add("determine_surplus_"+resource,"yes")
-  empireWeightsEventImmediate.add("check_income","yes")
+  # for resource in resources:
+  #   empireWeightsEventImmediate.add("determine_surplus_"+resource,"yes")
+  # empireWeightsEventImmediate.add("check_income","yes")
   for resource in resources:
     empireWeightsEventImmediate.variableOp("set",resource+"_country_weight",1)
   empireWeightsEventImmediate.addComment("First negative part test:")
