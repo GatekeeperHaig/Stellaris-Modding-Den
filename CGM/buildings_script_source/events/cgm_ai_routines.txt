@@ -13,7 +13,7 @@ event = { #game start
 		set_global_flag = cgm_game_start
 		set_timed_global_flag = { flag = cgm_game_start_timed days = 31 }
 		every_playable_country = { 
-			set_country_flag = reserve_and_income_variables_set
+			#set_country_flag = reserve_and_income_variables_set
 			if = { 
 				limit = { 
 					OR = {
@@ -99,31 +99,7 @@ event = {
 					is_country_type = default
 					is_country_type = awakened_fallen_empire
 				}
-			}
-			if = { 
-				limit = { NOT = { has_country_flag = reserve_and_income_variables_set } }
-				set_country_flag = reserve_and_income_variables_set
-				if = { 
-					limit = { 
-						OR = {
-							is_machine_empire = no
-							is_servitor = yes
-						}
-					}
-					set_variable = { which = food_reserve value = 0 }
-					set_variable = { which = food_income value = 0 }
-				}
-				set_variable = { which = energy_reserve value = 0 }
-				set_variable = { which = energy_income value = 0 }
-				set_variable = { which = minerals_reserve value = 0 }
-				set_variable = { which = minerals_income value = 0 }
-				set_variable = { which = society_research_reserve value = 0 }
-				set_variable = { which = society_research_income value = 0 }
-				set_variable = { which = physics_research_reserve value = 0 }
-				set_variable = { which = physics_research_income value = 0 }
-				set_variable = { which = engineering_research_reserve value = 0 }
-				set_variable = { which = engineering_research_income value = 0 }		
-			}				
+			}			
 			if = { 
 				limit = { NOT = { has_global_flag = cgm_game_start_timed } }				
 				check_income = yes
@@ -135,13 +111,28 @@ event = {
 				check_and_set_building_flags = yes
 				set_timed_country_flag = { flag = starbase_and_planet_check_delay days = 360 }
 			}	
+			set_variable = { which = reserve_transport value = 0 }
 			if = { 
-				limit = { 
-					check_variable = { which = minerals_reserve value > 0 } 
-					check_variable = { which = minerals_income value > 0 } 
-				}
-				set_variable = { which = reserve_transport value = minerals_income }
-				multiply_variable = { which = reserve_transport value = 0.2 } 
+				limit = { check_variable = { which = minerals_reserve value > 0 } }
+
+				if = { 
+					limit = { check_variable = { which = minerals_income value > 0 } }
+					set_variable = { which = reserve_transport value = minerals_income }
+					multiply_variable = { which = reserve_transport value = 0.2 }
+					else = {
+						set_variable = { which = cgm_tmp value = minerals_income }
+						multiply_variable = { which = cgm_tmp value = -1 }
+						set_variable = { which = cgm_months_to_starvation value = minerals_reserve }
+						divide_variable = { which = cgm_months_to_starvation value = minerals_income }
+						if = {
+							limit = {
+								check_variable = { which = cgm_months_to_starvation value > 20 }
+							}
+							set_variable = { which = reserve_transport value = minerals_reserve }
+							multiply_variable = { which = reserve_transport value = 0.2 }
+						}
+					}
+				 
 				if = { 
 					limit = { check_variable = { which = minerals_reserve value > reserve_transport } }
 					if = { 
