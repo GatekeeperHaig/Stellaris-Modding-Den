@@ -111,7 +111,7 @@ def main():
   findBestPlanetLimit.add("or", TagList("and", TagList("sector_controlled","no").add("prev", TagList("has_country_flag", "cgm_core_world_auto"))).add("and", TagList("sector_controlled","yes").add("not", TagList("prev", TagList("has_country_flag", "cgm_core_world_auto")))))
   # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("or", TagList("is_growing", "yes").add("is_unemployed","yes")))
   # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("is_unemployed","yes")) #seems not to work
-  findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("NOR",TagList("tile",TagList("has_building","yes").add("has_building_construction","yes"))))
+  findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))))
   # findBestPlanetLimit.
   empireStandardBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
   if debug:
@@ -204,7 +204,7 @@ def main():
   findBestPlanetLimit.add("or", TagList("and", TagList("sector_controlled","no").add("prev", TagList("has_country_flag", "cgm_core_world_auto"))).add("and", TagList("sector_controlled","yes").add("not", TagList("prev", TagList("has_country_flag", "cgm_core_world_auto")))))
   # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("or", TagList("is_growing", "yes").add("is_unemployed","yes")))
   # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("is_unemployed","yes")) #seems not to work
-  findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("NOR",TagList("tile",TagList("has_building","yes").add("has_building_construction","yes"))))
+  findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))))
   # findBestPlanetLimit.
   empireSpecialBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
     
