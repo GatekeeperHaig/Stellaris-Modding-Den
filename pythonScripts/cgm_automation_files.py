@@ -485,7 +485,8 @@ def main():
         curEffect=curEffect.addReturn("else")
       curEffect.variableOp("set", resource+"_log", i+1)
       curEffect.variableOp("set", resource+"_income", round(fun(i+0.5),3))
-    outputToFolderAndFile(checkResourceEffect, "common/scripted_effects", "cgm_income_count_test{}.txt".format(name),2, "../CGM/buildings_script_source")
+    outputToFolderAndFile(checkResourceEffect, "common/scripted_effects", "cgm_income_record_effects.txt",2, "../CGM/buildings_script_source")
+    # outputToFolderAndFile(checkResourceEffect, "common/scripted_effects", "cgm_income_record_effects{}.txt".format(name),2, "../CGM/buildings_script_source")
 
 
 
