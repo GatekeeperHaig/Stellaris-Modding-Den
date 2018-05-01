@@ -247,6 +247,10 @@ def main():
   locClass.addLoc("deactivate_edict"+"Desc", "Removes the edict to start the main menu of this mod. Main menu can still be started via Mod Menu or calling 'event custum_difficulty.0' in console")
   locClass.addLoc("activate_edict", "Show Menu Edict")
   locClass.addLoc("activate_edict"+"Desc", "Show the edict to start the main menu of this mod")
+  locClass.addLoc("activate_host_only", "Activate Host Changes Only")
+  locClass.addLoc("activate_host_only"+"Desc", "Only the host of the game will be able to change any settings. Other players can open the dynamic difficulty menu and see the settings, but won't be able to change anything")
+  locClass.addLoc("activate_host_only", "Deactivate Host Changes Only")
+  locClass.addLoc("activate_host_only"+"Desc", "Everybody can change any dynamic difficulty settings, unless settings have been locked")
 
 
 
@@ -1119,13 +1123,15 @@ def main():
   optionWithInverse["activate_delay_mode"]=["deactivate_delay_mode"]
   optionWithInverse["activate_edict"]=["deactivate_edict"]
   optionWithInverse["deactivate_edict"]=["activate_edict"]
+  optionWithInverse["activate_host_only"]=["deactivate_host_only"]
+  optionWithInverse["deactivate_host_only"]=["activate_host_only"]
   # optionWithInverse[]=[]
 
   optionExtraEvents=dict()
   optionExtraEvents["activate_simple_mode"]=["name_removeAllModifiers"]
   optionExtraEvents["activate_custom_mode"]=["name_removeAllModifiers"]
 
-  optionColors="GGBBYYEE"
+  optionColors="GGBBYYEERR"
   defaultOptions=[]
 
 
@@ -1142,6 +1148,9 @@ def main():
     trigger=deepcopy(t_notLockedTrigger)
     option.add("trigger", trigger)
     trigger.add("not", TagList("has_global_flag", "custom_difficulty_"+key))
+    if "hostOnly" in key:
+      trigger.add("is_multiplayer","yes") 
+      trigger.add("is_host","yes") 
     t_anyOption.add("has_global_flag", "custom_difficulty_"+key)
     effect=TagList("set_global_flag", "custom_difficulty_"+key)
     inverseIsDefault=False
@@ -1254,6 +1263,12 @@ def main():
 
   outputToFolderAndFile(mainFileContent , "events", "custom_difficulty_main.txt",1 )
 
+  scriptedTriggers=TagList()
+  allowChangesTrigger=scriptedTriggers.addReturn("custom_difficulty_allow_changes")
+  allowChangesTrigger.add("NOT", TagList("has_global_flag", "custom_difficulty_locked"))
+  allowChangesTrigger.add("OR", TagList("is_multiplayer", "no").add("custom_difficulty_is_host", "yes").add("not", TagList("has_global_flag","custom_difficulty_activate_host_only")))
+
+  outputToFolderAndFile(scriptedTriggers , "common/scripted_triggers", "custom_difficulty_triggers.txt",1 )
 
   locClassCopy=deepcopy(locClass)
   for language in locClass.languages:
