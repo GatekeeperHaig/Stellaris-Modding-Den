@@ -13,7 +13,16 @@ country_event = {
 	hide_window = yes
 	immediate = {
 		remove_country_flag = cgm_auto_built
-		 #TODO: only redo empire income checks after certain time has passed
+		if = {
+			limit = { has_country_flag = cgm_redo_all_planet_calcs }
+			remove_country_flag = cgm_redo_all_planet_calcs
+			every_owned_planet = {
+				set_variable = { which = cgm_worstWeight value = 99999 }
+				set_variable = { which = cgm_bestWeight_0 value = 0 }
+				set_variable = { which = cgm_bestWeight_1 value = 0 }
+				set_variable = { which = cgm_bestWeight_2 value = 0 }
+			}
+		}
 		if = {
 			limit = { NOT = { has_country_flag = cgm_empire_weights_computed_timed } }
 			country_event = { id = cgm_auto.30 }
@@ -75,7 +84,6 @@ country_event = {
 					OR = {
 						check_variable = { which = cgm_bestWeight_1 value = 0 }
 						has_planet_flag = cgm_redo_planet_calc
-						owner = { has_country_flag = cgm_redo_all_planet_calcs }
 					}
 				}
 				planet_event = { id = cgm_auto.20 }
@@ -90,7 +98,6 @@ country_event = {
 				}
 			}
 		}
-		remove_country_flag = cgm_redo_all_planet_calcs
 		log = "bestStandard:[this.cgm_bestWeight_1]"
 		log = "bestSpecial:[this.cgm_special_bestWeight]"
 		if = {

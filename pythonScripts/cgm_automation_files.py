@@ -66,8 +66,13 @@ def main():
   empireMainBuildEvent.triggeredHidden()
   empireMainBuildEventImmediate=empireMainBuildEvent.addReturn("immediate")
   empireMainBuildEventImmediate.add("remove_country_flag", "cgm_auto_built")
-  empireMainBuildEventImmediate.addComment("TODO: only redo empire income checks after certain time has passed")
-  empireMainBuildEventImmediate.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_empire_weights_computed"))).createEvent(name_empire_weights)
+  resetAll=empireMainBuildEventImmediate.createReturnIf(TagList("has_country_flag","cgm_redo_all_planet_calcs"))
+  resetAll.add("remove_country_flag", "cgm_redo_all_planet_calcs")
+  resetAll=resetAll.addReturn("every_owned_planet")
+  resetAll.variableOp("set", "cgm_worstWeight", pseudoInf)
+  for i in range(3):
+    resetAll.variableOp("set", "cgm_bestWeight_{!s}".format(i), 0)
+  empireMainBuildEventImmediate.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_empire_weights_computed_timed"))).createEvent(name_empire_weights)
   empireMainBuildEventImmediate.add("set_country_flag", "display_low_tier_flag", "#The buildings we create are otherwise probably unavaiable due to direct build. Later removed again.")
 
   
@@ -121,13 +126,13 @@ def main():
   empireStandardBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
   if debug:
     findBestPlanet.add("log", '"searching on planet [this.GetName]"')
-  findBestPlanet.add("if",TagList("limit", TagList("OR", TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value", "0","","=")).add("has_planet_flag", "cgm_redo_planet_calc").add("owner", TagList("has_country_flag", "cgm_redo_all_planet_calcs")))).createEvent(name_planet_find_best, "planet_event"))
+  findBestPlanet.add("if",TagList("limit", TagList("OR", TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value", "0","","=")).add("has_planet_flag", "cgm_redo_planet_calc"))).createEvent(name_planet_find_best, "planet_event"))
   findBestPlanetIf=TagList("limit", TagList("check_variable", TagList("which", "cgm_bestWeight_1").add("value", "prev","",">")))
   findBestPlanet.add("if", findBestPlanetIf)
   findBestPlanetIf.add("save_event_target_as", "cgm_best_planet")
   findBestPlanetIf.add("prev", TagList("set_variable", TagList("which", "cgm_bestWeight_1").add("value", "prev")))
 
-  empireStandardBuildEventImmediate.add("remove_country_flag", "cgm_redo_all_planet_calcs")
+  # empireStandardBuildEventImmediate.add("remove_country_flag", "cgm_redo_all_planet_calcs")
   if debug:
     empireStandardBuildEventImmediate.add("log",'"bestStandard:[this.cgm_bestWeight_1]"')
     empireStandardBuildEventImmediate.add("log",'"bestSpecial:[this.cgm_special_bestWeight]"')
@@ -384,7 +389,7 @@ def main():
   outTag.add("country_event", empireWeightsEvent)
   empireWeightsEvent.triggeredHidden()
   empireWeightsEventImmediate=empireWeightsEvent.addReturn("immediate")
-  empireWeightsEventImmediate.add("set_timed_country_flag", TagList( "flag", "cgm_empire_weights_computed").add("days", 180))
+  empireWeightsEventImmediate.add("set_timed_country_flag", TagList( "flag", "cgm_empire_weights_computed_timed").add("days", 180))
   # for resource in resources:
   #   empireWeightsEventImmediate.add("determine_surplus_"+resource,"yes")
   for resource in resources:
