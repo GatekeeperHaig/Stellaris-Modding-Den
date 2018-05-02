@@ -14,13 +14,19 @@ country_event = {
 	immediate = {
 		remove_country_flag = cgm_auto_built
 		 #TODO: only redo empire income checks after certain time has passed
-		country_event = { id = cgm_auto.30 }
+		if = {
+			limit = { NOT = { has_country_flag = cgm_empire_weights_computed_timed } }
+			country_event = { id = cgm_auto.30 }
+		}
 		set_country_flag = display_low_tier_flag #The buildings we create are otherwise probably unavaiable due to direct build. Later removed again.
-		set_country_flag = cgm_core_world_auto #searching core worlds for standard buildings
-		 #Search for possible Special buildings:
-		country_event = { id = cgm_auto.11 }
-		 #Search for possible Standard buildings. Build best out of standard/special:
-		country_event = { id = cgm_auto.10 }
+		if = {
+			limit = { not = { has_country_flag = cgm_sector_autobuild } }
+			set_country_flag = cgm_core_world_auto #searching core worlds for standard buildings
+			 #Search for possible Special buildings:
+			country_event = { id = cgm_auto.11 }
+			 #Search for possible Standard buildings. Build best out of standard/special:
+			country_event = { id = cgm_auto.10 }
+		}
 		if = {
 			limit = { not = { has_country_flag = cgm_auto_built } }
 			remove_country_flag = cgm_core_world_auto #searching sector worlds for standard buildings
@@ -823,6 +829,7 @@ country_event = {
 	is_triggered_only = yes
 	hide_window = yes
 	immediate = {
+		set_timed_country_flag = { flag = cgm_empire_weights_computed_timed days = 180 }
 		set_variable = { which = energy_country_weight value = 1 }
 		set_variable = { which = minerals_country_weight value = 1 }
 		set_variable = { which = food_country_weight value = 1 }
@@ -975,6 +982,254 @@ country_event = {
 				}
 				set_variable = { which = engineering_research_country_weight value = 2 }
 			}
+		}
+		if = {
+			limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+			if = {
+				limit = {
+					OR = {
+						check_variable = { which = energy_country_weight_old value = 0 }
+						check_variable = { which = energy_country_weight value = 0 }
+					}
+				}
+				if = {
+					limit = {
+						OR = {
+							check_variable = { which = energy_country_weight_old value > 0.5 }
+							check_variable = { which = energy_country_weight value > 0.5 }
+						}
+					}
+					set_country_flag = cgm_redo_all_planet_calcs
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+				set_variable = { which = cgm_tmp value = energy_country_weight_old }
+				divide_variable = { which = cgm_tmp value = energy_country_weight }
+				if = {
+					limit = {
+						OR = {
+							check_variable = { which = cgm_tmp value > 1.5 }
+							check_variable = { which = cgm_tmp value < 0.666 }
+						}
+					}
+					set_country_flag = cgm_redo_all_planet_calcs
+				}
+				if = {
+					limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+					if = {
+						limit = {
+							OR = {
+								check_variable = { which = minerals_country_weight_old value = 0 }
+								check_variable = { which = minerals_country_weight value = 0 }
+							}
+						}
+						if = {
+							limit = {
+								OR = {
+									check_variable = { which = minerals_country_weight_old value > 0.5 }
+									check_variable = { which = minerals_country_weight value > 0.5 }
+								}
+							}
+							set_country_flag = cgm_redo_all_planet_calcs
+						}
+					}
+					if = {
+						limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+						set_variable = { which = cgm_tmp value = minerals_country_weight_old }
+						divide_variable = { which = cgm_tmp value = minerals_country_weight }
+						if = {
+							limit = {
+								OR = {
+									check_variable = { which = cgm_tmp value > 1.5 }
+									check_variable = { which = cgm_tmp value < 0.666 }
+								}
+							}
+							set_country_flag = cgm_redo_all_planet_calcs
+						}
+						if = {
+							limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+							if = {
+								limit = {
+									OR = {
+										check_variable = { which = food_country_weight_old value = 0 }
+										check_variable = { which = food_country_weight value = 0 }
+									}
+								}
+								if = {
+									limit = {
+										OR = {
+											check_variable = { which = food_country_weight_old value > 0.5 }
+											check_variable = { which = food_country_weight value > 0.5 }
+										}
+									}
+									set_country_flag = cgm_redo_all_planet_calcs
+								}
+							}
+							if = {
+								limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+								set_variable = { which = cgm_tmp value = food_country_weight_old }
+								divide_variable = { which = cgm_tmp value = food_country_weight }
+								if = {
+									limit = {
+										OR = {
+											check_variable = { which = cgm_tmp value > 1.5 }
+											check_variable = { which = cgm_tmp value < 0.666 }
+										}
+									}
+									set_country_flag = cgm_redo_all_planet_calcs
+								}
+								if = {
+									limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+									if = {
+										limit = {
+											OR = {
+												check_variable = { which = unity_country_weight_old value = 0 }
+												check_variable = { which = unity_country_weight value = 0 }
+											}
+										}
+										if = {
+											limit = {
+												OR = {
+													check_variable = { which = unity_country_weight_old value > 0.5 }
+													check_variable = { which = unity_country_weight value > 0.5 }
+												}
+											}
+											set_country_flag = cgm_redo_all_planet_calcs
+										}
+									}
+									if = {
+										limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+										set_variable = { which = cgm_tmp value = unity_country_weight_old }
+										divide_variable = { which = cgm_tmp value = unity_country_weight }
+										if = {
+											limit = {
+												OR = {
+													check_variable = { which = cgm_tmp value > 1.5 }
+													check_variable = { which = cgm_tmp value < 0.666 }
+												}
+											}
+											set_country_flag = cgm_redo_all_planet_calcs
+										}
+										if = {
+											limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+											if = {
+												limit = {
+													OR = {
+														check_variable = { which = society_research_country_weight_old value = 0 }
+														check_variable = { which = society_research_country_weight value = 0 }
+													}
+												}
+												if = {
+													limit = {
+														OR = {
+															check_variable = { which = society_research_country_weight_old value > 0.5 }
+															check_variable = { which = society_research_country_weight value > 0.5 }
+														}
+													}
+													set_country_flag = cgm_redo_all_planet_calcs
+												}
+											}
+											if = {
+												limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+												set_variable = { which = cgm_tmp value = society_research_country_weight_old }
+												divide_variable = { which = cgm_tmp value = society_research_country_weight }
+												if = {
+													limit = {
+														OR = {
+															check_variable = { which = cgm_tmp value > 1.5 }
+															check_variable = { which = cgm_tmp value < 0.666 }
+														}
+													}
+													set_country_flag = cgm_redo_all_planet_calcs
+												}
+												if = {
+													limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+													if = {
+														limit = {
+															OR = {
+																check_variable = { which = physics_research_country_weight_old value = 0 }
+																check_variable = { which = physics_research_country_weight value = 0 }
+															}
+														}
+														if = {
+															limit = {
+																OR = {
+																	check_variable = { which = physics_research_country_weight_old value > 0.5 }
+																	check_variable = { which = physics_research_country_weight value > 0.5 }
+																}
+															}
+															set_country_flag = cgm_redo_all_planet_calcs
+														}
+													}
+													if = {
+														limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+														set_variable = { which = cgm_tmp value = physics_research_country_weight_old }
+														divide_variable = { which = cgm_tmp value = physics_research_country_weight }
+														if = {
+															limit = {
+																OR = {
+																	check_variable = { which = cgm_tmp value > 1.5 }
+																	check_variable = { which = cgm_tmp value < 0.666 }
+																}
+															}
+															set_country_flag = cgm_redo_all_planet_calcs
+														}
+														if = {
+															limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+															if = {
+																limit = {
+																	OR = {
+																		check_variable = { which = engineering_research_country_weight_old value = 0 }
+																		check_variable = { which = engineering_research_country_weight value = 0 }
+																	}
+																}
+																if = {
+																	limit = {
+																		OR = {
+																			check_variable = { which = engineering_research_country_weight_old value > 0.5 }
+																			check_variable = { which = engineering_research_country_weight value > 0.5 }
+																		}
+																	}
+																	set_country_flag = cgm_redo_all_planet_calcs
+																}
+															}
+															if = {
+																limit = { NOT = { has_country_flag = cgm_redo_all_planet_calcs } }
+																set_variable = { which = cgm_tmp value = engineering_research_country_weight_old }
+																divide_variable = { which = cgm_tmp value = engineering_research_country_weight }
+																if = {
+																	limit = {
+																		OR = {
+																			check_variable = { which = cgm_tmp value > 1.5 }
+																			check_variable = { which = cgm_tmp value < 0.666 }
+																		}
+																	}
+																	set_country_flag = cgm_redo_all_planet_calcs
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = { has_country_flag = cgm_redo_all_planet_calcs }
+			set_variable = { which = energy_country_weight_old value = energy_country_weight }
+			set_variable = { which = minerals_country_weight_old value = minerals_country_weight }
+			set_variable = { which = food_country_weight_old value = food_country_weight }
+			set_variable = { which = unity_country_weight_old value = unity_country_weight }
+			set_variable = { which = society_research_country_weight_old value = society_research_country_weight }
+			set_variable = { which = physics_research_country_weight_old value = physics_research_country_weight }
+			set_variable = { which = engineering_research_country_weight_old value = engineering_research_country_weight }
 		}
 		log = "energy_country_weight:[this.energy_country_weight]"
 		log = "minerals_country_weight:[this.minerals_country_weight]"

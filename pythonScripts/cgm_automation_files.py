@@ -67,13 +67,16 @@ def main():
   empireMainBuildEventImmediate=empireMainBuildEvent.addReturn("immediate")
   empireMainBuildEventImmediate.add("remove_country_flag", "cgm_auto_built")
   empireMainBuildEventImmediate.addComment("TODO: only redo empire income checks after certain time has passed")
-  empireMainBuildEventImmediate.createEvent(name_empire_weights)
+  empireMainBuildEventImmediate.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_empire_weights_computed"))).createEvent(name_empire_weights)
   empireMainBuildEventImmediate.add("set_country_flag", "display_low_tier_flag", "#The buildings we create are otherwise probably unavaiable due to direct build. Later removed again.")
-  empireMainBuildEventImmediate.add("set_country_flag", "cgm_core_world_auto", "#searching core worlds for standard buildings")
-  empireMainBuildEventImmediate.addComment("Search for possible Special buildings:")
-  empireMainBuildEventImmediate.createEvent(name_empire_special_build_event)
-  empireMainBuildEventImmediate.addComment("Search for possible Standard buildings. Build best out of standard/special:")
-  empireMainBuildEventImmediate.createEvent(name_empire_standard_build_event)
+
+  
+  standard_build=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_sector_autobuild")))
+  standard_build.add("set_country_flag", "cgm_core_world_auto", "#searching core worlds for standard buildings")
+  standard_build.addComment("Search for possible Special buildings:")
+  standard_build.createEvent(name_empire_special_build_event)
+  standard_build.addComment("Search for possible Standard buildings. Build best out of standard/special:")
+  standard_build.createEvent(name_empire_standard_build_event)
   #disabl for better testing(no deletion of variables):
   sectorBuild=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_auto_built")))
   sectorBuild.add("remove_country_flag", "cgm_core_world_auto", "#searching sector worlds for standard buildings")
@@ -381,9 +384,9 @@ def main():
   outTag.add("country_event", empireWeightsEvent)
   empireWeightsEvent.triggeredHidden()
   empireWeightsEventImmediate=empireWeightsEvent.addReturn("immediate")
+  empireWeightsEventImmediate.add("set_timed_country_flag", TagList( "flag", "cgm_empire_weights_computed").add("days", 180))
   # for resource in resources:
   #   empireWeightsEventImmediate.add("determine_surplus_"+resource,"yes")
-  # empireWeightsEventImmediate.add("check_income","yes")
   for resource in resources:
     empireWeightsEventImmediate.variableOp("set",resource+"_country_weight",1)
   empireWeightsEventImmediate.addComment("First negative part test:")
@@ -430,6 +433,23 @@ def main():
       empireWeightsEventAllPositive.variableOp("divide",resource+"_country_weight", "cgm_tmp")
       empireWeightsEventAllPositive.createReturnIf(variableOpNew("check",resource+"_country_weight", 2,">")).variableOp("set",resource+"_country_weight", 2)
 
+  # empireWeightsEventImmediate.add("check_income","yes")
+  noChangeYet=empireWeightsEventImmediate
+  for resource in resources:
+    noChangeYet=noChangeYet.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_redo_all_planet_calcs")))
+    atLeastOneZero=noChangeYet.createReturnIf(TagList("OR", variableOpNew("check", resource+"_country_weight_old",0).variableOp("check", resource+"_country_weight",0)))
+    atLeastOneDecentlyLarge=atLeastOneZero.createReturnIf(TagList("OR", variableOpNew("check", resource+"_country_weight_old",0.5,">").variableOp("check", resource+"_country_weight",0.5,">")))
+    atLeastOneDecentlyLarge.add("set_country_flag", "cgm_redo_all_planet_calcs")
+
+    noChangeYet=noChangeYet.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_redo_all_planet_calcs")))
+    noChangeYet.variableOp("set", "cgm_tmp", resource+"_country_weight_old")
+    noChangeYet.variableOp("divide", "cgm_tmp", resource+"_country_weight")
+    noChangeYet.createReturnIf(TagList("OR", variableOpNew("check", "cgm_tmp",1.5,">").variableOp("check", "cgm_tmp",0.666,"<"))).add("set_country_flag", "cgm_redo_all_planet_calcs")
+
+
+  storeWeightsAfterChange=empireWeightsEventImmediate.createReturnIf(TagList("has_country_flag", "cgm_redo_all_planet_calcs"))
+  for resource in resources:
+    storeWeightsAfterChange.variableOp("set",resource+"_country_weight_old",resource+"_country_weight")
   if debug:
     for resource in resources:
       empireWeightsEventImmediate.add("log", '"'+resource+"_country_weight:[this."+resource+'_country_weight]"')
