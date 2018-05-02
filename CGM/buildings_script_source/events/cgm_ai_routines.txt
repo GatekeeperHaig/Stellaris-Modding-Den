@@ -42,6 +42,7 @@ event = { #game start
 		every_playable_country = {
 			limit = { is_ai = no }
 			set_country_flag = cgm_ai_disable_autobuild
+			set_variable = { which = cgm_building_construction_percent value = 20 } #not used initially, but just to have a default value.
 		}
 		every_system = {
 			system_star = { 
@@ -115,14 +116,20 @@ event = {
 				set_timed_country_flag = { flag = starbase_and_planet_check_delay days = 360 }
 			}	
 			set_variable = { which = reserve_transport value = 0 }
-			set_variable = { which = cgm_building_construction_percent value = 0.5 } #todo: make customizable (and probably depend on pops without building for AI)
+			if = {
+				limit = { is_ai = no }
+				set_variable = { which = cgm_building_construction_fraction value = cgm_building_construction_percent }
+				divide_variable = { which = cgm_building_construction_fraction value = 100 }
+				else = { set_variable = { which = cgm_building_construction_fraction value = 0.2 } } #todo: make it depend on pops without building
+			}
+			
 			if = { 
 				limit = { check_variable = { which = minerals_reserve value > 0 } }
 
 				if = { 
 					limit = { check_variable = { which = minerals_income value > 0 } }
 					set_variable = { which = reserve_transport value = minerals_income }
-					multiply_variable = { which = reserve_transport value = cgm_building_construction_percent }
+					multiply_variable = { which = reserve_transport value = cgm_building_construction_fraction }
 					else = {
 						set_variable = { which = cgm_tmp value = minerals_income }
 						multiply_variable = { which = cgm_tmp value = -1 }
@@ -133,7 +140,7 @@ event = {
 								check_variable = { which = cgm_months_to_starvation value > 20 }
 							}
 							set_variable = { which = reserve_transport value = minerals_reserve }
-							multiply_variable = { which = reserve_transport value = cgm_building_construction_percent }
+							multiply_variable = { which = reserve_transport value = cgm_building_construction_fraction }
 						}
 					}
 				}
