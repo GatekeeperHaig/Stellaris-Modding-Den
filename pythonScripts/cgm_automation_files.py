@@ -424,6 +424,9 @@ def main():
       empireWeightsEventAllPositive.variableOp("multiply",resource+"_country_weight", "minerals_log")
       empireWeightsEventAllPositive.variableOp("set","cgm_tmp", resource+"_log")
       empireWeightsEventAllPositive.variableOp("change","cgm_tmp", math.log(factor,2))
+      if "research" in resource:
+        empireWeightsEventAllPositive.addComment("Subtract extra bonuses that hary AIs are getting from minerals to prevent them going science crazy")
+        empireWeightsEventAllPositive.variableOp("subtract","cgm_tmp", "cgm_difficutly_imbalance_log")
       empireWeightsEventAllPositive.variableOp("divide",resource+"_country_weight", "cgm_tmp")
       empireWeightsEventAllPositive.createReturnIf(variableOpNew("check",resource+"_country_weight", 2,">")).variableOp("set",resource+"_country_weight", 2)
 

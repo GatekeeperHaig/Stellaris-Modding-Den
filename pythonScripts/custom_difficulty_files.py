@@ -7,6 +7,7 @@ from copy import deepcopy
 from googletrans import Translator
 import re
 from locList import LocList
+import math
 
 
 ET = "event_target:custom_difficulty_var_storage"
@@ -736,6 +737,8 @@ def main():
         if debugMode:
           ifChanged.add("log",'"setting flag {}"'.format("custom_difficulty_{}_changed".format(bonus)))
         ifChanged.add("set_variable", TagList().add("which", "custom_difficulty_{}_value".format(bonus)).add("value", ET))
+        if bonus=="minerals":
+          ifChanged.createReturnIf(TagList("has_global_flag","core_game_mechanics_and_ai")).add("check_country_imbalanced_difficulty_bonuses","yes")
         if cat in modifierCats: #only create the modifier for these cats. Rest use the same as one of those!
           removeIFChanged=TagList("limit", TagList("has_country_flag", "custom_difficulty_{}_changed".format(bonus)))
           addIFChanged=deepcopy(removeIFChanged)
@@ -1278,6 +1281,46 @@ def main():
     if not os.path.exists(outFolderLoc):
       os.makedirs(outFolderLoc)
     locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
+
+
+  cgm_ImbalancedDifficultyBonusesEffect=TagList()
+  effect=cgm_ImbalancedDifficultyBonusesEffect.addReturn("check_imbalanced_difficulty_bonuses")
+  effect=effect.addReturn("every_playable_country")
+  cgm_ImbalancedDifficultyBonusesEffect.add("check_country_imbalanced_difficulty_bonuses",effect)
+
+  for i in range(7):
+    effect=effect.createReturnIf(variableOpNew("check","custom_difficulty_minerals_value", round(pow(2,(i+1)/10*5+0.05)*100-100), "<"))
+    subEffect=effect
+    for j in range(1,5):
+      subEffect=subEffect.createReturnIf(variableOpNew("check","custom_difficulty_minerals_value", round(pow(2,(i+j/5)/10*5+0.05)*100-100), "<"))
+      subEffect.variableOp("set", "cgm_difficutly_imbalance_log", round((i+j/5)/10*5,1))
+      subEffect=subEffect.addReturn("else")
+    subEffect.variableOp("set", "cgm_difficutly_imbalance_log", round((i+1)/10*5,1))
+    effect=effect.addReturn("else")
+
+  # for i in range(35):
+  #   effect=effect.createReturnIf(variableOpNew("check","custom_difficulty_minerals_value", round(pow(2,(i+0.5)/10)*100-100), "<"))
+  #   effect.variableOp("set", "cgm_difficutly_imbalance_log", i/10)
+  #   effect=effect.addReturn("else")
+  # for i in range(11):
+  #   effect=effect.createReturnIf(variableOpNew("check","custom_difficulty_minerals_value", pow(2,i), "<"))
+  #   effect.variableOp("set", "cgm_difficutly_imbalance_log", math.log(1+pow(2,i)/100,2))
+  #   effect=effect.addReturn("else")
+  # effect.add("custom_difficulty_minerals_value")
+  outputToFolderAndFile(cgm_ImbalancedDifficultyBonusesEffect , "common/scripted_effects", "custom_difficulty_cgm_effects.txt")
+
+
+#     check_imbalanced_difficulty_bonuses = { #one time check! Main reason this is needed is that difficulty bonuses are different: minerals,food, energy and unity are on income, while science is applied on increasing tech research speed, rather than income. This prevents that harder AIs will go crazy research heavy.
+#   every_playable_country = {
+#     switch = {
+#       trigger = is_difficulty
+#       1 = { set_variable = { which = cgm_difficutly_imbalance_log value = 0.321 } } # Factor 1.25 from difficulty. Applied log_2
+#       2 = { set_variable = { which = cgm_difficutly_imbalance_log value = 0.584 } } # Factor 1.5 from difficulty. Applied log_2
+#       3 = { set_variable = { which = cgm_difficutly_imbalance_log value = 0.807 } } # Factor 1.75 from difficulty. Applied log_2
+#       4 = { set_variable = { which = cgm_difficutly_imbalance_log value = 1 } } # Factor 2 from difficulty. Applied log_2
+#     }
+#   }
+# }
 
 
   # locClass=locClassCopy
