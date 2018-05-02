@@ -1151,7 +1151,7 @@ def main():
     if "host_only" in key:
       trigger.add("is_multiplayer","yes") 
       # immediate.add("set_country_flag", "custom_difficulty_game_host")
-      trigger.add("custom_difficulty_game_host","yes") 
+      trigger.add("has_country_flag", "custom_difficulty_game_host") 
     t_anyOption.add("has_global_flag", "custom_difficulty_"+key)
     effect=TagList("set_global_flag", "custom_difficulty_"+key)
     inverseIsDefault=False
@@ -1171,7 +1171,8 @@ def main():
     # effect.add("country_event", TagList("id", name_optionsEvent))
     option.add("hidden_effect", effect)
   optionsEvent.add("option", TagList("name","custom_difficulty_lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
-  optionsEvent.add("option", TagList("name","custom_difficulty_remove.name").add("custom_tooltip","custom_difficulty_remove.name").add("hidden_effect", TagList("country_event", TagList("id",name_removeEvent))))
+  hostOrNotMP=TagList("OR", TagList("is_multiplayer", "no").add("has_country_flag", "custom_difficulty_game_host"))
+  optionsEvent.add("option", TagList("name","custom_difficulty_remove.name").add("trigger", hostOrNotMP).add("custom_tooltip","custom_difficulty_remove.desc").add("hidden_effect", TagList("country_event", TagList("id",name_removeEvent))))
   optionsEvent.add("option", t_backMainOption )
   optionsEvent.add("option", t_closeOption)
 
