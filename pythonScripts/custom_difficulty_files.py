@@ -1271,7 +1271,7 @@ def main():
   scriptedTriggers=TagList()
   allowChangesTrigger=scriptedTriggers.addReturn("custom_difficulty_allow_changes")
   allowChangesTrigger.add("NOT", TagList("has_global_flag", "custom_difficulty_locked"))
-  allowChangesTrigger.add("OR", TagList("is_multiplayer", "no").add("has_country_flag","custom_difficulty_game_host", "yes").add("not", TagList("has_global_flag","custom_difficulty_activate_host_only")))
+  allowChangesTrigger.add("OR", TagList("is_multiplayer", "no").add("has_country_flag","custom_difficulty_game_host").add("not", TagList("has_global_flag","custom_difficulty_activate_host_only")))
 
   outputToFolderAndFile(scriptedTriggers , "common/scripted_triggers", "custom_difficulty_triggers.txt",1 )
 
