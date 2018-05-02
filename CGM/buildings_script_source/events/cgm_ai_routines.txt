@@ -15,6 +15,8 @@ event = { #game start
 		check_imbalanced_difficulty_bonuses = yes
 		set_global_flag = cgm_game_start
 		set_timed_global_flag = { flag = cgm_game_start_timed days = 31 }
+		#set_variable = { which = cgm_free_pops value = 1 } #sets construction percent to 20% for AI until first building constructed by autobuild
+		#set_variable = { which = cgm_non_filled_planet_count value = 1 } #sets construction percent to 20% for AI until first building constructed by autobuild
 		#NOT NEEDED: no first month buildings (and wrong anyway... depends on so many factors)
 #		every_playable_country = { 
 #			#set_country_flag = reserve_and_income_variables_set
@@ -116,6 +118,36 @@ event = {
 				set_timed_country_flag = { flag = starbase_and_planet_check_delay days = 360 }
 			}	
 			set_variable = { which = reserve_transport value = 0 }
+
+			#used to find suitable planets and for AI percentage:
+			set_variable = { which = cgm_free_pops value = 0 }
+			set_variable = { which = cgm_non_filled_planet_count value = 0 }
+			every_owned_planet = {
+				limit = { free_building_tiles > 0 }
+				prev = {
+					change_variable = { which = cgm_non_filled_planet_count value = 1 }
+				}
+				set_variable = { which = cgm_free_pops value = 0 }
+				every_pop = {
+					limit = {
+						OR = { is_colony_pop = yes is_growing = yes }
+						tile = {
+							NOR = { has_building = yes has_building_construction = yes }
+						}
+						OR = {
+							is_being_purged = no
+							has_purge_type = { type = purge_labor_camps }
+						}
+					}
+					prev = {
+						change_variable = { which = cgm_free_pops value = 1 }
+					}
+				}
+				prev = {
+					change_variable = { which = cgm_free_pops value = prev }
+				}
+			}
+
 			if = {
 				limit = { is_ai = no }
 				set_variable = { which = cgm_building_construction_fraction value = cgm_building_construction_percent }
