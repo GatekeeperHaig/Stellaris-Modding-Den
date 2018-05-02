@@ -1137,14 +1137,18 @@ def main():
     seperateDesc=False
     locClass.append("custom_difficulty_"+key+".desc", "§{}@{}Desc§!".format(optionColors[optionI],key))
     locClass.append("custom_difficulty_"+key+".name", "§{}@{}§!".format(optionColors[optionI],key))
-    descTrigger.add("success_text", TagList().add("text", "custom_difficulty_"+key+".desc").add("has_global_flag", "custom_difficulty_"+key))
+
+    successText=descTrigger.addReturn("success_text")
+    successText.add("text", "custom_difficulty_"+key+".desc").add("has_global_flag", "custom_difficulty_"+key)
+    if "host_only" in key:
+      successText.add("is_multiplayer", "yes")
     option=TagList("name","custom_difficulty_{}.name".format(key))
     optionsEvent.add("option", option)
     option.add("custom_tooltip", "custom_difficulty_{}.desc".format(key))
     trigger=deepcopy(t_notLockedTrigger)
     option.add("trigger", trigger)
     trigger.add("not", TagList("has_global_flag", "custom_difficulty_"+key))
-    if "hostOnly" in key:
+    if "host_only" in key:
       trigger.add("is_multiplayer","yes") 
       # immediate.add("set_country_flag", "custom_difficulty_game_host")
       trigger.add("custom_difficulty_game_host","yes") 
