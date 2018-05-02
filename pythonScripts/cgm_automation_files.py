@@ -72,10 +72,21 @@ def main():
   resetAll.variableOp("set", "cgm_worstWeight", pseudoInf)
   for i in range(3):
     resetAll.variableOp("set", "cgm_bestWeight_{!s}".format(i), 0)
-  empireMainBuildEventImmediate.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_empire_weights_computed_timed"))).createEvent(name_empire_weights)
-  empireMainBuildEventImmediate.add("set_country_flag", "display_low_tier_flag", "#The buildings we create are otherwise probably unavaiable due to direct build. Later removed again.")
-
   
+
+  # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))))
+
+  everyHalfYear=empireMainBuildEventImmediate.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_empire_weights_computed_timed")))
+  everyHalfYear.createEvent(name_empire_weights)
+
+  empireMainBuildEventImmediate.variableOp("set", "cgm_free_pops", 0)
+  countFreePops=empireMainBuildEventImmediate.addReturn("every_owned_planet")
+  countFreePops.add("limit", TagList("free_building_tiles", "0","",">"))
+  countFreePops.variableOp("set", "cgm_free_pops", 0)
+  countFreePops.add("every_pop", TagList("limit", TagList("OR", TagList("is_colony_pop", "yes").add("is_growing", "yes")).add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes")))).variableOp("change", "cgm_free_pops", 1))
+  countFreePops.addReturn("prev").variableOp("change", "cgm_free_pops", "prev")
+  
+  empireMainBuildEventImmediate.add("set_country_flag", "display_low_tier_flag", "#The buildings we create are otherwise probably unavaiable due to direct build. Later removed again.")
   standard_build=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_sector_autobuild")))
   standard_build.add("set_country_flag", "cgm_core_world_auto", "#searching core worlds for standard buildings")
   standard_build.addComment("Search for possible Special buildings:")
@@ -121,7 +132,8 @@ def main():
   findBestPlanetLimit.add("or", TagList("and", TagList("sector_controlled","no").add("prev", TagList("has_country_flag", "cgm_core_world_auto"))).add("and", TagList("sector_controlled","yes").add("not", TagList("prev", TagList("has_country_flag", "cgm_core_world_auto")))))
   # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("or", TagList("is_growing", "yes").add("is_unemployed","yes")))
   # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("is_unemployed","yes")) #seems not to work
-  findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))))
+  findBestPlanetLimit.variableOp("check", "cgm_free_pops", 0, ">")
+  # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))))
   # findBestPlanetLimit.
   empireStandardBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
   if debug:
@@ -215,7 +227,8 @@ def main():
   findBestPlanetLimit.add("or", TagList("and", TagList("sector_controlled","no").add("prev", TagList("has_country_flag", "cgm_core_world_auto"))).add("and", TagList("sector_controlled","yes").add("not", TagList("prev", TagList("has_country_flag", "cgm_core_world_auto")))))
   # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("or", TagList("is_growing", "yes").add("is_unemployed","yes")))
   # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("is_unemployed","yes")) #seems not to work
-  findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))))
+  findBestPlanetLimit.variableOp("check", "cgm_free_pops", 0, ">")
+  # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))))
   # findBestPlanetLimit.
   empireSpecialBuildEventImmediate.add("every_owned_planet",  findBestPlanet)
     
