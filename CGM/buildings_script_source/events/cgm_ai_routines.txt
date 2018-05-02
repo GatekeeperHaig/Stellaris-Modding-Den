@@ -120,7 +120,45 @@ event = {
 				limit = { is_ai = no }
 				set_variable = { which = cgm_building_construction_fraction value = cgm_building_construction_percent }
 				divide_variable = { which = cgm_building_construction_fraction value = 100 }
-				else = { set_variable = { which = cgm_building_construction_fraction value = 0.2 } } #todo: make it depend on pops without building
+				else = { 
+					set_variable = { which =  cgm_relative_free_pops value = cgm_free_pops }
+					divide_variable = { which =  cgm_relative_free_pops value = cgm_non_filled_planet_count }
+					if = {
+						limit = { check_variable = { which = cgm_free_pops value = 0 } }
+						set_variable = { which = cgm_building_construction_fraction value = 0 }
+						else = {
+							if = {
+								limit = { check_variable = { which = cgm_relative_free_pops value < 1.05 } }
+								set_variable = { which = cgm_building_construction_fraction value = 0.2 }
+								else = {
+									if = {
+										limit = { check_variable = { which = cgm_relative_free_pops value < 1.5 } }
+										set_variable = { which = cgm_building_construction_fraction value = 0.3 }
+										else = {
+											if = {
+												limit = { check_variable = { which = cgm_relative_free_pops value < 2 } }
+												set_variable = { which = cgm_building_construction_fraction value = 0.4 }
+												else = {
+													if = {
+														limit = { check_variable = { which = cgm_relative_free_pops value < 3 } }
+														set_variable = { which = cgm_building_construction_fraction value = 0.5 }
+														else = { set_variable = { which = cgm_building_construction_fraction value = 0.6 } }
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					if = {
+						limit = { is_at_war = yes }
+						multiply_variable = { which = cgm_building_construction_fraction value = 0.33 }
+					}
+
+					 
+				}
 			}
 			
 			if = { 

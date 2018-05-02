@@ -28,14 +28,22 @@ country_event = {
 			country_event = { id = cgm_auto.30 }
 		}
 		set_variable = { which = cgm_free_pops value = 0 }
+		set_variable = { which = cgm_non_filled_planet_count value = 0 }
 		every_owned_planet = {
 			limit = { free_building_tiles > 0 }
+			prev = {
+				change_variable = { which = cgm_non_filled_planet_count value = 1 }
+			}
 			set_variable = { which = cgm_free_pops value = 0 }
 			every_pop = {
 				limit = {
 					OR = { is_colony_pop = yes is_growing = yes }
 					tile = {
 						NOR = { has_building = yes has_building_construction = yes }
+					}
+					OR = {
+						is_being_purged = no
+						has_purge_type = { type = purge_labor_camps }
 					}
 				}
 				change_variable = { which = cgm_free_pops value = 1 }
