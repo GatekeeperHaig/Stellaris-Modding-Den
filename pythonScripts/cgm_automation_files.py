@@ -41,6 +41,8 @@ def main():
   name_empire_standard_build_event=eventNameSpace.format(10)
   name_empire_special_build_event=eventNameSpace.format(11)
   name_planet_find_best=eventNameSpace.format(20)
+  name_update_modifiers_on_all_planets=eventNameSpace.format(21)
+  name_update_modifiers_on_planet=eventNameSpace.format(22)
   name_empire_weights=eventNameSpace.format(30)
 
   outTag=TagList("namespace", eventNameSpace.format("")[:-1])
@@ -247,30 +249,54 @@ def main():
 
   planetFindBestEventImmediate=planetFindBestEventImmediate.createReturnIf(TagList("NOT", TagList("any_owned_pop", TagList("is_being_purged", "no")))).add("set_planet_flag", "purged_planet")
   planetFindBestEventImmediate=planetFindBestEventImmediate.addReturn("else")
+  planetFindBestEventImmediate.addComment("modifiers are updated yearly!")
+
+  modifierUpdate=TagList("id", name_update_modifiers_on_all_planets)
+  outTag.add("event", modifierUpdate)
+  modifierUpdate.triggeredHidden()
+  modifierUpdateSingle=TagList("id", name_update_modifiers_on_planet)
+  outTag.add("planet_event", modifierUpdateSingle)
+  modifierUpdateSingle.triggeredHidden()
+  recheckModifiers=modifierUpdate.addReturn("immediate")
+  recheckModifiers=recheckModifiers.addReturn("every_country")
+  recheckModifiers=recheckModifiers.addReturn("every_owned_planet")
+  # recheckModifiers=planetFindBestEventImmediate.createReturnIf(TagList("has_planet_flag", "cgm_modifier_calc_done"))
   for resource in resources:
-    planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet_base", 1)
-  planetFindBestEventImmediate.add("check_vanilla_planet_modifiers","yes")
-  planetFindBestEventImmediate.add("check_planet_modifiers_pe","yes")
-  planetFindBestEventImmediate.add("check_planet_modifiers_gpm","yes")
-  planetFindBestEventImmediate.add("check_planet_modifiers_pd","yes")
-  planetFindBestEventImmediate.add("check_planet_modifiers_am","yes")
-  planetFindBestEventImmediate.add("check_planet_modifiers_se","yes")
-  planetFindBestEventImmediate.add("check_planet_modifiers_gse","yes")
+    recheckModifiers.variableOp("set", resource+"_mult_planet_base_old", resource+"_mult_planet_base")
+    recheckModifiers.variableOp("set", resource+"_mult_planet_base", 0)
+  recheckModifiers.add("check_vanilla_planet_modifiers","yes")
+  recheckModifiers.add("check_planet_modifiers_pe","yes")
+  recheckModifiers.add("check_planet_modifiers_gpm","yes")
+  recheckModifiers.add("check_planet_modifiers_pd","yes")
+  recheckModifiers.add("check_planet_modifiers_am","yes")
+  recheckModifiers.add("check_planet_modifiers_se","yes")
+  recheckModifiers.add("check_planet_modifiers_gse","yes")
+  redoLimit=TagList()
+  redoOr=redoLimit.addReturn("NAND")
+  for resource in resources:
+    redoOr.variableOp("check", resource+"_mult_planet_base_old", resource+"_mult_planet_base")
+  recheckModifiers.createReturnIf(redoLimit).add("set_planet_flag", "cgm_redo_planet_calc")
+  modifierUpdateSingle.add("immediate", recheckModifiers)
+
+  recheckBuildings=planetFindBestEventImmediate.createReturnIf(TagList("has_planet_flag", "cgm_bonus_building_calc_done"))
+  for resource in resources:
+    recheckBuildings.variableOp("set", resource+"_mult_planet_building", 0)
+  recheckBuildings.add("check_planet_bonus_buildings","yes")
+  recheckBuildings.add("check_planet_bonus_buildings_pe","yes")
+  recheckBuildings.add("check_planet_bonus_buildings_am","yes")
+  recheckBuildings.add("check_planet_bonus_buildings_eutab","yes")
+  recheckBuildings.add("check_planet_bonus_buildings_ag","yes")
+  recheckBuildings.add("set_planet_flag", "cgm_bonus_building_calc_done")
+
+  recheckPops=planetFindBestEventImmediate.createReturnIf(TagList("has_planet_flag", "cgm_pop_calc_done"))
+  for resource in resources:
+    recheckPops.variableOp("set", resource+"_mult_planet_pop", 0)
+  recheckPops.add("calculate_average_pop_multipliers","yes")
+  recheckPops.add("set_planet_flag", "cgm_pop_calc_done")
 
   for resource in resources:
-    planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet_building", 0)
-  planetFindBestEventImmediate.add("check_planet_bonus_buildings","yes")
-  planetFindBestEventImmediate.add("check_planet_bonus_buildings_pe","yes")
-  planetFindBestEventImmediate.add("check_planet_bonus_buildings_am","yes")
-  planetFindBestEventImmediate.add("check_planet_bonus_buildings_eutab","yes")
-  planetFindBestEventImmediate.add("check_planet_bonus_buildings_ag","yes")
-
-  for resource in resources:
-    planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet_pop", 0)
-  planetFindBestEventImmediate.add("calculate_average_pop_multipliers","yes")
-
-  for resource in resources:
-    planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet", resource+"_mult_planet_base")
+    planetFindBestEventImmediate.variableOp("set", resource+"_mult_planet", 1)
+    planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_base")
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_building")
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_pop")
     planetFindBestEventImmediate.variableOp("set", resource+"_country_weight", "owner")
