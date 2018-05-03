@@ -663,7 +663,7 @@ def main():
   upgradeEvent.triggeredHidden()
   upgradeEvent=upgradeEvent.addReturn("immediate")
   upgradeEvent=upgradeEvent.addReturn("every_owned_planet")
-  upgradeEvent.add("limit", TagList("has_building_construction", "no"))
+  upgradeEvent.add("limit", TagList("has_building_construction", "no").add("sector_controlled","no"))
   everyPop=upgradeEvent.addReturn("every_pop")
   everyPop.add("limit",  TagList("OR", TagList("is_colony_pop", "yes").add("is_growing", "yes")).add("OR", TagList("is_being_purged", "no").add("has_purge_type", TagList("type", "purge_labor_camps"))))
   tileSwitch=everyPop.addReturn("tile")
