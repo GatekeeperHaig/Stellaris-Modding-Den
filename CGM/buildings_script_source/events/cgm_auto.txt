@@ -18,9 +18,9 @@ country_event = {
 			remove_country_flag = cgm_redo_all_planet_calcs
 			every_owned_planet = {
 				set_variable = { which = cgm_worstWeight value = 99999 }
-				set_variable = { which = cgm_bestWeight_0 value = 0 }
 				set_variable = { which = cgm_bestWeight_1 value = 0 }
 				set_variable = { which = cgm_bestWeight_2 value = 0 }
+				set_variable = { which = cgm_bestWeight_3 value = 0 }
 			}
 		}
 		if = {
@@ -507,8 +507,8 @@ planet_event = {
 				change_variable = { which = food_mult_planet value = food_mult_planet_base }
 				change_variable = { which = food_mult_planet value = food_mult_planet_building }
 				change_variable = { which = food_mult_planet value = food_mult_planet_pop }
-				set_variable = { which = food_country_weight value = owner }
-				multiply_variable = { which = food_mult_planet value = food_country_weight }
+				set_variable = { which = food_country_weight_TILE value = owner }
+				multiply_variable = { which = food_mult_planet value = food_country_weight_TILE }
 				set_variable = { which = unity_mult_planet value = 1 }
 				change_variable = { which = unity_mult_planet value = unity_mult_planet_base }
 				change_variable = { which = unity_mult_planet value = unity_mult_planet_building }
@@ -834,6 +834,7 @@ country_event = {
 		set_variable = { which = society_research_country_weight value = 1 }
 		set_variable = { which = physics_research_country_weight value = 1 }
 		set_variable = { which = engineering_research_country_weight value = 1 }
+		set_variable = { which = food_country_weight_TILE value = 1 }
 		 #First negative part test:
 		 #MINERALS CHECK NEGATIVE
 		if = {
@@ -895,6 +896,7 @@ country_event = {
 					set_variable = { which = cgm_tmp value = 100 }
 					divide_variable = { which = cgm_tmp value = cgm_months_to_starvation }
 					change_variable = { which = food_country_weight value = cgm_tmp }
+					set_variable = { which = food_country_weight_TILE value = food_country_weight }
 				}
 			}
 		}
@@ -911,6 +913,11 @@ country_event = {
 			multiply_variable = { which = energy_country_weight value = minerals_log }
 			set_variable = { which = cgm_tmp value = energy_log }
 			change_variable = { which = cgm_tmp value = 2.0 }
+			 #Reduce energy surplus wanted during war. Minerals are more important and energy surplus is harder to reach due to active fleets
+			if = {
+				limit = { is_at_war = yes }
+				change_variable = { which = cgm_tmp value = 4 }
+			}
 			divide_variable = { which = energy_country_weight value = cgm_tmp }
 			if = {
 				limit = {
@@ -929,6 +936,37 @@ country_event = {
 				}
 				set_variable = { which = food_country_weight value = 2 }
 			}
+			 #check if the food is really needed: If there are few growing planets, we reduce the amount! _TILE remains unchanged as food on tile can be used for energy
+			set_variable = { which = food_country_weight_TILE value = food_country_weight }
+			set_variable = { which = cgm_max_useful_food value = 0 }
+			every_owned_planet = {
+				limit = { has_growing_pop = yes }
+				prev = {
+					change_variable = { which = cgm_max_useful_food value = 100 }
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { which = food_income value > cgm_max_useful_food }
+				}
+				set_variable = { which = food_country_weight value = 0 }
+				else = {
+					divide_variable = { which = cgm_max_useful_food value = 2 }
+					if = {
+						limit = {
+							check_variable = { which = food_income value > cgm_max_useful_food }
+						}
+						 #Reduction as soon as we have more than half the limit: *1 for half the limit. *0.5 for 3/4 the limit. *0 for limit. Linear interpolation in between. 2*(1-x) Where x is income/max_required. '*-1' instead of '*-2' as we divided the nominator by 2 already
+						set_variable = { which = cgm_tmp value = food_income }
+						divide_variable = { which = cgm_tmp value = cgm_max_useful_food }
+						multiply_variable = { which = cgm_tmp value = -1 }
+						change_variable = { which = cgm_tmp value = 2 }
+						multiply_variable = { which = food_country_weight value = cgm_tmp }
+					}
+				}
+			}
+			log = "tile food weight: [this.food_country_weight_TILE]"
+			log = "country food weight: [this.food_country_weight]"
 			 #UNITY
 			multiply_variable = { which = unity_country_weight value = minerals_log }
 			set_variable = { which = cgm_tmp value = unity_log }

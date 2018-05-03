@@ -70,7 +70,7 @@ def main():
   resetAll.add("remove_country_flag", "cgm_redo_all_planet_calcs")
   resetAll=resetAll.addReturn("every_owned_planet")
   resetAll.variableOp("set", "cgm_worstWeight", pseudoInf)
-  for i in range(3):
+  for i in storedValsRange:
     resetAll.variableOp("set", "cgm_bestWeight_{!s}".format(i), 0)
   
 
@@ -324,8 +324,12 @@ def main():
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_base")
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_building")
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_pop")
-    planetFindBestEventImmediate.variableOp("set", resource+"_country_weight", "owner")
-    planetFindBestEventImmediate.variableOp("multiply", resource+"_mult_planet", resource+"_country_weight")
+    if resource=="food":
+      planetFindBestEventImmediate.variableOp("set", resource+"_country_weight_TILE", "owner")
+      planetFindBestEventImmediate.variableOp("multiply", resource+"_mult_planet", resource+"_country_weight_TILE")
+    else:
+      planetFindBestEventImmediate.variableOp("set", resource+"_country_weight", "owner")
+      planetFindBestEventImmediate.variableOp("multiply", resource+"_mult_planet", resource+"_country_weight")
 
   everyTileSearch=TagList()
   planetFindBestEventImmediate.add("every_tile", everyTileSearch)
@@ -411,6 +415,7 @@ def main():
   #   empireWeightsEventImmediate.add("determine_surplus_"+resource,"yes")
   for resource in resources:
     empireWeightsEventImmediate.variableOp("set",resource+"_country_weight",1)
+  empireWeightsEventImmediate.variableOp("set","food_country_weight_TILE",1)
   empireWeightsEventImmediate.addComment("First negative part test:")
   allPosLimit=TagList()
   allPosNor=allPosLimit.addReturn("NOR")
@@ -429,6 +434,8 @@ def main():
     negativeResourceSub.variableOp("set", "cgm_tmp",  starvationWeight)
     negativeResourceSub.variableOp("divide", "cgm_tmp",  "cgm_months_to_starvation")
     negativeResourceSub.variableOp("change", resource+"_country_weight", "cgm_tmp")
+    if resource=="food":
+      negativeResourceSub.variableOp("set", resource+"_country_weight_TILE", resource+"_country_weight")
     # food_reserve
 
 
@@ -452,8 +459,32 @@ def main():
       if "research" in resource:
         empireWeightsEventAllPositive.addComment("Subtract extra bonuses that hary AIs are getting from minerals to prevent them going science crazy. Actually treated as an addition to science output as that is less prone to problems")
         empireWeightsEventAllPositive.variableOp("change","cgm_tmp", "cgm_difficutly_imbalance_log")
+      if resource == "energy":
+        empireWeightsEventAllPositive.addComment("Reduce energy surplus wanted during war. Minerals are more important and energy surplus is harder to reach due to active fleets")
+        empireWeightsEventAllPositive.createReturnIf(TagList("is_at_war", "yes")).variableOp("change","cgm_tmp", 4)
       empireWeightsEventAllPositive.variableOp("divide",resource+"_country_weight", "cgm_tmp")
       empireWeightsEventAllPositive.createReturnIf(variableOpNew("check",resource+"_country_weight", 2,">")).variableOp("set",resource+"_country_weight", 2)
+      if resource=="food":
+        empireWeightsEventAllPositive.addComment("check if the food is really needed: If there are few growing planets, we reduce the amount! _TILE remains unchanged as food on tile can be used for energy")
+        empireWeightsEventAllPositive.variableOp("set", resource+"_country_weight_TILE", resource+"_country_weight")
+        empireWeightsEventAllPositive.variableOp("set", "cgm_max_useful_food", 0)
+        searchGrowingPlanets=empireWeightsEventAllPositive.addReturn("every_owned_planet")
+        searchGrowingPlanets.add("limit", TagList("has_growing_pop", "yes"))
+        searchGrowingPlanets.add("prev", variableOpNew("change", "cgm_max_useful_food", 100))
+        reduceFoodWeight=empireWeightsEventAllPositive.createReturnIf(variableOpNew("check", "food_income", "cgm_max_useful_food", ">"))
+        reduceFoodWeight.variableOp("set", "food_country_weight", 0)
+        reduceFoodWeight=reduceFoodWeight.addReturn("else")
+        reduceFoodWeight.variableOp("divide", "cgm_max_useful_food", 2)
+        reduceFoodWeight=reduceFoodWeight.createReturnIf(variableOpNew("check", "food_income", "cgm_max_useful_food", ">"))
+        reduceFoodWeight.addComment("Reduction as soon as we have more than half the limit: *1 for half the limit. *0.5 for 3/4 the limit. *0 for limit. Linear interpolation in between. 2*(1-x) Where x is income/max_required. '*-1' instead of '*-2' as we divided the nominator by 2 already")
+        reduceFoodWeight.variableOp("set", "cgm_tmp", "food_income")
+        reduceFoodWeight.variableOp("divide", "cgm_tmp","cgm_max_useful_food")
+        reduceFoodWeight.variableOp("multiply", "cgm_tmp",-1)
+        reduceFoodWeight.variableOp("change", "cgm_tmp",2)
+        reduceFoodWeight.variableOp("multiply", "food_country_weight", "cgm_tmp")
+        if debug:
+          empireWeightsEventAllPositive.add("log", '"tile food weight: [this.food_country_weight_TILE]"')
+          empireWeightsEventAllPositive.add("log", '"country food weight: [this.food_country_weight]"')
 
   # empireWeightsEventImmediate.add("check_income","yes")
   noChangeYet=empireWeightsEventImmediate
