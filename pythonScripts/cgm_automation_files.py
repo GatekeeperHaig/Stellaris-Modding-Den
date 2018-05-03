@@ -414,16 +414,23 @@ def main():
   empireWeightsEvent.triggeredHidden()
   empireWeightsEventImmediate=empireWeightsEvent.addReturn("immediate")
   empireWeightsEventImmediate.add("set_timed_country_flag", TagList( "flag", "cgm_empire_weights_computed_timed").add("days", 180))
+  playerWeight=empireWeightsEventImmediate.createReturnIf(TagList("AND", TagList("is_ai", "no").add("NOT", TagList("has_country_flag","cgm_player_focus_as_ai"))))
+  for resource in resources:
+    resourceFocus=playerWeight.createReturnIf(TagList("has_country_flag","cgm_player_focus_"+resource))
+    resourceFocus.variableOp("set", resource+"_country_weight", "cgm_focus_strength")
+    resourceFocus.add("else",variableOpNew("set", resource+"_country_weight", 1) )
+  playerWeight.variableOp("set", "food_country_weight_TILE", "food_country_weight")
+  AIWeight=playerWeight.addReturn("else")
   # for resource in resources:
   #   empireWeightsEventImmediate.add("determine_surplus_"+resource,"yes")
   for resource in resources:
-    empireWeightsEventImmediate.variableOp("set",resource+"_country_weight",1)
-  empireWeightsEventImmediate.variableOp("set","food_country_weight_TILE",1)
-  empireWeightsEventImmediate.addComment("First negative part test:")
+    AIWeight.variableOp("set",resource+"_country_weight",1)
+  AIWeight.variableOp("set","food_country_weight_TILE",1)
+  AIWeight.addComment("First negative part test:")
   allPosLimit=TagList()
   allPosNor=allPosLimit.addReturn("NOR")
   for resource in ["minerals", "energy", "food"]:
-    negativeResourceSub=empireWeightsEventImmediate
+    negativeResourceSub=AIWeight
     negativeResourceSub.addComment(resource.upper()+" CHECK NEGATIVE")
     negCond=variableOpNew("check", resource+"_income", 0, "<")
     negativeResourceSub=negativeResourceSub.createReturnIf(negCond)
@@ -451,7 +458,7 @@ def main():
     # empireWeightsEventImmediate=empireWeightsEventImmediate.addReturn("else")
 
 
-  empireWeightsEventAllPositive=empireWeightsEventImmediate.createReturnIf(allPosLimit)
+  empireWeightsEventAllPositive=AIWeight.createReturnIf(allPosLimit)
   empireWeightsEventAllPositive.addComment("All positive weightings:")
   for resource,factor in zip(resources,inverseFactorComparedToMinerals):
     if resource!="minerals":
@@ -577,7 +584,7 @@ def main():
     triggerText=TagList("text", locList.append(nameBase.format(resource+"_focus_event.desc"), "${}$".format(resource))).add("has_{}_flag".format(scope), "cgm_player_focus_{}".format(resource))
     descTrigger.add("success_text", triggerText)
     customTooltips.add("custom_tooltip", deepcopy(triggerText))
-    
+
     e.add("desc", TagList("trigger", descTrigger))
     e.add("picture_event_data", TagList("room","cgm_menu_room"))
     edict=edictOut.addReturn(scope+"_edict")
@@ -614,7 +621,10 @@ def main():
       option.add("name", locList.append(nameBase.format(resource+"_focus.name"),"${}$".format(resource)))
       option.add("custom_gui","cgm_option")
       option.add("hidden_effect", TagList("set_{}_flag".format(scope), "cgm_player_focus_{}".format(resource)).add(scope+"_event", TagList("id",e.get("id"))))
-    e.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option"))#.add("hidden_effect", TagList("country_event", TagList("id","blub"))))
+    option=e.addReturn("option")
+    option.add("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option")
+    if scope=="country":
+      option.add("hidden_effect", TagList("country_event", TagList("id",name_empire_weights)))
 
 
   outputToFolderAndFile(edictOut, "common/edicts", "cgm_script_created_auto_edicts.txt",2, "../CGM/buildings_script_source")
