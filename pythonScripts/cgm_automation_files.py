@@ -563,6 +563,8 @@ def main():
   locList.addLoc("FocusMenuTitle", "Choose a Focus for Automated Construction")
   locList.addLoc("FocusMenuDesc", "Choose a category that should be prefered with a certain factor you can also choose here. '1' would mean no change. '3' should be used with caution as it most likely will use tiles that are way better for other things eventually.")
   locList.addLoc("focusStrength", "Focus Strength Factor")
+  locList.addLoc("focus", "Focus")
+  locList.addLoc("focusModifierDesc", "This income type will be placed at the given priority, ignoring empire focus settings. All other resources get the standard empire focus values.")
   locList.addLoc("country", "Empire")
   locList.addLoc("planet", "Planet Specific")
   locList.addLoc("asAI", "Same as AI")
@@ -623,6 +625,9 @@ def main():
         continue
       if scope=="planet" and resource=="as_ai":
         continue
+      if scope=="planet":
+        locList.append(resource+"_focused_automation", "@focus: ${}$".format(resource))
+        locList.append(resource+"_focused_automation_desc", "@focusModifierDesc")
       option=e.addReturn("option")
       # if resource=="as_ai":
       #   option.add("name", locList.append(nameBase.format(resource+"_focus.name"),"@{}".format(resource)))
