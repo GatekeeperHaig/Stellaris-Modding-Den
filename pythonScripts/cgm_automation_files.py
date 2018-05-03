@@ -79,14 +79,15 @@ def main():
   everyHalfYear=empireMainBuildEventImmediate.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_empire_weights_computed_timed")))
   everyHalfYear.createEvent(name_empire_weights)
 
-  empireMainBuildEventImmediate.variableOp("set", "cgm_free_pops", 0)
-  empireMainBuildEventImmediate.variableOp("set", "cgm_non_filled_planet_count", 0)
-  countFreePops=empireMainBuildEventImmediate.addReturn("every_owned_planet")
-  countFreePops.add("limit", TagList("free_building_tiles", "0","",">"))
-  countFreePops.addReturn("prev").variableOp("change", "cgm_non_filled_planet_count", 1)
-  countFreePops.variableOp("set", "cgm_free_pops", 0)
-  countFreePops.add("every_pop", TagList("limit", TagList("OR", TagList("is_colony_pop", "yes").add("is_growing", "yes")).add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))).add("OR", TagList("is_being_purged", "no").add("has_purge_type", TagList("type", "purge_labor_camps")))).add("prev", variableOpNew("change", "cgm_free_pops", 1)))
-  countFreePops.addReturn("prev").variableOp("change", "cgm_free_pops", "prev")
+  #added to different file. DO NOT DELETE!
+  # empireMainBuildEventImmediate.variableOp("set", "cgm_free_pops", 0)
+  # empireMainBuildEventImmediate.variableOp("set", "cgm_non_filled_planet_count", 0)
+  # countFreePops=empireMainBuildEventImmediate.addReturn("every_owned_planet")
+  # countFreePops.add("limit", TagList("free_building_tiles", "0","",">"))
+  # countFreePops.addReturn("prev").variableOp("change", "cgm_non_filled_planet_count", 1)
+  # countFreePops.variableOp("set", "cgm_free_pops", 0)
+  # countFreePops.add("every_pop", TagList("limit", TagList("OR", TagList("is_colony_pop", "yes").add("is_growing", "yes")).add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))).add("OR", TagList("is_being_purged", "no").add("has_purge_type", TagList("type", "purge_labor_camps")))).add("prev", variableOpNew("change", "cgm_free_pops", 1)))
+  # countFreePops.addReturn("prev").variableOp("change", "cgm_free_pops", "prev")
 
 
   empireMainBuildEventImmediate.add("set_country_flag", "display_low_tier_flag", "#The buildings we create are otherwise probably unavaiable due to direct build. Later removed again.")
@@ -513,7 +514,7 @@ def main():
   outputToFolderAndFile(newTileCheckFile, "common/scripted_effects", "cgm_new_tile_checks.txt",2, "../CGM/buildings_script_source")
   outputToFolderAndFile(outTag, "events", "cgm_auto.txt",2, "../CGM/buildings_script_source")
   if debug:
-    outputToFolderAndFile(outTriggers, "common/scripted_triggers", "cgm_auto_trigger_template.txt",2, "../CGM/buildings_script_source")
+    outputToFolderAndFile(outTriggers, "common/scripted_triggers/WIP/", "cgm_auto_trigger_template.txt",2, "../CGM/buildings_script_source")
     outputToFolderAndFile(outEffects, "common/scripted_effects/WIP/", "cgm_auto_effects_template.txt",2, "../CGM/buildings_script_source")
   # with open("test.txt", "w") as file:
   #   outTag.writeAll(file,args())
