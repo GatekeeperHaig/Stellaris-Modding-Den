@@ -327,12 +327,17 @@ def main():
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_base")
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_building")
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_pop")
+    planetSpecificWeight=planetFindBestEventImmediate.createReturnIf(TagList("has_planet_flag", "cgm_player_focus_"+resource))
+    nonSpecific=TagList()
     if resource=="food":
-      planetFindBestEventImmediate.variableOp("set", resource+"_country_weight_TILE", "owner")
+      planetSpecificWeight.variableOp("set", resource+"_country_weight_TILE", "cgm_focus_strength")
+      nonSpecific.variableOp("set", resource+"_country_weight_TILE", "owner")
       planetFindBestEventImmediate.variableOp("multiply", resource+"_mult_planet", resource+"_country_weight_TILE")
     else:
-      planetFindBestEventImmediate.variableOp("set", resource+"_country_weight", "owner")
+      planetSpecificWeight.variableOp("set", resource+"_country_weight", "cgm_focus_strength")
+      nonSpecific.variableOp("set", resource+"_country_weight", "owner")
       planetFindBestEventImmediate.variableOp("multiply", resource+"_mult_planet", resource+"_country_weight")
+    planetSpecificWeight.add("else", nonSpecific)
 
   everyTileSearch=TagList()
   planetFindBestEventImmediate.add("every_tile", everyTileSearch)
@@ -614,13 +619,29 @@ def main():
       option.add("custom_gui","cgm_option")
       option.add("hidden_effect", variableOpNew("set", "cgm_focus_strength", bonusStrength).add(scope+"_event", TagList("id",e.get("id"))))
     for resource in resources+["as_ai"]:
+      if resource=="unity":
+        continue
+      if scope=="planet" and resource=="as_ai":
+        continue
       option=e.addReturn("option")
       # if resource=="as_ai":
       #   option.add("name", locList.append(nameBase.format(resource+"_focus.name"),"@{}".format(resource)))
       # else:
       option.add("name", locList.append(nameBase.format(resource+"_focus.name"),"${}$".format(resource)))
       option.add("custom_gui","cgm_option")
-      option.add("hidden_effect", TagList("set_{}_flag".format(scope), "cgm_player_focus_{}".format(resource)).add(scope+"_event", TagList("id",e.get("id"))))
+      hiddenEffect=option.addReturn("hidden_effect")
+      hiddenEffect.add("set_{}_flag".format(scope), "cgm_player_focus_{}".format(resource))
+      for res in resources+["as_ai"]:
+        if res!=resource and res!="unity":
+          hiddenEffect.add("remove_{}_flag".format(scope), "cgm_player_focus_{}".format(res))
+      if resource!="as_ai":
+        hiddenEffect.createReturnIf(variableOpNew("check", "cgm_focus_strength", 1.001, "<")).variableOp("set", "cgm_focus_strength", 1.5)
+      if scope=="planet":
+        hiddenEffect.add("add_modifier", TagList("modifier", resource+"_focused_automation").add("days", -1))
+        for res in resources:
+          if res!=resource and res!="unity":
+            hiddenEffect.add("remove_modifier",res+"_focused_automation")
+      hiddenEffect.add(scope+"_event", TagList("id",e.get("id")))
     option=e.addReturn("option")
     option.add("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option")
     if scope=="country":
