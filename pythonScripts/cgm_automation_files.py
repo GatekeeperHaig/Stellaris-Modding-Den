@@ -44,6 +44,8 @@ def main():
   name_update_modifiers_on_all_planets=eventNameSpace.format(21)
   name_update_modifiers_on_planet=eventNameSpace.format(22)
   name_empire_weights=eventNameSpace.format(30)
+  name_player_weights=eventNameSpace.format(40)
+  name_player_weights_planet=eventNameSpace.format(41)
 
   outTag=TagList("namespace", eventNameSpace.format("")[:-1])
   storedValsRange=range(1,4)
@@ -541,6 +543,30 @@ def main():
         # curEffect=curEffect.addReturn("else")
 
   newTileCheckFile.deleteOnLowestLevel(checkEmpty)
+
+
+  playerWeightEvent=outTag.addReturn("country_event")
+  playerWeightEventPlanet=outTag.addReturn("planet_event")
+  playerWeightEvent.add("id", name_player_weights)
+  playerWeightEventPlanet.add("id", name_player_weights_planet)
+  for e in [playerWeightEvent,playerWeightEventPlanet]:
+    e.add("is_triggered_only", "yes")
+    e.add("custom_gui","cgm_buildings_advanced_configuration").add("diplomatic","yes").add("force_open", "no") 
+    e.add("title", locList.append(eventNames.format("main_event.name"), "@mainTitle"))
+    e.add("desc", locList.append(eventNames.format("main_event.desc"), "@mainDesc"))
+    e.add("picture_event_data", TagList("room","cgm_menu_room"))
+  # playerWeightEvent.add("is_triggered_only", "yes")
+  # playerWeightEvent.add("custom_gui","cgm_buildings_advanced_configuration").add("diplomatic","yes").add("force_open", "no") 
+  # playerWeightEvent.add("title", locList.append(eventNames.format("main_event.name"), "@mainTitle"))
+  # playerWeightEvent.add("desc", locList.append(eventNames.format("main_event.desc"), "@mainDesc"))
+  # playerWeightEvent.add("picture_event_data", TagList("room","cgm_menu_room"))
+  # playerWeightEventPlanet.add("is_triggered_only", "yes")
+  # playerWeightEventPlanet.add("custom_gui","cgm_buildings_advanced_configuration").add("diplomatic","yes").add("force_open", "no") 
+  # playerWeightEventPlanet.add("title", locList.append(eventNames.format("main_event.name"), "@mainTitle"))
+  # playerWeightEventPlanet.add("desc", locList.append(eventNames.format("main_event.desc"), "@mainDesc"))
+  # playerWeightEventPlanet.add("picture_event_data", TagList("room","cgm_menu_room"))
+
+    e.add("option", TagList("name", eventNames.format("blub.name")).add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id","blub"))))
 
 
   outputToFolderAndFile(newTileCheckFile, "common/scripted_effects", "cgm_new_tile_checks.txt",2, "../CGM/buildings_script_source")
