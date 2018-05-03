@@ -9,6 +9,7 @@ import re
 from locList import LocList
 from custom_difficulty_files import *
 from functools import reduce
+import glob
 
 
 #TODO: Prio List how to use this:
@@ -40,6 +41,7 @@ def main():
   name_empire_main_build_event=eventNameSpace.format(0)
   name_empire_standard_build_event=eventNameSpace.format(10)
   name_empire_special_build_event=eventNameSpace.format(11)
+  name_empire_upgrade_event=eventNameSpace.format(12)
   name_planet_find_best=eventNameSpace.format(20)
   name_update_modifiers_on_all_planets=eventNameSpace.format(21)
   name_update_modifiers_on_planet=eventNameSpace.format(22)
@@ -100,6 +102,9 @@ def main():
   standard_build.createEvent(name_empire_special_build_event)
   standard_build.addComment("Search for possible Standard buildings. Build best out of standard/special:")
   standard_build.createEvent(name_empire_standard_build_event)
+  upgrade_build=standard_build.createReturnIf(TagList("is_ai", "no").add("not", TagList("has_country_flag", "cgm_auto_built")))
+  upgrade_build.addComment("Try to upgrade something. Player only!")
+  upgrade_build.createEvent(name_empire_upgrade_event)
   #disabl for better testing(no deletion of variables):
   sectorBuild=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_auto_built")))
   sectorBuild.add("remove_country_flag", "cgm_core_world_auto", "#searching sector worlds for standard buildings")
@@ -651,6 +656,39 @@ def main():
     option.add("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option")
     if scope=="country":
       option.add("hidden_effect", TagList("country_event", TagList("id",name_empire_weights)))
+
+
+  upgradeEvent=outTag.addReturn("country_event")
+  upgradeEvent.add("id", name_empire_upgrade_event)
+  upgradeEvent.triggeredHidden()
+  upgradeEvent=upgradeEvent.addReturn("immediate")
+  upgradeEvent=upgradeEvent.addReturn("every_owned_planet")
+  upgradeEvent.add("limit", TagList("has_building_construction", "no"))
+  everyPop=upgradeEvent.addReturn("every_pop")
+  everyPop.add("limit",  TagList("OR", TagList("is_colony_pop", "yes").add("is_growing", "yes")).add("OR", TagList("is_being_purged", "no").add("has_purge_type", TagList("type", "purge_labor_camps"))))
+  tileSwitch=everyPop.addReturn("tile")
+  tileSwitch=tileSwitch.addReturn("switch")
+  tileSwitch.add("trigger", "has_building")
+
+
+
+  # everyTile.add(name)
+
+
+  # every_tile = {
+  #     limit = { autobuild_trigger_tile_has_pop = yes }
+  #     switch = {
+  #       trigger = has_building
+
+  for buildingFile in glob.glob("../CGM/buildings_script_source/common/buildings/*.txt"):
+    buildingContent=TagList().readFile(buildingFile)
+    for buildingName, building in buildingContent.getNameVal():
+      if isinstance(building, TagList):
+        upgrades=building.attemptGet("upgrades")
+        if len(upgrades)>0:
+          tileSwitch.add(buildingName, TagList("add_building_construction", upgrades.names[0]))
+  everyPop.createReturnIf(TagList("tile", TagList("has_building_construction","yes"))).add("owner", TagList("set_country_flag", "cgm_auto_built")).add("break","yes")
+  upgradeEvent.createReturnIf(TagList("has_building_construction","yes")).add("break","yes")
 
 
   outputToFolderAndFile(edictOut, "common/edicts", "cgm_script_created_auto_edicts.txt",2, "../CGM/buildings_script_source")
