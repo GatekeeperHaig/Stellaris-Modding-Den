@@ -6,7 +6,7 @@ namespace = cgm_ai_routines
 #set default reserve and income for first month
 
 
-event = { #game start
+event = { #game start or mod install
 	id = cgm_ai_routines.0
 	hide_window = yes	
 	fire_only_once = yes
@@ -46,6 +46,11 @@ event = { #game start
 			set_country_flag = cgm_ai_disable_autobuild
 			set_variable = { which = cgm_building_construction_percent value = 20 } #not used initially, but just to have a default value.
 		}
+		set_global_flag = cgm_disable_vanilla_building_AI
+		every_playable_country = {
+			limit = { is_ai = yes }
+			set_country_flag = cgm_disable_vanilla_building_AI
+		}
 		every_system = {
 			system_star = { 
 				set_variable = { which = num_of_hyperlane_connections value = 0 }
@@ -58,6 +63,45 @@ event = { #game start
 			}				
 		}		
 		random_planet = { save_global_event_target_as = cgm_var_storage }
+	}
+}
+
+event = {
+	id = cgm_ai_routines.8
+	fire_only_once = yes
+	is_triggered_only = yes
+	hide_window = yes
+	immediate = {
+		set_global_flag = cgm_prevent_update_event
+	}
+}
+
+country_event = {
+	id = cgm_ai_routines.9
+	fire_only_once = yes
+	title = cgm_beta_updated.title
+	desc = cgm_beta_updated.desc
+	diplomatic = yes
+	custom_gui = "cgm_main_menu"
+	force_open = yes
+
+	picture_event_data = { room = cgm_menu_room }
+	trigger = {
+		NOT = { has_global_flag = cgm_prevent_update_event }
+	}
+	immediate = {
+		set_global_flag = cgm_prevent_update_event
+	}
+	option = {
+		name = cgm_beta_updated_configure_button.name
+		custom_gui = "cgm_option"
+		hidden_effect = {
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
+	}
+	option = {
+		name = OK
+		custom_gui = "cgm_option"
 	}
 }
 
