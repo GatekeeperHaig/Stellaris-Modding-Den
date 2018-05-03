@@ -513,12 +513,21 @@ planet_event = {
 	id = cgm_buildings.3
 	hide_window = yes
 	is_triggered_only = yes
-	trigger = {
-		from = { has_planet_bonus_building = yes }
-	}
+	#trigger = {
+#		from = { has_planet_bonus_building = yes }
+#	}
 	immediate = {
-		set_planet_flag = cgm_redo_planet_calc
-		remove_planet_flag = cgm_bonus_building_calc_done
+		if = { 
+			limit = { has_planet_bonus_building = yes }
+			set_planet_flag = cgm_redo_planet_calc
+			remove_planet_flag = cgm_bonus_building_calc_done
+			else = { 
+				if = {
+					limit = { has_adjacency_building = yes }
+					set_planet_flag = cgm_redo_planet_calc
+				}
+			}
+		}
 	}
 }
 #this event is fired using the on_building_demolished and on_building_ruined on action triggers.
@@ -527,12 +536,21 @@ planet_event = {
 	id = cgm_buildings.4
 	hide_window = yes
 	is_triggered_only = yes
-	trigger = {
-		from = { had_planet_bonus_building = yes }
-	}
+	#trigger = {
+	#	from = { had_planet_bonus_building = yes }
+	#}
 	immediate = {
-		set_planet_flag = cgm_redo_planet_calc
-		remove_planet_flag = cgm_bonus_building_calc_done
+		if = { 
+			limit = { has_planet_bonus_building = yes }
+			set_planet_flag = cgm_redo_planet_calc
+			remove_planet_flag = cgm_bonus_building_calc_done
+			else = { 
+				if = {
+					limit = { has_adjacency_building = yes }
+					set_planet_flag = cgm_redo_planet_calc
+				}
+			}
+		}
 	}
 }
 #this event is fired using the on_building_replaced on action trigger.
@@ -541,14 +559,23 @@ planet_event = {
 	id = cgm_buildings.5
 	hide_window = yes
 	is_triggered_only = yes
-	trigger = {
-		from = {
-			OR = { had_planet_bonus_building = yes has_planet_bonus_building = yes }
-		}
-	}
+#	trigger = {
+#		from = {
+#			OR = { had_planet_bonus_building = yes has_planet_bonus_building = yes }
+#		}
+#	}
 	immediate = {
-		set_planet_flag = cgm_redo_planet_calc
-		remove_planet_flag = cgm_bonus_building_calc_done
+		if = { 
+			limit = { OR = { had_planet_bonus_building = yes has_planet_bonus_building = yes } }
+			set_planet_flag = cgm_redo_planet_calc
+			remove_planet_flag = cgm_bonus_building_calc_done
+			else = { 
+				if = {
+					limit = { OR = { had_adjacency_building = yes has_adjacency_building = yes } }
+					set_planet_flag = cgm_redo_planet_calc
+				}
+			}
+		}
 	}
 }
 #this event is fired on the on_modification_complete on action trigger.
