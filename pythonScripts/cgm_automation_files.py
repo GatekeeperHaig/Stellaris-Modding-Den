@@ -76,8 +76,9 @@ def main():
 
   # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))))
 
-  everyHalfYear=empireMainBuildEventImmediate.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_empire_weights_computed_timed")))
-  everyHalfYear.createEvent(name_empire_weights)
+  #added to different file. DO NOT DELETE!
+  # everyHalfYear=empireMainBuildEventImmediate.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_empire_weights_computed_timed")))
+  # everyHalfYear.createEvent(name_empire_weights)
 
   #added to different file. DO NOT DELETE!
   # empireMainBuildEventImmediate.variableOp("set", "cgm_free_pops", 0)
