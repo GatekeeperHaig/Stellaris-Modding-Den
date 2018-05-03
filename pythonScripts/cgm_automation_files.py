@@ -44,7 +44,7 @@ def main():
   name_update_modifiers_on_all_planets=eventNameSpace.format(21)
   name_update_modifiers_on_planet=eventNameSpace.format(22)
   name_empire_weights=eventNameSpace.format(30)
-  name_player_weights=eventNameSpace.format(40)
+  name_player_weights_country=eventNameSpace.format(40)
   name_player_weights_planet=eventNameSpace.format(41)
 
   outTag=TagList("namespace", eventNameSpace.format("")[:-1])
@@ -544,31 +544,80 @@ def main():
 
   newTileCheckFile.deleteOnLowestLevel(checkEmpty)
 
+  if debug:
+    locList=LocList(False)
+  else:
+    locList=LocList(True)
+  locList.addLoc("FocusMenuTitle", "Choose a Focus for Automated Construction")
+  locList.addLoc("FocusMenuDesc", "Choose a category that should be prefered with a certain factor you can also choose here. '1' would mean no change. '3' should be used with caution as it most likely will use tiles that are way better for other things eventually.")
+  locList.addLoc("focusStrength", "Focus Strength Factor")
+  locList.addLoc("country", "Empire")
+  locList.addLoc("planet", "Planet Specific")
+  locList.addLoc("asAI", "Same as AI")
+  locList.addLoc("currently", "Currently")
+  locList.append("as_ai", "@asAI")
 
+  edictOut=TagList()
   playerWeightEvent=outTag.addReturn("country_event")
   playerWeightEventPlanet=outTag.addReturn("planet_event")
-  playerWeightEvent.add("id", name_player_weights)
+  playerWeightEvent.add("id", name_player_weights_country)
   playerWeightEventPlanet.add("id", name_player_weights_planet)
-  for e in [playerWeightEvent,playerWeightEventPlanet]:
+  for scope, e in zip(["country", "planet"],[playerWeightEvent,playerWeightEventPlanet]):
     e.add("is_triggered_only", "yes")
     e.add("custom_gui","cgm_buildings_advanced_configuration").add("diplomatic","yes").add("force_open", "no") 
-    e.add("title", locList.append(eventNames.format("main_event.name"), "@mainTitle"))
-    e.add("desc", locList.append(eventNames.format("main_event.desc"), "@mainDesc"))
+    e.add("title", locList.append(nameBase.format(scope+"_focus_event.name"), "@"+scope+": @FocusMenuTitle"))
+    descTrigger=TagList("text", locList.append(nameBase.format(scope+"_focus_event.desc"), "@FocusMenuDesc @currently:"))
+    customTooltips=TagList()
+    for resource in resources:
+      triggerText=TagList("text", locList.append(nameBase.format(resource+"_focus_event.desc"), "${}$: @focusStrength [this.cgm_focus_strength]".format(resource))).add("has_{}_flag".format(scope), "cgm_player_focus_{}".format(resource))
+      descTrigger.add("success_text", triggerText)
+      customTooltips.add("custom_tooltip", deepcopy(triggerText))
+
+    resource="as_ai"
+    triggerText=TagList("text", locList.append(nameBase.format(resource+"_focus_event.desc"), "${}$".format(resource))).add("has_{}_flag".format(scope), "cgm_player_focus_{}".format(resource))
+    descTrigger.add("success_text", triggerText)
+    customTooltips.add("custom_tooltip", deepcopy(triggerText))
+    
+    e.add("desc", TagList("trigger", descTrigger))
     e.add("picture_event_data", TagList("room","cgm_menu_room"))
+    edict=edictOut.addReturn(scope+"_edict")
+    edict.add("name", locList.append("edict_"+nameBase.format(scope+"_focus_event"), "@FocusMenuTitle").replace("edict_",""))
+    locList.append("edict_"+nameBase.format(scope+"_focus_event_desc"), "@FocusMenuDesc")
+    edict.add("length", 0)
+    edict.add("cost", TagList())
+    if scope=="country":
+      edict.add("potential", TagList("is_ai", "no").add("NOT", TagList("has_country_flag", "cgm_disable_autobuild")))
+    else:
+      edict.add("potential", TagList("owner", TagList("is_ai", "no").add("NOT", TagList("has_country_flag", "cgm_disable_autobuild"))))
+    # edict.add("effect", TagList("hidden_effect", createEvent(TagList(), e.get("id"), scope+"_event").add("custom_tooltip", TagList("trigger", deepcopy(descTrigger)))))
+    edict.add("effect", TagList("hidden_effect", createEvent(TagList(), e.get("id"), scope+"_event")))#.addTagList(customTooltips))
   # playerWeightEvent.add("is_triggered_only", "yes")
   # playerWeightEvent.add("custom_gui","cgm_buildings_advanced_configuration").add("diplomatic","yes").add("force_open", "no") 
-  # playerWeightEvent.add("title", locList.append(eventNames.format("main_event.name"), "@mainTitle"))
-  # playerWeightEvent.add("desc", locList.append(eventNames.format("main_event.desc"), "@mainDesc"))
+  # playerWeightEvent.add("title", locList.append(nameBase.format("main_event.name"), "@mainTitle"))
+  # playerWeightEvent.add("desc", locList.append(nameBase.format("main_event.desc"), "@mainDesc"))
   # playerWeightEvent.add("picture_event_data", TagList("room","cgm_menu_room"))
   # playerWeightEventPlanet.add("is_triggered_only", "yes")
   # playerWeightEventPlanet.add("custom_gui","cgm_buildings_advanced_configuration").add("diplomatic","yes").add("force_open", "no") 
-  # playerWeightEventPlanet.add("title", locList.append(eventNames.format("main_event.name"), "@mainTitle"))
-  # playerWeightEventPlanet.add("desc", locList.append(eventNames.format("main_event.desc"), "@mainDesc"))
+  # playerWeightEventPlanet.add("title", locList.append(nameBase.format("main_event.name"), "@mainTitle"))
+  # playerWeightEventPlanet.add("desc", locList.append(nameBase.format("main_event.desc"), "@mainDesc"))
   # playerWeightEventPlanet.add("picture_event_data", TagList("room","cgm_menu_room"))
+    for bonusStrength in [1,1.5,2,3]:
+      option=e.addReturn("option")
+      option.add("name", locList.append(nameBase.format("focus_strength_{!s}".format(bonusStrength).replace(".","_")+".name"), "@focusStrength: {!s}".format(bonusStrength)))
+      option.add("custom_gui","cgm_option")
+      option.add("hidden_effect", variableOpNew("set", "cgm_focus_strength", bonusStrength).add(scope+"_event", TagList("id",e.get("id"))))
+    for resource in resources+["as_ai"]:
+      option=e.addReturn("option")
+      # if resource=="as_ai":
+      #   option.add("name", locList.append(nameBase.format(resource+"_focus.name"),"@{}".format(resource)))
+      # else:
+      option.add("name", locList.append(nameBase.format(resource+"_focus.name"),"${}$".format(resource)))
+      option.add("custom_gui","cgm_option")
+      option.add("hidden_effect", TagList("set_{}_flag".format(scope), "cgm_player_focus_{}".format(resource)).add(scope+"_event", TagList("id",e.get("id"))))
+    e.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option"))#.add("hidden_effect", TagList("country_event", TagList("id","blub"))))
 
-    e.add("option", TagList("name", eventNames.format("blub.name")).add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id","blub"))))
 
-
+  outputToFolderAndFile(edictOut, "common/edicts", "cgm_script_created_auto_edicts.txt",2, "../CGM/buildings_script_source")
   outputToFolderAndFile(newTileCheckFile, "common/scripted_effects", "cgm_new_tile_checks.txt",2, "../CGM/buildings_script_source")
   outputToFolderAndFile(outTag, "events", "cgm_auto.txt",2, "../CGM/buildings_script_source")
   if debug:
@@ -618,7 +667,11 @@ def main():
     # outputToFolderAndFile(checkResourceEffect, "common/scripted_effects", "cgm_income_record_effects{}.txt".format(name),2, "../CGM/buildings_script_source")
 
 
-
+  for language in locList.languages:
+    outFolderLoc="../CGM/buildings_script_source/localisation/"+language
+    if not os.path.exists(outFolderLoc):
+      os.makedirs(outFolderLoc)
+    locList.write(outFolderLoc+"/cgm_automization_l_"+language+".yml",language)
 
 
 if __name__ == "__main__":
