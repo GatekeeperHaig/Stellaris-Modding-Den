@@ -552,7 +552,7 @@ has_no_deposit_or_allow_on_food = {
 }	
 
 allow_on_food_tile_conditions = { 
-	from.owner = { 
+	owner= { 
 		OR = { 
 			AND = { 
 				is_machine_empire = yes
@@ -602,8 +602,16 @@ allow_on_food_tile_conditions = {
 
 food_buildings_ai_allow = {
 	has_any_tile_strategic_resource = no
-	from.owner = { 
-		has_monthly_income = { resource = food value < 150 }
+	owner= { 
+		OR = { 
+			is_machine_empire = no
+			is_servitor = yes
+			AND = { 
+				is_synth_empire = yes
+				any_owned_pop = { is_growing = yes is_robot_pop = no }
+			}
+		}	
+		has_monthly_income = { resource = food value < 150 }		
 	}	
 	from = { NOT = { has_planet_flag = purged_planet } }
 	OR = {
@@ -617,7 +625,7 @@ food_buildings_ai_allow = {
 			}
 		}
 		AND = { 
-			from.owner = { 
+			owner= { 
 				is_machine_empire = no
 				is_synth_empire = no
 				has_monthly_income = { resource = food value < 0 }
@@ -638,7 +646,7 @@ food_buildings_ai_allow = {
 
 planet_unique_prerequisite = {
 	OR = { 
-		from.owner = { 
+		owner= { 
 			OR = { 
 				has_monthly_income = { resource = minerals value < 50 }
 				has_monthly_income = { resource = energy value < 50 }
