@@ -575,6 +575,7 @@ def main():
   locList.addLoc("asAI", "Same as AI")
   locList.addLoc("currently", "Currently")
   locList.append("as_ai", "@asAI")
+  locList.addLoc("none", "None")
 
   edictOut=TagList()
   playerWeightEvent=outTag.addReturn("country_event")
@@ -652,6 +653,20 @@ def main():
           if res!=resource and res!="unity":
             hiddenEffect.add("remove_modifier",res+"_focused_automation")
       hiddenEffect.add(scope+"_event", TagList("id",e.get("id")))
+    
+    #ALLOW FOCUS REMOVAL ON PLANET:
+    if scope=="planet":
+      option=e.addReturn("option")
+      option.add("name", locList.append(nameBase.format("none_focus.name"),"@none"))
+      option.add("custom_gui","cgm_option")
+      hiddenEffect=option.addReturn("hidden_effect")
+      for res in resources+["as_ai"]:
+        if res!="unity":
+          hiddenEffect.add("remove_{}_flag".format(scope), "cgm_player_focus_{}".format(res))
+          hiddenEffect.add("remove_modifier",res+"_focused_automation")
+
+
+
     option=e.addReturn("option")
     option.add("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option")
     if scope=="country":
