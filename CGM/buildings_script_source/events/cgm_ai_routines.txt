@@ -47,11 +47,7 @@ event = { #game start or mod install
 			set_variable = { which = cgm_building_construction_percent value = 20 } #not used initially, but just to have a default value.
 			set_country_flag = cgm_player_focus_as_ai
 		}
-		set_global_flag = cgm_disable_vanilla_building_AI
-		every_playable_country = {
-			limit = { is_ai = yes }
-			set_country_flag = cgm_disable_vanilla_building_AI
-		}
+
 		every_system = {
 			system_star = { 
 				set_variable = { which = num_of_hyperlane_connections value = 0 }
@@ -93,13 +89,14 @@ event = {
 	is_triggered_only = yes
 	hide_window = yes
 	immediate = {
-		set_global_flag = cgm_prevent_update_event
+		set_global_flag = cgm_ai_routines_update_active
 	}
 }
 
 country_event = {
 	id = cgm_ai_routines.9
 	fire_only_once = yes
+	is_triggered_only = yes
 	title = cgm_beta_updated.title
 	desc = cgm_beta_updated.desc
 	diplomatic = yes
@@ -108,10 +105,15 @@ country_event = {
 
 	picture_event_data = { room = cgm_menu_room }
 	trigger = {
-		NOT = { has_global_flag = cgm_prevent_update_event }
+		NOT = { has_global_flag = cgm_ai_routines_update_active }
 	}
 	immediate = {
-		set_global_flag = cgm_prevent_update_event
+		set_global_flag = cgm_ai_routines_update_active
+		set_global_flag = cgm_disable_vanilla_building_AI
+		every_playable_country = {
+			limit = { is_ai = yes }
+			set_country_flag = cgm_disable_vanilla_building_AI
+		}
 	}
 	option = {
 		name = cgm_beta_updated_configure_button.name
