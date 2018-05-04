@@ -17,11 +17,16 @@ class LocList:
       self.dicts[languageCode]=dict()
 
   def addLoc(self, id, loc, language="en"):
+    # if id=="basic":
+    #   print(loc)
+    #   print(language)
     if language=="all":
       for k,d in self.dicts.items():
         d[id]=loc
     else:
       self.dicts[language][id]=loc
+    # if id=="basic" and language=="en":
+      # print(self.dicts)
     return id
   def addEntry(self, gameLocId, string, complainOnOverwrite=False):
     if complainOnOverwrite:
@@ -43,10 +48,13 @@ class LocList:
       translator=Translator()
 
     localDict=self.dicts[languageCode]
+    if not localDict and self.translateRest<=1:
+      translateRest=0
+    else:
+      translateRest=self.translateRest
     for englishKey, englishLoc in self.dicts["en"].items():
-      # print(self.translateRest)
       if not englishKey in localDict:
-        if self.translateRest>1 or self.translateRest==1 and localDict: #full translate mode, or non empty dict
+        if (translateRest>0) and not "$" in englishLoc and not "£" in englishLoc: #full translate mode, or non empty dict and leftover translate mode
           localDict[englishKey]=translator.translate(text=englishLoc, src="en", dest=languageCode).text
         else:
           localDict[englishKey]=englishLoc
