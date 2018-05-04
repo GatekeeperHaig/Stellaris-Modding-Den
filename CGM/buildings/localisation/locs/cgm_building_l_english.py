@@ -31,7 +31,7 @@ locList.addLoc("edict_cgm_enable_sector_ai_desc","AI will again construct new bu
 
 
 locList.addLoc("cgm_beta_updated_title","CGM Buildings: Major Update","en")
-locList.addLoc("cgm_beta_updated_desc","We have introduced a new automated construction routine, both for AI and Player. This should allow smart construction and end AI building stupity. By default, in any AI country, vanilla AI construction is now disabled and the new routine is active. In player empires, new country edicts can be used to deactivate sector building AI or activate full or sector automated construction","en")
+locList.addLoc("cgm_beta_updated_desc","We have introduced a new automated construction routine, both for AI and Player. This should allow smart construction and end AI building stupidity. By default, in any AI country, vanilla AI construction is now disabled and the new routine is active. In player empires, new country edicts can be used to deactivate sector building AI or activate full or sector automated construction","en")
 locList.addLoc("cgm_beta_updated_configure_button_name","Change Default Settings","en")
 
 locList.addLoc("cgm_main_menu_close_desc","Close Menu","en")

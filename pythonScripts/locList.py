@@ -38,6 +38,7 @@ class LocList:
   def append(self, gameLocId, string, complainOnOverwrite=False):
     return self.addEntry(gameLocId,string,complainOnOverwrite)
   def write(self,fileName, language, yml=True):
+    outputMissing=False
     if len(language)==2:
       languageCode=language
       language=self.languages[self.languageCodes.index(language)]
@@ -47,6 +48,8 @@ class LocList:
       from googletrans import Translator
       translator=Translator()
 
+    if languageCode!="en" and outputMissing:
+      missingStuffFile= io.open(os.path.dirname(fileName)+"/missing_"+languageCode+".txt", "a+", encoding="utf-8")
     localDict=self.dicts[languageCode]
     if not localDict and self.translateRest<=1:
       translateRest=0
@@ -55,10 +58,15 @@ class LocList:
     for englishKey, englishLoc in self.dicts["en"].items():
       if not englishKey in localDict:
         if (translateRest>0) and not "$" in englishLoc and not "£" in englishLoc: #full translate mode, or non empty dict and leftover translate mode
+          if outputMissing:
+            missingStuffFile.write('locList.addLoc("{}", "{}","{}")\n'.format(englishKey,englishLoc,languageCode))
           localDict[englishKey]=translator.translate(text=englishLoc, src="en", dest=languageCode).text
         else:
           localDict[englishKey]=englishLoc
-
+    if languageCode!="en" and outputMissing:
+      missingStuffFile.write("#next file\n")
+      missingStuffFile.write("\n")
+      missingStuffFile.close()    
     with io.open(fileName,'w', encoding="utf-8") as file:
       if yml:
         file.write(u'\ufeff')
