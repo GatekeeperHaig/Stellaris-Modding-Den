@@ -660,7 +660,7 @@ def main():
       option.add("name", locList.append(nameBase.format("none_focus.name"),"@none"))
       option.add("custom_gui","cgm_option")
       hiddenEffect=option.addReturn("hidden_effect")
-      for res in resources+["as_ai"]:
+      for res in resources:
         if res!="unity":
           hiddenEffect.add("remove_{}_flag".format(scope), "cgm_player_focus_{}".format(res))
           hiddenEffect.add("remove_modifier",res+"_focused_automation")
