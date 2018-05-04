@@ -590,7 +590,7 @@ def main():
   playerWeightEventPlanet.add("id", name_player_weights_planet)
   for scope, e in zip(["country", "planet"],[playerWeightEvent,playerWeightEventPlanet]):
     e.add("is_triggered_only", "yes")
-    e.add("custom_gui","cgm_buildings_advanced_configuration").add("diplomatic","yes").add("force_open", "no") 
+    e.add("custom_gui","cgm_buildings_advanced_configuration_more_options").add("diplomatic","yes").add("force_open", "no") 
     # e.add("custom_gui","cgm_buildings_advanced_configuration_more_options").add("diplomatic","yes").add("force_open", "no") 
     e.add("title", locList.append(nameBase.format(scope+"_focus_event.name"), "@"+scope+": @FocusMenuTitle"))
     descTrigger=TagList("text", locList.append(nameBase.format(scope+"_focus_event.desc"), "@FocusMenuDesc @currently:"))
@@ -606,7 +606,7 @@ def main():
     customTooltips.add("custom_tooltip", deepcopy(triggerText))
 
     e.add("desc", TagList("trigger", descTrigger))
-    e.add("picture_event_data", TagList("room","cgm_menu_room"))
+    # e.add("picture_event_data", TagList("room","cgm_menu_room"))
     # e.add("picture_event_data", TagList("room","cgm_menu_room_small"))
     edict=edictOut.addReturn(scope+"_edict")
     edict.add("name", locList.append("edict_"+nameBase.format(scope+"_focus_event"), "@FocusMenuTitle").replace("edict_",""))
@@ -632,7 +632,7 @@ def main():
     for bonusStrength in [1,1.5,2,3]:
       option=e.addReturn("option")
       option.add("name", locList.append(nameBase.format("focus_strength_{!s}".format(bonusStrength).replace(".","_")+".name"), "@focusStrength: {!s}".format(bonusStrength)))
-      option.add("custom_gui","cgm_option")
+      option.add("custom_gui","cgm_advanced_configuration_option_more_options")
       option.add("hidden_effect", variableOpNew("set", "cgm_focus_strength", bonusStrength).add(scope+"_event", TagList("id",e.get("id"))))
     for resource in resources+["as_ai"]:
       if resource=="unity":
@@ -647,7 +647,7 @@ def main():
       #   option.add("name", locList.append(nameBase.format(resource+"_focus.name"),"@{}".format(resource)))
       # else:
       option.add("name", locList.append(nameBase.format(resource+"_focus.name"),"${}$".format(resource)))
-      option.add("custom_gui","cgm_option")
+      option.add("custom_gui","cgm_advanced_configuration_option_more_options")
       hiddenEffect=option.addReturn("hidden_effect")
       hiddenEffect.add("set_{}_flag".format(scope), "cgm_player_focus_{}".format(resource))
       for res in resources+["as_ai"]:
@@ -666,7 +666,7 @@ def main():
     if scope=="planet":
       option=e.addReturn("option")
       option.add("name", locList.append(nameBase.format("none_focus.name"),"@none"))
-      option.add("custom_gui","cgm_option")
+      option.add("custom_gui","cgm_advanced_configuration_option_more_options")
       hiddenEffect=option.addReturn("hidden_effect")
       for res in resources:
         if res!="unity":
@@ -676,7 +676,7 @@ def main():
 
 
     option=e.addReturn("option")
-    option.add("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option")
+    option.add("name", "cgm_main_menu.close.name").add("custom_gui","cgm_advanced_configuration_option_more_options")
     if scope=="country":
       option.add("hidden_effect", TagList("country_event", TagList("id",name_empire_weights)))
 
