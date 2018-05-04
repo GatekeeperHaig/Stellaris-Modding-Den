@@ -263,7 +263,7 @@ def main():
   chooseSpecialBuilding.addReturn("prev").variableOp("set","cgm_special_bestWeight", "prev").variableOp("set","cgm_special_bestBuilding", 2)
   chooseSpecialBuilding.add("save_global_event_target_as", "cgm_best_planet_for_special")
 
-
+  cgmCompTrigger=TagList().readFile("../CGM/buildings_script_source/common/scripted_effects/z_cgm_compatibility_effects.txt")
 
 
   planetFindBestEvent=TagList("id", name_planet_find_best)
@@ -298,12 +298,15 @@ def main():
     recheckModifiers.variableOp("set", resource+"_mult_planet_base_old", resource+"_mult_planet_base")
     recheckModifiers.variableOp("set", resource+"_mult_planet_base", 0)
   recheckModifiers.add("check_vanilla_planet_modifiers","yes")
-  recheckModifiers.add("check_planet_modifiers_pe","yes")
-  recheckModifiers.add("check_planet_modifiers_gpm","yes")
-  recheckModifiers.add("check_planet_modifiers_pd","yes")
-  recheckModifiers.add("check_planet_modifiers_am","yes")
-  recheckModifiers.add("check_planet_modifiers_se","yes")
-  recheckModifiers.add("check_planet_modifiers_gse","yes")
+  for name in cgmCompTrigger.names:
+    if "check_planet_modifiers" in name:
+      recheckModifiers.add(name,"yes")
+  # recheckModifiers.add("check_planet_modifiers_pe","yes")
+  # recheckModifiers.add("check_planet_modifiers_gpm","yes")
+  # recheckModifiers.add("check_planet_modifiers_pd","yes")
+  # recheckModifiers.add("check_planet_modifiers_am","yes")
+  # recheckModifiers.add("check_planet_modifiers_se","yes")
+  # recheckModifiers.add("check_planet_modifiers_gse","yes")
   redoLimit=TagList()
   redoOr=redoLimit.addReturn("NAND")
   for resource in resources:
@@ -315,10 +318,13 @@ def main():
   for resource in resources:
     recheckBuildings.variableOp("set", resource+"_mult_planet_building", 0)
   recheckBuildings.add("check_planet_bonus_buildings","yes")
-  recheckBuildings.add("check_planet_bonus_buildings_pe","yes")
-  recheckBuildings.add("check_planet_bonus_buildings_am","yes")
-  recheckBuildings.add("check_planet_bonus_buildings_eutab","yes")
-  recheckBuildings.add("check_planet_bonus_buildings_ag","yes")
+  for name in cgmCompTrigger.names:
+    if "check_planet_bonus_buildings" in name:
+      recheckBuildings.add(name,"yes")
+  # recheckBuildings.add("check_planet_bonus_buildings_pe","yes")
+  # recheckBuildings.add("check_planet_bonus_buildings_am","yes")
+  # recheckBuildings.add("check_planet_bonus_buildings_eutab","yes")
+  # recheckBuildings.add("check_planet_bonus_buildings_ag","yes")
   recheckBuildings.add("set_planet_flag", "cgm_bonus_building_calc_done")
 
   recheckPops=planetFindBestEventImmediate.createReturnIf(TagList("has_planet_flag", "cgm_pop_calc_done"))
