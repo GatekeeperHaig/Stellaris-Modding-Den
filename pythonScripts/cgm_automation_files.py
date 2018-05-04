@@ -590,7 +590,8 @@ def main():
   playerWeightEventPlanet.add("id", name_player_weights_planet)
   for scope, e in zip(["country", "planet"],[playerWeightEvent,playerWeightEventPlanet]):
     e.add("is_triggered_only", "yes")
-    e.add("custom_gui","cgm_buildings_advanced_configuration_more_options").add("diplomatic","yes").add("force_open", "no") 
+    e.add("custom_gui","cgm_buildings_advanced_configuration").add("diplomatic","yes").add("force_open", "no") 
+    # e.add("custom_gui","cgm_buildings_advanced_configuration_more_options").add("diplomatic","yes").add("force_open", "no") 
     e.add("title", locList.append(nameBase.format(scope+"_focus_event.name"), "@"+scope+": @FocusMenuTitle"))
     descTrigger=TagList("text", locList.append(nameBase.format(scope+"_focus_event.desc"), "@FocusMenuDesc @currently:"))
     customTooltips=TagList()
@@ -605,7 +606,8 @@ def main():
     customTooltips.add("custom_tooltip", deepcopy(triggerText))
 
     e.add("desc", TagList("trigger", descTrigger))
-    e.add("picture_event_data", TagList("room","cgm_menu_room_small"))
+    e.add("picture_event_data", TagList("room","cgm_menu_room"))
+    # e.add("picture_event_data", TagList("room","cgm_menu_room_small"))
     edict=edictOut.addReturn(scope+"_edict")
     edict.add("name", locList.append("edict_"+nameBase.format(scope+"_focus_event"), "@FocusMenuTitle").replace("edict_",""))
     locList.append("edict_"+nameBase.format(scope+"_focus_event_desc"), "@FocusMenuDesc")
