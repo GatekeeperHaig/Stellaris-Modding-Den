@@ -502,18 +502,15 @@ add_energy_building = {
 			#	else = { check for other mods and their APIs			
 		}	
 		else = { 
+			add_building_construction = building_galactic_stock_exchange
 			if = { 
 				limit = { 
-					owner = { NOT = { has_country_flag = energy_focus_2 } }				
+					owner = { check_variable = { which = energy_country_weight value < 2 } }	#only build expensive stuff when not in dire need of energy			
 					OR = { 
 						new_building_content_enabled = no
-						AND = { 
-							new_building_content_enabled = yes
-							has_resource = { type = energy amount < 2 } #we do not want to build on more than 1 energy anything other than tile restricted buildings
-						}
+						has_resource = { type = energy amount < 2 } #we do not want to build on more than 1 energy anything other than tile restricted buildings
 					}	
 				}	
-				add_building_construction = building_galactic_stock_exchange
 				if = {
 					limit = { NOR = { has_building_construction = yes has_building = yes } } 			
 					add_building_construction = building_probability_engine	
@@ -690,13 +687,10 @@ add_minerals_building = {
 		else = { 
 			if = { 
 				limit = { 
-					owner = { NOT = { has_country_flag = minerals_focus_2 } }				
+					owner = { check_variable = { which = minerals_country_weight value < 2 } }	#only build expensive stuff when not in dire need of minerals
 					OR = { 
 						new_building_content_enabled = no
-						AND = { 
-							new_building_content_enabled = yes
-							has_resource = { type = minerals amount < 2 } #we do not want to build on more than 1 minerals anything other than tile restricted buildings
-						}
+						has_resource = { type = minerals amount < 2 } #we do not want to build on more than 1 minerals anything other than tile restricted buildings
 					}	
 				}	
 				if = {
@@ -853,212 +847,56 @@ add_food_building = {
 		else = { 
 			if = { 
 				limit = { 
-					owner = { 
-						NOR = { 
+					owner = {
+						OR = {
 							is_food_delimited = yes
-							has_country_flag = food_focus_2 
-						}	
-					}	
-					OR = { 
-						new_building_content_enabled = no
-						AND = { 
-							new_building_content_enabled = yes
-							has_resource = { type = food amount < 2 } #we do not want to build on more than 1 food anything other than tile restricted buildings
+							check_variable = { which = energy_country_weight value > food_country_weight }
 						}
-					}	
-				}	
-				if = {
-					limit = { NOR = { has_building_construction = yes has_building = yes } } 
-					add_building_construction = building_paradise_dome
-					else = { owner = { set_country_flag = cgm_auto_built }  }							
-				}	
-				if = {
-					limit = { 
-						NOR = { has_building_construction = yes has_building = yes }
-						new_building_content_enabled = yes
-					} 
-					add_building_construction = building_agricultural_processor_1
-					else = { owner = { set_country_flag = cgm_auto_built }  }							
-				}			
-				#if = { 
-				#	limit = { #check other mod triggers } #replicate as needed per mod
-				#	API effects
-				#	if = {
-				#		limit = { OR = { has_building_construction = yes has_building = yes } }
-				#		owner = { set_country_flag = cgm_auto_built }
-				#		
-				#	}
-				#}					
-				if = {
-					limit = { new_building_content_enabled = no }
-					if = { 
-						limit = { prev = { is_habitat = no } }
-						add_building_construction = building_hydroponics_farm_1
-						add_building_construction = building_nutrient_paste_facility
-						else = { 
-							add_building_construction = building_hab_agri_bay
-							add_building_construction = building_nutrient_paste_facility
-						}
-					}	
+					}
 					if = {
-						limit = { OR = { has_building_construction = yes has_building = yes } }
-						owner = { set_country_flag = cgm_auto_built }
-						
-					}						
-					else = {
+						limit = { new_building_content_enabled = yes } 
+						add_building_construction = building_biofuel_refinery_1_1
+						add_building_construction = building_biofuel_refinery_1_2
+						add_building_construction = building_biofuel_refinery_1_3
+						add_building_construction = building_biofuel_refinery_1_4									
+						add_building_construction = building_biofuel_refinery_1_5											
+					}
+				}
+			if = {
+				limit = { NOR = { has_building_construction = yes has_building = yes } }
+				if = {
+					limit = {
+						owner = { check_variable = { which = food_country_weight value < 2 } }	#only build expensive stuff when not in dire need of food
+						OR = { 
+							new_building_content_enabled = no
+							has_resource = { type = food amount < 2 } #we do not want to build on more than 1 food anything other than tile restricted buildings
+						}	
+					}
+					add_building_construction = building_paradise_dome
+					add_building_construction = building_agricultural_processor_1
+					add_building_construction = building_hydroponics_farm_1
+					add_building_construction = building_hab_agri_bay
+					add_building_construction = building_nutrient_paste_facility
+				}
+				if = {
+					limit = { NOR = { has_building_construction = yes has_building = yes } }
 						if = { 
-							limit = { has_resource = { type = food amount > 0 } }
-							if = { 
-								limit = { has_resource = { type = food amount = 1 } }
-								add_building_construction = building_farming_complex_1_1
-								else = { 
-									if = { 
-										limit = { has_resource = { type = food amount = 2 } }
-										add_building_construction = building_farming_complex_1_2
-										else = { 
-											if = { 
-												limit = { has_resource = { type = food amount = 3 } }
-												add_building_construction = building_farming_complex_1_3
-												else = { 
-													if = { 
-														limit = { has_resource = { type = food amount = 4 } }
-														add_building_construction = building_farming_complex_1_4									
-														else = { 
-															if = { 
-																limit = { has_resource = { type = food amount = 5 } }
-																add_building_construction = building_farming_complex_1_5
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}	
-							else = { 
-								if = { 
-									limit = { has_deposit = no }
-									add_building_construction = building_hydroponic_farm_1
-								}
-							}					
-						}
-						if = {
-							limit = { OR = { has_building_construction = yes has_building = yes } }
-							owner = { set_country_flag = cgm_auto_built }
-							
+							limit = { new_building_content_enabled = yes has_resource = { type = food amount > 0 } }
+							add_building_construction = building_farming_complex_1_1
+							add_building_construction = building_farming_complex_1_2
+							add_building_construction = building_farming_complex_1_3
+							add_building_construction = building_farming_complex_1_4									
+							add_building_construction = building_farming_complex_1_5
 						}
 					}		
 				}
-				else = {
-					if = {
-						limit = { owner = { is_food_delimited = yes } }
-						add_building_construction = building_paradise_dome
-						if = {
-							limit = { new_building_content_enabled = yes } 
-							if = { 
-								limit = { has_resource = { type = food amount > 0 } }
-								if = { 
-									limit = { has_resource = { type = food amount = 1 } }
-									add_building_construction = building_biofuel_refinery_1_1
-									else = { 
-										if = { 
-											limit = { has_resource = { type = food amount = 2 } }
-											add_building_construction = building_biofuel_refinery_1_2
-											else = { 
-												if = { 
-													limit = { has_resource = { type = food amount = 3 } }
-													add_building_construction = building_biofuel_refinery_1_3
-													else = { 
-														if = { 
-															limit = { has_resource = { type = food amount = 4 } }
-															add_building_construction = building_biofuel_refinery_1_4									
-															else = { 
-																if = { 
-																	limit = { has_resource = { type = food amount = 5 } }
-																	add_building_construction = building_biofuel_refinery_1_5
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}	
-							}
-							if = {
-								limit = { OR = { has_building_construction = yes has_building = yes } }
-								owner = { set_country_flag = cgm_auto_built }								
-							}												
-						}	
-						else = { 
-							if = {
-								limit = { new_building_content_enabled = no }
-								if = { 
-									limit = { prev = { is_habitat = no } }
-									add_building_construction = building_hydroponics_farm_1
-									add_building_construction = building_nutrient_paste_facility
-									else = { 
-										add_building_construction = building_hab_agri_bay
-										add_building_construction = building_nutrient_paste_facility
-									}
-								}	
-								if = {
-									limit = { OR = { has_building_construction = yes has_building = yes } }
-									owner = { set_country_flag = cgm_auto_built }
-									
-								}			
-								else = {
-									if = { 
-										limit = { has_resource = { type = food amount > 0 } }
-										if = { 
-											limit = { has_resource = { type = food amount = 1 } }
-											add_building_construction = building_farming_complex_1_1
-											else = { 
-												if = { 
-													limit = { has_resource = { type = food amount = 2 } }
-													add_building_construction = building_farming_complex_1_2
-													else = { 
-														if = { 
-															limit = { has_resource = { type = food amount = 3 } }
-															add_building_construction = building_farming_complex_1_3
-															else = { 
-																if = { 
-																	limit = { has_resource = { type = food amount = 4 } }
-																	add_building_construction = building_farming_complex_1_4									
-																	else = { 
-																		if = { 
-																			limit = { has_resource = { type = food amount = 5 } }
-																			add_building_construction = building_farming_complex_1_5
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}	
-										else = { 
-											if = { 
-												limit = { has_deposit = no }
-												add_building_construction = building_hydroponic_farm_1
-											}
-										}					
-									}
-									if = {
-										limit = { OR = { has_building_construction = yes has_building = yes } }
-										owner = { set_country_flag = cgm_auto_built }								
-									}					
-								}		
-							}
-						}	
-					}
-				}	
 			}
-		}	
+		}
 	}
+	if = {
+		limit = { OR = { has_building_construction = yes has_building = yes } }
+		owner = { set_country_flag = cgm_auto_built }								
+	}	
 }	
 add_society_research_building = {
 	log = "trying to build standard on tile [prev.cgm_curTile]"
@@ -1084,13 +922,10 @@ add_society_research_building = {
 		else = { 
 			if = { 
 				limit = { 			
-					owner = { NOT = { has_country_flag = society_research_focus_2 } }				
+					owner = { check_variable = { which = society_research_country_weight value < 2 } }	#only build expensive stuff when not in dire need of society_research
 					OR = { 
 						new_building_content_enabled = no
-						AND = { 
-							new_building_content_enabled = yes
-							has_resource = { type = society_research amount < 2 } #we do not want to build on more than 1 society_research anything other than tile restricted buildings
-						}
+						has_resource = { type = society_research amount < 2 } #we do not want to build on more than 1 society_research anything other than tile restricted buildings
 					}	
 				}	
 				add_building_construction = building_institute
@@ -1283,13 +1118,10 @@ add_physics_research_building = {
 		else = { 
 			if = { 
 				limit = { 			
-					owner = { NOT = { has_country_flag = physics_research_focus_2 } }				
+					owner = { check_variable = { which = physics_research_country_weight value < 2 } }	#only build expensive stuff when not in dire need of
 					OR = { 
 						new_building_content_enabled = no
-						AND = { 
-							new_building_content_enabled = yes
-							has_resource = { type = physics_research amount < 2 } #we do not want to build on more than 1 physics_research anything other than tile restricted buildings
-						}
+						has_resource = { type = physics_research amount < 2 } #we do not want to build on more than 1 physics_research anything other than tile restricted buildings
 					}	
 				}
 				add_building_construction = building_institute
@@ -1446,14 +1278,11 @@ add_engineering_research_building = {
 		
 		else = { 
 			if = { 
-				limit = { 			
-					owner = { NOT = { has_country_flag = engineering_research_focus_2 } }				
+				limit = { 
+					owner = { check_variable = { which = engineering_research_country_weight value < 2 } }	#only build expensive stuff when not in dire need of			
 					OR = { 
 						new_building_content_enabled = no
-						AND = { 
-							new_building_content_enabled = yes
-							has_resource = { type = engineering_research amount < 2 } #we do not want to build on more than 1 engineering_research anything other than tile restricted buildings
-						}
+						has_resource = { type = engineering_research amount < 2 } #we do not want to build on more than 1 engineering_research anything other than tile restricted buildings
 					}	
 				}
 				add_building_construction = building_institute

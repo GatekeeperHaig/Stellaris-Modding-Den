@@ -768,9 +768,19 @@ has_black_hole_or_dyson_sphere = {
 }
 ### limit and prerequisite conditions - meant to be used in AI allow effects
 food_buildings_limitation = {
-	from.owner = { check_variable = { which = food_country_weight value = 0 } }
+	from.owner = { 
+		OR = {
+			requires_any_food = no
+			check_variable = { which = food_country_weight value = 0 } 
+		}
+	}
 }
-is_food_delimited = { check_variable = { which = food_country_weight value = 0 } }
+is_food_delimited = { 
+	OR = {
+		requires_any_food = no
+		check_variable = { which = food_country_weight value = 0 } 
+	}
+}
 empire_unique_prerequisite = {
 	from.owner = { minerals > 1500 influence > 300 }
 }
@@ -882,3 +892,14 @@ food_tech_potential = {
 food_buildings_destroy_conditions = {
 	owner_is_machine_empire = yes
 }	
+
+requires_any_food = {
+	OR = {
+		AND = {
+			is_machine_empire = no
+			is_synth_empire = no
+		}
+		has_monthly_income = { resource = food value < 0 }
+		has_civic = civic_machine_servitor
+	}
+}
