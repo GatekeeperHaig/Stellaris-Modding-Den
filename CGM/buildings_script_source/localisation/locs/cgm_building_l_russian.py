@@ -4,7 +4,7 @@ locList.addLoc("basic","Базовый","ru")
 locList.addLoc("improved","Улучшенный","ru")
 locList.addLoc("enhanced","Расширенный","ru")
 locList.addLoc("advanced","Продвинутый","ru")
-locList.addLoc("Superior","Максимально Равитой","ru")
+locList.addLoc("superior","Максимально Равитой","ru")
 locList.addLoc("optimal","Оптимальный","ru")
 
 locList.addLoc("edict_cgm_menu_edict_desc","Этот указ открывает главное меню CGM.","ru")

@@ -4,7 +4,7 @@ locList.addLoc("basic","Basic","en")
 locList.addLoc("improved","Improved","en")
 locList.addLoc("enhanced","Enhanced","en")
 locList.addLoc("advanced","Advanced","en")
-locList.addLoc("Superior","Superior","en")
+locList.addLoc("superior","superior","en")
 locList.addLoc("optimal","Optimal","en")
 
 locList.addLoc("edict_cgm_menu_edict_desc","This edict opens the CGM main menu.","en")
