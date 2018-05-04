@@ -565,7 +565,7 @@ def main():
     locList=LocList(False)
   else:
     locList=LocList(2)
-  locList.addLoc("FocusMenuTitle", "Choose a Focus for Automated Construction")
+  locList.addLoc("FocusMenuTitle", "Choose Automation Focus")
   locList.addLoc("FocusMenuDesc", "Choose a category that should be prefered with a certain factor you can also choose here. '1' would mean no change. '3' should be used with caution as it most likely will use tiles that are way better for other things eventually.")
   locList.addLoc("focusStrength", "Focus Strength Factor")
   locList.addLoc("focus", "Focus")
