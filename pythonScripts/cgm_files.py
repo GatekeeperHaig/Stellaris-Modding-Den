@@ -45,7 +45,7 @@ def main():
 
 
   # # doTranslation=True
-  doTranslation=False
+  doTranslation=1
   locList=LocList(doTranslation)
   locList.addLoc("build_speed_mult", "Building Construction Speed")
   locList.addLoc("build_cost_mult", "Building Costs")

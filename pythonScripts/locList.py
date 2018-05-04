@@ -6,7 +6,7 @@ import re
 
 
 class LocList:
-  def __init__(self, translateRest=False):
+  def __init__(self, translateRest=0):
     self.languages=["braz_por","english","french","german","polish","russian","spanish"]
     self.languageCodes=["pt","en","fr", "de","pl","ru", "es"]
     # self.entries=[]
@@ -46,7 +46,7 @@ class LocList:
     for englishKey, englishLoc in self.dicts["en"].items():
       # print(self.translateRest)
       if not englishKey in localDict:
-        if self.translateRest:
+        if self.translateRest>1 or self.translateRest==1 and localDict: #full translate mode, or non empty dict
           localDict[englishKey]=translator.translate(text=englishLoc, src="en", dest=languageCode).text
         else:
           localDict[englishKey]=englishLoc
@@ -167,7 +167,7 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
         file.write("#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nimport os,sys,glob,io\n")
         file.write("os.chdir(os.path.dirname(__file__))\n")
         file.write("sys.path.insert(1, '"+relPath+"')\n")
-        file.write("from locList import LocList\nlocList=LocList()\n")
+        file.write("from locList import LocList\nlocList=LocList(1)\n")
         # file.write("import allModules,importlib\n")
         file.write("for fileName in glob.glob('locs/*.py'):\n")
         file.write("\twith io.open(fileName,'r', encoding='utf-8') as file:\n")
