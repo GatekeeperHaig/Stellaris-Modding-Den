@@ -283,7 +283,7 @@ def readAndConvert(args, allowRestart=1):
             
           if len(newRequirements.vals)>0 and not buildingData.tagName in args.t0_buildings:
               buildingData.getOrCreate("potential").add("NAND", newRequirements)
-              newRequirements.add("NOT", TagList("country",TagList("has_country_flag","display_low_tier_flag")))
+              newRequirements.add("NOT", TagList("owner",TagList("has_country_flag","display_low_tier_flag")))
               if args.make_optional:
                 newRequirements.add("has_global_flag","direct_build_enabled")
     #END OF COPY AND MODIFY        
