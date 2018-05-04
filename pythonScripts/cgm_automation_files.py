@@ -605,7 +605,7 @@ def main():
     customTooltips.add("custom_tooltip", deepcopy(triggerText))
 
     e.add("desc", TagList("trigger", descTrigger))
-    e.add("picture_event_data", TagList("room","cgm_menu_room"))
+    e.add("picture_event_data", TagList("room","cgm_menu_room_small"))
     edict=edictOut.addReturn(scope+"_edict")
     edict.add("name", locList.append("edict_"+nameBase.format(scope+"_focus_event"), "@FocusMenuTitle").replace("edict_",""))
     locList.append("edict_"+nameBase.format(scope+"_focus_event_desc"), "@FocusMenuDesc")
