@@ -9,7 +9,31 @@ locList.addLoc("optimal","Optimal","en")
 
 locList.addLoc("edict_cgm_menu_edict_desc","This edict opens the CGM main menu.","en")
 locList.addLoc("edict_cgm_menu_edict","Open CGM Menu","en")
+
+locList.addLoc("edict_cgm_autobuild_decrease_spending","Decrease Automated Construction Budget","en")
+locList.addLoc("edict_cgm_autobuild_decrease_spending_desc","","en")
+locList.addLoc("cgm_autobuild_decrease_spending_desc","Decrease percentage of your monthly income going to automatic building construction by 5%. Current: [this.cgm_building_construction_percent]%","en")
+locList.addLoc("edict_cgm_autobuild_increase_spending","Increase Automated Construction Budget","en")
+locList.addLoc("edict_cgm_autobuild_increase_spending_desc","","en")
+locList.addLoc("cgm_autobuild_increase_spending_desc","Increase percentage of your monthly income going to automatic building construction by 5%. Current: [this.cgm_building_construction_percent]%","en")
 locList.addLoc("cgm_buildings_text","Core Game Mechanics: Buildings","en")
+locList.addLoc("edict_cgm_enable_player_autobuild","Enable Full Automated Construction","en")
+locList.addLoc("edict_cgm_sector_autobuild_only","Enable Sector Automated Construction","en")
+locList.addLoc("edict_cgm_disable_player_autobuild","Disable Automated Construction","en")
+locList.addLoc("edict_cgm_enable_player_autobuild_desc","Will remove a customizable percentage (default 20%) of your mineral income every month and uses this in a smart automatic construction of buildings. Core worlds are prefered. No effect on AI or other players.","en")
+locList.addLoc("edict_cgm_sector_autobuild_only_desc","Will remove a customizable percentage (default 20%) of your mineral income every month and uses this in a smart automatic construction of buildings. Sector only! No effect on AI or other players.","en")
+locList.addLoc("edict_cgm_disable_player_autobuild_desc","Disable automated construction. Returns minerals leftover in construction reserve. No effect on AI or other players.","en")
+
+locList.addLoc("edict_cgm_disable_sector_ai","Disable Vanilla Sector AI","en")
+locList.addLoc("edict_cgm_enable_sector_ai","Enable Vanilla Sector AI","en")
+locList.addLoc("edict_cgm_disable_sector_ai_desc","AI will no longer build any new buildings in your sectors. Enable full or sector automated construction to automatically construct in your sectors in a smart way. AI will still upgrade!","en")
+locList.addLoc("edict_cgm_enable_sector_ai_desc","AI will again construct new buildings on their own in sectors.","en")
+
+
+locList.addLoc("cgm_beta_updated_title","CGM Buildings: Major Update","en")
+locList.addLoc("cgm_beta_updated_desc","We have introduced a new automated construction routine, both for AI and Player. This should allow smart construction and end AI building stupity. By default, in any AI country, vanilla AI construction is now disabled and the new routine is active. In player empires, new country edicts can be used to deactivate sector building AI or activate full or sector automated construction","en")
+locList.addLoc("cgm_beta_updated_configure_button_name","Change Default Settings","en")
+
 locList.addLoc("cgm_main_menu_close_desc","Close Menu","en")
 locList.addLoc("cgm_buildings_preset_enable_new_building_content_name","Enable CGM Building Content","en")
 locList.addLoc("cgm_buildings_preset_enable_new_building_content_desc","This option enables the CGM resource building rework. All the standard vanilla resource buildings, e.g. mining network or power plants, are automatically replaced and any required technology that is missing is automatically given.\n\n§HPlease note§!, this option is only available during Game Start and it cannot be undone.","en")
@@ -19,6 +43,15 @@ locList.addLoc("cgm_buildings_option_enable_overhauled_vanilla_building_stats_na
 locList.addLoc("cgm_buildings_option_enable_overhauled_vanilla_building_stats_desc","This option enables overhauled building stats. With some buildings having a different resource outputs, planet modifiers etc. from vanilla. This option can be turned on/off at your discretion at any time during the game.","en")
 locList.addLoc("cgm_buildings_option_disable_overhauled_vanilla_building_stats_name","Disable Overhauled Building Stats","en")
 locList.addLoc("cgm_buildings_option_disable_overhauled_vanilla_building_stats_desc","This option disables the overhauled buildings stats. All vanilla content building will have the same stats as in vanilla.","en")
+locList.addLoc("#cgm_ai_enable_vanilla_name","Enable Vanilla AI Building Construction","en")#cgm_ai_enable_vanilla.name:0 Enable Vanilla AI Building Construction
+locList.addLoc("#cgm_ai_enable_vanilla_desc","The vanilla building construction AI is enabled. This is required to disable event based construction.","en")#cgm_ai_enable_vanilla.desc:0 The vanilla building construction AI is enabled. This is required to disable event based construction.
+locList.addLoc("#cgm_ai_disable_vanilla_name","Disable Vanilla AI Building Construction","en")#cgm_ai_disable_vanilla.name:0 Disable Vanilla AI Building Construction
+locList.addLoc("#cgm_ai_disable_vanilla_desc","The vanilla AI will only be able to upgrade buildings, not build new ones. New building constructions will be created by scripts (normally using resources but with enhanced weights).","en")#cgm_ai_disable_vanilla.desc:0 The vanilla AI will only be able to upgrade buildings, not build new ones. New building constructions will be created by scripts (normally using resources but with enhanced weights).
+locList.addLoc("#cgm_ai_enable_autobuild_name","Enable Enhanced AI Routines","en")#cgm_ai_enable_autobuild.name:0 Enable Enhanced AI Routines
+locList.addLoc("#cgm_ai_enable_autobuild_desc","The AI will build using script based AI enhancement. This is required to disable vanilla AI building construction.","en")#cgm_ai_enable_autobuild.desc:0 The AI will build using script based AI enhancement. This is required to disable vanilla AI building construction.
+locList.addLoc("#cgm_disable_autobuild_name","Disable Enhanced AI Routines","en")#cgm_disable_autobuild.name:0 Disable Enhanced AI Routines
+locList.addLoc("#cgm_disable_autobuild_desc","The AI will not build using script based AI enhancement.","en")#cgm_disable_autobuild.desc:0 The AI will not build using script based AI enhancement.
+
 locList.addLoc("cgm_ai_preset_cgm_ai_routines_name","Full AI Routines and Autobuild","en")
 locList.addLoc("cgm_ai_preset_cgm_ai_routines_desc","This option enables the CGM AI routines and autobuild. The vanilla AI routines are turned off to maximize performance.","en")
 locList.addLoc("cgm_ai_preset_mixed_ai_routines_name","Mixed AI Routines and Autobuild","en")

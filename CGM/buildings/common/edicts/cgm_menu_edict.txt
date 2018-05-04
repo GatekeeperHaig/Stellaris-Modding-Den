@@ -18,3 +18,143 @@ country_edict = {
 		}	
 	}
 }
+
+country_edict = {
+	name = cgm_enable_player_autobuild
+	length = 0
+	cost = { }
+	potential = {
+		is_ai = no
+		OR = {
+			has_country_flag = cgm_disable_autobuild
+			has_country_flag = cgm_sector_autobuild
+		}
+		has_global_flag = cgm_ai_routines_update_active
+	}
+	effect = {
+		hidden_effect = {
+			remove_country_flag = cgm_disable_autobuild
+			remove_country_flag = cgm_sector_autobuild
+		}
+	}
+}
+
+country_edict = {
+	name = cgm_disable_player_autobuild
+	length = 0
+	cost = { }
+	potential = {
+		is_ai = no
+		NOT = { has_country_flag = cgm_disable_autobuild }
+		has_global_flag = cgm_ai_routines_update_active
+	}
+	effect = {
+		hidden_effect = {
+			set_country_flag = cgm_disable_autobuild
+			#return stored:
+			set_variable = { which = minerals_reserve value = building_construction_reserve }
+			restore_minerals_reserve = yes
+		}
+	}
+}
+
+country_edict = {
+	name = cgm_sector_autobuild_only
+	length = 0
+	cost = { }
+	potential = {
+		is_ai = no
+		OR = {
+			has_country_flag = cgm_disable_autobuild
+			NOT = { has_country_flag = cgm_sector_autobuild }
+		}
+		has_global_flag = cgm_ai_routines_update_active
+	}
+	effect = {
+		hidden_effect = {
+			remove_country_flag = cgm_disable_autobuild
+			set_country_flag = cgm_sector_autobuild
+		}
+	}
+}
+
+country_edict = {
+	name = cgm_enable_sector_ai
+	length = 0
+	cost = { }
+	potential = {
+		is_ai = no
+		has_country_flag = cgm_disable_vanilla_building_AI
+		has_global_flag = cgm_ai_routines_update_active
+	}
+	effect = {
+		hidden_effect = {
+			remove_country_flag = cgm_disable_vanilla_building_AI
+		}
+	}
+}
+
+country_edict = {
+	name = cgm_disable_sector_ai
+	length = 0
+	cost = { }
+	potential = {
+		is_ai = no
+		NOT = { has_country_flag = cgm_disable_vanilla_building_AI }
+		has_global_flag = cgm_ai_routines_update_active
+	}
+	effect = {
+		hidden_effect = {
+			set_country_flag = cgm_disable_vanilla_building_AI
+		}
+	}
+}
+
+#country_edict = {
+#	name = cgm_disable_sector_autobuild
+#	length = 0
+#	cost = { }
+#	potential = {
+#		is_ai = no
+#		NOT = { has_country_flag = cgm_disable_autobuild }
+#	}
+#	effect = {
+#		hidden_effect = {
+#			set_country_flag = cgm_disable_autobuild
+#		}
+#	}
+#}
+
+country_edict = {
+	name = cgm_autobuild_increase_spending
+	length = 0
+	cost = { }
+	potential = {
+		is_ai = no
+		NOT = { has_country_flag = cgm_disable_autobuild }
+		has_global_flag = cgm_ai_routines_update_active
+	}
+	effect = {
+		hidden_effect = {
+			change_variable = { which = cgm_building_construction_percent value = 5 }
+		}
+		custom_tooltip = "cgm_autobuild_increase_spending_desc"
+	}
+}
+country_edict = {
+	name = cgm_autobuild_decrease_spending
+	length = 0
+	cost = { }
+	potential = {
+		is_ai = no
+		NOT = { has_country_flag = cgm_disable_autobuild }
+		check_variable = { which = cgm_building_construction_percent value > 4 }
+		has_global_flag = cgm_ai_routines_update_active
+	}
+	effect = {
+		hidden_effect = {
+			change_variable = { which = cgm_building_construction_percent value = -5 }
+		}
+		custom_tooltip = "cgm_autobuild_decrease_spending_desc"
+	}
+}

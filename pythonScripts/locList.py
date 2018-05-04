@@ -117,7 +117,11 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
   trivialAssignment=[]
   with io.open(filePath,'r', encoding="utf-8") as file:
     for line in file:
-      lineArray=shlex.split(line)
+      try:
+        lineArray=shlex.split(line)
+      except:
+        print("Error in line "+line)
+        raise()
       if not langCodeInFile and len(lineArray)!=0:
         for lang, langCode in zip(locList.languages, locList.languageCodes):
           if "l_"+lang in lineArray[0]:
@@ -144,9 +148,10 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
             trivialAssignment.append('locList.addEntry("{}","@{}")'.format(key,key.replace(".","_")))
         # contents.append(lineArray[1])
       for i,entry in enumerate(lineArray):
-        if entry[0]=="#":
-          outArray[-1]+=" ".join(lineArray[i:])
-          break
+        if entry:
+          if entry[0]=="#":
+            outArray[-1]+=" ".join(lineArray[i:])
+            break
 
   lastOutFile=""
   outFile=args.output_folder+"/locs/"+fileName.replace(".yml",".py")

@@ -15,12 +15,26 @@ building_replicator = {
 	 #resource output and modifiers
 	planet_modifier = { static_planet_resource_minerals_add = 40 }
 	 #ai restrictions and weights
-	ai_allow = { mixed_or_vanilla_ai_routines = yes replicator_ai_allow = yes }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+		replicator_ai_allow = yes
+	}
 	ai_weight = {
 		weight = 0
 		modifier = {
-			weight = 50
-			from.owner = { has_country_flag = minerals_focus_factor_2 }
+			weight = 5
+			from.owner = {
+				OR = {
+					AND = {
+						is_at_war = no
+						check_variable = { which = energy_country_weight value < 0.5 }
+					}
+					AND = {
+						is_at_war = yes
+						check_variable = { which = energy_country_weight value < 0.1 }
+					}
+				}
+			}
 		}
 	}
 }

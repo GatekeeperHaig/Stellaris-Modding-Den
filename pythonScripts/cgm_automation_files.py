@@ -21,7 +21,7 @@ eventNameSpace="cgm_auto.{!s}"
 nameBase="cgm_auto_{!s}"
 def main():
 
-  debug=True
+  debug=False
   os.chdir(os.path.dirname(__file__))
   
   # weightTypes=["energy", "minerals", "food", "unity", "society_research", "physics_research", "engineering_research"]
