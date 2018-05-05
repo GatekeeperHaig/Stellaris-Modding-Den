@@ -91,7 +91,7 @@ def main():
   # countFreePops.add("limit", TagList("free_building_tiles", "0","",">"))
   # countFreePops.addReturn("prev").variableOp("change", "cgm_non_filled_planet_count", 1)
   # countFreePops.variableOp("set", "cgm_free_pops", 0)
-  # countFreePops.add("every_pop", TagList("limit", TagList("OR", TagList("is_colony_pop", "yes").add("is_growing", "yes")).add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))).add("OR", TagList("is_being_purged", "no").add("has_purge_type", TagList("type", "purge_labor_camps")))).add("prev", variableOpNew("change", "cgm_free_pops", 1)))
+  # countFreePops.add("every_owned_pop", TagList("limit", TagList("OR", TagList("is_colony_pop", "yes").add("is_growing", "yes")).add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))).add("OR", TagList("is_being_purged", "no").add("has_purge_type", TagList("type", "purge_labor_camps")))).add("prev", variableOpNew("change", "cgm_free_pops", 1)))
   # countFreePops.addReturn("prev").variableOp("change", "cgm_free_pops", "prev")
 
 
@@ -140,7 +140,7 @@ def main():
   findBestPlanetLimit=findBestPlanet.addReturn("limit")
   findBestPlanetLimit.add("has_building_construction","no")
   findBestPlanetLimit.add("free_building_tiles", "0", "", ">")
-  findBestPlanetLimit.add("not",TagList("has_planet_flag", "purged_planet"))
+  # findBestPlanetLimit.add("not",TagList("has_planet_flag", "purged_planet"))
   findBestPlanetLimit.add("or", TagList("and", TagList("sector_controlled","no").add("prev", TagList("has_country_flag", "cgm_core_world_auto"))).add("and", TagList("sector_controlled","yes").add("not", TagList("prev", TagList("has_country_flag", "cgm_core_world_auto")))))
   # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("or", TagList("is_growing", "yes").add("is_unemployed","yes")))
   # findBestPlanetLimit.add("any_pop", TagList("is_colony_pop", "yes").add("is_unemployed","yes")) #seems not to work
@@ -282,6 +282,7 @@ def main():
 
   planetFindBestEventImmediate=planetFindBestEventImmediate.createReturnIf(TagList("NOT", TagList("any_owned_pop", TagList("is_being_purged", "no")))).add("set_planet_flag", "purged_planet")
   planetFindBestEventImmediate=planetFindBestEventImmediate.addReturn("else")
+  planetFindBestEventImmediate.add("remove_planet_flag", "purged_planet")
   planetFindBestEventImmediate.addComment("modifiers are updated yearly!")
 
   modifierUpdate=TagList("id", name_update_modifiers_on_all_planets)
@@ -314,7 +315,7 @@ def main():
   recheckModifiers.createReturnIf(redoLimit).add("set_planet_flag", "cgm_redo_planet_calc")
   modifierUpdateSingle.add("immediate", recheckModifiers)
 
-  recheckBuildings=planetFindBestEventImmediate.createReturnIf(TagList("has_planet_flag", "cgm_bonus_building_calc_done"))
+  recheckBuildings=planetFindBestEventImmediate.createReturnIf(TagList("NOT", TagList("has_planet_flag", "cgm_bonus_building_calc_done")))
   for resource in resources:
     recheckBuildings.variableOp("set", resource+"_mult_planet_building", 0)
   recheckBuildings.add("check_planet_bonus_buildings","yes")
@@ -327,7 +328,7 @@ def main():
   # recheckBuildings.add("check_planet_bonus_buildings_ag","yes")
   recheckBuildings.add("set_planet_flag", "cgm_bonus_building_calc_done")
 
-  recheckPops=planetFindBestEventImmediate.createReturnIf(TagList("has_planet_flag", "cgm_pop_calc_done"))
+  recheckPops=planetFindBestEventImmediate.createReturnIf(TagList("NOT", TagList("has_planet_flag", "cgm_pop_calc_done")))
   for resource in resources:
     recheckPops.variableOp("set", resource+"_mult_planet_pop", 0)
   recheckPops.add("calculate_average_pop_multipliers","yes")
@@ -687,7 +688,7 @@ def main():
   upgradeEvent=upgradeEvent.addReturn("immediate")
   upgradeEvent=upgradeEvent.addReturn("every_owned_planet")
   upgradeEvent.add("limit", TagList("has_building_construction", "no").add("sector_controlled","no"))
-  everyPop=upgradeEvent.addReturn("every_pop")
+  everyPop=upgradeEvent.addReturn("every_owned_pop")
   everyPop.add("limit",  TagList("OR", TagList("is_colony_pop", "yes").add("is_growing", "yes")).add("OR", TagList("is_being_purged", "no").add("has_purge_type", TagList("type", "purge_labor_camps"))))
   tileSwitch=everyPop.addReturn("tile")
   tileSwitch=tileSwitch.addReturn("switch")
