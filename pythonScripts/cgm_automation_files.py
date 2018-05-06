@@ -49,6 +49,8 @@ def main():
   name_player_weights_country=eventNameSpace.format(40)
   name_player_weights_planet=eventNameSpace.format(41)
 
+  miscAutoEffects=TagList()
+
   outTag=TagList("namespace", eventNameSpace.format("")[:-1])
   storedValsRange=range(1,4)
 
@@ -85,14 +87,26 @@ def main():
   # everyHalfYear.createEvent(name_empire_weights)
 
   #added to different file. DO NOT DELETE!
-  # empireMainBuildEventImmediate.variableOp("set", "cgm_free_pops", 0)
-  # empireMainBuildEventImmediate.variableOp("set", "cgm_non_filled_planet_count", 0)
-  # countFreePops=empireMainBuildEventImmediate.addReturn("every_owned_planet")
-  # countFreePops.add("limit", TagList("free_building_tiles", "0","",">"))
-  # countFreePops.addReturn("prev").variableOp("change", "cgm_non_filled_planet_count", 1)
-  # countFreePops.variableOp("set", "cgm_free_pops", 0)
-  # countFreePops.add("every_owned_pop", TagList("limit", TagList("OR", TagList("is_colony_pop", "yes").add("is_growing", "yes")).add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))).add("OR", TagList("is_being_purged", "no").add("has_purge_type", TagList("type", "purge_labor_camps")))).add("prev", variableOpNew("change", "cgm_free_pops", 1)))
-  # countFreePops.addReturn("prev").variableOp("change", "cgm_free_pops", "prev")
+  miscAutoEffects.addComment("this : country")
+  planetPopAndSizeEffect=miscAutoEffects.addReturn("cgm_every_planet_free_pops_count_and_size_check")
+  planetPopAndSizeEffect.variableOp("set", "cgm_free_pops", 0)
+  planetPopAndSizeEffect.variableOp("set", "cgm_non_filled_planet_count", 0)
+  countFreePops=planetPopAndSizeEffect.addReturn("every_owned_planet")
+  countFreePops.add("limit", TagList("free_building_tiles", "0","",">"))
+  countFreePops.addReturn("prev").variableOp("change", "cgm_non_filled_planet_count", 1)
+  countFreePops.variableOp("set", "cgm_free_pops", 0)
+  countFreePops.add("every_owned_pop", TagList("limit", TagList("OR", TagList("is_colony_pop", "yes").add("is_growing", "yes")).add("tile",TagList("NOR",TagList("has_building","yes").add("has_building_construction","yes"))).add("OR", TagList("is_being_purged", "no").add("has_purge_type", TagList("type", "purge_labor_camps")))).add("prev", variableOpNew("change", "cgm_free_pops", 1)))
+  countFreeBuildings=countFreePops.createReturnIf(variableOpNew("check", "cgm_free_pops", 0, ">")).addReturn("every_tile")
+  countFreeBuildings.add("limit", TagList("has_building", "yes").add("has_pop", "no"))
+  countFreeBuildings.add("prev", variableOpNew("change", "cgm_free_pops", -1))
+  countFreePops.addReturn("prev").variableOp("change", "cgm_free_pops", "prev")
+  switchPlanetSize=countFreePops.addReturn("switch")
+  switchPlanetSize.add("trigger", "planet_size")
+  for planetSize in range(5,26):
+    switchCommand=switchPlanetSize.addReturn(str(planetSize))
+    differentSize=switchCommand.createReturnIf(TagList("NOT", variableOpNew("check", "cgm_planet_size", planetSize)))
+    differentSize.add("set_planet_flag", "cgm_redo_planet_calc")
+    differentSize.variableOp("set", "cgm_planet_size", planetSize)
 
 
   empireMainBuildEventImmediate.add("set_country_flag", "display_low_tier_flag", "#The buildings we create are otherwise probably unavaiable due to direct build. Later removed again.")
@@ -573,7 +587,7 @@ def main():
   else:
     locList=LocList(2)
   locList.addLoc("FocusMenuTitle", "Choose Automation Focus")
-  locList.addLoc("FocusMenuDesc", "Choose a category that should be prefered with a certain factor you can also choose here. '1' would mean no change. '3' should be used with caution as it most likely will use tiles that are way better for other things eventually.")
+  locList.addLoc("FocusMenuDesc", "Choose your preferred automation focus here, and choose the strength factor of the focus. '1' would mean no change. '3' should be used with caution as it most likely will use tiles that are much better for other things eventually.")
   locList.addLoc("focusStrength", "Focus Strength Factor")
   locList.addLoc("focus", "Focus")
   locList.addLoc("focusModifierDesc", "This income type will be placed at the given priority, ignoring empire focus settings. All other resources get the standard empire focus values.")
@@ -728,6 +742,7 @@ def main():
 
   outputToFolderAndFile(edictOut, "common/edicts", "cgm_script_created_auto_edicts.txt",2, "../CGM/buildings_script_source")
   outputToFolderAndFile(newTileCheckFile, "common/scripted_effects", "cgm_new_tile_checks.txt",2, "../CGM/buildings_script_source")
+  outputToFolderAndFile(miscAutoEffects, "common/scripted_effects", "cgm_misc_auto_effects.txt",2, "../CGM/buildings_script_source")
   outputToFolderAndFile(outTag, "events", "cgm_auto.txt",2, "../CGM/buildings_script_source")
   if debug:
     outputToFolderAndFile(outTriggers, "common/scripted_triggers/WIP/", "cgm_auto_trigger_template.txt",2, "../CGM/buildings_script_source")
