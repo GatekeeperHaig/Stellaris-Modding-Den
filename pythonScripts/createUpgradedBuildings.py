@@ -619,9 +619,13 @@ def main(args, argv):
     return out
 
 def createConvertEvent(args):
-  onActionTagList=TagList("on_building_complete", TagList("events", TagList("direct_build.1",""))).add("on_building_replaced", TagList("events", TagList("direct_build.1","")))
-  eventTagList=TagList("namespace", "direct_build")
-  convertEvent=TagList("id", "direct_build.1")
+  if args.custom_mod_name=="":
+    print("ERROR: Custom mod name needed for create convert")
+    return 1
+  simpleModName=''.join(e for e in args.custom_mod_name if e.isalnum())
+  onActionTagList=TagList("on_building_complete", TagList("events", TagList("direct_build_{}.1".format(simpleModName),""))).add("on_building_replaced", TagList("events", TagList("direct_build_{}.1".format(simpleModName),"")))
+  eventTagList=TagList("namespace", "direct_build_{}".format(simpleModName))
+  convertEvent=TagList("id", "direct_build_{}.1".format(simpleModName))
   eventTagList.add("planet_event", convertEvent)
   convertEvent.add("hide_window", "yes")
   convertEvent.add("is_triggered_only","yes")
@@ -632,24 +636,25 @@ def createConvertEvent(args):
   for building in args.copiedBuildings:
     triggerOr.add("has_building", building+"_direct_build")
     immediateSwitch.add(building+"_direct_build", TagList("remove_building","yes").add("set_building", building))
-  convertPlanetEvent=TagList("id", "direct_build.3")
+  convertPlanetEvent=TagList("id", "direct_build_{}.3".format(simpleModName))
   eventTagList.add("planet_event", convertPlanetEvent)
   convertPlanetEvent.add("hide_window", "yes")
   convertPlanetEvent.add("is_triggered_only","yes")
   convertPlanetEvent.add("immediate", TagList("every_tile", TagList("limit", TagList("has_building","yes")).add("switch", immediateSwitch)))
-  convertAllEvent=TagList("id","direct_build.2")
+  convertAllEvent=TagList("id","direct_build_{}.2".format(simpleModName))
   eventTagList.add("country_event", convertAllEvent)
   convertAllEvent.add("hide_window", "yes").add("fire_only_once","yes")
-  convertAllEvent.add("immediate", TagList("every_playable_country", TagList("every_owned_planet", TagList("planet_event", TagList("id", "direct_build.3")))))
+  convertAllEvent.add("immediate", TagList("every_playable_country", TagList("every_owned_planet", TagList("planet_event", TagList("id", "direct_build_{}.3".format(simpleModName))))))
 
-  if not os.path.exists(args.output_folder+"/common/on_actions/"):
-     os.mkdir(args.output_folder+"/common/on_actions")
-  if not os.path.exists(args.output_folder+"/events/"):
-     os.mkdir(args.output_folder+"/events")
-  with open(args.output_folder+"/common/on_actions/direct_build.txt",'w') as file:
-    onActionTagList.writeAll(file,args)
-  with open(args.output_folder+"/events/direct_build.txt",'w') as file:
-    eventTagList.writeAll(file,args)
+  if not args.test_run:
+    if not os.path.exists(args.output_folder+"/common/on_actions/"):
+       os.makedirs(args.output_folder+"/common/on_actions")
+    if not os.path.exists(args.output_folder+"/events/"):
+       os.mkdir(args.output_folder+"/events")
+    with open(args.output_folder+"/common/on_actions/direct_build_{}.txt".format(simpleModName),'w') as file:
+      onActionTagList.writeAll(file,args)
+    with open(args.output_folder+"/events/direct_build_{}.txt".format(simpleModName),'w') as file:
+      eventTagList.writeAll(file,args)
   # print(eventTagList)
 if __name__ == "__main__":
   preprocess(sys.argv[1:])
