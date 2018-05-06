@@ -20,7 +20,7 @@ locList.addLoc("cgm_buildings_text","Core Game Mechanics: Buildings","en")
 locList.addLoc("edict_cgm_enable_player_autobuild","Enable Full Automated Construction","en")
 locList.addLoc("edict_cgm_sector_autobuild_only","Enable Sector Automated Construction","en")
 locList.addLoc("edict_cgm_disable_player_autobuild","Disable Automated Construction","en")
-locList.addLoc("edict_cgm_enable_player_autobuild_desc","Will remove a customizable percentage (default 20%) of your mineral income every month and uses this in a smart automatic construction of buildings. Core worlds are prefered. No effect on AI or other players.","en")
+locList.addLoc("edict_cgm_enable_player_autobuild_desc","Will remove a customizable percentage (default 20%) of your mineral income every month and uses this in a smart automatic construction of buildings. Core worlds are prioritized. No effect on AI or other players.","en")
 locList.addLoc("edict_cgm_sector_autobuild_only_desc","Will remove a customizable percentage (default 20%) of your mineral income every month and uses this in a smart automatic construction of buildings. Sector only! No effect on AI or other players.","en")
 locList.addLoc("edict_cgm_disable_player_autobuild_desc","Disable automated construction. Returns minerals leftover in construction reserve. No effect on AI or other players.","en")
 
@@ -31,7 +31,7 @@ locList.addLoc("edict_cgm_enable_sector_ai_desc","AI will again construct new bu
 
 
 locList.addLoc("cgm_beta_updated_title","CGM Buildings: Major Update","en")
-locList.addLoc("cgm_beta_updated_desc","We have introduced a new automated construction routine, both for AI and Player. This should allow smart construction and end AI building stupidity. By default, in any AI country, vanilla AI construction is now disabled and the new routine is active. In player empires, new country edicts can be used to deactivate sector building AI or activate full or sector automated construction","en")
+locList.addLoc("cgm_beta_updated_desc","We have introduced a new automated construction routine, both for AI and Player. This should allow smart construction and end AI building stupidity. By default, in any AI empire, vanilla AI construction is now disabled and the new routine is active. In player empires, new empire edicts can be used to deactivate sector building AI or activate full or sector automated construction","en")
 locList.addLoc("cgm_beta_updated_configure_button_name","Change Default Settings","en")
 
 locList.addLoc("cgm_main_menu_close_desc","Close Menu","en")
@@ -40,7 +40,7 @@ locList.addLoc("cgm_buildings_preset_enable_new_building_content_desc","This opt
 locList.addLoc("cgm_buildings_preset_keep_vanilla_building_content_name","Keep Vanilla Building Content","en")
 locList.addLoc("cgm_buildings_preset_keep_vanilla_building_content_desc","This option sets the game to use the vanilla resource buildings. No changes occur to existing buildings or technologies. Picking this option will unlock further configuration options.","en")
 locList.addLoc("cgm_buildings_option_enable_overhauled_vanilla_building_stats_name","Enable Overhauled Building Stats","en")
-locList.addLoc("cgm_buildings_option_enable_overhauled_vanilla_building_stats_desc","This option enables overhauled building stats. With some buildings having a different resource outputs, planet modifiers etc. from vanilla. This option can be turned on/off at your discretion at any time during the game.","en")
+locList.addLoc("cgm_buildings_option_enable_overhauled_vanilla_building_stats_desc","This option enables overhauled building stats with some buildings having different resource outputs, planet modifiers, etc from vanilla.","en")
 locList.addLoc("cgm_buildings_option_disable_overhauled_vanilla_building_stats_name","Disable Overhauled Building Stats","en")
 locList.addLoc("cgm_buildings_option_disable_overhauled_vanilla_building_stats_desc","This option disables the overhauled buildings stats. All vanilla content building will have the same stats as in vanilla.","en")
 locList.addLoc("#cgm_ai_enable_vanilla_name","Enable Vanilla AI Building Construction","en")#cgm_ai_enable_vanilla.name:0 Enable Vanilla AI Building Construction
@@ -82,9 +82,9 @@ locList.addLoc("requires_megastructure_node_tile","Requires Megastructure Node �
 
 #Tech
 
-locList.addLoc("tech_biofuel_refining_1_desc","Complex organic matter can be converted into a cheap fuel source. Although not as efficient as radio-active isotope synthesis, organic matter is significantly more common.","en")
+locList.addLoc("tech_biofuel_refining_1_desc","Complex organic matter can be converted into a cheap fuel source. Although not as efficient as radioactive isotope synthesis, organic matter is significantly more common.","en")
 locList.addLoc("tech_biofuel_refining_1","$basic$ Biofuel Refining","en")
-locList.addLoc("tech_biofuel_refining_2_desc","The potency of our biofuel can be $enhanced$ using genetically engineered bacteria that secrets a potent pseudo-oil.","en")
+locList.addLoc("tech_biofuel_refining_2_desc","The potency of our biofuel can be $enhanced$ using genetically engineered bacteria that secretes a potent pseudo-oil.","en")
 locList.addLoc("tech_biofuel_refining_2","$enhanced$ Biofuel Refining","en")
 locList.addLoc("tech_biofuel_refining_3_desc","By manipulating organic molecules on a minute scale, we are able to create significantly more potent artificial biofuel.","en")
 locList.addLoc("tech_biofuel_refining_3","$advanced$ Biofuel Synthesis","en")
@@ -196,7 +196,7 @@ locList.addLoc("sociological_campus_desc","Sociological Campuses are non-restric
 locList.addLoc("physics_campus","Physics Campus","en")
 locList.addLoc("physics_campus_desc","Physics Campuses are non-restricted £physics physics research producing buildings. These buildings represent centers of scientific research and development.\n\nThey have both a base produced resource output and a static resource output that scale respective of the building's specific tier.","en")
 locList.addLoc("engineering_campus","Engineering Campus","en")
-locList.addLoc("engineering_campus_desc","Engineering Campuses are non-restricted £engineering  engineering researchproducing buildings. These buildings represent centers of scientific research and development.\n\nThey have both a base produced resource output and a static resource output that scale respective of the building's specific tier.","en")
+locList.addLoc("engineering_campus_desc","Engineering Campuses are non-restricted £engineering engineering research producing buildings. These buildings represent centers of scientific research and development.\n\nThey have both a base produced resource output and a static resource output that scale respective of the building's specific tier.","en")
 locList.addLoc("agricultural_processor","Agricultural Processor","en")
 locList.addLoc("agricultural_processor_desc","Agricultural Processing Plants produce some £food food on their own, but more importantly increase the overall food £food output of the planet.","en")
 locList.addLoc("hyperstorage_facility","Hyperstorage Facility","en")
