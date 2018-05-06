@@ -278,6 +278,37 @@ def main():
   chooseSpecialBuilding.add("save_global_event_target_as", "cgm_best_planet_for_special")
 
   cgmCompTrigger=TagList().readFile("../CGM/buildings_script_source/common/scripted_effects/z_cgm_compatibility_effects.txt")
+  miscAutoEffects.addComment("this : pop")
+  miscAutoEffects.addComment("prev : planet")
+  popTraits=miscAutoEffects.addReturn("check_pop_traits_rights_modifiers_vanilla_and_API")
+  for name in cgmCompTrigger.names:
+    if "check_pop_traits" in name:
+      if name=="check_pop_traits_additional_traits":
+        popTraits.createReturnIf(TagList("additional_traits_enabled", "no")).add("check_vanilla_pop_traits", yes).add("else", TagList("check_pop_traits_additional_traits", yes))
+      else:
+        popTraits.add(name,"yes")
+  popTraits.add("vanilla_pop_modifiers",yes)
+  for name in cgmCompTrigger.names:
+    if "check_pop_modifiers" in name:
+      popTraits.add(name,"yes")
+  popTraits.add("check_pop_species_rights",yes)
+  for name in cgmCompTrigger.names:
+    if "check_pop_species_rights_" in name:
+      popTraits.add(name,"yes")
+  miscAutoEffects.addComment("this : tile")
+  miscAutoEffects.addComment("prev : planet")
+  adjacencyAPI=miscAutoEffects.addReturn("check_neighboring_adj_bonus_buildings_APIs")
+  for name in cgmCompTrigger.names:
+    if "check_neighboring_adj_bonus_buildings" in name:
+      adjacencyAPI.add(name,"yes")
+  miscAutoEffects.addComment("this : tile")
+  miscAutoEffects.addComment("prev : planet")
+  adjacencyBlockerAPI=miscAutoEffects.addReturn("check_neighboring_adj_bonus_blockers_APIs")
+  for name in cgmCompTrigger.names:
+    if "check_adj_bonus_blockers" in name:
+      adjacencyBlockerAPI.add(name,"yes")
+
+
 
 
   planetFindBestEvent=TagList("id", name_planet_find_best)
