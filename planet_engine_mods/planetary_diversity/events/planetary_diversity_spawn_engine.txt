@@ -79,17 +79,22 @@ event = {
 						if = {
 							limit = {
 								solar_system = {
-									starting_system = no
 									NOR = {
 										has_star_flag = sol_system
 										has_star_flag = sol
 										has_star_flag = deneb_system
 										has_star_flag = custom_system
-										has_star_flag = crystal_system
 										has_star_flag = floating_system
+										has_star_flag = crystal_system
 										has_star_flag = city_system
 									}
 								}
+								OR = { 
+									NOT = { exists = owner }
+									owner = { is_country_type = primitive }
+									NOT = { any_owned_pop = { has_regular_vanilla_habitability_trait = yes } }
+									is_colony = no 								
+								}	
 								is_capital = no
 								is_homeworld = no
 							}
@@ -97,8 +102,6 @@ event = {
 							planet_event = { id = spawn_engine_1.1 }
 							planet_event = { id = spawn_engine_1.2 }
 							planet_event = { id = spawn_engine_1.3 days = 1 } #these events are failsafe - in case there was some issue with the deposit/blocker spawn. 
-							planet_event = { id = spawn_engine_1.3 days = 30 } 
-							planet_event = { id = spawn_engine_1.3 days = 60 }
 						}
 					}
 				}
@@ -114,33 +117,17 @@ planet_event = {
 		if = {
 			limit = { is_vanilla_habitable_planet = yes }
 			if = {
-				limit = {
-					OR = {
-						AND = {
-							exists = owner
-							OR = {
-								owner = { is_country_type = primitive }
-								any_pop = {
-									has_regular_vanilla_habitability_trait = yes
-									OR = {
-										is_subspecies = yes
-										NOT = { species = { is_same_value = owner.species } }
-									}
-								}
-							}
-						}
-						AND = {
-							any_tile = { has_pop = yes }
-							any_pop = { is_presapient_pop = yes has_regular_vanilla_habitability_trait = yes }
-						}
-					}
-				}
+				limit = { has_pop = yes }
 				every_owned_pop = {
 					limit = { has_regular_vanilla_habitability_trait = yes }
 					check_habitability_trait_correspondence = yes
-				}
+				}	
 			}
 			planetary_diversity_habitable_planets_spawn_table = yes
+			if = {
+				limit = { has_pop = yes	}			
+				change_habitability_trait_correspondence = yes			
+			}				
 			else = {
 				if = {
 					limit = { is_vanilla_uninhabitable_planet = yes }
@@ -322,31 +309,7 @@ planet_event = {
 					}						
 				}
 			}	
-		}			
-		if = {
-			limit = {
-				OR = {
-					AND = {
-						exists = owner
-						OR = {
-							owner = { is_country_type = primitive }
-							any_pop = {
-								has_regular_vanilla_habitability_trait = yes
-								OR = {
-									is_subspecies = yes
-									NOT = { species = { is_same_value = owner.species } }
-								}
-							}
-						}
-					}
-					AND = {
-						any_tile = { has_pop = yes }
-						any_pop = { is_presapient_pop = yes has_regular_vanilla_habitability_trait = yes }
-					}
-				}
-			}
-			change_habitability_trait_correspondence = yes
-		}
+		}					
 	}
 }
 planet_event = {
