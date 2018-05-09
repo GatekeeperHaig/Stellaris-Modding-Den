@@ -1,45 +1,230 @@
-###global flag checks
+### Capital Triggers
 
-#flags used by mods using the engine
-alphamod_enabled = { has_global_flag = alpha_mod_active }
-core_game_mechanics_enabled = { has_global_flag = core_game_mechanics_active }
-guillis_planet_modifiers_enabled = { has_global_flag = guillis_planet_modifiers_active }
-new_worlds_enabled = { has_global_flag = new_worlds_active }
-planets_enhanced_enabled = { has_global_flag = planets_enhanced_active }
-planetary_diversity_enabled = { has_global_flag = planetary_diversity_active }
-###function flags
-same_class_terraforming_enabled = { has_global_flag = same_class_terraforming_enabled }
-cgm_terraforming_overhaul_enabled = { has_global_flag = ex_terraforming_overhaul_enabled }
-cgm_terraforming_rework_enabled = { has_global_flag = ex_terraforming_rework_enabled }
-cgm_cybertronic_worlds_enabled = { has_global_flag = ex_cybertronic_worlds_enabled }
-#compatibility flags - used to check other mods
-real_space_enabled = { has_global_flag = has_real_space_mod }
-STNH_enabled = { has_global_flag = star_trek_new_horizons }
-
-###Terraforming triggers
-is_cybertronic_candidate = { has_planet_flag = cybertronic_candidate }
-is_terraforming_candidate = {
-	OR = {
-		has_modifier = terraforming_candidate
-		has_planet_flag = terraforming_candidate_precursor
-	}
-}	
-
-###Vanilla Triggers
-has_regular_vanilla_habitability_trait = {
-	OR = {
-		has_trait = "trait_pc_continental_preference"
-		has_trait = "trait_pc_savannah_preference"
-		has_trait = "trait_pc_alpine_preference"
-		has_trait = "trait_pc_tropical_preference"
-		has_trait = "trait_pc_arid_preference"
-		has_trait = "trait_pc_tundra_preference"
-		has_trait = "trait_pc_ocean_preference"
-		has_trait = "trait_pc_desert_preference"
-		has_trait = "trait_pc_arctic_preference"
+requires_capital_1 = {
+	custom_tooltip = {
+		fail_text = "requires_building_capital_1"
+		planet = {
+			OR = { has_capital_1 = yes has_capital_2 = yes has_capital_3 = yes }
+		}
 	}
 }
 
+requires_megastructure_node_tile = {
+	custom_tooltip = {
+		fail_text = "requires_megastructure_node_tile"
+		tile = {
+			has_resource = { type = sr_megastructure_node amount > 0 }
+		}
+	}
+}
+
+### Owner Triggers
+is_machine_empire = { has_authority = auth_machine_intelligence }
+is_servitor = { has_government = gov_machine_servitor }
+is_assimilator = { has_government = gov_machine_assimilator }
+is_terminator = { has_government = gov_machine_terminator }
+is_hive_mind_empire = { has_authority = auth_hive_mind }
+is_synth_empire = { has_country_flag = synthetic_age }
+is_gestalt_consciousness = { has_ethic = ethic_gestalt_consciousness }
+is_devouring_swarm = { has_valid_civic = civic_hive_devouring_swarm }
+is_fanatic_purifier = { has_valid_civic = civic_fanatic_purifiers }
+is_exterminator = {
+	OR = { 
+		has_valid_civic = civic_fanatic_purifiers
+		has_valid_civic = civic_hive_devouring_swarm
+		has_government = gov_machine_terminator
+	}
+}	
+has_pursuit_of_profit = {
+	OR = { has_non_swapped_tradition = tr_prosperity_pursuit_of_profit has_swapped_tradition = tr_prosperity_pursuit_of_profit_machine }
+}
+# With exists = owner check
+owner_is_machine_empire = {
+	exists = owner
+	owner = { has_authority = auth_machine_intelligence }
+}
+owner_is_hive_mind_empire = {
+	exists = owner
+	owner = { has_authority = auth_hive_mind }
+}
+owner_is_spiritualist = {
+	exists = owner
+	owner = {
+		OR = { has_ethic = ethic_spiritualist has_ethic = ethic_fanatic_spiritualist }
+	}
+}
+owner_is_militarist = {
+	exists = owner
+	OR = { has_ethic = ethic_militarist has_ethic = ethic_fanatic_militarist }
+}
+owner_is_materialist = {
+	exists = owner
+	OR = { has_ethic = ethic_materialist has_ethic = ethic_fanatic_materialist }
+}
+owner_is_pacifist = {
+	exists = owner
+	OR = { has_ethic = ethic_pacifist has_ethic = ethic_fanatic_pacifist }
+}
+owner_is_xenophile = {
+	exists = owner
+	OR = { has_ethic = ethic_xenophile has_ethic = ethic_fanatic_xenophile }
+}
+owner_is_authoritarian = {
+	exists = owner
+	OR = { has_ethic = ethic_fanatic_authoritarian has_ethic = ethic_authoritarian }
+}
+owner_is_egalitarian = {
+	exists = owner
+	OR = { has_ethic = ethic_fanatic_egalitarian has_ethic = ethic_egalitarian }
+}
+owner_is_xenophobe = {
+	exists = owner
+	owner = {
+		OR = { has_ethic = ethic_fanatic_xenophobe has_ethic = ethic_xenophobe }
+	}
+}
+owner_is_organic_or_servitor = {
+	exists = owner
+	owner = { 
+		OR = { is_machine_empire = no is_servitor = yes }
+	}	
+}
+owner_is_servitor = {
+	exists = owner
+	owner = { has_government = gov_machine_servitor }
+}
+owner_is_gestalt_consciousness = {
+	exists = owner
+	owner = { has_ethic = ethic_gestalt_consciousness }
+}
+
+has_capital_1 = {
+	OR = { has_building = building_capital_1 has_building = building_machine_capital_1 }
+}
+
+### Allow Triggers
+
+allows_robots = { 
+	OR = { 
+		AND = { 
+			is_ai = no 
+			OR = { 
+				has_policy_flag = robots_allowed
+		
+				is_synth_empire = yes
+			}	
+		}
+		AND = { 
+			is_ai = yes
+			OR = { 
+				AND = { 
+					has_policy_flag = robots_allowed
+					has_ai_personality_behaviour = robot_exploiter
+				}
+				AND = { 
+					has_policy_flag = robots_allowed
+					has_ai_personality_behaviour = robot_liberator	
+				}	
+				is_synth_empire = yes	
+			}
+		}
+	}	
+}
+
+owner_allows_robots = { 
+	exists = owner
+	owner = { allows_robots = yes }
+}
+
+### Planet Triggers
+in_sector = { sector_controlled = yes }
+is_habitat = { is_planet_class = pc_habitat }
+is_machine_world = { is_planet_class = pc_machine }
+is_gaia_world = { is_planet_class = pc_gaia }
+is_tomb_world = { is_planet_class = pc_nuked }
+is_artificial = {
+	OR = {
+		is_ringworld = yes
+		is_planet_class = pc_habitat
+		is_planet_class_pc_squareworld_habitable = yes
+	}
+}
+is_special = {
+	OR = { is_ringworld = yes is_planet_class = pc_habitat is_planet_class = pc_machine is_planet_class = pc_gaia is_planet_class = pc_nuked }
+}
+is_fallen_empire_planet = {
+	owner = {
+		OR = { is_country_type = fallen_empire is_country_type = awakened_fallen_empire }
+	}
+}
+is_primitive_planet = {
+	owner = { is_country_type = primitive }
+}
+is_gas_giant_moon = { has_planet_flag = gas_giant_moon }
+is_broken_megastructure = {
+	OR = {
+		is_planet_class = pc_ringworld_habitable_damaged
+		is_planet_class = pc_ringworld_tech_damaged
+		is_planet_class = pc_ringworld_seam_damaged
+		has_planet_flag = has_ruined_megastructure			 
+	}
+}
+
+# with planet scope
+planet_in_sector = {
+	planet = { sector_controlled = yes }
+}
+planet_is_habitat = {
+	planet = { is_planet_class = pc_habitat }
+}
+planet_is_machine_world = {
+	planet = { is_planet_class = pc_machine }
+}
+planet_is_ringworld = {
+	planet = { is_ringworld = yes }
+}
+planet_is_gaia_world = {
+	planet = { is_planet_class = pc_gaia }
+}
+planet_is_tomb_world = {
+	planet = { is_planet_class = pc_nuked }
+}
+planet_is_homeworld = {
+	planet = { is_homeworld = yes }
+}
+planet_is_capital = {
+	planet = { is_capital = yes }
+}
+planet_is_artificial = {
+	planet = {
+		OR = {
+			is_planet_class = pc_habitat
+			is_planet_class_pc_squareworld_habitable = yes
+			is_ringworld = yes
+		}
+	}
+}
+planet_is_special = {
+	planet = {
+		OR = { is_planet_class = pc_habitat is_planet_class = pc_machine is_planet_class = pc_gaia is_planet_class = pc_nuked is_ringworld = yes }
+	}
+}
+planet_is_fallen_empire_planet = {
+	planet = {
+		owner = {
+			OR = { is_country_type = fallen_empire is_country_type = awakened_fallen_empire }
+		}
+	}
+}
+planet_is_primitive_planet = {
+	planet = {
+		owner = { is_country_type = primitive }
+	}
+}
+planet_has_robots = { 
+	planet = { any_owned_pop = { is_robot_pop = yes } }
+}	
+### Resource and Deposit Triggers
 has_regular_vanilla_planet_modifier = {
 	OR = {
 		has_modifier = hazardous_weather
@@ -166,95 +351,34 @@ has_vanilla_planetary_strategic_resource = {
 	}
 }
 
-### General Triggers
 
-is_gas_giant_moon = { has_planet_flag = gas_giant_moon }
-
-is_presapient_pop = {
+has_standard_resource = {
 	OR = {
-		is_species_class = PRE_FUN
-		is_species_class = PRE_MOL
-		is_species_class = PRE_ART
-		is_species_class = PRE_AVI
-		is_species_class = PRE_REP
-		is_species_class = PRE_MAM
+		has_resource = { type = energy amount > 0 }
+		has_resource = { type = minerals amount > 0 }
+		has_resource = { type = food amount > 0 }
+		has_resource = { type = unity amount > 0 }
+		has_resource = { type = society_research amount > 0 }
+		has_resource = { type = physics_research amount > 0 }
+		has_resource = { type = engineering_research amount > 0 }
 	}
 }	
 
-is_arthropoid = {
-	OR = {	
-		is_species_class = PRE_ART
-		is_species_class = ART
-	}
-}
-is_mammalian = {
+has_any_tile_strategic_resource = {
 	OR = {
-		is_species_class = PRE_MAM
-		is_species_class = MAM
-	}
-}	
-
-is_avian = {
-	OR = {
-		is_species_class = PRE_AVI
-		is_species_class = AVI
-	}
-}
-
-is_reptilian = {
-	OR = {
-		is_species_class = PRE_REP
-		is_species_class = REP
+		has_resource = { type = sr_betharian amount > 0 }
+		has_resource = { type = sr_alien_pets amount > 0 }
+		has_resource = { type = sr_megastructure_node amount > 0 }
+		has_planets_enhanced_planetary_strategic_resources = yes
+		has_alphamod_planetary_strategic_resources = yes
+		has_astrogeology_planetary_strategic_resources = yes
+		has_planetary_diversity_planetary_strategic_resources = yes
+		has_apsr_resource_local = yes
+		has_expandedsr_strategic_resources = yes
 	}
 }
 
-is_fungoid = {
-	OR = {
-		is_species_class = PRE_FUN
-		is_species_class = FUN
-	}
-}
-
-is_molluscoid = {
-	OR = {
-		is_species_class = PRE_MOL
-		is_species_class = MOL
-	}
-}
-
-is_humanoid = {
-	is_species_class = HUM	
-}
-
-is_plantoid = {
-	is_species_class = PLANT	
-}
-
-is_free_planetary_tile = {
-	has_building = no	
-	has_deposit = no
-	has_blocker = no
-}
-
-### solar system and planet triggers
-
-is_fallen_empire_planet = {
-	owner = {
-		OR = {
-			is_country_type = fallen_empire
-			is_country_type = awakened_fallen_empire
-		}
-	}
-}	
-
-is_primitive_planet = {
-	owner = { is_country_type = primitive }
-}
-
-is_presapient_planet = {
-	any_owned_pop = { is_presapient_pop = yes }
-}	
-
+###Star and Solar System triggers
 regular_star_system = {
 	planet = { 
 		solar_system = {
@@ -288,27 +412,6 @@ ternary_star_system = {
 		}		
 	}	
 }
-
-is_sol_system_planet = {
-	solar_system = { 
-		OR = {
-			has_star_flag = sol_system
-			has_star_flag = sol
-		}
-	}
-}	
-
-is_broken_megastructure = {
-	OR = {
-		is_planet_class = pc_ringworld_habitable_damaged
-		is_planet_class = pc_ringworld_tech_damaged
-		is_planet_class = pc_ringworld_seam_damaged
-		has_planet_flag = has_ruined_megastructure			 
-	}
-}
-
-###Star and Solar System triggers
-
 orbits_cold_star = {
     OR = {
         solar_system = { any_planet = { is_planet_class = pc_m_star } }
