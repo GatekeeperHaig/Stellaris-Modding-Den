@@ -8,25 +8,11 @@ check_and_set_building_flags = {
 					has_planet_flag = fortify_planet
 					AND = {
 						owner = { is_at_war = no }
-						OR = {
-							AND = {
-								is_capital = no
-								count_tile = {
-									limit = {
-										OR = { has_building = building_stronghold has_building = building_fortress has_building = building_planetary_shield_generator }
-									}
-									count > 2
-								}
+						count_tile = {
+							limit = {
+								OR = { has_building = building_stronghold has_building = building_fortress has_building = building_planetary_shield_generator }
 							}
-							AND = {
-								is_capital = no
-								count_tile = {
-									limit = {
-										OR = { has_building = building_stronghold has_building = building_fortress has_building = building_planetary_shield_generator }
-									}
-									count > 3
-								}
-							}
+							count > 2
 						}
 					}
 				}
@@ -51,33 +37,39 @@ check_and_set_building_flags = {
 										distance = { source = prevprev min_distance = 70 max_distance = 100 }
 									}
 								}
-								NOT = {
+								NAND = {
+									is_capital = no 
 									count_tile = {
 										limit = {
 											OR = { has_building = building_stronghold has_building = building_fortress }
 										}
-										count > 4
+										count > 1
+									}
+								}
+								NAND = {
+									is_capital = yes
+									count_tile = {
+										limit = {
+											OR = { has_building = building_stronghold has_building = building_fortress }
+										}
+										count > 2
 									}
 								}
 							}
 							AND = {
 								sector_controlled = yes
 								OR = { has_capital_1 = yes has_capital_2 = yes }
-								count_tile = {
-									limit = {
-										OR = { has_building = building_stronghold has_building = building_fortress }
-									}
-									count < 1
-								}
+								NOR = {
+									has_building = building_stronghold 
+									has_building = building_fortress
+								}								
 							}
 							AND = {
 								sector_controlled = no
 								has_capital_1 = yes
-								count_tile = {
-									limit = {
-										OR = { has_building = building_stronghold has_building = building_fortress }
-									}
-									count < 1
+								NOR = {
+									has_building = building_stronghold 
+									has_building = building_fortress
 								}
 							}
 							AND = {
@@ -89,16 +81,7 @@ check_and_set_building_flags = {
 									}
 									count < 2
 								}
-							}
-							AND = {
-								is_capital = yes
-								count_tile = {
-									limit = {
-										OR = { has_building = building_stronghold has_building = building_fortress }
-									}
-									count < 3
-								}
-							}
+							}							
 						}
 					}
 				}
