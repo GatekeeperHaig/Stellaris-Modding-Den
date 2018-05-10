@@ -113,19 +113,19 @@ planet_event = {
 	is_triggered_only = yes
 	immediate = {
 		if = {
-			limit = { is_vanilla_habitable_planet = yes }
-			if = {
-				limit = { has_pop = yes }
-				every_owned_pop = {
-					limit = { has_regular_vanilla_habitability_trait = yes }
-					check_habitability_trait_correspondence = yes
-				}	
-			}
+			limit = { is_vanilla_habitable_planet = yes }			
 			planetary_diversity_habitable_planets_spawn_table = yes
 			if = {
-				limit = { has_pop = yes	}			
-				change_habitability_trait_correspondence = yes			
-			}				
+				limit = { 
+					exists = owner
+					owner = { is_country_type = primitive } 
+					any_owned_pop = {
+						is_exact_same_species = owner_species
+						planet_class_and_habitability_trait_correspond = no
+					}	
+				}			
+				change_habitability_trait_correspondence = yes							
+			}
 			else = {
 				if = {
 					limit = { is_vanilla_uninhabitable_planet = yes }
@@ -141,7 +141,7 @@ planet_event = {
 				}	
 				has_regular_vanilla_planet_modifier = yes
 			}
-			remove_regular_planet_modifiers = yes
+			remove_and_count_vanilla_regular_planet_modifiers = yes
 			while = {
 				limit = {
 					check_variable = { which = "pm_points" value > 0 }
