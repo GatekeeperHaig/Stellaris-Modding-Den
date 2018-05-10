@@ -284,7 +284,7 @@ def main():
   for name in cgmCompTrigger.names:
     if "check_pop_traits" in name:
       if name=="check_pop_traits_additional_traits":
-        popTraits.createReturnIf(TagList("additional_traits_enabled", "no")).add("check_vanilla_pop_traits", yes).add("else", TagList("check_pop_traits_additional_traits", yes))
+        popTraits.createReturnIf(TagList("additional_traits_enabled", "no")).add("check_vanilla_pop_traits", yes).add("else", TagList(name, yes))
       else:
         popTraits.add(name,"yes")
   popTraits.add("vanilla_pop_modifiers",yes)
@@ -343,16 +343,16 @@ def main():
   for resource in resources:
     recheckModifiers.variableOp("set", resource+"_mult_planet_base_old", resource+"_mult_planet_base")
     recheckModifiers.variableOp("set", resource+"_mult_planet_base", 0)
-  recheckModifiers.add("check_vanilla_planet_modifiers","yes")
+  # recheckModifiers.add("check_vanilla_planet_modifiers","yes")
   for name in cgmCompTrigger.names:
     if "check_planet_modifiers" in name:
-      recheckModifiers.add(name,"yes")
-  # recheckModifiers.add("check_planet_modifiers_pe","yes")
-  # recheckModifiers.add("check_planet_modifiers_gpm","yes")
-  # recheckModifiers.add("check_planet_modifiers_pd","yes")
-  # recheckModifiers.add("check_planet_modifiers_am","yes")
-  # recheckModifiers.add("check_planet_modifiers_se","yes")
-  # recheckModifiers.add("check_planet_modifiers_gse","yes")
+      if name=="check_planet_modifiers_gpm":
+        recheckModifiers.createReturnIf(TagList("gpm_enabled", "no")).add("check_vanilla_planet_modifiers", yes).add("else", TagList(name, yes))
+      else:
+        recheckModifiers.add(name,"yes")
+    # if "check_planet_modifiers" in name:
+    #   recheckModifiers.add(name,"yes")
+
   redoLimit=TagList()
   redoOr=redoLimit.addReturn("NAND")
   for resource in resources:
