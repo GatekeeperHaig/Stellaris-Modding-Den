@@ -8,80 +8,76 @@ check_and_set_building_flags = {
 					has_planet_flag = fortify_planet
 					AND = {
 						owner = { is_at_war = no }
-						count_tile = {
-							limit = {
-								OR = { has_building = building_stronghold has_building = building_fortress has_building = building_planetary_shield_generator }
-							}
-							count > 2
-						}
+						OR = { 
+							has_building = building_stronghold 
+							has_building = building_hab_stronghold 
+							has_building = building_fortress						
+						}	
 					}
 				}
 				OR = {
 					AND = {
 						unrest > 40
 						OR = {
-							NOT = {
-								any_owned_pop = { is_enslaved = yes }
-							}
+							NOT = {	any_owned_pop = { is_enslaved = yes } }
 							has_building = building_slave_processing
 						}
+						count_tile = {
+							limit = {
+								OR = { 
+									has_building = building_stronghold 
+									has_building = building_hab_stronghold
+									has_building = building_fortress
+								}
+							}
+							count < 2
+						}						
 					}
 					AND = {
 						owner = { is_at_war = yes }
+						any_country = {
+							is_at_war_with = prev.owner
+							any_owned_planet = {
+								is_colony = yes
+								distance = { source = prevprev type = hyperlane max_jumps = 5 }
+							}
+						}						
 						OR = {
-							AND = {
-								any_country = {
-									is_at_war_with = prev.owner
-									any_owned_planet = {
-										is_colony = yes
-										distance = { source = prevprev min_distance = 70 max_distance = 100 }
-									}
-								}
-								NAND = {
-									is_capital = no 
-									count_tile = {
-										limit = {
-											OR = { has_building = building_stronghold has_building = building_fortress }
-										}
-										count > 1
-									}
-								}
-								NAND = {
-									is_capital = yes
-									count_tile = {
-										limit = {
-											OR = { has_building = building_stronghold has_building = building_fortress }
-										}
-										count > 2
-									}
-								}
-							}
-							AND = {
-								sector_controlled = yes
-								OR = { has_capital_1 = yes has_capital_2 = yes }
-								NOR = {
-									has_building = building_stronghold 
-									has_building = building_fortress
-								}								
-							}
-							AND = {
-								sector_controlled = no
-								has_capital_1 = yes
-								NOR = {
-									has_building = building_stronghold 
-									has_building = building_fortress
-								}
-							}
-							AND = {
-								sector_controlled = no
-								has_capital_2 = yes
+							NAND = {
+								is_capital = no
+								sector_controlled = no	
 								count_tile = {
 									limit = {
-										OR = { has_building = building_stronghold has_building = building_fortress }
+										OR = { 
+											has_building = building_stronghold 
+											has_building = building_hab_stronghold
+											has_building = building_fortress
+										}
 									}
-									count < 2
+									count > 0
+								}	
+							}
+							NAND = {
+								is_capital = yes
+								count_tile = {
+									limit = {
+										OR = { 
+											has_building = building_stronghold 
+											has_building = building_hab_stronghold
+											has_building = building_fortress
+										}
+									}
+									count > 1
 								}
 							}							
+							AND = {
+								sector_controlled = yes
+								NOR = {
+									has_building = building_stronghold 
+									has_building = building_hab_stronghold
+									has_building = building_fortress
+								}								
+							}													
 						}
 					}
 				}
@@ -99,16 +95,6 @@ check_and_set_building_flags = {
 				is_habitat = no
 				OR = {
 					AND = {
-						is_capital = yes
-						count_tile = {
-							limit = {
-								OR = { has_building = building_stronghold has_building = building_fortress }
-							}
-							count > 2
-						}
-					}
-					AND = {
-						is_capital = no
 						sector_controlled = no
 						count_tile = {
 							limit = {
