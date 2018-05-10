@@ -409,6 +409,7 @@ def main():
   everyTileSearch=everyTileSearch.addReturn("prev")
   for resource in resources:
     if resource!="unity":
+      everyTileSearch.variableOp("subtract", resource+"_weight","unity_weight")
       everyTileSearch.variableOp("multiply", resource+"_weight",resource+"_mult_planet")
       everyTileSearch.variableOp("multiply", resource+"_adjacency_weight",resource+"_mult_planet")
 
@@ -610,6 +611,8 @@ def main():
         # # curEffect.add("prev", variableOpNew("change", resource+"_weight", round(i*math.sqrt(i),3)))
         # curEffect.add("prev", variableOpNew("change", resource+"_weight", 2*i))
         # curEffect=curEffect.addReturn("else")
+  tileWeightSummary.add("check_neighboring_adj_bonus_buildings","yes")
+  tileWeightSummary.add("check_adj_bonus_blockers","yes")
 
   newTileCheckFile.deleteOnLowestLevel(checkEmpty)
 
