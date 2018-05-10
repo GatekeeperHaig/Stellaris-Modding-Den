@@ -460,7 +460,7 @@ def main():
     locIf.add("else", curLevel)
 
   #finding the worst of the best: best over weightTypes, worst over tiles
-  locIf=everyTileSearch.createReturnIf(variableOp(TagList(), "check", "cgm_curWeight", "cgm_worstWeight", "<"))
+  locIf=everyTileSearch.createReturnIf(variableOp(TagList(), "check", "cgm_curWeight", "cgm_worstWeight", "<").add("prev",TagList("has_any_tile_strategic_resource", "no")))
   for varToMove in varsToMove[:-1]: #:-1 as type is not needed. Don't care about type here
     locIf.variableOp("set", "cgm_worst{}".format(varToMove),"cgm_cur{}".format(varToMove))
 
