@@ -761,7 +761,7 @@ class TabControlClass:
 
     BUOptions=[of,"custom_mod_name","game_version","t0_buildings","languages",
     #"replacement_file",
-    "time_discount","cost_discount","custom_direct_build_AI_allow","simplify_upgrade_AI_allow","load_order_priority","make_optional",jf,oll]
+    "time_discount","cost_discount","custom_direct_build_AI_allow","simplify_upgrade_AI_allow","load_order_priority","make_optional",jf,oll,"scripted_variables"]
     self.newTab("Create Upgraded Buildings",createUpgradedBuildings,("text files","*.txt"),[]
       ,BUOptions,"Add Helper File(s)")
     self.tabClasses[-1].helpText='1. "Add file(s)": "Stellaris/common/buildings/00_buildings.txt" (unless you have no dependence on vanilla buildings at all, not even capital building requirements. Check "Helper file". Contents of such a file will be used, but the buildings wont be output.\n1b. If your buildings depend on any other buildings (other mods, other vanilla buildings): Add them the same way.\n2. Add all building files of the mod you want to make compatible. Do *not* check the "Helper file" checkbox\n3. In "Options", set a output folder, mod name and check "load order priority" and "join files".\n4. Convert All'
