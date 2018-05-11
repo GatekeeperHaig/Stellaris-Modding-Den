@@ -18,6 +18,29 @@ event = {
 		if = {
 			limit = { NOT = { has_global_flag = new_worlds_active } } #if New Worlds is enabled, all Planetary Diversity planets are seeded through it's engine instead.
 			every_planet = {
+				if = { 
+					limit = { 
+						exists = owner
+						owner = { is_country_type = default }
+						is_capital = yes
+						is_homeworld = yes 
+					}
+					save_event_target_as = capital_target
+					every_planet = { 
+						limit = { 							
+							NOT = { exists = owner }
+							is_colonizable = yes								
+							is_ideal_planet_class = { who = event_target:capital_target.owner status = yes }
+							distance = { 
+								source = event_target:capital_target
+								type = hyperlane
+								min_jumps = 1
+								max_jumps = 2
+							}
+						}	
+						solar_system = { set_timed_star_flag = { flag = capital_neighbor_system days = 3 } }
+					}	
+				}	
 				if = {
 					limit = { is_star = yes }
 					if = {
@@ -87,6 +110,7 @@ event = {
 										has_star_flag = floating_system
 										has_star_flag = crystal_system
 										has_star_flag = city_system
+										has_star_flag = capital_neighbor_system
 									}
 								}
 								OR = { 
@@ -119,12 +143,9 @@ planet_event = {
 				limit = { 
 					exists = owner
 					owner = { is_country_type = primitive } 
-					any_owned_pop = {
-						is_exact_same_species = owner_species
-						planet_class_and_habitability_trait_correspond = no
-					}	
+					is_ideal_planet_class = { who = owner status = no
 				}			
-				change_habitability_trait_correspondence = yes							
+				change_owner_species_to_this_planet_preference = yes							
 			}
 			else = {
 				if = {
