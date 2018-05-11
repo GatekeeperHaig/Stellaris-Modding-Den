@@ -51,6 +51,7 @@ def main(args,*unused):
     with open(outputFileName, "w") as file:
       tagList.writeAll(file, args)
       tagList=TagList()
+  return fileName
 
 
 if __name__ == "__main__":
