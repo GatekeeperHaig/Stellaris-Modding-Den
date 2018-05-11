@@ -25,11 +25,11 @@ def main():
   os.chdir(os.path.dirname(__file__))
   
   # weightTypes=["energy", "minerals", "food", "unity", "society_research", "physics_research", "engineering_research"]
-  weightTypes=["energy", "minerals", "food", "society_research", "physics_research", "engineering_research"]
+  weightTypes=["energy", "minerals", "food", "society_research", "physics_research", "engineering_research"] #not same as resources, see below!
   for weight in deepcopy(weightTypes):
     weightTypes.append(weight+"_adjacency")
   resources=["energy", "minerals", "food","unity", "society_research", "physics_research", "engineering_research"]
-  inverseFactorComparedToMinerals=[4,1,4,4,2,2,2]
+  inverseFactorComparedToMinerals=[4,1,8,4,4,4,4]
   exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_power_hub_1","building_power_hub_1","building_power_hub_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
   varsToMove=["Weight","Tile","Type"]
   pseudoInf=99999
@@ -762,16 +762,61 @@ def main():
   #     limit = { autobuild_trigger_tile_has_pop = yes }
   #     switch = {
   #       trigger = has_building
-
+  buildingContent=TagList()
+  allVars=TagList()
   for buildingFile in glob.glob("../CGM/buildings_script_source/common/buildings/*.txt"):
-    buildingContent=TagList().readFile(buildingFile)
-    for buildingName, building in buildingContent.getNameVal():
-      if isinstance(building, TagList):
-        upgrades=building.attemptGet("upgrades")
-        if len(upgrades)>0:
-          tileSwitch.add(buildingName, TagList("add_building_construction", upgrades.names[0]))
+    buildingContent.readFile(buildingFile,0,allVars)
+  for varFile in glob.glob("../CGM/buildings_script_source/common/scripted_variables/*.txt"):
+    allVars.readFile(varFile)
+
+  for buildingName, building in buildingContent.getNameVal():
+    if isinstance(building, TagList):
+      upgrades=building.attemptGet("upgrades")
+      if len(upgrades)>0:
+        tileSwitch.add(buildingName, TagList("add_building_construction", upgrades.names[0]))
   everyPop.createReturnIf(TagList("tile", TagList("has_building_construction","yes"))).add("owner", TagList("set_country_flag", "cgm_auto_built")).add("break","yes")
   upgradeEvent.createReturnIf(TagList("has_building_construction","yes")).add("break","yes")
+
+
+  # buildingContent=TagList()
+  # allVars=TagList()
+  # for buildingFile in glob.glob("../NOTES/api files/cgm_api_files/alphamod/buildings/*.txt"):
+  #   buildingContent.readFile(buildingFile,0,allVars)
+
+
+  # buildingLists=dict()
+  # for buildingName, building in buildingContent.getNameVal():
+  #   if isinstance(building, TagList) and building.attemptGet("is_listed")!="no":
+  #     assigned=False
+  #     assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars)
+  #     assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,"adjacency_bonus", "tile_building_resource_{}_add", "{}_adjacency")
+  #     assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,"planet_modifier", "static_planet_resource_{}_add")
+  #     if not assigned:
+  #       print("Building {} not assigned to any list".format(buildingName))
+  # for key, item in buildingLists.items():
+  #   print(key)
+  #   print(item)
+
+
+
+  def addUniqueFirst(key, element, dictList,building):
+    if building.attemptGet("planet_unique")=="yes" or building.attemptGet("empire_unique"):
+      insertToDictList(key, element, dictList)
+    else:
+      addToDictList(key, element, dictList)
+
+  def addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars, buildingTagName="produced_resources",subTag="{}", outName="{}" ):
+    for resource in resources:
+      buildingTag=building.attemptGet(buildingTagName)
+      val=buildingTag.attemptGet(subTag.format(resource))
+      if len(val)>0:
+        # print(subTag.format(resource))
+        val=getVariableValueFromList(val, allVars)
+        if val>=0.1:
+          addUniqueFirst(outName.format(resource), buildingName, buildingLists,building)
+          assigned=True
+    return assigned
+
 
 
   outputToFolderAndFile(edictOut, "common/edicts", "cgm_script_created_auto_edicts.txt",2, "../CGM/buildings_script_source")
@@ -830,6 +875,17 @@ def main():
     if not os.path.exists(outFolderLoc):
       os.makedirs(outFolderLoc)
     locList.write(outFolderLoc+"/cgm_automization_l_"+language+".yml",language)
+
+def getVariableValueFromList(name, allVars):
+  if name[0]=="@":
+    try:
+      name=float(allVars.get(name))
+    except:
+      print("Warning: income variable {} not found. Assuming to be >=1".format(name))
+      name=1
+  else:
+    name=float(name)
+  return name
 
 
 if __name__ == "__main__":

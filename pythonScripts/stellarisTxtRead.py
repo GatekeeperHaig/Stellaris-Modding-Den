@@ -1050,3 +1050,12 @@ def checkTotallyEmpty(item):
     return True
   else:
     return False
+
+def addToDictList(key, element, dictList):
+  if not key in dictList:
+    dictList[key]=[]
+  dictList[key].append(element)
+def insertToDictList(key, element, dictList, position=0):
+  if not key in dictList:
+    dictList[key]=[]
+  dictList[key].insert(position, element)
