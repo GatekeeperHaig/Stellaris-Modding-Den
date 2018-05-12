@@ -778,6 +778,14 @@ def main():
   upgradeEvent.createReturnIf(TagList("has_building_construction","yes")).add("break","yes")
 
 
+  # triggersAndEffects=TagList()
+  # for file in glob.glob("../CGM/buildings_script_source/common/scripted_triggers/*.txt")+glob.glob("../CGM/buildings_script_source/common/scripted_effects/*.txt"):
+  #   triggersAndEffects.readFile(file)
+  # buildingContent.resolveStellarisLinks(triggersAndEffects)
+  # buildingContent.removeDuplicatesRec()
+  # outputToFolderAndFile(buildingContent, "", "test.txt",2, ".")
+  # return
+
   # buildingContent=TagList()
   # allVars=TagList()
   # for buildingFile in glob.glob("../NOTES/api files/cgm_api_files/alphamod/buildings/*.txt"):

@@ -410,6 +410,27 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       if func(self.getAllI(i),*argList):
         self.removeIndex(i)
 
+  #resolves triggers and effect (possibly other stuff). targetList would be the full list of triggers and effect. If a trigger/effect is not in the list, it is assumed to be vanilla. No missing trigger/effect checking (use cwtools for this!)
+  def resolveStellarisLinks(self, targetList):
+    i=0
+    while i<len(self):
+      name=self.names[i]
+      val=self.vals[i]
+    # for name, val in self.getNameVal:
+      if isinstance(val, TagList):
+        val.resolveStellarisLinks(targetList)
+      elif val in ["yes", "no"]:
+        if name in targetList.names:
+          # print(name)
+          self.removeIndex(i)
+          i-=1 #will be counted up later again to process the next element. newly added ones are added at the back and need to be checked as well
+          if val =="yes":
+            self.addTagList(targetList.get(name))
+          else:
+            self.add("NOT", targetList.get(name))
+      i+=1
+
+
 
   def readString(self, line, expectingVal=False,objectList=0,args=0, bracketLevel=0, useNamedTagList=False, lineI=0):
     if objectList==0:
@@ -480,9 +501,6 @@ class TagList: #Basically everything is stored recursively in objects of this cl
 
     bracketLevel=0
     objectList=[self] #objects currently open objectList[0] would be lowest bracket object (a building), etc
-    # currentlyInHeader=True
-    # writeToList=self
-    # writeTo=False
     expectingVal=False
     # expectingNameAddition=False
     with open(fileName,'r') as inputFile:
@@ -493,67 +511,6 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         except:
           print("In file: "+fileName)
           raise
-        # lineSplit=re.split(splitPattern,line)
-        # countEmpty=0
-        # for wordI, word in enumerate(lineSplit):
-        #   try:
-        #     word=word.strip()
-        #     #empty
-        #     if len(word)==0:
-        #       countEmpty+=1
-        #       continue
-        #     elif word=="{":
-        #       if not expectingVal:
-        #         raise ParseError("ERROR: Unexpected '{'")
-        #       bracketLevel+=1
-        #       if useNamedTagList and bracketLevel==1:
-        #         newTag=NamedTagList(objectList[-1].names[-1])
-        #       else:
-        #         newTag=TagList(bracketLevel)
-        #       objectList[-1].vals[-1]=newTag
-        #       objectList.append(newTag)
-        #       expectingVal=False
-        #     #bracket level decrease
-        #     elif word=="}":
-        #       if expectingVal or bracketLevel==0:
-        #         raise ParseError("ERROR: Too many '}' found. Beware that the one that triggered this error is most likely not the incorrect one!")
-        #       bracketLevel-=1
-        #       objectList.pop()
-        #     #equal
-        #     # elif word=="=":
-        #     #   expectingVal=True
-        #     #comment 
-        #     elif word=='#': 
-        #       comment="".join(lineSplit[wordI:]).strip()
-        #       #comment without anything else in line
-        #       if countEmpty==wordI or len(objectList[-1].names)==0:
-        #         objectList[-1].add("","",comment) #will print comment only line at right place later
-        #       else:
-        #         objectList[-1].comments[-1]=" "+comment
-        #       break #rest of line is comment. Was already added, not being parsed to avoid special characters to have an impact in the comment
-        #     #signs that should be equivalt to "=" but are currently not supported. Thus simply saved as plain text in "name"
-        #     elif word in [">=","<=",">","<","="]:
-        #       objectList[-1].seperators[-1]=word
-        #       expectingVal=True
-        #       # objectList[-1].names[-1]+=" "+word+" "
-        #       # expectingNameAddition=True
-        #     elif word=="log":
-        #       objectList[-1].add("","","".join(lineSplit[wordI:]).strip())
-        #       break
-        #     elif expectingVal:
-        #       objectList[-1].vals[-1]+=word
-        #       expectingVal=False
-
-        #     # elif expectingNameAddition:
-        #     #   objectList[-1].names[-1]+=word
-        #     #   expectingNameAddition=False
-        #     else:
-        #       objectList[-1].add(word)
-        #   except:
-        #     print("Error reading line {}, word {}".format(lineI,wordI))
-        #     print("Line content: {}".format(line),end='')
-        #     print("Word: {}".format(word))
-        #     raise
 
     if isinstance(varsToValue,TagList):
       for name,val in self.getNameVal():
