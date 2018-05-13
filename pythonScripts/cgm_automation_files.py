@@ -1021,13 +1021,35 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
     # file.write(str(buildingFilesAdded))
 
 
-  if modName=="cgm_buildings":
-    mainTriggerFileContent=TagList()
-    mainTriggerFileContent.readFile("../CGM/buildings_script_source/common/scripted_triggers/cgm_automations_triggers.txt")
-    # for resource in resources:
-    #   trigger=mainTriggerFileContent.get(resource+"_any_building_available")
-    #   trigger.
-    outputToFolderAndFile(mainTriggerFileContent, "common/scripted_triggers/", "cgm_automations_triggers.txt",2, "../CGM/buildings_script_source")
+  mainTriggerFileContent=TagList()
+  autobuildCompTrigger=TagList()
+  if modName!="cgm_buildings":
+    autobuildCompTrigger.readFile("../CGM/buildings_script_source/common/scripted_triggers/00000_cgm_auto_compatibilty_triggers.txt")
+  mainTriggerFileContent.readFile("../CGM/buildings_script_source/common/scripted_triggers/cgm_automations_triggers.txt")
+  for resource in resources:
+    if resource!="unity":
+      trigger=mainTriggerFileContent.get(resource+"_any_building_available")
+      if modName=="cgm_buildings":
+        if resource+"_any_building_available_API" not in trigger.names:
+          trigger.add(resource+"_any_building_available_API",yes)
+        autobuildCompTrigger.add(resource+"_any_building_available_API", TagList())
+
+
+      trigger=mainTriggerFileContent.get(resource+"_adjacency_any_building_available")
+      if modName=="cgm_buildings":  
+        if not "or" in trigger.names and not "OR" in trigger.names:
+          trigger.add("OR", TagList("always", "no"))
+      else:
+        triggerOR=trigger.get("OR")
+        if "always" in triggerOR.names:
+          triggerOR.remove("always")
+        if not resource+"_adjacency_any_building_available_"+modName in triggerOR.names:
+          triggerOR.add(resource+"_adjacency_any_building_available_"+modName, yes) #TODO! Only add when needed!!
+        if not resource+"_adjacency_any_building_available_"+modName in autobuildCompTrigger.names:
+          autobuildCompTrigger.add(resource+"_adjacency_any_building_available_"+modName,TagList("always", "no"))
+
+  outputToFolderAndFile(mainTriggerFileContent, "common/scripted_triggers/", "cgm_automations_triggers.txt",2, "../CGM/buildings_script_source",False)
+  outputToFolderAndFile(autobuildCompTrigger, "common/scripted_triggers/", "00000_cgm_auto_compatibilty_triggers.txt",2, "../CGM/buildings_script_source")
 
   buildingContent=TagList()
   allVars=TagList()

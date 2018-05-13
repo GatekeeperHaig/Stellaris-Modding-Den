@@ -193,7 +193,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     out="{"
     for name, val, comment, seperator in self.getAll():
       out+=" "+name
-      if val:
+      if val or isinstance(val, TagList):
         out+=" {} ".format(seperator)
         if isinstance(val, TagList):
           out+=val._toLine()

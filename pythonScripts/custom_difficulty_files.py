@@ -1332,9 +1332,10 @@ def main():
   #   locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
 
 
-def outputToFolderAndFile(tagList, folder, file, level=2, modFolder="../gratak_mods/custom_difficulty"):
+def outputToFolderAndFile(tagList, folder, file, level=2, modFolder="../gratak_mods/custom_difficulty", warningText=True):
   tagList=deepcopy(tagList)
-  tagList.insert(0, "","","# This file was created by script!\n # Instead of editing it, you should change the python script.\n # Changes to the file will be overwritten the next time the script is run.")
+  if warningText:
+    tagList.insert(0, "","","# This file was created by script!\n # Instead of editing it, you should change the python script.\n # Changes to the file will be overwritten the next time the script is run.")
   folder=modFolder+"/"+folder
   if not os.path.exists(folder):
     os.makedirs(folder)
