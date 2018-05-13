@@ -59,6 +59,16 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       return self.get(name)
     except ValueError:
       return TagList(0) #empty list
+  def getAnywhere(self, name, avoid=[]): #don't use capitals in avoid! Example, see below
+    for locName, val in self.getNameVal():
+      if name==locName:
+        return val
+      if isinstance(val,TagList) and not locName.lower() in avoid:
+        possibleReturn=val.getAnywhere(name,avoid)
+        if possibleReturn!=None:
+          return possibleReturn
+  def getAnywhereRequired(self,name):
+    return self.getAnywhere(name, ["or", "not", "nor", "nand"])
   def getNameVal(self):
     return [[self.names[i],self.vals[i]] for i in range(len(self.names))]
   def getAll(self):
@@ -262,6 +272,24 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         if isinstance(val,TagList):
           return False
     return True
+  #remove a layer from the taglist. Subtags are added to where the removed one was, excluding the ones listed 
+  def removeLayer(self, layerName="custom_tooltip", excludedSubTags=[]):
+    i=0
+    while i<len(self):
+      name=self.names[i]
+      val=self.vals[i]
+      if isinstance(val, TagList):
+        if name==layerName:
+          self.removeIndex(i)
+          i-=1
+          for subname, subval in val.getNameVal():
+            if not subname in excludedSubTags:
+              self.add(subname,subval)
+        else:
+          val.removeLayer(layerName,excludedSubTags)
+      i+=1
+    # for name, val in self.getNameVal():
+
 
   def replaceAllHasBuildings(self, args): #"has_building=" fails working if different version of the same building exist (Paradox should have realised this on creation of machine empire capital buildings but they didn't... They simply created very lengthy conditions. Shame...). We replace them by scripted_triggers. Due to cross-reference in between files I do this for EVERY building, even the ones I did not copy.
   #beware that this function will not replace "has_building" hidden in the name (i.e. a longer name including it somewhere in the middle). This is WAD. This can only be added like this manually. This can be used to prevent a replace.
@@ -409,6 +437,19 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         self.vals[i].deleteOnLowestLevel(func, *argList)
       if func(self.getAllI(i),*argList):
         self.removeIndex(i)
+  def twoConditionRemove(self, condParent, condChild, condParentSatisfied=False):
+    i=0
+    while i<len(self):
+      name=self.names[i]
+      val=self.vals[i]
+      if isinstance(val, TagList):
+        # val.twoConditionApply(condParent,condChild, applyString, condParent(self,i))
+        val.twoConditionRemove(condParent,condChild, condParent(self,i))
+      if condParentSatisfied and condChild(self, i):
+        self.removeIndex(i)
+        i-=1
+      i+=1
+        # self.getattr(applyString)
 
   #resolves triggers and effect (possibly other stuff). targetList would be the full list of triggers and effect. If a trigger/effect is not in the list, it is assumed to be vanilla. No missing trigger/effect checking (use cwtools for this!)
   def resolveStellarisLinks(self, targetList):
