@@ -1,0 +1,638 @@
+@b0time = 120
+@b0cost = 30
+@b0effect = 1
+@b0upkeep = 1
+
+@b1time = 210
+@b1cost = 60
+@b1effect = 2
+@b1upkeep = 1
+
+@b2time = 180
+@b2cost = 90
+@b2effect = 3
+@b2upkeep = 1.5
+
+@b3time = 180
+@b3cost = 120
+@b3effect = 4
+@b3upkeep = 2
+
+@b4time = 180
+@b4cost = 150
+@b4effect = 5
+@b4upkeep = 2.5
+
+@b5time = 180
+@b5cost = 180
+@b5effect = 8
+@b5upkeep = 30
+
+@weightnormal = 2.5
+@weightuseful = 10
+@weightimportant = 100
+@weightcritical = 1000
+
+@srlow = 1
+@srmed = 2
+@srhigh = 4
+
+@mincostlow = 25
+@engcostmed = 50
+@infcostlow = 10
+
+building_arena_complex = {
+	base_buildtime = 360
+	planet_unique = yes	
+	ai_replace = no
+	
+	cost = {
+		minerals = 50
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	produced_resources = {
+		unity = 2
+	}
+	
+	army_modifier = {
+		army_defense_health_mult = 0.1
+	}
+	
+	planet_modifier = {
+		pop_government_ethic_attraction = 0.1
+		tile_resource_unity_mult = 0.05
+		pop_happiness = 0.05
+		planet_unrest_add = -10
+	}
+	
+	potential = {
+		planet = {
+			owner = {
+				or = {
+					has_ethic = ethic_xenophobe
+					has_ethic = ethic_fanatic_xenophobe 
+				}
+			}
+			any_pop = {
+				member_of_faction = gladiators
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requirement_battle_thrall"
+			tile = {
+				has_grown_pop = yes
+				exists = pop
+				pop = {
+					has_slavery_type = {
+						country = planet.owner
+						type = slavery_military
+					}			
+				}
+			}
+		}
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = {
+			nor = {
+				has_ethic = ethic_xenophobe
+				has_ethic = ethic_fanatic_xenophobe 
+			}
+		}		
+	}
+	
+	# Building requires battle thrall pops to function
+	active = { # scope: pop
+		custom_tooltip = {
+			fail_text = "arena_tooltip_1"
+			has_slavery_type = {
+				country = planet.owner
+				type = slavery_military
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 0	
+	}
+}
+
+building_state_media = {
+	base_buildtime = 360
+	planet_unique = yes
+	
+	cost = {
+		minerals = 100
+		energy = 250
+		influence = 25
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+
+	produced_resources = {
+		unity = 2
+	}
+	
+	planet_modifier = {
+		pop_government_ethic_attraction = 0.1
+		tile_resource_unity_mult = 0.1
+		pop_consumer_goods_mult = -0.1
+		planet_unrest_add = -10
+	}
+	
+	prerequisites = {
+		"tech_alpha_fanatic_xenophobia"
+	}
+	
+	# ai_special_building = yes
+	ai_replace = no
+	
+	ai_weight = {
+		factor = @weightcritical
+		modifier = {
+			factor = 0
+			from = { sector_controlled = yes }
+		}	
+	}
+}
+
+building_genetic_pairing = {
+	base_buildtime = 360
+	planet_unique = yes
+	
+	cost = {
+		minerals = 100
+		energy = 250
+	}
+	
+	produced_resources = {
+		unity = 1
+		society_research = 2
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	planet_modifier = {
+		pop_citizen_happiness = 0.05
+		pop_growth_speed = 0.25
+	}
+	
+	potential = {
+		planet = {
+			has_building = building_genetic_data
+		}
+	}
+	
+	prerequisites = {
+		"tech_alpha_gene_analytics_2"
+	}
+	
+	# ai_special_building = yes
+	ai_replace = no
+	
+	ai_weight = {
+		weight = @weightuseful
+	}
+}
+
+building_child_rearing = {
+	base_buildtime = 360
+	planet_unique = yes
+	
+	cost = {
+		minerals = 50
+		energy = 150
+	}
+	
+	produced_resources = {
+		society_research = 1
+		unity = 2
+	}
+	
+	required_resources = {
+		energy = 2
+	}
+	
+	planet_modifier = {
+		pop_government_ethic_attraction = 0.1
+		pop_food_req_mult = -0.1
+		pop_consumer_goods_mult = -0.1
+	}
+	
+	prerequisites = {
+		"tech_alpha_gene_analytics"
+	}
+	
+	# ai_special_building = yes
+	ai_replace = no
+	
+	ai_weight = {
+		weight = @weightimportant	
+	}
+}
+
+building_genetic_data = {
+	base_buildtime = 360
+	planet_unique = yes
+	
+	cost = {
+		minerals = 100
+		energy = 200
+	}
+	
+	produced_resources = {
+		society_research = 3
+	}
+	
+	planet_modifier = {
+		tile_resource_society_research_mult = 0.1
+	}
+	
+	prerequisites = {
+		"tech_alpha_gene_analytics"
+	}
+	
+	# ai_special_building = yes
+	ai_replace = no
+	
+	ai_weight = {
+		weight = @weightcritical	
+	}
+}
+
+building_smart_labs = {
+	base_buildtime = 300
+
+	cost = {
+		minerals = 50
+		energy = 100
+	}
+	
+	required_resources = {
+		energy = 2
+	}
+	
+	produced_resources = {
+		society_research = 3
+		physics_research = 4
+		engineering_research = 4
+	}
+	
+	potential = {
+		planet = {
+			has_building = "building_genetic_data"
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requirement_adjacent_genetic_data"
+			tile = {
+				any_neighboring_tile = {
+					has_building = "building_genetic_data"
+				}
+			}
+		}		
+	}
+	
+	prerequisites = {
+		"tech_alpha_gene_analytics_3"
+	}
+	
+	ai_weight = {
+		weight = @weightuseful	
+		modifier = {
+			factor = 0
+			from = { sector_controlled = yes }
+		}	
+	}
+}
+
+building_industrial_camp = {
+	base_buildtime = 180
+
+	cost = {
+		minerals = 100
+		energy = 50
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	potential = {
+		planet = {
+			or = {
+				has_building = "building_genetic_data"
+				has_building = "building_security_center"
+				has_building = "building_security_center_2"
+				has_building = "building_surveillance_center"
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requirement_adjacent_state_control"
+			tile = {
+				any_neighboring_tile = {
+					or = {
+						has_building = "building_genetic_data"
+						has_building = "building_security_center"
+						has_building = "building_security_center_2"
+						has_building = "building_surveillance_center"
+					}
+				}
+			}
+		}		
+	}
+	
+	produced_resources = {
+		minerals = 4
+		food = 2
+	}
+	
+	planet_modifier = {
+		pop_government_ethic_attraction = 0.1
+	}
+	
+	prerequisites = {
+		"tech_alpha_gene_analytics_2"
+	}
+	
+	ai_weight = {
+		weight = @weightnormal
+	}
+}
+
+building_energy_network = {
+	base_buildtime = 360
+
+	cost = {
+		minerals = 75
+		energy = 125
+	}
+	
+	required_resources = {
+		minerals = 1
+	}
+	
+	produced_resources = {
+		energy = 5
+		physics_research = 1
+		society_research = 2
+	}
+	
+	potential = {
+		planet = {
+			has_building = "building_genetic_data"
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requirement_adjacent_genetic_data"
+			tile = {
+				any_neighboring_tile = {
+					has_building = "building_genetic_data"
+				}
+			}
+		}		
+	}
+	
+	prerequisites = {
+		"tech_alpha_gene_analytics_3"
+	}
+	
+	ai_weight = {
+		weight = @weightnormal	
+	}
+}
+
+building_surveillance_center = {
+	base_buildtime = 360
+	planet_unique = yes
+
+	cost = {
+		minerals = @mincostlow
+		energy = @engcostmed
+	}
+	
+	required_resources = {
+		energy = 2
+	}
+
+	produced_resources = {
+		society_research = 2
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			or = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+				has_ethic = ethic_xenophobe
+				has_ethic = ethic_fanatic_xenophobe
+			}
+			resources = {
+				sr_intelligence = 1
+			}
+		}
+	}
+	
+	planet_modifier = {
+		planet_unrest_add = -5
+		pop_government_ethic_attraction = 0.1
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				nor = {
+					has_ethic = ethic_xenophile
+					has_ethic = ethic_fanatic_xenophile
+				}
+			}
+		}
+		modifier = { 
+			pop_ethic_xenophobe_attraction_mult = 0.1			
+		}
+	}
+	
+	prerequisites = {
+		"tech_alpha_surveillance_centers"
+	}
+	
+	ai_weight = {
+		weight = 0
+		modifier = {
+			weight = @weightnormal
+			from = { owner = {
+				or = {
+					has_ethic = ethic_xenophobe
+					has_ethic = ethic_fanatic_xenophobe
+					has_ethic = ethic_militarist
+					has_ethic = ethic_fanatic_militarist
+				}
+			}}
+		}
+		modifier = {
+			factor = 1.2
+			from = { owner = { has_ethic = ethic_fanatic_authoritarian }}
+		}
+		modifier = {
+			factor = 1.1
+			from = { owner = { has_ethic = ethic_authoritarian }}
+		}
+		modifier = {
+			factor = 1.5
+			from = { owner = { has_ethic = ethic_fanatic_militarist }}
+		}
+		modifier = {
+			factor = 1.3
+			from = { owner = { has_ethic = ethic_militarist }}
+		}
+	}
+	
+	ai_replace = no
+}
+
+building_security_center = {
+	base_buildtime = 360
+	planet_unique = yes
+
+	cost = {
+		influence = @infcostlow
+		minerals = @mincostlow
+		energy = @engcostmed
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+
+	produced_resources = {
+		society_research = 3
+		unity = 1
+	}
+	
+	army_modifier = {
+		army_defense_health_mult = 0.1
+	}
+	
+	planet_modifier = {
+		planet_unrest_add = -10
+	}
+	
+	prerequisites = {
+		"tech_homeworld_security"
+	}
+	
+	ai_weight = {
+		weight = 0
+		modifier = {
+			weight = @weightnormal
+			from = { owner = {
+				or = {
+					has_ethic = ethic_xenophobe
+					has_ethic = ethic_fanatic_xenophobe
+					has_ethic = ethic_militarist
+					has_ethic = ethic_fanatic_militarist
+				}
+			}}
+		}
+		modifier = {
+			factor = 1.2
+			from = { owner = { has_ethic = ethic_fanatic_authoritarian }}
+		}
+		modifier = {
+			factor = 1.1
+			from = { owner = { has_ethic = ethic_authoritarian }}
+		}
+		modifier = {
+			factor = 1.5
+			from = { owner = { has_ethic = ethic_fanatic_militarist }}
+		}
+		modifier = {
+			factor = 1.3
+			from = { owner = { has_ethic = ethic_militarist }}
+		}
+	}
+	
+	upgrades = {
+		building_security_center_2 
+	}
+	
+	ai_replace = no
+}
+
+building_security_center_2 = {
+	base_buildtime = 360
+	planet_unique = yes
+	is_listed = no
+
+	cost = {
+		influence = @infcostlow
+		minerals = @mincostlow
+		energy = @engcostmed
+	}
+	
+	required_resources = {
+		energy = 2
+	}
+
+	produced_resources = {
+		society_research = 4
+		unity = 1.5
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			AND = {
+				or = {
+					has_ethic = ethic_fanatic_authoritarian
+					has_ethic = ethic_fanatic_xenophobe
+					has_ethic = ethic_fanatic_militarist					
+				}
+				is_at_war = yes
+			}
+			resources = {
+				unity = 1
+			}
+		}
+	}
+	
+	army_modifier = {
+		army_defense_health_mult = 0.15
+	}
+	
+	planet_modifier = {
+		pop_citizen_happiness = 0.05
+		planet_unrest_add = -10
+		pop_ethic_xenophile_attraction_mult = -0.2
+		pop_consumer_goods_mult = 0.1
+	}
+	
+	prerequisites = {
+		"tech_alpha_aggressive_security"
+	}
+	
+	ai_weight = {
+		weight = @weightuseful
+	}
+	
+	ai_replace = no
+}
