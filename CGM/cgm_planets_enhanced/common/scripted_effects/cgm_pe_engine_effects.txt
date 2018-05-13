@@ -1,0 +1,161 @@
+#there are 5 planet classes for terraforming currently implemented. Others will be added for other mods
+#pc_barren_terraforming
+#pc_barren_cold_terraforming
+#pc_toxic_terraforming
+#pc_molten_terraforming
+#pc_frozen_terraforming
+#this effect is called on planet scope in the terraforming links file. 
+cgm_set_terraformer = {
+	while = { 
+		limit = { planet_size > 25 }
+		change_planet_size = -1
+	}		
+	random_tile = { 
+		limit = { has_deposit = no has_blocker = no num_adjacent_tiles < 3 }	
+		set_building = building_terraformer
+	}		
+	switch = {
+		trigger = planet_size
+		5 = { set_variable = { which = planet_size value = 5 } }
+		6 = { set_variable = { which = planet_size value = 6 } }
+		7 = { set_variable = { which = planet_size value = 7 } }
+		8 = { set_variable = { which = planet_size value = 8 } }
+		9 = { set_variable = { which = planet_size value = 9 } }
+		10 = { set_variable = { which = planet_size value = 10 } }
+		11 = { set_variable = { which = planet_size value = 11 } }
+		12 = { set_variable = { which = planet_size value = 12 } }
+		13 = { set_variable = { which = planet_size value = 13 } }
+		14 = { set_variable = { which = planet_size value = 14 } }
+		15 = { set_variable = { which = planet_size value = 15 } }
+		16 = { set_variable = { which = planet_size value = 16 } }
+		17 = { set_variable = { which = planet_size value = 17 } }
+		18 = { set_variable = { which = planet_size value = 18 } }
+		19 = { set_variable = { which = planet_size value = 19 } }
+		20 = { set_variable = { which = planet_size value = 20 } }
+		21 = { set_variable = { which = planet_size value = 21 } }
+		22 = { set_variable = { which = planet_size value = 22 } }
+		23 = { set_variable = { which = planet_size value = 23 } }
+		24 = { set_variable = { which = planet_size value = 24 } }
+		25 = { set_variable = { which = planet_size value = 25 } }
+	}	
+	set_variable = { which = blocker_tiles value = planet_size }
+	random_list = {
+		20 = { divide_variable = { which = blocker_tiles value = 2 } }
+		20 = { divide_variable = { which = blocker_tiles value = 3 } }
+		20 = { divide_variable = { which = blocker_tiles value = 4 } }
+		20 = { divide_variable = { which = blocker_tiles value = 5 } }
+	}	
+	divide_variable = { which = blocker_tiles value = 1000 }
+	multiply_variable = { which = blocker_tiles value = 1000 }	
+	set_variable = { which = deposit_tiles value = planet_size }
+	if = { 
+		limit = { has_global_flag = vanilla_base_deposits }
+		multiply_variable = { which = deposit_tiles value = 0.6 }
+		else = { 	
+			if = { 
+				limit = { has_global_flag = very_high_deposits }
+				multiply_variable = { which = deposit_tiles value = 0.80 }		
+				else = { 	
+					if = { 
+						limit = { has_global_flag = high_deposits }
+						multiply_variable = { which = deposit_tiles value = 0.65 }						
+						else = { 
+							if = { 
+								limit = { has_global_flag = normal_deposits }
+								multiply_variable = { which = deposit_tiles value = 0.5 }						
+								else = { 	
+									if = { 
+										limit = { has_global_flag = low_deposits }
+										multiply_variable = { which = deposit_tiles value = 0.35 }						
+										else = { multiply_variable = { which = deposit_tiles value = 0.2 } }						
+									}
+								}								
+							}
+						}
+					}	
+				}
+			}
+		}
+	}	
+	divide_variable = { which = deposit_tiles value = 1000 }
+	multiply_variable = { which = deposit_tiles value = 1000 }
+	if = { 
+		limit = { check_variable = { which = deposit_tiles value < 1 } }
+		set_variable = { which = deposit_tiles value = 1 }	
+	}	
+	while = { 
+		count = deposit_tiles
+		random_tile = {
+			limit = { has_deposit = no has_building = no }
+			cgm_pe_regular_deposit_spawn_table = yes
+		}
+	}
+	while = { 
+		count = deposit_tiles
+		random_tile = {		
+			limit = { has_building = no }
+			cgm_pe_tile_blocker_spawn_table = yes
+		}
+	}	
+	set_planet_flag = cgm_terraforming_planet
+	planet_event = { id = cgm_terraforming.1 days = 360 }
+}
+
+#the effects below run on tile scope
+
+roll_mineral_deposit = {
+	random_list = {
+		40 = { add_deposit = d_mineral_deposit }
+		30 = { add_deposit = d_rich_mineral_deposit }
+		20 = { add_deposit = d_vast_mineral_deposit }
+		10 = { add_deposit = d_immense_mineral_deposit }
+	}
+}
+roll_energy_deposit = {
+	random_list = {
+		40 = { add_deposit = d_energy_deposit }
+		30 = { add_deposit = d_rich_energy_deposit }
+		20 = { add_deposit = d_vast_energy_deposit }
+		10 = { add_deposit = d_immense_energy_deposit }
+	}
+}
+roll_food_deposit = {
+	random_list = {
+		40 = { add_deposit = d_farmland_deposit }
+		30 = { add_deposit = d_rich_farmland_deposit }
+		20 = { add_deposit = d_vast_farmland_deposit }
+		10 = { add_deposit = d_immense_farmland_deposit }
+	}
+}
+roll_mixed_deposit = {
+	random_list = {
+		40 = { add_deposit = d_mineral_energy_deposit }
+		10 = { add_deposit = d_rich_mineral_energy_deposit }
+		40 = { add_deposit = d_mineral_food_deposit }
+		10 = { add_deposit = d_rich_food_mineral_deposit }
+	}
+}
+roll_society_research_deposit = {
+	random_list = {
+		40 = { add_deposit = d_society_deposit }
+		30 = { add_deposit = d_rich_society_deposit }
+		20 = { add_deposit = d_vast_society_deposit }
+		10 = { add_deposit = d_immense_society_deposit }
+	}
+}
+roll_physics_research_deposit = {
+	random_list = {
+		40 = { add_deposit = d_physics_deposit }
+		30 = { add_deposit = d_rich_physics_deposit }
+		20 = { add_deposit = d_vast_physics_deposit }
+		10 = { add_deposit = d_immense_physics_deposit }
+	}
+}
+roll_engineering_research_deposit = {
+	random_list = {
+		40 = { add_deposit = d_engineering_deposit }
+		30 = { add_deposit = d_rich_engineering_deposit }
+		20 = { add_deposit = d_vast_engineering_deposit }
+		10 = { add_deposit = d_immense_engineering_deposit }
+	}
+}
