@@ -1021,6 +1021,13 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
     # file.write(str(buildingFilesAdded))
 
 
+  if modName=="cgm_buildings":
+    mainTriggerFileContent=TagList()
+    mainTriggerFileContent.readFile("../CGM/buildings_script_source/common/scripted_triggers/cgm_automations_triggers.txt")
+    # for resource in resources:
+    #   trigger=mainTriggerFileContent.get(resource+"_any_building_available")
+    #   trigger.
+    outputToFolderAndFile(mainTriggerFileContent, "common/scripted_triggers/", "cgm_automations_triggers.txt",2, "../CGM/buildings_script_source")
 
   buildingContent=TagList()
   allVars=TagList()
