@@ -781,49 +781,71 @@ def main():
   # triggersAndEffects=TagList()
   # for file in glob.glob("../CGM/buildings_script_source/common/scripted_triggers/*.txt")+glob.glob("../CGM/buildings_script_source/common/scripted_effects/*.txt"):
   #   triggersAndEffects.readFile(file)
+  # buildingContentOrig=deepcopy(buildingContent)
   # buildingContent.resolveStellarisLinks(triggersAndEffects)
   # buildingContent.removeDuplicatesRec()
-  # outputToFolderAndFile(buildingContent, "", "test.txt",2, ".")
-  # return
+  # # outputToFolderAndFile(buildingContent, "", "test.txt",2, ".")
+  # # return
 
-  # buildingContent=TagList()
-  # allVars=TagList()
-  # for buildingFile in glob.glob("../NOTES/api files/cgm_api_files/alphamod/buildings/*.txt"):
-  #   buildingContent.readFile(buildingFile,0,allVars)
+  # # buildingContent=TagList()
+  # # allVars=TagList()
+  # # for buildingFile in glob.glob("../NOTES/api files/cgm_api_files/alphamod/buildings/*.txt"):
+  # #   buildingContent.readFile(buildingFile,0,allVars)
 
 
-  # buildingLists=dict()
-  # for buildingName, building in buildingContent.getNameVal():
+  # # buildingLists=dict()
+  # buildingLists=TagList()
+  # specialResourceTrigger=TagList()
+  # for i,(buildingName, building) in enumerate(buildingContent.getNameVal()):
   #   if isinstance(building, TagList) and building.attemptGet("is_listed")!="no":
   #     assigned=False
-  #     assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars)
-  #     assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,"adjacency_bonus", "tile_building_resource_{}_add", "{}_adjacency")
-  #     assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,"planet_modifier", "static_planet_resource_{}_add")
+  #     for potAllowName in ["potential","allow"]:
+  #       hasResourceTag=building.attemptGet(potAllowName).getAnywhereRequired("has_resource")
+  #       if hasResourceTag:
+  #         if not hasResourceTag.get("type") in resources:
+  #           triggerAND=specialResourceTrigger.addReturn("AND")
+  #           triggerAND.add("has_resource", hasResourceTag)
+  #           for tech in building.attemptGet("prerequisites").names:
+  #             triggerAND.add("owner", TagList("has_technology", tech))
+  #           triggerAND.addTagList(buildingContentOrig[i].get("potential"))
+  #           triggerAND.addTagList(buildingContentOrig[i].get("allow"))
+  #           addUniqueFirst("special_resource", buildingName, buildingLists, building)
+  #           break
   #     if not assigned:
-  #       print("Building {} not assigned to any list".format(buildingName))
-  # for key, item in buildingLists.items():
-  #   print(key)
-  #   print(item)
+  #       # if building.attemptGet("potential").getAnywhereRequired("has_resource") or building.attemptGet("allow").getAnywhereRequired("has_resource"):
+  #       assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars)
+  #       assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,"adjacency_bonus", "tile_building_resource_{}_add", "{}_adjacency")
+  #       assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,"planet_modifier", "static_planet_resource_{}_add")
+  #       if not assigned:
+  #         print("Building {} not assigned to any list".format(buildingName))
+  # buildingLists.removeDuplicatesRec()
+  # specialResourceTrigger.removeLayer("custom_tooltip",["fail_text", "success_text", "text"])
+  # specialResourceTrigger.removeLayer("tile")
+  # def condParent(tagList, i):
+  #   if tagList.names[i]=="OR":
+  #     return True
+  #   else:
+  #     return False
+  # def condChild(tagList, i):
+  #   if tagList.names[i]=="always" and tagList.vals[i]=="no":
+  #     return True
+  #   else:
+  #     return False
+  # specialResourceTrigger.twoConditionRemove(condParent,condChild)
+
+
+  # specialResourceTrigger.removeDuplicatesRec()
+  # specialResourceTrigger=TagList("special_resource_any_building_available", TagList("has_any_tile_strategic_resource", "yes").add("OR", specialResourceTrigger))
+  # # print(buildingLists)
+  # outputToFolderAndFile(specialResourceTrigger, "", "test3.txt",2, ".")
+  # # for key, item in buildingLists.items():
+  # #   print(key)
+  # #   print(item)
+  # return #TODO!!!!!!!!!
 
 
 
-  def addUniqueFirst(key, element, dictList,building):
-    if building.attemptGet("planet_unique")=="yes" or building.attemptGet("empire_unique"):
-      insertToDictList(key, element, dictList)
-    else:
-      addToDictList(key, element, dictList)
 
-  def addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars, buildingTagName="produced_resources",subTag="{}", outName="{}" ):
-    for resource in resources:
-      buildingTag=building.attemptGet(buildingTagName)
-      val=buildingTag.attemptGet(subTag.format(resource))
-      if len(val)>0:
-        # print(subTag.format(resource))
-        val=getVariableValueFromList(val, allVars)
-        if val>=0.1:
-          addUniqueFirst(outName.format(resource), buildingName, buildingLists,building)
-          assigned=True
-    return assigned
 
 
 
@@ -883,7 +905,25 @@ def main():
     if not os.path.exists(outFolderLoc):
       os.makedirs(outFolderLoc)
     locList.write(outFolderLoc+"/cgm_automization_l_"+language+".yml",language)
+def addUniqueFirst(key, element, dictList,building):
+  if building.attemptGet("planet_unique")=="yes" or building.attemptGet("empire_unique"):
+    dictList.getOrCreate(key).insert(0,element)
+    # insertToDictList(key, element, dictList)
+  else:
+    dictList.getOrCreate(key).add(element)
+    # addToDictList(key, element, dictList)
 
+def addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars, buildingTagName="produced_resources",subTag="{}", outName="{}" ):
+  for resource in resources:
+    buildingTag=building.attemptGet(buildingTagName)
+    val=buildingTag.attemptGet(subTag.format(resource))
+    if len(val)>0:
+      # print(subTag.format(resource))
+      val=getVariableValueFromList(val, allVars)
+      if val>=0.1:
+        addUniqueFirst(outName.format(resource), buildingName, buildingLists,building)
+        assigned=True
+  return assigned
 def getVariableValueFromList(name, allVars):
   if name[0]=="@":
     try:
