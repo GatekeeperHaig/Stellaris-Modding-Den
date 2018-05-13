@@ -1,144 +1,73 @@
 namespace = cgm_planets_enhanced_spawn_engine
 
-event = { 
+country_event = { 
+	id = cgm_planets_enhanced_spawn_engine.0
+	hide_window = yes
+	fire_only_once = yes
+	trigger = { 
+		NOT = { has_global_flag = planets_enhanced_active }
+		is_ai = no
+	}
+	immediate = { 
+		set_global_flag = planets_enhanced_active
+		if = { 
+			limit = { NOT = { has_country_flag = cgm_game_host } }
+			set_country_flag = cgm_game_host	
+		}	
+		every_megastructure = {
+			limit = { 
+				OR = {
+					is_megastructure_type = dyson_sphere_ruined
+					is_megastructure_type = think_tank_ruined
+					is_megastructure_type = spy_orb_ruined
+					is_megastructure_type = gateway_ruined
+				}
+				exists = orbit				
+			}
+			orbit.planet = { set_planet_flag = has_ruined_megastructure } 
+		}
+		every_planet = {
+			if = { 
+				limit = { is_star = yes }		
+				if = { 
+					limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_1 } } } }
+					set_planet_flag = system_star_1				
+					else = {
+						if = { 
+							limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_2 } } } }
+							set_planet_flag = system_star_2						
+							else = {
+								if = { 
+									limit = { solar_system = { NOT = { any_planet = { NOT = { is_same_value = root } has_planet_flag = system_star_3 } } } }
+									set_planet_flag = system_star_3						
+								}
+							}
+						}
+					}				
+				}	
+			}			
+			if = {
+				limit = { 
+					is_gas_giant = yes
+					has_moon = yes
+					any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
+				}				
+				every_moon = { 
+					limit = { NOT = { has_planet_flag = gas_giant_moon } }
+					set_planet_flag = gas_giant_moon
+				}	
+			}
+		}	
+		country_event = { id = cgm_planets_enhanced_spawn_engine.1 }	
+	}
+}	
+
+country_event = { 
 	id = cgm_planets_enhanced_spawn_engine.1
 	hide_window = yes
 	is_triggered_only = yes	
 	
-	immediate = {
-		while = { 
-			limit = { 
-				OR = { 
-					NOT = { has_global_flag = unique_sr1 }
-					NOT = { has_global_flag = unique_sr2 }					
-					NOT = { has_global_flag = unique_sr3 }
-					NOT = { has_global_flag = unique_sr4 }
-					NOT = { has_global_flag = unique_sr5 }
-					NOT = { has_global_flag = unique_sr6 }
-					NOT = { has_global_flag = unique_sr7 }
-					NOT = { has_global_flag = unique_sr8 }
-					NOT = { has_global_flag = unique_sr9 }
-				}
-			}	
-			random_planet = { 				
-				limit = { 
-					NOT = { exists = owner }
-					habitable_planet = yes								
-					any_tile = { has_pop = no } 
-					solar_system = { 
-						starting_system = no
-						NOR = { 							
-							has_star_flag = empire_cluster
-							has_star_flag = sol_system
-							has_star_flag = sol
-							has_star_flag = deneb_system
-							has_star_flag = custom_system
-							has_star_flag = floating_system
-							has_star_flag = crystal_system
-							has_star_flag = city_system							
-							any_planet = { has_planet_flag = unique_sr }																		
-							any_neighbor_system = { ignore_hyperlanes = no any_planet = { has_planet_flag = unique_sr } }
-						}						
-					}					
-				}													
-				save_event_target_as = unique_resource_candidate
-				cgm_pe_unique_sr_spawn_table = yes	
-			}	
-		}						
-		every_planet = { 										
-			limit = { 
-				is_capital = no
-				habitable_structure = no	
-				planet_is_not_virtual = yes		
-				solar_system = { 
-					NOR = { 							
-						has_star_flag = empire_home_system
-						has_star_flag = empire_cluster
-						has_star_flag = sol_system
-						has_star_flag = sol
-						has_star_flag = deneb_system
-						has_star_flag = custom_system
-						has_star_flag = floating_system
-						has_star_flag = crystal_system
-						has_star_flag = city_system							
-					}											
-				}					
-			}	
-			if = {
-				limit = { 
-					is_colonizable = no
-					has_strategic_resource = no 
-				}
-				random_list = {
-					87.5 = { }
-					12.5 = { cgm_pe_orbital_sr_spawn_table = yes } #uninhabitable planets only	
-				}							 			
-				else = { 
-					if = {
-						limit = { habitable_planet = yes }
-						set_variable = { which = sr_points value = 0 }
-						every_tile = {
-							limit = { has_any_tile_strategic_resource = yes }
-							prev = { change_variable = { which = sr_points value = -1 } }
-						}	
-						random_list = { 
-							45 = { change_variable = { which = sr_points value = 0 } }
-							30 = { change_variable = { which = sr_points value = 1 } }
-							12 = { change_variable = { which = sr_points value = 2 } }
-							7 = { change_variable = { which = sr_points value = 3 } }
-							4 = { change_variable = { which = sr_points value = 4 } }
-							2 = { change_variable = { which = sr_points value = 5 } }
-						}		
-						while = {
-							limit = { check_variable = { which = sr_points value > 0 } } 
-							if = {
-								limit = { 
-									any_tile = { 
-										has_deposit = no 
-										has_building = no 
-									}
-								}
-								random_tile = { 
-									limit = { 
-										has_deposit = no
-										has_building = no
-									}
-									cgm_pe_planetary_sr_spawn_table = yes						
-									prev = { change_variable = { which = sr_points value = -1 } }
-								}
-								else = { 
-									if = {
-										limit = { 
-											any_tile = { 
-												has_building = no 
-												has_regular_vanilla_deposit = yes
-											}
-										}
-										random_tile = { 
-											limit = { has_building = no }
-											cgm_pe_planetary_sr_spawn_table = yes
-											prev = { change_variable = { which = sr_points value = -1 } }
-										}
-										else = { 
-											if = { 
-												limit = { 
-													any_tile = { has_regular_vanilla_deposit = yes }
-												}	
-												random_tile = { 
-													limit = { has_regular_vanilla_deposit = yes }
-													cgm_pe_planetary_sr_spawn_table = yes
-													prev = { change_variable = { which = sr_points value = -1 } }
-												}	
-												else = { set_variable = { which = sr_points value = 0 } }
-											}
-										}	
-									}	
-								}								
-							}								
-						}					
-					}
-				}	
-			}	
+
 		}	
 	}	
 }
