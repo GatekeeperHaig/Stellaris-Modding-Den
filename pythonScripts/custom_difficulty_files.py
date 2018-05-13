@@ -1393,12 +1393,13 @@ def createEvent(self, id, name="country_event"):
   return self
 TagList.createEvent=createEvent
 
-def createReturnIf(self, limit):
+def createReturnIf(self, limit, addMethod="add"):
   if not isinstance(limit, TagList):
     print("Invalid use of createReturnIf")
     return 0
   ifLoc=TagList("limit", limit)
-  self.add("if", ifLoc)
+  getattr(self,addMethod)("if", ifLoc)
+  # self.add
   return ifLoc
 TagList.createReturnIf=createReturnIf
 

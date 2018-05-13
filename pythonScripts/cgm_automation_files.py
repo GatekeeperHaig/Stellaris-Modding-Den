@@ -763,11 +763,8 @@ def main():
   #     switch = {
   #       trigger = has_building
   buildingContent=TagList()
-  allVars=TagList()
   for buildingFile in glob.glob("../CGM/buildings_script_source/common/buildings/*.txt"):
-    buildingContent.readFile(buildingFile,0,allVars)
-  for varFile in glob.glob("../CGM/buildings_script_source/common/scripted_variables/*.txt"):
-    allVars.readFile(varFile)
+    buildingContent.readFile(buildingFile)
 
   for buildingName, building in buildingContent.getNameVal():
     if isinstance(building, TagList):
@@ -778,72 +775,7 @@ def main():
   upgradeEvent.createReturnIf(TagList("has_building_construction","yes")).add("break","yes")
 
 
-  # triggersAndEffects=TagList()
-  # for file in glob.glob("../CGM/buildings_script_source/common/scripted_triggers/*.txt")+glob.glob("../CGM/buildings_script_source/common/scripted_effects/*.txt"):
-  #   triggersAndEffects.readFile(file)
-  # buildingContentOrig=deepcopy(buildingContent)
-  # buildingContent.resolveStellarisLinks(triggersAndEffects)
-  # buildingContent.removeDuplicatesRec()
-  # # outputToFolderAndFile(buildingContent, "", "test.txt",2, ".")
-  # # return
-
-  # # buildingContent=TagList()
-  # # allVars=TagList()
-  # # for buildingFile in glob.glob("../NOTES/api files/cgm_api_files/alphamod/buildings/*.txt"):
-  # #   buildingContent.readFile(buildingFile,0,allVars)
-
-
-  # # buildingLists=dict()
-  # buildingLists=TagList()
-  # specialResourceTrigger=TagList()
-  # for i,(buildingName, building) in enumerate(buildingContent.getNameVal()):
-  #   if isinstance(building, TagList) and building.attemptGet("is_listed")!="no":
-  #     assigned=False
-  #     for potAllowName in ["potential","allow"]:
-  #       hasResourceTag=building.attemptGet(potAllowName).getAnywhereRequired("has_resource")
-  #       if hasResourceTag:
-  #         if not hasResourceTag.get("type") in resources:
-  #           triggerAND=specialResourceTrigger.addReturn("AND")
-  #           triggerAND.add("has_resource", hasResourceTag)
-  #           for tech in building.attemptGet("prerequisites").names:
-  #             triggerAND.add("owner", TagList("has_technology", tech))
-  #           triggerAND.addTagList(buildingContentOrig[i].get("potential"))
-  #           triggerAND.addTagList(buildingContentOrig[i].get("allow"))
-  #           addUniqueFirst("special_resource", buildingName, buildingLists, building)
-  #           break
-  #     if not assigned:
-  #       # if building.attemptGet("potential").getAnywhereRequired("has_resource") or building.attemptGet("allow").getAnywhereRequired("has_resource"):
-  #       assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars)
-  #       assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,"adjacency_bonus", "tile_building_resource_{}_add", "{}_adjacency")
-  #       assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,"planet_modifier", "static_planet_resource_{}_add")
-  #       if not assigned:
-  #         print("Building {} not assigned to any list".format(buildingName))
-  # buildingLists.removeDuplicatesRec()
-  # specialResourceTrigger.removeLayer("custom_tooltip",["fail_text", "success_text", "text"])
-  # specialResourceTrigger.removeLayer("tile")
-  # def condParent(tagList, i):
-  #   if tagList.names[i]=="OR":
-  #     return True
-  #   else:
-  #     return False
-  # def condChild(tagList, i):
-  #   if tagList.names[i]=="always" and tagList.vals[i]=="no":
-  #     return True
-  #   else:
-  #     return False
-  # specialResourceTrigger.twoConditionRemove(condParent,condChild)
-
-
-  # specialResourceTrigger.removeDuplicatesRec()
-  # specialResourceTrigger=TagList("special_resource_any_building_available", TagList("has_any_tile_strategic_resource", "yes").add("OR", specialResourceTrigger))
-  # # print(buildingLists)
-  # outputToFolderAndFile(specialResourceTrigger, "", "test3.txt",2, ".")
-  # # for key, item in buildingLists.items():
-  # #   print(key)
-  # #   print(item)
-  # return #TODO!!!!!!!!!
-
-
+  #return automatedCreationAutobuildAPI(buildingContent,resources)
 
 
 
@@ -906,11 +838,24 @@ def main():
       os.makedirs(outFolderLoc)
     locList.write(outFolderLoc+"/cgm_automization_l_"+language+".yml",language)
 def addUniqueFirst(key, element, dictList,building):
-  if building.attemptGet("planet_unique")=="yes" or building.attemptGet("empire_unique"):
-    dictList.getOrCreate(key).insert(0,element)
+  usedSubList=dictList.getOrCreate(key)
+  if building.attemptGet("planet_unique")=="yes" or building.attemptGet("empire_unique")=="yes":
+    if not hasattr(usedSubList, "countUnique"):
+      usedSubList.countUnique=0
+    usedSubList.insert(0,element) #0 is needed (unless I add another variable. don't add after countUnique!)
+    usedSubList.countUnique+=1
     # insertToDictList(key, element, dictList)
   else:
-    dictList.getOrCreate(key).add(element)
+    specialRequ=building.attemptGet("normal_resource_special_requirement").attemptGet("has_resource").attemptGet("type")
+    # print(specialRequ)
+    if len(specialRequ) and specialRequ in key:
+      # print("blub")
+      if not hasattr(usedSubList, "countUnique"):
+        usedSubList.countUnique=0
+      usedSubList.insert(usedSubList.countUnique,element)
+      usedSubList.countUnique+=1 #+1 to keep the order
+    else:
+      usedSubList.add(element)
     # addToDictList(key, element, dictList)
 
 def addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars, buildingTagName="produced_resources",subTag="{}", outName="{}" ):
@@ -935,6 +880,182 @@ def getVariableValueFromList(name, allVars):
     name=float(name)
   return name
 
+def uniquenessList(buildingContentOrig, type="planet_unique"):
+  planetUniqueLists=dict()
+  for buildingName, building in buildingContentOrig.getNameVal():
+    if isinstance(building, TagList) and not building.attemptGet("is_listed")=="no" and  building.attemptGet(type)=="yes" and not buildingName in planetUniqueLists:
+      upgrades=building.attemptGet("upgrades")
+      toParseList=[]
+      parsedList=[buildingName]
+      tagListOfMembers=TagList()
+      tagListOfMembers.add(buildingName)
+      planetUniqueLists[buildingName]=tagListOfMembers
+      for upgradeName in upgrades.names:
+        toParseList.append(upgradeName)
+      while len(toParseList)>0:
+        nextToParse=toParseList.pop(0)
+        if nextToParse in planetUniqueLists: #"exception" need to join branches. We write everything into the old one!
+          planetUniqueLists[nextToParse].addTagList(tagListOfMembers)
+          tagListOfMembers=planetUniqueLists[nextToParse]
+          for e in parsedList:
+            planetUniqueLists[e]=tagListOfMembers
+        else:
+          upgrade=buildingContentOrig.get(nextToParse)
+          print(nextToParse)
+          if upgrade.attemptGet("planet_unique")=="yes" or upgrade.attemptGet("empire_unique")=="yes":
+            tagListOfMembers.add(nextToParse)
+            upgrades=upgrade.attemptGet("upgrades")
+            for upgradeName in upgrades.names:
+              toParseList.append(upgradeName)
+        parsedList.append(nextToParse)
+  # for key, val in planetUniqueLists.items():
+    # print("KEY:"+key)
+    # print(val)
+  return planetUniqueLists
+
+def automatedCreationAutobuildAPI(buildingContent,resources):
+#AUTOMATED CREATION OF EFFECTS AND TRIGGERS USED FOR AUTOBUILD API (might be moved elsewhere later)
+  #possible todo: BUILDINGS: sort and mod load order and overwrite files accordingly!
+  allVars=TagList()
+  for buildingFile in glob.glob("../CGM/buildings_script_source/common/buildings/*.txt"):
+    buildingContent.readFile(buildingFile,0,allVars)
+  for varFile in glob.glob("../CGM/buildings_script_source/common/scripted_variables/*.txt"):
+    allVars.readFile(varFile)
+
+  upgradeEffect=TagList()
+  tileSwitch=upgradeEffect.addReturn("switch")
+  tileSwitch.add("trigger", "has_building")
+
+  for buildingName, building in buildingContent.getNameVal():
+    if isinstance(building, TagList):
+      upgrades=building.attemptGet("upgrades")
+      if len(upgrades)>0:
+        tileSwitch.add(buildingName, TagList("add_building_construction", upgrades.names[0]))
+
+  triggersAndEffects=TagList()
+  #possible todo: mod load order and overwrite files accordingly!
+  triggersFiles=glob.glob("../CGM/buildings_script_source/common/scripted_triggers/*.txt")#+glob.glob(...)
+  effectFiles=glob.glob("../CGM/buildings_script_source/common/scripted_effects/*.txt")#+glob.glob(...)
+  triggersFiles=list(reversed(sorted(triggersFiles, key=os.path.basename))) #earlier files in our list are prefered -> need to reverse order here
+  effectFiles=sorted(effectFiles, key=os.path.basename)
+
+  for file in triggersFiles+effectFiles:
+    triggersAndEffects.readFile(file)
+  buildingContentOrig=deepcopy(buildingContent)
+  buildingContent.resolveStellarisLinks(triggersAndEffects)
+  buildingContent.removeDuplicatesRec()
+  # outputToFolderAndFile(buildingContent, "", "test.txt",2, ".")
+  # return
+
+  # buildingContent=TagList()
+  # allVars=TagList()
+  # for buildingFile in glob.glob("../NOTES/api files/cgm_api_files/alphamod/buildings/*.txt"):
+  #   buildingContent.readFile(buildingFile,0,allVars)
+
+
+  planetUniqueDict=uniquenessList(buildingContentOrig)
+  # print("EMPIRE UNIQUE")
+  empireUniqueDict=uniquenessList(buildingContentOrig,"empire_unique")
+
+
+
+
+
+
+  # buildingLists=dict()
+  buildingLists=TagList()
+  specialResourceTrigger=TagList()
+  for i,(buildingName, building) in enumerate(buildingContent.getNameVal()):
+    if isinstance(building, TagList) and building.attemptGet("is_listed")!="no":
+      assigned=False
+      for potAllowName in ["potential","allow"]:
+        hasResourceTag=building.attemptGet(potAllowName).getAnywhereRequired("has_resource")
+        if hasResourceTag:
+          if not hasResourceTag.get("type") in resources:
+            triggerAND=specialResourceTrigger.addReturn("AND")
+            triggerAND.add("has_resource", hasResourceTag)
+            for tech in building.attemptGet("prerequisites").names:
+              triggerAND.add("owner", TagList("has_technology", tech))
+            triggerAND.addTagList(buildingContentOrig[i].attemptGet("potential"))
+            triggerAND.addTagList(buildingContentOrig[i].attemptGet("allow"))
+            addUniqueFirst("special_resource", buildingName, buildingLists, building)
+            assigned=True
+            break
+          else:
+            building.getOrCreate("normal_resource_special_requirement").add("has_resource", hasResourceTag)
+            # print(building)
+      if not assigned:
+        # if building.attemptGet("potential").getAnywhereRequired("has_resource") or building.attemptGet("allow").getAnywhereRequired("has_resource"):
+        assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars)
+        assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,"adjacency_bonus", "tile_building_resource_{}_add", "{}_adjacency")
+        assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,"planet_modifier", "static_planet_resource_{}_add")
+        if not assigned:
+          print("Building {} not assigned to any list".format(buildingName))
+  buildingLists.removeDuplicatesRec()
+  specialResourceTrigger.removeLayer("custom_tooltip",["fail_text", "success_text", "text"])
+  specialResourceTrigger.removeLayer("tile")
+  def condParent(tagList, i):
+    if tagList.names[i]=="OR":
+      return True
+    else:
+      return False
+  def condChild(tagList, i):
+    if tagList.names[i]=="always" and tagList.vals[i]=="no":
+      return True
+    else:
+      return False
+  specialResourceTrigger.twoConditionRemove(condParent,condChild)
+
+
+  specialResourceTrigger.removeDuplicatesRec()
+  specialResourceTrigger=TagList("special_resource_any_building_available", TagList("has_any_tile_strategic_resource", "yes").add("OR", specialResourceTrigger))
+  # print(buildingLists)
+  outputToFolderAndFile(specialResourceTrigger, "testOut", "special_resource_trigger.txt",2, ".")
+
+  automationEffects=TagList()
+  adjacencyTriggers=TagList()
+  for typeName, typeContent in buildingLists.getNameVal():
+    typeEffect=automationEffects.addReturn(typeName+"_create_building")
+    if "adjacency" in typeName:
+      adjacencyTrigger=adjacencyTriggers.addReturn(typeName+"_any_building_available").addReturn("OR")
+    for buildingName in typeContent.names:
+      building=buildingContent.get(buildingName)
+      neededPlanetFlag=building.get("ai_allow").getAnywhereRequired("has_planet_flag")
+      if neededPlanetFlag!=None:
+        typeEffect.createReturnIf(TagList("has_planet_flag", neededPlanetFlag), "addFront").add("add_building_construction", buildingName)
+      else:
+        typeEffect.add("add_building_construction", buildingName)
+      if "adjacency" in typeName:
+        localTrigger=adjacencyTrigger.addReturn("AND")
+        for tech in building.attemptGet("prerequisites").names:
+          localTrigger.add("owner", TagList("has_technology", tech))
+        pot=buildingContentOrig[buildingContentOrig.names.index(buildingName)].attemptGet("potential")
+        if len(pot):
+          localTrigger.add("prev",pot )
+        pot=buildingContentOrig[buildingContentOrig.names.index(buildingName)].attemptGet("allow")
+        if len(pot):
+          localTrigger.add("prev",pot )
+        if building.attemptGet("planet_unique")=="yes":
+          locNor=localTrigger.addReturn("NOR")
+          for b in planetUniqueDict[buildingName].names:
+            locNor.add("has_building", b)
+        if building.attemptGet("empire_unique")=="yes":
+          locOr=localTrigger.addReturn("NOT").addReturn("owner").addReturn("any_owned_planet").addReturn("OR")
+          for b in empireUniqueDict[buildingName].names:
+            locOr.add("has_building", b)
+
+
+    typeEffect.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building",yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
+  outputToFolderAndFile(automationEffects, "testOut", "automation_effects.txt",2, ".")
+  outputToFolderAndFile(adjacencyTriggers, "testOut", "adjacency_triggers.txt",2, ".")
+  outputToFolderAndFile(upgradeEffect, "testOut", "upgrade_effects.txt",2, ".")
+
+  # for key, item in buildingLists.items():
+  #   print(key)
+  #   print(item)
+  return #TODO!!!!!!!!!
+
+  #END OF AUTOMATED CREATION OF EFFECTS AND TRIGGERS USED FOR AUTOBUILD API (might be moved elsewhere later)
 
 if __name__ == "__main__":
   main()
