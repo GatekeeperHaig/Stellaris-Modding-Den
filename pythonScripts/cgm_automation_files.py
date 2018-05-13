@@ -19,6 +19,8 @@ import glob
 #todo:we need to add a special effect for AI, which optimizes capitals #remove them on placement and instant create them anew 
 eventNameSpace="cgm_auto.{!s}"
 nameBase="cgm_auto_{!s}"
+resources=["energy", "minerals", "food","unity", "society_research", "physics_research", "engineering_research"]
+# resourcesShort=["energy", "minerals", "food","unity", "society", "physics", "engineering"]
 def main():
 
   debug=False
@@ -28,7 +30,6 @@ def main():
   weightTypes=["energy", "minerals", "food", "society_research", "physics_research", "engineering_research"] #not same as resources, see below!
   for weight in deepcopy(weightTypes):
     weightTypes.append(weight+"_adjacency")
-  resources=["energy", "minerals", "food","unity", "society_research", "physics_research", "engineering_research"]
   inverseFactorComparedToMinerals=[4,1,8,4,4,4,4]
   exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_power_hub_1","building_power_hub_1","building_power_hub_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
   varsToMove=["Weight","Tile","Type"]
@@ -750,32 +751,19 @@ def main():
   everyPop=upgradeEvent.addReturn("every_owned_pop")
   everyPop.add("limit",  TagList("OR", TagList("is_colony_pop", "yes").add("is_growing", "yes")).add("OR", TagList("is_being_purged", "no").add("has_purge_type", TagList("type", "purge_labor_camps"))))
   tileSwitch=everyPop.addReturn("tile")
-  tileSwitch=tileSwitch.addReturn("switch")
-  tileSwitch.add("trigger", "has_building")
 
-
-
-  # everyTile.add(name)
-
-
-  # every_tile = {
-  #     limit = { autobuild_trigger_tile_has_pop = yes }
-  #     switch = {
-  #       trigger = has_building
   buildingContent=TagList()
   for buildingFile in glob.glob("../CGM/buildings_script_source/common/buildings/*.txt"):
     buildingContent.readFile(buildingFile)
 
-  for buildingName, building in buildingContent.getNameVal():
-    if isinstance(building, TagList):
-      upgrades=building.attemptGet("upgrades")
-      if len(upgrades)>0:
-        tileSwitch.add(buildingName, TagList("add_building_construction", upgrades.names[0]))
+  createUpgradeSwitch(buildingContent, tileSwitch)
+
   everyPop.createReturnIf(TagList("tile", TagList("has_building_construction","yes"))).add("owner", TagList("set_country_flag", "cgm_auto_built")).add("break","yes")
   upgradeEvent.createReturnIf(TagList("has_building_construction","yes")).add("break","yes")
 
 
-  #return automatedCreationAutobuildAPI(buildingContent,resources)
+  #return automatedCreationAutobuildAPI(resources)
+  # return automatedCreationAutobuildAPI(resources,"alphamod",["../NOTES/api files/cgm_api_files/alphamod/"]) #TODO!!!
 
 
 
@@ -901,7 +889,7 @@ def uniquenessList(buildingContentOrig, type="planet_unique"):
             planetUniqueLists[e]=tagListOfMembers
         else:
           upgrade=buildingContentOrig.get(nextToParse)
-          print(nextToParse)
+          # print(nextToParse)
           if upgrade.attemptGet("planet_unique")=="yes" or upgrade.attemptGet("empire_unique")=="yes":
             tagListOfMembers.add(nextToParse)
             upgrades=upgrade.attemptGet("upgrades")
@@ -913,38 +901,159 @@ def uniquenessList(buildingContentOrig, type="planet_unique"):
     # print(val)
   return planetUniqueLists
 
-def automatedCreationAutobuildAPI(buildingContent,resources):
-#AUTOMATED CREATION OF EFFECTS AND TRIGGERS USED FOR AUTOBUILD API (might be moved elsewhere later)
-  #possible todo: BUILDINGS: sort and mod load order and overwrite files accordingly!
-  allVars=TagList()
-  for buildingFile in glob.glob("../CGM/buildings_script_source/common/buildings/*.txt"):
-    buildingContent.readFile(buildingFile,0,allVars)
-  for varFile in glob.glob("../CGM/buildings_script_source/common/scripted_variables/*.txt"):
-    allVars.readFile(varFile)
-
-  upgradeEffect=TagList()
-  tileSwitch=upgradeEffect.addReturn("switch")
+def createUpgradeSwitch(buildingContent, tagList):
+  tileSwitch=tagList.addReturn("switch")
   tileSwitch.add("trigger", "has_building")
 
   for buildingName, building in buildingContent.getNameVal():
-    if isinstance(building, TagList):
+    if isinstance(building, TagList) and not hasattr(building, "helper"):
+      # if hasattr(building, "helper"):
+        # print(building.helper)
       upgrades=building.attemptGet("upgrades")
       if len(upgrades)>0:
-        tileSwitch.add(buildingName, TagList("add_building_construction", upgrades.names[0]))
+        buildingFound=tileSwitch.addReturn(buildingName)
+        if len(upgrades)==1:
+          buildingFound.add("add_building_construction", upgrades.names[0])
+        else:
+          # for resource in resourcesShort:
+          #   for upgrade in upgrades:
+          #     if resource in upgrade:
+          #       print(resource)
+          #       print(upgrade)
+          buildingFound.addComment("First a random list, then all possible ones -> fail safe if the one chosen in the random list is invalid")
+          randomList=buildingFound.addReturn("random_list")
+          for upgrade in upgrades.names:
+            randomList.add(str(round(100/len(upgrades))), TagList("add_building_construction", upgrade))
+            buildingFound.add("add_building_construction", upgrade)
 
-  triggersAndEffects=TagList()
-  #possible todo: mod load order and overwrite files accordingly!
-  triggersFiles=glob.glob("../CGM/buildings_script_source/common/scripted_triggers/*.txt")#+glob.glob(...)
-  effectFiles=glob.glob("../CGM/buildings_script_source/common/scripted_effects/*.txt")#+glob.glob(...)
-  triggersFiles=list(reversed(sorted(triggersFiles, key=os.path.basename))) #earlier files in our list are prefered -> need to reverse order here
-  effectFiles=sorted(effectFiles, key=os.path.basename)
+def makeUnique(seq, idfun=None): 
+   # order preserving
+   if idfun is None:
+       def idfun(x): return x
+   seen = {}
+   result = []
+   for item in seq:
+       marker = idfun(item)
+       if marker in seen: continue
+       seen[marker] = 1
+       result.append(item)
+   return result
 
-  for file in triggersFiles+effectFiles:
-    triggersAndEffects.readFile(file)
+def priorityFileCheck(fileLists,reverse=False): #earlier -> higher prio
+  fileLists=list(map(lambda x: makeUnique(x, os.path.basename),fileLists))
+  allLists=list(reduce(lambda x,y:x+y,fileLists))
+  allLists=makeUnique(allLists, os.path.basename)
+  fileLists=list(map(lambda x: list(filter(lambda y: y in allLists,x)),fileLists)) #remove stuff that has been removed from allLists when making it unique
+  fileLists=list(map(lambda x: sorted(x),fileLists))
+  if reverse:
+    fileLists=list(map(lambda x: list(reversed(x)),fileLists))
+
+  return fileLists,allLists
+
+
+
+def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolders=[], addedFoldersPriority=[]): #if multiple are added  in one category, earlier is higher priority
+#AUTOMATED CREATION OF EFFECTS AND TRIGGERS USED FOR AUTOBUILD API
+  buildingFilesCGM=glob.glob("../CGM/buildings_script_source/common/buildings/*.txt")
+  buildingFilesAdded=[]
+  for folder in addedFolders:
+    buildingFilesAdded+=glob.glob(folder+"/buildings/*txt")
+    # print(folder+"/buildings/*txt")
+  buildingFilesPriority=[]
+  for folder in addedFoldersPriority:
+    buildingFilesPriority+=glob.glob(folder+"/buildings/*txt")
+  # print(buildingFilesAdded)
+  # return
+
+  triggerFilesCGM=glob.glob("../CGM/buildings_script_source/common/scripted_triggers/*.txt")
+  triggerFilesAdded=[]
+  for folder in addedFolders:
+    triggerFilesAdded+=glob.glob(folder+"/scripted_triggers/*txt")
+  triggerFilesPriority=[]
+  for folder in addedFoldersPriority:
+    triggerFilesPriority+=glob.glob(folder+"/scripted_triggers/*txt")
+
+  effectFilesCGM=glob.glob("../CGM/buildings_script_source/common/scripted_effects/*.txt")
+  effectFilesAdded=[]
+  for folder in addedFolders:
+    effectFilesAdded+=glob.glob(folder+"/scripted_effects/*txt")
+  effectFilesPriority=[]
+  for folder in addedFoldersPriority:
+    effectFilesPriority+=glob.glob(folder+"/scripted_effects/*txt")
+
+  variableFilesCGM=glob.glob("../CGM/buildings_script_source/common/scripted_variables/*.txt")
+  variableFilesAdded=[]
+  for folder in addedFolders:
+    variableFilesAdded+=glob.glob(folder+"/scripted_variables/*txt")
+  variableFilesPriority=[]
+  for folder in addedFoldersPriority:
+    variableFilesPriority+=glob.glob(folder+"/scripted_variables/*txt")
+
+  (buildingFilesPriority,buildingFilesCGM,buildingFilesAdded),buildingAllFiles=priorityFileCheck([buildingFilesPriority,buildingFilesCGM,buildingFilesAdded],True)
+  (triggerFilesPriority,triggerFilesCGM,triggerFilesAdded),triggerAllFiles=priorityFileCheck([triggerFilesPriority,triggerFilesCGM,triggerFilesAdded],True)
+  (effectFilesPriority,effectFilesCGM,effectFilesAdded),effectAllFiles=priorityFileCheck([effectFilesPriority,effectFilesCGM,effectFilesAdded],False)
+  (variableFilesPriority,variableFilesCGM,variableFilesAdded),variableAllFiles=priorityFileCheck([variableFilesPriority,variableFilesCGM,variableFilesAdded],True) #no idea of reversed is correct...
+
+  # buildingFilesAdded=makeUnique(buildingFilesAdded, os.path.basename)
+  # buildingFilesPriority=makeUnique(buildingFilesPriority, os.path.basename)
+  # allBuildingsFiles=buildingFilesPriority+buildingFilesCGM+buildingFilesAdded
+  # allBuildingsFiles=makeUnique(allBuildingsFiles, os.path.basename)
+  # buildingFilesCGM=list(filter(lambda x: x in allBuildingsFiles,buildingFilesCGM))
+  # buildingFilesAdded=list(filter(lambda x: x in allBuildingsFiles,buildingFilesAdded))
+
+  # with open("test.txt", "w") as file:
+  #   file.write(str(buildingFilesAdded))
+  #   file.write("\n")
+  #   # file.write(str(allBuildingsFiles))
+  #   file.write("\n")
+  #   file.write(str(buildingFilesCGM))
+    # buildingFilesAdded=makeUnique(buildingFilesAdded, os.path.basename)
+    # buildingFilesPriority=makeUnique(buildingFilesAdded, os.path.basename)
+    # print(buildingFilesAdded)
+    # file.write(str(buildingFilesAdded))
+
+
+
+  buildingContent=TagList()
+  allVars=TagList()
+  for buildingFile in buildingFilesPriority:
+    buildingContent.readFile(buildingFile,0,allVars)
+
+  #mark cgm_buildings stuff as helper unless we are parsing only cgm_buildings
+  prevLen=len(buildingContent.vals)
+  for buildingFile in buildingFilesCGM:
+    buildingContent.readFile(buildingFile,0,allVars)
+  if modName!="cgm_buildings":
+    for b in buildingContent[prevLen:]:
+      if isinstance(b,TagList):
+        b.helper=True
+
+  for buildingFile in buildingFilesAdded:
+    buildingContent.readFile(buildingFile,0,allVars)
+
+  buildingContent.removeDuplicateNames()
+
+
+  for varFile in variableAllFiles:
+  # for varFile in glob.glob("../CGM/buildings_script_source/common/scripted_variables/*.txt"):
+    allVars.readFile(varFile)
+
+  upgradeEffect=TagList()
+  createUpgradeSwitch(buildingContent, upgradeEffect)
+  
+
+  allTriggers=TagList()
+  # triggersFiles=glob.glob("../CGM/buildings_script_source/common/scripted_triggers/*.txt")#+glob.glob(...)
+  # effectFiles=glob.glob("../CGM/buildings_script_source/common/scripted_effects/*.txt")#+glob.glob(...)
+  # triggersFiles=list(reversed(sorted(triggersFiles, key=os.path.basename))) #earlier files in our list are prefered -> need to reverse order here
+  # effectFiles=sorted(effectFiles, key=os.path.basename)
+
+  for file in triggerAllFiles:
+    allTriggers.readFile(file)
   buildingContentOrig=deepcopy(buildingContent)
-  buildingContent.resolveStellarisLinks(triggersAndEffects)
+  buildingContent.resolveStellarisLinks(allTriggers)
   buildingContent.removeDuplicatesRec()
-  # outputToFolderAndFile(buildingContent, "", "test.txt",2, ".")
+  # outputToFolderAndFile(allTriggers, "", "test.txt",2, ".")
   # return
 
   # buildingContent=TagList()
@@ -966,7 +1075,7 @@ def automatedCreationAutobuildAPI(buildingContent,resources):
   buildingLists=TagList()
   specialResourceTrigger=TagList()
   for i,(buildingName, building) in enumerate(buildingContent.getNameVal()):
-    if isinstance(building, TagList) and building.attemptGet("is_listed")!="no":
+    if isinstance(building, TagList) and building.attemptGet("is_listed")!="no" and not hasattr(building, "helper"):
       assigned=False
       for potAllowName in ["potential","allow"]:
         hasResourceTag=building.attemptGet(potAllowName).getAnywhereRequired("has_resource")
@@ -1010,7 +1119,7 @@ def automatedCreationAutobuildAPI(buildingContent,resources):
   specialResourceTrigger.removeDuplicatesRec()
   specialResourceTrigger=TagList("special_resource_any_building_available", TagList("has_any_tile_strategic_resource", "yes").add("OR", specialResourceTrigger))
   # print(buildingLists)
-  outputToFolderAndFile(specialResourceTrigger, "testOut", "special_resource_trigger.txt",2, ".")
+  outputToFolderAndFile(specialResourceTrigger, modName, "special_resource_trigger.txt",2, ".")
 
   automationEffects=TagList()
   adjacencyTriggers=TagList()
@@ -1020,7 +1129,7 @@ def automatedCreationAutobuildAPI(buildingContent,resources):
       adjacencyTrigger=adjacencyTriggers.addReturn(typeName+"_any_building_available").addReturn("OR")
     for buildingName in typeContent.names:
       building=buildingContent.get(buildingName)
-      neededPlanetFlag=building.get("ai_allow").getAnywhereRequired("has_planet_flag")
+      neededPlanetFlag=building.attemptGet("ai_allow").getAnywhereRequired("has_planet_flag")
       if neededPlanetFlag!=None:
         typeEffect.createReturnIf(TagList("has_planet_flag", neededPlanetFlag), "addFront").add("add_building_construction", buildingName)
       else:
@@ -1046,14 +1155,14 @@ def automatedCreationAutobuildAPI(buildingContent,resources):
 
 
     typeEffect.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building",yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
-  outputToFolderAndFile(automationEffects, "testOut", "automation_effects.txt",2, ".")
-  outputToFolderAndFile(adjacencyTriggers, "testOut", "adjacency_triggers.txt",2, ".")
-  outputToFolderAndFile(upgradeEffect, "testOut", "upgrade_effects.txt",2, ".")
+  outputToFolderAndFile(automationEffects, modName, "automation_effects.txt",2, ".")
+  outputToFolderAndFile(adjacencyTriggers, modName, "adjacency_triggers.txt",2, ".")
+  outputToFolderAndFile(upgradeEffect, modName, "upgrade_effects.txt",2, ".")
 
   # for key, item in buildingLists.items():
   #   print(key)
   #   print(item)
-  return #TODO!!!!!!!!!
+  # return
 
   #END OF AUTOMATED CREATION OF EFFECTS AND TRIGGERS USED FOR AUTOBUILD API (might be moved elsewhere later)
 
