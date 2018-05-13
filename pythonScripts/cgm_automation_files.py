@@ -962,6 +962,9 @@ def priorityFileCheck(fileLists,reverse=False): #earlier -> higher prio
 
 def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolders=[], addedFoldersPriority=[]): #if multiple are added  in one category, earlier is higher priority
 #AUTOMATED CREATION OF EFFECTS AND TRIGGERS USED FOR AUTOBUILD API
+  additionString=""
+  if modName!="cgm_buildings":
+    additionString="_"+modName
   buildingFilesCGM=glob.glob("../CGM/buildings_script_source/common/buildings/*.txt")
   buildingFilesAdded=[]
   for folder in addedFolders:
@@ -1020,36 +1023,6 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
     # print(buildingFilesAdded)
     # file.write(str(buildingFilesAdded))
 
-
-  mainTriggerFileContent=TagList()
-  autobuildCompTrigger=TagList()
-  if modName!="cgm_buildings":
-    autobuildCompTrigger.readFile("../CGM/buildings_script_source/common/scripted_triggers/00000_cgm_auto_compatibilty_triggers.txt")
-  mainTriggerFileContent.readFile("../CGM/buildings_script_source/common/scripted_triggers/cgm_automations_triggers.txt")
-  for resource in resources:
-    if resource!="unity":
-      trigger=mainTriggerFileContent.get(resource+"_any_building_available")
-      if modName=="cgm_buildings":
-        if resource+"_any_building_available_API" not in trigger.names:
-          trigger.add(resource+"_any_building_available_API",yes)
-        autobuildCompTrigger.add(resource+"_any_building_available_API", TagList())
-
-
-      trigger=mainTriggerFileContent.get(resource+"_adjacency_any_building_available")
-      if modName=="cgm_buildings":  
-        if not "or" in trigger.names and not "OR" in trigger.names:
-          trigger.add("OR", TagList("always", "no"))
-      else:
-        triggerOR=trigger.get("OR")
-        if "always" in triggerOR.names:
-          triggerOR.remove("always")
-        if not resource+"_adjacency_any_building_available_"+modName in triggerOR.names:
-          triggerOR.add(resource+"_adjacency_any_building_available_"+modName, yes) #TODO! Only add when needed!!
-        if not resource+"_adjacency_any_building_available_"+modName in autobuildCompTrigger.names:
-          autobuildCompTrigger.add(resource+"_adjacency_any_building_available_"+modName,TagList("always", "no"))
-
-  outputToFolderAndFile(mainTriggerFileContent, "common/scripted_triggers/", "cgm_automations_triggers.txt",2, "../CGM/buildings_script_source",False)
-  outputToFolderAndFile(autobuildCompTrigger, "common/scripted_triggers/", "00000_cgm_auto_compatibilty_triggers.txt",2, "../CGM/buildings_script_source")
 
   buildingContent=TagList()
   allVars=TagList()
@@ -1154,16 +1127,16 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
 
 
   specialResourceTrigger.removeDuplicatesRec()
-  specialResourceTrigger=TagList("special_resource_any_building_available", TagList("has_any_tile_strategic_resource", "yes").add("OR", specialResourceTrigger))
+  specialResourceTrigger=TagList("special_resource_any_building_available"+additionString, TagList("OR", specialResourceTrigger))
   # print(buildingLists)
   outputToFolderAndFile(specialResourceTrigger, modName, "special_resource_trigger.txt",2, ".")
 
   automationEffects=TagList()
   adjacencyTriggers=TagList()
   for typeName, typeContent in buildingLists.getNameVal():
-    typeEffect=automationEffects.addReturn("add_"+typeName+"_building")
+    typeEffect=automationEffects.addReturn("add_"+typeName+"_building"+additionString)
     if "adjacency" in typeName:
-      adjacencyTrigger=adjacencyTriggers.addReturn(typeName+"_any_building_available").addReturn("OR")
+      adjacencyTrigger=adjacencyTriggers.addReturn(typeName+"_any_building_available"+additionString).addReturn("OR")
     for buildingName in typeContent.names:
       building=buildingContent.get(buildingName)
       neededPlanetFlag=building.attemptGet("ai_allow").getAnywhereRequired("has_planet_flag")
@@ -1189,9 +1162,41 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
           locOr=localTrigger.addReturn("NOT").addReturn("owner").addReturn("any_owned_planet").addReturn("OR")
           for b in empireUniqueDict[buildingName].names:
             locOr.add("has_building", b)
-
-
     typeEffect.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building",yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
+
+
+  mainTriggerFileContent=TagList()
+  autobuildCompTrigger=TagList()
+  if modName!="cgm_buildings":
+    autobuildCompTrigger.readFile("../CGM/buildings_script_source/common/scripted_triggers/00000_cgm_auto_compatibilty_triggers.txt")
+  mainTriggerFileContent.readFile("../CGM/buildings_script_source/common/scripted_triggers/cgm_automations_triggers.txt")
+  for resource in resources:
+    if resource!="unity":
+      trigger=mainTriggerFileContent.get(resource+"_any_building_available")
+      if modName=="cgm_buildings":
+        if resource+"_any_building_available_API" not in trigger.names:
+          trigger.add(resource+"_any_building_available_API",yes)
+        autobuildCompTrigger.add(resource+"_any_building_available_API", TagList())
+
+      #ADJACENCY
+      trigger=mainTriggerFileContent.get(resource+"_adjacency_any_building_available")
+      if modName=="cgm_buildings":  
+        if not "or" in trigger.names and not "OR" in trigger.names:
+          trigger.add("OR", TagList("always", "no"))
+      else:
+        adjName=resource+"_adjacency_any_building_available_"+modName
+        if adjName in adjacencyTriggers.names:
+          triggerOR=trigger.get("OR")
+          if "always" in triggerOR.names:
+            triggerOR.remove("always")
+          if not adjName in triggerOR.names:
+            triggerOR.add(adjName, yes)
+          if not adjName in autobuildCompTrigger.names:
+            autobuildCompTrigger.add(adjName,TagList("always", "no"))
+
+  outputToFolderAndFile(mainTriggerFileContent, "common/scripted_triggers/", "cgm_automations_triggers.txt",2, "../CGM/buildings_script_source",False)
+  outputToFolderAndFile(autobuildCompTrigger, "common/scripted_triggers/", "00000_cgm_auto_compatibilty_triggers.txt",2, "../CGM/buildings_script_source", False)
+
   outputToFolderAndFile(automationEffects, modName, "automation_effects.txt",2, ".")
   outputToFolderAndFile(adjacencyTriggers, modName, "adjacency_triggers.txt",2, ".")
   outputToFolderAndFile(upgradeEffect, modName, "upgrade_effects.txt",2, ".")
