@@ -681,21 +681,94 @@ add_engineering_research_building = {
 }	
 
 add_special_resource_building = {
-	add_building_construction = betharian_power_plant
-	add_building_construction = building_xeno_zoo
-	add_building_construction = building_animal_evaluation_laboratory
-	add_building_construction = building_energy_matter_converter_1_1
-	add_building_construction = building_energy_matter_converter_1_2
-	add_building_construction = building_energy_matter_converter_1_3
-	add_building_construction = building_energy_conduit_1_1
-	add_building_construction = building_energy_conduit_1_2
-	add_building_construction = building_energy_conduit_1_3
-	add_building_construction = building_food_replicator_1_1
-	add_building_construction = building_food_replicator_1_2
-	add_building_construction = building_food_replicator_1_3
-	add_building_construction = building_computational_array_1_1
-	add_building_construction = building_computational_array_1_2
-	add_building_construction = building_computational_array_1_3
+	if = {
+		limit = { has_resource = { type = sr_megastructure_node amount > 0 } }
+		prev = {
+		set_variable = { which = energy_adjacency_weight value = 0 }
+		}
+		check_energy_adjacency = yes
+		prev = {
+			set_variable = { which = minerals_adjacency_weight value = 0 }
+		}
+		check_minerals_adjacency = yes
+		prev = {
+			set_variable = { which = food_adjacency_weight value = 0 }
+		}
+		check_food_adjacency = yes
+		prev = {
+			set_variable = { which = society_research_adjacency_weight value = 0 }
+		}
+		check_society_research_adjacency = yes
+		prev = {
+			set_variable = { which = physics_research_adjacency_weight value = 0 }
+		}
+		check_physics_research_adjacency = yes
+		prev = {
+			set_variable = { which = engineering_research_adjacency_weight value = 0 }
+		}
+		check_engineering_research_adjacency = yes
+		prev = {
+			multiply_variable = { which = energy_adjacency_weight value = energy_mult_planet }
+			multiply_variable = { which = minerals_adjacency_weight value = minerals_mult_planet }
+			multiply_variable = { which = food_adjacency_weight value = food_mult_planet }
+			multiply_variable = { which = society_research_adjacency_weight value = society_research_mult_planet }
+			multiply_variable = { which = physics_research_adjacency_weight value = physics_research_mult_planet }
+			multiply_variable = { which = engineering_research_adjacency_weight value = engineering_research_mult_planet }
+		}
+		if = {
+			limit = {
+				prev = {
+					check_variable = { which = energy_adjacency_weight value > minerals_adjacency_weight }
+					check_variable = { which = energy_adjacency_weight value > food_adjacency_weight }
+					check_variable = { which = energy_adjacency_weight value > society_research_adjacency_weight }
+					check_variable = { which = energy_adjacency_weight value > physics_research_adjacency_weight }
+					check_variable = { which = energy_adjacency_weight value > engineering_research_adjacency_weight }
+				}
+			}
+			add_building_construction = building_energy_conduit_1_1
+			add_building_construction = building_energy_conduit_1_2
+			add_building_construction = building_energy_conduit_1_3
+			else = {
+				if = {
+					limit = {
+						prev = {
+							check_variable = { which = minerals_adjacency_weight value > food_adjacency_weight }
+							check_variable = { which = minerals_adjacency_weight value > society_research_adjacency_weight }
+							check_variable = { which = minerals_adjacency_weight value > physics_research_adjacency_weight }
+							check_variable = { which = minerals_adjacency_weight value > engineering_research_adjacency_weight }
+						}
+					}
+					add_building_construction = building_energy_matter_converter_1_1
+					add_building_construction = building_energy_matter_converter_1_2
+					add_building_construction = building_energy_matter_converter_1_3
+					else = {
+						if = {
+							limit = {
+								prev = {
+									check_variable = { which = food_adjacency_weight value > society_research_adjacency_weight }
+									check_variable = { which = food_adjacency_weight value > physics_research_adjacency_weight }
+									check_variable = { which = food_adjacency_weight value > engineering_research_adjacency_weight }
+								}
+							}
+							add_building_construction = building_food_replicator_1_1
+							add_building_construction = building_food_replicator_1_2
+							add_building_construction = building_food_replicator_1_3
+							else = {
+								add_building_construction = building_computational_array_1_1
+								add_building_construction = building_computational_array_1_2
+								add_building_construction = building_computational_array_1_3
+							}
+						}
+					}
+				}
+			}
+		}
+		else = {
+			add_building_construction = betharian_power_plant
+			add_building_construction = building_xeno_zoo
+			add_building_construction = building_animal_evaluation_laboratory
+		}
+	}
 	if = {
 		limit = {
 			OR = { has_building_construction = yes has_building = yes }

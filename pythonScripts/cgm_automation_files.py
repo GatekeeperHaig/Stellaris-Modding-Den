@@ -1166,5 +1166,34 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
 
   #END OF AUTOMATED CREATION OF EFFECTS AND TRIGGERS USED FOR AUTOBUILD API (might be moved elsewhere later)
 
+def createEffectDecisionStuff(modName="cgm_buildings"):
+  outTag=TagList()
+  curTag=outTag
+  buildingsDict=dict()
+  buildingsDict["energy"]="building_energy_conduit_1_"
+  buildingsDict["minerals"]="building_energy_matter_converter_1_"
+  buildingsDict["food"]="building_food_replicator_1_"
+  buildingsDict["society_research"]="building_computational_array_1_"
+  buildingsDict["physics_research"]="building_computational_array_1_"
+  buildingsDict["engineering_research"]="building_computational_array_1_"
+  for i,resource in enumerate(resources):
+    if resource=="unity":
+      continue
+    cond=TagList()
+    prev=cond.addReturn("prev")
+    for resource2 in resources[i+1:]:
+      if resource2=="unity":
+        continue
+      prev.variableOp("check", resource+"_adjacency_weight", resource2+"_adjacency_weight", ">")
+    if len(prev)<2:
+      break
+    if len(prev)>2:
+      curTag=curTag.createReturnIf(cond)
+    for j in range(1,4):
+      curTag.add("add_building_construction", buildingsDict[resource]+str(j))
+    curTag=curTag.addReturn("else")
+  outputToFolderAndFile(outTag, modName, "megastructure_node_stuff.txt",2, ".")
+
+
 if __name__ == "__main__":
   main()
