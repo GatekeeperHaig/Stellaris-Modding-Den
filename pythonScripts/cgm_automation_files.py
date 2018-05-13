@@ -1124,7 +1124,7 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
   automationEffects=TagList()
   adjacencyTriggers=TagList()
   for typeName, typeContent in buildingLists.getNameVal():
-    typeEffect=automationEffects.addReturn(typeName+"_create_building")
+    typeEffect=automationEffects.addReturn("add_"+typeName+"_building")
     if "adjacency" in typeName:
       adjacencyTrigger=adjacencyTriggers.addReturn(typeName+"_any_building_available").addReturn("OR")
     for buildingName in typeContent.names:
