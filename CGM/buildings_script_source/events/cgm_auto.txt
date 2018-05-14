@@ -1051,6 +1051,7 @@ country_event = {
 							check_variable = { which = cgm_months_to_starvation value < 2 }
 						}
 						change_variable = { which = food_country_weight value = 100 }
+						set_variable = { which = food_country_weight_TILE value = food_country_weight }
 						else = {
 							set_variable = { which = cgm_tmp value = 100 }
 							divide_variable = { which = cgm_tmp value = cgm_months_to_starvation }
@@ -1096,31 +1097,37 @@ country_event = {
 						set_variable = { which = food_country_weight value = 2 }
 					}
 					 #check if the food is really needed: If there are few growing planets, we reduce the amount! _TILE remains unchanged as food on tile can be used for energy
-					set_variable = { which = food_country_weight_TILE value = food_country_weight }
-					set_variable = { which = cgm_max_useful_food value = 0 }
-					every_owned_planet = {
-						limit = { has_growing_pop = yes }
-						prev = {
-							change_variable = { which = cgm_max_useful_food value = 100 }
-						}
-					}
 					if = {
-						limit = {
-							check_variable = { which = food_income value > cgm_max_useful_food }
-						}
-						set_variable = { which = food_country_weight value = 0 }
+						limit = { is_food_delimited = yes }
+						set_variable = { which = food_country_weight_TILE value = energy_country_weight }
 						else = {
-							divide_variable = { which = cgm_max_useful_food value = 2 }
+							set_variable = { which = food_country_weight_TILE value = food_country_weight }
+							set_variable = { which = cgm_max_useful_food value = 0 }
+							every_owned_planet = {
+								limit = { has_growing_pop = yes }
+								prev = {
+									change_variable = { which = cgm_max_useful_food value = 100 }
+								}
+							}
 							if = {
 								limit = {
 									check_variable = { which = food_income value > cgm_max_useful_food }
 								}
-								 #Reduction as soon as we have more than half the limit: *1 for half the limit. *0.5 for 3/4 the limit. *0 for limit. Linear interpolation in between. 2*(1-x) Where x is income/max_required. '*-1' instead of '*-2' as we divided the nominator by 2 already
-								set_variable = { which = cgm_tmp value = food_income }
-								divide_variable = { which = cgm_tmp value = cgm_max_useful_food }
-								multiply_variable = { which = cgm_tmp value = -1 }
-								change_variable = { which = cgm_tmp value = 2 }
-								multiply_variable = { which = food_country_weight value = cgm_tmp }
+								set_variable = { which = food_country_weight value = 0 }
+								else = {
+									divide_variable = { which = cgm_max_useful_food value = 2 }
+									if = {
+										limit = {
+											check_variable = { which = food_income value > cgm_max_useful_food }
+										}
+										 #Reduction as soon as we have more than half the limit: *1 for half the limit. *0.5 for 3/4 the limit. *0 for limit. Linear interpolation in between. 2*(1-x) Where x is income/max_required. '*-1' instead of '*-2' as we divided the nominator by 2 already
+										set_variable = { which = cgm_tmp value = food_income }
+										divide_variable = { which = cgm_tmp value = cgm_max_useful_food }
+										multiply_variable = { which = cgm_tmp value = -1 }
+										change_variable = { which = cgm_tmp value = 2 }
+										multiply_variable = { which = food_country_weight value = cgm_tmp }
+									}
+								}
 							}
 						}
 					}
