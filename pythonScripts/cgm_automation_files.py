@@ -1150,7 +1150,7 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
       building=buildingContent.get(buildingName)
       neededPlanetFlag=building.attemptGet("ai_allow").getAnywhereRequired("has_planet_flag")
       if neededPlanetFlag!=None:
-        typeEffect.createReturnIf(TagList("has_planet_flag", neededPlanetFlag), "addFront").add("add_building_construction", buildingName)
+        typeEffect.createReturnIf(TagList("has_planet_flag", neededPlanetFlag), "addFront").add("add_building_construction", buildingName).add("planet", TagList("remove_planet_flag", neededPlanetFlag))
       else:
         typeEffect.add("add_building_construction", buildingName)
       if "adjacency" in typeName:
