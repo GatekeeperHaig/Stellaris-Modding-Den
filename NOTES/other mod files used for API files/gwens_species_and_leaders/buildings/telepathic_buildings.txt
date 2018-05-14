@@ -1,0 +1,208 @@
+# Do not remove or rename this
+
+# Possible Variables for Buildings:
+# strategic_resource: strategic resource, deprecated, strategic resource used by the building.
+# allow: trigger to check for allowing construction of building.
+# prerequisites: Tech requirements for building.
+# empire_unique: boolean, can only build one if set to true.
+# cost: resource table, cost of building.
+# is_orbital: boolean, can only be built in orbital station.
+# modifier: modifier, deprecated, applies a modifier to planet; use planet_modifier instead.
+# planet_modifier, country_modifier, army_modifier: applies modifier to planet/country/armies
+# triggered_planet_modifier = { key (optional), potential (scope: planet), modifier }: applies conditional modifier to planet
+# base_buildtime: int, number of days for construction.
+# requires_pop, boolean, building will require a pop for production.
+# required_resources, resource table, required resources for production.
+# produced_resources, resource table, produced resources in production.
+# upgrades, buildings list, buildings this building can upgrade into.
+# is_listed, boolean, toggles if this building is shown in the non-upgrade buildable list.
+# planet_unique, toggles if one can build multiple of this type on a single planet.
+# ai_weight, weight for AI, default is set to one, weight set to 0 means that AI will never build it
+# is_colony: trigger to check if the building is a colony shelter for country (scope: country, from: planet). default: "always = no"
+# active: trigger to check if a building can be active with a given pop worker (scope: pop) if you add a trigger here, you should also add the requirements in the description
+# show_tech_unlock_if: trigger to show this building only conditionally in the technology screen. scope: country. default: { always = yes }
+# planet_modifier_with_pop_trigger = { key (optional), potential (scope: pop), modifier }: applies modifier to pops on planet that satisfy condition in trigger
+
+
+@b0time = 60
+@b0cost = 15
+@b0effect = 1
+@b0upkeep = 0.5
+
+@b1time = 210
+@b1cost = 60
+@b1effect = 2
+@b1upkeep = 1
+
+@b2time = 180
+@b2cost = 90
+@b2effect = 3
+@b2upkeep = 1.5
+
+@b3time = 180
+@b3cost = 120
+@b3effect = 4
+@b3upkeep = 2
+
+@b4time = 180
+@b4cost = 150
+@b4effect = 5
+@b4upkeep = 2.5
+
+@b5time = 180
+@b5cost = 180
+@b5effect = 8
+@b5upkeep = 3
+
+@science1 = 1
+@science2 = 2
+@science3 = 3
+@science4 = 4
+@science5 = 6
+
+@natural_equilibrium_happiness = 0.02
+
+building_gwen_telepathic_relay = {
+	planet_unique = yes
+	base_buildtime = @b1time
+	cost = {
+		minerals = @b3cost
+	}
+	
+	produced_resources = {
+		society_research = 4
+		unity = 2
+	}
+	
+	required_resources = {
+		energy = @b5upkeep
+	}
+
+	country_modifier = {
+		mod_distance_to_capital_static_modifier_efficiency_mult = -0.05
+		edict_length_mult = 0.10
+	}
+
+	planet_modifier = {
+		planet_sensor_range_add = 1
+	}
+	
+	prerequisites = {
+		"tech_Telepathic_buildings_relay"
+	}
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }	
+		}
+	}
+
+	destroy_if = {
+		AND = {
+			exists = owner
+			NAND = {
+				owner = { leader = { has_ruler_trait = Gwen_Adaptation_Telepathic_Rul } }
+				planet = { leader = { has_trait = Gwen_Adaptation_Telepathic_Gov } }
+				owner = { owner_species = { has_trait = Gwen_Adaptation_Telepathic } }
+			}
+		}
+	}
+
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+	}
+
+	ai_weight = {
+		factor = 1
+	}
+}
+
+building_gwen_telepathic_amplifier = {
+	base_buildtime = @b1time
+	planet_unique = yes
+	
+	cost = {
+		minerals = @b3cost
+	}
+	
+	required_resources = {
+		energy = @b5upkeep
+	}
+	
+	produced_resources = {
+		society_research = 3
+	}
+	
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_telepathic_amplifier_p1
+		potential = { NOT = { has_trait = Gwen_Adaptation_Telepathic } }
+		modifier = {
+			pop_government_ethic_attraction = 0.2
+			pop_ethics_shift_speed_mult = 0.2
+		}
+	}
+
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_telepathic_amplifier_p2
+		potential = { 
+			OR	= {
+				has_trait = Gwen_Adaptation_Precognitive_Species
+				has_trait = Gwen_Adaptation_Ageless_Species
+				has_trait = trait_psionic
+			}
+			NOT = { has_trait = Gwen_Adaptation_Telepathic }
+		}
+		modifier = {
+			pop_resource_output = 0.05
+		}
+	}
+
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_telepathic_amplifier_p3
+		potential = { has_trait = Gwen_Adaptation_Telepathic }
+		modifier = {
+			tile_resource_unity_mult = 0.20
+		}
+	}
+
+	prerequisites = {
+		"tech_Telepathic_buildings_amplifier"
+	}
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }	
+		}
+	}
+
+
+	destroy_if = {
+		AND = {
+			exists = owner
+			NAND = {
+				owner = { leader = { has_ruler_trait = Gwen_Adaptation_Telepathic_Rul } }
+				planet = { leader = { has_trait = Gwen_Adaptation_Telepathic_Gov } }
+				owner = { owner_species = { has_trait = Gwen_Adaptation_Telepathic } }
+			}
+		}
+	}
+}
