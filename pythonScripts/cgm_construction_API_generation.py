@@ -10,7 +10,7 @@ def main():
 
   createEffectDecisionStuff()
   automatedCreationAutobuildAPI(resources)
-  # return
+  return
   automatedCreationAutobuildAPI(resources,"alphamod",["../NOTES/api files/cgm_api_files/alphamod/"])
 
 
