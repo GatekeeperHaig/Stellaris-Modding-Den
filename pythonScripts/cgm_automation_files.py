@@ -31,6 +31,8 @@ def main():
   for weight in deepcopy(weightTypes):
     weightTypes.append(weight+"_adjacency")
   inverseFactorComparedToMinerals=[4,1,8,4,4,4,4]
+  inverseFactorComparedToMinerals25years=[4,1,8,3,3,3,3]
+  inverseFactorComparedToMinerals50years=[4,1,8,2,2,2,2]
   exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_power_hub_1","building_power_hub_1","building_power_hub_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
   varsToMove=["Weight","Tile","Type"]
   pseudoInf=99999
@@ -538,12 +540,21 @@ def main():
 
   empireWeightsEventAllPositive=AIWeight.createReturnIf(allPosLimit)
   empireWeightsEventAllPositive.addComment("All positive weightings:")
-  for resource,factor in zip(resources,inverseFactorComparedToMinerals):
+  for resource,factor,factor25,factor50 in zip(resources,inverseFactorComparedToMinerals, inverseFactorComparedToMinerals25years, inverseFactorComparedToMinerals50years):
     if resource!="minerals":
       empireWeightsEventAllPositive.addComment(resource.upper())
       empireWeightsEventAllPositive.variableOp("multiply",resource+"_country_weight", "minerals_log")
       empireWeightsEventAllPositive.variableOp("set","cgm_tmp", resource+"_log")
-      empireWeightsEventAllPositive.variableOp("change","cgm_tmp", math.log(factor,2))
+      if factor!=factor25 or factor!=factor50:
+        factorEarlyGame=empireWeightsEventAllPositive.createReturnIf(TagList("years_passed", 25, "", "<"))
+        factorEarlyGame.variableOp("change","cgm_tmp", math.log(factor,2))
+        factorMidGame=factorEarlyGame.addReturn("else")
+        factorMidGame=factorMidGame.createReturnIf(TagList("years_passed", 50, "", "<"))
+        factorMidGame.variableOp("change","cgm_tmp", math.log(factor25,2))
+        factorLateGame=factorMidGame.addReturn("else")
+        factorLateGame.variableOp("change","cgm_tmp", math.log(factor50,2))
+      else:
+        empireWeightsEventAllPositive.variableOp("change","cgm_tmp", math.log(factor,2))
       if "research" in resource:
         empireWeightsEventAllPositive.addComment("Subtract extra bonuses that hary AIs are getting from minerals to prevent them going science crazy. Actually treated as an addition to science output as that is less prone to problems")
         empireWeightsEventAllPositive.variableOp("change","cgm_tmp", "cgm_difficutly_imbalance_log")
@@ -969,7 +980,7 @@ def priorityFileCheck(fileLists,reverse=False): #earlier -> higher prio
 
 
 
-def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolders=[], addedFoldersPriority=[]): #if multiple are added  in one category, earlier is higher priority
+def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolders=[], addedFoldersPriority=[], specialBuildingWeight=10): #if multiple are added  in one category, earlier is higher priority
 #AUTOMATED CREATION OF EFFECTS AND TRIGGERS USED FOR AUTOBUILD API
   additionString=""
   if modName!="cgm_buildings":
@@ -1143,17 +1154,42 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
   automationEffects=TagList()
   adjacencyTriggers=TagList()
   for typeName, typeContent in buildingLists.getNameVal():
-    typeEffect=automationEffects.addReturn("add_"+typeName+"_building"+additionString)
-    if "adjacency" in typeName:
-      adjacencyTrigger=adjacencyTriggers.addReturn(typeName+"_any_building_available"+additionString).addReturn("OR")
+    if "unity" in typeName:
+      unity=True
+    else:
+      unity=False
+    automationEffects.addComment("this = tile")
+    automationEffects.addComment("prev = planet")
+    if unity:
+      typeEffect=automationEffects.getOrCreate("cgm_add_special_building"+additionString)
+    else:
+      typeEffect=automationEffects.addReturn("add_"+typeName+"_building"+additionString)
+    if "adjacency" in typeName or unity:
+      if unity:
+        automationEffects.addComment("this = planet")
+        automationEffects.addComment("prev = OWNER")
+        automationEffects.addComment("BIG TODO! Stuff CURENTLY MOSTLY ASSUMING PREV=TILE!!")
+        adjacencyTrigger2=automationEffects.getOrCreate("cgm_search_for_special_building"+additionString)
+        adjacencyTrigger=TagList()
+      else:
+        adjacencyTriggers.addComment("this = planet")
+        adjacencyTriggers.addComment("prev = tile")
+        adjacencyTrigger=adjacencyTriggers.addReturn(typeName+"_any_building_available"+additionString).addReturn("OR")
     for buildingName in typeContent.names:
+      if unity==True:
+        hashFixedNumber=round((hash(buildingName+additionString)%math.pow(2,32)-math.pow(2,31))/1000,3)
       building=buildingContent.get(buildingName)
       neededPlanetFlag=building.attemptGet("ai_allow").getAnywhereRequired("has_planet_flag")
-      if neededPlanetFlag!=None:
-        typeEffect.createReturnIf(TagList("has_planet_flag", neededPlanetFlag), "addFront").add("add_building_construction", buildingName)
+      if unity==True:
+        buildIt=typeEffect.createReturnIf(TagList("owner",variableOpNew("check","cgm_special_bestBuilding", hashFixedNumber)))
+        buildIt.add("add_building_construction", buildingName)
+        if neededPlanetFlag!=None:
+          buildIt.add("planet", TagList("remove_planet_flag", neededPlanetFlag))
+      elif neededPlanetFlag!=None and not unity:
+        typeEffect.createReturnIf(TagList("has_planet_flag", neededPlanetFlag), "addFront").add("add_building_construction", buildingName).add("planet", TagList("remove_planet_flag", neededPlanetFlag))
       else:
         typeEffect.add("add_building_construction", buildingName)
-      if "adjacency" in typeName:
+      if "adjacency" in typeName or unity:
         localTrigger=adjacencyTrigger.addReturn("AND")
         for tech in building.attemptGet("prerequisites").names:
           localTrigger.add("owner", TagList("has_technology", tech))
@@ -1171,6 +1207,13 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
           locOr=localTrigger.addReturn("NOT").addReturn("owner").addReturn("any_owned_planet").addReturn("OR")
           for b in empireUniqueDict[buildingName].names:
             locOr.add("has_building", b)
+        if unity==True:
+          localTrigger.add("owner",variableOpNew("check", "cgm_special_bestWeight", specialBuildingWeight, "<"))
+          if neededPlanetFlag!=None:
+            localTrigger.insert(0, "has_planet_flag", neededPlanetFlag)
+          takeThis=adjacencyTrigger2.createReturnIf(localTrigger)
+          takeThis.addReturn("prev").variableOp("set", "cgm_special_bestWeight", specialBuildingWeight).variableOp("set", "cgm_special_bestBuilding", hashFixedNumber)
+          takeThis.add("save_global_event_target_as","cgm_best_planet_for_special")
     typeEffect.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building",yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
 
 
