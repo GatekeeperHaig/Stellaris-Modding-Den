@@ -9,9 +9,24 @@ def main():
   os.chdir(os.path.dirname(__file__))
 
   createEffectDecisionStuff()
-  automatedCreationAutobuildAPI(resources)
+  automatedCreationAutobuildAPI()
   #return
-  automatedCreationAutobuildAPI(resources,"alphamod",["../NOTES/api files/cgm_api_files/alphamod/"])
+  with open("../NOTES/other mod files used for API files/list of abbrevations used in API files.csv", 'r') as file:
+    for line in file:
+      lineSplit=list(map(lambda x:x.strip(),line.split(",")))
+      modFolder, modAbbr, modName=lineSplit[:3]
+      modFolder="../NOTES/other mod files used for API files/"+modFolder
+      lowPri=[]
+      highPri=[]
+      if modName<"!Core Game Mechanics: Buildings":
+        highPri.append(modFolder)
+      if modName>"!Core Game Mechanics: Buildings":
+        lowPri.append(modFolder)
+      # print(modFolder)
+      # print(lowPri)
+      # if "gwen" in modFolder:
+      print("automatedCreationAutobuildAPI({},{},{})".format(modAbbr,lowPri,highPri))
+      automatedCreationAutobuildAPI(modAbbr,lowPri,highPri)
 
 
 if __name__ == "__main__":

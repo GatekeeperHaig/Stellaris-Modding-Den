@@ -906,9 +906,11 @@ def uniquenessList(buildingContentOrig, type="planet_unique"):
       tagListOfMembers.add(buildingName)
       planetUniqueLists[buildingName]=tagListOfMembers
       for upgradeName in upgrades.names:
-        toParseList.append(upgradeName)
+        if upgradeName!="" and upgradeName!=buildingName:
+          toParseList.append(upgradeName)
       while len(toParseList)>0:
         nextToParse=toParseList.pop(0)
+        # print(nextToParse)
         if nextToParse in planetUniqueLists: #"exception" need to join branches. We write everything into the old one!
           planetUniqueLists[nextToParse].addTagList(tagListOfMembers)
           tagListOfMembers=planetUniqueLists[nextToParse]
@@ -917,11 +919,18 @@ def uniquenessList(buildingContentOrig, type="planet_unique"):
         else:
           upgrade=buildingContentOrig.get(nextToParse)
           # print(nextToParse)
-          if upgrade.attemptGet("planet_unique")=="yes" or upgrade.attemptGet("empire_unique")=="yes":
-            tagListOfMembers.add(nextToParse)
-            upgrades=upgrade.attemptGet("upgrades")
-            for upgradeName in upgrades.names:
-              toParseList.append(upgradeName)
+          try:
+            if upgrade.attemptGet("planet_unique")=="yes" or upgrade.attemptGet("empire_unique")=="yes":
+              tagListOfMembers.add(nextToParse)
+              upgrades=upgrade.attemptGet("upgrades")
+              for upgradeName in upgrades.names:
+                if upgradeName!="" and not upgradeName in parsedList:
+                  # print("up"+upgradeName)
+                  toParseList.append(upgradeName)
+          except:
+            print(upgrade)
+            print(buildingName)
+            raise
         parsedList.append(nextToParse)
   # for key, val in planetUniqueLists.items():
     # print("KEY:"+key)
@@ -979,7 +988,7 @@ def priorityFileCheck(fileLists,reverse=False): #earlier -> higher prio
 
 
 
-def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolders=[], addedFoldersPriority=[], specialBuildingWeight=10): #if multiple are added  in one category, earlier is higher priority
+def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], addedFoldersPriority=[], specialBuildingWeight=10): #if multiple are added  in one category, earlier is higher priority
 #AUTOMATED CREATION OF EFFECTS AND TRIGGERS USED FOR AUTOBUILD API
   additionString=""
   if modName!="cgm_buildings":
@@ -1236,6 +1245,12 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
           takeThis.add("save_event_target_as","cgm_best_planet_for_special")
     typeEffect.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building",yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
 
+  adjacencyTriggers.deleteOnLowestLevel(checkTotallyEmpty)
+  automationEffects.deleteOnLowestLevel(checkTotallyEmpty)
+  specialResourceTrigger.deleteOnLowestLevel(checkTotallyEmpty)
+  for name,val in automationEffects.getNameVal():
+    if "add" in name and val.getAnywhere("add_building_construction")==None:
+      automationEffects.remove(name)
 
   mainTriggerFileContent=TagList()
   autobuildCompTrigger=TagList()
@@ -1298,7 +1313,7 @@ def getSpecialBuildingNumberHash(modName, buildingName, i):
   number/=1000 #use the 3 digits
   number=round(number,3)
   if number in [1,2,3,4,5]:
-    print("DAMN! You hit one of the five defined by hand! EXITING!")
+    print("DAMN! You hit one of the five defined by hand! You should play the lottery! 1 in a billion chance. EXITING!")
     sys.exit(1)
   return number
 
