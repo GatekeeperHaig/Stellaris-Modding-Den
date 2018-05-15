@@ -1152,6 +1152,7 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
 
   automationEffects=TagList()
   adjacencyTriggers=TagList()
+  specialBuildingNumber=0
   for typeName, typeContent in buildingLists.getNameVal():
     if "unity" in typeName:
       unity=True
@@ -1190,7 +1191,9 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
             break
         if tileStuff:
           continue
-        hashFixedNumber=round((hash(buildingName+additionString)%math.pow(2,32)-math.pow(2,31))/1000,3)
+        hashFixedNumber=getSpecialBuildingNumberHash(modName, buildingName, specialBuildingNumber)
+        specialBuildingNumber+=1
+        # hashFixedNumber=round((hash(buildingName+additionString)%math.pow(2,32)-math.pow(2,31))/1000,3)
       building=buildingContent.get(buildingName)
       neededPlanetFlag=building.attemptGet("ai_allow").getAnywhereRequired("has_planet_flag")
       if unity==True:
@@ -1276,6 +1279,33 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
   # return
 
   #END OF AUTOMATED CREATION OF EFFECTS AND TRIGGERS USED FOR AUTOBUILD API (might be moved elsewhere later)
+def getSpecialBuildingNumberHash(modName, buildingName, i):
+  j=0
+  number=0
+  for c in modName:
+    n=ord(c.lower())
+    n-=ord("a")
+    if n<0 or n>25:
+      continue #not a normal letter
+    n+=1 #1-26, zero would not work
+    number+=n*math.pow(2, 5*j) #need 5 bits per letter
+    j+=1
+    if j>4: #5*5 bits for this part
+      break
+  j=5
+  number+=(i+1)*math.pow(2, 5*j) #25 bits where reserved for the letters. 7 bits remain (->128 special buildings max per mod)
+  number-=math.pow(2,31) #use the negative parts as well!
+  number/=1000 #use the 3 digits
+  number=round(number,3)
+  if number in [1,2,3,4,5]:
+    print("DAMN! You hit one of the five defined by hand! EXITING!")
+    sys.exit(1)
+  return number
+
+  # round((hash(buildingName+additionString)%math.pow(2,32))/1000,3)
+  # number+=hash(modName+buildingName)%
+
+
 
 def createEffectDecisionStuff(modName="cgm_buildings"):
   outTag=TagList()
