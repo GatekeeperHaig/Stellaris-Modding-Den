@@ -15,7 +15,6 @@ import glob
 #TODO: Prio List how to use this:
 # 1. Core world important+medium important new building 2. Core world upgrades 3. Core world not so important building 4. Sector new buildings 5. Sector upgrades
 #possible far away todo: Replace worst existing building with (empire) unique
-#TODO: event target: global -> local
 #todo:we need to add a special effect for AI, which optimizes capitals #remove them on placement and instant create them anew 
 eventNameSpace="cgm_auto.{!s}"
 nameBase="cgm_auto_{!s}"
@@ -275,14 +274,14 @@ def main():
   effect.addComment("SPECIAL BUILDING NUMBER 1:")
   chooseSpecialBuilding=effect.createReturnIf(TagList("NOT", TagList("has_building","building_autochthon_monument")).add("prev",variableOpNew("check", "cgm_special_bestWeight", 20, "<")))
   chooseSpecialBuilding.addReturn("prev").variableOp("set","cgm_special_bestWeight", 20).variableOp("set","cgm_special_bestBuilding", 1)
-  chooseSpecialBuilding.add("save_global_event_target_as", "cgm_best_planet_for_special")
+  chooseSpecialBuilding.add("save_event_target_as", "cgm_best_planet_for_special")
   effect.addComment("SPECIAL BUILDING NUMBER 2: FORTRESS")
   effect.variableOp("set", "cgm_special_bestWeight", 10)
   effect.addComment("cgm_special_bestWeight named like this for easier comparison! Local scope!")
   chooseSpecialBuilding=effect.createReturnIf(TagList("has_planet_flag","NEEDS_DEFENSE").variableOp("multiply", "cgm_special_bestWeight", 4))
   chooseSpecialBuilding=effect.createReturnIf(variableOpNew("check", "cgm_special_bestWeight", "prev", ">"))
   chooseSpecialBuilding.addReturn("prev").variableOp("set","cgm_special_bestWeight", "prev").variableOp("set","cgm_special_bestBuilding", 2)
-  chooseSpecialBuilding.add("save_global_event_target_as", "cgm_best_planet_for_special")
+  chooseSpecialBuilding.add("save_event_target_as", "cgm_best_planet_for_special")
 
   cgmCompTrigger=TagList().readFile("../CGM/buildings_script_source/common/scripted_effects/z_cgm_compatibility_effects.txt")
   miscAutoEffects.addComment("this : pop")
@@ -1168,7 +1167,6 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
       if unity:
         automationEffects.addComment("this = planet")
         automationEffects.addComment("prev = OWNER")
-        automationEffects.addComment("BIG TODO! Stuff CURENTLY MOSTLY ASSUMING PREV=TILE!!")
         adjacencyTrigger2=automationEffects.getOrCreate("cgm_search_for_special_building"+additionString)
         adjacencyTrigger=TagList()
       else:
@@ -1177,6 +1175,21 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
         adjacencyTrigger=adjacencyTriggers.addReturn(typeName+"_any_building_available"+additionString).addReturn("OR")
     for buildingName in typeContent.names:
       if unity==True:
+        tileStuff=False
+        for potAllow in ["potential","allow"]:
+          potResolved=building.attemptGet(potAllow)
+          if potResolved.getAnywhere("tile")!=None:
+            otherUsage=buildingLists.getAnywhere(buildingName, ["unity", "unity_adjacency"])
+            if otherUsage==None:
+              print("Not taking {} as special building. It has tile specific conditions. As if is in no other category, this building will be missing from autobuild!".format(buildingName))
+            #   print("but also in other category")
+            # else:
+            #   print("not in other category!")
+            #   print(buildingLists)
+            tileStuff=True
+            break
+        if tileStuff:
+          continue
         hashFixedNumber=round((hash(buildingName+additionString)%math.pow(2,32)-math.pow(2,31))/1000,3)
       building=buildingContent.get(buildingName)
       neededPlanetFlag=building.attemptGet("ai_allow").getAnywhereRequired("has_planet_flag")
@@ -1193,12 +1206,16 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
         localTrigger=adjacencyTrigger.addReturn("AND")
         for tech in building.attemptGet("prerequisites").names:
           localTrigger.add("owner", TagList("has_technology", tech))
-        pot=buildingContentOrig[buildingContentOrig.names.index(buildingName)].attemptGet("potential")
-        if len(pot):
-          localTrigger.add("prev",pot )
-        pot=buildingContentOrig[buildingContentOrig.names.index(buildingName)].attemptGet("allow")
-        if len(pot):
-          localTrigger.add("prev",pot )
+        for potAllow in ["potential","allow"]:
+          pot=buildingContentOrig[buildingContentOrig.names.index(buildingName)].attemptGet(potAllow)
+          if len(pot):
+            if unity:
+              localTrigger.addTagList(deepcopy(pot).removeLayer("planet"))
+            else:
+              localTrigger.add("prev",pot )
+        # pot=buildingContentOrig[buildingContentOrig.names.index(buildingName)].attemptGet("allow")
+        # if len(pot):
+        #   localTrigger.add("prev",pot )
         if building.attemptGet("planet_unique")=="yes":
           locNor=localTrigger.addReturn("NOR")
           for b in planetUniqueDict[buildingName].names:
@@ -1213,7 +1230,7 @@ def automatedCreationAutobuildAPI(resources,modName="cgm_buildings", addedFolder
             localTrigger.insert(0, "has_planet_flag", neededPlanetFlag)
           takeThis=adjacencyTrigger2.createReturnIf(localTrigger)
           takeThis.addReturn("prev").variableOp("set", "cgm_special_bestWeight", specialBuildingWeight).variableOp("set", "cgm_special_bestBuilding", hashFixedNumber)
-          takeThis.add("save_global_event_target_as","cgm_best_planet_for_special")
+          takeThis.add("save_event_target_as","cgm_best_planet_for_special")
     typeEffect.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building",yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
 
 

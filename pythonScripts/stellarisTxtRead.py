@@ -61,7 +61,9 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       return TagList(0) #empty list
   def getAnywhere(self, name, avoid=[]): #don't use capitals in avoid! Example, see below
     for locName, val in self.getNameVal():
+      # print(name+"/"+locName)
       if name==locName:
+        # print("found")
         return val
       if isinstance(val,TagList) and not locName.lower() in avoid:
         possibleReturn=val.getAnywhere(name,avoid)
@@ -288,6 +290,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         else:
           val.removeLayer(layerName,excludedSubTags)
       i+=1
+    return self
     # for name, val in self.getNameVal():
 
 
