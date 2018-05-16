@@ -784,6 +784,8 @@ def main():
     buildingContent.readFile(buildingFile)
 
   createUpgradeSwitch(buildingContent, tileSwitch)
+  tileSwitch.add("cgm_upgrade_building", yes)
+  # tileSwitch.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building", yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
 
   everyPop.createReturnIf(TagList("tile", TagList("has_building_construction","yes"))).add("owner", TagList("set_country_flag", "cgm_auto_built")).add("break","yes")
   upgradeEvent.createReturnIf(TagList("has_building_construction","yes")).add("break","yes")
@@ -1076,8 +1078,10 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   # for varFile in glob.glob("../CGM/buildings_script_source/common/scripted_variables/*.txt"):
     allVars.readFile(varFile)
 
+
   upgradeEffect=TagList()
-  createUpgradeSwitch(buildingContent, upgradeEffect)
+  upgradeActualEffect=upgradeEffect.addReturn("cgm_upgrade_building"+additionString)
+  createUpgradeSwitch(buildingContent, upgradeActualEffect)
   
 
   allTriggers=TagList()
@@ -1250,6 +1254,9 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   for name,val in automationEffects.getNameVal():
     if "add" in name and val.getAnywhere("add_building_construction")==None:
       automationEffects.remove(name)
+  for name,val in upgradeEffect.getNameVal():
+    if val.getAnywhere("add_building_construction")==None:
+      upgradeEffect.remove(name)
 
   mainTriggerFileContent=TagList()
   autobuildCompTrigger=TagList()
@@ -1259,6 +1266,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   for resource in resources:
     if resource!="unity":
       trigger=mainTriggerFileContent.get(resource+"_any_building_available")
+
       if modName=="cgm_buildings":
         if resource+"_any_building_available_API" not in trigger.names:
           trigger.add(resource+"_any_building_available_API",yes)
@@ -1280,13 +1288,48 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
           if not adjName in autobuildCompTrigger.names:
             autobuildCompTrigger.add(adjName,TagList("always", "no"))
 
+  if modName!="cgm_buildings":
+    mainEffectFileContent=TagList()
+    mainEffectFileContent.readFile("../CGM/buildings_script_source/common/scripted_effects/cgm_automation_effects.txt")
+    autobuildCompEffects=TagList()
+    autobuildCompEffects.readFile("../CGM/buildings_script_source/common/scripted_effects/00000_cgm_auto_compatibility_effects.txt")
+    for effectName in automationEffects.names:
+      if effectName=="":
+        continue
+      # if not isinstance(effectName, TagList):
+      #   continue
+      # if "unity" in typeName:
+      #   # effect=mainEffectFileContent.get("add_"+resource+"_building")
+      # else:
+      effect=mainEffectFileContent.get(effectName.replace(additionString,""))
+      if not effectName in effect.names:
+        if "cgm_search_for_special_building" in effectName:
+          effect.add(effectName, "yes")#must not be first as it would be before set variable that is first neeeded!
+        else:
+          effect.insert(0, effectName, "yes")
+      autobuildCompEffects.addUnique(effectName,TagList())
+    if len(specialResourceTrigger)>0:
+      mainTriggerFileContent.get("special_resource_any_building_available").addUnique(specialResourceTrigger.names[0],yes)
+      autobuildCompTrigger.addUnique(specialResourceTrigger.names[0],TagList())
+    if len(upgradeEffect)>0:
+      mainEffectFileContent.get("cgm_upgrade_building").addUnique(upgradeEffect.names[0],yes)
+      autobuildCompEffects.addUnique(upgradeEffect.names[0],TagList())
+
   outputToFolderAndFile(mainTriggerFileContent, "common/scripted_triggers/", "cgm_automations_triggers.txt",2, "../CGM/buildings_script_source",False)
+  if modName!="cgm_buildings":
+    outputToFolderAndFile(mainEffectFileContent, "common/scripted_effects/", "cgm_automation_effects.txt",2, "../CGM/buildings_script_source",False)
+    outputToFolderAndFile(autobuildCompEffects, "common/scripted_effects/", "00000_cgm_auto_compatibility_effects.txt",2, "../CGM/buildings_script_source",False)
   outputToFolderAndFile(autobuildCompTrigger, "common/scripted_triggers/", "00000_cgm_auto_compatibilty_triggers.txt",2, "../CGM/buildings_script_source", False)
 
-  outputToFolderAndFile(specialResourceTrigger, modName, "cgm_special_resource_trigger{}.txt".format(additionString),2, "../NOTES/api files/cgm_auto")
-  outputToFolderAndFile(automationEffects, modName, "cgm_automation_effects.txt{}".format(additionString),2, "../NOTES/api files/cgm_auto")
-  outputToFolderAndFile(adjacencyTriggers, modName, "cgm_adjacency_triggers.txt{}".format(additionString),2, "../NOTES/api files/cgm_auto")
-  outputToFolderAndFile(upgradeEffect, modName, "cgm_upgrade_effects.txt{}".format(additionString),2, "../NOTES/api files/cgm_auto")
+  apiOutFolder="../NOTES/api files/cgm_auto/"+modName
+  if len(specialResourceTrigger):
+    outputToFolderAndFile(specialResourceTrigger, "/common/scripted_triggers/", "cgm_special_resource_trigger{}.txt".format(additionString),2,apiOutFolder )
+  if len(automationEffects):
+    outputToFolderAndFile(automationEffects, "/common/scripted_effects/", "cgm_automation_effects{}.txt".format(additionString),2, apiOutFolder)
+  if len(adjacencyTriggers):
+    outputToFolderAndFile(adjacencyTriggers, "/common/scripted_triggers/", "cgm_adjacency_triggers{}.txt".format(additionString),2, apiOutFolder)
+  if len(upgradeEffect):
+    outputToFolderAndFile(upgradeEffect, "/common/scripted_effects/", "cgm_upgrade_effects{}.txt".format(additionString),2, apiOutFolder)
 
   # for key, item in buildingLists.items():
   #   print(key)

@@ -80,6 +80,10 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def add(self,name,val='', comment='', seperator="="): #add via two separate pre-formated variables
     self._apply(lambda x,y:x.append(y),name,val,comment,seperator)
     return self
+  def addUnique(self,name,val='', comment='', seperator="="): #removes all element that would have the same name and already exist
+    while name in self.names:
+      self.remove(name)
+    return self.add(name,val, comment, seperator)
   def addReturn(self,name):
     val=TagList()
     self.add(name,val)
