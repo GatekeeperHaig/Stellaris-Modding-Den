@@ -1292,7 +1292,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     mainEffectFileContent=TagList()
     mainEffectFileContent.readFile("../CGM/buildings_script_source/common/scripted_effects/cgm_automation_effects.txt")
     autobuildCompEffects=TagList()
-    autobuildCompEffects.readFile("../CGM/buildings_script_source/common/scripted_effects/00000_cgm_auto_compatibility_effects.txt")
+    autobuildCompEffects.readFile("../CGM/buildings_script_source/common/scripted_effects/z_cgm_auto_compatibility_effects.txt")
     for effectName in automationEffects.names:
       if effectName=="":
         continue
@@ -1318,10 +1318,11 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   outputToFolderAndFile(mainTriggerFileContent, "common/scripted_triggers/", "cgm_automations_triggers.txt",2, "../CGM/buildings_script_source",False)
   if modName!="cgm_buildings":
     outputToFolderAndFile(mainEffectFileContent, "common/scripted_effects/", "cgm_automation_effects.txt",2, "../CGM/buildings_script_source",False)
-    outputToFolderAndFile(autobuildCompEffects, "common/scripted_effects/", "00000_cgm_auto_compatibility_effects.txt",2, "../CGM/buildings_script_source",False)
+    outputToFolderAndFile(autobuildCompEffects, "common/scripted_effects/", "z_cgm_auto_compatibility_effects.txt",2, "../CGM/buildings_script_source",False)
   outputToFolderAndFile(autobuildCompTrigger, "common/scripted_triggers/", "00000_cgm_auto_compatibilty_triggers.txt",2, "../CGM/buildings_script_source", False)
 
-  apiOutFolder="../NOTES/api files/cgm_auto/"+modName
+  # apiOutFolder="../NOTES/api files/cgm_auto/"+modName
+  apiOutFolder="../../mod/cgm_auto_"+modName
   if len(specialResourceTrigger):
     outputToFolderAndFile(specialResourceTrigger, "/common/scripted_triggers/", "cgm_special_resource_trigger{}.txt".format(additionString),2,apiOutFolder )
   if len(automationEffects):
@@ -1330,6 +1331,12 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     outputToFolderAndFile(adjacencyTriggers, "/common/scripted_triggers/", "cgm_adjacency_triggers{}.txt".format(additionString),2, apiOutFolder)
   if len(upgradeEffect):
     outputToFolderAndFile(upgradeEffect, "/common/scripted_effects/", "cgm_upgrade_effects{}.txt".format(additionString),2, apiOutFolder)
+  modFile=TagList()
+  modFile.add("name", '"!cgm_comp_{}"'.format(modName))
+  modFile.add("path", '"mod/cgm_auto_{}"'.format(modName))
+  modFile.add("tags", TagList('"BLUB"',""))
+  modFile.add("supported_version", '"2.0.*"')
+  outputToFolderAndFile(modFile, "", "cgm_auto_"+modName+".mod",2, "../../mod/")
 
   # for key, item in buildingLists.items():
   #   print(key)
