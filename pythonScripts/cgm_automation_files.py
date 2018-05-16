@@ -32,7 +32,7 @@ def main():
   inverseFactorComparedToMinerals=[4,1,8,4,4,4,4]
   inverseFactorComparedToMinerals25years=[4,1,8,3,3,3,3]
   inverseFactorComparedToMinerals50years=[4,1,8,2,2,2,2]
-  exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_power_hub_1","building_power_hub_1","building_power_hub_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1"]
+  exampleBuildings=["building_power_plant_1","building_mining_network_1","building_hydroponics_farm_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","building_power_hub_1","building_power_hub_1","building_power_hub_1","building_basic_science_lab_1","building_basic_science_lab_1","building_basic_science_lab_1","blub"]
   varsToMove=["Weight","Tile","Type"]
   pseudoInf=99999
   countToNeg=range(8)
@@ -207,7 +207,7 @@ def main():
 
   # buildSomeThing.add("else", TagList("set_country_flag", "cgm_noAutobuildPlanetFound"))
   ifTypeBest=planetBuildSomeThing
-  for i, weightType in enumerate(weightTypes):
+  for i, weightType in enumerate(weightTypes+["special_resource"]):
     ifTypeBest=ifTypeBest.createReturnIf(TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1)))
     # ifTypeBest= 
     # planetBuildSomeThing.add("if", ifTypeBest)
