@@ -1157,7 +1157,6 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   specialResourceTrigger.removeDuplicatesRec()
   specialResourceTrigger=TagList("special_resource_any_building_available"+additionString, TagList("OR", specialResourceTrigger))
   # print(buildingLists)
-  outputToFolderAndFile(specialResourceTrigger, modName, "special_resource_trigger.txt",2, ".")
 
   automationEffects=TagList()
   adjacencyTriggers=TagList()
@@ -1284,9 +1283,10 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   outputToFolderAndFile(mainTriggerFileContent, "common/scripted_triggers/", "cgm_automations_triggers.txt",2, "../CGM/buildings_script_source",False)
   outputToFolderAndFile(autobuildCompTrigger, "common/scripted_triggers/", "00000_cgm_auto_compatibilty_triggers.txt",2, "../CGM/buildings_script_source", False)
 
-  outputToFolderAndFile(automationEffects, modName, "automation_effects.txt",2, ".")
-  outputToFolderAndFile(adjacencyTriggers, modName, "adjacency_triggers.txt",2, ".")
-  outputToFolderAndFile(upgradeEffect, modName, "upgrade_effects.txt",2, ".")
+  outputToFolderAndFile(specialResourceTrigger, modName, "cgm_special_resource_trigger{}.txt".format(additionString),2, "../NOTES/api files/cgm_auto")
+  outputToFolderAndFile(automationEffects, modName, "cgm_automation_effects.txt{}".format(additionString),2, "../NOTES/api files/cgm_auto")
+  outputToFolderAndFile(adjacencyTriggers, modName, "cgm_adjacency_triggers.txt{}".format(additionString),2, "../NOTES/api files/cgm_auto")
+  outputToFolderAndFile(upgradeEffect, modName, "cgm_upgrade_effects.txt{}".format(additionString),2, "../NOTES/api files/cgm_auto")
 
   # for key, item in buildingLists.items():
   #   print(key)
