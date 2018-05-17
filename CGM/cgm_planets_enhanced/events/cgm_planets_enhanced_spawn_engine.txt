@@ -78,7 +78,9 @@ country_event = {
 			set_timed_global_flag = { flag = cgm_default_strategic_resources days = 1 }
 			set_timed_global_flag = { flag = cgm_default_deposits days = 1 }
 			set_timed_global_flag = { flag = cgm_default_tile_blockers days = 1 }				
-			set_timed_global_flag = { flag = cgm_default_planet_size days = 1 }				
+			set_timed_global_flag = { flag = cgm_small_planet_size days = 1 }				
+			set_global_flag = cgm_terraforming_rework_enabled
+			set_global_flag = cgm_uninhabitable_colonization_enabled
 			###
 			#menu flags
 			set_timed_country_flag = { flag = cgm_pe_default_configuration days = 1 }
@@ -116,7 +118,8 @@ country_event = {
 				has_country_flag = cgm_pe_resources_configured
 				has_country_flag = cgm_pe_configure_resources
 				has_country_flag = cgm_pe_configure_planet_size
-				has_country_flag = cgm_pe_configure_deposits								
+				has_country_flag = cgm_pe_configure_deposits	
+				has_country_flag = cgm_pe_configure_terraforming							
 			}
 		}			
 		hidden_effect = {
@@ -137,7 +140,8 @@ country_event = {
 				has_country_flag = cgm_pe_deposits_configured
 				has_country_flag = cgm_pe_configure_resources
 				has_country_flag = cgm_pe_configure_planet_size
-				has_country_flag = cgm_pe_configure_deposits								
+				has_country_flag = cgm_pe_configure_deposits	
+				has_country_flag = cgm_pe_configure_terraforming							
 			}
 		}			
 		hidden_effect = {
@@ -159,6 +163,7 @@ country_event = {
 				has_country_flag = cgm_pe_configure_resources
 				has_country_flag = cgm_pe_configure_planet_size
 				has_country_flag = cgm_pe_configure_deposits								
+				has_country_flag = cgm_pe_configure_terraforming
 			}
 		}			
 		hidden_effect = {
@@ -170,6 +175,28 @@ country_event = {
 			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
 		}
 	}			
+	option = {
+		name = cgm_pe.configure_terraforming.name
+		custom_tooltip = cgm_pe.configure_terraforming.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { 
+			NOR = { 
+				has_country_flag = cgm_pe_terraforming_configured
+				has_country_flag = cgm_pe_configure_resources
+				has_country_flag = cgm_pe_configure_planet_size
+				has_country_flag = cgm_pe_configure_deposits								
+				has_country_flag = cgm_pe_configure_terraforming
+			}
+		}			
+		hidden_effect = {
+			###
+			#menu flags			 
+			set_timed_country_flag = { flag = cgm_pe_configure_terraforming days = 1 }
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
 	option = {
 		name = cgm_pe_back
 		custom_gui = "cgm_pe_option"		
@@ -203,9 +230,12 @@ country_event = {
 				has_global_flag = no_planet_resize
 				has_global_flag = cgm_very_large_planet_size
 				has_global_flag = cgm_large_planet_size
-				has_global_flag = cgm_default_planet_size
 				has_global_flag = cgm_small_planet_size
-				has_global_flag = cgm_very_small_planet_size																				
+				has_global_flag = cgm_very_small_planet_size	
+				has_global_flag = cgm_terraforming_rework_disabled
+				has_global_flag = cgm_uninhabitable_colonization_disabled
+				has_global_flag = cgm_terraforming_rework_enabled
+				has_global_flag = cgm_uninhabitable_colonization_enabled																			
 			}			
 		}			
 		hidden_effect = { 
@@ -597,24 +627,6 @@ country_event = {
 		}
 	}		
 	option = {
-		name = cgm_pe.default_planet_size.name
-		custom_tooltip = cgm_pe.default_planet_size.desc
-		custom_gui = "cgm_pe_option"		
-		trigger = { has_country_flag = cgm_pe_configure_planet_size }		
-		hidden_effect = {
-			###
-			#feature flags
-			set_timed_global_flag = { flag = cgm_default_planet_size days = 1 }			
-			###
-			#menu flags			 
-			remove_country_flag = cgm_pe_configure_planet_size
-			set_timed_country_flag = { flag = cgm_pe_planet_size_configured days = 1 }
-			###
-			#effects				
-			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
-		}
-	}		
-	option = {
 		name = cgm_pe.small_planet_size.name
 		custom_tooltip = cgm_pe.small_planet_size.desc
 		custom_gui = "cgm_pe_option"		
@@ -650,6 +662,83 @@ country_event = {
 			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
 		}
 	}	
+	### Level 2 menu - terraforming and colonization
+	option = {
+		name = cgm_pe.cgm_terraforming_and_colonization_disabled.name
+		custom_tooltip = cgm_pe.cgm_terraforming_and_colonization_disabled.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_terraforming }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_global_flag = cgm_terraforming_rework_disabled
+			set_global_flag = cgm_uninhabitable_colonization_disabled
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_terraforming
+			set_timed_country_flag = { flag = cgm_pe_terraforming_configured days = 1 }
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}					
+	option = {
+		name = cgm_pe.cgm_terraforming_disabled_colonization_enabled.name
+		custom_tooltip = cgm_pe.cgm_terraforming_disabled_colonization_enabled.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_terraforming }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_global_flag = cgm_terraforming_rework_disabled
+			set_global_flag = cgm_uninhabitable_colonization_enabled
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_terraforming
+			set_timed_country_flag = { flag = cgm_pe_terraforming_configured days = 1 }
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}						
+	option = {
+		name = cgm_pe.cgm_terraforming_enabled_colonization_disabled.name
+		custom_tooltip = cgm_pe.cgm_terraforming_enabled_colonization_disabled.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_terraforming }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_global_flag = cgm_terraforming_rework_enabled
+			set_global_flag = cgm_uninhabitable_colonization_disabled
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_terraforming
+			set_timed_country_flag = { flag = cgm_pe_terraforming_configured days = 1 }
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.cgm_terraforming_enabled_colonization_enabled.name
+		custom_tooltip = cgm_pe.cgm_terraforming_enabled_colonization_enabled.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_terraforming }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_global_flag = cgm_terraforming_rework_enabled
+			set_global_flag = cgm_uninhabitable_colonization_enabled
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_terraforming
+			set_timed_country_flag = { flag = cgm_pe_terraforming_configured days = 1 }
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}				
 	###
 	option = {
 		name = cgm_pe_reset.name
@@ -678,9 +767,12 @@ country_event = {
 				has_global_flag = no_planet_resize
 				has_global_flag = cgm_very_large_planet_size
 				has_global_flag = cgm_large_planet_size
-				has_global_flag = cgm_default_planet_size
 				has_global_flag = cgm_small_planet_size
-				has_global_flag = cgm_very_small_planet_size				
+				has_global_flag = cgm_very_small_planet_size
+				has_global_flag = cgm_terraforming_rework_disabled
+				has_global_flag = cgm_uninhabitable_colonization_disabled
+				has_global_flag = cgm_terraforming_rework_enabled
+				has_global_flag = cgm_uninhabitable_colonization_enabled																							
 			}		
 		}			
 		hidden_effect = { 
@@ -705,9 +797,12 @@ country_event = {
 			remove_global_flag = no_planet_resize
 			remove_global_flag = cgm_very_large_planet_size
 			remove_global_flag = cgm_large_planet_size
-			remove_global_flag = cgm_default_planet_size
 			remove_global_flag = cgm_small_planet_size
-			remove_global_flag = cgm_very_small_planet_size			
+			remove_global_flag = cgm_very_small_planet_size	
+			remove_global_flag = cgm_terraforming_rework_disabled
+			remove_global_flag = cgm_uninhabitable_colonization_disabled
+			remove_global_flag = cgm_terraforming_rework_enabled
+			remove_global_flag = cgm_uninhabitable_colonization_enabled																						
 			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
 		}
 	}
@@ -745,10 +840,17 @@ country_event = {
 				has_global_flag = no_planet_resize
 				has_global_flag = cgm_very_large_planet_size
 				has_global_flag = cgm_large_planet_size
-				has_global_flag = cgm_default_planet_size
 				has_global_flag = cgm_small_planet_size
 				has_global_flag = cgm_very_small_planet_size	
 			}	
+			OR = {
+				has_global_flag = cgm_terraforming_rework_disabled
+				has_global_flag = cgm_terraforming_rework_enabled
+			}
+			OR = { 
+				has_global_flag = cgm_uninhabitable_colonization_disabled				
+				has_global_flag = cgm_uninhabitable_colonization_enabled				
+			}
 		}
 		hidden_effect = { cgm_resource_spawner = yes }
 	} 							
