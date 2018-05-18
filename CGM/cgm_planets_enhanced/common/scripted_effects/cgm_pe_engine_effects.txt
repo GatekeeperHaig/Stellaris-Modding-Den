@@ -64,21 +64,24 @@ cgm_resource_spawner = {
 				is_colonizable = no
 				has_strategic_resource = no 
 			}
-			if = { 
 			random_list = {
 				90 = { }
 				10 = { 
 					#save_event_target_as = orbital_resource_candidate
 					cgm_pe_orbital_sr_spawn_table = yes
-					modifier = { factor = 0.5 has_global_flag = very_low_strategic_resources }
-					modifier = { factor = 0.75 has_global_flag = low_strategic_resources }
-					modifier = { factor = 1.25 has_global_flag = high_strategic_resources }
-					modifier = { factor = 1.5 has_global_flag = high_strategic_resources }					
+					modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
+					modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
+					modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
+					modifier = { factor = 1.5 has_global_flag = cgm_high_strategic_resources }					
 				} #uninhabitable planets only	
 			}							 			
 			else = { 
 				if = {
 					limit = { habitable_planet = yes }
+					while = { 
+						limit = { planet_size > 25 }
+						change_planet_size = -1
+					}												
 					switch = {
 						trigger = planet_size
 						5 = { set_variable = { which = planet_size_var value = 5 } }
@@ -104,43 +107,43 @@ cgm_resource_spawner = {
 						25 = { set_variable = { which = planet_size_var value = 25 } }
 					}						
 					if = { 
-						limit = { NOT = { has_global_flag = disable_cgm_planet_resize } }
+						limit = { NOT = { has_global_flag = no_planet_resize } }
 						set_variable = { which = planet_resize_factor value = planet_size_var }
 						random_list = {
 							20 = {
 								multiply_variable = { which = planet_resize_factor value = 1.5 }
-								modifier = { factor = 0 has_global_flag = smallest_planets }
-								modifier = { factor = 0 has_global_flag = smaller_planets }
-								modifier = { factor = 1 has_global_flag = larger_planets }
-								modifier = { factor = 2 has_global_flag = largest_planets }								
+								modifier = { factor = 0 has_global_flag = cgm_very_small_planet_size }
+								modifier = { factor = 0 has_global_flag = cgm_small_planet_size }
+								modifier = { factor = 1 has_global_flag = cgm_large_planet_size }
+								modifier = { factor = 2 has_global_flag = cgm_very_large_planet_size }								
 							}
 							20 = { 
 								multiply_variable = { which = planet_resize_factor value = 1.25 }
-								modifier = { factor = 0 has_global_flag = smallest_planets }
-								modifier = { factor = 0 has_global_flag = smaller_planets }
-								modifier = { factor = 2 has_global_flag = larger_planets }
-								modifier = { factor = 1 has_global_flag = largest_planets }								
+								modifier = { factor = 0 has_global_flag = cgm_very_small_planet_size }
+								modifier = { factor = 0 has_global_flag = cgm_small_planet_size }
+								modifier = { factor = 2 has_global_flag = cgm_large_planet_size }
+								modifier = { factor = 1 has_global_flag = cgm_very_large_planet_size }								
 							}
 							20 = { 
 								multiply_variable = { which = planet_resize_factor value = 0 }
-								modifier = { factor = 0 has_global_flag = smallest_planets }
-								modifier = { factor = 1 has_global_flag = smaller_planets }
-								modifier = { factor = 1 has_global_flag = larger_planets }
-								modifier = { factor = 0 has_global_flag = largest_planets }								
+								modifier = { factor = 0 has_global_flag = cgm_very_small_planet_size }
+								modifier = { factor = 1 has_global_flag = cgm_small_planet_size }
+								modifier = { factor = 1 has_global_flag = cgm_large_planet_size }
+								modifier = { factor = 0 has_global_flag = cgm_very_large_planet_size }								
 							}		
 							20 = { 
 								multiply_variable = { which = planet_resize_factor value = 0.75 }								
-								modifier = { factor = 1 has_global_flag = smallest_planets }
-								modifier = { factor = 2 has_global_flag = smaller_planets }
-								modifier = { factor = 0 has_global_flag = larger_planets }
-								modifier = { factor = 0 has_global_flag = largest_planets }							
+								modifier = { factor = 1 has_global_flag = cgm_very_small_planet_size }
+								modifier = { factor = 2 has_global_flag = cgm_small_planet_size }
+								modifier = { factor = 0 has_global_flag = cgm_large_planet_size }
+								modifier = { factor = 0 has_global_flag = cgm_very_large_planet_size }							
 							}
 							20 = { 
 								multiply_variable = { which = planet_resize_factor value = 0.5 }
-								modifier = { factor = 2 has_global_flag = smallest_planets }
-								modifier = { factor = 1 has_global_flag = smaller_planets }
-								modifier = { factor = 0 has_global_flag = larger_planets }
-								modifier = { factor = 0 has_global_flag = largest_planets }																	
+								modifier = { factor = 2 has_global_flag = cgm_very_small_planet_size }
+								modifier = { factor = 1 has_global_flag = cgm_small_planet_size }
+								modifier = { factor = 0 has_global_flag = cgm_large_planet_size }
+								modifier = { factor = 0 has_global_flag = cgm_very_large_planet_size }																	
 							}
 						}		
 						divide_variable = { which = planet_resize_factor value = 1000 }
@@ -160,154 +163,150 @@ cgm_resource_spawner = {
 							}
 							change_planet_size = -1
 							change_variable = { which = planet_size_var value = -1 }
-						}							
-						while = { 
-							limit = { 
-								check_variable = { which = planet_resize_factor value > 0 }
-								planet_size < 25
-							}
-							change_planet_size = - 1
-						}							
+						}		
 					}	
-					set_variable = { which = sr_points value = 0 }
-					every_tile = {
-						limit = { has_any_tile_strategic_resource = yes }
-						prev = { change_variable = { which = sr_points value = -1 } }
-					}								
-					random_list = { 
-						50 = { 
-							change_variable = { which = sr_points value = 0 }
-							modifier = { factor = 1.5 has_global_flag = very_low_strategic_resources }
-							modifier = { factor = 1.25 has_global_flag = low_strategic_resources }
-							modifier = { factor = 0.75 has_global_flag = high_strategic_resources }
-							modifier = { factor = 0.5 has_global_flag = very_high_strategic_resources }
-						}
-						30 = { 
-							change_variable = { which = sr_points value = 1 } 
-							modifier = { factor = 0.5 has_global_flag = very_low_strategic_resources }
-							modifier = { factor = 0.75 has_global_flag = low_strategic_resources }
-							modifier = { factor = 1.25 has_global_flag = high_strategic_resources }
-							modifier = { factor = 1.5 has_global_flag = very_high_strategic_resources }							
-						}
-						12 = { 
-							change_variable = { which = sr_points value = 2 }
-							modifier = { factor = 0.5 has_global_flag = very_low_strategic_resources }
-							modifier = { factor = 0.75 has_global_flag = low_strategic_resources }
-							modifier = { factor = 1.25 has_global_flag = high_strategic_resources }
-							modifier = { factor = 1.5 has_global_flag = very_high_strategic_resources }							
-						}
-						7 = { 
-							change_variable = { which = sr_points value = 3 }
-							modifier = { factor = 0.5 has_global_flag = very_low_strategic_resources }
-							modifier = { factor = 0.75 has_global_flag = low_strategic_resources }
-							modifier = { factor = 1.25 has_global_flag = high_strategic_resources }
-							modifier = { factor = 1.5 has_global_flag = very_high_strategic_resources }							
-						}
-						4 = { 
-							change_variable = { which = sr_points value = 4 }
-							modifier = { factor = 0.5 has_global_flag = very_low_strategic_resources }
-							modifier = { factor = 0.75 has_global_flag = low_strategic_resources }
-							modifier = { factor = 1.25 has_global_flag = high_strategic_resources }
-							modifier = { factor = 1.5 has_global_flag = very_high_strategic_resources }							
-						}
-						2 = { 
-							change_variable = { which = sr_points value = 5 }
-							modifier = { factor = 0.5 has_global_flag = very_low_strategic_resources }
-							modifier = { factor = 0.75 has_global_flag = low_strategic_resources }
-							modifier = { factor = 1.25 has_global_flag = high_strategic_resources }
-							modifier = { factor = 1.5 has_global_flag = very_high_strategic_resources }							
-						}
+					if = {
+						limit = { NOT = { has_global_flag = cgm_resources_disabled } }
+						set_variable = { which = sr_points value = 0 }
+						every_tile = {
+							limit = { has_any_tile_strategic_resource = yes }
+							prev = { change_variable = { which = sr_points value = -1 } }
+						}								
+						random_list = { 
+							50 = { 
+								change_variable = { which = sr_points value = 0 }
+								modifier = { factor = 1.5 has_global_flag = cgm_very_low_strategic_resources }
+								modifier = { factor = 1.25 has_global_flag = cgm_low_strategic_resources }
+								modifier = { factor = 0.75 has_global_flag = cgm_high_strategic_resources }
+								modifier = { factor = 0.5 has_global_flag = cgm_very_high_strategic_resources }
+							}
+							30 = { 
+								change_variable = { which = sr_points value = 1 } 
+								modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
+								modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
+								modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
+								modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }							
+							}
+							12 = { 
+								change_variable = { which = sr_points value = 2 }
+								modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
+								modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
+								modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
+								modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }							
+							}
+							7 = { 
+								change_variable = { which = sr_points value = 3 }
+								modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
+								modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
+								modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
+								modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }							
+							}
+							4 = { 
+								change_variable = { which = sr_points value = 4 }
+								modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
+								modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
+								modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
+								modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }							
+							}
+							2 = { 
+								change_variable = { which = sr_points value = 5 }
+								modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
+								modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
+								modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
+								modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }							
+							}
 
-					}		
-					if = { 
-						limit = { check_variable = { which = sr_points value > 0 } } 
-						while = {												
-							count = sr_points
-							if = {
-								limit = { 
-									any_tile = { 
-										has_deposit = no 
-										has_building = no 
-									}
-								}
-								random_tile = { 
+						}		
+						if = { 
+							limit = { check_variable = { which = sr_points value > 0 } } 
+							while = {												
+								count = sr_points
+								if = {
 									limit = { 
-										has_deposit = no
-										has_building = no
+										any_tile = { 
+											has_deposit = no 
+											has_building = no 
+										}
 									}
-									cgm_pe_planetary_sr_spawn_table = yes						
-								}
-								else = { 
-									if = {
+									random_tile = { 
 										limit = { 
-											any_tile = { 
-												has_building = no 
-												has_regular_vanilla_deposit = yes
-											}
+											has_deposit = no
+											has_building = no
 										}
-										random_tile = { 
-											limit = { has_building = no }
-											cgm_pe_planetary_sr_spawn_table = yes
-										}
-										else = { 
-											if = { 
-												limit = { 
-													any_tile = { has_regular_vanilla_deposit = yes }
-												}	
-												random_tile = { 
-													limit = { has_regular_vanilla_deposit = yes }
-													cgm_pe_planetary_sr_spawn_table = yes
-												}	
+										cgm_pe_planetary_sr_spawn_table = yes						
+									}
+									else = { 
+										if = {
+											limit = { 
+												any_tile = { 
+													has_building = no 
+													has_regular_vanilla_deposit = yes
+												}
 											}
+											random_tile = { 
+												limit = { has_building = no }
+												cgm_pe_planetary_sr_spawn_table = yes
+											}
+											else = { 
+												if = { 
+													limit = { 
+														any_tile = { has_regular_vanilla_deposit = yes }
+													}	
+													random_tile = { 
+														limit = { has_regular_vanilla_deposit = yes }
+														cgm_pe_planetary_sr_spawn_table = yes
+													}	
+												}
+											}	
 										}	
-									}	
+									}								
 								}								
-							}								
-						}					
-					}											
+							}					
+						}											
+					}	
 					if = { 
-						limit = { NOT = { has_global_flag = disable_cgm_blockers } }
+						limit = { NOT = { has_global_flag = cgm_tile_blockers_disabled } }
 						set_variable = { which = tb_points value = planet_size_var }
 						random_list = {
 							20 = {
 								multiply_variable = { which = tb_points value = 0.8 }
-								modifier = { factor = 0 has_global_flag = very_low_tile_blockers }
-								modifier = { factor = 0.25 has_global_flag = low_tile_blockers }
-								modifier = { factor = 0.75 has_global_flag = default_tile_blockers }
-								modifier = { factor = 1.5 has_global_flag = high_tile_blockers }
-								modifier = { factor = 2.5 has_global_flag = very_high_tile_blockers }								
+								modifier = { factor = 0 has_global_flag = cgm_very_low_tile_blockers }
+								modifier = { factor = 0.25 has_global_flag = cgm_low_tile_blockers }
+								modifier = { factor = 0.75 has_global_flag = cgm_default_tile_blockers }
+								modifier = { factor = 1.5 has_global_flag = cgm_high_tile_blockers }
+								modifier = { factor = 2.5 has_global_flag = cgm_very_high_tile_blockers }								
 							}
 							20 = { 
 								multiply_variable = { which = tb_points value = 0.65 }
-								modifier = { factor = 0 has_global_flag = very_low_tile_blockers }
-								modifier = { factor = 0.5 has_global_flag = low_tile_blockers }
-								modifier = { factor = 1 has_global_flag = default_tile_blockers }
-								modifier = { factor = 2 has_global_flag = high_tile_blockers }
-								modifier = { factor = 1.5 has_global_flag = very_high_tile_blockers }								
+								modifier = { factor = 0 has_global_flag = cgm_very_low_tile_blockers }
+								modifier = { factor = 0.5 has_global_flag = cgm_low_tile_blockers }
+								modifier = { factor = 1 has_global_flag = cgm_default_tile_blockers }
+								modifier = { factor = 2 has_global_flag = cgm_high_tile_blockers }
+								modifier = { factor = 1.5 has_global_flag = cgm_very_high_tile_blockers }								
 							}
 							20 = { 
 								multiply_variable = { which = tb_points value = 0.5 }
-								modifier = { factor = 0 has_global_flag = very_low_tile_blockers }
-								modifier = { factor = 1.5 has_global_flag = low_tile_blockers }
-								modifier = { factor = 2 has_global_flag = default_tile_blockers }
-								modifier = { factor = 1.5 has_global_flag = high_tile_blockers }
-								modifier = { factor = 0 has_global_flag = very_high_tile_blockers }								
+								modifier = { factor = 0 has_global_flag = cgm_very_low_tile_blockers }
+								modifier = { factor = 1.5 has_global_flag = cgm_low_tile_blockers }
+								modifier = { factor = 2 has_global_flag = cgm_default_tile_blockers }
+								modifier = { factor = 1.5 has_global_flag = cgm_high_tile_blockers }
+								modifier = { factor = 0 has_global_flag = cgm_very_high_tile_blockers }								
 							}		
 							20 = { 
 								multiply_variable = { which = tb_points value = 0.35 }
-								modifier = { factor = 1.5 has_global_flag = very_low_tile_blockers }
-								modifier = { factor = 2 has_global_flag = low_tile_blockers }
-								modifier = { factor = 1 has_global_flag = default_tile_blockers }
-								modifier = { factor = 0.5 has_global_flag = high_tile_blockers }
-								modifier = { factor = 0 has_global_flag = very_high_tile_blockers }							
+								modifier = { factor = 1.5 has_global_flag = cgm_very_low_tile_blockers }
+								modifier = { factor = 2 has_global_flag = cgm_low_tile_blockers }
+								modifier = { factor = 1 has_global_flag = cgm_default_tile_blockers }
+								modifier = { factor = 0.5 has_global_flag = cgm_high_tile_blockers }
+								modifier = { factor = 0 has_global_flag = cgm_very_high_tile_blockers }							
 							}
 							20 = { 
 								multiply_variable = { which = tb_points value = 0.2 }
-								modifier = { factor = 2.5 has_global_flag = very_low_tile_blockers }
-								modifier = { factor = 1.5 has_global_flag = low_tile_blockers }
-								modifier = { factor = 0.75 has_global_flag = default_tile_blockers }
-								modifier = { factor = 0.25 has_global_flag = high_tile_blockers }
-								modifier = { factor = 0 has_global_flag = very_high_tile_blockers }																	
+								modifier = { factor = 2.5 has_global_flag = cgm_very_low_tile_blockers }
+								modifier = { factor = 1.5 has_global_flag = cgm_low_tile_blockers }
+								modifier = { factor = 0.75 has_global_flag = cgm_default_tile_blockers }
+								modifier = { factor = 0.25 has_global_flag = cgm_high_tile_blockers }
+								modifier = { factor = 0 has_global_flag = cgm_very_high_tile_blockers }																	
 							}
 						}		
 						divide_variable = { which = tb_points value = 1000 }
@@ -344,48 +343,48 @@ cgm_resource_spawner = {
 						}	
 					}	
 					if = { 
-						limit = { NOT = { has_global_flag = do_not_change_deposits } }
+						limit = { NOT = { has_global_flag = cgm_no_deposits_rebalance } }
 						set_variable = { which = dep_points value = planet_size_var }
 						random_list = {
 							20 = {
 								multiply_variable = { which = dep_points value = 0.8 }
-								modifier = { factor = 0 has_global_flag = very_low_deposits }
-								modifier = { factor = 0.25 has_global_flag = low_deposits }
-								modifier = { factor = 0.75 has_global_flag = default_deposits }
-								modifier = { factor = 1.5 has_global_flag = high_deposits }
-								modifier = { factor = 2.5 has_global_flag = very_high_deposits }								
+								modifier = { factor = 0 has_global_flag = cgm_very_low_deposits }
+								modifier = { factor = 0.25 has_global_flag = cgm_low_deposits }
+								modifier = { factor = 0.75 has_global_flag = cgm_default_deposits }
+								modifier = { factor = 1.5 has_global_flag = cgm_high_deposits }
+								modifier = { factor = 2.5 has_global_flag = cgm_very_high_deposits }								
 							}
 							20 = { 
 								multiply_variable = { which = dep_points value = 0.65 }
-								modifier = { factor = 0 has_global_flag = very_low_deposits }
-								modifier = { factor = 0.5 has_global_flag = low_deposits }
-								modifier = { factor = 1 has_global_flag = default_deposits }
-								modifier = { factor = 2 has_global_flag = high_deposits }
-								modifier = { factor = 1.5 has_global_flag = very_high_deposits }								
+								modifier = { factor = 0 has_global_flag = cgm_very_low_deposits }
+								modifier = { factor = 0.5 has_global_flag = cgm_low_deposits }
+								modifier = { factor = 1 has_global_flag = cgm_default_deposits }
+								modifier = { factor = 2 has_global_flag = cgm_high_deposits }
+								modifier = { factor = 1.5 has_global_flag = cgm_very_high_deposits }								
 							}
 							20 = { 
 								multiply_variable = { which = dep_points value = 0.5 }
-								modifier = { factor = 0 has_global_flag = very_low_deposits }
-								modifier = { factor = 1.5 has_global_flag = low_deposits }
-								modifier = { factor = 2 has_global_flag = default_deposits }
-								modifier = { factor = 1.5 has_global_flag = high_deposits }
-								modifier = { factor = 0 has_global_flag = very_high_deposits }								
+								modifier = { factor = 0 has_global_flag = cgm_very_low_deposits }
+								modifier = { factor = 1.5 has_global_flag = cgm_low_deposits }
+								modifier = { factor = 2 has_global_flag = cgm_default_deposits }
+								modifier = { factor = 1.5 has_global_flag = cgm_high_deposits }
+								modifier = { factor = 0 has_global_flag = cgm_very_high_deposits }								
 							}		
 							20 = { 
 								multiply_variable = { which = dep_points value = 0.35 }
-								modifier = { factor = 1.5 has_global_flag = very_low_deposits }
-								modifier = { factor = 2 has_global_flag = low_deposits }
-								modifier = { factor = 1 has_global_flag = default_deposits }
-								modifier = { factor = 0.5 has_global_flag = high_deposits }
-								modifier = { factor = 0 has_global_flag = very_high_deposits }							
+								modifier = { factor = 1.5 has_global_flag = cgm_very_low_deposits }
+								modifier = { factor = 2 has_global_flag = cgm_low_deposits }
+								modifier = { factor = 1 has_global_flag = cgm_default_deposits }
+								modifier = { factor = 0.5 has_global_flag = cgm_high_deposits }
+								modifier = { factor = 0 has_global_flag = cgm_very_high_deposits }							
 							}
 							20 = { 
 								multiply_variable = { which = dep_points value = 0.2 }
-								modifier = { factor = 2.5 has_global_flag = very_low_deposits }
-								modifier = { factor = 1.5 has_global_flag = low_deposits }
-								modifier = { factor = 0.75 has_global_flag = default_deposits }
-								modifier = { factor = 0.25 has_global_flag = high_deposits }
-								modifier = { factor = 0 has_global_flag = very_high_deposits }																	
+								modifier = { factor = 2.5 has_global_flag = cgm_very_low_deposits }
+								modifier = { factor = 1.5 has_global_flag = cgm_low_deposits }
+								modifier = { factor = 0.75 has_global_flag = cgm_default_deposits }
+								modifier = { factor = 0.25 has_global_flag = cgm_high_deposits }
+								modifier = { factor = 0 has_global_flag = cgm_very_high_deposits }																	
 							}
 						}		
 						divide_variable = { which = dep_points value = 1000 }
@@ -400,7 +399,7 @@ cgm_resource_spawner = {
 								count = dep_points
 								random_tile = {		
 									limit = { has_building = no has_deposit = no has_pop = no }
-									cgm_pe_tile_deposit_spawn_table = yes
+									cgm_pe_tile_blocker_spawn_table = yes
 								}	
 							}	
 							else = { 
@@ -467,67 +466,253 @@ cgm_set_terraformer = {
 		24 = { set_variable = { which = planet_size_var value = 24 } }
 		25 = { set_variable = { which = planet_size_var value = 25 } }
 	}	
-	set_variable = { which = blocker_tiles value = planet_size_var }
-	random_list = {
-		20 = { divide_variable = { which = blocker_tiles value = 2 } }
-		20 = { divide_variable = { which = blocker_tiles value = 3 } }
-		20 = { divide_variable = { which = blocker_tiles value = 4 } }
-		20 = { divide_variable = { which = blocker_tiles value = 5 } }
-	}	
-	divide_variable = { which = blocker_tiles value = 1000 }
-	multiply_variable = { which = blocker_tiles value = 1000 }	
-	set_variable = { which = deposit_tiles value = planet_size_var }
+	set_variable = { which = sr_points value = 0 }
+	every_tile = {
+		limit = { has_any_tile_strategic_resource = yes }
+		prev = { change_variable = { which = sr_points value = -1 } }
+	}								
+	random_list = { 
+		50 = { 
+			change_variable = { which = sr_points value = 0 }
+			modifier = { factor = 1.5 has_global_flag = cgm_very_low_strategic_resources }
+			modifier = { factor = 1.25 has_global_flag = cgm_low_strategic_resources }
+			modifier = { factor = 0.75 has_global_flag = cgm_high_strategic_resources }
+			modifier = { factor = 0.5 has_global_flag = cgm_very_high_strategic_resources }
+		}
+		30 = { 
+			change_variable = { which = sr_points value = 1 } 
+			modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
+			modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
+			modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
+			modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }							
+		}
+		12 = { 
+			change_variable = { which = sr_points value = 2 }
+			modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
+			modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
+			modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
+			modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }							
+		}
+		7 = { 
+			change_variable = { which = sr_points value = 3 }
+			modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
+			modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
+			modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
+			modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }							
+		}
+		4 = { 
+			change_variable = { which = sr_points value = 4 }
+			modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
+			modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
+			modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
+			modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }							
+		}
+		2 = { 
+			change_variable = { which = sr_points value = 5 }
+			modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
+			modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
+			modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
+			modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }							
+		}
+	}		
 	if = { 
-		limit = { has_global_flag = vanilla_base_deposits }
-		multiply_variable = { which = deposit_tiles value = 0.6 }
-		else = { 	
-			if = { 
-				limit = { has_global_flag = very_high_deposits }
-				multiply_variable = { which = deposit_tiles value = 0.80 }		
-				else = { 	
-					if = { 
-						limit = { has_global_flag = high_deposits }
-						multiply_variable = { which = deposit_tiles value = 0.65 }						
-						else = { 
-							if = { 
-								limit = { has_global_flag = default_deposits }
-								multiply_variable = { which = deposit_tiles value = 0.5 }						
-								else = { 	
-									if = { 
-										limit = { has_global_flag = low_deposits }
-										multiply_variable = { which = deposit_tiles value = 0.35 }						
-										else = { multiply_variable = { which = deposit_tiles value = 0.2 } }						
-									}
-								}								
+		limit = { check_variable = { which = sr_points value > 0 } } 
+		while = {												
+			count = sr_points
+			if = {
+				limit = { 
+					any_tile = { 
+						has_deposit = no 
+						has_building = no 
+					}
+				}
+				random_tile = { 
+					limit = { 
+						has_deposit = no
+						has_building = no
+					}
+					cgm_pe_planetary_sr_spawn_table = yes						
+				}
+				else = { 
+					if = {
+						limit = { 
+							any_tile = { 
+								has_building = no 
+								has_regular_vanilla_deposit = yes
 							}
 						}
+						random_tile = { 
+							limit = { has_building = no }
+							cgm_pe_planetary_sr_spawn_table = yes
+						}
+						else = { 
+							if = { 
+								limit = { 
+									any_tile = { has_regular_vanilla_deposit = yes }
+								}	
+								random_tile = { 
+									limit = { has_regular_vanilla_deposit = yes }
+									cgm_pe_planetary_sr_spawn_table = yes
+								}	
+							}
+						}	
 					}	
+				}								
+			}								
+		}					
+	}												
+	set_variable = { which = tb_points value = planet_size_var }
+	random_list = {
+		20 = {
+			multiply_variable = { which = tb_points value = 0.8 }
+			modifier = { factor = 0 has_global_flag = cgm_very_low_tile_blockers }
+			modifier = { factor = 0.25 has_global_flag = cgm_low_tile_blockers }
+			modifier = { factor = 0.75 has_global_flag = cgm_default_tile_blockers }
+			modifier = { factor = 1.5 has_global_flag = cgm_high_tile_blockers }
+			modifier = { factor = 2.5 has_global_flag = cgm_very_high_tile_blockers }								
+		}
+		20 = { 
+			multiply_variable = { which = tb_points value = 0.65 }
+			modifier = { factor = 0 has_global_flag = cgm_very_low_tile_blockers }
+			modifier = { factor = 0.5 has_global_flag = cgm_low_tile_blockers }
+			modifier = { factor = 1 has_global_flag = cgm_default_tile_blockers }
+			modifier = { factor = 2 has_global_flag = cgm_high_tile_blockers }
+			modifier = { factor = 1.5 has_global_flag = cgm_very_high_tile_blockers }								
+		}
+		20 = { 
+			multiply_variable = { which = tb_points value = 0.5 }
+			modifier = { factor = 0 has_global_flag = cgm_very_low_tile_blockers }
+			modifier = { factor = 1.5 has_global_flag = cgm_low_tile_blockers }
+			modifier = { factor = 2 has_global_flag = cgm_default_tile_blockers }
+			modifier = { factor = 1.5 has_global_flag = cgm_high_tile_blockers }
+			modifier = { factor = 0 has_global_flag = cgm_very_high_tile_blockers }								
+		}		
+		20 = { 
+			multiply_variable = { which = tb_points value = 0.35 }
+			modifier = { factor = 1.5 has_global_flag = cgm_very_low_tile_blockers }
+			modifier = { factor = 2 has_global_flag = cgm_low_tile_blockers }
+			modifier = { factor = 1 has_global_flag = cgm_default_tile_blockers }
+			modifier = { factor = 0.5 has_global_flag = cgm_high_tile_blockers }
+			modifier = { factor = 0 has_global_flag = cgm_very_high_tile_blockers }							
+		}
+		20 = { 
+			multiply_variable = { which = tb_points value = 0.2 }
+			modifier = { factor = 2.5 has_global_flag = cgm_very_low_tile_blockers }
+			modifier = { factor = 1.5 has_global_flag = cgm_low_tile_blockers }
+			modifier = { factor = 0.75 has_global_flag = cgm_default_tile_blockers }
+			modifier = { factor = 0.25 has_global_flag = cgm_high_tile_blockers }
+			modifier = { factor = 0 has_global_flag = cgm_very_high_tile_blockers }																	
+		}
+	}		
+	divide_variable = { which = tb_points value = 1000 }
+	multiply_variable = { which = tb_points value = 1000 }	
+	every_tile = {
+		limit = { has_blocker = yes }
+		prev = { change_variable = { which = tb_points value = -1 } }
+	}												
+	if = { 
+		limit = { check_variable = { which = tb_points value > 0 } }
+		while = { 
+			count = tb_points
+			random_tile = {		
+				limit = { has_building = no has_blocker = no has_pop = no }
+				cgm_pe_tile_blocker_spawn_table = yes
+			}	
+		}	
+		else = { 
+			if = { 
+				limit = { check_variable = { which = tb_points value < 0 } }
+				while = { 
+					limit = { 
+						check_variable = { which = tb_points value < 0 }
+						any_tile = { has_regular_vanilla_blocker = yes }
+					}
+					random_tile = {
+						limit = { has_regular_vanilla_blocker = yes }
+						remove_blocker = yes
+					}	
+					change_variable = { which = tb_points value = 1 }
+				}
+			}
+		}
+	}		
+	set_variable = { which = dep_points value = planet_size_var }
+	random_list = {
+		20 = {
+			multiply_variable = { which = dep_points value = 0.8 }
+			modifier = { factor = 0 has_global_flag = cgm_very_low_deposits }
+			modifier = { factor = 0.25 has_global_flag = cgm_low_deposits }
+			modifier = { factor = 0.75 has_global_flag = cgm_default_deposits }
+			modifier = { factor = 1.5 has_global_flag = cgm_high_deposits }
+			modifier = { factor = 2.5 has_global_flag = cgm_very_high_deposits }								
+		}
+		20 = { 
+			multiply_variable = { which = dep_points value = 0.65 }
+			modifier = { factor = 0 has_global_flag = cgm_very_low_deposits }
+			modifier = { factor = 0.5 has_global_flag = cgm_low_deposits }
+			modifier = { factor = 1 has_global_flag = cgm_default_deposits }
+			modifier = { factor = 2 has_global_flag = cgm_high_deposits }
+			modifier = { factor = 1.5 has_global_flag = cgm_very_high_deposits }								
+		}
+		20 = { 
+			multiply_variable = { which = dep_points value = 0.5 }
+			modifier = { factor = 0 has_global_flag = cgm_very_low_deposits }
+			modifier = { factor = 1.5 has_global_flag = cgm_low_deposits }
+			modifier = { factor = 2 has_global_flag = cgm_default_deposits }
+			modifier = { factor = 1.5 has_global_flag = cgm_high_deposits }
+			modifier = { factor = 0 has_global_flag = cgm_very_high_deposits }								
+		}		
+		20 = { 
+			multiply_variable = { which = dep_points value = 0.35 }
+			modifier = { factor = 1.5 has_global_flag = cgm_very_low_deposits }
+			modifier = { factor = 2 has_global_flag = cgm_low_deposits }
+			modifier = { factor = 1 has_global_flag = cgm_default_deposits }
+			modifier = { factor = 0.5 has_global_flag = cgm_high_deposits }
+			modifier = { factor = 0 has_global_flag = cgm_very_high_deposits }							
+		}
+		20 = { 
+			multiply_variable = { which = dep_points value = 0.2 }
+			modifier = { factor = 2.5 has_global_flag = cgm_very_low_deposits }
+			modifier = { factor = 1.5 has_global_flag = cgm_low_deposits }
+			modifier = { factor = 0.75 has_global_flag = cgm_default_deposits }
+			modifier = { factor = 0.25 has_global_flag = cgm_high_deposits }
+			modifier = { factor = 0 has_global_flag = cgm_very_high_deposits }																	
+		}
+	}		
+	divide_variable = { which = dep_points value = 1000 }
+	multiply_variable = { which = dep_points value = 1000 }	
+	every_tile = {
+		limit = { has_deposit = yes }
+		prev = { change_variable = { which = dep_points value = -1 } }
+	}												
+	if = { 
+		limit = { check_variable = { which = dep_points value > 0 } }
+		while = { 
+			count = dep_points
+			random_tile = {		
+				limit = { has_building = no has_deposit = no has_pop = no }
+				cgm_pe_tile_blocker_spawn_table = yes
+			}	
+		}	
+		else = { 
+			if = { 
+				limit = { check_variable = { which = dep_points value < 0 } }
+				while = { 
+					limit = { 
+						check_variable = { which = dep_points value < 0 }
+						any_tile = { has_regular_vanilla_deposit = yes }
+					}
+					random_tile = {
+						limit = { has_regular_vanilla_deposit = yes }
+						clear_deposits = yes
+					}	
+					change_variable = { which = dep_points value = 1 }
 				}
 			}
 		}
 	}	
-	divide_variable = { which = deposit_tiles value = 1000 }
-	multiply_variable = { which = deposit_tiles value = 1000 }
-	if = { 
-		limit = { check_variable = { which = deposit_tiles value < 1 } }
-		set_variable = { which = deposit_tiles value = 1 }	
-	}	
-	while = { 
-		count = deposit_tiles
-		random_tile = {
-			limit = { has_deposit = no has_building = no }
-			cgm_pe_regular_deposit_spawn_table = yes
-		}
-	}
-	while = { 
-		count = deposit_tiles
-		random_tile = {		
-			limit = { has_building = no }
-			cgm_pe_tile_blocker_spawn_table = yes
-		}
-	}	
 	set_planet_flag = cgm_terraforming_planet
-	planet_event = { id = cgm_terraforming.1 days = 360 }
+	#planet_event = { id = cgm_terraforming.1 days = 360 }
 }
 
 #the effects below run on tile scope
