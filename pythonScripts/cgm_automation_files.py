@@ -990,7 +990,7 @@ def priorityFileCheck(fileLists,reverse=False): #earlier -> higher prio
 
 
 
-def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], addedFoldersPriority=[], specialBuildingWeight=10): #if multiple are added  in one category, earlier is higher priority
+def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], addedFoldersPriority=[], specialBuildingWeight=10, apiOutFolder=""): #if multiple are added  in one category, earlier is higher priority
 #AUTOMATED CREATION OF EFFECTS AND TRIGGERS USED FOR AUTOBUILD API
   additionString=""
   if modName!="cgm_buildings":
@@ -1309,8 +1309,8 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
           effect.insert(0, effectName, "yes")
       autobuildCompEffects.addUnique(effectName,TagList())
     if len(specialResourceTrigger)>0:
-      mainTriggerFileContent.get("special_resource_any_building_available").addUnique(specialResourceTrigger.names[0],yes)
-      autobuildCompTrigger.addUnique(specialResourceTrigger.names[0],TagList())
+      mainTriggerFileContent.get("special_resource_any_building_available").get("OR").addUnique(specialResourceTrigger.names[0],yes)
+      autobuildCompTrigger.addUnique(specialResourceTrigger.names[0],TagList("always","no"))
     if len(upgradeEffect)>0:
       mainEffectFileContent.get("cgm_upgrade_building").addUnique(upgradeEffect.names[0],yes)
       autobuildCompEffects.addUnique(upgradeEffect.names[0],TagList())
@@ -1321,16 +1321,17 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     outputToFolderAndFile(autobuildCompEffects, "common/scripted_effects/", "z_cgm_auto_compatibility_effects.txt",2, "../CGM/buildings_script_source",False)
   outputToFolderAndFile(autobuildCompTrigger, "common/scripted_triggers/", "00000_cgm_auto_compatibilty_triggers.txt",2, "../CGM/buildings_script_source", False)
 
-  # apiOutFolder="../NOTES/api files/cgm_auto/"+modName
-  apiOutFolder="../../mod/cgm_auto_"+modName
+  if apiOutFolder=="":
+    # apiOutFolder="../NOTES/api files/cgm_auto/"+modName
+    apiOutFolder="../../mod/cgm_auto_"+modName
   if len(specialResourceTrigger):
-    outputToFolderAndFile(specialResourceTrigger, "/common/scripted_triggers/", "cgm_special_resource_trigger{}.txt".format(additionString),2,apiOutFolder )
+    outputToFolderAndFile(specialResourceTrigger, "/common/scripted_triggers/", "zz_cgm_special_resource_trigger{}.txt".format(additionString),2,apiOutFolder )
   if len(automationEffects):
-    outputToFolderAndFile(automationEffects, "/common/scripted_effects/", "cgm_automation_effects{}.txt".format(additionString),2, apiOutFolder)
+    outputToFolderAndFile(automationEffects, "/common/scripted_effects/", "zz_cgm_automation_effects{}.txt".format(additionString),2, apiOutFolder)
   if len(adjacencyTriggers):
-    outputToFolderAndFile(adjacencyTriggers, "/common/scripted_triggers/", "cgm_adjacency_triggers{}.txt".format(additionString),2, apiOutFolder)
+    outputToFolderAndFile(adjacencyTriggers, "/common/scripted_triggers/", "zz_cgm_adjacency_triggers{}.txt".format(additionString),2, apiOutFolder)
   if len(upgradeEffect):
-    outputToFolderAndFile(upgradeEffect, "/common/scripted_effects/", "cgm_upgrade_effects{}.txt".format(additionString),2, apiOutFolder)
+    outputToFolderAndFile(upgradeEffect, "/common/scripted_effects/", "zz_cgm_upgrade_effects{}.txt".format(additionString),2, apiOutFolder)
   modFile=TagList()
   modFile.add("name", '"!cgm_comp_{}"'.format(modName))
   modFile.add("path", '"mod/cgm_auto_{}"'.format(modName))
