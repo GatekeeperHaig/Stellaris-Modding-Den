@@ -283,7 +283,7 @@ def main():
   chooseSpecialBuilding.addReturn("prev").variableOp("set","cgm_special_bestWeight", "prev").variableOp("set","cgm_special_bestBuilding", 2)
   chooseSpecialBuilding.add("save_event_target_as", "cgm_best_planet_for_special")
 
-  cgmCompTrigger=TagList().readFile("../CGM/buildings_script_source/common/scripted_effects/z_cgm_compatibility_effects.txt")
+  cgmCompTrigger=TagList().readFile("../CGM/buildings_script_source/common/scripted_effects/00000_cgm_compatibility_effects.txt")
   miscAutoEffects.addComment("this : pop")
   miscAutoEffects.addComment("prev : planet")
   popTraits=miscAutoEffects.addReturn("check_pop_traits_rights_modifiers_vanilla_and_API")
@@ -1292,7 +1292,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     mainEffectFileContent=TagList()
     mainEffectFileContent.readFile("../CGM/buildings_script_source/common/scripted_effects/cgm_automation_effects.txt")
     autobuildCompEffects=TagList()
-    autobuildCompEffects.readFile("../CGM/buildings_script_source/common/scripted_effects/z_cgm_auto_compatibility_effects.txt")
+    autobuildCompEffects.readFile("../CGM/buildings_script_source/common/scripted_effects/00000_cgm_auto_compatibility_effects.txt")
     for effectName in automationEffects.names:
       if effectName=="":
         continue
@@ -1318,7 +1318,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   outputToFolderAndFile(mainTriggerFileContent, "common/scripted_triggers/", "cgm_automations_triggers.txt",2, "../CGM/buildings_script_source",False)
   if modName!="cgm_buildings":
     outputToFolderAndFile(mainEffectFileContent, "common/scripted_effects/", "cgm_automation_effects.txt",2, "../CGM/buildings_script_source",False)
-    outputToFolderAndFile(autobuildCompEffects, "common/scripted_effects/", "z_cgm_auto_compatibility_effects.txt",2, "../CGM/buildings_script_source",False)
+    outputToFolderAndFile(autobuildCompEffects, "common/scripted_effects/", "00000_cgm_auto_compatibility_effects.txt",2, "../CGM/buildings_script_source",False)
   outputToFolderAndFile(autobuildCompTrigger, "common/scripted_triggers/", "00000_cgm_auto_compatibilty_triggers.txt",2, "../CGM/buildings_script_source", False)
 
   if apiOutFolder=="":
