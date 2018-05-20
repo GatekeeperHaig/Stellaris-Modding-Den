@@ -875,16 +875,24 @@ def addUniqueFirst(key, element, dictList,building):
       usedSubList.add(element)
     # addToDictList(key, element, dictList)
 
-def addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars, buildingTagName="produced_resources",subTag="{}", outName="{}" ):
+def addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars, checkRun=False, buildingProductionTagName="produced_resources",subTag="{}", outName="{}" ):
   for resource in resources:
-    buildingTag=building.attemptGet(buildingTagName)
-    val=buildingTag.attemptGet(subTag.format(resource))
-    if len(val)>0:
+    buildingProductionTag=building.attemptGet(buildingProductionTagName)
+    val=buildingProductionTag.attemptGet(subTag.format(resource))
+    if 0 and hasattr(building, "bestVal"):
+      compare=building.bestVal
+    else:
+      compare=0.1
+    if len(val)>0: #string at this point!
       # print(subTag.format(resource))
       val=getVariableValueFromList(val, allVars)
-      if val>=0.1:
-        addUniqueFirst(outName.format(resource), buildingName, buildingLists,building)
-        assigned=True
+      if "adjacency" in buildingProductionTagName:
+        val*=4; #adjacency counts more
+      if val>compare*0.5: #at least 50% of the best val to allow adding this to the category
+        building.bestVal=max(val, compare)
+        if checkRun==False: #only add after all have been processed once, or stuff might be added just because it was processed before a better type was found
+          addUniqueFirst(outName.format(resource), buildingName, buildingLists,building)
+          assigned=True
   return assigned
 def getVariableValueFromList(name, allVars):
   if name[0]=="@":
@@ -1137,9 +1145,12 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
             # print(building)
       if not assigned:
         # if building.attemptGet("potential").getAnywhereRequired("has_resource") or building.attemptGet("allow").getAnywhereRequired("has_resource"):
+        assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,True)
+        assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,True,"adjacency_bonus", "tile_building_resource_{}_add", "{}_adjacency")
+        assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,True,"planet_modifier", "static_planet_resource_{}_add")
         assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars)
-        assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,"adjacency_bonus", "tile_building_resource_{}_add", "{}_adjacency")
-        assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,"planet_modifier", "static_planet_resource_{}_add")
+        assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,False,"adjacency_bonus", "tile_building_resource_{}_add", "{}_adjacency")
+        assigned=addToBuildingListsIf(assigned, buildingName,building, buildingLists,resources,allVars,False,"planet_modifier", "static_planet_resource_{}_add")
         if not assigned:
           print("Building {} not assigned to any list".format(buildingName))
   buildingLists.removeDuplicatesRec()
@@ -1322,8 +1333,8 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   outputToFolderAndFile(autobuildCompTrigger, "common/scripted_triggers/", "00000_cgm_auto_compatibilty_triggers.txt",2, "../CGM/buildings_script_source", False)
 
   if apiOutFolder=="":
-    # apiOutFolder="../NOTES/api files/cgm_auto/"+modName
-    apiOutFolder="../../mod/cgm_auto_"+modName
+    apiOutFolder="../NOTES/api files/cgm_auto/"+modName
+    # apiOutFolder="../../mod/cgm_auto_"+modName
   if len(specialResourceTrigger):
     outputToFolderAndFile(specialResourceTrigger, "/common/scripted_triggers/", "zz_cgm_special_resource_trigger{}.txt".format(additionString),2,apiOutFolder )
   if len(automationEffects):

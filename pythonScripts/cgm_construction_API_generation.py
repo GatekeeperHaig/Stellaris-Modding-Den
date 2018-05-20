@@ -8,7 +8,7 @@ def main():
 
   os.chdir(os.path.dirname(__file__))
 
-  createEffectDecisionStuff()
+  # createEffectDecisionStuff()
   automatedCreationAutobuildAPI()
   #return
   with open("../NOTES/other mod files used for API files/list of abbrevations used in API files.csv", 'r') as file:
