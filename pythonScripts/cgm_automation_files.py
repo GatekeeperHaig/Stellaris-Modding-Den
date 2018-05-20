@@ -284,34 +284,34 @@ def main():
   chooseSpecialBuilding.addReturn("prev").variableOp("set","cgm_special_bestWeight", "prev").variableOp("set","cgm_special_bestBuilding", 2)
   chooseSpecialBuilding.add("save_event_target_as", "cgm_best_planet_for_special")
 
-  cgmCompTrigger=TagList().readFile("../CGM/buildings_script_source/common/scripted_effects/00000_cgm_compatibility_effects.txt")
+  cgmCompEffect=TagList().readFile("../CGM/buildings_script_source/common/scripted_effects/00000_cgm_compatibility_effects.txt")
   miscAutoEffects.addComment("this : pop")
   miscAutoEffects.addComment("prev : planet")
   popTraits=miscAutoEffects.addReturn("check_pop_traits_rights_modifiers_vanilla_and_API")
-  for name in cgmCompTrigger.names:
+  for name in cgmCompEffect.names:
     if "check_pop_traits" in name:
       if name=="check_pop_traits_additional_traits":
         popTraits.createReturnIf(TagList("additional_traits_enabled", "no")).add("check_vanilla_pop_traits", yes).add("else", TagList(name, yes))
       else:
         popTraits.add(name,"yes")
   popTraits.add("vanilla_pop_modifiers",yes)
-  for name in cgmCompTrigger.names:
+  for name in cgmCompEffect.names:
     if "check_pop_modifiers" in name:
       popTraits.add(name,"yes")
   popTraits.add("check_pop_species_rights",yes)
-  for name in cgmCompTrigger.names:
+  for name in cgmCompEffect.names:
     if "check_pop_species_rights_" in name:
       popTraits.add(name,"yes")
   miscAutoEffects.addComment("this : tile")
   miscAutoEffects.addComment("prev : planet")
   adjacencyAPI=miscAutoEffects.addReturn("check_neighboring_adj_bonus_buildings_APIs")
-  for name in cgmCompTrigger.names:
+  for name in cgmCompEffect.names:
     if "check_neighboring_adj_bonus_buildings" in name:
       adjacencyAPI.add(name,"yes")
   miscAutoEffects.addComment("this : tile")
   miscAutoEffects.addComment("prev : planet")
   adjacencyBlockerAPI=miscAutoEffects.addReturn("check_neighboring_adj_bonus_blockers_APIs")
-  for name in cgmCompTrigger.names:
+  for name in cgmCompEffect.names:
     if "check_adj_bonus_blockers" in name:
       adjacencyBlockerAPI.add(name,"yes")
 
@@ -351,7 +351,7 @@ def main():
     recheckModifiers.variableOp("set", resource+"_mult_planet_base_old", resource+"_mult_planet_base")
     recheckModifiers.variableOp("set", resource+"_mult_planet_base", 0)
   # recheckModifiers.add("check_vanilla_planet_modifiers","yes")
-  for name in cgmCompTrigger.names:
+  for name in cgmCompEffect.names:
     if "check_planet_modifiers" in name:
       if name=="check_planet_modifiers_gpm":
         recheckModifiers.createReturnIf(TagList("gpm_enabled", "no")).add("check_vanilla_planet_modifiers", yes).add("else", TagList(name, yes))
@@ -371,7 +371,7 @@ def main():
   for resource in resources:
     recheckBuildings.variableOp("set", resource+"_mult_planet_building", 0)
   recheckBuildings.add("check_planet_bonus_buildings","yes")
-  for name in cgmCompTrigger.names:
+  for name in cgmCompEffect.names:
     if "check_planet_bonus_buildings" in name:
       recheckBuildings.add(name,"yes")
   # recheckBuildings.add("check_planet_bonus_buildings_pe","yes")
@@ -883,7 +883,7 @@ def addToBuildingListsIf(assigned, buildingName,building, buildingLists,resource
     if hasattr(building, "bestVal"):
       compare=building.bestVal
     else:
-      compare=0.1
+      compare=0
     if len(val)>0: #string at this point!
       # print(subTag.format(resource))
       val=getVariableValueFromList(val, allVars)
@@ -1347,6 +1347,41 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     outputToFolderAndFile(upgradeEffect, "/common/scripted_effects/", "zz_cgm_upgrade_effects{}.txt".format(additionString),2, apiOutFolder)
   for modFolder in addedFolders+addedFoldersPriority:
     createAIVarsFromModifiers.main(createAIVarsFromModifiers.parse([modFolder+"/buildings/*",modFolder+"/static_modifiers/*",modFolder+"/tile_blockers/*",modFolder+"/traits/*", "--effect_name", modName, "--output_folder", apiOutFolder]))
+
+    for dirpath, dirnames, files in os.walk(modFolder+"/buildings"):
+      for file in files:
+        buildingFileContent=readFile(os.path.join(dirpath, file))
+        buildingOut=TagList()
+        for name, val, comment, seperator in buildingFileContent.getAll():
+          if isinstance(val, TagList):
+            val.getOrCreate("ai_allow").add("NOT",TagList("owner" , TagList("has_country_flag","cgm_disable_vanilla_building_AI")))
+            val.removeDuplicatesRec()
+          buildingOut.add(name, val, comment, seperator)
+        outputToFolderAndFile(buildingOut, "/common/buildings/", file,2, apiOutFolder)
+
+
+  aiWeightTriggerFileName=apiOutFolder+"/common/scripted_triggers/cgm_{}_ai_weight_scripted_trigger.txt".format(modName)
+  if os.path.exists(aiWeightTriggerFileName):
+    hasBuildingTrigger=readFile(aiWeightTriggerFileName)
+    mainEngineTriggerFileContent=readFile("../CGM/buildings_script_source/common/scripted_triggers/cgm_engine_triggers.txt")
+    cgmCompTrigger=TagList().readFile("../CGM/buildings_script_source/common/scripted_triggers/00000_cgm_compatibility_triggers.txt")
+    for triggerName in ["has_{}planet_bonus", "had_{}planet_bonus", "has_{}adj_bonus", "had_{}adj_bonus"]:
+      if triggerName.format(modName+"_")+"_building" in hasBuildingTrigger.names:
+        mainEngineTriggerFileContent.get("cgm_"+triggerName.format("")+"_building").get("OR").addUnique(triggerName.format(modName+"_")+"_building",yes)#
+        cgmCompTrigger.addUnique(triggerName.format(modName+"_")+"_building", TagList("always","no"))
+    outputToFolderAndFile(mainEngineTriggerFileContent, "common/scripted_triggers/", "cgm_engine_triggers.txt",2, "../CGM/buildings_script_source",False)
+    outputToFolderAndFile(cgmCompTrigger, "common/scripted_triggers/", "00000_cgm_compatibility_triggers.txt",2, "../CGM/buildings_script_source",False)
+
+  aiWeightEffectFileName=apiOutFolder+"/common/scripted_effects/cgm_{}_ai_weight_API.txt".format(modName)
+  if os.path.exists(aiWeightEffectFileName):
+    aiWeightEffectFile=readFile(aiWeightEffectFileName)
+    cgmCompEffect=TagList().readFile("../CGM/buildings_script_source/common/scripted_effects/00000_cgm_compatibility_effects.txt")
+    for triggerName in aiWeightEffectFile.names:
+      cgmCompEffect.addUnique(triggerName, TagList())
+    outputToFolderAndFile(cgmCompEffect, "common/scripted_effects/", "00000_cgm_compatibility_effects.txt",2, "../CGM/buildings_script_source",False)
+
+    
+
   modFile=TagList()
   modFile.add("name", '"!cgm_comp_{}"'.format(modName))
   modFile.add("path", '"mod/cgm_auto_{}"'.format(modName))

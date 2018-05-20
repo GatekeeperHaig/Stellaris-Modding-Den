@@ -1,0 +1,189 @@
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+@lots = 10
+@lotsandlots = 20
+@infcosthigh = 50
+@infcostmed = 25
+@infcostlow = 10
+@weightnormal = 1
+@weightuseful = 2
+@weightimportant = 5
+@weightcritical = 10
+@engcostcheap = 75
+@engcostlow = 125
+@engcostmed = 250
+@engcosthigh = 400
+@mincostcheap = 25
+@mincostlow = 75
+@mincostmed = 200
+@mincosthigh = 350
+@srlow = 1
+@srmed = 2
+@srhigh = 4
+@buildquick = 90
+@buildnormal = 180
+@buildlong = 360
+@buildhuge = 720
+building_actinides_mine = {
+	base_buildtime = 180
+	cost = { minerals = 75 energy = 25 }
+	produced_resources = { minerals = 1 energy = 1 }
+	adjacency_bonus = { tile_building_resource_energy_add = 1 }
+	planet_modifier = { pop_environment_tolerance = -0.02 }
+	potential = {
+		planet = { any_tile = { has_actinides_deposit = yes } }
+	}
+	allow = {
+		custom_tooltip = {
+			text = "requirement_has_actinides"
+			tile = { has_actinides_deposit = yes }
+		}
+	}
+	 # ai_special_building = yes
+	ai_replace = no
+	ai_weight = { weight = 25 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_nuclear_research = {
+	base_buildtime = 360
+	planet_unique = yes
+	cost = { minerals = 75 energy = 50 }
+	produced_resources = { physics_research = 3 engineering_research = 2 }
+	planet_modifier = { pop_environment_tolerance = -0.01 }
+	potential = {
+		planet = { any_tile = { has_actinides_deposit = yes } }
+	}
+	allow = {
+		custom_tooltip = {
+			text = "requirement_has_actinides"
+			tile = { has_actinides_deposit = yes }
+		}
+	}
+	prerequisites = { "tech_physics_lab_1" }
+	 # ai_special_building = yes
+	ai_replace = no
+	ai_weight = { weight = 100 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_alpha_fuel_converter_fission = {
+	base_buildtime = @buildnormal
+	cost = { minerals = @mincostlow }
+	required_resources = { }
+	potential = {
+		planet = {
+			any_tile = { has_actinides_deposit = yes }
+			owner = { not = { has_technology = tech_alpha_fusion_plants } }
+		}
+	}
+	allow = {
+		custom_tooltip = {
+			text = "requirement_adjacent_actinides_sourcer"
+			tile = {
+				any_neighboring_tile = {
+					or = {
+						has_building = building_actinides_mine
+						has_building = building_nuclear_research
+						has_building = building_alpha_fuel_converter_2
+						has_building = building_alpha_fuel_converter_3
+						has_building = building_alpha_fuel_converter_4
+						has_building = building_alpha_fuel_converter_fission
+					}
+				}
+			}
+		}
+	}
+	produced_resources = { energy = 3 physics_research = 1 }
+	planet_modifier = { pop_environment_tolerance = -0.02 }
+	country_modifier = { max_energy = 200 }
+	prerequisites = { "tech_physics_lab_1" }
+	upgrades = { building_alpha_fuel_converter_2 }
+	ai_weight = { weight = 5 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_alpha_fuel_converter_2 = {
+	base_buildtime = @buildnormal
+	cost = { minerals = @mincostlow }
+	required_resources = { }
+	produced_resources = { energy = 4 physics_research = 2 }
+	planet_modifier = { pop_environment_tolerance = -0.01 }
+	country_modifier = { max_energy = 250 }
+	allow = {
+		custom_tooltip = {
+			text = "requirement_adjacent_actinides_sourcer"
+			tile = {
+				any_neighboring_tile = {
+					or = {
+						has_building = building_actinides_mine
+						has_building = building_nuclear_research
+						has_building = building_alpha_fuel_converter_2
+						has_building = building_alpha_fuel_converter_3
+						has_building = building_alpha_fuel_converter_4
+						has_building = building_alpha_fuel_converter_fission
+					}
+				}
+			}
+		}
+	}
+	prerequisites = { "tech_alpha_fusion_plants" }
+	upgrades = { building_alpha_fuel_converter_3 }
+	ai_weight = { weight = 5 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_alpha_fuel_converter_3 = {
+	base_buildtime = 360
+	planet_unique = yes
+	is_listed = no
+	cost = { minerals = 75 }
+	required_resources = { }
+	produced_resources = { energy = 5 physics_research = 2.5 }
+	planet_modifier = { pop_environment_tolerance = -0.01 }
+	country_modifier = { max_energy = 350 }
+	prerequisites = { "tech_alpha_cold_fusion" }
+	upgrades = { building_alpha_fuel_converter_4 }
+	 # ai_special_building = yes
+	ai_replace = no
+	ai_weight = { weight = 5 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_alpha_fuel_converter_4 = {
+	base_buildtime = 720
+	planet_unique = yes
+	is_listed = no
+	cost = {
+		minerals = 100
+		energy = 100
+		influence = 25
+	}
+	required_resources = { }
+	produced_resources = { energy = 6 physics_research = 3 }
+	country_modifier = { max_energy = 500 }
+	potential = {
+		planet = {
+			owner = {
+				has_technology = "tech_zero_point_power"
+				OR = {
+					has_ethic = ethic_materialist
+					has_ethic = ethic_fanatic_materialist
+					has_ethic = ethic_fanatic_egalitarian
+				}
+			}
+		}
+	}
+	 # ai_special_building = yes
+	ai_replace = no
+	ai_weight = { weight = 10 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os,sys,glob,io
-os.chdir(os.path.dirname(__file__))
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(1, '..\..\../pythonScripts')
 from locList import LocList
 locList=LocList(1)

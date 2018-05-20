@@ -53,7 +53,7 @@ def main(args,*unused):
   if not args.no_traits:
     outSubTags=[]
     effect=TagList()
-    outTagList.add("check_pop_traits"+args.effect_name, effect)
+    outTagList.add("check_pop_traits_"+args.effect_name, effect)
     outSubTags.append(effect)
     bios=TagList("limit", TagList("is_robot_pop", "no"))
     effect.add("if", bios)
@@ -66,10 +66,10 @@ def main(args,*unused):
   if not args.no_modifiers:
     outSubTags=[]
     effect=TagList()
-    outTagList.add("check_planet_modifier"+args.effect_name, effect)
+    outTagList.add("check_planet_modifiers_"+args.effect_name, effect)
     outSubTags.append(effect)
     effect=TagList()
-    outTagList.add("check_pop_modifier"+args.effect_name, effect)
+    outTagList.add("check_pop_modifiers_"+args.effect_name, effect)
     outSubTags.append(effect)
     outSubTagLists.append(outSubTags)
     funsToApply.append(addStaticModifiers)
@@ -176,11 +176,11 @@ def main(args,*unused):
     triggerContentA=TagList()
     triggerContentB=TagList()
     if i==0:
-      nameAddition="_adjacency"
+      nameAddition="adj_bonus"
     else:
-      nameAddition=""
-    triggerNameA="has_{}{}_bonus_building".format(args.effect_name, nameAddition) #args.effect_name+"_building_trigger_new"
-    triggerNameB="had_{}{}_bonus_building".format(args.effect_name, nameAddition) #args.effect_name+"_building_trigger_new"
+      nameAddition="planet_bonus"
+    triggerNameA="has_{}_{}_building".format(args.effect_name, nameAddition) #args.effect_name+"_building_trigger_new"
+    triggerNameB="had_{}_{}_building".format(args.effect_name, nameAddition) #args.effect_name+"_building_trigger_new"
     # triggerNameB=args.effect_name+"_building_trigger_old"
     triggerList.add(triggerNameA, TagList("OR", triggerContentA))
     triggerList.add(triggerNameB, TagList("OR", triggerContentB))
@@ -188,12 +188,14 @@ def main(args,*unused):
       triggerContentA.add("has_building", building)
       triggerContentB.add("has_prev_building", building)
 
-  triggerFolder=args.output_folder+"/common/scripted_triggers"
-  if not os.path.exists(triggerFolder):
-    os.makedirs(triggerFolder)
-  triggerFile=triggerFolder+"/cgm_"+args.effect_name+"_ai_weight_scripted_trigger.txt"
-  with open(triggerFile,"w") as file:
-    triggerList.writeAll(file)
+  triggerList.deleteOnLowestLevel(checkTotallyEmpty)
+  if len(triggerList)>0 and not args.test_run:
+    triggerFolder=args.output_folder+"/common/scripted_triggers"
+    if not os.path.exists(triggerFolder):
+      os.makedirs(triggerFolder)
+    triggerFile=triggerFolder+"/cgm_"+args.effect_name+"_ai_weight_scripted_trigger.txt"
+    with open(triggerFile,"w") as file:
+      triggerList.writeAll(file)
 
   if not args.test_run:
     if not os.path.exists(effectFolder):
