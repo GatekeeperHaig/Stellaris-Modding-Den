@@ -10,6 +10,7 @@ from locList import LocList
 from custom_difficulty_files import *
 from functools import reduce
 import glob
+import createAIVarsFromModifiers
 
 
 #TODO: Prio List how to use this:
@@ -1344,6 +1345,8 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     outputToFolderAndFile(adjacencyTriggers, "/common/scripted_triggers/", "zz_cgm_adjacency_triggers{}.txt".format(additionString),2, apiOutFolder)
   if len(upgradeEffect):
     outputToFolderAndFile(upgradeEffect, "/common/scripted_effects/", "zz_cgm_upgrade_effects{}.txt".format(additionString),2, apiOutFolder)
+  for modFolder in addedFolders+addedFoldersPriority:
+    createAIVarsFromModifiers.main(createAIVarsFromModifiers.parse([modFolder+"/buildings/*",modFolder+"/static_modifiers/*",modFolder+"/tile_blockers/*",modFolder+"/traits/*", "--effect_name", modName, "--output_folder", apiOutFolder]))
   modFile=TagList()
   modFile.add("name", '"!cgm_comp_{}"'.format(modName))
   modFile.add("path", '"mod/cgm_auto_{}"'.format(modName))

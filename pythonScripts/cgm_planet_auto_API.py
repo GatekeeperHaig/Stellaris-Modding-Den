@@ -22,7 +22,7 @@ def main():
   modAbbr="cgm_planets"
   print("automatedCreationAutobuildAPI({},{},{},10,../CGM/cgm_planets_enhanced)".format(modAbbr,lowPri,highPri))
   automatedCreationAutobuildAPI(modAbbr,lowPri,highPri,10,"../CGM/cgm_planets_enhanced")
-  createAIVarsFromModifiers.main(createAIVarsFromModifiers.parse(["../CGM/cgm_planets_enhanced/common/buildings/*","../CGM/cgm_planets_enhanced/common/static_modifiers/*","../CGM/cgm_planets_enhanced/common/tile_blockers/*", "--effect_name", "check_cgm_planets", "--output_folder", "../CGM/cgm_planets_enhanced/common/scripted_triggers"]))
+  createAIVarsFromModifiers.main(createAIVarsFromModifiers.parse(["../CGM/cgm_planets_enhanced/common/buildings/*","../CGM/cgm_planets_enhanced/common/static_modifiers/*","../CGM/cgm_planets_enhanced/common/tile_blockers/*", "--effect_name", "cgm_planets", "--output_folder", "../CGM/cgm_planets_enhanced/"]))
 
 
 
