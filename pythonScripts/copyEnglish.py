@@ -30,6 +30,6 @@ for dirpath, dirnames, files in os.walk("."):
                   if "l_"+sourceLanguage in line:
                     foundHeader=True
                     outfile.write(line.replace("l_"+sourceLanguage, "l_"+language))
-                  else:
-                    outfile.write(line)
+                else:
+                  outfile.write(line)
 input("Completed. Press Enter to continue...")

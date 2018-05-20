@@ -71,6 +71,7 @@ def readAndConvert(args, allowRestart=1):
   globbedList=[]
   for b in args.buildingFileNames:
     globbedList+=glob.glob(b)
+  globbedList=list(reversed(globbedList)) #historical reasons. stupid, but needed
 
   #helper files: Needed when a mod only provides upgrades, without changing the lower tier buildings. Those lower tiers are needed for the script, thus they have to be given as helper files. Entries from helper files are not written later.
   isHelperFileItList=[] #list later used in main iteration
@@ -115,7 +116,7 @@ def readAndConvert(args, allowRestart=1):
       args.outPath=args.output_folder
     else:
       args.outPath=args.output_folder+"/common/buildings/"
-    if not args.test_run and (not args.just_copy_and_check or not args.create_standalone_mod_from_mod):
+    if not args.test_run and (not args.just_copy_and_check or not args.create_standalone_mod_from_mod) and not thisFileIsAHelper:
       with open(args.outPath+buildingFileNameWithoutPath,'w') as outputFile:
         outputFile.write(args.scriptDescription)
         outputFile.write("#overwrite\n")
@@ -241,7 +242,8 @@ def readAndConvert(args, allowRestart=1):
               # newList.get("OR").add("has_prev_building",buildingNameToData.names[upgradeBuildingIndex]) #second entry to "OR"
               # triggers.add("has_prev_"+upgradeName, newList)
               if not args.test_run:
-                copiedBuildingsFile.write(upgradeName+"\n")
+                if not upgradeData.helper:
+                  copiedBuildingsFile.write(upgradeName+"\n")
               
               #REMOVE COPY FROM TECH TREE.
               while "show_tech_unlock_if" in buildingNameToData.vals[upgradeBuildingIndex].names:
@@ -415,7 +417,10 @@ def readAndConvert(args, allowRestart=1):
 
 
     if args.join_files:
-      outfileBaseName="JOINED"+buildingFileNameWithoutPath+".txt"
+      if args.custom_mod_name:
+        outfileBaseName=''.join(e for e in args.custom_mod_name if e.isalnum())+".txt"
+      else:
+        outfileBaseName="JOINED"+buildingFileNameWithoutPath+".txt"
     else:
       outfileBaseName=buildingFileNameWithoutPath
     if not args.just_copy_and_check and not args.test_run:
@@ -634,8 +639,9 @@ def createConvertEvent(args):
   immediateSwitch=TagList("trigger", "has_building")
   convertEvent.add("immediate", TagList("from", TagList("switch", immediateSwitch)))
   for building in args.copiedBuildings:
-    triggerOr.add("has_building", building+"_direct_build")
-    immediateSwitch.add(building+"_direct_build", TagList("remove_building","yes").add("set_building", building))
+    # if not building.helper:
+      triggerOr.add("has_building", building+"_direct_build")
+      immediateSwitch.add(building+"_direct_build", TagList("remove_building","yes").add("set_building", building))
   convertPlanetEvent=TagList("id", "direct_build_{}.3".format(simpleModName))
   eventTagList.add("planet_event", convertPlanetEvent)
   convertPlanetEvent.add("hide_window", "yes")
