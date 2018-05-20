@@ -53,7 +53,7 @@ def main(args,*unused):
   if not args.no_traits:
     outSubTags=[]
     effect=TagList()
-    outTagList.add("check_pop_traits"+args.effect_name, effect)
+    outTagList.add("check_pop_traits_"+args.effect_name, effect)
     outSubTags.append(effect)
     bios=TagList("limit", TagList("is_robot_pop", "no"))
     effect.add("if", bios)
@@ -66,10 +66,10 @@ def main(args,*unused):
   if not args.no_modifiers:
     outSubTags=[]
     effect=TagList()
-    outTagList.add("check_planet_modifier"+args.effect_name, effect)
+    outTagList.add("check_planet_modifier_"+args.effect_name, effect)
     outSubTags.append(effect)
     effect=TagList()
-    outTagList.add("check_pop_modifier"+args.effect_name, effect)
+    outTagList.add("check_pop_modifier_"+args.effect_name, effect)
     outSubTags.append(effect)
     outSubTagLists.append(outSubTags)
     funsToApply.append(addStaticModifiers)
