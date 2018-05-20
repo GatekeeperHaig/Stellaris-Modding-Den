@@ -66,10 +66,10 @@ def main(args,*unused):
   if not args.no_modifiers:
     outSubTags=[]
     effect=TagList()
-    outTagList.add("check_planet_modifier_"+args.effect_name, effect)
+    outTagList.add("check_planet_modifiers_"+args.effect_name, effect)
     outSubTags.append(effect)
     effect=TagList()
-    outTagList.add("check_pop_modifier_"+args.effect_name, effect)
+    outTagList.add("check_pop_modifiers_"+args.effect_name, effect)
     outSubTags.append(effect)
     outSubTagLists.append(outSubTags)
     funsToApply.append(addStaticModifiers)
