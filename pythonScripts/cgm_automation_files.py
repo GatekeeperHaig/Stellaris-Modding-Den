@@ -23,7 +23,7 @@ resources=["energy", "minerals", "food","unity", "society_research", "physics_re
 def main():
 
   debug=False
-  os.chdir(os.path.dirname(__file__))
+  os.chdir(os.path.dirname(os.path.abspath(__file__)))
   
   # weightTypes=["energy", "minerals", "food", "unity", "society_research", "physics_research", "engineering_research"]
   weightTypes=["energy", "minerals", "food", "society_research", "physics_research", "engineering_research"] #not same as resources, see below!

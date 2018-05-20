@@ -6,7 +6,7 @@ from cgm_automation_files import *
 
 def main():
 
-  os.chdir(os.path.dirname(__file__))
+  os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
   # createEffectDecisionStuff()
   automatedCreationAutobuildAPI()

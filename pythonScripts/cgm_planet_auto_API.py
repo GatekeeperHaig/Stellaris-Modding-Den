@@ -7,7 +7,7 @@ import createAIVarsFromModifiers
 
 def main():
 
-  os.chdir(os.path.dirname(__file__))
+  os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
   modFolder="../CGM/cgm_planets_enhanced/common"
   lowPri=[]

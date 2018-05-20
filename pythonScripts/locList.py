@@ -186,7 +186,7 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
           relPath+="/"+os.path.relpath(sys.path[0],commonPath)
         # print(relPath)
         file.write("#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nimport os,sys,glob,io\n")
-        file.write("os.chdir(os.path.dirname(__file__))\n")
+        file.write("os.chdir(os.path.dirname(os.path.abspath(__file__)))\n")
         file.write("sys.path.insert(1, '"+relPath+"')\n")
         file.write("from locList import LocList\nlocList=LocList(1)\n")
         # file.write("import allModules,importlib\n")

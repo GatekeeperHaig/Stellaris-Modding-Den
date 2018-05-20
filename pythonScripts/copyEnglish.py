@@ -5,7 +5,8 @@
 
 import os, sys, io
 
-os.chdir(os.path.dirname(sys.argv[0]))
+# os.chdir(os.path.dirname(sys.argv[0]))
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 #default to exporting from English to all other languages and not overwriting pre-existing files
 allLanguages = {'braz_por', 'english', 'french', 'german', 'polish', 'russian', 'spanish'}

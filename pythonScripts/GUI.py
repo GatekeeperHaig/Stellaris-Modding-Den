@@ -1082,7 +1082,7 @@ class MenuBar:
 
   
 def main():
-  os.chdir(os.path.dirname(__file__))
+  os.chdir(os.path.dirname(os.path.abspath(__file__)))
   root = Tk()
   root.title("Stellaris Python Script Helper")
   screen_width = root.winfo_screenwidth()
