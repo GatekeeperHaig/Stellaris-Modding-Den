@@ -1333,8 +1333,8 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   outputToFolderAndFile(autobuildCompTrigger, "common/scripted_triggers/", "00000_cgm_auto_compatibilty_triggers.txt",2, "../CGM/buildings_script_source", False)
 
   if apiOutFolder=="":
-    # apiOutFolder="../NOTES/api files/cgm_auto/"+modName
-    apiOutFolder="../../mod/cgm_auto_"+modName
+    apiOutFolder="../NOTES/api files/cgm_auto/"+modName
+    # apiOutFolder="../../mod/cgm_auto_"+modName
   if len(specialResourceTrigger):
     outputToFolderAndFile(specialResourceTrigger, "/common/scripted_triggers/", "zz_cgm_special_resource_trigger{}.txt".format(additionString),2,apiOutFolder )
   if len(automationEffects):
