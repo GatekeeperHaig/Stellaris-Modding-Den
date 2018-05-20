@@ -35,6 +35,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('--helper_file_list', default="", help="Non-separated list of zeros and ones. N-th number defines whether file number n is a helper file (1 helperfile, 0 standard file)")
   parser.add_argument('--make_optional', action="store_true", help="Adds 'direct_build_enabled = yes' as potential to all direct build buildings." )
   parser.add_argument('--scripted_variables', default="", help="Comma separated list of files that contain scripted variables used in the building files. This option is mandatory if you building costs use any of those variables. Recognizable at the spam of missing variable errors you get if not doing this!")
+  parser.add_argument('--skip_building', default="", help="Comma separated list of buildings which should remain untouched")
   addCommonArgs(parser)
 
   if returnParser:
@@ -55,7 +56,7 @@ def parse(argv, returnParser=False):
 def readAndConvert(args, allowRestart=1):   
   lastOutPutFileName=""
 
-
+  skipList=args.skip_building.split(",")
 
   if not args.just_copy_and_check and not args.test_run:
     if not os.path.exists(args.output_folder+"/common"):
@@ -157,6 +158,8 @@ def readAndConvert(args, allowRestart=1):
         if not isinstance(baseBuildingData,NamedTagList):
           continue
         if baseBuildingData.attemptGet("is_listed")=="no":
+          continue
+        if baseBuildingData.tagName in skipList:
           continue
         
         #ITERATE THROUGH WHOLE BUILDING TREE/LINE
