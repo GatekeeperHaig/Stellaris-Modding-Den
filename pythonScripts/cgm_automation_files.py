@@ -1348,6 +1348,18 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   for modFolder in addedFolders+addedFoldersPriority:
     createAIVarsFromModifiers.main(createAIVarsFromModifiers.parse([modFolder+"/buildings/*",modFolder+"/static_modifiers/*",modFolder+"/tile_blockers/*",modFolder+"/traits/*", "--effect_name", modName, "--output_folder", apiOutFolder]))
 
+    for dirpath, dirnames, files in os.walk(modFolder+"/buildings"):
+      for file in files:
+        buildingFileContent=readFile(os.path.join(dirpath, file))
+        buildingOut=TagList()
+        for name, val, comment, seperator in buildingFileContent.getAll():
+          if isinstance(val, TagList):
+            val.getOrCreate("ai_allow").add("NOT",TagList("owner" , TagList("has_country_flag","cgm_disable_vanilla_building_AI")))
+            val.removeDuplicatesRec()
+          buildingOut.add(name, val, comment, seperator)
+        outputToFolderAndFile(buildingOut, "/common/buildings/", file,2, apiOutFolder)
+
+
   aiWeightTriggerFileName=apiOutFolder+"/common/scripted_triggers/cgm_{}_ai_weight_scripted_trigger.txt".format(modName)
   if os.path.exists(aiWeightTriggerFileName):
     hasBuildingTrigger=readFile(aiWeightTriggerFileName)
@@ -1367,6 +1379,8 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     for triggerName in aiWeightEffectFile.names:
       cgmCompEffect.addUnique(triggerName, TagList())
     outputToFolderAndFile(cgmCompEffect, "common/scripted_effects/", "00000_cgm_compatibility_effects.txt",2, "../CGM/buildings_script_source",False)
+
+    
 
   modFile=TagList()
   modFile.add("name", '"!cgm_comp_{}"'.format(modName))

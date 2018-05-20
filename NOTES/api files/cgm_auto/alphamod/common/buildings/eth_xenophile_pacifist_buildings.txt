@@ -1,0 +1,869 @@
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+@b0time = 90
+@b0cost = 25
+@b0effect = 1
+@b0upkeep = 1
+@b1time = 120
+@b1cost = 50
+@b1effect = 2
+@b1upkeep = 1
+@b2time = 180
+@b2cost = 100
+@b2effect = 3
+@b2upkeep = 1.5
+@b3time = 270
+@b3cost = 200
+@b3effect = 5
+@b3upkeep = 2
+@b4time = 360
+@b4cost = 300
+@b4effect = 8
+@b4upkeep = 3
+@b5time = 720
+@b5cost = 500
+@b5effect = 10
+@b5upkeep = 3
+@weightnormal = 1
+@weightuseful = 2.5
+@weightimportant = 10
+@weightcritical = 1000
+@infcosthigh = 50
+@infcostmed = 25
+@infcostlow = 10
+@engcostcheap = 50
+@engcostlow = 100
+@engcostmed = 250
+@engcosthigh = 500
+@mincostcheap = 25
+@mincostlow = 50
+@mincostmed = 100
+@mincosthigh = 250
+@srlow = 1
+@srmed = 2
+@srhigh = 3
+building_open_embassy = {
+	base_buildtime = 360
+	planet_unique = yes
+	cost = {
+		minerals = @mincostcheap
+		energy = @engcostlow
+		influence = @infcostlow
+	}
+	produced_resources = { society_research = 2 unity = 1 }
+	produced_resource_trigger = {
+		modifier = {
+			or = { has_ethic = ethic_xenophile has_ethic = ethic_fanatic_xenophile }
+			resources = { sr_ambassadors = 1 }
+		}
+	}
+	planet_modifier = { pop_ethic_xenophile_attraction_mult = 0.1 pop_ethic_militarist_attraction_mult = -0.1 }
+	country_modifier = {
+		diplomacy_influence_cost = -0.01
+		country_trust_growth = 0.01
+		planet_migration_xeno_pull = 0.02
+		country_resource_influence_add = 0.1
+	}
+	prerequisites = { "tech_alpha_open_embassies" }
+	 # ai_special_building = yes
+	ai_replace = no
+	potential = {
+		planet = {
+			owner = { not = { has_country_flag = cf_openembassies_5 } }
+			solar_system = {
+				any_neighbor_system = {
+					exists = space_owner
+					space_owner = {
+						or = {
+							is_country_type = neutral_zone
+							nor = {
+								has_ethic = ethic_pacifist
+								has_ethic = ethic_fanatic_pacifist
+								has_ethic = ethic_xenophile
+								has_ethic = ethic_fanatic_xenophile
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	on_queued = {
+		planet = {
+			owner = {
+				if = {
+					limit = { has_country_flag = cf_openembassies_4 }
+					set_country_flag = cf_openembassies_5
+					remove_country_flag = cf_openembassies_4
+				}
+				if = {
+					limit = { has_country_flag = cf_openembassies_3 }
+					set_country_flag = cf_openembassies_4
+					remove_country_flag = cf_openembassies_3
+				}
+				if = {
+					limit = { has_country_flag = cf_openembassies_2 }
+					set_country_flag = cf_openembassies_3
+					remove_country_flag = cf_openembassies_2
+				}
+				if = {
+					limit = { has_country_flag = cf_openembassies_1 }
+					set_country_flag = cf_openembassies_2
+					remove_country_flag = cf_openembassies_1
+				}
+				if = {
+					limit = {
+						not = { has_country_flag = cf_openembassies_1 }
+						not = { has_country_flag = cf_openembassies_2 }
+						not = { has_country_flag = cf_openembassies_3 }
+						not = { has_country_flag = cf_openembassies_4 }
+						not = { has_country_flag = cf_openembassies_5 }
+					}
+					set_country_flag = cf_openembassies_1
+				}
+			}
+		}
+	}
+	on_unqueued = {
+		planet = {
+			owner = {
+				if = {
+					limit = { has_country_flag = cf_openembassies_1 }
+					remove_country_flag = cf_openembassies_1
+				}
+				if = {
+					limit = { has_country_flag = cf_openembassies_2 }
+					set_country_flag = cf_openembassies_1
+					remove_country_flag = cf_openembassies_2
+				}
+				if = {
+					limit = { has_country_flag = cf_openembassies_3 }
+					set_country_flag = cf_openembassies_2
+					remove_country_flag = cf_openembassies_3
+				}
+				if = {
+					limit = { has_country_flag = cf_openembassies_4 }
+					set_country_flag = cf_openembassies_3
+					remove_country_flag = cf_openembassies_4
+				}
+				if = {
+					limit = { has_country_flag = cf_openembassies_5 }
+					set_country_flag = cf_openembassies_4
+					remove_country_flag = cf_openembassies_5
+				}
+			}
+		}
+	}
+	ai_weight = {
+		weight = 0
+		modifier = {
+			weight = @weightuseful
+			from = { has_building = "building_visitor_center" }
+		}
+		modifier = {
+			factor = 1.5
+			from = {
+				owner = {
+					OR = { has_ethic = ethic_pacifist has_ethic = ethic_xenophile }
+				}
+			}
+		}
+		modifier = {
+			factor = 2.0
+			from = {
+				owner = {
+					OR = { has_ethic = ethic_fanatic_pacifist has_ethic = ethic_fanatic_xenophile }
+				}
+			}
+		}
+	}
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_refuge = {
+	base_buildtime = 180
+	planet_unique = yes
+	cost = { minerals = 100 energy = 150 }
+	required_resources = { energy = 1 }
+	potential = {
+		planet = {
+			solar_system = {
+				any_neighbor_system = {
+					exists = space_owner
+					space_owner = {
+						is_ai = yes
+						or = {
+							is_country_type = neutral_zone
+							is_at_war = yes
+							has_ethic = ethic_militarist
+							has_ethic = ethic_fanatic_militarist
+							has_ethic = ethic_authoritarian
+							has_ethic = ethic_fanatic_authoritarian
+							has_ethic = ethic_xenophobe
+							has_ethic = ethic_fanatic_xenophobe
+						}
+					}
+				}
+			}
+		}
+	}
+	planet_modifier = {
+		 # planet_border_mult = 0.25
+	}
+	 # triggered_planet_modifier = {
+	 # key = refuge_inactive
+	 # potential = {
+	 # owner = {
+	 # is_at_war = yes
+	 # }
+	 # }
+	 # modifier = {
+	 # # planet_border_mult = -0.25
+	 # }
+	 # }
+	triggered_planet_modifier = {
+		key = refuge_onstandby
+		potential = {
+			 # owner = {
+			 # is_at_war = no
+			 # }
+			not = {
+				solar_system = {
+					any_neighbor_system = {
+						exists = space_owner
+						space_owner = { is_at_war = yes }
+					}
+				}
+			}
+		}
+		modifier = { planet_migration_xeno_pull = 0.1 pop_ethic_pacifist_attraction_mult = 0.1 }
+	}
+	triggered_planet_modifier = {
+		key = refuge_more_active
+		potential = {
+			 # owner = {
+			 # is_at_war = no
+			 # }
+			solar_system = {
+				any_neighbor_system = {
+					exists = space_owner
+					space_owner = { is_at_war = yes }
+				}
+			}
+		}
+		modifier = { planet_migration_xeno_pull = 0.8 pop_ethic_pacifist_attraction_mult = 0.25 }
+	}
+	prerequisites = { "tech_alpha_pacifism" }
+	ai_weight = {
+		weight = @weightuseful
+		modifier = {
+			factor = 0
+			from = { sector_controlled = yes }
+		}
+	}
+	 # ai_special_building = yes
+	ai_replace = no
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_xeno_diplomacy_corp = {
+	base_buildtime = 720
+	empire_unique = yes
+	cost = {
+		minerals = 150
+		energy = 300
+		influence = 25
+	}
+	required_resources = { energy = 2 }
+	produced_resources = { society_research = 3 }
+	country_modifier = { diplomacy_influence_cost = -0.05 country_trust_growth = 0.05 }
+	potential = {
+		planet = {
+			OR = {
+				has_building = "building_capital_1"
+				has_building = "building_capital_2"
+				has_building = "building_capital_3"
+			}
+		}
+	}
+	prerequisites = { "tech_alpha_diplomatic_corps" }
+	upgrades = { building_peace_corps }
+	 # ai_special_building = yes
+	ai_replace = no
+	ai_weight = {
+		weight = @weightimportant
+		modifier = {
+			factor = 2.0
+			from = {
+				owner = {
+					OR = { has_ethic = ethic_pacifist has_ethic = ethic_xenophile }
+				}
+			}
+		}
+		modifier = {
+			factor = 3.0
+			from = {
+				owner = {
+					OR = { has_ethic = ethic_fanatic_pacifist has_ethic = ethic_fanatic_xenophile }
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			from = { sector_controlled = yes }
+		}
+	}
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_peace_corps = {
+	base_buildtime = 360
+	empire_unique = yes
+	is_listed = no
+	cost = {
+		minerals = 200
+		energy = 500
+		influence = 50
+	}
+	required_resources = { energy = 1 }
+	produced_resources = { society_research = 5 }
+	produced_resource_trigger = {
+		modifier = {
+			is_at_war = no
+			any_neighbor_country = { is_at_war = yes }
+			resources = { unity = 3 }
+		}
+		modifier = {
+			or = { has_ethic = ethic_pacifist has_ethic = ethic_fanatic_pacifist }
+			resources = { sr_signs_peace = 3 }
+		}
+	}
+	country_modifier = {
+		country_resource_influence_add = 0.25
+		diplomacy_influence_cost = -0.05
+		country_trust_growth = 0.1
+		pop_ethic_militarist_attraction_mult = -0.1
+	}
+	prerequisites = { "tech_alpha_mediation" }
+	 # ai_special_building = yes
+	ai_replace = no
+	ai_weight = { weight = @weightcritical }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_comms_hub = {
+	base_buildtime = 720
+	empire_unique = yes
+	cost = {
+		influence = @infcosthigh
+		minerals = @mincostmed
+		energy = @engcosthigh
+	}
+	required_resources = { energy = 5 }
+	produced_resources = { physics_research = 3 }
+	produced_resource_trigger = {
+		modifier = {
+			has_country_strategic_resource = { type = sr_gigarelays amount > 0 }
+			resources = { unity = 2 }
+		}
+		modifier = {
+			has_country_strategic_resource = { type = sr_gigarelays amount > 2 }
+			resources = { unity = 3 }
+		}
+		modifier = {
+			has_country_strategic_resource = { type = sr_gigarelays amount > 5 }
+			resources = { unity = 5 }
+		}
+		modifier = {
+			has_country_strategic_resource = { type = sr_gigarelays amount > 9 }
+			resources = { unity = 10 }
+		}
+	}
+	planet_modifier = { tile_resource_unity_mult = 0.05 }
+	country_modifier = { country_resource_unity_mult = 0.05 tradition_cost_num_colonies_mult = -0.1 }
+	potential = {
+		planet = {
+			OR = {
+				has_building = "building_capital_1"
+				has_building = "building_capital_2"
+				has_building = "building_capital_3"
+			}
+		}
+	}
+	prerequisites = { "tech_alpha_centralised_comms" }
+	 # ai_special_building = yes
+	ai_replace = no
+	ai_weight = {
+		weight = @weightimportant
+		modifier = {
+			factor = 20
+			from = {
+				owner = {
+					OR = { has_ethic = ethic_fanatic_militarist has_ethic = ethic_fanatic_authoritarian }
+				}
+			}
+		}
+		modifier = {
+			factor = 10
+			from = {
+				owner = {
+					OR = {
+						has_ethic = ethic_fanatic_xenophile
+						has_ethic = ethic_xenophile
+						has_ethic = ethic_militarist
+						has_ethic = ethic_authoritarian
+						has_ethic = ethic_fanatic_spiritualist
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = 2
+			from = {
+				owner = {
+					OR = {
+						has_ethic = ethic_spiritualist
+						has_ethic = ethic_pacifist
+						has_ethic = ethic_fanatic_pacifist
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = 0.5
+			from = {
+				owner = {
+					OR = { has_ethic = ethic_xenophobe has_ethic = ethic_fanatic_xenophobe }
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			from = { sector_controlled = yes }
+		}
+	}
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_tradestation = {
+	base_buildtime = 180
+	planet_unique = yes
+	cost = { minerals = 100 energy = 150 }
+	required_resources = { minerals = 2 }
+	produced_resources = { sr_tradegoods = 1 }
+	produced_resource_trigger = {
+		modifier = {
+			has_policy_flag = trade_regulation_restrictive
+			resources = { energy = 2 }
+		}
+		modifier = {
+			has_policy_flag = trade_regulation_moderate
+			resources = { energy = 1 }
+		}
+	}
+	potential = {
+		 # planet = {
+		 # has_spaceport = yes
+		 # }
+		planet = {
+			solar_system = {
+				exists = starbase
+				starbase = { has_starbase_size >= starbase_starport has_starbase_module = trading_hub }
+			}
+		}
+	}
+	allow = {
+		custom_tooltip = {
+			text = "requires_level_1_capital_and_spaceport"
+			planet = {
+				 #has_spaceport = yes
+				OR = {
+					has_building = "building_capital_1"
+					has_building = "building_capital_2"
+					has_building = "building_capital_3"
+				}
+			}
+		}
+	}
+	 # destroy_if = {
+	 # planet = { has_spaceport = no }
+	 # }
+	planet_modifier = { planet_resource_food_add = -2 }
+	triggered_planet_modifier = {
+		key = restrictive_regulation_ts
+		potential = { planet.owner = { has_policy_flag = trade_regulation_restrictive } }
+		modifier = { tile_resource_unity_mult = 0.05 planet_resource_food_add = 2 }
+	}
+	triggered_planet_modifier = {
+		key = moderate_regulation_ts
+		potential = { planet.owner = { has_policy_flag = trade_regulation_moderate } }
+		modifier = { pop_citizen_happiness = 0.025 planet_resource_food_add = 1 }
+	}
+	triggered_planet_modifier = {
+		key = lax_regulation_ts
+		potential = { planet.owner = { has_policy_flag = trade_regulation_lax } }
+		modifier = { pop_consumer_goods_mult = -0.05 }
+	}
+	prerequisites = { "tech_trade_ports" }
+	upgrades = { building_trade_company }
+	ai_weight = {
+		weight = @weightcritical
+		modifier = {
+			factor = 0.5
+			from = { planet_size < 10 }
+		}
+		modifier = {
+			factor = 1.5
+			from = { planet_size > 12 }
+		}
+		modifier = {
+			factor = 2.0
+			from = { planet_size > 15 }
+		}
+	}
+	 # ai_special_building = yes
+	ai_replace = no
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_trade_company = {
+	base_buildtime = 360
+	planet_unique = yes
+	is_listed = no
+	cost = { minerals = 200 energy = 250 }
+	required_resources = { minerals = 3 }
+	produced_resources = { sr_tradegoods = 1 sr_luxuries = 1 }
+	produced_resource_trigger = {
+		modifier = {
+			has_policy_flag = trade_regulation_restrictive
+			resources = { energy = 3 }
+		}
+		modifier = {
+			has_policy_flag = trade_regulation_moderate
+			resources = { energy = 1.5 }
+		}
+		modifier = {
+			has_policy_flag = trade_regulation_lax
+			resources = { influence = 0.1 }
+		}
+	}
+	planet_modifier = { planet_resource_food_add = -1 }
+	 # triggered_planet_modifier = {
+	 # key = restrictive_regulation_mc
+	 # potential = {
+	 # planet.owner = {
+	 # has_policy_flag = trade_regulation_restrictive
+	 # }
+	 # }
+	 # modifier = {
+	 # tile_resource_unity_mult = 0.1
+	 # planet_resource_food_add = 2
+	 # }
+	 # }
+	 # triggered_planet_modifier = {
+	 # key = moderate_regulation_mc
+	 # potential = {
+	 # planet.owner = {
+	 # has_policy_flag = trade_regulation_moderate
+	 # }
+	 # }
+	 # modifier = {
+	 # pop_citizen_happiness = 0.05
+	 # planet_resource_food_add = 1
+	 # }
+	 # }
+	 # triggered_planet_modifier = {
+	 # key = lax_regulation_mc
+	 # potential = {
+	 # planet.owner = {
+	 # has_policy_flag = trade_regulation_lax
+	 # }
+	 # }
+	 # modifier = {
+	 # pop_consumer_goods_mult = -0.1
+	 # }
+	 # }
+	 # destroy_if = {
+	 # planet = { has_spaceport = no }
+	 # }
+	allow = {
+		custom_tooltip = {
+			text = "requires_level_2_capital"
+			planet = {
+				OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
+			}
+		}
+	}
+	prerequisites = { "tech_merchant_companies" }
+	ai_weight = { weight = @weightimportant }
+	 # ai_special_building = yes
+	ai_replace = no
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_gravitic_comms_array = {
+	base_buildtime = 360
+	planet_unique = yes
+	cost = { minerals = @mincostcheap energy = @engcostlow }
+	required_resources = { energy = 2 }
+	produced_resources = { physics_research = 2 unity = 1 }
+	produced_resource_trigger = {
+		modifier = {
+			has_technology = tech_alpha_centralised_comms
+			resources = { sr_gigarelays = 1 }
+		}
+	}
+	ai_replace = no
+	planet_modifier = {
+		tile_resource_society_research_mult = 0.05
+		tile_resource_engineering_research_mult = 0.05
+		tile_resource_unity_mult = 0.05
+	}
+	potential = {
+		planet = {
+			OR = {
+				has_building = "building_capital_1"
+				has_building = "building_capital_2"
+				has_building = "building_capital_3"
+				has_building = "building_hab_capital"
+			}
+		}
+	}
+	upgrades = { building_subspace_comms_array }
+	prerequisites = { "tech_alpha_galactic_comms" }
+	ai_weight = {
+		weight = @weightuseful
+		modifier = {
+			factor = 1.5
+			from = {
+				owner = {
+					OR = { has_ethic = ethic_materialist has_ethic = ethic_fanatic_xenophile }
+				}
+			}
+		}
+		modifier = {
+			factor = 2.5
+			from = { owner = { has_ethic = ethic_fanatic_materialist } }
+		}
+	}
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_subspace_comms_array = {
+	base_buildtime = 720
+	planet_unique = yes
+	is_listed = no
+	cost = { minerals = @mincostlow energy = @engcostmed }
+	required_resources = { energy = 2 }
+	produced_resources = { physics_research = 4 unity = 2 }
+	produced_resource_trigger = {
+		modifier = {
+			has_technology = tech_alpha_centralised_comms
+			resources = { sr_gigarelays = 1 }
+		}
+	}
+	planet_modifier = {
+		 # planet_border_mult = 0.1
+		tile_resource_society_research_mult = 0.05
+		tile_resource_engineering_research_mult = 0.05
+		tile_resource_unity_mult = 0.1
+	}
+	prerequisites = { "tech_alpha_subspace_comms" }
+	ai_weight = { weight = @weightnormal }
+	on_queued = {
+		planet = {
+			owner = {
+				change_variable = { which = "cv_subspace_commsarrays" value = 1 }
+				country_event = { id = ethictekpxevents.10 }
+			}
+		}
+	}
+	on_unqueued = {
+		planet = {
+			owner = {
+				change_variable = { which = "cv_subspace_commsarrays" value = -1 }
+				country_event = { id = ethictekpxevents.10 }
+			}
+		}
+	}
+	ai_replace = no
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_cantina = {
+	base_buildtime = 90
+	 #planet_unique = yes
+	cost = { minerals = 50 energy = 100 }
+	required_resources = { }
+	produced_resources = { energy = 1 unity = 1 }
+	adjacency_bonus = { tile_building_resource_unity_add = 1 }
+	planet_modifier = { pop_ethic_xenophile_attraction_mult = 0.05 planet_migration_xeno_pull = 0.05 }
+	produced_resource_trigger = {
+		modifier = {
+			has_tradition = tr_diplomacy_alien_tourism
+			resources = { unity = 1 energy = 1 }
+		}
+	}
+	triggered_planet_modifier = {
+		key = foreign_tourism_and_trade
+		potential = {
+			planet.owner = {
+				not = { has_policy_flag = foreign_trade_embargo }
+				has_tradition = tr_diplomacy_alien_tourism
+			}
+		}
+		modifier = { pop_ethic_xenophile_attraction_mult = 0.05 planet_migration_xeno_pull = 0.05 }
+	}
+	potential = {
+		planet = {
+			NOT = { has_modifier = "capital" }
+			or = { has_building = building_trade_company has_building = building_tradestation }
+		}
+	}
+	allow = {
+		custom_tooltip = {
+			text = "requirement_adjacent_trade"
+			tile = {
+				any_neighboring_tile = {
+					OR = { has_building = building_trade_company has_building = building_tradestation }
+				}
+			}
+		}
+	}
+	prerequisites = { "tech_trade_ports" }
+	ai_weight = {
+		weight = @weightuseful
+		modifier = {
+			factor = 0
+			from = { has_building = building_cantina }
+		}
+		modifier = {
+			factor = 0
+			from = {
+				owner = {
+					nor = { has_ethic = ethic_xenophile has_ethic = ethic_fanatic_xenophile }
+				}
+			}
+		}
+	}
+	ai_replace = no
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_radio_telescope_array = {
+	tags = { science_production }
+	base_buildtime = 180
+	planet_unique = yes
+	cost = { minerals = @mincostcheap energy = @engcostcheap }
+	required_resources = { energy = 1 }
+	produced_resources = { physics_research = 2 }
+	adjacency_bonus = { tile_building_resource_physics_research_add = 1 }
+	planet_modifier = { planet_sensor_range_add = 1 }
+	 # prerequisites = {
+	 # "tech_spaceport_1"
+	 # }
+	upgrades = { building_radio_telescope_array_2 }
+	ai_weight = {
+		weight = @weightnormal
+		modifier = {
+			factor = 1.5
+			from = {
+				any_tile = {
+					has_resource = { type = physics_research amount > 1 }
+				}
+			}
+		}
+		modifier = {
+			factor = 2.5
+			from = {
+				any_tile = {
+					has_resource = { type = physics_research amount > 2 }
+				}
+			}
+		}
+	}
+	ai_replace = no
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_radio_telescope_array_2 = {
+	base_buildtime = 360
+	planet_unique = yes
+	is_listed = no
+	cost = { minerals = @mincostlow energy = @engcostcheap }
+	required_resources = { energy = 1.5 }
+	produced_resources = { physics_research = 3 }
+	adjacency_bonus = { tile_building_resource_physics_research_add = 1 }
+	planet_modifier = { planet_sensor_range_add = 2 }
+	potential = {
+		planet = {
+			OR = {
+				has_building = "building_capital_1"
+				has_building = "building_capital_2"
+				has_building = "building_capital_3"
+				has_building = "building_hab_capital"
+			}
+		}
+	}
+	prerequisites = { "tech_alpha_gravitic_surveillance" }
+	upgrades = { building_radio_telescope_array_3 }
+	ai_weight = { weight = @weightuseful }
+	ai_replace = no
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_radio_telescope_array_3 = {
+	base_buildtime = 360
+	planet_unique = yes
+	is_listed = no
+	cost = { minerals = @mincostlow energy = @engcostlow }
+	required_resources = { energy = 2 }
+	produced_resources = { physics_research = 4 }
+	adjacency_bonus = { tile_building_resource_physics_research_add = 1.5 }
+	planet_modifier = { planet_sensor_range_add = 3 }
+	prerequisites = { "tech_alpha_subspace_surveillance" }
+	upgrades = { building_radio_telescope_array_4 }
+	ai_weight = { weight = @weightuseful }
+	ai_replace = no
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_radio_telescope_array_4 = {
+	base_buildtime = 720
+	planet_unique = yes
+	is_listed = no
+	cost = { minerals = @mincostmed energy = @engcostlow }
+	required_resources = { energy = 3 }
+	produced_resources = { physics_research = 5 }
+	adjacency_bonus = { tile_building_resource_physics_research_add = 2 }
+	planet_modifier = { planet_sensor_range_add = 4 }
+	potential = {
+		planet = {
+			OR = {
+				has_building = "building_capital_2"
+				has_building = "building_capital_3"
+				has_building = "building_hab_capital"
+			}
+		}
+	}
+	prerequisites = { "tech_alpha_tachyon_surveillance" }
+	ai_weight = { weight = @weightuseful }
+	ai_replace = no
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
