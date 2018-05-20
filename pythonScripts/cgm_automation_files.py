@@ -1257,7 +1257,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
           takeThis=adjacencyTrigger2.createReturnIf(localTrigger)
           takeThis.addReturn("prev").variableOp("set", "cgm_special_bestWeight", specialBuildingWeight).variableOp("set", "cgm_special_bestBuilding", hashFixedNumber)
           takeThis.add("save_event_target_as","cgm_best_planet_for_special")
-    typeEffect.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building",yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
+    # typeEffect.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building",yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
 
   adjacencyTriggers.deleteOnLowestLevel(checkTotallyEmpty)
   automationEffects.deleteOnLowestLevel(checkTotallyEmpty)
@@ -1338,6 +1338,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   if len(specialResourceTrigger):
     outputToFolderAndFile(specialResourceTrigger, "/common/scripted_triggers/", "zz_cgm_special_resource_trigger{}.txt".format(additionString),2,apiOutFolder )
   if len(automationEffects):
+    automationEffects=addCheckBeforeAnyBuildingConstruction(automationEffects)
     outputToFolderAndFile(automationEffects, "/common/scripted_effects/", "zz_cgm_automation_effects{}.txt".format(additionString),2, apiOutFolder)
   if len(adjacencyTriggers):
     outputToFolderAndFile(adjacencyTriggers, "/common/scripted_triggers/", "zz_cgm_adjacency_triggers{}.txt".format(additionString),2, apiOutFolder)
@@ -1378,6 +1379,17 @@ def getSpecialBuildingNumberHash(modName, buildingName, i):
     print("DAMN! You hit one of the five defined by hand! You should play the lottery! 1 in a billion chance. EXITING!")
     sys.exit(1)
   return number
+
+def addCheckBeforeAnyBuildingConstruction(tagList):
+  outTag=TagList()
+  for nameTop,valTop in tagList.getNameVal():
+    if isinstance(valTop, TagList):
+      cur=outTag.addReturn(nameTop)
+      for name,val in valTop.getNameVal():
+        cur=cur.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building",yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
+        cur=cur.addReturn("else")
+        cur.add(name, val)
+  return outTag
 
   # round((hash(buildingName+additionString)%math.pow(2,32))/1000,3)
   # number+=hash(modName+buildingName)%
