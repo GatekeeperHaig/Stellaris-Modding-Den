@@ -188,12 +188,14 @@ def main(args,*unused):
       triggerContentA.add("has_building", building)
       triggerContentB.add("has_prev_building", building)
 
-  triggerFolder=args.output_folder+"/common/scripted_triggers"
-  if not os.path.exists(triggerFolder):
-    os.makedirs(triggerFolder)
-  triggerFile=triggerFolder+"/cgm_"+args.effect_name+"_ai_weight_scripted_trigger.txt"
-  with open(triggerFile,"w") as file:
-    triggerList.writeAll(file)
+  triggerList.deleteOnLowestLevel(checkTotallyEmpty)
+  if len(triggerList)>0 and not args.test_run:
+    triggerFolder=args.output_folder+"/common/scripted_triggers"
+    if not os.path.exists(triggerFolder):
+      os.makedirs(triggerFolder)
+    triggerFile=triggerFolder+"/cgm_"+args.effect_name+"_ai_weight_scripted_trigger.txt"
+    with open(triggerFile,"w") as file:
+      triggerList.writeAll(file)
 
   if not args.test_run:
     if not os.path.exists(effectFolder):
