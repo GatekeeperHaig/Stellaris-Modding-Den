@@ -1347,6 +1347,14 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     outputToFolderAndFile(upgradeEffect, "/common/scripted_effects/", "zz_cgm_upgrade_effects{}.txt".format(additionString),2, apiOutFolder)
   for modFolder in addedFolders+addedFoldersPriority:
     createAIVarsFromModifiers.main(createAIVarsFromModifiers.parse([modFolder+"/buildings/*",modFolder+"/static_modifiers/*",modFolder+"/tile_blockers/*",modFolder+"/traits/*", "--effect_name", modName, "--output_folder", apiOutFolder]))
+  aiWeightTriggerFileName=apiOutFolder+"/common/scripted_triggers/cgm_{}_ai_weight_scripted_trigger.txt".format(modName)
+  if os.path.exists(aiWeightTriggerFileName):
+    hasBuildingTrigger=TagList().readFile(aiWeightTriggerFileName)
+    mainEngineTriggerFileContent.readFile("../CGM/buildings_script_source/common/scripted_triggers/cgm_engine_triggers.txt")
+    for triggerName in ["has_{}planet_bonus", "had_{}planet_bonus", "has_{}adj_bonus", "had_{}adj_bonus"]:
+      if triggerName.format(modName+"_")+"_building" in hasBuildingTrigger.names:
+        mainEngineTriggerFileContent.get("cgm_"+triggerName.format("")+"_building").get("OR").addUnique(triggerName.format(modName+"_")+"_building")
+    outputToFolderAndFile(mainTriggerFileContent, "common/scripted_triggers/", "cgm_engine_triggers.txt",2, "../CGM/buildings_script_source",False)
   modFile=TagList()
   modFile.add("name", '"!cgm_comp_{}"'.format(modName))
   modFile.add("path", '"mod/cgm_auto_{}"'.format(modName))
