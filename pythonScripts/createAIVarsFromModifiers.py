@@ -35,6 +35,7 @@ def parse(argv, returnParser=False):
 
 def main(args,*unused):
   inputTagList=TagList()
+  varList=TagList()
   outTagList=TagList()
   globbedList=[]
   for b in args.inputFileNames:
@@ -43,7 +44,7 @@ def main(args,*unused):
   effectFolder=args.output_folder+"/common/scripted_effects"
   outFileEffects=effectFolder+"/cgm_"+args.effect_name+"_ai_weight_API.txt"
   for inputFileName in globbedList:
-    inputTagList.readFile(inputFileName)
+    inputTagList.readFile(inputFileName,0,varList)
 
   funsToApply=[]
 
@@ -127,7 +128,7 @@ def main(args,*unused):
       if not isinstance(val, TagList):
         continue
       for fun, outSubTag in zip(funsToApply, outSubTagLists):
-        fun(outSubTag, name, val,args)
+        fun(outSubTag, name, val,args, varList)
 
   # #delete empty: Todo: make more general: Recursivly remove emptry "if"?
   # if not args.no_traits:
@@ -202,7 +203,7 @@ def main(args,*unused):
   # print(outFileEffects)
   return outFileEffects
 
-def addTrait(outTags, name, val,args): #outTags[0]: any outTags[1]: bio outTags[2]: robots 
+def addTrait(outTags, name, val,args, varList): #outTags[0]: any outTags[1]: bio outTags[2]: robots 
   if not "modifier" in val.names:
     if args.debug:
       print("No modifier trait ignored: "+name)
@@ -220,17 +221,17 @@ def addTrait(outTags, name, val,args): #outTags[0]: any outTags[1]: bio outTags[
     cat=2
   prev=TagList()
   ifLoc=TagList("limit", TagList("has_trait", name)).add("prev", prev)
-  addFinalModifier(val.get("modifier"), prev, "_planet_pop")
+  addFinalModifier(varList, val.get("modifier"), prev, "_planet_pop")
   # for modName, modVal in val.get("modifier").getNameVal():
   #   if "tile_resource_" in modName:
   #     prev.add("change_variable", TagList("which",modName.replace("tile_resource_","").replace("_add","_weight")+"_planet_pop").add("value",modVal))
   if len(prev)>0:
     outTags[cat].add("if", ifLoc)
 
-def addStaticModifiers(outTags, name, val, args):
+def addStaticModifiers(outTags, name, val, args, varList):
   if "icon" in val.names: #possibly planet
     ifLoc=TagList("limit", TagList("has_modifier", name))
-    addFinalModifier(val, ifLoc, "_planet_base")
+    addFinalModifier(varList, val, ifLoc, "_planet_base")
     # for possibleModifierName, pmVal in val.getNameVal():
     #   if "tile_resource_" in possibleModifierName:
     #     ifLoc.add("change_variable", TagList(3).add("which",possibleModifierName.replace("tile_resource_","")).add("value",pmVal))
@@ -239,14 +240,14 @@ def addStaticModifiers(outTags, name, val, args):
   elif name[:3]=="pop": #possibly pop
     prev=TagList()
     ifLoc=TagList("limit", TagList("has_modifier", name)).add("prev", prev)
-    addFinalModifier(val, prev,"_planet_pop")
+    addFinalModifier(varList, val, prev,"_planet_pop")
     if len(prev)>0:
       outTags[1].add("if", ifLoc)
   else:
     if args.debug:
       print("Unassigned:"+name)
 
-def addBuildings(outTags, name, val, args):
+def addBuildings(outTags, name, val, args, varList):
   if (not args.no_traits or not args.no_blocker or not args.no_modifiers) and name[:8]!="building":
     if args.debug:
       print("Not used for building: "+name)
@@ -265,7 +266,7 @@ def addBuildings(outTags, name, val, args):
 
   if "adjacency_bonus" in val.names:
     tagName="check_neighboring_adj_bonus_buildings_"+args.effect_name
-    processBuilding(outTags, potential, val,name,"adjacency_bonus",False,tagName,"","tile_building_resource_" )
+    processBuilding(varList, outTags, potential, val,name,"adjacency_bonus",False,tagName,"","tile_building_resource_" )
 
   if val.attemptGet("planet_unique")=="yes" or val.attemptGet("empire_unique")=="yes":
     buildingUnique=True
@@ -274,7 +275,7 @@ def addBuildings(outTags, name, val, args):
 
 
   if "planet_modifier" in val.names:
-    processBuilding(outTags, potential, val,name,"planet_modifier",buildingUnique,"check_planet_bonus_buildings_"+args.effect_name)
+    processBuilding(varList, outTags, potential, val,name,"planet_modifier",buildingUnique,"check_planet_bonus_buildings_"+args.effect_name)
     
   triggeredNum=val.count("triggered_planet_modifier")
   if triggeredNum>0:
@@ -282,9 +283,9 @@ def addBuildings(outTags, name, val, args):
       tpm=val.getN_th("triggered_planet_modifier",i)
       tpmPotential=tpm.get("potential")
       # tpmPotential.addTagList(potential) #too much doubling stuff and hard to remove due to it being in triggers
-      processBuilding(outTags, tpmPotential, tpm,name, "modifier", buildingUnique,"check_planet_bonus_buildings_"+args.effect_name)
+      processBuilding(varList, outTags, tpmPotential, tpm,name, "modifier", buildingUnique,"check_planet_bonus_buildings_"+args.effect_name)
 
-def processBuilding(outTags, potential, val,name, modifierName, buildingUnique, tagName, extraName="_planet_building", searchFor="tile_resource_"):
+def processBuilding(varList, outTags, potential, val,name, modifierName, buildingUnique, tagName, extraName="_planet_building", searchFor="tile_resource_"):
   adjacencyCase=False
   if "_adj_bonus_" in tagName:
     adjacencyCase=True
@@ -318,7 +319,7 @@ def processBuilding(outTags, potential, val,name, modifierName, buildingUnique, 
       outTags[specPotentialString]=outTags[potentialString]
       outTags[specPotentialString].addComment("UNIQUE")
 
-  if addFinalModifier(val.get(modifierName), addHere, extraName,searchFor):
+  if addFinalModifier(varList, val.get(modifierName), addHere, extraName,searchFor):
     #added something:
     triggerSetName="triggerSet"
     if adjacencyCase:
@@ -330,7 +331,7 @@ def processBuilding(outTags, potential, val,name, modifierName, buildingUnique, 
       ifLoc.add("else", elseTagList)
       outTags[specPotentialString]=elseTagList
 
-def addBlockers(outTags, name, val, args):
+def addBlockers(outTags, name, val, args,varList):
   if not "spawn_chance" in val.names:# and not name[:2]==tb:
     if args.debug:
       print("Not used for tile blocker: "+name)
@@ -338,7 +339,7 @@ def addBlockers(outTags, name, val, args):
   if "adjacency_bonus" in val.names:
     prev=TagList()
     ifLoc=TagList("limit", TagList("has_blocker", name)).add("prevprev", prev)
-    addFinalModifier(val.get("adjacency_bonus"), prev, "","tile_building_resource_")
+    addFinalModifier(varList, val.get("adjacency_bonus"), prev, "","tile_building_resource_")
     elseTagList=TagList()
     ifLoc.add("else", elseTagList)
     if len(prev)>0:
@@ -346,10 +347,12 @@ def addBlockers(outTags, name, val, args):
       outTags[0]=elseTagList
 
 
-def addFinalModifier(input, output, extraName="", searchFor="tile_resource_"):
+def addFinalModifier(varList, input, output, extraName="", searchFor="tile_resource_"):
   addedSomething=False
   for modName, modVal in input.getNameVal():
     if searchFor in modName:
+      if modVal[0]=="@" and modVal in varList.names:
+        modVal=varList.get(modVal)
       output.add("change_variable", TagList("which",modName.replace(searchFor,"").replace("_add","_weight")+extraName).add("value",modVal))
       addedSomething=True
   return addedSomething
