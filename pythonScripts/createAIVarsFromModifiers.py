@@ -12,7 +12,7 @@ from stellarisTxtRead import *
 def parse(argv, returnParser=False):
   parser = argparse.ArgumentParser(description="", formatter_class=RawTextHelpFormatter)
   parser.add_argument('inputFileNames', nargs = '*' )
-  parser.add_argument('--output_folder',default="common/scripted_effect" )
+  parser.add_argument('--output_folder',default="." )
   parser.add_argument('-n','--effect_name', default='check', help="The name that will be given to the generated scripted_effect")
   # parser.add_argument('-t','--type', default="trait", help="Type of objects that are used: 'has_<value>' will be the check. Not needed for planet based modifiers. Reasonable values are 'building'(default)/'blocker/trait' and possible others")
   # parser.add_argument('-a','--adjacency',action="store_true", help="qu")
@@ -40,7 +40,8 @@ def main(args,*unused):
   for b in args.inputFileNames:
     globbedList+=glob.glob(b)
 
-  outFile=args.output_folder+"/"+args.effect_name+"_ai_weight_static_effects.txt"
+  effectFolder=args.output_folder+"/common/scripted_effects"
+  outFileEffects=effectFolder+"/cgm_"+args.effect_name+"_ai_weight_API.txt"
   for inputFileName in globbedList:
     inputTagList.readFile(inputFileName)
 
@@ -51,7 +52,7 @@ def main(args,*unused):
   if not args.no_traits:
     outSubTags=[]
     effect=TagList()
-    outTagList.add(args.effect_name+"_trait", effect)
+    outTagList.add("check_pop_traits"+args.effect_name, effect)
     outSubTags.append(effect)
     bios=TagList("limit", TagList("is_robot_pop", "no"))
     effect.add("if", bios)
@@ -64,10 +65,10 @@ def main(args,*unused):
   if not args.no_modifiers:
     outSubTags=[]
     effect=TagList()
-    outTagList.add(args.effect_name+"_planet_modifier", effect)
+    outTagList.add("check_planet_modifier"+args.effect_name, effect)
     outSubTags.append(effect)
     effect=TagList()
-    outTagList.add(args.effect_name+"_pop_modifier", effect)
+    outTagList.add("check_pop_modifier"+args.effect_name, effect)
     outSubTags.append(effect)
     outSubTagLists.append(outSubTags)
     funsToApply.append(addStaticModifiers)
@@ -90,19 +91,19 @@ def main(args,*unused):
     # effect.add("every_neighboring_tile", ent)
     # outSubTags[name]=ent
 
-    name=args.effect_name+"_buildings_adjacency"
+    name="check_neighboring_adj_bonus_buildings_"+args.effect_name
     effect=TagList()
     outTagList.add(name, effect)
     outSubTags[name]=effect
-    outSubTags["triggerSet"]=set()
-    triggerSets.append(outSubTags["triggerSet"])
+    outSubTags["triggerSet_adjacency"]=set()
+    triggerSets.append(outSubTags["triggerSet_adjacency"])
 
     # name=args.effect_name+"_buildings_triggered_non_unique"
     # effect=TagList()
     # outTagList.add(name,TagList("every_tile",effect))
     # outSubTags[name]=effect
 
-    name=args.effect_name+"_buildings"
+    name="check_planet_bonus_buildings_"+args.effect_name
     effect=TagList()
     outTagList.add(name, effect)
     outSubTags[name]=effect
@@ -116,7 +117,7 @@ def main(args,*unused):
     outSubTags=[]
     effect=TagList()
     ent=TagList()
-    outTagList.add(args.effect_name+"_blocker_adjacency", effect)
+    outTagList.add("check_adj_bonus_blockers_"+args.effect_name, effect)
     effect.add("every_neighboring_tile", ent)
     outSubTags.append(ent)
     outSubTagLists.append(outSubTags)
@@ -173,31 +174,33 @@ def main(args,*unused):
   for i,triggerSet in enumerate(triggerSets):
     triggerContentA=TagList()
     triggerContentB=TagList()
-    triggerNameA=args.effect_name+"_building_trigger_new"
-    triggerNameB=args.effect_name+"_building_trigger_old"
     if i==0:
-      triggerNameA+="_adjacency"
-      triggerNameB+="_adjacency"
+      nameAddition="_adjacency"
+    else:
+      nameAddition=""
+    triggerNameA="has_{}{}_bonus_building".format(args.effect_name, nameAddition) #args.effect_name+"_building_trigger_new"
+    triggerNameB="had_{}{}_bonus_building".format(args.effect_name, nameAddition) #args.effect_name+"_building_trigger_new"
+    # triggerNameB=args.effect_name+"_building_trigger_old"
     triggerList.add(triggerNameA, TagList("OR", triggerContentA))
     triggerList.add(triggerNameB, TagList("OR", triggerContentB))
     for building in sorted(triggerSet):
       triggerContentA.add("has_building", building)
       triggerContentB.add("has_prev_building", building)
 
-  triggerFolder=args.output_folder.replace("scripted_effect", "scripted_triggers")
+  triggerFolder=args.output_folder+"/common/scripted_triggers"
   if not os.path.exists(triggerFolder):
     os.makedirs(triggerFolder)
-  triggerFile=triggerFolder+"/"+args.effect_name+"_ai_weight_scripted_trigger.txt"
+  triggerFile=triggerFolder+"/cgm_"+args.effect_name+"_ai_weight_scripted_trigger.txt"
   with open(triggerFile,"w") as file:
     triggerList.writeAll(file)
 
   if not args.test_run:
-    if not os.path.exists(args.output_folder):
-      os.makedirs(args.output_folder)
-    with open(outFile,'w') as file:
+    if not os.path.exists(effectFolder):
+      os.makedirs(effectFolder)
+    with open(outFileEffects,'w') as file:
       outTagList.writeAll(file,args)
-  print(outFile)
-  return outFile
+  # print(outFileEffects)
+  return outFileEffects
 
 def addTrait(outTags, name, val,args): #outTags[0]: any outTags[1]: bio outTags[2]: robots 
   if not "modifier" in val.names:
@@ -261,7 +264,7 @@ def addBuildings(outTags, name, val, args):
     potential=TagList("NAND", potential)
 
   if "adjacency_bonus" in val.names:
-    tagName=args.effect_name+"_buildings_adjacency"
+    tagName="check_neighboring_adj_bonus_buildings_"+args.effect_name
     processBuilding(outTags, potential, val,name,"adjacency_bonus",False,tagName,"","tile_building_resource_" )
 
   if val.attemptGet("planet_unique")=="yes" or val.attemptGet("empire_unique")=="yes":
@@ -269,8 +272,9 @@ def addBuildings(outTags, name, val, args):
   else:
     buildingUnique=False
 
+
   if "planet_modifier" in val.names:
-    processBuilding(outTags, potential, val,name,"planet_modifier",buildingUnique,args.effect_name+"_buildings" )
+    processBuilding(outTags, potential, val,name,"planet_modifier",buildingUnique,"check_planet_bonus_buildings_"+args.effect_name)
     
   triggeredNum=val.count("triggered_planet_modifier")
   if triggeredNum>0:
@@ -278,11 +282,11 @@ def addBuildings(outTags, name, val, args):
       tpm=val.getN_th("triggered_planet_modifier",i)
       tpmPotential=tpm.get("potential")
       # tpmPotential.addTagList(potential) #too much doubling stuff and hard to remove due to it being in triggers
-      processBuilding(outTags, tpmPotential, tpm,name, "modifier", buildingUnique,args.effect_name+"_buildings")
+      processBuilding(outTags, tpmPotential, tpm,name, "modifier", buildingUnique,"check_planet_bonus_buildings_"+args.effect_name)
 
 def processBuilding(outTags, potential, val,name, modifierName, buildingUnique, tagName, extraName="_planet_building", searchFor="tile_resource_"):
   adjacencyCase=False
-  if "adjacency"==tagName[-9:]:
+  if "_adj_bonus_" in tagName:
     adjacencyCase=True
     addHere=TagList()
     ifLoc=TagList("limit", TagList("has_building", name)).add("prevprev", addHere)
@@ -316,7 +320,10 @@ def processBuilding(outTags, potential, val,name, modifierName, buildingUnique, 
 
   if addFinalModifier(val.get(modifierName), addHere, extraName,searchFor):
     #added something:
-    outTags["triggerSet"].add(name)
+    triggerSetName="triggerSet"
+    if adjacencyCase:
+      triggerSetName+="_adjacency"
+    outTags[triggerSetName].add(name)
     outTags[specPotentialString].add("if", ifLoc)
     if not buildingUnique:
       elseTagList=TagList()
