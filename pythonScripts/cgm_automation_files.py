@@ -1271,8 +1271,8 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
 
   mainTriggerFileContent=TagList()
   autobuildCompTrigger=TagList()
-  if modName!="cgm_buildings":
-    autobuildCompTrigger.readFile("../CGM/buildings_script_source/common/scripted_triggers/00000_cgm_auto_compatibilty_triggers.txt")
+  # if modName!="cgm_buildings":
+  autobuildCompTrigger.readFile("../CGM/buildings_script_source/common/scripted_triggers/00000_cgm_auto_compatibilty_triggers.txt")
   mainTriggerFileContent.readFile("../CGM/buildings_script_source/common/scripted_triggers/cgm_automations_triggers.txt")
   for resource in resources:
     if resource!="unity":
@@ -1281,7 +1281,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
       if modName=="cgm_buildings":
         if resource+"_any_building_available_API" not in trigger.names:
           trigger.add(resource+"_any_building_available_API",yes)
-        autobuildCompTrigger.add(resource+"_any_building_available_API", TagList())
+        autobuildCompTrigger.addUnique(resource+"_any_building_available_API", TagList())
 
       #ADJACENCY
       trigger=mainTriggerFileContent.get(resource+"_adjacency_any_building_available")
@@ -1296,8 +1296,8 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
             triggerOR.remove("always")
           if not adjName in triggerOR.names:
             triggerOR.add(adjName, yes)
-          if not adjName in autobuildCompTrigger.names:
-            autobuildCompTrigger.add(adjName,TagList("always", "no"))
+          # if not adjName in autobuildCompTrigger.names:
+          autobuildCompTrigger.addUnique(adjName,TagList("always", "no"))
 
   if modName!="cgm_buildings":
     mainEffectFileContent=TagList()
@@ -1333,8 +1333,8 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   outputToFolderAndFile(autobuildCompTrigger, "common/scripted_triggers/", "00000_cgm_auto_compatibilty_triggers.txt",2, "../CGM/buildings_script_source", False)
 
   if apiOutFolder=="":
-    apiOutFolder="../NOTES/api files/cgm_auto/"+modName
-    # apiOutFolder="../../mod/cgm_auto_"+modName
+    # apiOutFolder="../NOTES/api files/cgm_auto/"+modName
+    apiOutFolder="../../mod/cgm_auto_"+modName
   if len(specialResourceTrigger):
     outputToFolderAndFile(specialResourceTrigger, "/common/scripted_triggers/", "zz_cgm_special_resource_trigger{}.txt".format(additionString),2,apiOutFolder )
   if len(automationEffects):
