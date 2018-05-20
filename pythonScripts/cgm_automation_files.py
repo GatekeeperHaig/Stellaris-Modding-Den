@@ -883,7 +883,7 @@ def addToBuildingListsIf(assigned, buildingName,building, buildingLists,resource
     if hasattr(building, "bestVal"):
       compare=building.bestVal
     else:
-      compare=0.1
+      compare=0
     if len(val)>0: #string at this point!
       # print(subTag.format(resource))
       val=getVariableValueFromList(val, allVars)
