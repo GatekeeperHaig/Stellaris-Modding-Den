@@ -879,7 +879,7 @@ def addToBuildingListsIf(assigned, buildingName,building, buildingLists,resource
   for resource in resources:
     buildingProductionTag=building.attemptGet(buildingProductionTagName)
     val=buildingProductionTag.attemptGet(subTag.format(resource))
-    if 0 and hasattr(building, "bestVal"):
+    if hasattr(building, "bestVal"):
       compare=building.bestVal
     else:
       compare=0.1
