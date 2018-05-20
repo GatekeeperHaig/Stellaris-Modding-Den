@@ -176,11 +176,11 @@ def main(args,*unused):
     triggerContentA=TagList()
     triggerContentB=TagList()
     if i==0:
-      nameAddition="_adjacency"
+      nameAddition="adj_bonus"
     else:
-      nameAddition=""
-    triggerNameA="has_{}{}_bonus_building".format(args.effect_name, nameAddition) #args.effect_name+"_building_trigger_new"
-    triggerNameB="had_{}{}_bonus_building".format(args.effect_name, nameAddition) #args.effect_name+"_building_trigger_new"
+      nameAddition="planet_bonus"
+    triggerNameA="has_{}_{}_building".format(args.effect_name, nameAddition) #args.effect_name+"_building_trigger_new"
+    triggerNameB="had_{}_{}_building".format(args.effect_name, nameAddition) #args.effect_name+"_building_trigger_new"
     # triggerNameB=args.effect_name+"_building_trigger_old"
     triggerList.add(triggerNameA, TagList("OR", triggerContentA))
     triggerList.add(triggerNameB, TagList("OR", triggerContentB))

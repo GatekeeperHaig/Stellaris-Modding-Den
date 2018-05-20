@@ -3,517 +3,6 @@
 #Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
 namespace = cgm_buildings
 
-#event = {
-#	#this event fires on a monthly pulse.
-#	id = cgm_buildings.0
-#	hide_window = yes
-#	is_triggered_only = yes
-#	
-#	immediate = { 
-#		every_playable_country = { 
-#			set_variable = { which = energy_weight value = 0 }
-#			set_variable = { which = minerals_weight value = 0 }
-#			set_variable = { which = food_weight value = 0 }
-#			set_variable = { which = society_research_weight value = 0 }
-#			set_variable = { which = physics_research_weight value = 0 }
-#			set_variable = { which = engineering_research_weight value = 0 }
-#			check_income = yes
-#			check_resource_requirements = yes
-#			every_owned_planet = { add_ai_planet_flags = yes }		
-#		}	
-#	}
-#}		
-
-#event = {
-	#this event fires on a yearly pulse.
-#	id = cgm_buildings.0
-#	hide_window = yes
-#	is_triggered_only = yes
-	
-#	trigger = { has_global_flag = deposits_converted }
-	
-#	immediate = {
-		#every_planet = {
-		#	limit = {
-		#		NOT = { has_planet_flag = deposits_converted }
-		#		OR = {
-		#			is_colonizable = yes
-		#			is_colony = yes					
-		#		}
-		#	}			
-		#	set_variable = { which = energy_tile_resource value = 0 }
-		#	set_variable = { which = minerals_tile_resource value = 0 }
-		#	set_variable = { which = food_tile_resource value = 0 }
-		#	set_variable = { which = unity_tile_resource value = 0 }
-		#	set_variable = { which = society_research_tile_resource value = 0 }
-		#	set_variable = { which = physics_research_tile_resource value = 0 }
-		#	set_variable = { which = engineering_research_tile_resource value = 0 }
-		#	every_tile = {
-		#		limit = { has_deposit = yes has_any_tile_strategic_resource = no }
-		#		convert_deposits = yes
-		#	}
-		#	set_planet_flag = deposits_converted
-		#}
-#		every_country = { 
-#			limit = { 
-#				NOT = { has_country_flag = ai_routines_enabled }
-#				is_country_type = default 
-#				is_country_type = awakened_fallen_empire
-#			}
-#			country_event = { id = cgm_buildings.1 days = 1 random = 28 } #randomness added to spread performance
-#			country_event = { id = cgm_starbase.1 days = 61 random = 28 } #looping event
-#		}	
-#	}	
-#}
-#country_event = {
-#	#this event is fired from the previous event for any country that does not have the ai_routines_enabled flag, otherwise it is a looping event
-#	id = cgm_buildings.1
-#	hide_window = yes
-#	is_triggered_only = yes
-#	
-#	trigger = { OR = { is_country_type = default is_country_type = awakened_fallen_empire } }
-#	
-#	immediate = {
-#		set_country_flag = ai_routines_enabled
-#		country_event = { id = cgm_buildings.1 days = 45 } #looping event - this means the event will re-fire for this country without a need to reiterate through other countries. 
-#		if = {
-#			#see the scripted effects file cgm_country_scope_effects.txt
-#			limit = { NOT = { has_country_flag = country_check_delay } }
-#			set_variable = { which = energy_weight value = 0 }
-#			set_variable = { which = minerals_weight value = 0 }
-#			set_variable = { which = food_weight value = 0 }
-#			set_variable = { which = society_research_weight value = 0 }
-#			set_variable = { which = physics_research_weight value = 0 }
-#			set_variable = { which = engineering_research_weight value = 0 }
-#			check_income = yes
-#			check_resource_requirements = yes
-#			set_timed_country_flag = { flag = country_check_delay days = 90 }
-#		}
-#		every_owned_planet = {
-#			### switch to planet scope
-#			#see the scripted effects file cgm_planet_scope_effects.txt for the specifics
-#			limit = {
-#				OR = {
-#					prev = { is_ai = yes }
-#					sector_controlled = yes
-#				}
-#			}
-#			if = {
-#				limit = {
-#					NOT = { has_planet_flag = base_planet_modifier_check_delay }
-#				} #this check is gated to 360 days, to save performance.
-#				if = {
-#					limit = {
-#						num_modifiers = 0
-#						NOT = { has_planet_flag = planet_base_variables_set }
-#					}
-#					# this sets the base multiplier variables for the planet. The check is gated relative to the amount of planet modifiers
-#					# because these can be dynamically added during the game and by other mods.
-#					set_variable = { which = energy_mult_planet_base value = 1 }
-#					set_variable = { which = minerals_mult_planet_base value = 1 }
-#					set_variable = { which = food_mult_planet_base value = 1 }
-#					set_variable = { which = unity_mult_planet_base value = 1 }
-#					set_variable = { which = society_research_mult_planet_base value = 1 }
-#					set_variable = { which = physics_research_mult_planet_base value = 1 }
-#					set_variable = { which = engineering_research_mult_planet_base value = 1 }
-#					set_planet_flag = planet_base_variables_set
-#					if = {
-#						#this flag is used later on to gate some calculations
-#						limit = {
-#							NOT = { has_planet_flag = multipliers_updated }
-#						}
-#						set_timed_planet_flag = { flag = multipliers_updated days = 1 }
-#					}
-#					else = {
-#						#the check below is a failsafe, since there is no way to check if amount of modifiers has been changed
-#						if = {
-#							limit = {
-#								num_modifiers > 0
-#								NOR = {
-#									AND = {
-#										num_modifiers = 1
-#										check_variable = { which = pm_num value = 1 }
-#									}
-#									AND = {
-#										num_modifiers = 2
-#										check_variable = { which = pm_num value = 2 }
-#									}
-#									AND = {
-#										num_modifiers = 3
-#										check_variable = { which = pm_num value = 3 }
-#									}
-#									AND = {
-#										num_modifiers = 4
-#										check_variable = { which = pm_num value = 4 }
-#									}
-#									AND = {
-#										num_modifiers = 5
-#										check_variable = { which = pm_num value = 5 }
-#									}
-#									AND = {
-#										num_modifiers = 6
-#										check_variable = { which = pm_num value = 6 }
-#									}
-#									AND = {
-#										num_modifiers = 7
-#										check_variable = { which = pm_num value = 7 }
-#									}
-#									AND = {
-#										num_modifiers = 8
-#										check_variable = { which = pm_num value = 8 }
-#									}
-#									AND = {
-#										num_modifiers = 9
-#										check_variable = { which = pm_num value = 9 }
-#									}
-#									AND = {
-#										num_modifiers = 10
-#										check_variable = { which = pm_num value = 10 }
-#									}
-#									AND = {
-#										num_modifiers = 11
-#										check_variable = { which = pm_num value = 11 }
-#									}
-#									AND = {
-#										num_modifiers = 12
-#										check_variable = { which = pm_num value = 12 }
-#									}
-#									AND = {
-#										num_modifiers = 13
-#										check_variable = { which = pm_num value = 13 }
-#									}
-#									AND = {
-#										num_modifiers = 14
-#										check_variable = { which = pm_num value = 14 }
-#									}
-#									AND = {
-#										num_modifiers = 15
-#										check_variable = { which = pm_num value = 15 }
-#									}
-#									AND = {
-#										num_modifiers > 15
-#										check_variable = { which = pm_num value = 15 }
-#									}
-#								}
-#							}
-#							switch = {
-#								trigger = num_modifiers
-#								1 = {
-#									set_variable = { which = pm_num value = 1 }
-#								}
-#								2 = {
-#									set_variable = { which = pm_num value = 2 }
-#								}
-#								3 = {
-#									set_variable = { which = pm_num value = 3 }
-#								}
-#								4 = {
-#									set_variable = { which = pm_num value = 4 }
-#								}
-#								5 = {
-#									set_variable = { which = pm_num value = 5 }
-#								}
-#								6 = {
-#									set_variable = { which = pm_num value = 6 }
-#								}
-#								7 = {
-#									set_variable = { which = pm_num value = 7 }
-#								}
-#								8 = {
-#									set_variable = { which = pm_num value = 8 }
-#								}
-#								9 = {
-#									set_variable = { which = pm_num value = 9 }
-#								}
-#								10 = {
-#									set_variable = { which = pm_num value = 10 }
-#								}
-#								11 = {
-#									set_variable = { which = pm_num value = 11 }
-#								}
-#								12 = {
-#									set_variable = { which = pm_num value = 12 }
-#								}
-#								13 = {
-#									set_variable = { which = pm_num value = 13 }
-#								}
-#								14 = {
-#									set_variable = { which = pm_num value = 14 }
-#								}
-#								15 = {
-#									set_variable = { which = pm_num value = 15 }
-#								}
-#								15 < {
-#									set_variable = { which = pm_num value = 15 }
-#								}
-#							}
-#							set_variable = { which = energy_mult_planet_base value = 1 }
-#							set_variable = { which = minerals_mult_planet_base value = 1 }
-#							set_variable = { which = food_mult_planet_base value = 1 }
-#							set_variable = { which = unity_mult_planet_base value = 1 }
-#							set_variable = { which = society_research_mult_planet_base value = 1 }
-#							set_variable = { which = physics_research_mult_planet_base value = 1 }
-#							set_variable = { which = engineering_research_mult_planet_base value = 1 }
-#							if = {
-#								limit = { gpm_enabled = no }
-#								check_vanilla_planet_modifiers = yes
-#								else = { check_planet_modifiers_gpm = yes }
-#							}
-#							if = {
-#								limit = { planets_enhanced_enabled = yes }
-#								check_planet_modifiers_pe = yes
-#							}
-#							if = {
-#								limit = { planetary_diversity_enabled = yes }
-#								check_planet_modifiers_pd = yes
-#							}
-#							if = {
-#								limit = { alphamod_enabled = yes }
-#								check_planet_modifiers_am = yes
-#							}
-#							if = {
-#								limit = { stellar_expedition_enabled = yes }
-#								check_planet_modifiers_se = yes
-#							}
-#							if = {
-#								limit = { legw_enabled = yes }
-#								check_adj_bonus_blockers_legw = yes
-#							}								
-#							if = {
-#								#this flag is used later on to gate some calculations
-#								limit = {
-#									NOT = { has_planet_flag = multipliers_updated }
-#								}
-#								set_timed_planet_flag = { flag = multipliers_updated days = 1 }
-#							}
-#						}
-#					}
-#				}
-#				set_timed_planet_flag = { flag = base_planet_modifier_check_delay days = 360 }
-#			}
-#			if = {
-#				limit = {
-#					NOT = { has_planet_flag = planet_bonus_building_check_performed }
-#				}
-#				# this checks any planet modifier giving bonus on the planet. It is gated to occur once upon game start/colonization using a flag.
-#				# this flag is removed by other on actions, so this process is repeated.
-#				# see cgm_buildings.3 onwards for relevant events.
-#				set_variable = { which = energy_mult_planet_buildings value = 1 }
-#				set_variable = { which = minerals_mult_planet_buildings value = 1 }
-#				set_variable = { which = food_mult_planet_buildings value = 1 }
-#				set_variable = { which = unity_mult_planet_buildings value = 1 }
-#				set_variable = { which = society_research_mult_planet_buildings value = 1 }
-#				set_variable = { which = physics_research_mult_planet_buildings value = 1 }
-#				set_variable = { which = engineering_research_mult_planet_buildings value = 1 }
-#				check_planet_bonus_buildings = yes
-#				if = {
-#					limit = { planets_enhanced_enabled = yes }
-#					check_planet_bonus_buildings_pe = yes
-#				}
-#				if = {
-#					limit = { alphamod_enabled = yes }
-#					check_planet_bonus_buildings_am = yes
-#				}
-#				if = {
-#					limit = { eutab_enabled = yes }
-#					check_planet_bonus_buildings_eutab = yes
-#				}
-#				if = {
-#					limit = { astrogeology_enabled = yes }
-#					check_planet_bonus_buildings_ag = yes
-#				}
-#				if = {
-#					limit = { eac_enabled = yes }
-#					check_planet_bonus_buildings_eac = yes
-#				}
-#				if = {
-#					limit = { esc_enabled = yes }
-#					check_planet_bonus_buildings_esc = yes
-#				}	
-#				if = {
-#					limit = { gse_enabled = yes }
-#					check_planet_bonus_buildings_gse = yes
-#				}	
-#				if = {
-#					limit = { legw_enabled = yes }
-#					check_planet_bonus_buildings_legw = yes
-#				}	
-#				set_planet_flag = planet_bonus_building_check_performed
-#				if = {
-#					#this flag is used later on to gate some calculations
-#					limit = {
-#						NOT = { has_planet_flag = multipliers_updated }
-#					}
-#					set_timed_planet_flag = { flag = multipliers_updated days = 1 }
-#				}
-#			}
-#			if = {
-#				limit = {
-#					OR = {
-#						has_planet_flag = recheck_pops
-#						any_owned_pop = {
-#							is_growing = no
-#							OR = {
-#								is_being_purged = no
-#								has_purge_type = { type = purge_displacement }
-#								has_purge_type = { type = purge_labor_camps }
-#							}
-#							OR = { is_sapient = yes is_robot_pop = yes }
-#							NOT = { has_pop_flag = pop_checked }
-#						}
-#					}
-#				}
-#				### change to pop scope
-#				# see the file cgm_pop_scope_effects.txt
-#				# this check records the number of pops on the planet and the respective bonuses of each pop's traits/species rights combined and then divided by number of pops.
-#				# its gated using pop flags. These flags are removed when a species rights changes or a species is modified, see cgm_buildings.6.
-#				remove_planet_flag = recheck_pops
-#				remove_planet_flag = purged_planet
-#				set_variable = { which = pop_num value = 0 }
-#				every_owned_pop = {
-#					limit = {
-#						is_growing = no
-#						OR = {
-#							is_being_purged = no
-#							has_purge_type = { type = purge_displacement }
-#							has_purge_type = { type = purge_labor_camps }
-#						}
-#						OR = { is_sapient = yes is_robot_pop = yes }
-#					}
-#					PREV = {
-#						change_variable = { which = pop_num value = 1 }
-#					}
-#				}
-#				### pop variables - these are factored alongside the planet multiplier using an average number
-#				set_variable = { which = energy_mult_planet_pop value = 1 }
-#				set_variable = { which = minerals_mult_planet_pop value = 1 }
-#				set_variable = { which = food_mult_planet_pop value = 1 }
-#				set_variable = { which = unity_mult_planet_pop value = 1 }
-#				set_variable = { which = society_research_mult_planet_pop value = 1 }
-#				set_variable = { which = physics_research_mult_planet_pop value = 1 }
-#				set_variable = { which = engineering_research_mult_planet_pop value = 1 }
-#				calculate_average_pop_multipliers = yes
-#				if = {
-#					#this flag is used later on to gate some calculations
-#					limit = {
-#						NOT = { has_planet_flag = multipliers_updated }
-#					}
-#					set_timed_planet_flag = { flag = multipliers_updated days = 1 }
-#				}
-#				else = {
-#					if = {
-#						limit = {
-#							NOT = {
-#								any_owned_pop = { is_being_purged = no }
-#							}
-#						}
-#						#this makes sure that if the planet's pops are all being purged and cannot produce anything, the planet doesn't build anything.
-#						#this flag is also used in the ai_allow field in the building files.
-#						set_planet_flag = purged_planet
-#					}
-#				}
-#			}
-#			if = {
-#				limit = { has_planet_flag = multipliers_updated }
-#				### this sets a tile multiplier, which combines the base planet modifiers + building modifiers + average pop modifiers into a single multiplier for each resource.
-#				set_variable = { which = energy_mult_planet_tile value = energy_mult_planet_base }
-#				set_variable = { which = minerals_mult_planet_tile value = minerals_mult_planet_base }
-#				set_variable = { which = food_mult_planet_tile value = food_mult_planet_base }
-#				set_variable = { which = unity_mult_planet_tile value = unity_mult_planet_base }
-#				set_variable = { which = society_research_mult_planet_tile value = society_research_mult_planet_base }
-#				set_variable = { which = physics_research_mult_planet_tile value = physics_research_mult_planet_base }
-#				set_variable = { which = engineering_research_mult_planet_tile value = engineering_research_mult_planet_base }
-#				change_variable = { which = energy_mult_planet_tile value = energy_mult_planet_buildings }
-#				change_variable = { which = minerals_mult_planet_tile value = minerals_mult_planet_buildings }
-#				change_variable = { which = food_mult_planet_tile value = food_mult_planet_buildings }
-#				change_variable = { which = unity_mult_planet_tile value = unity_mult_planet_buildings }
-#				change_variable = { which = society_research_mult_planet_tile value = society_research_mult_planet_buildings }
-#				change_variable = { which = physics_research_mult_planet_tile value = physics_research_mult_planet_buildings }
-#				change_variable = { which = engineering_research_mult_planet_tile value = engineering_research_mult_planet_buildings }
-#				change_variable = { which = energy_mult_planet_tile value = energy_mult_planet_pop }
-#				change_variable = { which = minerals_mult_planet_tile value = minerals_mult_planet_pop }
-#				change_variable = { which = food_mult_planet_tile value = food_mult_planet_pop }
-#				change_variable = { which = unity_mult_planet_tile value = unity_mult_planet_pop }
-#				change_variable = { which = society_research_mult_planet_tile value = society_research_mult_planet_pop }
-#				change_variable = { which = physics_research_mult_planet_tile value = physics_research_mult_planet_pop }
-#				change_variable = { which = engineering_research_mult_planet_tile value = engineering_research_mult_planet_pop }
-#			}
-#			# the event below performs checks for every individual tile.
-#			# it is separated to a different event to allow better performance.
-#			# random used here to spread the load more evenly among each country's planets.
-#			if = {
-#				limit = {
-#					NOT = { has_planet_flag = purged_planet }
-#				}
-#				planet_event = { id = cgm_buildings.2 days = 15 random = 10 }
-#			}
-#		}
-#	}
-#}
-
-#planet_event = {
-#	#this event is fired using the previous event on a monthly pulse.
-#	id = cgm_buildings.2
-#	hide_window = yes
-#	is_triggered_only = yes
-#	immediate = {
-#		if = {
-#			limit = {
-#				owner = {
-#					check_variable = { which = energy_weight value < 1 }
-#					check_variable = { which = minerals_weight value < 1 }
-#					check_variable = { which = food_weight value < 1 }
-#				}
-#			}
-#			while = {
-#				limit = {
-#					any_tile = { has_blocker = no has_ai_null_deposit = no has_any_tile_strategic_resource = no }
-#				}
-#				set_variable = { which = energy_weight value = 0 }
-#				set_variable = { which = minerals_weight value = 0 }
-#				set_variable = { which = food_weight value = 0 }
-#				set_variable = { which = unity_weight value = 0 }
-#				set_variable = { which = society_research_weight value = 0 }
-#				set_variable = { which = physics_research_weight value = 0 }
-#				set_variable = { which = engineering_research_weight value = 0 }
-#				random_tile = {
-#					### change to tile scope
-#					#see the scripted effects file cgm_tile_scope_effects.txt
-#					limit = { has_blocker = no has_ai_null_deposit = no has_any_tile_strategic_resource = no }
-#					set_tile_building_weight = yes
-#				}
-#			}
-#			else = {
-#				every_tile = {
-#					limit = { has_deposit = yes has_any_tile_strategic_resource = no }
-#					convert_deposits = yes
-#				}
-#				while = {
-#					limit = {
-#						any_tile = { has_blocker = no has_ai_null_deposit = no has_any_tile_strategic_resource = no }
-#					}
-#					set_variable = { which = energy_weight value = owner }
-#					set_variable = { which = minerals_weight value = owner }
-#					set_variable = { which = food_weight value = owner }
-#					set_variable = { which = unity_weight value = 0 }
-#					set_variable = { which = society_research_weight value = 0 }
-#					set_variable = { which = physics_research_weight value = 0 }
-#					set_variable = { which = engineering_research_weight value = 0 }
-#					random_tile = {
-#						limit = { has_blocker = no has_ai_null_deposit = no has_any_tile_strategic_resource = no }
-#						set_tile_building_weight = yes
-#					}
-#				}
-#			}
-#		}
-#		if = {
-#			limit = {
-#				owner = { minerals > 1000 income > 50 }
-#			}
-#			add_ai_planet_flags = yes
-#		}
-#	}
-#}
 
 #this event is fired using the on_building_complete and on_building_upgraded on action triggers.
 #checking whether the upgraded building gave a planet modifier bonus.
@@ -522,16 +11,16 @@ planet_event = {
 	hide_window = yes
 	is_triggered_only = yes
 	#trigger = {
-#		from = { has_planet_bonus_building = yes }
+#		from = { cgm_has_planet_bonus_building = yes }
 #	}
 	immediate = {
 		if = { 
-			limit = { from = { has_planet_bonus_building = yes } }
+			limit = { from = { cgm_has_planet_bonus_building = yes } }
 			set_planet_flag = cgm_redo_planet_calc
 			remove_planet_flag = cgm_bonus_building_calc_done
 			else = { 
 				if = {
-					limit = { from = { has_adjacency_building = yes } }
+					limit = { from = { cgm_has_adjacency_building = yes } }
 					set_planet_flag = cgm_redo_planet_calc
 				}
 			}
@@ -545,16 +34,16 @@ planet_event = {
 	hide_window = yes
 	is_triggered_only = yes
 	#trigger = {
-	#	from = { had_planet_bonus_building = yes }
+	#	from = { cgm_had_planet_bonus_building = yes }
 	#}
 	immediate = {
 		if = { 
-			limit = { from = { has_planet_bonus_building = yes } }
+			limit = { from = { cgm_has_planet_bonus_building = yes } }
 			set_planet_flag = cgm_redo_planet_calc
 			remove_planet_flag = cgm_bonus_building_calc_done
 			else = { 
 				if = {
-					limit = { from = { has_adjacency_building = yes } }
+					limit = { from = { cgm_has_adjacency_building = yes } }
 					set_planet_flag = cgm_redo_planet_calc
 				}
 			}
@@ -569,17 +58,17 @@ planet_event = {
 	is_triggered_only = yes
 #	trigger = {
 #		from = {
-#			OR = { had_planet_bonus_building = yes has_planet_bonus_building = yes }
+#			OR = { cgm_had_planet_bonus_building = yes cgm_has_planet_bonus_building = yes }
 #		}
 #	}
 	immediate = {
 		if = { 
-			limit = { from = { OR = { had_planet_bonus_building = yes has_planet_bonus_building = yes } } }
+			limit = { from = { OR = { cgm_had_planet_bonus_building = yes cgm_has_planet_bonus_building = yes } } }
 			set_planet_flag = cgm_redo_planet_calc
 			remove_planet_flag = cgm_bonus_building_calc_done
 			else = { 
 				if = {
-					limit = { from = { OR = { had_adjacency_building = yes has_adjacency_building = yes } } }
+					limit = { from = { OR = { cgm_had_adjacency_building = yes cgm_has_adjacency_building = yes } } }
 					set_planet_flag = cgm_redo_planet_calc
 				}
 			}
