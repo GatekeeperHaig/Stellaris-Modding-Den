@@ -3,6 +3,7 @@
 
 import sys, os, io,math
 from cgm_automation_files import *
+import cgm_planet_auto_API
 
 def main():
 
@@ -27,7 +28,7 @@ def main():
       # if "gwen" in modFolder:
       print("automatedCreationAutobuildAPI({},{},{})".format(modAbbr,lowPri,highPri))
       automatedCreationAutobuildAPI(modAbbr,lowPri,highPri)
-
+  cgm_planet_auto_API.main()
       
 
 

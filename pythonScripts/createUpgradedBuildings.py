@@ -36,6 +36,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('--make_optional', action="store_true", help="Adds 'direct_build_enabled = yes' as potential to all direct build buildings." )
   parser.add_argument('--scripted_variables', default="", help="Comma separated list of files that contain scripted variables used in the building files. This option is mandatory if you building costs use any of those variables. Recognizable at the spam of missing variable errors you get if not doing this!")
   parser.add_argument('--skip_building', default="", help="Comma separated list of buildings which should remain untouched")
+  parser.add_argument('--copy_folder_first', default="", help="Comma separated list of folder that should be copied to target (basically alternative to standalone mod, that works with the GUI and helper files.")
   addCommonArgs(parser)
 
   if returnParser:
@@ -57,6 +58,21 @@ def readAndConvert(args, allowRestart=1):
   lastOutPutFileName=""
 
   skipList=args.skip_building.split(",")
+  if args.copy_folder_first!="" and not args.test_run:
+    foldersToCopy=args.copy_folder_first.split(",")
+    for inFolder in foldersToCopy:
+      for root, dirnames, filenames in os.walk(inFolder):
+        for file in filenames:
+          # absPath=os.path.abspath(args.output_folder)
+          commonPath=os.path.commonprefix([inFolder, root])
+          relPath=os.path.relpath(root,commonPath)
+          outFolder=args.output_folder+"/"+relPath
+          if not os.path.exists(outFolder):
+            os.makedirs(outFolder)
+          # print(commonPath)
+          # print(relPath)
+
+          copyfile(os.path.join(root,file), outFolder+"/"+file)
 
   if not args.just_copy_and_check and not args.test_run:
     if not os.path.exists(args.output_folder+"/common"):
