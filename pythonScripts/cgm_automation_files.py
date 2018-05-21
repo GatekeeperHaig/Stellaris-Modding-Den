@@ -1360,7 +1360,6 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     outputToFolderAndFile(upgradeEffect, "/common/scripted_effects/", "zz_cgm_upgrade_effects{}.txt".format(additionString),2, apiOutFolder)
   for modFolder in addedFolders+addedFoldersPriority:
     createAIVarsFromModifiers.main(createAIVarsFromModifiers.parse([modFolder+"/buildings/*",modFolder+"/static_modifiers/*",modFolder+"/tile_blockers/*",modFolder+"/traits/*", "--effect_name", modName, "--output_folder", apiOutFolder]))
-
     for dirpath, dirnames, files in os.walk(modFolder+"/buildings"):
       for file in files:
         buildingFileContent=readFile(os.path.join(dirpath, file))
@@ -1371,6 +1370,17 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
             val.removeDuplicatesRec()
           buildingOut.add(name, val, comment, seperator)
         outputToFolderAndFile(buildingOut, "/common/buildings/", file,2, apiOutFolder)
+
+  #priority sorted output for potential autobuild. Joined into one file!
+  buildingOut=TagList()
+  for name, val, comment, seperator in buildingContentOrig.getAll():
+    if isinstance(val, TagList):
+      if hasattr(val, "helper") and val.helper==True:
+        continue
+      val.getOrCreate("ai_allow").add("NOT",TagList("owner" , TagList("has_country_flag","cgm_disable_vanilla_building_AI")))
+      val.removeDuplicatesRec()
+    buildingOut.add(name, val, comment, seperator)
+  outputToFolderAndFile(buildingOut, "", "actuallyActiveBuildings.txt",2, apiOutFolder)
 
 
   aiWeightTriggerFileName=apiOutFolder+"/common/scripted_triggers/cgm_{}_ai_weight_scripted_trigger.txt".format(modName)
