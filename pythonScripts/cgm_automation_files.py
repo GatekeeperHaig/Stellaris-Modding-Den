@@ -992,8 +992,10 @@ def priorityFileCheck(fileLists,reverse=False): #earlier -> higher prio
   allLists=makeUnique(allLists, os.path.basename)
   fileLists=list(map(lambda x: list(filter(lambda y: y in allLists,x)),fileLists)) #remove stuff that has been removed from allLists when making it unique
   fileLists=list(map(lambda x: sorted(x),fileLists))
+  # print(fileLists)
   if reverse:
     fileLists=list(map(lambda x: list(reversed(x)),fileLists))
+    allLists=list(reversed(allLists))
 
   return fileLists,allLists
 
@@ -1041,7 +1043,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
 
   (buildingFilesPriority,buildingFilesCGM,buildingFilesAdded),buildingAllFiles=priorityFileCheck([buildingFilesPriority,buildingFilesCGM,buildingFilesAdded],True)
   (triggerFilesPriority,triggerFilesCGM,triggerFilesAdded),triggerAllFiles=priorityFileCheck([triggerFilesPriority,triggerFilesCGM,triggerFilesAdded],True)
-  (effectFilesPriority,effectFilesCGM,effectFilesAdded),effectAllFiles=priorityFileCheck([effectFilesPriority,effectFilesCGM,effectFilesAdded],False)
+  (effectFilesPriority,effectFilesCGM,effectFilesAdded),effectAllFiles=priorityFileCheck([effectFilesPriority,effectFilesCGM,effectFilesAdded],True)
   (variableFilesPriority,variableFilesCGM,variableFilesAdded),variableAllFiles=priorityFileCheck([variableFilesPriority,variableFilesCGM,variableFilesAdded],True) #no idea of reversed is correct...
 
   # buildingFilesAdded=makeUnique(buildingFilesAdded, os.path.basename)
@@ -1062,25 +1064,36 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     # print(buildingFilesAdded)
     # file.write(str(buildingFilesAdded))
 
-
   buildingContent=TagList()
   allVars=TagList()
-  for buildingFile in buildingFilesPriority:
+  for buildingFile in buildingAllFiles:
+    prevLen=len(buildingContent.vals)
     buildingContent.readFile(buildingFile,0,allVars)
-
-  #mark cgm_buildings stuff as helper unless we are parsing only cgm_buildings
-  prevLen=len(buildingContent.vals)
-  for buildingFile in buildingFilesCGM:
-    buildingContent.readFile(buildingFile,0,allVars)
-  if modName!="cgm_buildings":
-    for b in buildingContent[prevLen:]:
-      if isinstance(b,TagList):
-        b.helper=True
-
-  for buildingFile in buildingFilesAdded:
-    buildingContent.readFile(buildingFile,0,allVars)
-
+    if modName!="cgm_buildings" and buildingFile in buildingFilesCGM:
+      for b in buildingContent[prevLen:]:
+        if isinstance(b,TagList):
+          b.helper=True
   buildingContent.removeDuplicateNames()
+
+
+  # buildingContent=TagList()
+  # allVars=TagList()
+  # for buildingFile in buildingFilesPriority:
+  #   buildingContent.readFile(buildingFile,0,allVars)
+
+  # #mark cgm_buildings stuff as helper unless we are parsing only cgm_buildings
+  # prevLen=len(buildingContent.vals)
+  # for buildingFile in buildingFilesCGM:
+  #   buildingContent.readFile(buildingFile,0,allVars)
+  # if modName!="cgm_buildings":
+  #   for b in buildingContent[prevLen:]:
+  #     if isinstance(b,TagList):
+  #       b.helper=True
+
+  # for buildingFile in buildingFilesAdded:
+  #   buildingContent.readFile(buildingFile,0,allVars)
+
+  # buildingContent.removeDuplicateNames()
 
 
   for varFile in variableAllFiles:
