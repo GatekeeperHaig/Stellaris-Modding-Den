@@ -389,7 +389,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       for j in jRange:
         if j in duplicates:
           continue
-        if self.names[i]==self.names[j]:
+        if self.names[i]!="" and self.names[i]==self.names[j]:
           duplicates.append(j)
     self.removeIndexList(duplicates)
   def computeNewVals(self, other, tag, discount, varsToValue, inverse=False):

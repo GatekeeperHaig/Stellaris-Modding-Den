@@ -25,7 +25,8 @@ def parse(argv, returnParser=False):
   parser.add_argument('-f','--just_copy_and_check', action="store_true", help="If any non-building file in your mod includes 'has_building' mentions on buildings that will be copied by this script, run this mode once with all such files as input instead of the building files. In this mode the script will simply replace all 'has_building = ...' with scripted_triggers also checking for direct_build versions. IMPORTANT: 1. You need to apply the main script FIRST! 2. --output_folder will have to include the subfolder for this call!")
   parser.add_argument('-o','--output_folder', default="BU", help="Main output folder name. Specific subfolder needs to be included for '--just_copy_and_check' (default: %(default)s)")
   parser.add_argument('--replacement_file', default="", help="Executes a very basic conditional replace on buildings. Example: 'IF unique in tagName and is_listed==no newline	ai_weight = { weight = @crucial_2 }': For all buildings that have 'unique' in their name and are not listed, set ai_weight to given value. Any number of such replaces can be in the file. An 'IF' at the very start of a line starts a replace. the next xyz = will be the tag used for replacing. You can also start a line with 'EVAL' instead of 'IF' to write an arbitrary condition. You need to know the class structure for this though.")
-  parser.add_argument('-j','--join_files', action="store_true", help="Output from all input files goes into a single file. Has to be activated if you have upgrades distributed over different files.")
+  # parser.add_argument('-j','--join_files', action="store_true", help="Output from all input files goes into a single file. Has to be activated if you have upgrades distributed over different files.")
+  parser.add_argument('--different_same_name_vars', action="store_true", help="Activate this if you mod has differently valued variables with the same name across your building files. Be aware, that this removed the support for upgrades among different files. There won't be support for both. Please change your mod if this is an issue. This would horrible style!")
   parser.add_argument('-g','--game_version', default="2.0.*", help="Game version of the newly created .mod file to avoid launcher warning. Ignored for standalone mod creation. (default: %(default)s)")
   parser.add_argument('--tags', default="buildings", help="Comma separated list of mod tags (to be displayed in Steam/launcher). Ignored for standalone mod creation.")
   parser.add_argument('--picture_file', default="", help="Picture file set in the mod file. Ignored for standalone mod creation. This file must be manually added to the mod folder!")
@@ -85,37 +86,32 @@ def readAndConvert(args, allowRestart=1):
  
   if not args.just_copy_and_check and not args.test_run:
     copiedBuildingsFile=open(args.copiedBuildingsFileName,'w')
-  globbedList=[]
-  for b in args.buildingFileNames:
-    globbedList+=glob.glob(b)
-
-  #helper files: Needed when a mod only provides upgrades, without changing the lower tier buildings. Those lower tiers are needed for the script, thus they have to be given as helper files. Entries from helper files are not written later.
-  isHelperFileItList=[] #list later used in main iteration
-  if "1" in args.helper_file_list:
-    origGlobbedList=globbedList
-    helperList=[] #local
-
-    lHFL=len(args.helper_file_list)
-    lFL=len(globbedList)
-    if lHFL!=lFL:
-      if not args.test_run:
-        print("Warning: Invalid helper_file_list got {!s}, expected {!s}".format(lHFL,lFL))
-      for i in range(lHFL,lFL):
-        args.helper_file_list+="0"
-
-    for i in range(lFL):
-      if args.helper_file_list[i]=="1":
-        helperList.append(globbedList[i])
+  mainFileList=[]
+  helperList=[]
+  lHFL=len(args.helper_file_list)
+  lFL=len(args.buildingFileNames)
+  if lHFL!=lFL:
+    if not args.test_run:
+      print("Warning: Invalid helper_file_list got {!s}, expected {!s}".format(lHFL,lFL))
+    for i in range(lHFL,lFL):
+      args.helper_file_list+="0"
+  for i,b in enumerate(args.buildingFileNames):
+    if args.helper_file_list[i]==1:
+      helperList+=glob.glob(b)
+    else:
+      mainFileList+=glob.glob(b)
+  if not args.different_same_name_vars:
+    globbedList=helperList+mainFileList
+    isHelperFileItList=[True for _ in helperList]
+    isHelperFileItList+=[False for _ in mainFileList]
+  else:
     globbedList=[]
-    for i in range(lFL):
-      if args.helper_file_list[i]=="0":
-        globbedList+=helperList
-        globbedList.append(origGlobbedList[i])
-        for _ in helperList:
-          isHelperFileItList.append(True)
-        isHelperFileItList.append(False)
-        if args.join_files: #with join files, only one run of the helper files is needed
-          helperList=[]
+    for file in mainFileList:
+      globbedList+=helperList
+      isHelperFileItList+=[True for _ in helperList]
+      globbedList.append(file)
+      isHelperFileItList.append(False)
+
 
 
   for fileIndex,buildingFileName in enumerate(globbedList):
@@ -136,10 +132,10 @@ def readAndConvert(args, allowRestart=1):
       with open(args.outPath+buildingFileNameWithoutPath,'w') as outputFile:
         outputFile.write(args.scriptDescription)
         outputFile.write("#overwrite\n")
-    if fileIndex==0 or (not args.join_files) and (not isHelperFileItList): #create empty lists. Do only in first iteration when args.join_files is active as we add to the lists in each iteration here. helper stuff is deleted renewed after writing output file
+    if fileIndex==0 or args.different_same_name_vars and not isHelperFileItList: #create empty lists. Do only in first iteration when not args.different_same_name_vars is not active as we add to the lists in each iteration here. helper stuff is deleted renewed after writing output file
       varsToValue=TagList(0)
       buildingNameToData=TagList(0)
-    if (fileIndex==0 or (not args.join_files) and (not isHelperFileItList)) or (isHelperFileItList and thisFileIsAHelper==False):
+    if (fileIndex==0 or (args.different_same_name_vars) and (not isHelperFileItList)) or (isHelperFileItList and thisFileIsAHelper==False):
       if args.scripted_variables!="":
         for scriptVarFile in args.scripted_variables.split(","):
           scriptVarFile=scriptVarFile.strip()
@@ -152,7 +148,7 @@ def readAndConvert(args, allowRestart=1):
           if isinstance(b,TagList):
             b.helper=True
     
-    if args.join_files:
+    if not args.different_same_name_vars:
       if fileIndex<len(globbedList)-1:
         continue  #read all Files before processing
       elif isHelperFileItList:
@@ -434,7 +430,7 @@ def readAndConvert(args, allowRestart=1):
           modfile.write('picture="{}"'.format(args.picture_file))
 
 
-    if args.join_files:
+    if not args.different_same_name_vars:
       if args.custom_mod_name:
         outfileBaseName=''.join(e for e in args.custom_mod_name if e.isalnum())+".txt"
       else:
@@ -456,24 +452,44 @@ def readAndConvert(args, allowRestart=1):
             locOutPutFile.write(" "+line+"\n")
       
  
-    
-    #BUILDING OUTPUT
-    if args.create_standalone_mod_from_mod:
-      outputFileName=args.outPath+prioFile+outfileBaseName
-    else:
-      if args.load_order_priority and "events" in args.outPath: #events prefers low ascii. might be more for which this is true. Triggers prefer high ascii
-        prioFile="!_"
-      outputFileName=args.outPath+prioFile+"build_upgraded_"+outfileBaseName
-    lastOutPutFileName=outputFileName
     if args.test_run:
       continue
-    with open(outputFileName,'w') as outputFile:
-      outputFile.write(args.scriptDescription)
-      buildingNameToData.writeAll(outputFile,args,len(isHelperFileItList))
+    
+    #BUILDING OUTPUT
+    if not args.different_same_name_vars: #only happens once if that is true.
+      for nonHelperFile in mainFileList:
+        origFileContent=readFile(nonHelperFile)
+        outPutToThisFile=TagList()
+        for name,val, comment,separator in buildingNameToData.getAll():
+          for nameOrig,valOrig, commentOrig,separatorOrig in origFileContent.getAll():
+            # if not isinstance(val, TagList) and not isinstance(valOrig, TagList):
+              # print(name+","+comment+","+separator)
+              # print(val)
+              # print(nameOrig+","+commentOrig+","+separatorOrig+"found")
+              # print(valOrig)
+            if name==nameOrig and comment==commentOrig and separator==separatorOrig or name==nameOrig+"_direct_build" or name==nameOrig+"_hidden_tree_root":
+              outPutToThisFile.add(name,val, comment, separator)
+              break
+            # if isinstance(val, TagList) and isinstance(valOrig, TagList):
+            #   if name==nameOrig :
+            #     outPutToThisFile.add(name,val, comment,separator)
+            #     break
+        with open(args.outPath+os.path.basename(nonHelperFile),'w') as outputFile:
+          outputFile.write(args.scriptDescription)
+          outPutToThisFile.writeAll(outputFile,args)
+    else:
+      if args.create_standalone_mod_from_mod:
+        outputFileName=args.outPath+prioFile+outfileBaseName
+      else:
+        outputFileName=args.outPath+prioFile+"build_upgraded_"+outfileBaseName
+      lastOutPutFileName=outputFileName
+      with open(outputFileName,'w') as outputFile:
+        outputFile.write(args.scriptDescription)
+        buildingNameToData.writeAll(outputFile,args,len(isHelperFileItList))
 
-    if isHelperFileItList and not args.join_files:  #reset after doing a file
-      varsToValue=TagList(0)
-      buildingNameToData=TagList(0)
+      if isHelperFileItList and args.different_same_name_vars:  #reset after doing a file
+        varsToValue=TagList(0)
+        buildingNameToData=TagList(0)
 
 
   if not args.just_copy_and_check and not args.test_run:
