@@ -96,7 +96,7 @@ def readAndConvert(args, allowRestart=1):
     for i in range(lHFL,lFL):
       args.helper_file_list+="0"
   for i,b in enumerate(args.buildingFileNames):
-    if args.helper_file_list[i]==1:
+    if args.helper_file_list[i]=="1":
       helperList+=glob.glob(b)
     else:
       mainFileList+=glob.glob(b)
@@ -111,7 +111,6 @@ def readAndConvert(args, allowRestart=1):
       isHelperFileItList+=[True for _ in helperList]
       globbedList.append(file)
       isHelperFileItList.append(False)
-
 
 
   for fileIndex,buildingFileName in enumerate(globbedList):
@@ -135,11 +134,11 @@ def readAndConvert(args, allowRestart=1):
     if fileIndex==0 or args.different_same_name_vars and not isHelperFileItList: #create empty lists. Do only in first iteration when not args.different_same_name_vars is not active as we add to the lists in each iteration here. helper stuff is deleted renewed after writing output file
       varsToValue=TagList(0)
       buildingNameToData=TagList(0)
-    if (fileIndex==0 or (args.different_same_name_vars) and (not isHelperFileItList)) or (isHelperFileItList and thisFileIsAHelper==False):
-      if args.scripted_variables!="":
-        for scriptVarFile in args.scripted_variables.split(","):
-          scriptVarFile=scriptVarFile.strip()
-          varsToValue.readFile(scriptVarFile)
+    # if (args.different_same_name_vars and ((not isHelperFileItList) or (isHelperFileItList and thisFileIsAHelper==False))):
+    #   if args.scripted_variables!="":
+    #     for scriptVarFile in args.scripted_variables.split(","):
+    #       scriptVarFile=scriptVarFile.strip()
+    #       varsToValue.readFile(scriptVarFile)
     prevLen=len(buildingNameToData.vals)
     buildingNameToData.readFile(buildingFileName,args, varsToValue,True)
     if isHelperFileItList: #mark helper buildings
@@ -158,7 +157,13 @@ def readAndConvert(args, allowRestart=1):
         continue
       else:
         buildingNameToData.removeDuplicateNames(True) #remove duplicate buildings. Last file that has been read has highest priority (won't be deleted). Thus lowest priority for the helper files.
-    
+
+    #did not read before. do it now. I guess global vars have lower priority so they should come later.
+    if args.scripted_variables!="":
+      for scriptVarFile in args.scripted_variables.split(","):
+        scriptVarFile=scriptVarFile.strip()
+        varsToValue.readFile(scriptVarFile)
+
     if not args.just_copy_and_check:  
       #COPY AND MODIFY WHERE NEEDED       
       buildingNameToDataOrigVals=copy.copy(buildingNameToData.vals) #shallow copy of the buildings: buldingNameToData.vals will later be changed (a lot). Most of these changes reflect in buildingNameToDataOrigVals, except that new entries in the array do not appear!
@@ -458,6 +463,7 @@ def readAndConvert(args, allowRestart=1):
     #BUILDING OUTPUT
     if not args.different_same_name_vars: #only happens once if that is true.
       for nonHelperFile in mainFileList:
+        print(nonHelperFile)
         origFileContent=readFile(nonHelperFile)
         outPutToThisFile=TagList()
         for name,val, comment,separator in buildingNameToData.getAll():
