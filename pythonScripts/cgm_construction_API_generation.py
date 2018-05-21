@@ -16,6 +16,8 @@ def main():
     for line in file:
       lineSplit=list(map(lambda x:x.strip(),line.split(",")))
       modFolder, modAbbr, modName=lineSplit[:3]
+      if len(lineSplit)>4:
+        buildingsIgnoredByBU=lineSplit[4:]
       modFolder="../NOTES/other mod files used for API files/"+modFolder
       lowPri=[]
       highPri=[]
@@ -29,7 +31,7 @@ def main():
       # print("automatedCreationAutobuildAPI({},{},{})".format(modAbbr,lowPri,highPri))
       # if modAbbr!="gwen":
         # continue
-      automatedCreationAutobuildAPI(modAbbr,lowPri,highPri)
+      automatedCreationAutobuildAPI(modAbbr,lowPri,highPri, 10,"",buildingsIgnoredByBU)
   cgm_planet_auto_API.main()
       
 
