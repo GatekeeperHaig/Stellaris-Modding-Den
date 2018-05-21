@@ -91,8 +91,8 @@ def readAndConvert(args, allowRestart=1):
   lHFL=len(args.helper_file_list)
   lFL=len(args.buildingFileNames)
   if lHFL!=lFL:
-    if not args.test_run:
-      print("Warning: Invalid helper_file_list got {!s}, expected {!s}".format(lHFL,lFL))
+    # if not args.test_run:
+      # print("Warning: Invalid helper_file_list got {!s}, expected {!s}".format(lHFL,lFL))
     for i in range(lHFL,lFL):
       args.helper_file_list+="0"
   for i,b in enumerate(args.buildingFileNames):
@@ -192,6 +192,8 @@ def readAndConvert(args, allowRestart=1):
            
           #iterate through all upgrades: Create a copy of each upgrade, compute costs. Finish requirements for current building and add the copies to the to-use-list
           for upgradeName in upgrades.names:
+            if upgradeName=="":
+              continue
             try:
               upgradeData=buildingNameToData.get(upgradeName) #allow editing
             except ValueError:
@@ -200,11 +202,15 @@ def readAndConvert(args, allowRestart=1):
                 print("EXTRA WARNING: The problematic building is planet_unique or empire_unique. This error might destroy uniqueness!")
               continue
             secondVisit=False
+            # try:
             if upgradeData.wasVisited:
               print("Script tried to visit "+upgradeData.tagName +" twice (second time via "+buildingData.tagName+"). This is to be expected if different buildings upgrade into this building, but could also indicate an error in ordering: Of all 'is_listed=yes' buildings in a tree, the lowest tier must always be first!")
               secondVisit=True
             elif buildingData.tagName in args.t0_buildings: #don't do if visited twice!
               upgradeData.costChangeUpgradeToDirectBuild(buildingData, args, varsToValue, True) #fix t0-t1 costs
+            # except:
+              # print(upgradeName)
+              # raise
               
             #this is a higher tier building. If there is no pure upgrade version yet, create it now. A direct build one will be created anyway!
             upgradeData.replace("is_listed","no") #creates if does not exist

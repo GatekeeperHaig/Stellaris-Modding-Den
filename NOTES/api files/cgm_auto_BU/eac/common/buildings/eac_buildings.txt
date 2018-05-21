@@ -1,0 +1,625 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # Do not remove or rename this
+ # Possible Variables for Buildings:
+ # strategic_resource: strategic resource, deprecated, strategic resource used by the building.
+ # allow: trigger to check for allowing construction of building.
+ # prerequisites: Tech requirements for building.
+ # empire_unique: boolean, can only build one if set to true.
+ # cost: resource table, cost of building.
+ # is_orbital: boolean, can only be built in orbital station.
+ # modifier: modifier, deprecated, applies a modifier to planet; use planet_modifier instead.
+ # planet_modifier, country_modifier, army_modifier: applies modifier to planet/country/armies
+ # triggered_planet_modifier = { key (optional), potential, modifier }: applies conditional modifier to planet
+ # base_buildtime: int, number of days for construction.
+ # requires_pop, boolean, building will require a pop for production.
+ # required_resources, resource table, required resources for production.
+ # produced_resources, resource table, produced resources in production.
+ # upgrades, buildings list, buildings this building can upgrade into.
+ # is_listed, boolean, toggles if this building is shown in the non-upgrade buildable list.
+ # planet_unique, toggles if one can build multiple of this type on a single planet.
+ # ai_weight, weight for AI, default is set to one, weight set to 0 means that AI will never build it
+ #
+ # BALANCE
+ # can change the time and cost of all common buildings with these variables below
+ #
+ #	MINERALS
+ #
+eac_building_rare_minerals_mine = {
+	base_buildtime = @b3time
+	icon = "eac_building_rare_minerals_mine"
+	cost = { minerals = @b3cost }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	produced_resources = { minerals = 10 }
+	prerequisites = { "eac_tech_mine_rare_minerals" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "eac_requires_building_any_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "eac_requires_rare_minerals"
+				tile = {
+					has_resource = { type = eac_sr_rare_minerals amount > 0 }
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+eac_building_luxury_goods_factory = {
+	base_buildtime = @b3time
+	icon = "eac_building_luxury_goods_factory"
+	planet_unique = yes
+	cost = { minerals = @b5cost }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	produced_resources = { minerals = 2 }
+	country_modifier = { pop_consumer_goods_mult = -0.02 }
+	prerequisites = { "eac_tech_produce_luxury_goods" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "eac_requires_building_any_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "eac_requires_rare_mineral_mine"
+				planet = { any_tile = { has_building = eac_building_rare_minerals_mine } }
+			}
+		}
+	}
+	 # Make sure the building only exists when the planet has a rare mineral mine
+	destroy_if = {
+		planet = {
+			NOT = { any_tile = { has_building = eac_building_rare_minerals_mine } }
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+ #
+ #	FOOD
+ #
+eac_building_fertile_land_farm = {
+	base_buildtime = @b3time
+	icon = "eac_building_fertile_land_farm"
+	cost = { minerals = @b3cost }
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+		NOT = { owner = { has_authority = auth_machine_intelligence } }
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	produced_resources = { food = 6 }
+	prerequisites = { "eac_tech_farm_fertile_land" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "eac_requires_fertile_land"
+				tile = {
+					has_resource = { type = eac_sr_fertile_land amount > 0 }
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+eac_building_gourmet_restaurant = {
+	base_buildtime = @b3time
+	icon = "eac_building_gourmet_restaurant"
+	planet_unique = yes
+	cost = { minerals = @b5cost }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	produced_resources = { food = 2 }
+	planet_modifier = { pop_happiness = 0.05 planet_migration_all_pull = 0.25 }
+	prerequisites = { "eac_tech_advanced_food_preparation" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "eac_requires_building_any_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "eac_requires_fertile_land_farm"
+				planet = { any_tile = { has_building = eac_building_fertile_land_farm } }
+			}
+		}
+	}
+	 # Make sure the building only exists when the planet has a fertile land farm
+	destroy_if = {
+		planet = {
+			NOT = { any_tile = { has_building = eac_building_fertile_land_farm } }
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+eac_building_food_packaging_plant_1_hidden_tree_root = {
+	potential = { always = no }
+	planet_unique = yes
+	icon = eac_building_food_packaging_plant_1
+}
+eac_building_food_packaging_plant_1 = {
+	base_buildtime = @b2time
+	planet_unique = yes
+	cost = { minerals = 150 }
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+		NOT = { owner = { has_authority = auth_machine_intelligence } }
+		NAND = {
+			owner = { has_technology = "eac_tech_food_packaging_2" }
+			custom_tooltip = {
+				fail_text = "requires_building_capital_2"
+				planet = {
+					OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
+				}
+			}
+			NOT = { owner = { has_country_flag = display_low_tier_flag } }
+			has_global_flag = direct_build_enabled
+		}
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	allow = {
+		custom_tooltip = {
+			fail_text = "requires_building_capital_1"
+			planet = {
+				OR = {
+					has_building = "building_capital_1"
+					has_building = "building_capital_2"
+					has_building = "building_capital_3"
+				}
+			}
+		}
+	}
+	produced_resources = { food = 2 }
+	planet_modifier = { tile_resource_food_mult = 0.10 }
+	required_resources = { energy = 2 }
+	upgrades = { eac_building_food_packaging_plant_2 }
+	prerequisites = { "eac_tech_food_packaging_1" }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+			has_resource = { type = eac_sr_rare_minerals amount > 0 }
+			has_resource = { type = eac_sr_fertile_land amount > 0 }
+			has_resource = { type = eac_sr_unusual_metals amount > 0 }
+			has_resource = { type = eac_sr_gravitational_anomaly amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { factor = 10 }
+}
+eac_building_food_packaging_plant_2_direct_build = {
+	base_buildtime = 315
+	planet_unique = yes
+	cost = { minerals = 350 }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+		NOT = { owner = { has_authority = auth_machine_intelligence } }
+		NOT = { has_building = eac_building_food_packaging_plant_2 }
+		direct_build_enabled = yes
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	allow = {
+		custom_tooltip = {
+			fail_text = "requires_building_capital_2"
+			planet = {
+				OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
+			}
+		}
+	}
+	produced_resources = { food = 4 }
+	planet_modifier = { tile_resource_food_mult = 0.20 }
+	required_resources = { energy = 3 }
+	prerequisites = { "eac_tech_food_packaging_2" }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+			has_resource = { type = eac_sr_rare_minerals amount > 0 }
+			has_resource = { type = eac_sr_fertile_land amount > 0 }
+			has_resource = { type = eac_sr_unusual_metals amount > 0 }
+			has_resource = { type = eac_sr_gravitational_anomaly amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	show_tech_unlock_if = { always = no }
+	icon = eac_building_food_packaging_plant_2
+	upgrades = { eac_building_food_packaging_plant_1_hidden_tree_root }
+}
+eac_building_food_packaging_plant_2 = {
+	base_buildtime = @b3time
+	is_listed = no
+	planet_unique = yes
+	cost = { minerals = 200 }
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+		NOT = { owner = { has_authority = auth_machine_intelligence } }
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	allow = {
+		custom_tooltip = {
+			fail_text = "requires_building_capital_2"
+			planet = {
+				OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
+			}
+		}
+	}
+	produced_resources = { food = 4 }
+	planet_modifier = { tile_resource_food_mult = 0.20 }
+	required_resources = { energy = 3 }
+	prerequisites = { "eac_tech_food_packaging_2" }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	upgrades = { eac_building_food_packaging_plant_1_hidden_tree_root }
+}
+ #
+ # Physics
+ #
+eac_building_anomaly_research_facility = {
+	base_buildtime = 360
+	icon = "eac_building_anomaly_research_facility"
+	planet_unique = yes
+	cost = { minerals = 200 }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	required_resources = { energy = 1 }
+	produced_resources = { physics_research = 4 unity = 4 }
+	planet_modifier = { tile_resource_physics_research_mult = 0.05 }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "eac_requires_building_any_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "eac_requires_gravitational_anomaly"
+				tile = {
+					has_resource = { type = eac_sr_gravitational_anomaly amount > 0 }
+				}
+			}
+		}
+	}
+	prerequisites = { "eac_tech_gravitational_anomaly_studies" }
+	ai_weight = { factor = 10 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+eac_building_grav_application_lab = {
+	base_buildtime = @b3time
+	icon = "eac_building_grav_application_lab"
+	planet_unique = yes
+	cost = { minerals = @b5cost }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	produced_resources = { physics_research = 2 }
+	country_modifier = { category_field_manipulation_research_speed_mult = 0.03 category_particles_research_speed_mult = 0.02 }
+	planet_modifier = { pop_happiness = -0.05 }
+	prerequisites = { "eac_tech_applied_grav_theory" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "eac_requires_building_any_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "eac_requires_anomaly_research_facility"
+				planet = { any_tile = { has_building = eac_building_anomaly_research_facility } }
+			}
+		}
+	}
+	 # Make sure the building only exists when the planet has an anomaly research facility
+	destroy_if = {
+		planet = {
+			NOT = { any_tile = { has_building = eac_building_anomaly_research_facility } }
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+ #
+ # Engineering
+ #
+eac_building_alchemists_forge = {
+	base_buildtime = 360
+	icon = "eac_building_alchemists_forge"
+	planet_unique = yes
+	cost = { minerals = 200 }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	required_resources = { energy = 1 }
+	produced_resources = { engineering_research = 4 unity = 4 }
+	planet_modifier = { tile_resource_engineering_research_mult = 0.05 }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "eac_requires_building_any_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "eac_requires_unusual_metals"
+				tile = {
+					has_resource = { type = eac_sr_unusual_metals amount > 0 }
+				}
+			}
+		}
+	}
+	prerequisites = { "eac_tech_unusual_metal_studies" }
+	ai_weight = { factor = 10 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+eac_building_advanced_prefab_facility = {
+	base_buildtime = @b3time
+	icon = "eac_building_advanced_prefab_facility"
+	planet_unique = yes
+	cost = { minerals = @b5cost }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	produced_resources = { engineering_research = 2 }
+	planet_modifier = { planet_building_cost_mult = -0.15 planet_building_build_speed_mult = 0.15 }
+	prerequisites = { "eac_tech_advanced_prefab_techniques" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "eac_requires_building_any_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "eac_requires_alchemists_forge"
+				planet = { any_tile = { has_building = eac_building_alchemists_forge } }
+			}
+		}
+	}
+	 # Make sure the building only exists when the planet has an alchemists forge
+	destroy_if = {
+		planet = {
+			NOT = { any_tile = { has_building = eac_building_alchemists_forge } }
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+ ###############################
+ ### Planet Unique buildings ###
+ ###############################
+eac_building_galactic_stage = {
+	base_buildtime = 360
+	empire_unique = yes
+	cost = { minerals = 500 influence = 100 }
+	potential = {
+		planet = { is_capital = yes }
+		NOT = { owner = { has_government = gov_machine_terminator } }
+		NOT = { owner = { has_valid_civic = civic_fanatic_purifiers } }
+	}
+	destroy_if = { planet = { is_capital = no } }
+	allow = {
+		custom_tooltip = {
+			fail_text = "eac_requires_building_any_capital_3"
+			planet = {
+				OR = { has_building = "building_capital_3" has_building = "building_machine_capital_3" }
+			}
+		}
+	}
+	country_modifier = { max_influence = 500 }
+	prerequisites = { "eac_tech_galactic_elevation" }
+	ai_weight = { weight = 20 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+eac_building_hab_laboratory_physics_module = {
+	base_buildtime = 360
+	cost = { minerals = 250 }
+	potential = { planet = { is_planet_class = pc_habitat } }
+	allow = { planet = { has_building = "building_hab_capital" } }
+	produced_resources = { physics_research = 5 }
+	required_resources = { energy = 2 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+eac_building_hab_laboratory_bio_module = {
+	base_buildtime = 360
+	cost = { minerals = 250 }
+	potential = { planet = { is_planet_class = pc_habitat } }
+	allow = { planet = { has_building = "building_hab_capital" } }
+	produced_resources = { society_research = 5 }
+	required_resources = { energy = 2 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+eac_building_hab_laboratory_engineering_module = {
+	base_buildtime = 360
+	cost = { minerals = 250 }
+	potential = { planet = { is_planet_class = pc_habitat } }
+	allow = { planet = { has_building = "building_hab_capital" } }
+	produced_resources = { engineering_research = 5 }
+	required_resources = { energy = 2 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # Do not remove or rename this
+ # Possible Variables for Buildings:
+ # strategic_resource: strategic resource, deprecated, strategic resource used by the building.
+ # allow: trigger to check for allowing construction of building.
+ # prerequisites: Tech requirements for building.
+ # empire_unique: boolean, can only build one if set to true.
+ # cost: resource table, cost of building.
+ # is_orbital: boolean, can only be built in orbital station.
+ # modifier: modifier, deprecated, applies a modifier to planet; use planet_modifier instead.
+ # planet_modifier, country_modifier, army_modifier: applies modifier to planet/country/armies
+ # triggered_planet_modifier = { key (optional), potential, modifier }: applies conditional modifier to planet
+ # base_buildtime: int, number of days for construction.
+ # requires_pop, boolean, building will require a pop for production.
+ # required_resources, resource table, required resources for production.
+ # produced_resources, resource table, produced resources in production.
+ # upgrades, buildings list, buildings this building can upgrade into.
+ # is_listed, boolean, toggles if this building is shown in the non-upgrade buildable list.
+ # planet_unique, toggles if one can build multiple of this type on a single planet.
+ # ai_weight, weight for AI, default is set to one, weight set to 0 means that AI will never build it
+ #
+ # BALANCE
+ # can change the time and cost of all common buildings with these variables below
+@b0time = 120
+@b0cost = 30
+@b0effect = 1
+@b0upkeep = 0.5
+@b1time = 210
+@b1cost = 60
+@b1effect = 2
+@b1upkeep = 1
+@b2time = 180
+@b2cost = 90
+@b2effect = 3
+@b2upkeep = 1.5
+@b3time = 180
+@b3cost = 120
+@b3effect = 4
+@b3upkeep = 2
+@b4time = 180
+@b4cost = 150
+@b4effect = 5
+@b4upkeep = 2.5
+@b5time = 180
+@b5cost = 180
+@b5effect = 8
+@b5upkeep = 3
+@science1 = 1
+@science2 = 2
+@science3 = 3
+@science4 = 4
+@science5 = 6
+@natural_equilibrium_happiness = 0.02
+ #
+ #

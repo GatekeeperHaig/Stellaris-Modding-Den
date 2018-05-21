@@ -1,0 +1,892 @@
+namespace = cgm_planets_enhanced_spawn_engine
+
+country_event = { 
+	id = cgm_planets_enhanced_spawn_engine.0
+	hide_window = yes
+	fire_only_once = yes
+	trigger = { 
+		NOT = { has_global_flag = planets_enhanced_active }
+		is_ai = no
+	}
+	immediate = { 
+		set_global_flag = planets_enhanced_active
+		if = { 
+			limit = { NOT = { has_country_flag = cgm_game_host } }
+			set_country_flag = cgm_game_host	
+		}	
+		every_megastructure = {
+			limit = { 
+				OR = {
+					is_megastructure_type = dyson_sphere_ruined
+					is_megastructure_type = think_tank_ruined
+					is_megastructure_type = spy_orb_ruined
+					is_megastructure_type = gateway_ruined
+				}
+				exists = orbit				
+			}
+			orbit.planet = { set_planet_flag = has_ruined_megastructure } 
+		}
+		every_planet = {
+			limit = { 
+				is_gas_giant = yes
+				has_moon = yes
+				any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
+			}				
+			every_moon = { 
+				limit = { NOT = { has_planet_flag = gas_giant_moon } }
+				set_planet_flag = gas_giant_moon
+			}
+		}	
+		country_event = { id = cgm_planets_enhanced_spawn_engine.1 }	
+	}
+}	
+
+country_event = { 
+	id = cgm_planets_enhanced_spawn_engine.1
+	is_triggered_only = yes	
+	title = cgm_pe.main_menu.title
+	desc = cgm_pe.main_menu.desc
+	diplomatic = yes
+	force_open = yes
+	custom_gui = "cgm_pe_main_menu"	
+	picture_event_data = { room = cgm_pe_menu_room }	
+	trigger = { 		
+		is_ai = no
+		OR = {
+			is_multiplayer = no
+			AND = { 
+				is_multiplayer = yes				
+				has_country_flag = cgm_game_host
+			}	
+		}				
+	}	
+	#Level 0 menu options
+	option = {
+		name = cgm_pe.default_configuration.name
+		custom_tooltip = cgm_pe.default_configuration.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { 
+			NOR = { 
+				has_country_flag = cgm_pe_default_configuration				
+				has_country_flag = cgm_pe_advanced_configuration
+			}
+		}
+		hidden_effect = { 
+			###
+			#feature flags			
+			set_timed_global_flag = { flag = cgm_default_strategic_resources days = 1 }
+			set_timed_global_flag = { flag = cgm_default_deposits days = 1 }
+			set_timed_global_flag = { flag = cgm_default_tile_blockers days = 1 }				
+			set_timed_global_flag = { flag = no_planet_resize days = 1 }				
+			set_global_flag = cgm_terraforming_rework_enabled
+			set_global_flag = cgm_uninhabitable_colonization_enabled
+			###
+			#menu flags
+			set_timed_country_flag = { flag = cgm_pe_default_configuration days = 1 }
+			###
+			#effects
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }	
+		}
+	}	
+	option = {
+		name = cgm_pe.advanced_configuration.name
+		custom_tooltip = cgm_pe.advanced_configuration.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { 
+			NOR = { 
+				has_country_flag = cgm_pe_default_configuration				
+				has_country_flag = cgm_pe_advanced_configuration
+			}
+		}			
+		hidden_effect = { 
+			###
+			#menu flags
+			set_timed_country_flag = { flag = cgm_pe_advanced_configuration	days = 1 }
+			###
+			#effects			
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}			
+	#Level 1 menu options 
+	option = {
+		name = cgm_pe.configure_resources.name
+		custom_tooltip = cgm_pe.configure_resources.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { 
+			has_country_flag = cgm_pe_advanced_configuration
+			NOR = { 
+				has_global_flag = cgm_resources_disabled
+				has_global_flag = cgm_very_high_strategic_resources
+				has_global_flag = cgm_high_strategic_resources
+				has_global_flag = cgm_default_strategic_resources
+				has_global_flag = cgm_low_strategic_resources
+				has_global_flag = cgm_very_low_strategic_resources	
+				has_country_flag = cgm_pe_configure_resources
+				has_country_flag = cgm_pe_configure_planet_size
+				has_country_flag = cgm_pe_configure_deposits	
+				has_country_flag = cgm_pe_configure_terraforming	
+				has_country_flag = cgm_pe_configure_tile_blockers								
+			}
+		}			
+		hidden_effect = {
+			###
+			#menu flags			 
+			set_timed_country_flag = { flag = cgm_pe_configure_resources days = 1 }
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.configure_deposits.name
+		custom_tooltip = cgm_pe.configure_deposits.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { 
+			has_country_flag = cgm_pe_advanced_configuration
+			NOR = { 
+				has_global_flag = cgm_no_deposits_rebalance
+				has_global_flag = cgm_very_high_deposits
+				has_global_flag = cgm_high_deposits
+				has_global_flag = cgm_default_deposits
+				has_global_flag = cgm_low_deposits
+				has_global_flag = cgm_very_low_deposits				
+				has_country_flag = cgm_pe_configure_resources
+				has_country_flag = cgm_pe_configure_planet_size
+				has_country_flag = cgm_pe_configure_deposits	
+				has_country_flag = cgm_pe_configure_terraforming		
+				has_country_flag = cgm_pe_configure_tile_blockers								
+			}
+		}			
+		hidden_effect = {
+			###
+			#menu flags			 
+			set_timed_country_flag = { flag = cgm_pe_configure_deposits days = 1 }
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.configure_tile_blockers.name
+		custom_tooltip = cgm_pe.configure_tile_blockers.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { 
+			has_country_flag = cgm_pe_advanced_configuration
+			NOR = {
+				has_global_flag = cgm_tile_blockers_disabled
+				has_global_flag = cgm_very_high_tile_blockers
+				has_global_flag = cgm_high_tile_blockers
+				has_global_flag = cgm_default_tile_blockers
+				has_global_flag = cgm_low_tile_blockers
+				has_global_flag = cgm_very_low_tile_blockers			
+				has_country_flag = cgm_pe_configure_resources
+				has_country_flag = cgm_pe_configure_planet_size
+				has_country_flag = cgm_pe_configure_deposits	
+				has_country_flag = cgm_pe_configure_terraforming	
+				has_country_flag = cgm_pe_configure_tile_blockers				
+			}
+		}			
+		hidden_effect = {
+			###
+			#menu flags			 
+			set_timed_country_flag = { flag = cgm_pe_configure_tile_blockers days = 1 }
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}				
+	option = {
+		name = cgm_pe.configure_planet_size.name
+		custom_tooltip = cgm_pe.configure_planet_size.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { 
+			has_country_flag = cgm_pe_advanced_configuration
+			NOR = { 
+				has_global_flag = no_planet_resize
+				has_global_flag = cgm_very_large_planet_size
+				has_global_flag = cgm_large_planet_size
+				has_global_flag = cgm_small_planet_size
+				has_global_flag = cgm_very_small_planet_size		
+				has_country_flag = cgm_pe_configure_resources
+				has_country_flag = cgm_pe_configure_planet_size
+				has_country_flag = cgm_pe_configure_deposits								
+				has_country_flag = cgm_pe_configure_terraforming
+				has_country_flag = cgm_pe_configure_tile_blockers								
+			}
+		}			
+		hidden_effect = {
+			###
+			#menu flags			 
+			set_timed_country_flag = { flag = cgm_pe_configure_planet_size days = 1 }
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}			
+	option = {
+		name = cgm_pe.configure_terraforming.name
+		custom_tooltip = cgm_pe.configure_terraforming.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { 
+			has_country_flag = cgm_pe_advanced_configuration
+			NOR = { 
+				has_global_flag = cgm_terraforming_rework_disabled
+				has_global_flag = cgm_terraforming_rework_enabled	
+				has_global_flag = cgm_uninhabitable_colonization_disabled				
+				has_global_flag = cgm_uninhabitable_colonization_enabled				
+				has_country_flag = cgm_pe_configure_resources
+				has_country_flag = cgm_pe_configure_planet_size
+				has_country_flag = cgm_pe_configure_deposits								
+				has_country_flag = cgm_pe_configure_terraforming
+				has_country_flag = cgm_pe_configure_tile_blockers								
+			}
+		}			
+		hidden_effect = {
+			###
+			#menu flags			 
+			set_timed_country_flag = { flag = cgm_pe_configure_terraforming days = 1 }
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe_back
+		custom_gui = "cgm_pe_option"		
+		trigger = { 
+			OR = { 
+				has_country_flag = cgm_pe_default_configuration				
+				has_country_flag = cgm_pe_advanced_configuration
+			}
+			NOR = { 
+				has_country_flag = cgm_pe_configure_resources
+				has_country_flag = cgm_pe_configure_planet_size
+				has_country_flag = cgm_pe_configure_deposits
+				has_country_flag = cgm_pe_configure_terraforming
+				has_country_flag = cgm_pe_configure_tile_blockers							
+				has_global_flag = cgm_resources_disabled
+				has_global_flag = cgm_very_high_strategic_resources
+				has_global_flag = cgm_high_strategic_resources
+				has_global_flag = cgm_default_strategic_resources
+				has_global_flag = cgm_low_strategic_resources
+				has_global_flag = cgm_very_low_strategic_resources
+				has_global_flag = cgm_no_deposits_rebalance
+				has_global_flag = cgm_very_high_deposits
+				has_global_flag = cgm_high_deposits
+				has_global_flag = cgm_default_deposits
+				has_global_flag = cgm_low_deposits
+				has_global_flag = cgm_very_low_deposits
+				has_global_flag = cgm_tile_blockers_disabled
+				has_global_flag = cgm_very_high_tile_blockers
+				has_global_flag = cgm_high_tile_blockers
+				has_global_flag = cgm_default_tile_blockers
+				has_global_flag = cgm_low_tile_blockers
+				has_global_flag = cgm_very_low_tile_blockers				
+				has_global_flag = no_planet_resize
+				has_global_flag = cgm_very_large_planet_size
+				has_global_flag = cgm_large_planet_size
+				has_global_flag = cgm_small_planet_size
+				has_global_flag = cgm_very_small_planet_size	
+				has_global_flag = cgm_terraforming_rework_disabled
+				has_global_flag = cgm_uninhabitable_colonization_disabled
+				has_global_flag = cgm_terraforming_rework_enabled
+				has_global_flag = cgm_uninhabitable_colonization_enabled																			
+			}			
+		}			
+		hidden_effect = { 
+			remove_country_flag = cgm_pe_advanced_configuration	
+			remove_country_flag = cgm_pe_default_configuration				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}
+	#Level 2 menu options - resources
+	option = {
+		name = cgm_pe.cgm_resources_disabled.name
+		custom_tooltip = cgm_pe.cgm_resources_disabled.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_resources }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_resources_disabled days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_resources
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}	
+	option = {
+		name = cgm_pe.very_high_resources.name
+		custom_tooltip = cgm_pe.very_high_resources.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_resources }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_very_high_strategic_resources days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_resources
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}	
+	option = {
+		name = cgm_pe.high_resources.name
+		custom_tooltip = cgm_pe.high_resources.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_resources }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_high_strategic_resources days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_resources
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.default_resources.name
+		custom_tooltip = cgm_pe.default_resources.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_resources }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_default_strategic_resources days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_resources
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.low_resources.name
+		custom_tooltip = cgm_pe.low_resources.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_resources }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_low_strategic_resources days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_resources
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.very_low_resources.name
+		custom_tooltip = cgm_pe.very_low_resources.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_resources }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_very_low_strategic_resources days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_resources
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}	
+	#Level 2 menu options - deposits
+	option = {
+		name = cgm_pe.cgm_no_deposits_rebalance.name
+		custom_tooltip = cgm_pe.cgm_no_deposits_rebalance.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_deposits }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_no_deposits_rebalance days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_deposits
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.very_high_deposits.name
+		custom_tooltip = cgm_pe.very_high_deposits.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_deposits }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_very_high_deposits days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_deposits
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}	
+	option = {
+		name = cgm_pe.high_deposits.name
+		custom_tooltip = cgm_pe.high_deposits.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_deposits }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_high_deposits days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_deposits
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.default_deposits.name
+		custom_tooltip = cgm_pe.default_deposits.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_deposits }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_default_deposits days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_deposits
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.low_deposits.name
+		custom_tooltip = cgm_pe.low_deposits.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_deposits }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_low_deposits days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_deposits
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.very_low_deposits.name
+		custom_tooltip = cgm_pe.very_low_deposits.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_deposits }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_very_low_deposits days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_deposits
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}	
+	#Level 2 menu options - tile_blockers
+	option = {
+		name = cgm_pe.cgm_tile_blockers_disabled.name
+		custom_tooltip = cgm_pe.cgm_tile_blockers_disabled.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_tile_blockers }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_tile_blockers_disabled days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_tile_blockers
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}	
+	option = {
+		name = cgm_pe.very_high_tile_blockers.name
+		custom_tooltip = cgm_pe.very_high_tile_blockers.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_tile_blockers }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_very_high_tile_blockers days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_tile_blockers
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}	
+	option = {
+		name = cgm_pe.high_tile_blockers.name
+		custom_tooltip = cgm_pe.high_tile_blockers.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_tile_blockers }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_high_tile_blockers days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_tile_blockers
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.default_tile_blockers.name
+		custom_tooltip = cgm_pe.default_tile_blockers.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_tile_blockers }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_default_tile_blockers days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_tile_blockers
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.low_tile_blockers.name
+		custom_tooltip = cgm_pe.low_tile_blockers.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_tile_blockers }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_low_tile_blockers days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_tile_blockers
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.very_low_tile_blockers.name
+		custom_tooltip = cgm_pe.very_low_tile_blockers.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_tile_blockers }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_very_low_tile_blockers days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_tile_blockers
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	#Level 2 menu options - planet_size
+	option = {
+		name = cgm_pe.no_planet_resize.name
+		custom_tooltip = cgm_pe.no_planet_resize.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_planet_size }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_no_planet_resize days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_planet_size
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}	
+	option = {
+		name = cgm_pe.very_large_planet_size.name
+		custom_tooltip = cgm_pe.very_large_planet_size.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_planet_size }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_very_large_planet_size days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_planet_size
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}	
+	option = {
+		name = cgm_pe.large_planet_size.name
+		custom_tooltip = cgm_pe.large_planet_size.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_planet_size }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_large_planet_size days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_planet_size
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.small_planet_size.name
+		custom_tooltip = cgm_pe.small_planet_size.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_planet_size }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_small_planet_size days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_planet_size
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.very_small_planet_size.name
+		custom_tooltip = cgm_pe.very_small_planet_size.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_planet_size }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_timed_global_flag = { flag = cgm_very_small_planet_size days = 1 }			
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_planet_size
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}	
+	### Level 2 menu - terraforming and colonization
+	option = {
+		name = cgm_pe.cgm_terraforming_and_colonization_disabled.name
+		custom_tooltip = cgm_pe.cgm_terraforming_and_colonization_disabled.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_terraforming }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_global_flag = cgm_terraforming_rework_disabled
+			set_global_flag = cgm_uninhabitable_colonization_disabled
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_terraforming
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}					
+	option = {
+		name = cgm_pe.cgm_terraforming_disabled_colonization_enabled.name
+		custom_tooltip = cgm_pe.cgm_terraforming_disabled_colonization_enabled.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_terraforming }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_global_flag = cgm_terraforming_rework_disabled
+			set_global_flag = cgm_uninhabitable_colonization_enabled
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_terraforming
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}						
+	option = {
+		name = cgm_pe.cgm_terraforming_enabled_colonization_disabled.name
+		custom_tooltip = cgm_pe.cgm_terraforming_enabled_colonization_disabled.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_terraforming }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_global_flag = cgm_terraforming_rework_enabled
+			set_global_flag = cgm_uninhabitable_colonization_disabled
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_terraforming
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}		
+	option = {
+		name = cgm_pe.cgm_terraforming_enabled_colonization_enabled.name
+		custom_tooltip = cgm_pe.cgm_terraforming_enabled_colonization_enabled.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_terraforming }		
+		hidden_effect = {
+			###
+			#feature flags
+			set_global_flag = cgm_terraforming_rework_enabled
+			set_global_flag = cgm_uninhabitable_colonization_enabled
+			###
+			#menu flags			 
+			remove_country_flag = cgm_pe_configure_terraforming
+			###
+			#effects				
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}				
+	###
+	option = {
+		name = cgm_pe_reset.name
+		custom_tooltip = cgm_pe_reset.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { 
+			OR = { 
+				has_global_flag = cgm_resources_disabled
+				has_global_flag = cgm_very_high_strategic_resources
+				has_global_flag = cgm_high_strategic_resources
+				has_global_flag = cgm_default_strategic_resources
+				has_global_flag = cgm_low_strategic_resources
+				has_global_flag = cgm_very_low_strategic_resources
+				has_global_flag = cgm_no_deposits_rebalance
+				has_global_flag = cgm_very_high_deposits
+				has_global_flag = cgm_high_deposits
+				has_global_flag = cgm_default_deposits
+				has_global_flag = cgm_low_deposits
+				has_global_flag = cgm_very_low_deposits
+				has_global_flag = cgm_tile_blockers_disabled
+				has_global_flag = cgm_very_high_tile_blockers
+				has_global_flag = cgm_high_tile_blockers
+				has_global_flag = cgm_default_tile_blockers
+				has_global_flag = cgm_low_tile_blockers
+				has_global_flag = cgm_very_low_tile_blockers				
+				has_global_flag = no_planet_resize
+				has_global_flag = cgm_very_large_planet_size
+				has_global_flag = cgm_large_planet_size
+				has_global_flag = cgm_small_planet_size
+				has_global_flag = cgm_very_small_planet_size
+				has_global_flag = cgm_terraforming_rework_disabled
+				has_global_flag = cgm_uninhabitable_colonization_disabled
+				has_global_flag = cgm_terraforming_rework_enabled
+				has_global_flag = cgm_uninhabitable_colonization_enabled																							
+			}		
+		}			
+		hidden_effect = { 
+			remove_global_flag = cgm_resources_disabled
+			remove_global_flag = cgm_very_high_strategic_resources
+			remove_global_flag = cgm_high_strategic_resources
+			remove_global_flag = cgm_default_strategic_resources
+			remove_global_flag = cgm_low_strategic_resources
+			remove_global_flag = cgm_very_low_strategic_resources
+			remove_global_flag = cgm_no_deposits_rebalance
+			remove_global_flag = cgm_very_high_deposits
+			remove_global_flag = cgm_high_deposits
+			remove_global_flag = cgm_default_deposits
+			remove_global_flag = cgm_low_deposits
+			remove_global_flag = cgm_very_low_deposits
+			remove_global_flag = cgm_tile_blockers_disabled
+			remove_global_flag = cgm_very_high_tile_blockers
+			remove_global_flag = cgm_high_tile_blockers
+			remove_global_flag = cgm_default_tile_blockers
+			remove_global_flag = cgm_low_tile_blockers
+			remove_global_flag = cgm_very_low_tile_blockers				
+			remove_global_flag = no_planet_resize
+			remove_global_flag = cgm_very_large_planet_size
+			remove_global_flag = cgm_large_planet_size
+			remove_global_flag = cgm_small_planet_size
+			remove_global_flag = cgm_very_small_planet_size	
+			remove_global_flag = cgm_terraforming_rework_disabled
+			remove_global_flag = cgm_uninhabitable_colonization_disabled
+			remove_global_flag = cgm_terraforming_rework_enabled
+			remove_global_flag = cgm_uninhabitable_colonization_enabled																						
+			country_event = { id = cgm_planets_enhanced_spawn_engine.1 }				
+		}
+	}
+	#level 3 menu - resource spawn
+	option = { 		
+		name = cgm_pe_done.name
+		custom_tooltip = cgm_pe_done.desc
+		custom_gui = "cgm_pe_option"			
+		trigger = { 
+			OR = { 
+				has_global_flag = cgm_resources_disabled
+				has_global_flag = cgm_very_high_strategic_resources
+				has_global_flag = cgm_high_strategic_resources
+				has_global_flag = cgm_default_strategic_resources
+				has_global_flag = cgm_low_strategic_resources
+				has_global_flag = cgm_very_low_strategic_resources
+			}	
+			OR = { 
+				has_global_flag = cgm_no_deposits_rebalance
+				has_global_flag = cgm_very_high_deposits
+				has_global_flag = cgm_high_deposits
+				has_global_flag = cgm_default_deposits
+				has_global_flag = cgm_low_deposits
+				has_global_flag = cgm_very_low_deposits
+			}	
+			OR = {
+				has_global_flag = cgm_tile_blockers_disabled
+				has_global_flag = cgm_very_high_tile_blockers
+				has_global_flag = cgm_high_tile_blockers
+				has_global_flag = cgm_default_tile_blockers
+				has_global_flag = cgm_low_tile_blockers
+				has_global_flag = cgm_very_low_tile_blockers				
+			}	
+			OR = { 
+				has_global_flag = no_planet_resize
+				has_global_flag = cgm_very_large_planet_size
+				has_global_flag = cgm_large_planet_size
+				has_global_flag = cgm_small_planet_size
+				has_global_flag = cgm_very_small_planet_size	
+			}	
+			OR = {
+				has_global_flag = cgm_terraforming_rework_disabled
+				has_global_flag = cgm_terraforming_rework_enabled
+			}
+			OR = { 
+				has_global_flag = cgm_uninhabitable_colonization_disabled				
+				has_global_flag = cgm_uninhabitable_colonization_enabled				
+			}
+		}
+		hidden_effect = { country_event = { id = cgm_planets_enhanced_spawn_engine.2 days = 1 } }
+	} 							
+}
+country_event = {
+	id = cgm_planets_enhanced_spawn_engine.2
+	is_triggered_only = yes	
+	hide_window = yes
+	
+	immediate = { cgm_resource_spawner = yes }
+}	

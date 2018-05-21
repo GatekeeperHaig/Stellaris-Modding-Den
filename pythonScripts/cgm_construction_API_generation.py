@@ -26,7 +26,9 @@ def main():
       # print(modFolder)
       # print(lowPri)
       # if "gwen" in modFolder:
-      print("automatedCreationAutobuildAPI({},{},{})".format(modAbbr,lowPri,highPri))
+      # print("automatedCreationAutobuildAPI({},{},{})".format(modAbbr,lowPri,highPri))
+      # if modAbbr!="gwen":
+        # continue
       automatedCreationAutobuildAPI(modAbbr,lowPri,highPri)
   cgm_planet_auto_API.main()
       

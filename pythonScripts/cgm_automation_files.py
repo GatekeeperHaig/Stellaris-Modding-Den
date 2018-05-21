@@ -11,6 +11,7 @@ from custom_difficulty_files import *
 from functools import reduce
 import glob
 import createAIVarsFromModifiers
+import createUpgradedBuildings
 
 
 #TODO: Prio List how to use this:
@@ -1370,17 +1371,19 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
             val.removeDuplicatesRec()
           buildingOut.add(name, val, comment, seperator)
         outputToFolderAndFile(buildingOut, "/common/buildings/", file,2, apiOutFolder)
+    BUArgV=[apiOutFolder+"/common/buildings/*","../CGM/buildings_script_source/common/buildings/*","--output_folder","../NOTES/api files/cgm_auto_BU/"+modName, "--custom_mod_name", "CGM - {}: Comp Patch".format(modName), "--load_order_priority", "--make_optional", "--scripted_variables",",".join(variableAllFiles),"--copy_folder_first", apiOutFolder,"--helper_file_list","01" ]
+    createUpgradedBuildings.main(createUpgradedBuildings.parse(BUArgV),BUArgV)
 
   #priority sorted output for potential autobuild. Joined into one file!
-  buildingOut=TagList()
-  for name, val, comment, seperator in buildingContentOrig.getAll():
-    if isinstance(val, TagList):
-      if hasattr(val, "helper") and val.helper==True:
-        continue
-      val.getOrCreate("ai_allow").add("NOT",TagList("owner" , TagList("has_country_flag","cgm_disable_vanilla_building_AI")))
-      val.removeDuplicatesRec()
-    buildingOut.add(name, val, comment, seperator)
-  outputToFolderAndFile(buildingOut, "", "actuallyActiveBuildings.txt",2, apiOutFolder)
+  # buildingOut=TagList()
+  # for name, val, comment, seperator in buildingContentOrig.getAll():
+  #   if isinstance(val, TagList):
+  #     if hasattr(val, "helper") and val.helper==True:
+  #       continue
+  #     val.getOrCreate("ai_allow").add("NOT",TagList("owner" , TagList("has_country_flag","cgm_disable_vanilla_building_AI")))
+  #     val.removeDuplicatesRec()
+  #   buildingOut.add(name, val, comment, seperator)
+  # outputToFolderAndFile(buildingOut, "", "actuallyActiveBuildings.txt",2, apiOutFolder)
 
 
   aiWeightTriggerFileName=apiOutFolder+"/common/scripted_triggers/cgm_{}_ai_weight_scripted_trigger.txt".format(modName)
