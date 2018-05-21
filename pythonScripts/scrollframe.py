@@ -39,6 +39,7 @@ class ScrollFrame(tk.Frame):
         
     def _on_mousewheel(self, event):
         #print("m")
+        scroll=0
         if event.num == 5 or event.delta == -120:
           scroll = 1
         if event.num == 4 or event.delta == 120:
