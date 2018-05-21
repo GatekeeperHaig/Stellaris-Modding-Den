@@ -450,7 +450,7 @@ class TabClass:
       if self.singleEntryCheck=="Helper File":
         argList.append("--helper_file_list")
         argList.append("")
-        for line in reversed(self.lines):
+        for line in self.lines:
           if line.lineCheckVar.get():
             argList[-1]+="1"
           else:

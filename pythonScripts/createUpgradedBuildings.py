@@ -88,7 +88,6 @@ def readAndConvert(args, allowRestart=1):
   globbedList=[]
   for b in args.buildingFileNames:
     globbedList+=glob.glob(b)
-  globbedList=list(reversed(globbedList)) #historical reasons. stupid, but needed
 
   #helper files: Needed when a mod only provides upgrades, without changing the lower tier buildings. Those lower tiers are needed for the script, thus they have to be given as helper files. Entries from helper files are not written later.
   isHelperFileItList=[] #list later used in main iteration
