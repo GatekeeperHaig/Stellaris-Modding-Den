@@ -1,0 +1,223 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # Do not remove or rename this
+ # Possible Variables for Buildings:
+ # strategic_resource: strategic resource, deprecated, strategic resource used by the building.
+ # allow: trigger to check for allowing construction of building.
+ # prerequisites: Tech requirements for building.
+ # empire_unique: boolean, can only build one if set to true.
+ # cost: resource table, cost of building.
+ # is_orbital: boolean, can only be built in orbital station.
+ # modifier: modifier, deprecated, applies a modifier to planet; use planet_modifier instead.
+ # planet_modifier, country_modifier, army_modifier: applies modifier to planet/country/armies
+ # triggered_planet_modifier = { key (optional), potential, modifier }: applies conditional modifier to planet
+ # base_buildtime: int, number of days for construction.
+ # requires_pop, boolean, building will require a pop for production.
+ # required_resources, resource table, required resources for production.
+ # produced_resources, resource table, produced resources in production.
+ # upgrades, buildings list, buildings this building can upgrade into.
+ # is_listed, boolean, toggles if this building is shown in the non-upgrade buildable list.
+ # planet_unique, toggles if one can build multiple of this type on a single planet.
+ # ai_weight, weight for AI, default is set to one, weight set to 0 means that AI will never build it
+ #
+ # BALANCE
+ # can change the time and cost of all common buildings with these variables below
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # Do not remove or rename this
+ # Possible Variables for Buildings:
+ # strategic_resource: strategic resource, deprecated, strategic resource used by the building.
+ # allow: trigger to check for allowing construction of building.
+ # prerequisites: Tech requirements for building.
+ # empire_unique: boolean, can only build one if set to true.
+ # cost: resource table, cost of building.
+ # is_orbital: boolean, can only be built in orbital station.
+ # modifier: modifier, deprecated, applies a modifier to planet; use planet_modifier instead.
+ # planet_modifier, country_modifier, army_modifier: applies modifier to planet/country/armies
+ # triggered_planet_modifier = { key (optional), potential, modifier }: applies conditional modifier to planet
+ # base_buildtime: int, number of days for construction.
+ # requires_pop, boolean, building will require a pop for production.
+ # required_resources, resource table, required resources for production.
+ # produced_resources, resource table, produced resources in production.
+ # upgrades, buildings list, buildings this building can upgrade into.
+ # is_listed, boolean, toggles if this building is shown in the non-upgrade buildable list.
+ # planet_unique, toggles if one can build multiple of this type on a single planet.
+ # ai_weight, weight for AI, default is set to one, weight set to 0 means that AI will never build it
+ #
+ # BALANCE
+ # can change the time and cost of all common buildings with these variables below
+@b0time = 120
+@b0cost = 30
+@b0effect = 1
+@b0upkeep = 0.5
+@b1time = 210
+@b1cost = 60
+@b1effect = 2
+@b1upkeep = 1
+@b2time = 180
+@b2cost = 90
+@b2effect = 3
+@b2upkeep = 1.5
+@b3time = 180
+@b3cost = 120
+@b3effect = 4
+@b3upkeep = 2
+@b4time = 180
+@b4cost = 150
+@b4effect = 5
+@b4upkeep = 2.5
+@b5time = 180
+@b5cost = 180
+@b5effect = 8
+@b5upkeep = 3
+@science1 = 1
+@science2 = 2
+@science3 = 3
+@science4 = 4
+@science5 = 6
+@natural_equilibrium_happiness = 0.02
+ #
+ #	MACHINE FOOD
+ #
+eac_building_green_smoothie_factory = {
+	base_buildtime = @b3time
+	cost = { minerals = @b3cost }
+	show_tech_unlock_if = {
+		has_authority = auth_machine_intelligence
+		has_government = gov_machine_servitor  # required civic cannot be added/removed
+	}
+	potential = {
+		owner = { has_authority = auth_machine_intelligence has_government = gov_machine_servitor }
+	}
+	destroy_if = {
+		exists = owner
+		owner = {
+			NOR = { has_authority = auth_machine_intelligence has_government = gov_machine_servitor }
+		}
+	}
+	produced_resources = { food = 6 }
+	prerequisites = { "eac_tech_green_smoothie_recipes" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "building_machine_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "eac_requires_fertile_land"
+				tile = {
+					has_resource = { type = eac_sr_fertile_land amount > 0 }
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+eac_building_bio_lubricant_refinery = {
+	base_buildtime = @b3time
+	cost = { minerals = @b3cost }
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+	potential = { owner = { has_authority = auth_machine_intelligence } }
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+	}
+	produced_resources = { energy = 2 food = -2 }
+	country_modifier = { pop_robot_upkeep_mult = -0.03 }
+	prerequisites = { "eac_tech_bio_lubricant_refining" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "building_machine_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "eac_requires_fertile_land"
+				tile = {
+					has_resource = { type = eac_sr_fertile_land amount > 0 }
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+eac_building_paste_processing_plant = {
+	base_buildtime = @b2time
+	planet_unique = yes
+	cost = { minerals = 150 }
+	show_tech_unlock_if = {
+		has_authority = auth_machine_intelligence
+		has_government = gov_machine_servitor  # required civic cannot be added/removed
+	}
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+		owner = { has_authority = auth_machine_intelligence has_government = gov_machine_servitor }
+	}
+	destroy_if = {
+		exists = owner
+		owner = {
+			NOR = { has_authority = auth_machine_intelligence has_government = gov_machine_servitor }
+		}
+	}
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_machine_capital_1"
+			planet = {
+				OR = {
+					has_building = "building_machine_capital_1"
+					has_building = "building_machine_capital_2"
+					has_building = "building_machine_capital_3"
+				}
+			}
+		}
+	}
+	produced_resources = { food = 2 }
+	planet_modifier = { tile_resource_food_mult = 0.10 }
+	required_resources = { energy = 2 }
+	prerequisites = { "eac_tech_paste_processing" }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+			has_resource = { type = eac_sr_rare_minerals amount > 0 }
+			has_resource = { type = eac_sr_fertile_land amount > 0 }
+			has_resource = { type = eac_sr_unusual_metals amount > 0 }
+			has_resource = { type = eac_sr_gravitational_anomaly amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { factor = 10 }
+}

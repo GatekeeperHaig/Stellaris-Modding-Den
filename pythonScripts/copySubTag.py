@@ -23,7 +23,6 @@ def parse(argv, returnParser=False):
     parser.add_argument('fileNamesSources', nargs = '*', help='File(s)/Path(s) to file(s) to be searched as source. Globbing star(*) can be used (even under windows :P)')
   parser.add_argument('--tag_to_be_copied', default="ai_weight", help="The tag to be overwritten")
   parser.add_argument('--output_folder', default="", help="Pretty obvious I hope")
-  # parser.add_argument('-j','--join_files', action="store_true", help="Do not mix different top level tags!")
   # parser.add_argument('--filter', action="store_true", help="Use a comma separated file to determine with tags that are to be outputted. Everything below that key will be used. Filter file that will we tried to use is <filename(no .txt)>_filter.txt")
   # parser.add_argument('--manual_filter', default="", help="filter file used for all input files")
   # parser.add_argument('-t','--to_txt', action="store_true", help="The csv file(s) previously created (<filename(no .txt)>.csv) will be used to try and find tags in the opened txt files whos value will be replaced by the entry in the txt files. If the txt file value is a variable, the value will we written in the header (possibly overwriting something else!")
@@ -61,9 +60,6 @@ def main(args,unused=0):
     for fileName in globbedList:
       fileIndex+=1
       varsToValue=TagList(0)
-      # if fileIndex==0 or not args.join_files:
-      #   nameToData=TagList(0)
-      #   tagList=TagList(0)
         
       oldEnd=len(sourceEntries.vals)
       sourceEntries.readFile(fileName,args, varsToValue) 

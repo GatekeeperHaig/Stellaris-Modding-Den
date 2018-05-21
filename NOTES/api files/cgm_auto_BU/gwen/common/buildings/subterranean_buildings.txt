@@ -1,0 +1,1940 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ #
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ #
+ #
+ #
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ #
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ #
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ #
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ #
+ #
+ #
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ #
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # Do not remove or rename this
+ # Possible Variables for Buildings:
+ # strategic_resource: strategic resource, deprecated, strategic resource used by the building.
+ # allow: trigger to check for allowing construction of building.
+ # prerequisites: Tech requirements for building.
+ # empire_unique: boolean, can only build one if set to true.
+ # cost: resource table, cost of building.
+ # is_orbital: boolean, can only be built in orbital station.
+ # modifier: modifier, deprecated, applies a modifier to planet; use planet_modifier instead.
+ # planet_modifier, country_modifier, army_modifier: applies modifier to planet/country/armies
+ # triggered_planet_modifier = { key (optional), potential (scope: planet), modifier }: applies conditional modifier to planet
+ # base_buildtime: int, number of days for construction.
+ # requires_pop, boolean, building will require a pop for production.
+ # required_resources, resource table, required resources for production.
+ # produced_resources, resource table, produced resources in production.
+ # upgrades, buildings list, buildings this building can upgrade into.
+ # is_listed, boolean, toggles if this building is shown in the non-upgrade buildable list.
+ # planet_unique, toggles if one can build multiple of this type on a single planet.
+ # ai_weight, weight for AI, default is set to one, weight set to 0 means that AI will never build it
+ # is_colony: trigger to check if the building is a colony shelter for country (scope: country, from: planet). default: "always = no"
+ # active: trigger to check if a building can be active with a given pop worker (scope: pop) if you add a trigger here, you should also add the requirements in the description
+ # show_tech_unlock_if: trigger to show this building only conditionally in the technology screen. scope: country. default: { always = yes }
+ # planet_modifier_with_pop_trigger = { key (optional), potential (scope: pop), modifier }: applies modifier to pops on planet that satisfy condition in trigger
+building_gwen_underground_city_1_hidden_tree_root = {
+	potential = { always = no }
+	planet_unique = yes
+	icon = building_gwen_underground_city_1
+}
+building_gwen_underground_city_1 = {
+	icon = "Subterranean
+	City
+	T1"
+	tags = { hydroponics_farm }
+	immune_to_bombardment = yes
+	base_buildtime = @b1time
+	cost = { minerals = @b1cost }
+	produced_resources = {
+		food = 2  #per tier per building
+		society_research = 2  #per tier per building
+	}
+	required_resources = { energy = @b1upkeep }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			NOT = { has_swapped_tradition = tr_adaptability_finish }
+			resources = { unity = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			NOT = { has_valid_civic = civic_agrarian_idyll }
+			resources = { minerals = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			has_valid_civic = civic_agrarian_idyll
+			resources = { unity = 1 minerals = 1 }
+		}
+	}
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			has_modifier = planet_gwen_Cave_World_Modifications
+			owner = { has_technology = tech_subterranean_buildings_1 }
+		}
+		NAND = {
+			owner = {
+				has_technology = tech_hydroponics
+				has_technology = tech_biolab_1
+				has_technology = tech_subterranean_buildings_2
+			}
+			planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+			NOT = { owner = { has_country_flag = display_low_tier_flag } }
+			has_global_flag = direct_build_enabled
+		}
+	}
+	allow = {
+		owner = {
+			has_technology = tech_eco_simulation
+			has_technology = tech_planetary_government
+			has_technology = tech_subterranean_buildings_1
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	upgrades = { building_gwen_underground_city_2 }
+	ai_weight = { factor = 1 }
+}
+building_gwen_underground_city_2_direct_build = {
+	icon = "Subterranean
+	City
+	T2"
+	tags = { hydroponics_farm }
+	immune_to_bombardment = yes
+	base_buildtime = 345
+	cost = { minerals = 150 }
+	required_resources = { energy = @b2upkeep }
+	produced_resources = {
+		food = 4  #per tier per building
+		society_research = 4  #per tier per building
+	}
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		owner = {
+			has_technology = tech_hydroponics
+			has_technology = tech_biolab_1
+			has_technology = tech_subterranean_buildings_2
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			NOT = { has_swapped_tradition = tr_adaptability_finish }
+			resources = { unity = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			NOT = { has_valid_civic = civic_agrarian_idyll }
+			resources = { minerals = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			has_valid_civic = civic_agrarian_idyll
+			resources = { unity = 1 minerals = 1 }
+		}
+	}
+	upgrades = { building_gwen_underground_city_3 }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	show_tech_unlock_if = { always = no }
+	potential = {
+		NOT = { has_building = building_gwen_underground_city_2 }
+		direct_build_enabled = yes
+		NAND = {
+			owner = {
+				has_technology = tech_gene_crops
+				has_technology = tech_biolab_2
+				has_technology = tech_subterranean_buildings_3
+			}
+			planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+			NOT = { owner = { has_country_flag = display_low_tier_flag } }
+			has_global_flag = direct_build_enabled
+		}
+	}
+}
+building_gwen_underground_city_2 = {
+	icon = "Subterranean
+	City
+	T2"
+	tags = { hydroponics_farm }
+	immune_to_bombardment = yes
+	base_buildtime = @b2time
+	is_listed = no
+	cost = { minerals = @b2cost }
+	required_resources = { energy = @b2upkeep }
+	produced_resources = {
+		food = 4  #per tier per building
+		society_research = 4  #per tier per building
+	}
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		owner = {
+			has_technology = tech_hydroponics
+			has_technology = tech_biolab_1
+			has_technology = tech_subterranean_buildings_2
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			NOT = { has_swapped_tradition = tr_adaptability_finish }
+			resources = { unity = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			NOT = { has_valid_civic = civic_agrarian_idyll }
+			resources = { minerals = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			has_valid_civic = civic_agrarian_idyll
+			resources = { unity = 1 minerals = 1 }
+		}
+	}
+	upgrades = { building_gwen_underground_city_3 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_gwen_underground_city_3_direct_build = {
+	icon = "Subterranean
+	City
+	T3"
+	tags = { hydroponics_farm }
+	immune_to_bombardment = yes
+	base_buildtime = 480
+	cost = { minerals = 270 }
+	required_resources = { energy = @b3upkeep }
+	produced_resources = { food = 6 society_research = 6 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		owner = {
+			has_technology = tech_gene_crops
+			has_technology = tech_biolab_2
+			has_technology = tech_subterranean_buildings_3
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			NOT = { has_swapped_tradition = tr_adaptability_finish }
+			resources = { unity = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			NOT = { has_valid_civic = civic_agrarian_idyll }
+			resources = { minerals = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			has_valid_civic = civic_agrarian_idyll
+			resources = { unity = 1 minerals = 1 }
+		}
+	}
+	upgrades = { building_gwen_underground_city_4 }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	show_tech_unlock_if = { always = no }
+	potential = {
+		NOT = { has_building = building_gwen_underground_city_3 }
+		direct_build_enabled = yes
+		NAND = {
+			owner = {
+				has_technology = tech_nano_vitality_crops
+				has_technology = tech_biolab_3
+				has_technology = tech_subterranean_buildings_4
+			}
+			planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+			NOT = { owner = { has_country_flag = display_low_tier_flag } }
+			has_global_flag = direct_build_enabled
+		}
+	}
+}
+building_gwen_underground_city_3 = {
+	icon = "Subterranean
+	City
+	T3"
+	tags = { hydroponics_farm }
+	immune_to_bombardment = yes
+	base_buildtime = @b3time
+	is_listed = no
+	cost = { minerals = @b3cost }
+	required_resources = { energy = @b3upkeep }
+	produced_resources = { food = 6 society_research = 6 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		owner = {
+			has_technology = tech_gene_crops
+			has_technology = tech_biolab_2
+			has_technology = tech_subterranean_buildings_3
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			NOT = { has_swapped_tradition = tr_adaptability_finish }
+			resources = { unity = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			NOT = { has_valid_civic = civic_agrarian_idyll }
+			resources = { minerals = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			has_valid_civic = civic_agrarian_idyll
+			resources = { unity = 1 minerals = 1 }
+		}
+	}
+	upgrades = { building_gwen_underground_city_4 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_gwen_underground_city_4_direct_build = {
+	icon = "Subterranean
+	City
+	T4"
+	tags = { hydroponics_farm }
+	planet_unique = yes
+	immune_to_bombardment = yes
+	protects_from_bombardment = yes
+	defense_armies = 3
+	base_buildtime = 615
+	cost = { minerals = 420 }
+	produced_resources = { food = 8 society_research = 8 }
+	required_resources = { energy = @b4upkeep }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		owner = {
+			has_technology = tech_nano_vitality_crops
+			has_technology = tech_biolab_3
+			has_technology = tech_subterranean_buildings_4
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			NOT = { has_swapped_tradition = tr_adaptability_finish }
+			resources = { unity = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			NOT = { has_valid_civic = civic_agrarian_idyll }
+			resources = { minerals = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			has_valid_civic = civic_agrarian_idyll
+			resources = { unity = 1 minerals = 1 }
+		}
+	}
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	show_tech_unlock_if = { always = no }
+	potential = {
+		NOT = { has_building = building_gwen_underground_city_4 }
+		direct_build_enabled = yes
+	}
+	upgrades = { building_gwen_underground_city_1_hidden_tree_root }
+}
+building_gwen_underground_city_4 = {
+	icon = "Subterranean
+	City
+	T4"
+	tags = { hydroponics_farm }
+	planet_unique = yes
+	immune_to_bombardment = yes
+	protects_from_bombardment = yes
+	defense_armies = 3
+	base_buildtime = @b4time
+	is_listed = no
+	cost = { minerals = @b4cost }
+	produced_resources = { food = 8 society_research = 8 }
+	required_resources = { energy = @b4upkeep }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		owner = {
+			has_technology = tech_nano_vitality_crops
+			has_technology = tech_biolab_3
+			has_technology = tech_subterranean_buildings_4
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			NOT = { has_swapped_tradition = tr_adaptability_finish }
+			resources = { unity = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			NOT = { has_valid_civic = civic_agrarian_idyll }
+			resources = { minerals = 1 }
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			has_valid_civic = civic_agrarian_idyll
+			resources = { unity = 1 minerals = 1 }
+		}
+	}
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	upgrades = { building_gwen_underground_city_1_hidden_tree_root }
+}
+ #
+ #	GWENERGY
+ #
+building_gwen_subterranean_geothermal_plant_1_hidden_tree_root = {
+	potential = { always = no }
+	planet_unique = yes
+	icon = building_gwen_subterranean_geothermal_plant_1
+}
+building_gwen_subterranean_geothermal_plant_1 = {
+	icon = "Subterranean
+	Geothermal
+	Plant
+	T1"
+	immune_to_bombardment = yes
+	base_buildtime = @b1time
+	cost = { minerals = @b1cost }
+	produced_resources = { energy = 2 physics_research = 2 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			has_modifier = planet_gwen_Cave_World_Modifications
+			owner = { has_technology = tech_subterranean_buildings_1 }
+		}
+		NAND = {
+			planet = {
+				NOT = { is_planet_class = pc_habitat }
+				has_modifier = planet_gwen_Cave_World_Modifications
+			}
+			if = {
+				custom_tooltip = {
+					text = "requires_building_gwen_underground_city_1"
+					planet = {
+						OR = {
+							has_building = "building_gwen_underground_city_1"
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+			}
+			owner = {
+				has_technology = tech_power_plant_2
+				has_technology = tech_physics_lab_1
+				has_technology = tech_subterranean_buildings_2
+			}
+			planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+			NOT = { owner = { has_country_flag = display_low_tier_flag } }
+			has_global_flag = direct_build_enabled
+		}
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_power_plant_1
+			has_technology = tech_basic_science_lab_1
+			has_technology = tech_subterranean_buildings_1
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	upgrades = { building_gwen_subterranean_geothermal_plant_2 }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { factor = 1 }
+}
+building_gwen_subterranean_geothermal_plant_2_direct_build = {
+	icon = "Subterranean
+	Geothermal
+	Plant
+	T2"
+	immune_to_bombardment = yes
+	base_buildtime = 345
+	cost = { minerals = 150 }
+	produced_resources = { energy = 4 physics_research = 4 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			has_modifier = planet_gwen_Cave_World_Modifications
+		}
+		NOT = { has_building = building_gwen_subterranean_geothermal_plant_2 }
+		direct_build_enabled = yes
+		NAND = {
+			planet = {
+				NOT = { is_planet_class = pc_habitat }
+				has_modifier = planet_gwen_Cave_World_Modifications
+				owner = { has_technology = tech_subterranean_buildings_1 }
+			}
+			if = {
+				custom_tooltip = {
+					text = "requires_building_gwen_underground_city_1"
+					planet = {
+						OR = {
+							has_building = "building_gwen_underground_city_1"
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+			}
+			owner = {
+				has_technology = tech_power_plant_3
+				has_technology = tech_physics_lab_2
+				has_technology = tech_subterranean_buildings_3
+			}
+			planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+			NOT = { owner = { has_country_flag = display_low_tier_flag } }
+			has_global_flag = direct_build_enabled
+		}
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_power_plant_2
+			has_technology = tech_physics_lab_1
+			has_technology = tech_subterranean_buildings_2
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	upgrades = { building_gwen_subterranean_geothermal_plant_3 }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { factor = 1 }
+	show_tech_unlock_if = { always = no }
+}
+building_gwen_subterranean_geothermal_plant_2 = {
+	icon = "Subterranean
+	Geothermal
+	Plant
+	T2"
+	immune_to_bombardment = yes
+	is_listed = no
+	base_buildtime = @b2time
+	cost = { minerals = @b2cost }
+	produced_resources = { energy = 4 physics_research = 4 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			has_modifier = planet_gwen_Cave_World_Modifications
+		}
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_power_plant_2
+			has_technology = tech_physics_lab_1
+			has_technology = tech_subterranean_buildings_2
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	upgrades = { building_gwen_subterranean_geothermal_plant_3 }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { factor = 1 }
+}
+building_gwen_subterranean_geothermal_plant_3_direct_build = {
+	icon = "Subterranean
+	Geothermal
+	Plant
+	T3"
+	immune_to_bombardment = yes
+	base_buildtime = 480
+	cost = { minerals = 270 }
+	produced_resources = { energy = 6 physics_research = 6 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			has_modifier = planet_gwen_Cave_World_Modifications
+			owner = { has_technology = tech_subterranean_buildings_1 }
+		}
+		NOT = { has_building = building_gwen_subterranean_geothermal_plant_3 }
+		direct_build_enabled = yes
+		NAND = {
+			if = {
+				custom_tooltip = {
+					text = "requires_building_gwen_underground_city_1"
+					planet = {
+						OR = {
+							has_building = "building_gwen_underground_city_1"
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+			}
+			owner = {
+				has_technology = tech_power_plant_4
+				has_technology = tech_physics_lab_3
+				has_technology = tech_subterranean_buildings_4
+			}
+			planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+			NOT = { owner = { has_country_flag = display_low_tier_flag } }
+			has_global_flag = direct_build_enabled
+		}
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_power_plant_3
+			has_technology = tech_physics_lab_2
+			has_technology = tech_subterranean_buildings_3
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	upgrades = { building_gwen_subterranean_geothermal_plant_4 }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	show_tech_unlock_if = { always = no }
+}
+building_gwen_subterranean_geothermal_plant_3 = {
+	icon = "Subterranean
+	Geothermal
+	Plant
+	T3"
+	immune_to_bombardment = yes
+	base_buildtime = @b3time
+	is_listed = no
+	cost = { minerals = @b3cost }
+	produced_resources = { energy = 6 physics_research = 6 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			has_modifier = planet_gwen_Cave_World_Modifications
+			owner = { has_technology = tech_subterranean_buildings_1 }
+		}
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_power_plant_3
+			has_technology = tech_physics_lab_2
+			has_technology = tech_subterranean_buildings_3
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	upgrades = { building_gwen_subterranean_geothermal_plant_4 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_gwen_subterranean_geothermal_plant_4_direct_build = {
+	icon = "Subterranean
+	Geothermal
+	Plant
+	T4"
+	planet_unique = yes
+	immune_to_bombardment = yes
+	base_buildtime = 615
+	cost = { minerals = 420 }
+	produced_resources = { energy = 8 physics_research = 8 }
+	planet_modifier = { tile_resource_energy_mult = 0.10 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_power_plant_4
+			has_technology = tech_physics_lab_3
+			has_technology = tech_subterranean_buildings_4
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	produced_resource_trigger = {
+		modifier = {
+			OR = { has_non_swapped_tradition = tr_prosperity_pursuit_of_profit has_swapped_tradition = tr_prosperity_pursuit_of_profit_machine }
+			resources = { unity = 2 }
+		}
+	}
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	show_tech_unlock_if = { always = no }
+	potential = {
+		NOT = { has_building = building_gwen_subterranean_geothermal_plant_4 }
+		direct_build_enabled = yes
+	}
+	upgrades = { building_gwen_subterranean_geothermal_plant_1_hidden_tree_root }
+}
+building_gwen_subterranean_geothermal_plant_4 = {
+	icon = "Subterranean
+	Geothermal
+	Plant
+	T4"
+	planet_unique = yes
+	immune_to_bombardment = yes
+	base_buildtime = @b4time
+	is_listed = no
+	cost = { minerals = @b4cost }
+	produced_resources = { energy = 8 physics_research = 8 }
+	planet_modifier = { tile_resource_energy_mult = 0.10 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_power_plant_4
+			has_technology = tech_physics_lab_3
+			has_technology = tech_subterranean_buildings_4
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	produced_resource_trigger = {
+		modifier = {
+			OR = { has_non_swapped_tradition = tr_prosperity_pursuit_of_profit has_swapped_tradition = tr_prosperity_pursuit_of_profit_machine }
+			resources = { unity = 2 }
+		}
+	}
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	upgrades = { building_gwen_subterranean_geothermal_plant_1_hidden_tree_root }
+}
+ #
+ #	GWINERALS
+ #
+building_gwen_subterranean_surface_collection_network_1_hidden_tree_root = {
+	potential = { always = no }
+	planet_unique = yes
+	icon = building_gwen_subterranean_surface_collection_network_1
+}
+building_gwen_subterranean_surface_collection_network_1 = {
+	icon = "Subterranean
+	Surface
+	Collection
+	T1"
+	immune_to_bombardment = yes
+	tags = { mining_network }
+	base_buildtime = @b1time
+	cost = { minerals = @b1cost }
+	required_resources = { energy = @b1upkeep }
+	produced_resources = { minerals = 2 engineering_research = 2 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			has_modifier = planet_gwen_Cave_World_Modifications
+			owner = { has_technology = tech_subterranean_buildings_1 }
+		}
+		NAND = {
+			if = {
+				custom_tooltip = {
+					text = "requires_building_gwen_underground_city_1"
+					planet = {
+						OR = {
+							has_building = "building_gwen_underground_city_1"
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+			}
+			owner = {
+				has_technology = tech_mining_network_2
+				has_technology = tech_engineering_lab_1
+				has_technology = tech_subterranean_buildings_2
+			}
+			planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+			NOT = { owner = { has_country_flag = display_low_tier_flag } }
+			has_global_flag = direct_build_enabled
+		}
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_basic_industry
+			has_technology = tech_basic_science_lab_1
+			has_technology = tech_subterranean_buildings_1
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { factor = 1 }
+	upgrades = { building_gwen_subterranean_surface_collection_network_2 }
+}
+building_gwen_subterranean_surface_collection_network_2_direct_build = {
+	icon = "Subterranean
+	Surface
+	Collection
+	T2"
+	tags = { mining_network }
+	immune_to_bombardment = yes
+	base_buildtime = 345
+	cost = { minerals = 150 }
+	required_resources = { energy = @b2upkeep }
+	produced_resources = { minerals = 4 engineering_research = 4 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_mining_network_2
+			has_technology = tech_engineering_lab_1
+			has_technology = tech_subterranean_buildings_2
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	upgrades = { building_gwen_subterranean_surface_collection_network_3 }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { factor = 1 }
+	show_tech_unlock_if = { always = no }
+	potential = {
+		NOT = { has_building = building_gwen_subterranean_surface_collection_network_2 }
+		direct_build_enabled = yes
+		NAND = {
+			if = {
+				custom_tooltip = {
+					text = "requires_building_gwen_underground_city_1"
+					planet = {
+						OR = {
+							has_building = "building_gwen_underground_city_1"
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+			}
+			owner = {
+				has_technology = tech_mining_network_3
+				has_technology = tech_engineering_lab_2
+				has_technology = tech_subterranean_buildings_3
+			}
+			planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+			NOT = { owner = { has_country_flag = display_low_tier_flag } }
+			has_global_flag = direct_build_enabled
+		}
+	}
+}
+building_gwen_subterranean_surface_collection_network_2 = {
+	icon = "Subterranean
+	Surface
+	Collection
+	T2"
+	tags = { mining_network }
+	immune_to_bombardment = yes
+	is_listed = no
+	base_buildtime = @b2time
+	cost = { minerals = @b2cost }
+	required_resources = { energy = @b2upkeep }
+	produced_resources = { minerals = 4 engineering_research = 4 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_mining_network_2
+			has_technology = tech_engineering_lab_1
+			has_technology = tech_subterranean_buildings_2
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	upgrades = { building_gwen_subterranean_surface_collection_network_3 }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { factor = 1 }
+}
+building_gwen_subterranean_surface_collection_network_3_direct_build = {
+	icon = "Subterranean
+	Surface
+	Collection
+	T3"
+	tags = { mining_network }
+	immune_to_bombardment = yes
+	base_buildtime = 480
+	cost = { minerals = 270 }
+	required_resources = { energy = @b3upkeep }
+	produced_resources = { minerals = 6 engineering_research = 6 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_mining_network_3
+			has_technology = tech_engineering_lab_2
+			has_technology = tech_subterranean_buildings_3
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	upgrades = { building_gwen_subterranean_surface_collection_network_4 }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	show_tech_unlock_if = { always = no }
+	potential = {
+		NOT = { has_building = building_gwen_subterranean_surface_collection_network_3 }
+		direct_build_enabled = yes
+		NAND = {
+			if = {
+				custom_tooltip = {
+					text = "requires_building_gwen_underground_city_1"
+					planet = {
+						OR = {
+							has_building = "building_gwen_underground_city_1"
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+			}
+			owner = {
+				has_technology = tech_mining_network_4
+				has_technology = tech_engineering_lab_3
+				has_technology = tech_subterranean_buildings_4
+			}
+			planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+			NOT = { owner = { has_country_flag = display_low_tier_flag } }
+			has_global_flag = direct_build_enabled
+		}
+	}
+}
+building_gwen_subterranean_surface_collection_network_3 = {
+	icon = "Subterranean
+	Surface
+	Collection
+	T3"
+	tags = { mining_network }
+	immune_to_bombardment = yes
+	base_buildtime = @b3time
+	is_listed = no
+	cost = { minerals = @b3cost }
+	required_resources = { energy = @b3upkeep }
+	produced_resources = { minerals = 6 engineering_research = 6 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_mining_network_3
+			has_technology = tech_engineering_lab_2
+			has_technology = tech_subterranean_buildings_3
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	upgrades = { building_gwen_subterranean_surface_collection_network_4 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_gwen_subterranean_surface_collection_network_4_direct_build = {
+	icon = "Subterranean
+	Surface
+	Collection
+	T4"
+	tags = { mining_network }
+	planet_unique = yes
+	immune_to_bombardment = yes
+	base_buildtime = 615
+	cost = { minerals = 420 }
+	required_resources = { energy = @b4upkeep }
+	produced_resources = { minerals = 8 engineering_research = 8 }
+	planet_modifier = { tile_resource_minerals_mult = 0.10 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_mining_network_4
+			has_technology = tech_engineering_lab_3
+			has_technology = tech_subterranean_buildings_4
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	show_tech_unlock_if = { always = no }
+	potential = {
+		NOT = { has_building = building_gwen_subterranean_surface_collection_network_4 }
+		direct_build_enabled = yes
+	}
+	upgrades = { building_gwen_subterranean_surface_collection_network_1_hidden_tree_root }
+}
+building_gwen_subterranean_surface_collection_network_4 = {
+	icon = "Subterranean
+	Surface
+	Collection
+	T4"
+	tags = { mining_network }
+	planet_unique = yes
+	immune_to_bombardment = yes
+	base_buildtime = @b4time
+	is_listed = no
+	cost = { minerals = @b4cost }
+	required_resources = { energy = @b4upkeep }
+	produced_resources = { minerals = 8 engineering_research = 8 }
+	planet_modifier = { tile_resource_minerals_mult = 0.10 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			has_technology = tech_mining_network_4
+			has_technology = tech_engineering_lab_3
+			has_technology = tech_subterranean_buildings_4
+		}
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	upgrades = { building_gwen_subterranean_surface_collection_network_1_hidden_tree_root }
+}
+building_cavernous_stronghold_1 = {
+	base_buildtime = 90
+	is_listed = yes
+	defense_armies = 3
+	immune_to_bombardment = yes
+	protects_from_bombardment = yes
+	planetary_ftl_inhibitor = yes
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+		NAND = {
+			if = {
+				custom_tooltip = {
+					text = "requires_building_gwen_underground_city_1"
+					planet = {
+						OR = {
+							has_building = "building_gwen_underground_city_1"
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+			}
+			owner = { has_technology = tech_global_defense_grid has_technology = tech_subterranean_buildings_2 }
+			planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+			NOT = { owner = { has_country_flag = display_low_tier_flag } }
+			has_global_flag = direct_build_enabled
+		}
+	}
+	cost = { minerals = 150 }
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_citizen_service
+			resources = { unity = 1 }
+		}
+	}
+	planet_modifier = {
+		army_defense_damage_mult = 0.02
+		army_defense_health_mult = 0.02
+		army_defense_morale_mult = 0.02
+	}
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	produced_resources = { unity = 1 }
+	required_resources = { energy = 2 }
+	planet_modifier = { planet_unrest_add = -30 }
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			has_modifier = planet_gwen_Cave_World_Modifications
+			owner = { has_technology = tech_subterranean_buildings_1 }
+		}
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = { has_technology = tech_planetary_defenses has_technology = tech_subterranean_buildings_1 }
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	ai_weight = {
+		weight = 1000
+		modifier = { factor = 0 years_passed < 25 }
+		modifier = {
+			factor = 0
+			planet = {
+				unrest < 50
+				sector_controlled = yes
+				owner = { is_ai = no }
+			}
+			NOR = { has_building = "building_cavernous_stronghold_1" has_building = "building_cavernous_stronghold_2" }
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 12
+						OR = {
+							has_building = "building_gwen_underground_city_1"
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 16
+						OR = {
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+				count_tile = {
+					limit = {
+						OR = { has_building = building_cavernous_stronghold_1 has_building = building_cavernous_stronghold_2 }
+					}
+					count > 0
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 20
+						OR = {
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+				count_tile = {
+					limit = {
+						OR = { has_building = building_cavernous_stronghold_1 has_building = building_cavernous_stronghold_2 }
+					}
+					count > 1
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				count_tile = {
+					limit = {
+						OR = { has_building = building_cavernous_stronghold_1 has_building = building_cavernous_stronghold_2 }
+					}
+					count > 2
+				}
+			}
+		}
+	}
+	upgrades = { building_cavernous_stronghold_2 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_cavernous_stronghold_2_direct_build = {
+	base_buildtime = 157
+	defense_armies = 5
+	immune_to_bombardment = yes
+	protects_from_bombardment = yes
+	planetary_ftl_inhibitor = yes
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+		NOT = { has_building = building_cavernous_stronghold_2 }
+		direct_build_enabled = yes
+	}
+	cost = { minerals = 400 }
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_citizen_service
+			resources = { unity = 1 }
+		}
+	}
+	planet_modifier = {
+		army_defense_damage_mult = 0.05
+		army_defense_health_mult = 0.05
+		army_defense_morale_mult = 0.05
+	}
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	produced_resources = { unity = 2 }
+	required_resources = { energy = 5 }
+	planet_modifier = { planet_unrest_add = -30 }
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = { has_technology = tech_global_defense_grid has_technology = tech_subterranean_buildings_2 }
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	ai_weight = {
+		weight = 1000
+		modifier = { factor = 0 years_passed < 25 }
+		modifier = {
+			factor = 0
+			planet = {
+				unrest < 50
+				sector_controlled = yes
+				owner = { is_ai = no }
+			}
+			NOR = { has_building = "building_cavernous_stronghold_1" has_building = "building_cavernous_stronghold_2" }
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 12
+						OR = {
+							has_building = "building_gwen_underground_city_1"
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 16
+						OR = {
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+				count_tile = {
+					limit = {
+						OR = { has_building = building_cavernous_stronghold_1 has_building = building_cavernous_stronghold_2 }
+					}
+					count > 0
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 20
+						OR = {
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+				count_tile = {
+					limit = {
+						OR = { has_building = building_cavernous_stronghold_1 has_building = building_cavernous_stronghold_2 }
+					}
+					count > 1
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				count_tile = {
+					limit = {
+						OR = { has_building = building_cavernous_stronghold_1 has_building = building_cavernous_stronghold_2 }
+					}
+					count > 2
+				}
+			}
+		}
+	}
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	show_tech_unlock_if = { always = no }
+	icon = building_cavernous_stronghold_2
+}
+building_cavernous_stronghold_2 = {
+	base_buildtime = 90
+	is_listed = no
+	defense_armies = 5
+	immune_to_bombardment = yes
+	protects_from_bombardment = yes
+	planetary_ftl_inhibitor = yes
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	cost = { minerals = 250 }
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_citizen_service
+			resources = { unity = 1 }
+		}
+	}
+	planet_modifier = {
+		army_defense_damage_mult = 0.05
+		army_defense_health_mult = 0.05
+		army_defense_morale_mult = 0.05
+	}
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	produced_resources = { unity = 2 }
+	required_resources = { energy = 5 }
+	planet_modifier = { planet_unrest_add = -30 }
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = { has_technology = tech_global_defense_grid has_technology = tech_subterranean_buildings_2 }
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	ai_weight = {
+		weight = 1000
+		modifier = { factor = 0 years_passed < 25 }
+		modifier = {
+			factor = 0
+			planet = {
+				unrest < 50
+				sector_controlled = yes
+				owner = { is_ai = no }
+			}
+			NOR = { has_building = "building_cavernous_stronghold_1" has_building = "building_cavernous_stronghold_2" }
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 12
+						OR = {
+							has_building = "building_gwen_underground_city_1"
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 16
+						OR = {
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+				count_tile = {
+					limit = {
+						OR = { has_building = building_cavernous_stronghold_1 has_building = building_cavernous_stronghold_2 }
+					}
+					count > 0
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 20
+						OR = {
+							has_building = "building_gwen_underground_city_2"
+							has_building = "building_gwen_underground_city_3"
+							has_building = "building_gwen_underground_city_4"
+						}
+					}
+				}
+				count_tile = {
+					limit = {
+						OR = { has_building = building_cavernous_stronghold_1 has_building = building_cavernous_stronghold_2 }
+					}
+					count > 1
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				count_tile = {
+					limit = {
+						OR = { has_building = building_cavernous_stronghold_1 has_building = building_cavernous_stronghold_2 }
+					}
+					count > 2
+				}
+			}
+		}
+	}
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_gwen_surface_dweller_acclimation_center = {
+	base_buildtime = 270
+	planet_unique = yes
+	defense_armies = 3
+	immune_to_bombardment = yes
+	cost = { minerals = 150 }
+	produced_resources = { minerals = 2 food = 2 }
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_unhappy
+		potential = { has_trait = Gwen_Adaptation_Subterranean_Species }
+		modifier = { pop_resource_output = 0.02 }
+	}
+	planet_modifier_with_pop_trigger = {
+		key = building_gwen_underground_slave_robot
+		potential = { NOT = { has_trait = Gwen_Adaptation_Subterranean_Species } }
+		modifier = {
+			pop_slave_resource_output = 0.10
+			pop_robot_production_output = 0.10
+			pop_processing_output = 0.10
+		}
+	}
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			has_modifier = planet_gwen_Cave_World_Modifications
+			owner = { has_technology = tech_subterranean_buildings_1 }
+		}
+	}
+	allow = {
+		if = {
+			custom_tooltip = {
+				text = "requires_building_gwen_underground_city_1"
+				planet = {
+					OR = {
+						has_building = "building_gwen_underground_city_1"
+						has_building = "building_gwen_underground_city_2"
+						has_building = "building_gwen_underground_city_3"
+						has_building = "building_gwen_underground_city_4"
+					}
+				}
+			}
+		}
+		owner = {
+			OR = {
+				has_technology = tech_robotic_workers
+				has_technology = tech_neural_implants
+				has_swapped_tradition = tr_synchronicity_hive_mind_synapse
+				has_non_swapped_tradition = tr_diplomacy_alien_tourism
+			}
+			has_technology = tech_subterranean_buildings_1
+		}
+		 #		planet = { leader = { has_trait = Gwen_Adaptation_Subterranean_Species_Gov } }
+		planet = { has_modifier = planet_gwen_Cave_World_Modifications }
+	}
+	planet_modifier = {
+		planet_migration_xeno_pull = 0.50
+		planet_unrest_add = -30
+		static_planet_resource_unity_add = 2
+	}
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		 # If planet only has slaves/robots, keep it to mining and farming...
+		is_slave_tile_or_planet = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { factor = 10 }
+}
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # Do not remove or rename this
+ # Possible Variables for Buildings:
+ # strategic_resource: strategic resource, deprecated, strategic resource used by the building.
+ # allow: trigger to check for allowing construction of building.
+ # prerequisites: Tech requirements for building.
+ # empire_unique: boolean, can only build one if set to true.
+ # cost: resource table, cost of building.
+ # is_orbital: boolean, can only be built in orbital station.
+ # modifier: modifier, deprecated, applies a modifier to planet; use planet_modifier instead.
+ # planet_modifier, country_modifier, army_modifier: applies modifier to planet/country/armies
+ # triggered_planet_modifier = { key (optional), potential (scope: planet), modifier }: applies conditional modifier to planet
+ # base_buildtime: int, number of days for construction.
+ # requires_pop, boolean, building will require a pop for production.
+ # required_resources, resource table, required resources for production.
+ # produced_resources, resource table, produced resources in production.
+ # upgrades, buildings list, buildings this building can upgrade into.
+ # is_listed, boolean, toggles if this building is shown in the non-upgrade buildable list.
+ # planet_unique, toggles if one can build multiple of this type on a single planet.
+ # ai_weight, weight for AI, default is set to one, weight set to 0 means that AI will never build it
+ # is_colony: trigger to check if the building is a colony shelter for country (scope: country, from: planet). default: "always = no"
+ # active: trigger to check if a building can be active with a given pop worker (scope: pop) if you add a trigger here, you should also add the requirements in the description
+ # show_tech_unlock_if: trigger to show this building only conditionally in the technology screen. scope: country. default: { always = yes }
+ # planet_modifier_with_pop_trigger = { key (optional), potential (scope: pop), modifier }: applies modifier to pops on planet that satisfy condition in trigger
+@b0time = 60
+@b0cost = 15
+@b0effect = 1
+@b0upkeep = 0.5
+@b1time = 210
+@b1cost = 60
+@b1effect = 2
+@b1upkeep = 1
+@b2time = 180
+@b2cost = 90
+@b2effect = 3
+@b2upkeep = 1.5
+@b3time = 180
+@b3cost = 120
+@b3effect = 4
+@b3upkeep = 2
+@b4time = 180
+@b4cost = 150
+@b4effect = 5
+@b4upkeep = 2.5
+@b5time = 180
+@b5cost = 180
+@b5effect = 8
+@b5upkeep = 3
+@science1 = 1
+@science2 = 2
+@science3 = 3
+@science4 = 4
+@science5 = 6
+@natural_equilibrium_happiness = 0.02

@@ -1,0 +1,806 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # Do not remove or rename this
+ # Possible Variables for Buildings:
+ # strategic_resource: strategic resource, deprecated, strategic resource used by the building.
+ # allow: trigger to check for allowing construction of building.
+ # prerequisites: Tech requirements for building.
+ # empire_unique: boolean, can only build one if set to true.
+ # cost: resource table, cost of building.
+ # is_orbital: boolean, can only be built in orbital station.
+ # modifier: modifier, deprecated, applies a modifier to planet; use planet_modifier instead.
+ # planet_modifier, country_modifier, army_modifier: applies modifier to planet/country/armies
+ # triggered_planet_modifier = { key (optional), potential (scope: planet), modifier }: applies conditional modifier to planet
+ # base_buildtime: int, number of days for construction.
+ # requires_pop, boolean, building will require a pop for production.
+ # required_resources, resource table, required resources for production.
+ # produced_resources, resource table, produced resources in production.
+ # upgrades, buildings list, buildings this building can upgrade into.
+ # is_listed, boolean, toggles if this building is shown in the non-upgrade buildable list.
+ # planet_unique, toggles if one can build multiple of this type on a single planet.
+ # ai_weight, weight for AI, default is set to one, weight set to 0 means that AI will never build it
+ # is_colony: trigger to check if the building is a colony shelter for country (scope: country, from: planet). default: "always = no"
+ # active: trigger to check if a building can be active with a given pop worker (scope: pop) if you add a trigger here, you should also add the requirements in the description
+ # show_tech_unlock_if: trigger to show this building only conditionally in the technology screen. scope: country. default: { always = yes }
+ # planet_modifier_with_pop_trigger = { key (optional), potential (scope: pop), modifier }: applies modifier to pops on planet that satisfy condition in trigger
+ #
+ # BALANCE
+ # can change the time and cost of all common buildings with these variables below
+ # Special - Local Resources
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ #
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # Do not remove or rename this
+ # Possible Variables for Buildings:
+ # strategic_resource: strategic resource, deprecated, strategic resource used by the building.
+ # allow: trigger to check for allowing construction of building.
+ # prerequisites: Tech requirements for building.
+ # empire_unique: boolean, can only build one if set to true.
+ # cost: resource table, cost of building.
+ # is_orbital: boolean, can only be built in orbital station.
+ # modifier: modifier, deprecated, applies a modifier to planet; use planet_modifier instead.
+ # planet_modifier, country_modifier, army_modifier: applies modifier to planet/country/armies
+ # triggered_planet_modifier = { key (optional), potential (scope: planet), modifier }: applies conditional modifier to planet
+ # base_buildtime: int, number of days for construction.
+ # requires_pop, boolean, building will require a pop for production.
+ # required_resources, resource table, required resources for production.
+ # produced_resources, resource table, produced resources in production.
+ # upgrades, buildings list, buildings this building can upgrade into.
+ # is_listed, boolean, toggles if this building is shown in the non-upgrade buildable list.
+ # planet_unique, toggles if one can build multiple of this type on a single planet.
+ # ai_weight, weight for AI, default is set to one, weight set to 0 means that AI will never build it
+ # is_colony: trigger to check if the building is a colony shelter for country (scope: country, from: planet). default: "always = no"
+ # active: trigger to check if a building can be active with a given pop worker (scope: pop) if you add a trigger here, you should also add the requirements in the description
+ # show_tech_unlock_if: trigger to show this building only conditionally in the technology screen. scope: country. default: { always = yes }
+ # planet_modifier_with_pop_trigger = { key (optional), potential (scope: pop), modifier }: applies modifier to pops on planet that satisfy condition in trigger
+ #
+ # BALANCE
+ # can change the time and cost of all common buildings with these variables below
+ ##############################
+ ### Astrogeology buildings ###
+ ##############################
+ # Special - Local Resources
+trionium_digging = {
+	base_buildtime = 240
+	icon = "building_trionium_digging"
+	cost = { minerals = 150 }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	produced_resources = { unity = 4 energy = 10 }
+	prerequisites = { "tech_mine_trionium" }
+	allow = {
+		if = {
+			limit = {
+				owner = { NOT = { has_authority = auth_machine_intelligence } }
+			}
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_capital_1"
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_trionium_crystal"
+					tile = {
+						has_resource = { type = sr_trionium amount > 0 }
+					}
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_authority = auth_machine_intelligence } }
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_machine_capital_1"
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_trionium_crystal"
+					tile = {
+						has_resource = { type = sr_trionium amount > 0 }
+					}
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+adranite_mines = {
+	base_buildtime = 240
+	icon = "building_adranite_mines"
+	cost = { minerals = 150 }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	required_resources = { energy = 2 }
+	produced_resources = { unity = 4 minerals = 10 }
+	prerequisites = { "tech_mine_adranite" }
+	allow = {
+		if = {
+			limit = {
+				owner = { NOT = { has_authority = auth_machine_intelligence } }
+			}
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_capital_1"
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_adranite_ore"
+					tile = {
+						has_resource = { type = sr_adranite amount > 0 }
+					}
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_authority = auth_machine_intelligence } }
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_machine_capital_1"
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_adranite_ore"
+					tile = {
+						has_resource = { type = sr_adranite amount > 0 }
+					}
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+xylaan_production_complex = {
+	base_buildtime = 240
+	icon = "building_xylaan_production_complex"
+	cost = { minerals = 150 }
+	potential = {
+		NOT = { owner = { has_authority = auth_machine_intelligence } }
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	required_resources = { energy = 2 }
+	produced_resources = { unity = 4 food = 10 }
+	prerequisites = { "tech_mine_xylaan" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_xylaan_pollen"
+				tile = {
+					has_resource = { type = sr_xylaan amount > 0 }
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+uhlon_computer_center = {
+	base_buildtime = 240
+	icon = "building_uhlon_computer_center"
+	cost = { minerals = 150 }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	required_resources = { energy = 2 }
+	produced_resources = { unity = 4 physics_research = 10 }
+	prerequisites = { "tech_uhlon_artifact" }
+	allow = {
+		if = {
+			limit = {
+				owner = { NOT = { has_authority = auth_machine_intelligence } }
+			}
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_capital_1"
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_uhlon_artifact"
+					tile = {
+						has_resource = { type = sr_uhlon_artifact amount > 0 }
+					}
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_authority = auth_machine_intelligence } }
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_machine_capital_1"
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_uhlon_artifact"
+					tile = {
+						has_resource = { type = sr_uhlon_artifact amount > 0 }
+					}
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+gravitoid_test_area = {
+	base_buildtime = 240
+	icon = "building_gravitoid_test_area"
+	cost = { minerals = 150 }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	required_resources = { energy = 2 }
+	produced_resources = { unity = 4 engineering_research = 10 }
+	prerequisites = { "tech_mine_gravitoid" }
+	allow = {
+		if = {
+			limit = {
+				owner = { NOT = { has_authority = auth_machine_intelligence } }
+			}
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_capital_1"
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_gravitoid_material"
+					tile = {
+						has_resource = { type = sr_gravitoid amount > 0 }
+					}
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_authority = auth_machine_intelligence } }
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_machine_capital_1"
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_gravitoid_material"
+					tile = {
+						has_resource = { type = sr_gravitoid amount > 0 }
+					}
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+virtual_reality_center = {
+	base_buildtime = 240
+	icon = "building_virtual_reality_center"
+	cost = { minerals = 300 }
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+	potential = {
+		NOT = { owner = { has_authority = auth_machine_intelligence } }
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	required_resources = { energy = 3 }
+	produced_resources = {
+		unity = 4
+		society_research = 5
+		engineering_research = 5
+	}
+	planet_modifier = { pop_citizen_happiness = 0.10 planet_migration_all_pull = 0.25 }
+	adjacency_bonus = { pop_citizen_happiness = 0.05 tile_building_resource_energy_add = 1 }
+	prerequisites = { "tech_vultaum_artifact" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_vultaum_artifact"
+				tile = {
+					has_resource = { type = sr_vultaum_artifact amount > 0 }
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+data_stream_amplifier = {
+	base_buildtime = 240
+	icon = "building_virtual_data_stream_amplifier"
+	cost = { minerals = 300 }
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+	}
+	required_resources = { energy = 3 }
+	produced_resources = {
+		unity = 4
+		society_research = 5
+		engineering_research = 5
+	}
+	planet_modifier = { pop_robot_upkeep_mult = -0.10 pop_robot_production_output = 0.15 }
+	adjacency_bonus = { pop_robot_production_output = 0.05 tile_building_resource_energy_add = 1 }
+	prerequisites = { "tech_vultaum_artifact" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_vultaum_artifact"
+				tile = {
+					has_resource = { type = sr_vultaum_artifact amount > 0 }
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+yuht_bastion = {
+	base_buildtime = 240
+	icon = "building_yuhtaan_bastion_center"
+	 #is_listed = no
+	defense_armies = 5
+	protects_from_bombardment = yes
+	planetary_ftl_inhibitor = yes
+	cost = { minerals = 300 }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	required_resources = { energy = 3 }
+	produced_resources = {
+		unity = 4
+		society_research = 5
+		engineering_research = 5
+	}
+	planet_modifier = {
+		planet_unrest_add = -70
+		planet_migration_all_pull = 0.05
+		planet_army_build_cost_mult = -0.20
+	}
+	prerequisites = { "tech_yuht_artifact" }
+	allow = {
+		if = {
+			limit = {
+				owner = { NOT = { has_authority = auth_machine_intelligence } }
+			}
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_capital_1"
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_yuht_artifact"
+					tile = {
+						has_resource = { type = sr_yuht_artifact amount > 0 }
+					}
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_authority = auth_machine_intelligence } }
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_machine_capital_1"
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_yuhtaan_artifact"
+					tile = {
+						has_resource = { type = sr_yuht_artifact amount > 0 }
+					}
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+museum_luxury = {
+	base_buildtime = 240
+	icon = "building_museum_luxury"
+	cost = { minerals = 300 }
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+	potential = {
+		NOT = { owner = { has_authority = auth_machine_intelligence } }
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	produced_resources = {
+		unity = 4
+		society_research = 5
+		energy = 2
+	}
+	planet_modifier = {
+		tile_resource_energy_mult = 0.15
+		tile_resource_society_research_mult = 1
+		planet_migration_all_pull = 0.25
+	}
+	prerequisites = { "tech_first_league_artifact" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_first_league_artifact"
+				tile = {
+					has_resource = { type = sr_first_league_artifact amount > 0 }
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+garbage_recycling_center = {
+	base_buildtime = 240
+	icon = "building_garbage_recycling_center"
+	cost = { minerals = 300 }
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+	}
+	required_resources = { energy = 3 }
+	produced_resources = {
+		unity = 4
+		society_research = 5
+		minerals = 3
+	}
+	planet_modifier = {
+		tile_resource_minerals_mult = 0.15
+		tile_resource_society_research_mult = 0.15
+		tile_resource_engineering_research_mult = 0.10
+	}
+	prerequisites = { "tech_first_league_artifact" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_first_league_artifact"
+				tile = {
+					has_resource = { type = sr_first_league_artifact amount > 0 }
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+disease_control_center = {
+	base_buildtime = 240
+	icon = "building_disease_control_center"
+	cost = { minerals = 300 }
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+	potential = {
+		NOT = { owner = { has_authority = auth_machine_intelligence } }
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	required_resources = { energy = 3 }
+	produced_resources = { unity = 4 society_research = 7 }
+	planet_modifier = {
+		tile_resource_society_research_mult = 0.25
+		pop_environment_tolerance = 0.5
+		pop_growth_speed = 0.25
+	}
+	adjacency_bonus = { tile_building_resource_society_research_add = 2 }
+	prerequisites = { "tech_irassian_artifact" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_irassian_artifact"
+				tile = {
+					has_resource = { type = sr_irassian_artifact amount > 0 }
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+biomaterial_bank = {
+	base_buildtime = 240
+	icon = "building_biomaterial_bank"
+	cost = { minerals = 300 }
+	show_tech_unlock_if = { has_authority = auth_machine_intelligence }
+	potential = {
+		owner = { has_authority = auth_machine_intelligence }
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	destroy_if = {
+		exists = owner
+		owner = { NOT = { has_authority = auth_machine_intelligence } }
+	}
+	required_resources = { energy = 3 }
+	produced_resources = { unity = 4 society_research = 7 }
+	planet_modifier = { tile_resource_society_research_mult = 0.30 }
+	adjacency_bonus = { tile_building_resource_society_research_add = 2 }
+	prerequisites = { "tech_irassian_artifact" }
+	allow = {
+		AND = {
+			custom_tooltip = {
+				fail_text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_irassian_artifact"
+				tile = {
+					has_resource = { type = sr_irassian_artifact amount > 0 }
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+automated_fabrication_complex = {
+	base_buildtime = 240
+	icon = "building_automated_fabrication_complex"
+	cost = { minerals = 300 }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	required_resources = { energy = 3 }
+	produced_resources = {
+		unity = 4
+		engineering_research = 5
+		minerals = 10
+	}
+	planet_modifier = { tile_resource_minerals_mult = 0.25 tile_resource_engineering_research_mult = 0.25 }
+	adjacency_bonus = { tile_building_resource_minerals_add = 1 tile_building_resource_energy_add = 1 }
+	prerequisites = { "tech_cybrex_artifact" }
+	allow = {
+		if = {
+			limit = {
+				owner = { NOT = { has_authority = auth_machine_intelligence } }
+			}
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_capital_1"
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_cybrex_artifact"
+					tile = {
+						has_resource = { type = sr_cybrex_artifact amount > 0 }
+					}
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_authority = auth_machine_intelligence } }
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_machine_capital_1"
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_cybrex_artifact"
+					tile = {
+						has_resource = { type = sr_cybrex_artifact amount > 0 }
+					}
+				}
+			}
+		}
+	}
+	ai_allow = {
+		always = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
