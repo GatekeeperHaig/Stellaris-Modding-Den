@@ -1,10 +1,7 @@
-namespace = cgm_planet_specialization_menu	
-
-@standard_deep_core_mining_energy_cost = 1000
-@standard_deep_core_mining_influence_cost = 50
+namespace = cgm_planet_specialization	
 
 planet_event = { 	
-	id = cgm_planet_specialization_menu.1
+	id = cgm_planet_specialization.1
 	is_triggered_only = yes	
 	title = cgm_pe.planet_specialization_menu.title
 	desc = cgm_pe.planet_specialization_menu.desc
@@ -21,15 +18,9 @@ planet_event = {
 			is_artificial_planet = no
 			NOR = { 
 				has_planet_flag = cgm_deep_core_mining
-				has_planet_flag = cgm_advanced_deep_core_mining
 				has_planet_flag = cgm_geothermal_tap
-				has_planet_flag = cgm_advanced_geothermal_tap
 				has_planet_flag = cgm_tectonic_engineering
-				has_planet_flag = cgm_advanced_tectonic_engineering
 				has_planet_flag = cgm_soil_enrichment
-				has_planet_flag = cgm_advanced_soil_enrichment
-				has_planet_flag = cgm_ecological_preserve
-				has_planet_flag = cgm_geophysics_test_site
 			}
 		}
 		allow = { 
@@ -97,15 +88,9 @@ planet_event = {
 			is_artificial_planet = no
 			NOR = { 
 				has_planet_flag = cgm_deep_core_mining
-				has_planet_flag = cgm_advanced_deep_core_mining
 				has_planet_flag = cgm_geothermal_tap
-				has_planet_flag = cgm_advanced_geothermal_tap
 				has_planet_flag = cgm_tectonic_engineering
-				has_planet_flag = cgm_advanced_tectonic_engineering
 				has_planet_flag = cgm_soil_enrichment
-				has_planet_flag = cgm_advanced_soil_enrichment
-				has_planet_flag = cgm_ecological_preserve
-				has_planet_flag = cgm_geophysics_test_site
 			}
 		}
 		allow = { 
@@ -171,15 +156,9 @@ planet_event = {
 			is_artificial_planet = no
 			NOR = { 
 				has_planet_flag = cgm_deep_core_mining
-				has_planet_flag = cgm_advanced_deep_core_mining
 				has_planet_flag = cgm_geothermal_tap
-				has_planet_flag = cgm_advanced_geothermal_tap
 				has_planet_flag = cgm_tectonic_engineering
-				has_planet_flag = cgm_advanced_tectonic_engineering
 				has_planet_flag = cgm_soil_enrichment
-				has_planet_flag = cgm_advanced_soil_enrichment
-				has_planet_flag = cgm_ecological_preserve
-				has_planet_flag = cgm_geophysics_test_site
 			}
 		}
 		allow = { 
@@ -209,7 +188,7 @@ planet_event = {
 		}		
 		hidden_effect = { 
 			set_planet_flag = cgm_soil_enrichment
-			add_modifier = cgm_geothermal_tap
+			add_modifier = cgm_soil_enrichment
 			owner = { 
 				energy = -500
 				minerals = -500
@@ -241,5 +220,302 @@ planet_event = {
 				}	
 			}			
 		}
+	}	
+	option = { 
+		name = cgm_pe.tectonic_engineering.name
+		custom_tooltip = cgm_pe.tectonic_engineering.desc
+		custom_gui = "cgm_pe_option"				
+		trigger = { 
+			is_artificial_planet = no
+			NOR = { 
+				has_planet_flag = cgm_deep_core_mining
+				has_planet_flag = cgm_geothermal_tap
+				has_planet_flag = cgm_tectonic_engineering
+				has_planet_flag = cgm_soil_enrichment
+			}
+		}
+		allow = { 
+			custom_tooltip = {
+				fail_text = "requires_3_empty_tiles"
+				count_tile = { 
+					limit = { has_pop = no has_growing_pop = no has_blocker = no has_building = no }
+					count > 2
+				}
+			}	
+			custom_tooltip = {
+				fail_text = "requires_non_unstable_tectonics"
+				NOT = { has_modifier = unstable_tectonics }				
+			}	
+			custom_tooltip = {
+				fail_text = "requires_750_minerals"
+				owner = { energy > 749 }				
+			}				
+			custom_tooltip = {
+				fail_text = "requires_750_energy"
+				owner = { energy > 749 }				
+			}							
+			custom_tooltip = {
+				fail_text = "requires_50_influence"
+				owner = { influence > 49 }				
+			}				
+			custom_tooltip = {
+				fail_text = "requires_smaller_than_25_planet"
+				planet_size < 25
+			}				
+		}		
+		hidden_effect = { 
+			set_planet_flag = cgm_tectonic_engineering
+			add_modifier = cgm_tectonic_engineering		
+			if = { 
+				limit = { NOT = { check_variable = { which = cgm_tectonic_engineering value > 0 } } }
+				set_variable = { which = cgm_tectonic_engineering value = 0 }
+			}	
+			owner = { 
+				energy = -500
+				minerals = -500
+				influence = -50
+			}										
+			planet_event = { id = cgm_planet_specialization.2 days = 1800 random = 1800 }
+		}
+	}	
+}	
+
+planet_event = { 	
+	id = cgm_planet_specialization.2
+	is_triggered_only = yes
+	hide_window = yes
+	
+	trigger = { has_modifier = cgm_tectonic_engineering	}	
+	
+	immediate = { 
+		if = { 
+			limit = { check_variable = { which = cgm_tectonic_engineering value = 0 } }		
+			change_planet_size = 1
+			change_variable = { which = planet_size_var value = 1 }
+			change_variable = { which = cgm_tectonic_engineering value = 1 }
+			planet_event = { id = cgm_planet_specialization.3 }
+			else = { 
+				if = { 
+					limit = { check_variable = { which = cgm_tectonic_engineering value = 1 } }	
+					random_list = { 
+						80 = { 
+							change_planet_size = 1
+							change_variable = { which = planet_size_var value = 1 }
+							change_variable = { which = cgm_tectonic_engineering value = 1 }
+							planet_event = { id = cgm_planet_specialization.3 }
+						}
+						20 = {
+							if = { 
+								limit = { check_variable = { which = cgm_tectonic_engineering_catastrophe value = 0 } }
+								set_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } 
+								else = { change_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+							}	
+							planet_event = { id = cgm_planet_specialization.4 } 									
+							modifier = { add = 10 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+							modifier = { add = 20 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 2 } }
+							modifier = { add = 30 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 3 } }
+							modifier = { add = 40 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 4 } }
+							modifier = { factor = 0.5 owner = { has_technology = "advanced_tectonic_engineering" } }
+						}
+					}	
+					else = { 
+						if = { 
+							limit = { check_variable = { which = cgm_tectonic_engineering value = 2 } }	
+							random_list = { 
+								60 = { 
+									change_planet_size = 1
+									change_variable = { which = planet_size_var value = 1 }
+									change_variable = { which = cgm_tectonic_engineering value = 1 }
+									planet_event = { id = cgm_planet_specialization.3 }
+								}
+								40 = {
+									if = { 
+										limit = { check_variable = { which = cgm_tectonic_engineering_catastrophe value = 0 } }
+										set_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } 
+										else = { change_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+									}	
+									planet_event = { id = cgm_planet_specialization.4 } 		
+									modifier = { add = 10 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+									modifier = { add = 20 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 2 } }
+									modifier = { add = 30 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 3 } }
+									modifier = { add = 40 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 4 } }									
+									modifier = { factor = 0.5 owner = { has_technology = "advanced_tectonic_engineering" } }
+								}
+							}						
+							else = { 
+								if = { 
+									limit = { check_variable = { which = cgm_tectonic_engineering value = 3 } }	
+									random_list = { 
+										40 = { 
+											change_planet_size = 1
+											change_variable = { which = planet_size_var value = 1 }
+											change_variable = { which = cgm_tectonic_engineering value = 1 }
+											planet_event = { id = cgm_planet_specialization.3 }
+										}
+										60 = {
+											if = { 
+												limit = { check_variable = { which = cgm_tectonic_engineering_catastrophe value = 0 } }
+												set_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } 
+												else = { change_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+											}	
+											planet_event = { id = cgm_planet_specialization.4 } 	
+											modifier = { add = 10 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+											modifier = { add = 20 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 2 } }
+											modifier = { add = 30 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 3 } }
+											modifier = { add = 40 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 4 } }											
+											modifier = { factor = 0.5 owner = { has_technology = "advanced_tectonic_engineering" } }
+										}										
+									}	
+									else = { 
+										if = { 
+											limit = { check_variable = { which = cgm_tectonic_engineering value = 4 } }									
+											random_list = { 
+												20 = { 
+													change_planet_size = 1
+													change_variable = { which = planet_size_var value = 1 }
+													change_variable = { which = cgm_tectonic_engineering value = 1 }
+													planet_event = { id = cgm_planet_specialization.3 }
+												}
+												80 = {
+													if = { 
+														limit = { check_variable = { which = cgm_tectonic_engineering_catastrophe value = 0 } }
+														set_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } 
+														else = { change_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+													}	
+													planet_event = { id = cgm_planet_specialization.4 } 	
+													modifier = { add = 10 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+													modifier = { add = 20 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 2 } }
+													modifier = { add = 30 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 3 } }
+													modifier = { add = 40 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 4 } }													
+													modifier = { factor = 0.5 owner = { has_technology = "advanced_tectonic_engineering" } }
+												}										
+											}
+										}
+									}	
+								}
+							}	
+						}	
+					}
+				}
+			}
+		}				
+	}	
+}		
+
+planet_event = { 	
+	id = cgm_planet_specialization.3
+	is_triggered_only = yes
+	title = cgm_tectonic_engineering_planet_size_increased.title
+	desc = cgm_tectonic_engineering_planet_size_increased.desc
+	picture = GFX_evt_xyz
+		
+	option = { 
+		name = continue_tectonic_engineering_project.name
+		custom_tooltip = continue_tectonic_engineering_project.desc
+		allow = { 
+			custom_tooltip = {
+				fail_text = "requires_smaller_than_25_planet"
+				planet_size < 25
+			}		
+			custom_tooltip = {
+				fail_text = "tectonic_engineering_cannot_be_performed_more_than_5_times"
+				check_variable = { which = cgm_tectonic_engineering value < 5 }
+			}				
+		}
+		hidden_effect = { planet_event = { id = cgm_planet_specialization.2 days = 1800 random = 1800 } }
+	}	
+	option = { 
+		name = end_tectonic_engineering_project.name
+		custom_tooltip = end_tectonic_engineering_project.desc
+		hidden_effect = { 
+			remove_planet_flag = cgm_tectonic_engineering
+			remove_modifier = cgm_tectonic_engineering	
+		}
 	}		
 }	
+planet_event = { 	
+	id = cgm_planet_specialization.4
+	is_triggered_only = yes
+	title = cgm_tectonic_engineering_catastrophic_outcome.title
+	desc = cgm_tectonic_engineering_catastrophic_outcome.desc
+	picture = GFX_evt_xyz
+	
+	immediate = { 
+		random_tile = { 
+			limit = { has_building = yes has_pop = yes }
+			kill_pop = yes
+			remove_building = yes
+			set_blocker = tb_catastrophe_tectonic_fracture
+			every_neighboring_tile = { 
+				if = { 
+					limit = { has_pop = yes has_building = yes }
+					random_list = { 
+						33.3 = { kill_pop = yes set_ruined = yes } 	
+						33.3 = { kill_pop = yes remove_building = yes set_blocker = tb_lava_flows } 
+						33.3 = { } 
+					}	
+					else = { 
+						if = { 
+							limit = { has_pop = yes has_building = no }
+							random_list = { 
+								33.3 = { kill_pop = yes } 	
+								33.3 = { kill_pop = yes set_blocker = tb_lava_flows } 
+								33.3 = { } 
+							}						
+							else = { 
+								if = { 
+									limit = { has_pop = no has_building = yes }
+									random_list = { 
+										33.3 = { set_ruined = yes } 	
+										33.3 = { set_ruined = yes set_blocker = tb_lava_flows } 
+										33.3 = { } 
+									}													
+								}
+								else = { 
+									if = { 
+										limit = { has_pop = no has_building = no has_blocker = yes }
+										random_list = { 
+											50 = { } 	
+											50 = { remove_blocker = yes set_blocker = tb_lava_flows } 
+										}													
+									}								
+									else = { 
+										random_list = { 
+											50 = { } 	
+											50 = { set_blocker = tb_lava_flows } 
+										}	
+									}	
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}	
+	option = { 
+		name = continue_tectonic_engineering_project.name
+		custom_tooltip = continue_tectonic_engineering_project.desc
+		allow = { 
+			custom_tooltip = {
+				fail_text = "requires_smaller_than_25_planet"
+				planet_size < 25
+			}		
+		}
+		hidden_effect = { planet_event = { id = cgm_planet_specialization.2 days = 1800 random = 1800 } }
+	}	
+	option = { 
+		name = end_tectonic_engineering_project.name
+		custom_tooltip = end_tectonic_engineering_project.desc
+		allow = { 
+			custom_tooltip = {
+				fail_text = "requires_smaller_than_25_planet"
+				planet_size < 25
+			}		
+		}
+		hidden_effect = { 
+			remove_planet_flag = cgm_tectonic_engineering
+			remove_modifier = cgm_tectonic_engineering	
+		}
+	}		
+}
