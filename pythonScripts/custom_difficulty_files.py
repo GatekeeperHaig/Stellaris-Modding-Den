@@ -1038,8 +1038,10 @@ def main():
   immediate=TagList()
   rootUpdateMenu.add("immediate",immediate)
   ifSimple=TagList("limit",TagList("has_global_flag", "custom_difficulty_activate_simple_mode"))
-  ifSimple.add("if", ifDelay(name_countryUpdateEventSimple)).add("else", TagList("if",ifDelay(name_countryUpdateEvent)))
+  ifSimple.add("if", ifDelay(name_countryUpdateEventSimple))
+  ifSimple.add("else", TagList("every_country", TagList("country_event", TagList("id", name_countryUpdateEventSimple))))
   immediate.add("if", ifSimple)
+  immediate.add("else", TagList("if",ifDelay(name_countryUpdateEvent)).add("else", TagList("every_country", TagList("country_event", TagList("id", name_countryUpdateEvent)))))
 
 
 
@@ -1361,7 +1363,6 @@ def ifDelay(name):
   self=TagList("limit",TagList("has_global_flag", "custom_difficulty_activate_delay_mode"))
   self.add("every_country", TagList("country_event", TagList("id", name).add("days","1").add("random","180")))
   # ifInstant=TagList("limit",TagList("not", TagList("has_global_flag", "custom_difficulty_activate_delay_mode")))
-  self.add("else", TagList("every_country", TagList("country_event", TagList("id", name))))
   return self
 
 
