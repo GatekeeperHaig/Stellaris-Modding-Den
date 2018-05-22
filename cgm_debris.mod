@@ -5,4 +5,4 @@ tags={
 }
 picture="thumb_cgm_debris.jpg"
 remote_file_id="1377634390"
-supported_version="2.0.*"
+supported_version="2.1.*"
