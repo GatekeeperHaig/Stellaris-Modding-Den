@@ -15,98 +15,81 @@ event = {
 	immediate = {
 		set_global_flag = planetary_diversity_active #this sets a global flag for this mod, to be used by other mods and the engine
 		#spawn_unique_planets = yes
-		if = {
-			limit = { NOT = { has_global_flag = new_worlds_active } } #if New Worlds is enabled, all Planetary Diversity planets are seeded through it's engine instead.			
-			every_planet = { 
+		every_planet = {
+			if = {
+				limit = { is_star = yes }
 				if = {
-					limit = { is_star = yes }
-					if = {
-						limit = {
-							solar_system = {
-								NOT = {
-									any_planet = {
-										NOT = { is_same_value = prev }
-										has_planet_flag = system_star_1
-									}
-								}
-							}
-						}
-						set_planet_flag = system_star_1
-						else = {
-							if = {
-								limit = {
-									solar_system = {
-										NOT = {
-											any_planet = {
-												NOT = { is_same_value = prev }
-												has_planet_flag = system_star_2
-											}
-										}
-									}
-								}
-								set_planet_flag = system_star_2
-								else = {
-									if = {
-										limit = {
-											solar_system = {
-												NOT = {
-													any_planet = {
-														NOT = { is_same_value = prev }
-														has_planet_flag = system_star_3
-													}
-												}
-											}
-										}
-										set_planet_flag = system_star_3
-									}
+					limit = {
+						solar_system = {
+							NOT = {
+								any_planet = {
+									NOT = { is_same_value = this }
+									has_planet_flag = system_star_1
 								}
 							}
 						}
 					}
-					else = {
-						if = {
-							#this adds a unique flag to gas giant moons, which is checked through a scripted trigger (see common/scripted_triggers/engine_triggers.txt )
-							limit = {
-								is_planet_class = pc_gas_giant
-								has_moon = yes
-								any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
-							}
-							every_moon = {
-								limit = { NOT = { has_planet_flag = gas_giant_moon } }
-								set_planet_flag = gas_giant_moon
-							}
-						}
-						if = {
-							limit = {
-								solar_system = {
-									NOR = {
-										has_star_flag = sol_system
-										has_star_flag = sol
-										has_star_flag = deneb_system
-										has_star_flag = custom_system
-										has_star_flag = floating_system
-										has_star_flag = crystal_system
-										has_star_flag = city_system
-									}
+					set_planet_flag = system_star_1
+				}	
+				else_if = {
+					limit = {
+						solar_system = {
+							NOT = {
+								any_planet = {
+									NOT = { is_same_value = this }
+									has_planet_flag = system_star_2
 								}
-								OR = { 
-									NOT = { exists = owner }
-									owner = { is_country_type = primitive }
-									NOT = { any_owned_pop = { is_robot_pop = no } }
-									is_colony = no 								
-								}
-								NOT = { has_planet_flag = prescripted_ideal }
 							}
-							# these events occur one after the other.
-							planet_event = { id = spawn_engine_1.1 }
-							planet_event = { id = spawn_engine_1.2 }
-							planet_event = { id = spawn_engine_1.3 days = 1 } #these events are failsafe - in case there was some issue with the deposit/blocker spawn. 
 						}
 					}
+					set_planet_flag = system_star_2
+				}	
+				else_if = {
+					limit = {
+						solar_system = {
+							NOT = {
+								any_planet = {
+									NOT = { is_same_value = this }
+									has_planet_flag = system_star_3
+								}
+							}
+						}
+					}
+					set_planet_flag = system_star_3
 				}
+			}	
+			else_if = { 			
+				limit = { is_planet_class = pc_gas_giant has_moon = yes }
+				every_moon = { set_planet_flag = gas_giant_moon }
 			}
-			every_playable_country = { country_event = { id = spawn_engine_1.10 } }
-		}
+			if = {
+				limit = {
+					solar_system = {
+						NOR = {
+							has_star_flag = sol_system
+							has_star_flag = sol
+							has_star_flag = deneb_system
+							has_star_flag = custom_system
+							has_star_flag = floating_system
+							has_star_flag = crystal_system
+							has_star_flag = city_system
+						}
+					}
+					OR = { 
+						NOT = { exists = owner }
+						owner = { is_country_type = primitive }
+						NOT = { any_owned_pop = { is_robot_pop = no } }
+						is_colony = no 								
+					}	
+					NOT = { has_planet_flag = prescripted_ideal }
+				}	
+				# these events occur one after the other.
+				planet_event = { id = spawn_engine_1.1 }
+				planet_event = { id = spawn_engine_1.2 }
+				planet_event = { id = spawn_engine_1.3 days = 1 } #these events are failsafe - in case there was some issue with the deposit/blocker spawn. 
+			}
+		}	
+		every_playable_country = { country_event = { id = spawn_engine_1.10 } }	
 	}
 }
 planet_event = {
@@ -125,12 +108,10 @@ planet_event = {
 				}			
 				change_owner_species_to_this_planet_preference = yes							
 			}
-			else = {
-				if = {
-					limit = { is_vanilla_uninhabitable_planet = yes }
-					planetary_diversity_uninhabitable_planets_spawn_table = yes					
-				}
-			}
+		}	
+		else_if = {
+			limit = { is_vanilla_uninhabitable_planet = yes }
+			planetary_diversity_uninhabitable_planets_spawn_table = yes
 		}
 		if = {
 			limit = { 
@@ -227,24 +208,11 @@ planet_event = {
 				reroll_deposits = yes	
 			}							
 			else = { 
-				if = { 
-					limit = { 
-						OR = { 
-							AND = { 
-								is_colonizable = yes
-								NOT = { exists = owner }
-							}	
-							AND = { 
-								is_colony = yes owner = { is_ai = no }
-							}	
-						}	
-					}
-					every_tile = {
-						limit = { has_regular_vanilla_deposit = yes	has_building = no }
-						clear_deposits = yes
-						planetary_diversity_planetary_resource_spawn_table = yes
-					}
-				}	
+				every_tile = {
+					limit = { has_regular_vanilla_deposit = yes	has_building = no }
+					clear_deposits = yes
+					planetary_diversity_planetary_resource_spawn_table = yes
+				}
 			}	
 		}	
 		if = {
@@ -254,60 +222,61 @@ planet_event = {
 				remove_blocker = yes
 				planetary_diversity_tile_blocker_spawn_table = yes
 			}	
-			else = { 
-				if = { 
-					limit = { NOT = { any_tile = { has_blocker = yes } } }
-					random_tile = { 
-						limit = { has_building = no has_pop = no }
-						planetary_diversity_tile_blocker_spawn_table = yes
+			else_if = { 
+				limit = { NOT = { any_tile = { has_blocker = yes } } }
+				every_tile = { 
+					limit = { has_building = no has_pop = no }
+					random_list = { 
+						50 = { planetary_diversity_tile_blocker_spawn_table = yes }
+						50 = { }
 					}	
-				}				
-				if = { 
-					limit = { NOT = { any_tile = { has_blocker = yes has_regular_vanilla_blocker = yes } } }
-					while = {
-						limit = {
-							OR = {
-								AND = {
-									planet_size > 19
-									count_tile = {
-										limit = { has_blocker = yes }
-										count < 6
-									}
+				}	
+			}				
+			else_if = { 
+				limit = { NOT = { any_tile = { has_blocker = yes has_regular_vanilla_blocker = yes } } }
+				while = {
+					limit = {
+						OR = {
+							AND = {
+								planet_size > 19
+								count_tile = {
+									limit = { has_blocker = yes }
+									count < 6
 								}
-								AND = {
-									planet_size > 15
-									planet_size < 19
-									count_tile = {
-										limit = { has_blocker = yes }
-										count < 5
-									}
+							}
+							AND = {
+								planet_size > 15
+								planet_size < 19
+								count_tile = {
+									limit = { has_blocker = yes }
+									count < 5
 								}
-								AND = {
-									planet_size > 10
-									planet_size < 16
-									count_tile = {
-										limit = { has_blocker = yes }
-										count < 4
-									}
+							}
+							AND = {
+								planet_size > 10
+								planet_size < 16
+								count_tile = {
+									limit = { has_blocker = yes }
+									count < 4
 								}
-								AND = {
-									planet_size < 11
-									count_tile = {
-										limit = { has_blocker = yes }
-										count < 3
-									}
+							}
+							AND = {
+								planet_size < 11
+								count_tile = {
+									limit = { has_blocker = yes }
+									count < 3
 								}
 							}
 						}
-						random_tile = {
-							limit = { has_blocker = no }
-							planetary_diversity_tile_blocker_spawn_table = yes
-						}
-					}						
-				}
-			}	
-		}					
-	}
+					}
+					random_tile = {
+						limit = { has_blocker = no }
+						planetary_diversity_tile_blocker_spawn_table = yes
+					}
+				}						
+			}
+		}	
+	}						
 }
 planet_event = {
 	id = spawn_engine_1.3
@@ -505,31 +474,31 @@ country_event = {
 			if = { 
 				limit = { is_ideal_planet_class = { who = root status = no } }
 				if = { limit = { event_target:capital_target = { is_planet_class = pc_tropical } } change_pc = pc_tropical }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_arid } } change_pc = pc_arid }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_continental } } change_pc = pc_continental }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_ocean } } change_pc = pc_ocean }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_tundra } } change_pc = pc_tundra }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_arctic } } change_pc = pc_arctic }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_alpine } } change_pc = pc_alpine }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_savannah } } change_pc = pc_savannah }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_tidallylocked } } change_pc = pc_tidallylocked }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_mangrove } } change_pc = pc_mangrove }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_desertislands } } change_pc = pc_desertislands }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_hajungle } } change_pc = pc_hajungle }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_cascadian } } change_pc = pc_cascadian }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_swamp } } change_pc = pc_swamp }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_subarctic } } change_pc = pc_subarctic }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_glacial } } change_pc = pc_glacial }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_geothermal } } change_pc = pc_geothermal }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_sandsea } } change_pc = pc_sandsea }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_mesa } } change_pc = pc_mesa }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_oasis } } change_pc = pc_oasis }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_hadesert } } change_pc = pc_hadesert }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_steppe } } change_pc = pc_steppe }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_frozen_desert } } change_pc = pc_frozen_desert }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_antarctic } } change_pc = pc_antarctic }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_ammonia } } change_pc = pc_ammonia }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_methane } } change_pc = pc_methane }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_arid } } change_pc = pc_arid }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_continental } } change_pc = pc_continental }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_ocean } } change_pc = pc_ocean }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_tundra } } change_pc = pc_tundra }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_arctic } } change_pc = pc_arctic }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_alpine } } change_pc = pc_alpine }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_savannah } } change_pc = pc_savannah }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_tidallylocked } } change_pc = pc_tidallylocked }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_mangrove } } change_pc = pc_mangrove }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_desertislands } } change_pc = pc_desertislands }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_hajungle } } change_pc = pc_hajungle }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_cascadian } } change_pc = pc_cascadian }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_swamp } } change_pc = pc_swamp }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_subarctic } } change_pc = pc_subarctic }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_glacial } } change_pc = pc_glacial }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_geothermal } } change_pc = pc_geothermal }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_sandsea } } change_pc = pc_sandsea }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_mesa } } change_pc = pc_mesa }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_oasis } } change_pc = pc_oasis }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_hadesert } } change_pc = pc_hadesert }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_steppe } } change_pc = pc_steppe }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_frozen_desert } } change_pc = pc_frozen_desert }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_antarctic } } change_pc = pc_antarctic }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_ammonia } } change_pc = pc_ammonia }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_methane } } change_pc = pc_methane }
 			}
 		}
 	}
