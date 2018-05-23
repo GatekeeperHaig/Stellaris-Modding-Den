@@ -6,4 +6,5 @@ tags={
 	"Graphics"
 }
 picture="new_worlds_beta.png"
-supported_version="2.0.*"
+remote_file_id="1389588383"
+supported_version="2.1.*"
