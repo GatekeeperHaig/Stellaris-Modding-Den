@@ -486,9 +486,13 @@ def readAndConvert(args, allowRestart=1):
             #   if name==nameOrig :
             #     outPutToThisFile.add(name,val, comment,separator)
             #     break
+        startBuildingsOrig, endBuildingsOrig=origFileContent.findFirstAndLastTagList()
+        startBuildingsOut, endBuildingsOut=outPutToThisFile.findFirstAndLastTagList()
         with open(args.outPath+os.path.basename(nonHelperFile),'w') as outputFile:
           outputFile.write(args.scriptDescription)
-          outPutToThisFile.writeAll(outputFile,args)
+          origFileContent.writeAll(outputFile,args,False,0,startBuildingsOrig)
+          outPutToThisFile.writeAll(outputFile,args,False, startBuildingsOut, endBuildingsOut+1)
+          origFileContent.writeAll(outputFile,args,False, endBuildingsOrig+1)
     else:
       if args.create_standalone_mod_from_mod:
         outputFileName=args.outPath+prioFile+outfileBaseName
