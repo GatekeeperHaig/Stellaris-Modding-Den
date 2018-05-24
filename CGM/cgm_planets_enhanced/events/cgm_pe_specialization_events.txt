@@ -17,7 +17,7 @@ planet_event = {
 		trigger = { 			
 			NOR = { 
 				has_planet_flag = cgm_deep_core_mining				
-				has_planet_flag = cgm_soil_enrichment
+				has_planet_flag = cgm_harvest
 			}
 		}
 		allow = { 
@@ -40,6 +40,10 @@ planet_event = {
 				fail_text = "requires_non_tectonic_engineering"
 				NOT = { has_planet_flag = cgm_tectonic_engineering }
 			}						
+			custom_tooltip = {
+				fail_text = "requires_non_harvest"
+				NOT = { has_planet_flag = cgm_harvest }				
+			}										
 			custom_tooltip = {
 				fail_text = "requires_500_energy"
 				owner = { energy > 499 }				
@@ -101,7 +105,7 @@ planet_event = {
 		trigger = { 
 			NOR = { 
 				has_planet_flag = cgm_geothermal_tap
-				has_planet_flag = cgm_soil_enrichment
+				has_planet_flag = cgm_harvest
 			}
 		}
 		allow = { 
@@ -123,7 +127,11 @@ planet_event = {
 			custom_tooltip = {
 				fail_text = "requires_non_deep_core_mining"
 				NOT = { has_planet_flag = cgm_deep_core_mining }
-			}				
+			}		
+			custom_tooltip = {
+				fail_text = "requires_non_harvest"
+				NOT = { has_planet_flag = cgm_harvest }				
+			}										
 			custom_tooltip = {
 				fail_text = "requires_500_energy"
 				owner = { energy > 499 }				
@@ -179,21 +187,21 @@ planet_event = {
 		}
 	}	
 	option = { 
-		name = cgm_pe.soil_enrichment.name
-		custom_tooltip = cgm_pe.soil_enrichment.desc
+		name = cgm_pe.harvest.name
+		custom_tooltip = cgm_pe.harvest.desc
 		custom_gui = "cgm_pe_option"				
-		trigger = { NOT = { has_planet_flag = cgm_soil_enrichment } }
+		trigger = { NOT = { has_planet_flag = cgm_harvest } }
 		allow = { 
 			custom_tooltip = {
-				fail_text = "requires_3_empty_tiles"
+				fail_text = "requires_3_empty_food_tiles"
 				count_tile = { 
-					limit = { has_pop = no has_growing_pop = no has_blocker = no has_building = no }
+					limit = { has_deposit = yes has_resource = { type = food amount > 0 } has_pop = no has_growing_pop = no has_blocker = no has_building = no }
 					count > 2
 				}
 			}	
 			custom_tooltip = {
-				fail_text = "requires_non_bleak_or_irradiated"
-				NOT = { has_modifier = weak_magnetic_field }				
+				fail_text = "requires_non_irradiated"
+				NOT = { has_modifier = irradiated_planet }				
 			}	
 			custom_tooltip = {
 				fail_text = "requires_non_deep_core_mining"
@@ -204,7 +212,7 @@ planet_event = {
 				NOT = { has_planet_flag = cgm_geothermal_tap }
 			}	
 			custom_tooltip = {
-				fail_text = "cannot_perform_soil_enrichemtn_when_tectonic_engineering_active"
+				fail_text = "requires_non_tectonic_engineering_active"
 				NOT = { has_planet_flag = cgm_tectonic_engineering }				
 			}				
 			custom_tooltip = {
@@ -221,8 +229,8 @@ planet_event = {
 			}				
 		}		
 		hidden_effect = { 
-			set_planet_flag = cgm_soil_enrichment
-			add_modifier = cgm_soil_enrichment_stage_0
+			set_planet_flag = cgm_harvest
+			add_modifier = cgm_harvest_stage_0
 			owner = { 
 				add_energy = -500
 				add_minerals = -500
@@ -233,21 +241,21 @@ planet_event = {
 				limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 4 } }
 				random_tile = { 
 					limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 4 }
-					set_blocker = tb_planetary_exploitation_soil_enrichment_engine
+					set_blocker = tb_planetary_exploitation_harvest_engine
 				}
 			}	
 			else_if = { 	
 				limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 3 } }				
 				random_tile = { 
 					limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 3 }
-					set_blocker = tb_planetary_exploitation_soil_enrichment_engine
+					set_blocker = tb_planetary_exploitation_harvest_engine
 				}					
 			}	
 			else_if = { 
 				limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 2 } }
 				random_tile = { 
 					limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 2 }
-					set_blocker = tb_planetary_exploitation_soil_enrichment_engine
+					set_blocker = tb_planetary_exploitation_harvest_engine
 				}						
 			}
 		}
@@ -278,8 +286,8 @@ planet_event = {
 				NOT = { has_planet_flag = cgm_geothermal_tap }
 			}	
 			custom_tooltip = {
-				fail_text = "cannot_perform_tectonic_engineering_when_soil_enrichment_active"
-				NOT = { has_planet_flag = cgm_soil_enrichment }				
+				fail_text = "requires_non_harvest"
+				NOT = { has_planet_flag = cgm_harvest }				
 			}							
 			custom_tooltip = {
 				fail_text = "requires_750_minerals"
