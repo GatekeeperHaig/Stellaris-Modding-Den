@@ -216,8 +216,12 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         self.vals[i]=applyIfTagList(self.vals[i], lambda *x: self.vals[i].forceOneLineIf(*x), condition(self.names[i], self.vals[i]), condition)
       return self
 
-  def writeAll(self,file,args=0,checkForHelpers=False): #formatted writing. Paradox style minus most whitespace tailing errors
-    for i in range(len(self.names)):
+  def writeAll(self,file,args=0,checkForHelpers=False, start=0, end=None): #formatted writing. Paradox style minus most whitespace tailing errors
+    if end!=None:
+      r=range(start,end)
+    else:
+      r=range(start, len(self.names))
+    for i in r:
       try:
         if not checkForHelpers or ( isinstance(self.vals[i],NamedTagList) and self.vals[i].helper==False ):
           self.writeEntry(file, i,args)
@@ -896,6 +900,15 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       bodyEntry[headerIndex]="addedLines"
       for i in range(extraLines-1):
         self.add(headerName, self.getN_th(headerName, n_th_occurence-1))
+  def findFirstAndLastTagList(self):
+    first=0
+    last=0
+    for i,val in enumerate(self.vals):
+      if isinstance(val, TagList):
+        if first==0:
+          first=i
+        last=i
+    return first,last
 
           
 class NamedTagList(TagList): #derived from TagList with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
