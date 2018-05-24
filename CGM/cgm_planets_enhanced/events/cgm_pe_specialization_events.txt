@@ -1,33 +1,28 @@
-namespace = cgm_planet_specialization	
+namespace = cgm_planetary_exploitation	
 
 planet_event = { 	
-	id = cgm_planet_specialization.1
+	id = cgm_planetary_exploitation.1
 	is_triggered_only = yes	
-	title = cgm_pe.planet_specialization_menu.title
-	desc = cgm_pe.planet_specialization_menu.desc
+	title = cgm_pe.planet_exploitation_menu.title
+	desc = cgm_pe.planet_exploitation_menu.desc
 	diplomatic = yes
 	force_open = yes
-	custom_gui = "planet_specialization_menu"	
+	custom_gui = "cgm_planet_exploitation_menu"	
 	picture_event_data = { room = cgm_pe_menu_room }	
 	
 	option = { 
 		name = cgm_pe.deep_core_mining.name
 		custom_tooltip = cgm_pe.deep_core_mining.desc
 		custom_gui = "cgm_pe_option"				
-		trigger = { 
-			is_artificial_planet = no
-			NOR = { 
-				has_planet_flag = cgm_deep_core_mining
-				has_planet_flag = cgm_geothermal_tap
-				has_planet_flag = cgm_tectonic_engineering
-				has_planet_flag = cgm_soil_enrichment
-			}
+		trigger = { 			
+			NOT = { has_planet_flag = cgm_deep_core_mining }
+			owner = { has_technology = "tech_deep_core_mining" }
 		}
 		allow = { 
 			custom_tooltip = {
 				fail_text = "requires_3_empty_tiles"
 				count_tile = { 
-					limit = { has_pop = no has_growing_pop = no has_blocker = no has_building = no }
+					limit = { has_pop = no has_growing_pop = no has_building = no }
 					count > 2
 				}
 			}	
@@ -36,48 +31,69 @@ planet_event = {
 				NOT = { has_modifier = mineral_poor }				
 			}			
 			custom_tooltip = {
-				fail_text = "requires_1000_energy"
-				owner = { energy > 999 }				
+				fail_text = "requires_non_geothermal_tap"
+				NOT = { has_planet_flag = cgm_geothermal_tap }
+			}	
+			custom_tooltip = {
+				fail_text = "requires_non_tectonic_engineering"
+				NOT = { has_planet_flag = cgm_tectonic_engineering }
+			}						
+			custom_tooltip = {
+				fail_text = "requires_non_harvest"
+				NOT = { has_planet_flag = cgm_harvest }				
+			}										
+			custom_tooltip = {
+				fail_text = "requires_500_energy"
+				owner = { energy > 499 }				
 			}				
 			custom_tooltip = {
 				fail_text = "requires_50_influence"
 				owner = { influence > 49 }				
-			}						
+			}			
 		}		
 		hidden_effect = { 
 			set_planet_flag = cgm_deep_core_mining
-			add_modifier = cgm_deep_core_mining
-			owner = { 
-				energy = -1000
-				influence = -50
-			}	
 			if = { 
-				limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 4 } }
-				random_tile = { 
-					limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 4 }
-					set_blocker = tb_planetary_specialization_deep_core_mining_engine
+				limit = { 
+					NOR = { 
+						has_modifier = cgm_deep_core_mining_stage_1
+						has_modifier = cgm_deep_core_mining_stage_2
+						has_modifier = cgm_deep_core_mining_stage_3
+					}						
 				}
-				else = { 	
-					if = { 
-						limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 3 } }				
-						random_tile = { 
-							limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 3 }
-							remove_blocker = yes
-							set_blocker = tb_planetary_specialization_deep_core_mining_engine
-						}						
-						else = { 
-							if = { 
-								limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 2 } }
-								random_tile = { 
-									limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 2 }
-									remove_blocker = yes
-									set_blocker = tb_planetary_specialization_deep_core_mining_engine
-								}						
-							}
-						}
+				add_modifier = { modifier = cgm_deep_core_mining_stage_0 days = -1 }
+			}				
+			owner = { 
+				add_energy = -500
+				add_influence = -50
+			}				
+			planet_event = { id = cgm_planetary_exploitation.10 days = 1800 random = 1800 }
+			if = { 
+				limit = { NOT = { any_tile = { has_blocker = tb_planetary_exploitation_deep_core_mining_engine } } }
+				if = { 
+					limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 4 } }
+					random_tile = { 
+						limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 4 }
+						set_blocker = tb_planetary_exploitation_deep_core_mining_engine
 					}
 				}	
-			}			
+				else_if = { 	
+					limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 3 } }				
+					random_tile = { 
+						limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 3 }
+						remove_blocker = yes
+						set_blocker = tb_planetary_exploitation_deep_core_mining_engine
+					}						
+				}	
+				else_if = { 
+					limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 2 } }
+					random_tile = { 
+						limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 2 }
+						remove_blocker = yes
+						set_blocker = tb_planetary_exploitation_deep_core_mining_engine
+					}						
+				}
+			}	
 		}
 	}	
 	option = { 
@@ -85,19 +101,14 @@ planet_event = {
 		custom_tooltip = cgm_pe.geothermal_tap.desc
 		custom_gui = "cgm_pe_option"				
 		trigger = { 
-			is_artificial_planet = no
-			NOR = { 
-				has_planet_flag = cgm_deep_core_mining
-				has_planet_flag = cgm_geothermal_tap
-				has_planet_flag = cgm_tectonic_engineering
-				has_planet_flag = cgm_soil_enrichment
-			}
+			NOT = { has_planet_flag = cgm_geothermal_tap }
+			owner = { has_technology = "tech_geothermal_tap" }
 		}
 		allow = { 
 			custom_tooltip = {
 				fail_text = "requires_3_empty_tiles"
 				count_tile = { 
-					limit = { has_pop = no has_growing_pop = no has_blocker = no has_building = no }
+					limit = { has_pop = no has_growing_pop = no has_building = no }
 					count > 2
 				}
 			}	
@@ -106,8 +117,20 @@ planet_event = {
 				NOT = { has_modifier = weak_magnetic_field }				
 			}	
 			custom_tooltip = {
-				fail_text = "requires_1000_energy"
-				owner = { energy > 999 }				
+				fail_text = "requires_non_tectonic_engineering"
+				NOT = { has_planet_flag = cgm_tectonic_engineering }
+			}						
+			custom_tooltip = {
+				fail_text = "requires_non_deep_core_mining"
+				NOT = { has_planet_flag = cgm_deep_core_mining }
+			}		
+			custom_tooltip = {
+				fail_text = "requires_non_harvest"
+				NOT = { has_planet_flag = cgm_harvest }				
+			}										
+			custom_tooltip = {
+				fail_text = "requires_500_energy"
+				owner = { energy > 499 }				
 			}				
 			custom_tooltip = {
 				fail_text = "requires_50_influence"
@@ -116,109 +139,131 @@ planet_event = {
 		}		
 		hidden_effect = { 
 			set_planet_flag = cgm_geothermal_tap
-			add_modifier = cgm_geothermal_tap
-			owner = { 
-				energy = -1000
-				influence = -50
-			}				
 			if = { 
-				limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 4 } }
-				random_tile = { 
-					limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 4 }
-					set_blocker = tb_planetary_specialization_geothermal_fracking_engine
+				limit = { 
+					NOR = { 
+						has_modifier = cgm_geothermal_tap_stage_1
+						has_modifier = cgm_geothermal_tap_stage_2
+						has_modifier = cgm_geothermal_tap_stage_3
+					}						
 				}
-				else = { 	
-					if = { 
-						limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 3 } }				
-						random_tile = { 
-							limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 3 }
-							set_blocker = tb_planetary_specialization_geothermal_fracking_engine
-						}						
-						else = { 
-							if = { 
-								limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 2 } }
-								random_tile = { 
-									limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 2 }
-									set_blocker = tb_planetary_specialization_geothermal_fracking_engine
-								}						
-							}
-						}
+				add_modifier = { modifier = cgm_geothermal_tap_stage_0 days = -1 }
+			}				
+			owner = { 
+				add_energy = -500
+				add_influence = -50
+			}				
+			planet_event = { id = cgm_planetary_exploitation.20 days = 1800 random = 1800 }
+			if = { 
+				limit = { NOT = { any_tile = { has_blocker = tb_planetary_exploitation_geothermal_tap_engine } } }
+				if = { 
+					limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 4 } }
+					random_tile = { 
+						limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 4 }
+						set_blocker = tb_planetary_exploitation_geothermal_tap_engine
 					}
 				}	
-			}			
+				else_if = { 	
+					limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 3 } }				
+					random_tile = { 
+						limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 3 }
+						remove_blocker = yes
+						set_blocker = tb_planetary_exploitation_geothermal_tap_engine
+					}						
+				}	
+				else_if = { 
+					limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 2 } }
+					random_tile = { 
+						limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 2 }
+						remove_blocker = yes
+						set_blocker = tb_planetary_exploitation_geothermal_tap_engine
+					}						
+				}
+			}	
 		}
 	}	
 	option = { 
-		name = cgm_pe.soil_enrichment.name
-		custom_tooltip = cgm_pe.soil_enrichment.desc
+		name = cgm_pe.harvest.name
+		custom_tooltip = cgm_pe.harvest.desc
 		custom_gui = "cgm_pe_option"				
 		trigger = { 
-			is_artificial_planet = no
-			NOR = { 
-				has_planet_flag = cgm_deep_core_mining
-				has_planet_flag = cgm_geothermal_tap
-				has_planet_flag = cgm_tectonic_engineering
-				has_planet_flag = cgm_soil_enrichment
-			}
+			NOT = { has_planet_flag = cgm_harvest } 
+			owner_is_machine_empire = no
+			owner = { has_technology = "tech_soil_harvesting" }
 		}
 		allow = { 
 			custom_tooltip = {
-				fail_text = "requires_3_empty_tiles"
+				fail_text = "requires_3_empty_food_tiles"
 				count_tile = { 
-					limit = { has_pop = no has_growing_pop = no has_blocker = no has_building = no }
+					limit = { has_resource = { type = food amount > 0 } has_any_tile_strategic_resource = no has_pop = no has_growing_pop = no has_blocker = no has_building = no }
 					count > 2
 				}
 			}	
 			custom_tooltip = {
-				fail_text = "requires_non_bleak_or_irradiated"
-				NOT = { has_modifier = weak_magnetic_field }				
+				fail_text = "requires_non_irradiated"
+				NOT = { has_modifier = irradiated_planet }				
 			}	
 			custom_tooltip = {
-				fail_text = "requires_500_minerals"
-				owner = { energy > 499 }				
+				fail_text = "requires_non_deep_core_mining"
+				NOT = { has_planet_flag = cgm_deep_core_mining }
 			}				
 			custom_tooltip = {
-				fail_text = "requires_500_energy"
-				owner = { energy > 499 }				
-			}							
+				fail_text = "requires_non_geothermal_tap"
+				NOT = { has_planet_flag = cgm_geothermal_tap }
+			}	
+			custom_tooltip = {
+				fail_text = "requires_non_tectonic_engineering_active"
+				NOT = { has_planet_flag = cgm_tectonic_engineering }				
+			}				
+			custom_tooltip = {
+				fail_text = "requires_250_energy"
+				owner = { energy > 249 }				
+			}				
 			custom_tooltip = {
 				fail_text = "requires_50_influence"
 				owner = { influence > 49 }				
 			}				
 		}		
 		hidden_effect = { 
-			set_planet_flag = cgm_soil_enrichment
-			add_modifier = cgm_soil_enrichment
+			set_planet_flag = cgm_harvest
 			owner = { 
-				energy = -500
-				minerals = -500
-				influence = -50
-			}				
-			if = { 
-				limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 4 } }
-				random_tile = { 
-					limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 4 }
-					set_blocker = tb_planetary_specialization_soil_enrichment_engine
-				}
-				else = { 	
-					if = { 
-						limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 3 } }				
-						random_tile = { 
-							limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 3 }
-							set_blocker = tb_planetary_specialization_soil_enrichment_engine
-						}						
-						else = { 
-							if = { 
-								limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 2 } }
-								random_tile = { 
-									limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 2 }
-									set_blocker = tb_planetary_specialization_soil_enrichment_engine
-								}						
-							}
-						}
-					}
-				}	
-			}			
+				add_energy = -250
+				add_influence = -50
+			}					
+			planet_event = { id = cgm_planetary_exploitation.30 days = 1800 random = 1800 }									
+			set_variable = { which = num_of_harvested_tiles value = 0 }
+			every_tile = { 
+				limit = { has_resource = { type = food amount > 0 } has_any_tile_strategic_resource = no has_pop = no has_growing_pop = no has_blocker = no has_building = no }
+				set_blocker = tb_planetary_exploitation_harvest_engine
+			}
+			every_tile = {
+				limit = { has_blocker = tb_planetary_exploitation_harvest_engine }
+				prev = { change_variable = { which = num_of_harvested_tiles value = 1 } }
+			}	
+			if = { limit = { check_variable = { which = num_of_harvested_tiles value = 1 } } add_modifier = { modifier = cgm_harvest_1_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 2 } } add_modifier = { modifier = cgm_harvest_2_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 3 } } add_modifier = { modifier = cgm_harvest_3_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 4 } } add_modifier = { modifier = cgm_harvest_4_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 5 } } add_modifier = { modifier = cgm_harvest_5_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 6 } } add_modifier = { modifier = cgm_harvest_6_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 7 } } add_modifier = { modifier = cgm_harvest_7_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 8 } } add_modifier = { modifier = cgm_harvest_8_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 9 } } add_modifier = { modifier = cgm_harvest_9_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 10 } } add_modifier = { modifier = cgm_harvest_10_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 11 } } add_modifier = { modifier = cgm_harvest_11_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 12 } } add_modifier = { modifier = cgm_harvest_12_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 13 } } add_modifier = { modifier = cgm_harvest_13_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 14 } } add_modifier = { modifier = cgm_harvest_14_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 15 } } add_modifier = { modifier = cgm_harvest_15_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 16 } } add_modifier = { modifier = cgm_harvest_16_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 17 } } add_modifier = { modifier = cgm_harvest_17_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 18 } } add_modifier = { modifier = cgm_harvest_18_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 19 } } add_modifier = { modifier = cgm_harvest_19_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 20 } } add_modifier = { modifier = cgm_harvest_20_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 21 } } add_modifier = { modifier = cgm_harvest_21_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 22 } } add_modifier = { modifier = cgm_harvest_22_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 23 } } add_modifier = { modifier = cgm_harvest_23_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 24 } } add_modifier = { modifier = cgm_harvest_24_tile }}
 		}
 	}	
 	option = { 
@@ -226,13 +271,8 @@ planet_event = {
 		custom_tooltip = cgm_pe.tectonic_engineering.desc
 		custom_gui = "cgm_pe_option"				
 		trigger = { 
-			is_artificial_planet = no
-			NOR = { 
-				has_planet_flag = cgm_deep_core_mining
-				has_planet_flag = cgm_geothermal_tap
-				has_planet_flag = cgm_tectonic_engineering
-				has_planet_flag = cgm_soil_enrichment
-			}
+			NOT = { has_planet_flag = cgm_tectonic_engineering }
+			owner = { has_technology = "tech_tectonic_engineering" }
 		}
 		allow = { 
 			custom_tooltip = {
@@ -241,11 +281,23 @@ planet_event = {
 					limit = { has_pop = no has_growing_pop = no has_blocker = no has_building = no }
 					count > 2
 				}
-			}	
+			}				
 			custom_tooltip = {
 				fail_text = "requires_non_unstable_tectonics"
 				NOT = { has_modifier = unstable_tectonics }				
 			}	
+			custom_tooltip = {
+				fail_text = "requires_non_deep_core_mining"
+				NOT = { has_planet_flag = cgm_deep_core_mining }
+			}				
+			custom_tooltip = {
+				fail_text = "requires_non_geothermal_tap"
+				NOT = { has_planet_flag = cgm_geothermal_tap }
+			}	
+			custom_tooltip = {
+				fail_text = "requires_non_harvest"
+				NOT = { has_planet_flag = cgm_harvest }				
+			}							
 			custom_tooltip = {
 				fail_text = "requires_750_minerals"
 				owner = { energy > 749 }				
@@ -265,23 +317,470 @@ planet_event = {
 		}		
 		hidden_effect = { 
 			set_planet_flag = cgm_tectonic_engineering
-			add_modifier = cgm_tectonic_engineering		
+			add_modifier = { modifier = cgm_tectonic_engineering days = -1 }
 			if = { 
 				limit = { NOT = { check_variable = { which = cgm_tectonic_engineering value > 0 } } }
 				set_variable = { which = cgm_tectonic_engineering value = 0 }
 			}	
 			owner = { 
-				energy = -500
-				minerals = -500
-				influence = -50
+				add_energy = -500
+				add_minerals = -500
+				add_influence = -50
 			}										
-			planet_event = { id = cgm_planet_specialization.2 days = 1800 random = 1800 }
+			planet_event = { id = cgm_planetary_exploitation.40 days = 1800 random = 1800 }
 		}
 	}	
+	option = { name = CLOSE }
 }	
 
 planet_event = { 	
-	id = cgm_planet_specialization.2
+	id = cgm_planetary_exploitation.10
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = { 		
+		if = { 
+			limit = { has_modifier = cgm_deep_core_mining_stage_0 }
+			random_list = { 
+				99 = { 
+					remove_modifier = cgm_deep_core_mining_stage_0
+					add_modifier = { modifier = cgm_deep_core_mining_stage_1 days = -1 }
+					planet_event = { id = cgm_planetary_exploitation.11 }
+				}
+				1 = { planet_event = { id = cgm_planetary_exploitation.12 } }
+			}	
+		}	
+		else_if = { 
+			limit = { has_modifier = cgm_deep_core_mining_stage_1 }
+			random_list = {
+				65 = { 
+					remove_modifier = cgm_deep_core_mining_stage_1
+					add_modifier = { modifier = cgm_deep_core_mining_stage_2 days = -1 }
+					planet_event = { id = cgm_planetary_exploitation.11 }	
+					modifier = { add = 10 owner = { has_ascension_perk = ap_world_shaper } }
+				}
+				35 = { 
+					planet_event = { id = cgm_planetary_exploitation.12 }
+					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_deep_core_mining" } }
+				}	
+			}	
+		}
+		else_if = { 
+			limit = { has_modifier = cgm_deep_core_mining_stage_2 }
+			random_list = { 
+				45 = { 
+					remove_modifier = cgm_deep_core_mining_stage_2
+					add_modifier = { modifier = cgm_deep_core_mining_stage_3 days = -1 }
+					planet_event = { id = cgm_planetary_exploitation.11 }	
+					modifier = { add = 10 owner = { has_ascension_perk = ap_world_shaper } }
+				}
+				55 = { 
+					planet_event = { id = cgm_planetary_exploitation.12 }
+					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_deep_core_mining" } }
+				}	
+			}	
+		}		
+	}
+}			
+
+planet_event = { 	
+	id = cgm_planetary_exploitation.11
+	is_triggered_only = yes
+	title = cgm_deep_core_mining_successful.title
+	desc = cgm_deep_core_mining_successful.desc
+	picture = GFX_evt_xyz
+		
+	option = { 
+		name = further_increase_deep_core_mining_level.name
+		custom_tooltip = further_increase_deep_core_mining_level.desc		
+		allow = { 
+			custom_tooltip = {
+				fail_text = "deep_core_mining_at_maximal_level"
+				NOT = { has_modifier = cgm_deep_core_mining_stage_3 }
+			}
+			if = { 
+				limit = { has_modifier = cgm_deep_core_mining_stage_2 }
+				custom_tooltip = {
+					fail_text = "requires_advanced_deep_core_mining_tech"
+					owner = { has_technology = "tech_advanced_deep_core_mining" }
+				}	
+			}	
+		}		
+		hidden_effect = { planet_event = { id = cgm_planetary_exploitation.40 days = 1800 random = 1800 } }
+	}	
+	option = { name = OK }		
+}	
+
+planet_event = { 	
+	id = cgm_planetary_exploitation.12
+	is_triggered_only = yes
+	title = cgm_deep_core_mining_catastrophic_outcome.title
+	desc = cgm_deep_core_mining_catastrophic_outcome.desc
+	picture = GFX_evt_xyz
+	
+	immediate = { 
+		random_tile = { 
+			limit = { has_building = yes has_pop = yes }
+			kill_pop = yes
+			remove_building = yes
+			random_list = { 
+				50 = { set_blocker = tb_catastrophe_erupting_volcano_1 }
+				50 = { set_blocker = tb_catastrophe_erupting_volcano_2 }
+			}	
+			every_neighboring_tile = { 
+				if = { 
+					limit = { has_pop = yes has_building = yes }
+					random_list = { 
+						33.3 = { kill_pop = yes set_ruined = yes } 	
+						33.3 = { kill_pop = yes remove_building = yes set_blocker = tb_lava_flows } 
+						33.3 = { } 
+					}	
+				}	
+				else_if = { 
+					limit = { has_pop = yes has_building = no }
+					random_list = { 
+						33.3 = { kill_pop = yes } 	
+						33.3 = { kill_pop = yes set_blocker = tb_lava_flows } 
+						33.3 = { } 
+					}					
+				}	
+				else_if = { 
+					limit = { has_pop = no has_building = yes }
+					random_list = { 
+						33.3 = { set_ruined = yes } 	
+						33.3 = { set_ruined = yes set_blocker = tb_lava_flows } 
+						33.3 = { } 
+					}													
+				}
+				else_if = { 
+					limit = { has_pop = no has_building = no has_blocker = yes }
+					random_list = { 
+						50 = { } 	
+						50 = { remove_blocker = yes set_blocker = tb_lava_flows } 
+					}													
+				}								
+				else = { 
+					random_list = { 
+						50 = { } 	
+						50 = { set_blocker = tb_lava_flows } 
+					}	
+				}	
+			}
+		}
+	}
+	option = { 
+		name = continue_deep_core_mining_level_increase_project.name
+		custom_tooltip = continue_deep_core_mining_level_increase_project.desc		
+		hidden_effect = { planet_event = { id = cgm_planetary_exploitation.10 days = 1800 random = 1800 } }
+	}	
+	option = { 
+		name = cancel_deep_core_mining_level_increase_project.name
+		custom_tooltip = cancel_deep_core_mining_level_increase_project.desc		
+	}	
+}
+
+planet_event = { 	
+	id = cgm_planetary_exploitation.20
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = { 		
+		if = { 
+			limit = { has_modifier = cgm_geothermal_tap_stage_0 }
+			random_list = { 
+				99 = { 
+					remove_modifier = cgm_geothermal_tap_stage_0
+					add_modifier = { modifier = cgm_geothermal_tap_stage_1 days = -1 }					
+					planet_event = { id = cgm_planetary_exploitation.21 }
+				}
+				1 = { planet_event = { id = cgm_planetary_exploitation.22 } }
+			}	
+		}	
+		else_if = { 
+			limit = { has_modifier = cgm_geothermal_tap_stage_1 }
+			random_list = { 
+				65 = { 
+					remove_modifier = cgm_geothermal_tap_stage_1
+					add_modifier = { modifier = cgm_geothermal_tap_stage_2 days = -1 }					
+					planet_event = { id = cgm_planetary_exploitation.21 }	
+					modifier = { add = 10 owner = { has_ascension_perk = ap_world_shaper } }
+				}
+				35 = { 
+					planet_event = { id = cgm_planetary_exploitation.22 }
+					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_geothermal_tap" } }
+				}	
+			}	
+		}
+		else_if = { 
+			limit = { has_modifier = cgm_geothermal_tap_stage_2 }
+			random_list = { 
+				45 = { 
+					remove_modifier = cgm_geothermal_tap_stage_2
+					add_modifier = { modifier = cgm_geothermal_tap_stage_3 days = -1 }					
+					planet_event = { id = cgm_planetary_exploitation.21 }	
+					modifier = { add = 10 owner = { has_ascension_perk = ap_world_shaper } }
+				}
+				55 = { 
+					planet_event = { id = cgm_planetary_exploitation.22 }
+					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_geothermal_tap" } }
+				}	
+			}	
+		}		
+	}
+}			
+
+planet_event = { 	
+	id = cgm_planetary_exploitation.21
+	is_triggered_only = yes
+	title = cgm_geothermal_tap_successful.title
+	desc = cgm_geothermal_tap_successful.desc
+	picture = GFX_evt_xyz
+		
+	option = { 
+		name = further_increase_geothermal_tap_level.name
+		custom_tooltip = further_increase_geothermal_tap_level.desc		
+		allow = { 
+			custom_tooltip = {
+				fail_text = "geothermal_tap_at_maximal_level"
+				NOT = { has_modifier = cgm_geothermal_tap_stage_3 }
+			}
+			if = { 
+				limit = { has_modifier = cgm_geothermal_tap_stage_2 }
+				custom_tooltip = {
+					fail_text = "requires_advanced_geothermal_tap_tech"
+					owner = { has_technology = "tech_advanced_geothermal_tap" }
+				}	
+			}	
+		}		
+		hidden_effect = { planet_event = { id = cgm_planetary_exploitation.40 days = 1800 random = 1800 } }
+	}	
+	option = { name = OK }		
+}	
+
+planet_event = { 	
+	id = cgm_planetary_exploitation.22
+	is_triggered_only = yes
+	title = cgm_geothermal_tap_catastrophic_outcome.title
+	desc = cgm_geothermal_tap_catastrophic_outcome.desc
+	picture = GFX_evt_xyz
+	
+	immediate = { 
+		random_tile = { 
+			limit = { has_building = yes has_pop = yes }
+			kill_pop = yes
+			remove_building = yes
+			set_blocker = tb_catastrophe_mega_gayser 
+			every_neighboring_tile = { 
+				if = { 
+					limit = { has_pop = yes has_building = yes }
+					random_list = { 
+						33.3 = { kill_pop = yes set_ruined = yes } 	
+						33.3 = { kill_pop = yes remove_building = yes set_blocker = tb_lava_flows } 
+						33.3 = { } 
+					}	
+				}	
+				else_if = { 
+					limit = { has_pop = yes has_building = no }
+					random_list = { 
+						33.3 = { kill_pop = yes } 	
+						33.3 = { kill_pop = yes set_blocker = tb_lava_flows } 
+						33.3 = { } 
+					}					
+				}	
+				else_if = { 
+					limit = { has_pop = no has_building = yes }
+					random_list = { 
+						33.3 = { set_ruined = yes } 	
+						33.3 = { set_ruined = yes set_blocker = tb_lava_flows } 
+						33.3 = { } 
+					}													
+				}
+				else_if = { 
+					limit = { has_pop = no has_building = no has_blocker = yes }
+					random_list = { 
+						50 = { } 	
+						50 = { remove_blocker = yes set_blocker = tb_lava_flows } 
+					}													
+				}								
+				else = { 
+					random_list = { 
+						50 = { } 	
+						50 = { set_blocker = tb_lava_flows } 
+					}	
+				}	
+			}
+		}
+	}
+	option = { 
+		name = continue_geothermal_tap_level_increase_project.name
+		custom_tooltip = continue_geothermal_tap_level_increase_project.desc		
+		hidden_effect = { planet_event = { id = cgm_planetary_exploitation.20 days = 1800 random = 1800 } }
+	}	
+	option = { 
+		name = cancel_geothermal_tap_level_increase_project.name
+		custom_tooltip = cancel_geothermal_tap_level_increase_project.desc		
+	}	
+}
+	
+planet_event = {
+	id = cgm_planetary_exploitation.30
+	is_triggered_only = yes
+	hide_window = yes
+	
+	immediate = { 
+		random_list = { 
+			30 = { 
+				random_tile = {
+					limit = { has_blocker = tb_planetary_exploitation_harvest_engine }
+					clear_deposits = yes
+					remove_blocker = yes
+					set_blocker = tb_depleted_terrain					
+				}
+				modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_soil_harvesting" } }
+			}
+			20 = { 
+				while = { 
+					count = 2
+					random_tile = {
+						limit = { has_blocker = tb_planetary_exploitation_harvest_engine }
+						clear_deposits = yes
+						remove_blocker = yes
+						set_blocker = tb_depleted_terrain
+					}
+				}	
+				modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_soil_harvesting" } }
+			}			
+			10 = { 
+				while = { 
+					count = 3
+					random_tile = {
+						limit = { has_blocker = tb_planetary_exploitation_harvest_engine }
+						clear_deposits = yes
+						remove_blocker = yes
+						set_blocker = tb_depleted_terrain
+					}
+				}	
+				modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_soil_harvesting" } }
+			}						
+			40 = { }							
+		}	
+	}
+	
+	option = { 
+		name = continue_planetary_harvest_project.name
+		custom_tooltip = continue_planetary_harvest_project.desc
+		allow = { 
+			custom_tooltip = {
+				fail_text = "requires_at_least_one_exploited_or_exploitable_tile"
+				any_tile = { 
+					OR = { 
+						has_blocker = tb_planetary_exploitation_harvest_engine
+						AND = { 
+							has_resource = { type = food amount > 0 } has_any_tile_strategic_resource = no has_pop = no has_growing_pop = no has_blocker = no has_building = no
+						}	
+					}
+				}	
+			}				
+		}
+		hidden_effect = { 
+			if = { limit = { has_modifier = cgm_harvest_1_tile } remove_modifier = cgm_harvest_1_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_2_tile } remove_modifier = cgm_harvest_2_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_3_tile } remove_modifier = cgm_harvest_3_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_4_tile } remove_modifier = cgm_harvest_4_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_5_tile } remove_modifier = cgm_harvest_5_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_6_tile } remove_modifier = cgm_harvest_6_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_7_tile } remove_modifier = cgm_harvest_7_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_8_tile } remove_modifier = cgm_harvest_8_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_9_tile } remove_modifier = cgm_harvest_9_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_10_tile } remove_modifier = cgm_harvest_10_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_11_tile } remove_modifier = cgm_harvest_11_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_12_tile } remove_modifier = cgm_harvest_12_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_13_tile } remove_modifier = cgm_harvest_13_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_14_tile } remove_modifier = cgm_harvest_14_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_15_tile } remove_modifier = cgm_harvest_15_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_16_tile } remove_modifier = cgm_harvest_16_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_17_tile } remove_modifier = cgm_harvest_17_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_18_tile } remove_modifier = cgm_harvest_18_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_19_tile } remove_modifier = cgm_harvest_19_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_20_tile } remove_modifier = cgm_harvest_20_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_21_tile } remove_modifier = cgm_harvest_21_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_22_tile } remove_modifier = cgm_harvest_22_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_23_tile } remove_modifier = cgm_harvest_23_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_24_tile } remove_modifier = cgm_harvest_24_tile }			
+			set_variable = { which = num_of_harvested_tiles value = 0 }
+			every_tile = { 
+				limit = { has_resource = { type = food amount > 0 } has_any_tile_strategic_resource = no has_pop = no has_growing_pop = no has_blocker = no has_building = no }
+				set_blocker = tb_planetary_exploitation_harvest_engine
+			}				
+			every_tile = {
+				limit = { has_blocker = tb_planetary_exploitation_harvest_engine }
+				prev = { change_variable = { which = num_of_harvested_tiles value = 1 } }
+			}			
+			if = { limit = { check_variable = { which = num_of_harvested_tiles value = 1 } } add_modifier = { modifier = cgm_harvest_1_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 2 } } add_modifier = { modifier = cgm_harvest_2_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 3 } } add_modifier = { modifier = cgm_harvest_3_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 4 } } add_modifier = { modifier = cgm_harvest_4_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 5 } } add_modifier = { modifier = cgm_harvest_5_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 6 } } add_modifier = { modifier = cgm_harvest_6_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 7 } } add_modifier = { modifier = cgm_harvest_7_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 8 } } add_modifier = { modifier = cgm_harvest_8_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 9 } } add_modifier = { modifier = cgm_harvest_9_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 10 } } add_modifier = { modifier = cgm_harvest_10_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 11 } } add_modifier = { modifier = cgm_harvest_11_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 12 } } add_modifier = { modifier = cgm_harvest_12_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 13 } } add_modifier = { modifier = cgm_harvest_13_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 14 } } add_modifier = { modifier = cgm_harvest_14_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 15 } } add_modifier = { modifier = cgm_harvest_15_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 16 } } add_modifier = { modifier = cgm_harvest_16_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 17 } } add_modifier = { modifier = cgm_harvest_17_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 18 } } add_modifier = { modifier = cgm_harvest_18_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 19 } } add_modifier = { modifier = cgm_harvest_19_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 20 } } add_modifier = { modifier = cgm_harvest_20_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 21 } } add_modifier = { modifier = cgm_harvest_21_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 22 } } add_modifier = { modifier = cgm_harvest_22_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 23 } } add_modifier = { modifier = cgm_harvest_23_tile }}
+			else_if = { limit = { check_variable = { which = num_of_harvested_tiles value = 24 } } add_modifier = { modifier = cgm_harvest_24_tile }}			
+			planet_event = { id = cgm_planetary_exploitation.30 days = 1800 random = 1800 }
+		}
+	}	
+	option = { 
+		name = end_lanetary_harvest_project.name
+		custom_tooltip = end_lanetary_harvest_project.desc
+		hidden_effect = { 
+			if = { limit = { has_modifier = cgm_harvest_1_tile } remove_modifier = cgm_harvest_1_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_2_tile } remove_modifier = cgm_harvest_2_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_3_tile } remove_modifier = cgm_harvest_3_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_4_tile } remove_modifier = cgm_harvest_4_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_5_tile } remove_modifier = cgm_harvest_5_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_6_tile } remove_modifier = cgm_harvest_6_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_7_tile } remove_modifier = cgm_harvest_7_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_8_tile } remove_modifier = cgm_harvest_8_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_9_tile } remove_modifier = cgm_harvest_9_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_10_tile } remove_modifier = cgm_harvest_10_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_11_tile } remove_modifier = cgm_harvest_11_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_12_tile } remove_modifier = cgm_harvest_12_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_13_tile } remove_modifier = cgm_harvest_13_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_14_tile } remove_modifier = cgm_harvest_14_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_15_tile } remove_modifier = cgm_harvest_15_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_16_tile } remove_modifier = cgm_harvest_16_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_17_tile } remove_modifier = cgm_harvest_17_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_18_tile } remove_modifier = cgm_harvest_18_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_19_tile } remove_modifier = cgm_harvest_19_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_20_tile } remove_modifier = cgm_harvest_20_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_21_tile } remove_modifier = cgm_harvest_21_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_22_tile } remove_modifier = cgm_harvest_22_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_23_tile } remove_modifier = cgm_harvest_23_tile }
+			else_if = { limit = { has_modifier = cgm_harvest_24_tile } remove_modifier = cgm_harvest_24_tile }
+			every_tile = { 
+				limit = { has_blocker = tb_planetary_exploitation_harvest_engine }
+				remove_blocker = yes
+			}	
+		}
+	}			
+}	
+	
+planet_event = { 	
+	id = cgm_planetary_exploitation.40
 	is_triggered_only = yes
 	hide_window = yes
 	
@@ -293,121 +792,113 @@ planet_event = {
 			change_planet_size = 1
 			change_variable = { which = planet_size_var value = 1 }
 			change_variable = { which = cgm_tectonic_engineering value = 1 }
-			planet_event = { id = cgm_planet_specialization.3 }
-			else = { 
-				if = { 
-					limit = { check_variable = { which = cgm_tectonic_engineering value = 1 } }	
-					random_list = { 
-						80 = { 
-							change_planet_size = 1
-							change_variable = { which = planet_size_var value = 1 }
-							change_variable = { which = cgm_tectonic_engineering value = 1 }
-							planet_event = { id = cgm_planet_specialization.3 }
-							modifier = { add = 20 owner = { has_ascension_perk = ap_world_shaper } }
-						}
-						20 = {
-							if = { 
-								limit = { check_variable = { which = cgm_tectonic_engineering_catastrophe value = 0 } }
-								set_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } 
-								else = { change_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
-							}	
-							planet_event = { id = cgm_planet_specialization.4 } 									
-							modifier = { add = 10 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
-							modifier = { add = 20 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 2 } }
-							modifier = { add = 30 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 3 } }
-							modifier = { add = 40 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 4 } }
-							modifier = { factor = 0.5 owner = { has_technology = "advanced_tectonic_engineering" } }
-						}
+			planet_event = { id = cgm_planetary_exploitation.41 }
+		}	
+		else_if = { 
+			limit = { check_variable = { which = cgm_tectonic_engineering value = 1 } }	
+			random_list = { 
+				80 = { 
+					change_planet_size = 1
+					change_variable = { which = planet_size_var value = 1 }
+					change_variable = { which = cgm_tectonic_engineering value = 1 }
+					planet_event = { id = cgm_planetary_exploitation.41 }
+					modifier = { add = 20 owner = { has_ascension_perk = ap_world_shaper } }
+				}					
+				20 = {
+					if = { 
+						limit = { check_variable = { which = cgm_tectonic_engineering_catastrophe value = 0 } }
+						set_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } 						
 					}	
-					else = { 
-						if = { 
-							limit = { check_variable = { which = cgm_tectonic_engineering value = 2 } }	
-							random_list = { 
-								60 = { 
-									change_planet_size = 1
-									change_variable = { which = planet_size_var value = 1 }
-									change_variable = { which = cgm_tectonic_engineering value = 1 }
-									planet_event = { id = cgm_planet_specialization.3 }
-									modifier = { add = 20 owner = { has_ascension_perk = ap_world_shaper } }
-								}
-								40 = {
-									if = { 
-										limit = { check_variable = { which = cgm_tectonic_engineering_catastrophe value = 0 } }
-										set_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } 
-										else = { change_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
-									}	
-									planet_event = { id = cgm_planet_specialization.4 } 		
-									modifier = { add = 10 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
-									modifier = { add = 20 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 2 } }
-									modifier = { add = 30 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 3 } }
-									modifier = { add = 40 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 4 } }									
-									modifier = { factor = 0.5 owner = { has_technology = "advanced_tectonic_engineering" } }
-								}
-							}						
-							else = { 
-								if = { 
-									limit = { check_variable = { which = cgm_tectonic_engineering value = 3 } }	
-									random_list = { 
-										40 = { 
-											change_planet_size = 1
-											change_variable = { which = planet_size_var value = 1 }
-											change_variable = { which = cgm_tectonic_engineering value = 1 }
-											planet_event = { id = cgm_planet_specialization.3 }
-											modifier = { add = 20 owner = { has_ascension_perk = ap_world_shaper } }
-										}
-										60 = {
-											if = { 
-												limit = { check_variable = { which = cgm_tectonic_engineering_catastrophe value = 0 } }
-												set_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } 
-												else = { change_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
-											}	
-											planet_event = { id = cgm_planet_specialization.4 } 	
-											modifier = { add = 10 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
-											modifier = { add = 20 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 2 } }
-											modifier = { add = 30 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 3 } }
-											modifier = { add = 40 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 4 } }											
-											modifier = { factor = 0.5 owner = { has_technology = "advanced_tectonic_engineering" } }
-										}										
-									}	
-									else = { 
-										if = { 
-											limit = { check_variable = { which = cgm_tectonic_engineering value = 4 } }									
-											random_list = { 
-												20 = { 
-													change_planet_size = 1
-													change_variable = { which = planet_size_var value = 1 }
-													change_variable = { which = cgm_tectonic_engineering value = 1 }
-													planet_event = { id = cgm_planet_specialization.3 }
-													modifier = { add = 20 owner = { has_ascension_perk = ap_world_shaper } }
-												}
-												80 = {
-													if = { 
-														limit = { check_variable = { which = cgm_tectonic_engineering_catastrophe value = 0 } }
-														set_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } 
-														else = { change_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
-													}	
-													planet_event = { id = cgm_planet_specialization.4 } 	
-													modifier = { add = 10 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
-													modifier = { add = 20 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 2 } }
-													modifier = { add = 30 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 3 } }
-													modifier = { add = 40 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 4 } }													
-													modifier = { factor = 0.5 owner = { has_technology = "advanced_tectonic_engineering" } }
-												}										
-											}
-										}
-									}	
-								}
-							}	
-						}	
-					}
+					else = { change_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+					planet_event = { id = cgm_planetary_exploitation.42 } 									
+					modifier = { add = 10 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+					modifier = { add = 20 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 2 } }
+					modifier = { add = 30 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 3 } }
+					modifier = { add = 40 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 4 } }
+					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_tectonic_engineering" } }
 				}
+			}	
+		}	
+		else_if = { 
+			limit = { check_variable = { which = cgm_tectonic_engineering value = 2 } }	
+			random_list = { 
+				60 = { 
+					change_planet_size = 1
+					change_variable = { which = planet_size_var value = 1 }
+					change_variable = { which = cgm_tectonic_engineering value = 1 }
+					planet_event = { id = cgm_planetary_exploitation.41 }
+					modifier = { add = 20 owner = { has_ascension_perk = ap_world_shaper } }
+				}
+				40 = {
+					if = { 
+						limit = { check_variable = { which = cgm_tectonic_engineering_catastrophe value = 0 } }
+						set_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } 						
+					}	
+					else = { change_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+					planet_event = { id = cgm_planetary_exploitation.42 } 		
+					modifier = { add = 10 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+					modifier = { add = 20 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 2 } }
+					modifier = { add = 30 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 3 } }
+					modifier = { add = 40 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 4 } }									
+					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_tectonic_engineering" } }
+				}
+			}						
+		}	
+		else_if = { 
+			limit = { check_variable = { which = cgm_tectonic_engineering value = 3 } }	
+			random_list = { 
+				40 = { 
+					change_planet_size = 1
+					change_variable = { which = planet_size_var value = 1 }
+					change_variable = { which = cgm_tectonic_engineering value = 1 }
+					planet_event = { id = cgm_planetary_exploitation.41 }
+					modifier = { add = 20 owner = { has_ascension_perk = ap_world_shaper } }
+				}
+				60 = {
+					if = { 
+						limit = { check_variable = { which = cgm_tectonic_engineering_catastrophe value = 0 } }
+						set_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } 						
+					}	
+					else = { change_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+					planet_event = { id = cgm_planetary_exploitation.42 } 	
+					modifier = { add = 10 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+					modifier = { add = 20 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 2 } }
+					modifier = { add = 30 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 3 } }
+					modifier = { add = 40 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 4 } }											
+					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_tectonic_engineering" } }
+				}										
+			}	
+		}	
+		else_if = { 
+			limit = { check_variable = { which = cgm_tectonic_engineering value = 4 } }									
+			random_list = { 
+				20 = { 
+					change_planet_size = 1
+					change_variable = { which = planet_size_var value = 1 }
+					change_variable = { which = cgm_tectonic_engineering value = 1 }
+					planet_event = { id = cgm_planetary_exploitation.41 }
+					modifier = { add = 20 owner = { has_ascension_perk = ap_world_shaper } }
+				}
+				80 = {
+					if = { 
+						limit = { check_variable = { which = cgm_tectonic_engineering_catastrophe value = 0 } }
+						set_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } 						
+					}	
+					else = { change_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+					planet_event = { id = cgm_planetary_exploitation.42 } 	
+					modifier = { add = 10 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 1 } }
+					modifier = { add = 20 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 2 } }
+					modifier = { add = 30 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 3 } }
+					modifier = { add = 40 check_variable = { which = cgm_tectonic_engineering_catastrophe value = 4 } }													
+					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_tectonic_engineering" } }
+				}										
 			}
-		}				
-	}	
+		}
+	}		
 }		
 
 planet_event = { 	
-	id = cgm_planet_specialization.3
+	id = cgm_planetary_exploitation.41
 	is_triggered_only = yes
 	title = cgm_tectonic_engineering_planet_size_increased.title
 	desc = cgm_tectonic_engineering_planet_size_increased.desc
@@ -426,19 +917,18 @@ planet_event = {
 				check_variable = { which = cgm_tectonic_engineering value < 5 }
 			}				
 		}
-		hidden_effect = { planet_event = { id = cgm_planet_specialization.2 days = 1800 random = 1800 } }
+		hidden_effect = { planet_event = { id = cgm_planetary_exploitation.40 days = 1800 random = 1800 } }
 	}	
 	option = { 
 		name = end_tectonic_engineering_project.name
 		custom_tooltip = end_tectonic_engineering_project.desc
 		hidden_effect = { 
-			remove_planet_flag = cgm_tectonic_engineering
 			remove_modifier = cgm_tectonic_engineering	
 		}
 	}		
 }	
 planet_event = { 	
-	id = cgm_planet_specialization.4
+	id = cgm_planetary_exploitation.42
 	is_triggered_only = yes
 	title = cgm_tectonic_engineering_catastrophic_outcome.title
 	desc = cgm_tectonic_engineering_catastrophic_outcome.desc
@@ -458,45 +948,39 @@ planet_event = {
 						33.3 = { kill_pop = yes remove_building = yes set_blocker = tb_lava_flows } 
 						33.3 = { } 
 					}	
-					else = { 
-						if = { 
-							limit = { has_pop = yes has_building = no }
-							random_list = { 
-								33.3 = { kill_pop = yes } 	
-								33.3 = { kill_pop = yes set_blocker = tb_lava_flows } 
-								33.3 = { } 
-							}						
-							else = { 
-								if = { 
-									limit = { has_pop = no has_building = yes }
-									random_list = { 
-										33.3 = { set_ruined = yes } 	
-										33.3 = { set_ruined = yes set_blocker = tb_lava_flows } 
-										33.3 = { } 
-									}													
-								}
-								else = { 
-									if = { 
-										limit = { has_pop = no has_building = no has_blocker = yes }
-										random_list = { 
-											50 = { } 	
-											50 = { remove_blocker = yes set_blocker = tb_lava_flows } 
-										}													
-									}								
-									else = { 
-										random_list = { 
-											50 = { } 	
-											50 = { set_blocker = tb_lava_flows } 
-										}	
-									}	
-								}
-							}
-						}
-					}
+				}	
+				else_if = { 
+					limit = { has_pop = yes has_building = no }
+					random_list = { 
+						33.3 = { kill_pop = yes } 	
+						33.3 = { kill_pop = yes set_blocker = tb_lava_flows } 
+						33.3 = { } 
+					}					
+				}	
+				else_if = { 
+					limit = { has_pop = no has_building = yes }
+					random_list = { 
+						33.3 = { set_ruined = yes } 	
+						33.3 = { set_ruined = yes set_blocker = tb_lava_flows } 
+						33.3 = { } 
+					}													
 				}
+				else_if = { 
+					limit = { has_pop = no has_building = no has_blocker = yes }
+					random_list = { 
+						50 = { } 	
+						50 = { remove_blocker = yes set_blocker = tb_lava_flows } 
+					}													
+				}								
+				else = { 
+					random_list = { 
+						50 = { } 	
+						50 = { set_blocker = tb_lava_flows } 
+					}	
+				}	
 			}
 		}
-	}	
+	}
 	option = { 
 		name = continue_tectonic_engineering_project.name
 		custom_tooltip = continue_tectonic_engineering_project.desc
@@ -506,7 +990,7 @@ planet_event = {
 				planet_size < 25
 			}		
 		}
-		hidden_effect = { planet_event = { id = cgm_planet_specialization.2 days = 1800 random = 1800 } }
+		hidden_effect = { planet_event = { id = cgm_planetary_exploitation.40 days = 1800 random = 1800 } }
 	}	
 	option = { 
 		name = end_tectonic_engineering_project.name
@@ -518,7 +1002,6 @@ planet_event = {
 			}		
 		}
 		hidden_effect = { 
-			remove_planet_flag = cgm_tectonic_engineering
 			remove_modifier = cgm_tectonic_engineering	
 		}
 	}		
