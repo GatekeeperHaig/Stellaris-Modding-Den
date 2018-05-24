@@ -15,10 +15,8 @@ planet_event = {
 		custom_tooltip = cgm_pe.deep_core_mining.desc
 		custom_gui = "cgm_pe_option"				
 		trigger = { 			
-			NOR = { 
-				has_planet_flag = cgm_deep_core_mining				
-				has_planet_flag = cgm_harvest
-			}
+			NOT = { has_planet_flag = cgm_deep_core_mining }
+			owner = { has_technology = "tech_deep_core_mining" }
 		}
 		allow = { 
 			custom_tooltip = {
@@ -103,10 +101,8 @@ planet_event = {
 		custom_tooltip = cgm_pe.geothermal_tap.desc
 		custom_gui = "cgm_pe_option"				
 		trigger = { 
-			NOR = { 
-				has_planet_flag = cgm_geothermal_tap
-				has_planet_flag = cgm_harvest
-			}
+			NOT = { has_planet_flag = cgm_geothermal_tap }
+			owner = { has_technology = "tech_geothermal_tap" }
 		}
 		allow = { 
 			custom_tooltip = {
@@ -190,12 +186,16 @@ planet_event = {
 		name = cgm_pe.harvest.name
 		custom_tooltip = cgm_pe.harvest.desc
 		custom_gui = "cgm_pe_option"				
-		trigger = { NOT = { has_planet_flag = cgm_harvest } }
+		trigger = { 
+			NOT = { has_planet_flag = cgm_harvest } 
+			owner_is_machine_empire = no
+			owner = { has_technology = "tech_soil_harvest" }
+		}
 		allow = { 
 			custom_tooltip = {
 				fail_text = "requires_3_empty_food_tiles"
 				count_tile = { 
-					limit = { has_deposit = yes has_resource = { type = food amount > 0 } has_pop = no has_growing_pop = no has_blocker = no has_building = no }
+					limit = { has_resource = { type = food amount > 0 } has_any_tile_strategic_resource = no has_pop = no has_growing_pop = no has_blocker = no has_building = no }
 					count > 2
 				}
 			}	
@@ -216,13 +216,9 @@ planet_event = {
 				NOT = { has_planet_flag = cgm_tectonic_engineering }				
 			}				
 			custom_tooltip = {
-				fail_text = "requires_500_minerals"
-				owner = { energy > 499 }				
-			}				
-			custom_tooltip = {
 				fail_text = "requires_500_energy"
 				owner = { energy > 499 }				
-			}							
+			}				
 			custom_tooltip = {
 				fail_text = "requires_50_influence"
 				owner = { influence > 49 }				
@@ -230,41 +226,31 @@ planet_event = {
 		}		
 		hidden_effect = { 
 			set_planet_flag = cgm_harvest
-			add_modifier = cgm_harvest_stage_0
+			add_modifier = cgm_harvest
 			owner = { 
 				add_energy = -500
-				add_minerals = -500
 				add_influence = -50
 			}					
-			planet_event = { id = cgm_planetary_exploitation.30 days = 1800 random = 1800 }						
-			if = { 
-				limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 4 } }
-				random_tile = { 
-					limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 4 }
-					set_blocker = tb_planetary_exploitation_harvest_engine
-				}
-			}	
-			else_if = { 	
-				limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 3 } }				
-				random_tile = { 
-					limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 3 }
-					set_blocker = tb_planetary_exploitation_harvest_engine
-				}					
-			}	
-			else_if = { 
-				limit = { any_tile = { has_building = no has_pop = no has_any_tile_strategic_resource = no num_adjacent_tiles = 2 } }
-				random_tile = { 
-					limit = { has_building = no has_pop = no has_any_tile_strategic_resource = no has_blocker = no num_adjacent_tiles = 2 }
-					set_blocker = tb_planetary_exploitation_harvest_engine
-				}						
+			planet_event = { id = cgm_planetary_exploitation.30 days = 1800 random = 1800 }									
+			set_variable = { which = num_of_harvested_tiles value = 0 }
+			every_tile = { 
+				limit = { has_resource = { type = food amount > 0 } has_any_tile_strategic_resource = no has_pop = no has_growing_pop = no has_blocker = no has_building = no }
+				set_blocker = tb_planetary_exploitation_harvest_engine
 			}
+			every_tile = {
+				limit = { has_blocker = tb_planetary_exploitation_harvest_engine }
+				prev = { change_variable = { which = num_of_harvested_tiles value = 1 } }
+			}	
 		}
 	}	
 	option = { 
 		name = cgm_pe.tectonic_engineering.name
 		custom_tooltip = cgm_pe.tectonic_engineering.desc
 		custom_gui = "cgm_pe_option"				
-		trigger = { NOT = { has_planet_flag = cgm_tectonic_engineering } }
+		trigger = { 
+			NOT = { has_planet_flag = cgm_tectonic_engineering }
+			owner = { has_technology = "tech_tectonic_engineering" }
+		}
 		allow = { 
 			custom_tooltip = {
 				fail_text = "requires_3_empty_tiles"
@@ -351,7 +337,7 @@ planet_event = {
 				}
 				35 = { 
 					planet_event = { id = cgm_planetary_exploitation.12 }
-					modifier = { factor = -0.5 owner = { has_technology = "tech_advanced_deep_core_mining" } }
+					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_deep_core_mining" } }
 				}	
 			}	
 		}
@@ -366,7 +352,7 @@ planet_event = {
 				}
 				55 = { 
 					planet_event = { id = cgm_planetary_exploitation.12 }
-					modifier = { factor = -0.5 owner = { has_technology = "tech_advanced_deep_core_mining" } }
+					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_deep_core_mining" } }
 				}	
 			}	
 		}		
@@ -497,7 +483,7 @@ planet_event = {
 				}
 				35 = { 
 					planet_event = { id = cgm_planetary_exploitation.22 }
-					modifier = { factor = -0.5 owner = { has_technology = "tech_advanced_geothermal_tap" } }
+					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_geothermal_tap" } }
 				}	
 			}	
 		}
@@ -512,7 +498,7 @@ planet_event = {
 				}
 				55 = { 
 					planet_event = { id = cgm_planetary_exploitation.22 }
-					modifier = { factor = -0.5 owner = { has_technology = "tech_advanced_geothermal_tap" } }
+					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_geothermal_tap" } }
 				}	
 			}	
 		}		
@@ -611,6 +597,46 @@ planet_event = {
 		custom_tooltip = cancel_geothermal_tap_level_increase_project.desc		
 	}	
 }
+	
+planet_event = {
+	id = cgm_planetary_exploitation.30
+	is_triggered_only = yes
+	hide_window = yes
+	
+	immediate = { 
+		random_list = { 
+			40 = { 
+				random_tile = {
+					limit = { has_blocker = tb_planetary_exploitation_harvest_engine }
+					remove_blocker = yes
+					set_blocker = tb_depleted_terrain_
+				}
+			}
+			25 = { 
+				while = { 
+					count = 2
+					random_tile = {
+						limit = { has_blocker = tb_planetary_exploitation_harvest_engine }
+						remove_blocker = yes
+						set_blocker = tb_depleted_terrain_
+					}
+				}	
+			}			
+			10 = { 
+				while = { 
+					count = 3
+					random_tile = {
+						limit = { has_blocker = tb_planetary_exploitation_harvest_engine }
+						remove_blocker = yes
+						set_blocker = tb_depleted_terrain_
+					}
+				}	
+				modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_soil_harvest" } }
+			}						
+			25 = { }							
+		}	
+	}
+}	
 	
 planet_event = { 	
 	id = cgm_planetary_exploitation.40

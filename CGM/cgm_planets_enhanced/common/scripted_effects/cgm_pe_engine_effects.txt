@@ -46,14 +46,16 @@ cgm_resource_spawner = {
 		limit = {
 			OR = {
 				is_capital = no
-				AND = { exists = owner owner = { is_country_type = primitive } }
+				AND = { 
+					exists = owner 
+					owner = { is_ai = yes }
+				}
 			}
 			habitable_structure = no
 			planet_is_not_virtual = yes
 			solar_system = {
 				NOR = {
 					has_star_flag = empire_home_system
-					has_star_flag = empire_cluster
 					has_star_flag = sol_system
 					has_star_flag = sol
 					has_star_flag = deneb_system
@@ -263,6 +265,31 @@ cgm_resource_spawner = {
 					limit = { has_blocker = yes has_regular_vanilla_blocker = yes }
 					remove_blocker = yes
 					cgm_pe_tile_blocker_spawn_table = yes
+				}	
+				if = { 
+					limit = { 
+						exists = owner
+						owner = { 
+							OR = { 
+								is_country_type = fallen_empire
+								is_country_type = awakened_fallen_empire
+							}
+						}
+						is_planet_class = pc_gaia
+					}
+					random_list = {
+						50 = { }
+						50 = { 
+							random_tile = {
+								limit = { has_building = no has_pop = no }
+								if = { 
+									limit = { has_blocker = yes }
+									remove_blocker = yes
+								}
+								set_blocker = tb_fe_submerged_city
+							}
+						}
+					}
 				}	
 				set_variable = { which = tb_points value = planet_size_var }
 				random_list = {
