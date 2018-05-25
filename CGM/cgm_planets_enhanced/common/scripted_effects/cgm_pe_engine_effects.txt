@@ -73,14 +73,14 @@ cgm_resource_spawner = {
 				has_strategic_resource = no
 			}
 			random_list = {
-				90 = { }
-				10 = {
+				96 = { }
+				4 = {
 					 #save_event_target_as = orbital_resource_candidate
 					cgm_pe_orbital_sr_spawn_table = yes
-					modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
-					modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
-					modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
+					modifier = { factor = 0.25 has_global_flag = cgm_very_low_strategic_resources }
+					modifier = { factor = 0.5 has_global_flag = cgm_low_strategic_resources }
 					modifier = { factor = 1.5 has_global_flag = cgm_high_strategic_resources }
+					modifier = { factor = 2 has_global_flag = cgm_very_high_strategic_resources }
 				}
 			}
 		}	
@@ -482,48 +482,23 @@ cgm_set_terraformer = {
 		25 = { set_variable = { which = planet_size_var value = 25 } }
 	}
 	set_variable = { which = sr_points value = 0 }
-	every_tile = {
-		limit = { has_any_tile_strategic_resource = yes }
-		prev = { change_variable = { which = sr_points value = -1 } }
-	}
 	random_list = {
-		60 = {
+		80 = {
 			change_variable = { which = sr_points value = 0 }
 			modifier = { factor = 1.5 has_global_flag = cgm_very_low_strategic_resources }
 			modifier = { factor = 1.25 has_global_flag = cgm_low_strategic_resources }
 			modifier = { factor = 0.75 has_global_flag = cgm_high_strategic_resources }
 			modifier = { factor = 0.5 has_global_flag = cgm_very_high_strategic_resources }
 		}
-		20 = {
+		15 = {
 			change_variable = { which = sr_points value = 1 }
 			modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
 			modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
 			modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
 			modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }
 		}
-		12 = {
-			change_variable = { which = sr_points value = 2 }
-			modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
-			modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
-			modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
-			modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }
-		}
 		5 = {
-			change_variable = { which = sr_points value = 3 }
-			modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
-			modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
-			modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
-			modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }
-		}
-		2 = {
-			change_variable = { which = sr_points value = 4 }
-			modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
-			modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
-			modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
-			modifier = { factor = 1.5 has_global_flag = cgm_very_high_strategic_resources }
-		}
-		1 = {
-			change_variable = { which = sr_points value = 5 }
+			change_variable = { which = sr_points value = 2 }
 			modifier = { factor = 0.5 has_global_flag = cgm_very_low_strategic_resources }
 			modifier = { factor = 0.75 has_global_flag = cgm_low_strategic_resources }
 			modifier = { factor = 1.25 has_global_flag = cgm_high_strategic_resources }
@@ -540,15 +515,7 @@ cgm_set_terraformer = {
 					limit = { has_deposit = no has_building = no }
 					cgm_pe_planetary_sr_spawn_table = yes
 				}
-			}	
-			else_if = {
-				limit = { any_tile = { has_building = no has_regular_vanilla_deposit = yes } }
-				random_tile = { limit = { has_building = no } cgm_pe_planetary_sr_spawn_table = yes }
-			}	
-			else_if = {
-				limit = { any_tile = { has_regular_vanilla_deposit = yes } }
-				random_tile = { limit = { has_regular_vanilla_deposit = yes } cgm_pe_planetary_sr_spawn_table = yes }			
-			}
+			}				
 		}
 	}
 	set_variable = { which = tb_points value = planet_size_var }
@@ -606,21 +573,65 @@ cgm_set_terraformer = {
 			count = tb_points
 			random_tile = {
 				limit = { has_building = no has_blocker = no has_pop = no }
-				cgm_pe_tile_blocker_spawn_table = yes
+				if = { 
+					limit = { prev = { is_planet_class_pc_barren_terraforming = yes } }
+					random_list = {
+						50 = { set_blocker = tb_pc_barren_terraforming_dust_steppe }
+						50 = { set_blocker = tb_pc_barren_terraforming_inactive_volcano }
+					}
+				}
+				else_if = { 
+					limit = { prev = { is_planet_class_pc_barren_cold_terraforming = yes } }
+					random_list = {
+						50 = { set_blocker = tb_pc_barren_terraforming_rugged_land }
+						50 = { set_blocker = tb_pc_barren_terraforming_wind_mountains }
+					}					
+				}	
+				else_if = { 
+					limit = { prev = { is_planet_class_pc_molten_terraforming = yes } }
+					random_list = {
+						50 = { set_blocker = tb_pc_molten_terraforming_magma_river }
+						50 = { set_blocker = tb_pc_molten_terraforming_pyroclastic_terrain }
+					}					
+				}				
+				else_if = { 
+					limit = { prev = { is_planet_class_pc_toxic_terraforming = yes } }
+					random_list = {
+						50 = { set_blocker = tb_pc_toxic_sulphoric_flora }
+						50 = { set_blocker = tb_pc_toxic_terraforming_noxious }
+					}					
+				}		
+				else_if = { 
+					limit = { prev = { is_planet_class_pc_frozen_terraforming = yes } }
+					random_list = {
+						50 = { set_blocker = tb_pc_frozen_terraforming_deep_valley }
+						50 = { set_blocker = tb_pc_frozen_terraforming_frozen_desolation }
+					}					
+				}					
+				else_if = { 
+					limit = { prev = { is_planet_class_pc_hothouse_terraforming = yes } }
+					random_list = {
+						50 = { set_blocker = tb_pc_hot_greenhouse_terraforming_rugged_terrain }
+						50 = { set_blocker = tb_pc_hot_greenhouse_terraforming_stormfield }
+					}					
+				}					
+				else_if = { 
+					limit = { prev = { is_planet_class_pc_cold_greenhouse_terraforming = yes } }
+					random_list = {
+						50 = { set_blocker = tb_pc_cold_greenhouse_terraforming_rugged_land }
+						50 = { set_blocker = tb_pc_cold_greenhouse_terraforming_sufuric_vents }
+					}					
+				}									
+				else_if = { 
+					limit = { prev = { is_planet_class_pc_hot_greenhouse_terraforming = yes } }
+					random_list = {
+						50 = { set_blocker = tb_pc_hot_greenhouse_terraforming_rugged_terrain }
+						50 = { set_blocker = tb_pc_hot_greenhouse_terraforming_stormfield }
+					}					
+				}									
 			}
 		}
 	}	
-	else_if = {
-		limit = { check_variable = { which = tb_points value < 0 } }
-		while = {
-			limit = {
-				check_variable = { which = tb_points value < 0 }
-				any_tile = { has_regular_vanilla_blocker = yes }
-			}
-			random_tile = { limit = { has_regular_vanilla_blocker = yes } remove_blocker = yes }
-			change_variable = { which = tb_points value = 1 }
-		}
-	}
 	set_variable = { which = dep_points value = planet_size_var }
 	random_list = {
 		20 = {
@@ -692,7 +703,8 @@ cgm_set_terraformer = {
 		}
 	}
 	set_planet_flag = cgm_terraforming_planet
-	 #planet_event = { id = cgm_terraforming.1 days = 360 }
+	set_variable = { which = cgm_terraforming_years value = 0 }
+	planet_event = { id = cgm_terraforming.1 days = 360 }
 }
  #the effects below run on tile scope
 roll_mineral_deposit = {
