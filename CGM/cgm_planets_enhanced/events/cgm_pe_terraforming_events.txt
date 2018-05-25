@@ -1,0 +1,89 @@
+namespace = cgm_pe_terraforming_events
+
+planet_event = { 
+	id = cgm_pe_terraforming_events.1
+	is_triggered_only = yes
+	hide_window = yes
+	
+	trigger = { has_planet_flag = cgm_terraforming_planet }
+	
+	immediate = { 
+		if = { 
+			limit = { 
+				any_tile = { 
+					has_building = building_terraformer
+				}
+				exists = owner 
+				OR = { 
+					has_planet_flag = baseline_terraformer_speed
+					has_planet_flag = increased_terraformer_speed
+					has_planet_flag = maximal_terraformer_speed
+				}	
+			}	
+			change_variable = { which = cgm_terraforming_years value = 1 }
+			if = { 
+				limit = { 
+					any_tile = { has_cgm_terraforming_blocker = yes }
+				}
+				40 = { 
+					random_tile = { 
+						limit = { has_cgm_terraforming_blocker = yes }
+						remove_blocker = yes
+					}	
+					modifier = { factor = 1.25 has_planet_flag = increased_terraformer_speed }
+					modifier = { factor = 1.5 has_planet_flag = maximal_terraformer_speed }
+				}
+				60 = { }
+			}	
+			if = { 
+				limit = { 
+					NOT = { any_tile = { has_cgm_terraforming_blocker = yes } } 
+					check_variable = { which = cgm_terraforming_years value > 25 }	
+				}
+				remove_planet_flag = cgm_terraforming_planet
+				set_planet_flag = cgm_terraformed_planet
+				planet_event = { id = cgm_pe_terraforming_events.2 }				
+			}	
+			else = { planet_event = { id = cgm_pe_terraforming_events.1 days = 360 } }
+		}	
+		else = { planet_event = { id = cgm_pe_terraforming_events.1 days = 360 } }
+	}
+}	
+
+planet_event = {
+	id = cgm_pe_terraforming_events.2
+	is_triggered_only = yes
+	picture = GFX_evt_alien_planet
+	title = cgm_terraforming_successful.title
+	desc = cgm_terraforming_successful.desc	
+	
+	immediate = { 
+		remove_planet_flag = baseline_terraformer_speed
+		remove_planet_flag = increased_terraformer_speed
+		remove_planet_flag = maximal_terraformer_speed
+		random_tile = {
+			limit = { has_building = building_terraformer }
+			remove_building = yes										
+		}		
+		if = { 
+			limit = { is_planet_class_pc_barren_terraforming = yes }
+			change_pc = pc_arid
+		}
+		else_if = { 	
+			limit = { is_planet_class_pc_barren_cold_terraforming = yes }
+			change_pc = pc_tundra
+		}	
+		else_if = { 	
+			limit = { is_planet_class_pc_molten_terraforming = yes }
+			change_pc = pc_desert
+		}		
+		else_if = { 	
+			limit = { is_planet_class_pc_toxic_terraforming = yes }
+			change_pc = pc_continental
+		}			
+		else_if = { 	
+			limit = { is_planet_class_pc_frozen_terraforming = yes }
+			change_pc = pc_arctic
+		}			
+	}
+	option = { name = OK }
