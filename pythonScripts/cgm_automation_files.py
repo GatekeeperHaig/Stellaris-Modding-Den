@@ -415,7 +415,7 @@ def main():
   specialResourcePossible.variableOp("set", "cgm_curWeight", 50)
   specialResourcePossible.variableOp("set", "cgm_curType", len(weightTypes)+1)
 
-  everyTileSearchNoSpecial=everyTileSearchSub.addReturn("else")
+  everyTileSearchNoSpecial=everyTileSearch.addReturn("else")
 
   everyTileSearchNoSpecial.add("calculate_tile_weight","yes")
   everyTileSearchNoSpecial=everyTileSearchNoSpecial.addReturn("prev")
