@@ -1,0 +1,770 @@
+# Do not remove or rename this
+
+# Possible Variables for Buildings:
+# strategic_resource: strategic resource, deprecated, strategic resource used by the building.
+# allow: trigger to check for allowing construction of building.
+# prerequisites: Tech requirements for building.
+# empire_unique: boolean, can only build one if set to true.
+# cost: resource table, cost of building.
+# is_orbital: boolean, can only be built in orbital station.
+# modifier: modifier, deprecated, applies a modifier to planet; use planet_modifier instead.
+# planet_modifier, country_modifier, army_modifier: applies modifier to planet/country/armies
+# triggered_planet_modifier = { key (optional), potential (scope: planet), modifier }: applies conditional modifier to planet
+# base_buildtime: int, number of days for construction.
+# requires_pop, boolean, building will require a pop for production.
+# required_resources, resource table, required resources for production.
+# produced_resources, resource table, produced resources in production.
+# upgrades, buildings list, buildings this building can upgrade into.
+# is_listed, boolean, toggles if this building is shown in the non-upgrade buildable list.
+# planet_unique, toggles if one can build multiple of this type on a single planet.
+# ai_weight, weight for AI, default is set to one, weight set to 0 means that AI will never build it
+# is_colony: trigger to check if the building is a colony shelter for country (scope: country, from: planet). default: "always = no"
+# active: trigger to check if a building can be active with a given pop worker (scope: pop) if you add a trigger here, you should also add the requirements in the description
+# show_tech_unlock_if: trigger to show this building only conditionally in the technology screen. scope: country. default: { always = yes }
+# planet_modifier_with_pop_trigger = { key (optional), potential (scope: pop), modifier }: applies modifier to pops on planet that satisfy condition in trigger
+
+#
+# BALANCE
+# can change the time and cost of all common buildings with these variables below
+
+@b0time = 120
+@b0cost = 30
+@b0effect = 1
+@b0upkeep = 0.5
+
+@b1time = 210
+@b1cost = 60
+@b1effect = 2
+@b1upkeep = 1
+
+@b2time = 180
+@b2cost = 90
+@b2effect = 3
+@b2upkeep = 1.5
+
+@b3time = 180
+@b3cost = 120
+@b3effect = 4
+@b3upkeep = 2
+
+@b4time = 180
+@b4cost = 150
+@b4effect = 5
+@b4upkeep = 2.5
+
+@b5time = 180
+@b5cost = 180
+@b5effect = 8
+@b5upkeep = 3
+
+@science1 = 1
+@science2 = 2
+@science3 = 3
+@science4 = 4
+@science5 = 6
+
+@natural_equilibrium_happiness = 0.02
+
+
+########################
+### Shroud buildings ###
+########################
+
+building_shroud_capacitor = {
+	base_buildtime = 1000
+	planet_unique = yes
+	
+	cost = {
+		minerals = 1000
+		energy = 1000
+		influence = 100
+	}
+	
+	required_resources = {
+		energy = 10
+		unity = 10
+	}
+	
+	planet_modifier = {
+		tile_resource_energy_mult = 0.10
+		tile_resource_minerals_mult = 0.10
+		tile_resource_engineering_research_mult = 0.10
+		tile_resource_physics_research_mult = 0.10
+		tile_resource_society_research_mult = 0.10
+		pop_happiness = 0.05
+	}
+
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+	}
+
+	destroy_if = {
+		OR = {
+			AND = {
+				exists = owner
+				owner = { has_authority = auth_machine_intelligence }
+			}
+		}
+	}
+	
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+		}
+	}
+	prerequisites = {
+		"tech_shroud_container"
+	}
+	
+	ai_weight = {
+		weight = 1	
+	}
+}
+
+building_virtual_capital = {
+	base_buildtime = 100	
+	planet_unique = yes
+	capital = yes
+	
+	cost = {
+		energy = 150
+	}
+	
+	produced_resources = {
+		energy = 12
+		unity = 5
+	}
+	
+	potential = {
+		planet = {		
+			is_planet_class = pc_virtual_world
+		}	
+	}
+	
+	ai_replace = no
+}
+
+building_super_adventure_building = {
+	base_buildtime = 180
+	planet_unique = yes
+	
+	cost = {
+		energy = 1000
+		unity = 50
+	}
+	
+	potential = {
+		planet = {		
+			is_planet_class = pc_virtual_world
+		}	
+	}
+
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_virtual_capital"
+			planet = {
+				OR = {
+					has_building = "building_virtual_capital"
+				}
+			}
+		}
+	}
+	
+	produced_resources = {
+		unity = 9
+	}
+	
+	required_resources = {
+		energy = 5
+	}
+
+	ai_weight = {
+		factor = 1
+	}
+	
+	ai_allow = {
+		is_slave_tile_or_planet = no
+	}	
+}
+
+building_virtual_science_lab = {
+	base_buildtime = 180
+	
+	cost = {
+		energy = 1000
+		unity = 50
+	}
+	
+	potential = {
+		planet = {		
+			is_planet_class = pc_virtual_world
+		}	
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_virtual_capital"
+			planet = {
+				OR = {
+					has_building = "building_virtual_capital"
+				}
+			}
+		}
+	}
+	
+	produced_resources = {
+		engineering_research = 4
+		physics_research = 4
+		society_research = 4
+	}
+	
+	required_resources = {
+		energy = 5
+	}
+
+	ai_weight = {
+		factor = 1
+	}
+	
+	ai_allow = {
+		is_slave_tile_or_planet = no
+	}	
+}
+
+building_virtual_bank = {
+	base_buildtime = 180
+	
+	cost = {
+		energy = 1000
+		unity = 50
+	}
+	
+	potential = {
+		planet = {		
+			is_planet_class = pc_virtual_world
+		}	
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_virtual_capital"
+			planet = {
+				OR = {
+					has_building = "building_virtual_capital"
+				}
+			}
+		}
+	}
+	
+	produced_resources = {
+		energy = 7
+	}
+	
+	required_resources = {
+		unity = 5
+	}
+
+	ai_weight = {
+		factor = 1
+	}
+	
+	ai_allow = {
+		is_slave_tile_or_planet = no
+	}	
+}
+
+building_virtual_energy_storage = {
+	base_buildtime = 180
+	
+	cost = {
+		energy = 1000
+		unity = 50
+	}
+	
+	potential = {
+		planet = {		
+			is_planet_class = pc_virtual_world
+		}	
+	}
+
+	country_modifier = {
+		max_energy = 2500
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_virtual_capital"
+			planet = {
+				OR = {
+					has_building = "building_virtual_capital"
+				}
+			}
+		}
+	}
+
+	planet_modifier = {
+		pop_citizen_happiness = -0.025
+	}
+	
+	required_resources = {
+		energy = 5
+	}
+
+	ai_weight = {
+		factor = 1
+	}
+	
+	ai_allow = {
+		is_slave_tile_or_planet = no
+	}	
+}
+
+building_outside_connection = {
+	base_buildtime = 180
+	planet_unique = yes
+	
+	cost = {
+		energy = 1000
+		unity = 50
+	}
+	
+	potential = {
+		planet = {		
+			is_planet_class = pc_virtual_world
+		}	
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_virtual_capital"
+			planet = {
+				OR = {
+					has_building = "building_virtual_capital"
+				}
+			}
+		}
+	}
+	
+	planet_modifier = {
+		pop_citizen_happiness = 0.10
+	}
+
+	produced_resources = {
+		unity = 10
+	}
+	
+	required_resources = {
+		energy = 5
+	}
+
+	ai_weight = {
+		factor = 1
+	}
+	
+	ai_allow = {
+		is_slave_tile_or_planet = no
+	}	
+}
+
+building_virtual_city = {
+	base_buildtime = 180
+	
+	cost = {
+		energy = 750
+		unity = 50
+	}
+
+	potential = {
+		planet = {		
+			is_planet_class = pc_virtual_world
+		}	
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_building_virtual_capital"
+			planet = {
+				OR = {
+					has_building = "building_virtual_capital"
+				}
+			}
+		}
+	}
+
+	produced_resources = {
+		unity = 2
+		energy = 3
+	}
+
+	ai_weight = {
+		factor = 1
+	}
+	
+	ai_allow = {
+		is_slave_tile_or_planet = no
+	}	
+}
+
+building_pure_purplarium_power_plant = {
+	base_buildtime = 250
+	
+	cost = {
+		minerals = 250
+	}
+	
+	potential = {
+		owner = {
+			has_country_flag = found_purplarium
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			NOT = { is_planet_class = pc_virtual_world }	
+		}
+	}
+	
+	produced_resources = {
+		energy = 35
+		physics_research = 10
+	}
+	
+	required_resources = {
+		minerals = 5
+		sr_pure_purplarium = 0.5
+	}
+	
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_2"
+					planet = {
+						OR = {
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_2"
+					planet = {
+						OR = {
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	ai_allow = {
+		always = yes
+	}
+	
+	ai_weight = {
+		weight = 10	
+	}
+}
+
+building_osat_habitat = {
+	is_listed = no
+
+	allow = {
+		always = no
+	}
+	
+	produced_resources = {
+		unity = 5
+		society_research = 10
+	}
+	
+	required_resources = {
+		energy = 2
+	}	
+	
+	prerequisites = {
+	}
+	
+	ai_replace = no
+	event_building = yes
+}
+
+building_iodizium_plant = {
+	base_buildtime = 350
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }	
+		}
+	}
+	
+	cost = {
+		minerals = 500
+	}
+	
+	produced_resources = {
+		energy = 10
+	}
+	
+	required_resources = {
+		sr_iodizium = 1
+	}
+	
+	prerequisites = {
+		"tech_fusion_disruption"
+	}
+	
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			custom_tooltip = {
+				text = "requires_building_machine_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+		}
+	}
+	
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+	}
+
+	ai_weight = {
+		factor = 1
+	}
+}
+
+building_iodizium_research = {
+	base_buildtime = 350
+	planet_unique = yes
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+		}
+	}
+	
+	cost = {
+		minerals = 600
+	}
+	
+	produced_resources = {
+		engineering_research = 10
+		physics_research = 10
+		society_research = 10
+	}
+
+	planet_modifier  = {
+		tile_resource_engineering_research_mult = 0.15
+		tile_resource_society_research_mult = 0.15
+		tile_resource_physics_research_mult = 0.15
+	}
+	
+	required_resources = {
+		sr_iodizium = 1
+		energy = 10
+	}
+	
+	prerequisites = {
+		"tech_fusion_disruption"
+	}
+	
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			custom_tooltip = {
+				text = "requires_building_machine_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+		}
+	}
+	
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+	}
+
+	ai_weight = {
+		factor = 1
+	}
+}
+
+building_kugelblitz_tower = {
+	base_buildtime = 250
+	planet_unique = yes
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			NOT = { is_planet_class = pc_virtual_world }	
+		}
+	}
+	
+	cost = {
+		minerals = 350
+	}
+	
+	produced_resources = {
+		energy = 10
+		physics_research = 5
+	}
+
+	adjacency_bonus = {
+		tile_building_resource_energy_add = 3
+		tile_building_resource_physics_research_add = 1
+	}
+	
+	planet_modifier  = {
+		tile_resource_energy_mult = 0.125
+		tile_resource_physics_research_mult = 0.05
+	}
+	
+	required_resources = {
+		sr_kugelblitz = 1
+	}
+	
+	prerequisites = {
+		"tech_kugelblitz_generator"
+	}
+	
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			custom_tooltip = {
+				text = "requires_building_machine_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+		}
+	}
+	
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+	}
+
+	ai_weight = {
+		factor = 1
+	}
+}

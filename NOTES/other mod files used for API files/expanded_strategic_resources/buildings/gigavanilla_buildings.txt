@@ -1,0 +1,596 @@
+# Do not remove or rename this
+
+# Possible Variables for Buildings:
+# strategic_resource: strategic resource, deprecated, strategic resource used by the building.
+# allow: trigger to check for allowing construction of building.
+# prerequisites: Tech requirements for building.
+# empire_unique: boolean, can only build one if set to true.
+# cost: resource table, cost of building.
+# is_orbital: boolean, can only be built in orbital station.
+# modifier: modifier, deprecated, applies a modifier to planet; use planet_modifier instead.
+# planet_modifier, country_modifier, army_modifier: applies modifier to planet/country/armies
+# triggered_planet_modifier = { key (optional), potential (scope: planet), modifier }: applies conditional modifier to planet
+# base_buildtime: int, number of days for construction.
+# requires_pop, boolean, building will require a pop for production.
+# required_resources, resource table, required resources for production.
+# produced_resources, resource table, produced resources in production.
+# upgrades, buildings list, buildings this building can upgrade into.
+# is_listed, boolean, toggles if this building is shown in the non-upgrade buildable list.
+# planet_unique, toggles if one can build multiple of this type on a single planet.
+# ai_weight, weight for AI, default is set to one, weight set to 0 means that AI will never build it
+# is_colony: trigger to check if the building is a colony shelter for country (scope: country, from: planet). default: "always = no"
+# active: trigger to check if a building can be active with a given pop worker (scope: pop) if you add a trigger here, you should also add the requirements in the description
+# show_tech_unlock_if: trigger to show this building only conditionally in the technology screen. scope: country. default: { always = yes }
+# planet_modifier_with_pop_trigger = { key (optional), potential (scope: pop), modifier }: applies modifier to pops on planet that satisfy condition in trigger
+
+#
+# BALANCE
+# can change the time and cost of all common buildings with these variables below
+
+@b0time = 120
+@b0cost = 30
+@b0effect = 1
+@b0upkeep = 0.5
+
+@b1time = 210
+@b1cost = 60
+@b1effect = 2
+@b1upkeep = 1
+
+@b2time = 180
+@b2cost = 90
+@b2effect = 3
+@b2upkeep = 1.5
+
+@b3time = 180
+@b3cost = 120
+@b3effect = 4
+@b3upkeep = 2
+
+@b4time = 180
+@b4cost = 150
+@b4effect = 5
+@b4upkeep = 2.5
+
+@b5time = 180
+@b5cost = 180
+@b5effect = 8
+@b5upkeep = 3
+
+@science1 = 1
+@science2 = 2
+@science3 = 3
+@science4 = 4
+@science5 = 6
+
+@natural_equilibrium_happiness = 0.02
+
+building_fortress = {
+	base_buildtime = 180
+	is_listed = no
+	defense_armies = 5
+	protects_from_bombardment = yes
+	
+	planetary_ftl_inhibitor = yes
+	
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			NOT = { is_planet_class = pc_virtual_world }
+		}
+	}
+	
+	prerequisites = {
+		"tech_global_defense_grid"
+	}
+	
+	cost = {
+		minerals = 500
+	}
+	
+	produced_resource_trigger = {
+		modifier = {		
+			has_valid_civic = civic_citizen_service
+			resources = {
+				unity = 1
+			}
+		}
+	}
+	
+	produced_resources = {
+		unity = 2
+	}
+	
+	required_resources = {
+		energy = 4
+	}
+	
+	planet_modifier = {
+		planet_unrest_add = -50
+	}
+	
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			custom_tooltip = {
+				text = "requires_building_machine_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 0
+			years_passed < 25
+		}
+		modifier = {
+			factor = 0
+			planet = { 
+				unrest < 50
+				sector_controlled = yes 
+				owner = { is_ai = no }
+			}
+			NOR = { 
+				has_building = "building_stronghold" 
+				has_building = "building_fortress"
+			}
+		}		
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 12
+						OR = {
+							has_building = "building_capital_1"
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"	
+							has_building = "building_machine_capital_1"
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"							
+						}							
+					}				
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 16
+						OR = {
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"	
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"							
+						}						
+					}					
+				}
+				count_tile = {
+					limit = {
+						OR = {
+							has_building = building_stronghold
+							has_building = building_fortress
+						}
+					}
+					count > 0					
+				}				
+			}
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				NOR = {
+					unrest > 50
+					AND = {
+						planet_size > 20
+						OR = {
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"	
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"							
+						}						
+					}				
+				}
+				count_tile = {
+					limit = {
+						OR = {
+							has_building = building_stronghold
+							has_building = building_fortress
+						}
+					}
+					count > 1					
+				}				
+			}
+		}	
+		modifier = {
+			factor = 0
+			planet = {
+				count_tile = {
+					limit = {
+						OR = {
+							has_building = building_stronghold
+							has_building = building_fortress
+						}
+					}
+					count > 2					
+				}
+			}
+		}
+	}
+}
+
+building_capital_1 = {
+	base_buildtime = 360	
+	planet_unique = yes
+	capital = yes
+	level = 1
+	defense_armies = 3
+	
+	cost = {
+		minerals = 350
+	}
+	
+	produced_resources = {
+		energy = 4
+		unity = 1
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			OR = {
+				has_non_swapped_tradition = tr_expansion_colonization_fever
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+				has_swapped_tradition = tr_expansion_colonization_fever_hive
+			}
+			resources = {
+				unity = 1
+			}
+		}
+	}
+	
+	adjacency_bonus = {
+		tile_building_resource_minerals_add = 1
+		tile_building_resource_food_add = 1
+		tile_building_resource_energy_add = 1
+	}
+	
+	planet_modifier = {
+		pop_government_ethic_attraction = 0.15
+	}
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			NOT = { is_planet_class = pc_virtual_world }
+		}	
+	}
+
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	
+	allow = {
+		custom_tooltip = {
+			text = "requires_pops_5"
+			planet = {
+				count_pops = {
+					count > 4
+					limit = {
+						is_colony_pop = yes
+					}
+				}
+			}
+		}
+	}
+	
+	upgrades = {
+		building_capital_2
+	}
+	
+	prerequisites = {
+		"tech_planetary_government"
+	}
+
+	ai_replace = no
+}
+
+building_colony_shelter = {
+	base_buildtime = 180	
+	planet_unique = yes
+	capital = yes
+	level = 0
+	defense_armies = 1
+	
+	cost = {
+	}
+	
+	produced_resources = {
+		energy = 1
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			OR = {
+				has_non_swapped_tradition = tr_expansion_colonization_fever
+				has_swapped_tradition = tr_expansion_colonization_fever_machine
+				has_swapped_tradition = tr_expansion_colonization_fever_hive
+			}
+			resources = {
+				unity = 1
+			}
+		}
+	}
+	
+	planet_modifier = {
+		pop_government_ethic_attraction = 0.05
+	}
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			NOT = { is_planet_class = pc_virtual_world }
+		}	
+		planet = {
+			NOT = {
+				has_building = building_colony_shelter
+				has_building = building_capital_1
+				has_building = building_capital_2
+				has_building = building_capital_3
+			}
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	
+	upgrades = {
+		building_capital_1
+	}
+	
+	ai_replace = no
+}
+
+building_basic_science_lab_1 = {
+	base_buildtime = @b1time
+	
+	cost = {
+		minerals = @b1cost
+	}
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			NOT = { is_planet_class = pc_virtual_world }
+		}
+	}
+	
+	produced_resources = {
+		engineering_research = @science1
+		physics_research = @science1
+		society_research = @science1
+	}
+	
+	required_resources = {
+		energy = @b1upkeep
+	}
+	
+	upgrades = {
+		building_engineering_facility_1
+		building_physics_lab_1
+		building_biolab_1
+	}	
+	
+	prerequisites = {
+		"tech_basic_science_lab_1"
+	}	
+	
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+		
+		# If planet only has slaves/robots, keep it to mining and farming...
+		is_slave_tile_or_planet = no		
+	}
+
+	ai_weight = {
+		factor = 1
+	}
+}
+
+building_autochthon_monument = {
+	base_buildtime = 180
+	planet_unique = yes
+	
+	cost = {
+		minerals = 100
+	}
+	
+	show_tech_unlock_if = { 
+		NOR = {
+			has_ethic = ethic_spiritualist		
+			has_ethic = ethic_fanatic_spiritualist
+			has_authority = auth_machine_intelligence
+		}
+	}
+
+	potential = {
+		owner = {
+			NOR = {
+				has_ethic = ethic_spiritualist		
+				has_ethic = ethic_fanatic_spiritualist
+				has_authority = auth_machine_intelligence
+			}
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }
+			NOT = { is_planet_class = pc_virtual_world }
+			NOR = {
+				has_building = building_temple
+				has_building = building_holotemple				
+				has_building = building_citadel_of_faith
+				has_building = building_sacred_nexus
+			}
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	
+	produced_resources = {
+		unity = 2
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	prerequisites = {
+		"tech_cultural_heritage"
+	}	
+	
+	upgrades = {
+		building_heritage_site
+	}
+	
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+	}
+
+	ai_weight = {
+		factor = 1
+	}
+	
+	ai_allow = {
+		# If planet only has slaves/robots, keep it to mining and farming...
+		is_slave_tile_or_planet = no
+	}	
+}
+
+building_clinic = {
+	base_buildtime = 360
+	planet_unique = yes
+	
+	cost = {
+		minerals = 150
+	}
+
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_virtual_world }
+		}
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+	}
+
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	produced_resources = {
+		society_research = 2
+		unity = 1
+	}
+	
+	planet_modifier = {
+		pop_growth_speed = 0.1
+	}
+	
+	prerequisites = {
+		"tech_frontier_health"
+	}
+	
+	upgrades = {
+		building_hospital
+	}
+	
+	ai_allow = {
+		NOR = {
+			has_resource = {
+				type = sr_betharian
+				amount > 0
+			}	
+			has_resource = {
+				type = sr_alien_pets
+				amount > 0
+			}				
+		}
+		
+		# If planet only has slaves/robots, keep it to mining and farming...
+		is_slave_tile_or_planet = no
+		is_robot_tile_or_planet = no
+	}
+
+	ai_weight = {
+		factor = 10
+	}
+}
