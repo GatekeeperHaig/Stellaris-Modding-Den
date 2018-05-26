@@ -237,8 +237,7 @@ def main():
       for varToMove in varsToMove:
         locSubIf.variableOp("set", "cgm_best"+varToMove+"_{!s}".format(k-1),"cgm_best"+varToMove+"_{!s}".format(k))
     locSubIf.variableOp("set", "cgm_bestWeight_{!s}".format(j), 0)
-    curSubLevel=TagList()
-    locSubIf.add("else", curSubLevel)
+    curSubLevel=curSubLevel.addReturn("else") #fixed 2.1
   curSubLevel.variableOp("set", "cgm_bestWeight_1".format(j), 0)
     # ifTypeBest.add("Find correct tile and build")
 
@@ -290,7 +289,7 @@ def main():
     if "check_pop_traits" in name:
       if name=="check_pop_traits_additional_traits":
         popTraits.createReturnIf(TagList("additional_traits_enabled", "no")).add("check_vanilla_pop_traits", yes)
-        popTraits.add("else", TagList(name, yes))
+        popTraits.add("else", TagList(name, yes)) #fixed 2.1
       else:
         popTraits.add(name,"yes")
   popTraits.add("vanilla_pop_modifiers",yes)
