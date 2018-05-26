@@ -14,71 +14,74 @@ event = {
 	#This event fires only once.
 	immediate = {
 		set_global_flag = planetary_diversity_active #this sets a global flag for this mod, to be used by other mods and the engine
-		#spawn_unique_planets = yes
-		every_planet = {
-			limit = { is_star = yes }
-			if = {
-				limit = {
-					solar_system = {
-						NOT = {
-							any_planet = {
-								NOT = { is_same_value = this }
-								has_planet_flag = system_star_1
+		if = { 
+			limit = { NOT = { has_global_flag = new_worlds_active } }
+			#spawn_unique_planets = yes
+			every_planet = {
+				limit = { is_star = yes }
+				if = {
+					limit = {
+						solar_system = {
+							NOT = {
+								any_planet = {
+									NOT = { is_same_value = this }
+									has_planet_flag = system_star_1
+								}
 							}
 						}
 					}
-				}
-				set_planet_flag = system_star_1
-			}	
-			else_if = {
-				limit = {
-					solar_system = {
-						NOT = {
-							any_planet = {
-								NOT = { is_same_value = this }
-								has_planet_flag = system_star_2
-							}
-						}
-					}
-				}
-				set_planet_flag = system_star_2
-			}	
-			else = {				
-				set_planet_flag = system_star_3
-			}
-		}	
-		every_planet = { 			
-			limit = { is_planet_class = pc_gas_giant has_moon = yes }
-			every_moon = { set_planet_flag = gas_giant_moon }
-		}
-		every_planet = { 	
-			limit = {
-				solar_system = {
-					NOR = {
-						has_star_flag = sol_system
-						has_star_flag = sol
-						has_star_flag = deneb_system
-						has_star_flag = custom_system
-						has_star_flag = floating_system
-						has_star_flag = crystal_system
-						has_star_flag = city_system
-					}
-				}
-				OR = { 
-					NOT = { exists = owner }
-					owner = { is_country_type = primitive }
-					NOT = { any_owned_pop = { is_robot_pop = no } }
-					is_colony = no 								
+					set_planet_flag = system_star_1
 				}	
-				NOT = { has_planet_flag = prescripted_ideal }
+				else_if = {
+					limit = {
+						solar_system = {
+							NOT = {
+								any_planet = {
+									NOT = { is_same_value = this }
+									has_planet_flag = system_star_2
+								}
+							}
+						}
+					}
+					set_planet_flag = system_star_2
+				}	
+				else = {				
+					set_planet_flag = system_star_3
+				}
 			}	
-			# these events occur one after the other.
-			planet_event = { id = spawn_engine_1.1 }
-			planet_event = { id = spawn_engine_1.2 }
-			planet_event = { id = spawn_engine_1.3 days = 1 } #these events are failsafe - in case there was some issue with the deposit/blocker spawn. 
-		}			
-		every_playable_country = { country_event = { id = spawn_engine_1.10 } }	
-	}
+			every_planet = { 			
+				limit = { is_planet_class = pc_gas_giant has_moon = yes }
+				every_moon = { set_planet_flag = gas_giant_moon }
+			}
+			every_planet = { 	
+				limit = {
+					solar_system = {
+						NOR = {
+							has_star_flag = sol_system
+							has_star_flag = sol
+							has_star_flag = deneb_system
+							has_star_flag = custom_system
+							has_star_flag = floating_system
+							has_star_flag = crystal_system
+							has_star_flag = city_system
+						}
+					}
+					OR = { 
+						NOT = { exists = owner }
+						owner = { is_country_type = primitive }
+						NOT = { any_owned_pop = { is_robot_pop = no } }
+						is_colony = no 								
+					}	
+					NOT = { has_planet_flag = prescripted_ideal }
+				}	
+				# these events occur one after the other.
+				planet_event = { id = spawn_engine_1.1 }
+				planet_event = { id = spawn_engine_1.2 }
+				planet_event = { id = spawn_engine_1.3 days = 1 } #these events are failsafe - in case there was some issue with the deposit/blocker spawn. 
+			}			
+			every_playable_country = { country_event = { id = spawn_engine_1.10 } }	
+		}
+	}	
 }
 planet_event = {
 	id = spawn_engine_1.1
