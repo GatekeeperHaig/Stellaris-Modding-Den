@@ -1343,7 +1343,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     outputToFolderAndFile(upgradeEffect, "/common/scripted_effects/", "zz_cgm_upgrade_effects{}.txt".format(additionString),2, apiOutFolder)
   for modFolder in addedFolders+addedFoldersPriority:
     if modName!="cgm_planets": #those are written separately. this would mess things up!
-      createAIVarsFromModifiers.main(createAIVarsFromModifiers.parse([modFolder+"/buildings/*",modFolder+"/static_modifiers/*",modFolder+"/tile_blockers/*",modFolder+"/traits/*", "--effect_name", modName, "--output_folder", apiOutFolder]))
+      createAIVarsFromModifiers.main(createAIVarsFromModifiers.parse([modFolder+"/buildings/*.txt",modFolder+"/static_modifiers/*.txt",modFolder+"/tile_blockers/*.txt",modFolder+"/traits/*.txt", "--effect_name", modName, "--output_folder", apiOutFolder]))
       for dirpath, dirnames, files in os.walk(modFolder+"/buildings"):
         for file in files:
           buildingFileContent=readFile(os.path.join(dirpath, file))
@@ -1354,7 +1354,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
               val.removeDuplicatesRec()
             buildingOut.add(name, val, comment, seperator)
           outputToFolderAndFile(buildingOut, "/common/buildings/", file,2, apiOutFolder)
-      BUArgV=[apiOutFolder+"/common/buildings/*","../CGM/buildings_script_source/common/buildings/*","--output_folder","../NOTES/api files/cgm_auto_BU/"+modName, "--custom_mod_name", "CGM - {}: Comp Patch".format(modName), "--load_order_priority", "--make_optional", "--scripted_variables",",".join(variableAllFiles),"--copy_folder_first", apiOutFolder,"--helper_file_list","01", "--skip_building", ",".join(buildingsIgnoredByBU) ]
+      BUArgV=[apiOutFolder+"/common/buildings/*.txt","../CGM/buildings_script_source/common/buildings/*.txt","--output_folder","../NOTES/api files/cgm_auto_BU/"+modName, "--custom_mod_name", "CGM - {}: Comp Patch".format(modName), "--load_order_priority", "--make_optional", "--scripted_variables",",".join(variableAllFiles),"--copy_folder_first", apiOutFolder,"--helper_file_list","01", "--skip_building", ",".join(buildingsIgnoredByBU) ]
       createUpgradedBuildings.main(createUpgradedBuildings.parse(BUArgV),BUArgV)
 
   #priority sorted output for potential autobuild. Joined into one file!
@@ -1392,7 +1392,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     
   if os.path.exists("../../modModding/") and modName!="cgm_buildings" and fullModName!="" and modName!="eutab":
     foundBU=False
-    for file in glob.glob("../NOTES/api files/cgm_auto_BU/"+modName+"/common/buildings/*"):
+    for file in glob.glob("../NOTES/api files/cgm_auto_BU/"+modName+"/common/buildings/*.txt"):
       if open(file, 'r').read().find('direct_build'):
         foundBU=True
         break
