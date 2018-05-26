@@ -571,9 +571,9 @@ def main():
         searchGrowingPlanets=foodNeeded.addReturn("every_owned_planet")
         searchGrowingPlanets.add("limit", TagList("has_growing_pop", "yes"))
         searchGrowingPlanets.add("prev", variableOpNew("change", "cgm_max_useful_food", 100))
-        reduceFoodWeight=foodNeeded.createReturnIf(variableOpNew("check", "food_income", "cgm_max_useful_food", ">"))
-        reduceFoodWeight.variableOp("set", "food_country_weight", 0)
-        reduceFoodWeight=reduceFoodWeight.addReturn("else")
+        reduceFoodWeightIf=foodNeeded.createReturnIf(variableOpNew("check", "food_income", "cgm_max_useful_food", ">"))
+        reduceFoodWeightIf.variableOp("set", "food_country_weight", 0)
+        reduceFoodWeight=foodNeeded.addReturn("else") #fixed 2.1
         reduceFoodWeight.variableOp("divide", "cgm_max_useful_food", 2)
         reduceFoodWeight=reduceFoodWeight.createReturnIf(variableOpNew("check", "food_income", "cgm_max_useful_food", ">"))
         reduceFoodWeight.addComment("Reduction as soon as we have more than half the limit: *1 for half the limit. *0.5 for 3/4 the limit. *0 for limit. Linear interpolation in between. 2*(1-x) Where x is income/max_required. '*-1' instead of '*-2' as we divided the nominator by 2 already")
@@ -622,7 +622,7 @@ def main():
       curEffectIf=curEffect.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", i, "", "=")))
       # curEffect.add("prev", variableOpNew("change", resource+"_weight", round(i*math.sqrt(i),3)))
       curEffectIf.add("prev", variableOpNew("change", resource+"_weight", 2*i))
-      curEffect=curEffect.addReturn("else")
+      curEffect=curEffect.addReturn("else") #fixed 2.1
   #adjacency:
   for resource in resources:
     if resource!="unity":
