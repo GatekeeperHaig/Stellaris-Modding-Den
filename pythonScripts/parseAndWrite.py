@@ -14,7 +14,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('--remove_tags', default="", help="Comma separated list of tags that should be fully removed from the file")
   # parser.add_argument('--replacement_file', default="", help="Executes a very basic conditional replace on buildings. Example: 'IF unique in tagName and is_listed==no newline  ai_weight = { weight = @crucial_2 }': For all buildings that have 'unique' in their name and are not listed, set ai_weight to given value. Any number of such replaces can be in the file. An 'IF' at the very start of a line starts a replace. the next xyz = will be the tag used for replacing. You can also start a line with 'EVAL' instead of 'IF' to write an arbitrary condition. You need to know the class structure for this though.")
   parser.add_argument('-j','--join_files', default="", help="Output from all input files goes into a single file. Give non-empty input as filename/path to store to.")
-  parser.add_argument('-c','--check_if_else', action="store_true", help="checks all input files for incorrect 'pre 2.1 else'. Will not output anything except errors in that respect. Not sure to find all problems! There are cases where stuff is right with regard to the old and new system, but has different meaning")
+  parser.add_argument('-c','--check_if_else', action="store_true", help="checks all input files for incorrect 'pre 2.1 else'. Will not output anything except errors in that respect. Not sure to find all problems! There are cases where stuff is right with regard to the old and new system, but has different meaning. It correct trivial ones.")
   if returnParser:
     return parser
   addCommonArgs(parser)
@@ -53,7 +53,7 @@ def main(args,*unused):
     for deleteTagName in args.remove_tags.split(","):
       if deleteTagName.strip()!="":
         tagList.deleteOnLowestLevel(deleteIfTag)
-    if not args.test_run and not args.check_if_else:
+    if not args.test_run:# and not args.check_if_else:
       with open(outputFileName, "w") as file:
         tagList.writeAll(file, args)
     tagList=TagList()
