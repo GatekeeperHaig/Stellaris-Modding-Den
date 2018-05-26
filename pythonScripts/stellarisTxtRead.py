@@ -903,7 +903,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         self.add(headerName, self.getN_th(headerName, n_th_occurence-1))
   def findFirstAndLastTagList(self):
     first=0
-    last=0
+    last=-1
     for i,val in enumerate(self.vals):
       if isinstance(val, TagList):
         if first==0:

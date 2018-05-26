@@ -1,132 +1,125 @@
-#This file was created by script!
-#Instead of editing it, you should change the origin files or the script and rerun the script!
-#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+ #This file was created by script!
+ #Instead of editing it, you should change the origin files or the script and rerun the script!
+ #Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
 namespace = cgm_buildings
-
-
-#this event is fired using the on_building_complete and on_building_upgraded on action triggers.
-#checking whether the upgraded building gave a planet modifier bonus.
+ #this event is fired using the on_building_complete and on_building_upgraded on action triggers.
+ #checking whether the upgraded building gave a planet modifier bonus.
 planet_event = {
 	id = cgm_buildings.3
 	hide_window = yes
 	is_triggered_only = yes
-	#trigger = {
-#		from = { cgm_has_planet_bonus_building = yes }
-#	}
+	 #trigger = {
+	 #		from = { cgm_has_planet_bonus_building = yes }
+	 #	}
 	immediate = {
-		if = { 
+		if = {
 			limit = { from = { cgm_has_planet_bonus_building = yes } }
 			set_planet_flag = cgm_redo_planet_calc
 			remove_planet_flag = cgm_bonus_building_calc_done
-			else = { 
-				if = {
-					limit = { from = { cgm_has_adj_bonus_building = yes } }
-					set_planet_flag = cgm_redo_planet_calc
-				}
+		}
+		else = {
+			if = {
+				limit = { from = { cgm_has_adj_bonus_building = yes } }
+				set_planet_flag = cgm_redo_planet_calc
 			}
 		}
 	}
 }
-#this event is fired using the on_building_demolished and on_building_ruined on action triggers.
-#checking whether the building demolished/ruined used to give a planet modifier.
+ #this event is fired using the on_building_demolished and on_building_ruined on action triggers.
+ #checking whether the building demolished/ruined used to give a planet modifier.
 planet_event = {
 	id = cgm_buildings.4
 	hide_window = yes
 	is_triggered_only = yes
-	#trigger = {
-	#	from = { cgm_had_planet_bonus_building = yes }
-	#}
+	 #trigger = {
+	 #	from = { cgm_had_planet_bonus_building = yes }
+	 #}
 	immediate = {
-		if = { 
+		if = {
 			limit = { from = { cgm_has_planet_bonus_building = yes } }
 			set_planet_flag = cgm_redo_planet_calc
 			remove_planet_flag = cgm_bonus_building_calc_done
-			else = { 
-				if = {
-					limit = { from = { cgm_has_adj_bonus_building = yes } }
-					set_planet_flag = cgm_redo_planet_calc
-				}
+		}
+		else = {
+			if = {
+				limit = { from = { cgm_has_adj_bonus_building = yes } }
+				set_planet_flag = cgm_redo_planet_calc
 			}
 		}
 	}
 }
-#this event is fired using the on_building_replaced on action trigger.
-#checking whether the building replaced used to give a planet modifier or if the new building does.
+ #this event is fired using the on_building_replaced on action trigger.
+ #checking whether the building replaced used to give a planet modifier or if the new building does.
 planet_event = {
 	id = cgm_buildings.5
 	hide_window = yes
 	is_triggered_only = yes
-#	trigger = {
-#		from = {
-#			OR = { cgm_had_planet_bonus_building = yes cgm_has_planet_bonus_building = yes }
-#		}
-#	}
+	 #	trigger = {
+	 #		from = {
+	 #			OR = { cgm_had_planet_bonus_building = yes cgm_has_planet_bonus_building = yes }
+	 #		}
+	 #	}
 	immediate = {
-		if = { 
-			limit = { from = { OR = { cgm_had_planet_bonus_building = yes cgm_has_planet_bonus_building = yes } } }
+		if = {
+			limit = {
+				from = {
+					OR = { cgm_had_planet_bonus_building = yes cgm_has_planet_bonus_building = yes }
+				}
+			}
 			set_planet_flag = cgm_redo_planet_calc
 			remove_planet_flag = cgm_bonus_building_calc_done
-			else = { 
-				if = {
-					limit = { from = { OR = { cgm_had_adj_bonus_building = yes cgm_has_adj_bonus_building = yes } } }
-					set_planet_flag = cgm_redo_planet_calc
+		}
+		else = {
+			if = {
+				limit = {
+					from = {
+						OR = { cgm_had_adj_bonus_building = yes cgm_has_adj_bonus_building = yes }
+					}
 				}
+				set_planet_flag = cgm_redo_planet_calc
 			}
 		}
 	}
 }
-#this event is fired on the on_modification_complete on action trigger.
+ #this event is fired on the on_modification_complete on action trigger.
 country_event = {
 	id = cgm_buildings.6
 	hide_window = yes
 	is_triggered_only = yes
 	immediate = {
 		set_country_flag = cgm_redo_all_planet_calcs
-		every_owned_planet = {
-			remove_planet_flag = cgm_pop_calc_done
-		}
+		every_owned_planet = { remove_planet_flag = cgm_pop_calc_done }
 	}
 }
-#this event is fired on the on_pop_rights_change, on_pop_enslaved and on_pop_emancipated on action triggers.
+ #this event is fired on the on_pop_rights_change, on_pop_enslaved and on_pop_emancipated on action triggers.
 pop_event = {
 	id = cgm_buildings.7
 	hide_window = yes
 	is_triggered_only = yes
 	trigger = {
 		planet = {
-			any_pop = {
-				NOT = { is_same_species = PREVPREV }
-			}
+			any_pop = { NOT = { is_same_species = PREVPREV } }
 		}
 	}
 	immediate = {
-		planet = {
-			set_planet_flag = cgm_redo_planet_calc
-			remove_planet_flag = cgm_pop_calc_done
-		}
+		planet = { set_planet_flag = cgm_redo_planet_calc remove_planet_flag = cgm_pop_calc_done }
 	}
 }
-#this event is fired with the on_purge_begun and on_purge_canceled on action triggers. setting a flag that enables the pop in cgm_buildings.1.
+ #this event is fired with the on_purge_begun and on_purge_canceled on action triggers. setting a flag that enables the pop in cgm_buildings.1.
 pop_event = {
 	id = cgm_buildings.8
 	hide_window = yes
 	is_triggered_only = yes
 	immediate = {
-		planet = {
-			set_planet_flag = cgm_redo_planet_calc
-			remove_planet_flag = cgm_pop_calc_done
-		}
+		planet = { set_planet_flag = cgm_redo_planet_calc remove_planet_flag = cgm_pop_calc_done }
 	}
 }
-#this event is fired with the on_purge_complete on action trigger. setting a flag that enables the pop in cgm_buildings.1.
+ #this event is fired with the on_purge_complete on action trigger. setting a flag that enables the pop in cgm_buildings.1.
 planet_event = {
 	id = cgm_buildings.9
 	hide_window = yes
 	is_triggered_only = yes
-	immediate = {
-		set_planet_flag = cgm_redo_planet_calc
-		remove_planet_flag = cgm_pop_calc_done
-	}
+	immediate = { set_planet_flag = cgm_redo_planet_calc remove_planet_flag = cgm_pop_calc_done }
 }
 planet_event = {
 	id = cgm_buildings.10
@@ -138,13 +131,10 @@ planet_event = {
 		remove_planet_flag = cgm_bonus_building_calc_done
 	}
 }
-#just an unconditional tile redo, for example when a building is demolished or a blocker cleared
+ #just an unconditional tile redo, for example when a building is demolished or a blocker cleared
 planet_event = {
 	id = cgm_buildings.11
 	hide_window = yes
 	is_triggered_only = yes
-	immediate = {
-		set_planet_flag = cgm_redo_planet_calc
-	}
+	immediate = { set_planet_flag = cgm_redo_planet_calc }
 }
-
