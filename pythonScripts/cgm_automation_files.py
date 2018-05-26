@@ -515,25 +515,16 @@ def main():
     negativeResourceSub.variableOp("multiply", "cgm_tmp",  -1)
     negativeResourceSub.variableOp("set", "cgm_months_to_starvation",  resource+"_reserve")
     negativeResourceSub.variableOp("divide", "cgm_months_to_starvation",  resource+"_income")
-    negativeResourceSub=negativeResourceSub.createReturnIf(variableOpNew("check", "cgm_months_to_starvation", 2, "<")).variableOp("change", resource+"_country_weight", starvationWeight)
+    negativeResourceSubIf=negativeResourceSub.createReturnIf(variableOpNew("check", "cgm_months_to_starvation", 2, "<")).variableOp("change", resource+"_country_weight", starvationWeight)
     if resource=="food":
-      negativeResourceSub.variableOp("set", resource+"_country_weight_TILE", resource+"_country_weight")
-    negativeResourceSub=negativeResourceSub.addReturn("else")
+      negativeResourceSubIf.variableOp("set", resource+"_country_weight_TILE", resource+"_country_weight")
+    negativeResourceSub=negativeResourceSub.addReturn("else") #fixed 2.1
     negativeResourceSub.variableOp("set", "cgm_tmp",  starvationWeight)
     negativeResourceSub.variableOp("divide", "cgm_tmp",  "cgm_months_to_starvation")
     negativeResourceSub.variableOp("change", resource+"_country_weight", "cgm_tmp")
     if resource=="food":
       negativeResourceSub.variableOp("set", resource+"_country_weight_TILE", resource+"_country_weight")
-    # food_reserve
 
-
-    # empireWeightsEventImmediate=empireWeightsEventImmediate.createReturnIf(variableOpNew("check", resource+"_log", 0, "<"))
-    # empireWeightsEventImmediate.addComment("Give a factor of 2-4 depending on how negative we are.")
-    # empireWeightsEventImmediate.variableOp("set", "cgm_tmp",  resource+"_log")
-    # empireWeightsEventImmediate.variableOp("divide", "cgm_tmp",  (-countToNeg[-1]-1)/2)
-    # empireWeightsEventImmediate.variableOp("change", "cgm_tmp",  1)
-    # empireWeightsEventImmediate.variableOp("change", resource+"_country_weight", "cgm_tmp")
-    # empireWeightsEventImmediate=empireWeightsEventImmediate.addReturn("else")
 
 
   empireWeightsEventAllPositive=AIWeight.createReturnIf(allPosLimit)
