@@ -1,168 +1,187 @@
 namespace = cgm_building_operations
-
-country_event = { 
+country_event = {
 	id = cgm_building_operations.1
 	hide_window = yes
 	is_triggered_only = yes
-
 	immediate = {
 		every_country = {
-			limit = { 
+			limit = {
 				OR = {
 					is_country_type = default
 					is_country_type = fallen_empire
 					is_country_type = awakened_fallen_empire
 					is_country_type = ascended_empire
-				}	
+				}
 			}
 			switch = {
 				trigger = has_technology
-				tech_power_plant_4 = { give_technology = { tech = tech_power_plant_5 message = no } }
-				tech_mining_network_4 = { give_technology = { tech = tech_mining_network_5 message = no } }
-				tech_nano_vitality_crops = { give_technology = { tech = tech_superior_agriculture message = no } }
-				tech_biolab_3 = { give_technology = { tech = tech_biolab_4 message = no } }
-				tech_physics_lab_3 = { give_technology = { tech = tech_physics_lab_4 message = no } }
-				tech_engineering_lab_3 = { give_technology = { tech = tech_engineering_lab_4 message = no } }
-			}		
-		}	
+				tech_power_plant_4 = {
+					give_technology = { tech = tech_power_plant_5 message = no }
+				}
+				tech_mining_network_4 = {
+					give_technology = { tech = tech_mining_network_5 message = no }
+				}
+				tech_nano_vitality_crops = {
+					give_technology = { tech = tech_superior_agriculture message = no }
+				}
+				tech_biolab_3 = {
+					give_technology = { tech = tech_biolab_4 message = no }
+				}
+				tech_physics_lab_3 = {
+					give_technology = { tech = tech_physics_lab_4 message = no }
+				}
+				tech_engineering_lab_3 = {
+					give_technology = { tech = tech_engineering_lab_4 message = no }
+				}
+			}
+		}
 		every_planet = {
 			limit = {
-				OR = {
-					is_colonizable = yes
-					is_colony = yes
-				}
-			}	
+				OR = { is_colonizable = yes is_colony = yes }
+			}
 			if = {
-				limit = { 
-					OR = { 
+				limit = {
+					OR = {
 						is_habitat = yes
 						is_ringworld = yes
 						has_planet_flag = megastructure
 						is_planet_class_pc_squareworld_habitable = yes
 					}
-					NAND = { 
-						gse_enabled = yes
-						is_planet_class_pc_virtual_world = yes										
-					}					
+					NAND = { gse_enabled = yes is_planet_class_pc_virtual_world = yes }
 				}
-				if = { 
-					limit = { 
+				if = {
+					limit = {
 						OR = {
 							is_habitat = yes
-							AND = {
-								has_planet_flag = megastructure
-								is_ringworld = no
-							}						
-						}	
-						NAND = { 
-							gse_enabled = yes
-							is_planet_class_pc_squareworld_habitable = yes
-						}		
-						NAND = { 
-							kugelring_enabled = yes
-							is_planet_class_pc_kugelring_habitable = yes
-						}							
+							AND = { has_planet_flag = megastructure is_ringworld = no }
+						}
+						NAND = { gse_enabled = yes is_planet_class_pc_squareworld_habitable = yes }
+						NAND = { kugelring_enabled = yes is_planet_class_pc_kugelring_habitable = yes }
 					}
 					spawn_initial_megastructure_nodes_habitat = yes
-					every_tile = { 
-						limit = { has_building = yes } 
+					every_tile = {
+						limit = { has_building = yes }
 						switch = {
 							trigger = has_building
 							building_hab_astro_mining_facility = { set_building = building_manufacturing_complex_3 }
 							building_hab_solar_power_processor = { set_building = building_economic_district_3 }
 							building_hab_agri_bay = { set_building = building_hydroponic_farm_3 }
 							building_hab_laboratory_module = {
-								random_list = { 
+								random_list = {
 									33.3 = { set_building = building_physics_campus_3 }
 									33.3 = { set_building = building_engineering_campus_3 }
 									33.3 = { set_building = building_sociological_campus_3 }
-								}						
+								}
 							}
 						}
 					}
-				}	
+				}
 				else = {
 					spawn_initial_megastructure_nodes_ringworld = yes
-					if = { 
-						limit = { 
+					if = {
+						limit = {
 							exists = owner
 							owner = {
-								OR = { 
-									is_country_type = fallen_empire 
-									is_country_type = awakened_fallen_empire 
-								}
-							}	
+								OR = { is_country_type = fallen_empire is_country_type = awakened_fallen_empire }
+							}
 						}
 						every_tile = {
-							limit = { 
-								has_resource = { type = sr_megastructure_node amount = 1 } 
-								has_blocker = no									
+							limit = {
+								has_resource = { type = sr_megastructure_node amount = 1 }
+								has_blocker = no
 							}
 							random_list = {
-								33.3 = { 
-									set_building = building_energy_matter_converter_1_1 
-									modifier = { factor = 4 any_neighboring_tile = { has_building = building_ancient_factory } }
-								}	
-								33.3 = { 
-									set_building = building_energy_conduit_1_1 
-									modifier = { factor = 4 any_neighboring_tile = { has_building = building_dark_matter_power_plant } }
-								}											
-								33.3 = { 
-									set_building = building_food_replicator_1_1 
-									modifier = { factor = 4 any_neighboring_tile = { has_building = building_agri_processing_complex } }
-								}											
+								33.3 = {
+									set_building = building_energy_matter_converter_1_1
+									modifier = {
+										factor = 4
+										any_neighboring_tile = { has_building = building_ancient_factory }
+									}
+								}
+								33.3 = {
+									set_building = building_energy_conduit_1_1
+									modifier = {
+										factor = 4
+										any_neighboring_tile = { has_building = building_dark_matter_power_plant }
+									}
+								}
+								33.3 = {
+									set_building = building_food_replicator_1_1
+									modifier = {
+										factor = 4
+										any_neighboring_tile = { has_building = building_agri_processing_complex }
+									}
+								}
 							}
-						}										
+						}
 						every_tile = {
-							limit = { 
-								has_resource = { type = sr_megastructure_node amount = 2 } 
-								has_blocker = no									
+							limit = {
+								has_resource = { type = sr_megastructure_node amount = 2 }
+								has_blocker = no
 							}
 							random_list = {
-								33.3 = { 
-									set_building = building_energy_matter_converter_1_2 
-									modifier = { factor = 4 any_neighboring_tile = { has_building = building_ancient_factory } }
-								}	
-								33.3 = { 
+								33.3 = {
+									set_building = building_energy_matter_converter_1_2
+									modifier = {
+										factor = 4
+										any_neighboring_tile = { has_building = building_ancient_factory }
+									}
+								}
+								33.3 = {
 									set_building = building_energy_conduit_1_2
-									modifier = { factor = 4 any_neighboring_tile = { has_building = building_dark_matter_power_plant } }
-								}											
-								33.3 = { 
+									modifier = {
+										factor = 4
+										any_neighboring_tile = { has_building = building_dark_matter_power_plant }
+									}
+								}
+								33.3 = {
 									set_building = building_food_replicator_1_2
-									modifier = { factor = 4 any_neighboring_tile = { has_building = building_agri_processing_complex } }
-								}											
+									modifier = {
+										factor = 4
+										any_neighboring_tile = { has_building = building_agri_processing_complex }
+									}
+								}
 							}
-						}									
+						}
 						every_tile = {
-							limit = { 
-								has_resource = { type = sr_megastructure_node amount = 3 } 
-								has_blocker = no									
+							limit = {
+								has_resource = { type = sr_megastructure_node amount = 3 }
+								has_blocker = no
 							}
 							random_list = {
-								33.3 = { 
+								33.3 = {
 									set_building = building_energy_matter_converter_1_3
-									modifier = { factor = 4 any_neighboring_tile = { has_building = building_ancient_factory } }
-								}	
-								33.3 = { 
+									modifier = {
+										factor = 4
+										any_neighboring_tile = { has_building = building_ancient_factory }
+									}
+								}
+								33.3 = {
 									set_building = building_energy_conduit_1_3
-									modifier = { factor = 4 any_neighboring_tile = { has_building = building_dark_matter_power_plant } }
-								}											
-								33.3 = { 
-									set_building = building_food_replicator_1_3 
-									modifier = { factor = 4 any_neighboring_tile = { has_building = building_agri_processing_complex } }
-								}											
+									modifier = {
+										factor = 4
+										any_neighboring_tile = { has_building = building_dark_matter_power_plant }
+									}
+								}
+								33.3 = {
+									set_building = building_food_replicator_1_3
+									modifier = {
+										factor = 4
+										any_neighboring_tile = { has_building = building_agri_processing_complex }
+									}
+								}
 							}
-						}																
-					}	
-				}	
-			}				
+						}
+					}
+				}
+			}
 			every_tile = {
 				limit = { has_building = yes }
-				if = { 
-					limit = { has_any_resource = no }								
+				if = {
+					limit = { has_any_resource = no }
 					if = {
-						limit = { 
-							OR = {										
+						limit = {
+							OR = {
 								has_building = building_power_plant_1
 								has_building = building_power_plant_2
 								has_building = building_power_plant_3
@@ -191,7 +210,7 @@ country_event = {
 								has_building = building_physics_lab_2
 								has_building = building_physics_lab_3
 								has_building = building_physics_lab_4
-							}	
+							}
 						}
 						switch = {
 							trigger = has_building
@@ -209,33 +228,37 @@ country_event = {
 							building_hydroponics_farm_2 = { set_building = building_hydroponic_farm_2 }
 							building_hydroponics_farm_3 = { set_building = building_hydroponic_farm_3 }
 							building_hydroponics_farm_4 = { set_building = building_hydroponic_farm_4 }
-							building_hydroponics_farm_5 = { set_building = building_hydroponic_farm_5 }									
-							building_biolab_1 = { set_building = building_sociological_campus_2 }									
-							building_biolab_2 = { set_building = building_sociological_campus_3 }									
-							building_biolab_3 = { set_building = building_sociological_campus_4 }									
-							building_biolab_4 = { set_building = building_sociological_campus_5 }									
-							building_engineering_facility_1 = { set_building = building_engineering_campus_2 }									
-							building_engineering_facility_2 = { set_building = building_engineering_campus_3 }									
-							building_engineering_facility_3 = { set_building = building_engineering_campus_4 }									
-							building_engineering_facility_4 = { set_building = building_engineering_campus_5 }									
-							building_physics_lab_1 = { set_building = building_physics_campus_2 }									
-							building_physics_lab_2 = { set_building = building_physics_campus_3 }									
-							building_physics_lab_3 = { set_building = building_physics_campus_4 }									
-							building_physics_lab_4 = { set_building = building_physics_campus_5 }									
+							building_hydroponics_farm_5 = { set_building = building_hydroponic_farm_5 }
+							building_biolab_1 = { set_building = building_sociological_campus_2 }
+							building_biolab_2 = { set_building = building_sociological_campus_3 }
+							building_biolab_3 = { set_building = building_sociological_campus_4 }
+							building_biolab_4 = { set_building = building_sociological_campus_5 }
+							building_engineering_facility_1 = { set_building = building_engineering_campus_2 }
+							building_engineering_facility_2 = { set_building = building_engineering_campus_3 }
+							building_engineering_facility_3 = { set_building = building_engineering_campus_4 }
+							building_engineering_facility_4 = { set_building = building_engineering_campus_5 }
+							building_physics_lab_1 = { set_building = building_physics_campus_2 }
+							building_physics_lab_2 = { set_building = building_physics_campus_3 }
+							building_physics_lab_3 = { set_building = building_physics_campus_4 }
+							building_physics_lab_4 = { set_building = building_physics_campus_5 }
 							building_basic_science_lab_1 = {
-								random_list = { 
+								random_list = {
 									33.3 = { set_building = building_physics_campus_1 }
 									33.3 = { set_building = building_engineering_campus_1 }
 									33.3 = { set_building = building_sociological_campus_1 }
-								}	
-							}	
-						}	
-					}	
-				}	
+								}
+							}
+						}
+					}
+				}
 				else_if = {
-					limit = { has_resource = { type = energy amount > 0 } }
+					limit = {
+						has_resource = { type = energy amount > 0 }
+					}
 					if = {
-						limit = { has_resource = { type = energy amount = 1 } }
+						limit = {
+							has_resource = { type = energy amount = 1 }
+						}
 						switch = {
 							trigger = has_building
 							building_power_plant_1 = { set_building = building_isotope_refinery_1_1 }
@@ -244,9 +267,11 @@ country_event = {
 							building_power_plant_4 = { set_building = building_isotope_refinery_4_1 }
 							building_power_plant_5 = { set_building = building_isotope_refinery_5_1 }
 						}
-					}	
+					}
 					else_if = {
-						limit = { has_resource = { type = energy amount = 2 } }
+						limit = {
+							has_resource = { type = energy amount = 2 }
+						}
 						switch = {
 							trigger = has_building
 							building_power_plant_1 = { set_building = building_isotope_refinery_1_2 }
@@ -255,9 +280,11 @@ country_event = {
 							building_power_plant_4 = { set_building = building_isotope_refinery_4_2 }
 							building_power_plant_5 = { set_building = building_isotope_refinery_5_2 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = energy amount = 3 } }
+						limit = {
+							has_resource = { type = energy amount = 3 }
+						}
 						switch = {
 							trigger = has_building
 							building_power_plant_1 = { set_building = building_isotope_refinery_1_3 }
@@ -266,9 +293,11 @@ country_event = {
 							building_power_plant_4 = { set_building = building_isotope_refinery_4_3 }
 							building_power_plant_5 = { set_building = building_isotope_refinery_5_3 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = energy amount = 4 } }
+						limit = {
+							has_resource = { type = energy amount = 4 }
+						}
 						switch = {
 							trigger = has_building
 							building_power_plant_1 = { set_building = building_isotope_refinery_1_4 }
@@ -277,9 +306,11 @@ country_event = {
 							building_power_plant_4 = { set_building = building_isotope_refinery_4_4 }
 							building_power_plant_5 = { set_building = building_isotope_refinery_5_4 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = energy amount = 5 } }
+						limit = {
+							has_resource = { type = energy amount = 5 }
+						}
 						switch = {
 							trigger = has_building
 							building_power_plant_1 = { set_building = building_isotope_refinery_1_5 }
@@ -289,11 +320,15 @@ country_event = {
 							building_power_plant_5 = { set_building = building_isotope_refinery_5_5 }
 						}
 					}
-				}	
-				else_if = { 	
-					limit = { has_resource = { type = minerals amount > 0 } }								
+				}
+				else_if = {
+					limit = {
+						has_resource = { type = minerals amount > 0 }
+					}
 					if = {
-						limit = { has_resource = { type = minerals amount = 1 } }
+						limit = {
+							has_resource = { type = minerals amount = 1 }
+						}
 						switch = {
 							trigger = has_building
 							building_mining_network_1 = { set_building = building_mining_complex_1_1 }
@@ -302,9 +337,11 @@ country_event = {
 							building_mining_network_4 = { set_building = building_mining_complex_4_1 }
 							building_mining_network_5 = { set_building = building_mining_complex_5_1 }
 						}
-					}	
+					}
 					else_if = {
-						limit = { has_resource = { type = minerals amount = 2 } }
+						limit = {
+							has_resource = { type = minerals amount = 2 }
+						}
 						switch = {
 							trigger = has_building
 							building_mining_network_1 = { set_building = building_mining_complex_1_2 }
@@ -313,9 +350,11 @@ country_event = {
 							building_mining_network_4 = { set_building = building_mining_complex_4_2 }
 							building_mining_network_5 = { set_building = building_mining_complex_5_2 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = minerals amount = 3 } }
+						limit = {
+							has_resource = { type = minerals amount = 3 }
+						}
 						switch = {
 							trigger = has_building
 							building_mining_network_1 = { set_building = building_mining_complex_1_3 }
@@ -324,9 +363,11 @@ country_event = {
 							building_mining_network_4 = { set_building = building_mining_complex_4_3 }
 							building_mining_network_5 = { set_building = building_mining_complex_5_3 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = minerals amount = 4 } }
+						limit = {
+							has_resource = { type = minerals amount = 4 }
+						}
 						switch = {
 							trigger = has_building
 							building_mining_network_1 = { set_building = building_mining_complex_1_4 }
@@ -335,9 +376,11 @@ country_event = {
 							building_mining_network_4 = { set_building = building_mining_complex_4_4 }
 							building_mining_network_5 = { set_building = building_mining_complex_5_4 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = minerals amount = 5 } }
+						limit = {
+							has_resource = { type = minerals amount = 5 }
+						}
 						switch = {
 							trigger = has_building
 							building_mining_network_1 = { set_building = building_mining_complex_1_5 }
@@ -346,12 +389,16 @@ country_event = {
 							building_mining_network_4 = { set_building = building_mining_complex_4_5 }
 							building_mining_network_5 = { set_building = building_mining_complex_5_5 }
 						}
-					}	
-				}	
+					}
+				}
 				else_if = {
-					limit = { has_resource = { type = food amount > 0 } }												
+					limit = {
+						has_resource = { type = food amount > 0 }
+					}
 					if = {
-						limit = { has_resource = { type = food amount = 1 } }
+						limit = {
+							has_resource = { type = food amount = 1 }
+						}
 						switch = {
 							trigger = has_building
 							building_hydroponics_farm_1 = { set_building = building_farming_complex_1_1 }
@@ -360,9 +407,11 @@ country_event = {
 							building_hydroponics_farm_4 = { set_building = building_farming_complex_4_1 }
 							building_hydroponics_farm_5 = { set_building = building_farming_complex_5_1 }
 						}
-					}	
+					}
 					else_if = {
-						limit = { has_resource = { type = food amount = 2 } }
+						limit = {
+							has_resource = { type = food amount = 2 }
+						}
 						switch = {
 							trigger = has_building
 							building_hydroponics_farm_1 = { set_building = building_farming_complex_1_2 }
@@ -371,9 +420,11 @@ country_event = {
 							building_hydroponics_farm_4 = { set_building = building_farming_complex_4_2 }
 							building_hydroponics_farm_5 = { set_building = building_farming_complex_5_2 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = food amount = 3 } }
+						limit = {
+							has_resource = { type = food amount = 3 }
+						}
 						switch = {
 							trigger = has_building
 							building_hydroponics_farm_1 = { set_building = building_farming_complex_1_3 }
@@ -382,9 +433,11 @@ country_event = {
 							building_hydroponics_farm_4 = { set_building = building_farming_complex_4_3 }
 							building_hydroponics_farm_5 = { set_building = building_farming_complex_5_3 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = food amount = 4 } }
+						limit = {
+							has_resource = { type = food amount = 4 }
+						}
 						switch = {
 							trigger = has_building
 							building_hydroponics_farm_1 = { set_building = building_farming_complex_1_4 }
@@ -393,9 +446,11 @@ country_event = {
 							building_hydroponics_farm_4 = { set_building = building_farming_complex_4_4 }
 							building_hydroponics_farm_5 = { set_building = building_farming_complex_5_4 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = food amount = 5 } }
+						limit = {
+							has_resource = { type = food amount = 5 }
+						}
 						switch = {
 							trigger = has_building
 							building_hydroponics_farm_1 = { set_building = building_farming_complex_1_5 }
@@ -404,12 +459,16 @@ country_event = {
 							building_hydroponics_farm_4 = { set_building = building_farming_complex_4_5 }
 							building_hydroponics_farm_5 = { set_building = building_farming_complex_5_5 }
 						}
-					}		
-				}	
+					}
+				}
 				else_if = {
-					limit = { has_resource = { type = society_research amount > 0 } }													
+					limit = {
+						has_resource = { type = society_research amount > 0 }
+					}
 					if = {
-						limit = { has_resource = { type = society_research amount = 1 } }
+						limit = {
+							has_resource = { type = society_research amount = 1 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_society_lab_1_1 }
@@ -426,9 +485,11 @@ country_event = {
 							building_physics_lab_3 = { set_building = building_society_lab_4_1 }
 							building_physics_lab_4 = { set_building = building_society_lab_5_1 }
 						}
-					}	
+					}
 					else_if = {
-						limit = { has_resource = { type = society_research amount = 2 } }
+						limit = {
+							has_resource = { type = society_research amount = 2 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_society_lab_1_2 }
@@ -443,11 +504,13 @@ country_event = {
 							building_physics_lab_1 = { set_building = building_society_lab_2_2 }
 							building_physics_lab_2 = { set_building = building_society_lab_3_2 }
 							building_physics_lab_3 = { set_building = building_society_lab_4_2 }
-							building_physics_lab_4 = { set_building = building_society_lab_5_2 }							
+							building_physics_lab_4 = { set_building = building_society_lab_5_2 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = society_research amount = 3 } }
+						limit = {
+							has_resource = { type = society_research amount = 3 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_society_lab_1_3 }
@@ -462,11 +525,13 @@ country_event = {
 							building_physics_lab_1 = { set_building = building_society_lab_2_3 }
 							building_physics_lab_2 = { set_building = building_society_lab_3_3 }
 							building_physics_lab_3 = { set_building = building_society_lab_4_3 }
-							building_physics_lab_4 = { set_building = building_society_lab_5_3 }							
+							building_physics_lab_4 = { set_building = building_society_lab_5_3 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = society_research amount = 4 } }
+						limit = {
+							has_resource = { type = society_research amount = 4 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_society_lab_1_4 }
@@ -481,11 +546,13 @@ country_event = {
 							building_physics_lab_1 = { set_building = building_society_lab_2_4 }
 							building_physics_lab_2 = { set_building = building_society_lab_3_4 }
 							building_physics_lab_3 = { set_building = building_society_lab_4_4 }
-							building_physics_lab_4 = { set_building = building_society_lab_5_4 }							
+							building_physics_lab_4 = { set_building = building_society_lab_5_4 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = society_research amount = 5 } }
+						limit = {
+							has_resource = { type = society_research amount = 5 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_society_lab_1_5 }
@@ -500,14 +567,18 @@ country_event = {
 							building_physics_lab_1 = { set_building = building_society_lab_2_5 }
 							building_physics_lab_2 = { set_building = building_society_lab_3_5 }
 							building_physics_lab_3 = { set_building = building_society_lab_4_5 }
-							building_physics_lab_4 = { set_building = building_society_lab_5_5 }							
+							building_physics_lab_4 = { set_building = building_society_lab_5_5 }
 						}
 					}
-				}	
+				}
 				else_if = {
-					limit = { has_resource = { type = physics_research amount > 0 } }															
+					limit = {
+						has_resource = { type = physics_research amount > 0 }
+					}
 					if = {
-						limit = { has_resource = { type = physics_research amount = 1 } }
+						limit = {
+							has_resource = { type = physics_research amount = 1 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_physics_lab_1_1 }
@@ -524,9 +595,11 @@ country_event = {
 							building_physics_lab_3 = { set_building = building_physics_lab_4_1 }
 							building_physics_lab_4 = { set_building = building_physics_lab_5_1 }
 						}
-					}	
+					}
 					else_if = {
-						limit = { has_resource = { type = physics_research amount = 2 } }
+						limit = {
+							has_resource = { type = physics_research amount = 2 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_physics_lab_1_2 }
@@ -541,11 +614,13 @@ country_event = {
 							building_physics_lab_1 = { set_building = building_physics_lab_2_2 }
 							building_physics_lab_2 = { set_building = building_physics_lab_3_2 }
 							building_physics_lab_3 = { set_building = building_physics_lab_4_2 }
-							building_physics_lab_4 = { set_building = building_physics_lab_5_2 }							
+							building_physics_lab_4 = { set_building = building_physics_lab_5_2 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = physics_research amount = 3 } }
+						limit = {
+							has_resource = { type = physics_research amount = 3 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_physics_lab_1_3 }
@@ -560,11 +635,13 @@ country_event = {
 							building_physics_lab_1 = { set_building = building_physics_lab_2_3 }
 							building_physics_lab_2 = { set_building = building_physics_lab_3_3 }
 							building_physics_lab_3 = { set_building = building_physics_lab_4_3 }
-							building_physics_lab_4 = { set_building = building_physics_lab_5_3 }							
+							building_physics_lab_4 = { set_building = building_physics_lab_5_3 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = physics_research amount = 4 } }
+						limit = {
+							has_resource = { type = physics_research amount = 4 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_physics_lab_1_4 }
@@ -579,11 +656,13 @@ country_event = {
 							building_physics_lab_1 = { set_building = building_physics_lab_2_4 }
 							building_physics_lab_2 = { set_building = building_physics_lab_3_4 }
 							building_physics_lab_3 = { set_building = building_physics_lab_4_4 }
-							building_physics_lab_4 = { set_building = building_physics_lab_5_4 }							
+							building_physics_lab_4 = { set_building = building_physics_lab_5_4 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = physics_research amount = 5 } }
+						limit = {
+							has_resource = { type = physics_research amount = 5 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_physics_lab_1_5 }
@@ -598,14 +677,18 @@ country_event = {
 							building_physics_lab_1 = { set_building = building_physics_lab_2_5 }
 							building_physics_lab_2 = { set_building = building_physics_lab_3_5 }
 							building_physics_lab_3 = { set_building = building_physics_lab_4_5 }
-							building_physics_lab_4 = { set_building = building_physics_lab_5_5 }							
+							building_physics_lab_4 = { set_building = building_physics_lab_5_5 }
 						}
-					}	
+					}
 				}
 				else_if = {
-					limit = { has_resource = { type = engineering_research amount > 0 } }																	
+					limit = {
+						has_resource = { type = engineering_research amount > 0 }
+					}
 					if = {
-						limit = { has_resource = { type = engineering_research amount = 1 } }
+						limit = {
+							has_resource = { type = engineering_research amount = 1 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_engineering_lab_1_1 }
@@ -622,9 +705,11 @@ country_event = {
 							building_physics_lab_3 = { set_building = building_engineering_lab_4_1 }
 							building_physics_lab_4 = { set_building = building_engineering_lab_5_1 }
 						}
-					}	
+					}
 					else_if = {
-						limit = { has_resource = { type = engineering_research amount = 2 } }
+						limit = {
+							has_resource = { type = engineering_research amount = 2 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_engineering_lab_1_2 }
@@ -639,11 +724,13 @@ country_event = {
 							building_physics_lab_1 = { set_building = building_engineering_lab_2_2 }
 							building_physics_lab_2 = { set_building = building_engineering_lab_3_2 }
 							building_physics_lab_3 = { set_building = building_engineering_lab_4_2 }
-							building_physics_lab_4 = { set_building = building_engineering_lab_5_2 }							
+							building_physics_lab_4 = { set_building = building_engineering_lab_5_2 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = engineering_research amount = 3 } }
+						limit = {
+							has_resource = { type = engineering_research amount = 3 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_engineering_lab_1_3 }
@@ -658,11 +745,13 @@ country_event = {
 							building_physics_lab_1 = { set_building = building_engineering_lab_2_3 }
 							building_physics_lab_2 = { set_building = building_engineering_lab_3_3 }
 							building_physics_lab_3 = { set_building = building_engineering_lab_4_3 }
-							building_physics_lab_4 = { set_building = building_engineering_lab_5_3 }							
+							building_physics_lab_4 = { set_building = building_engineering_lab_5_3 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = engineering_research amount = 4 } }
+						limit = {
+							has_resource = { type = engineering_research amount = 4 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_engineering_lab_1_4 }
@@ -677,11 +766,13 @@ country_event = {
 							building_physics_lab_1 = { set_building = building_engineering_lab_2_4 }
 							building_physics_lab_2 = { set_building = building_engineering_lab_3_4 }
 							building_physics_lab_3 = { set_building = building_engineering_lab_4_4 }
-							building_physics_lab_4 = { set_building = building_engineering_lab_5_4 }							
+							building_physics_lab_4 = { set_building = building_engineering_lab_5_4 }
 						}
-					}					
+					}
 					else_if = {
-						limit = { has_resource = { type = engineering_research amount = 5 } }
+						limit = {
+							has_resource = { type = engineering_research amount = 5 }
+						}
 						switch = {
 							trigger = has_building
 							building_basic_science_lab_1 = { set_building = building_engineering_lab_1_5 }
@@ -696,25 +787,23 @@ country_event = {
 							building_physics_lab_1 = { set_building = building_engineering_lab_2_5 }
 							building_physics_lab_2 = { set_building = building_engineering_lab_3_5 }
 							building_physics_lab_3 = { set_building = building_engineering_lab_4_5 }
-							building_physics_lab_4 = { set_building = building_engineering_lab_5_5 }							
+							building_physics_lab_4 = { set_building = building_engineering_lab_5_5 }
 						}
-					}	
+					}
 				}
 			}
 		}
 	}
-}	
-
+}
 country_event = {
 	id = cgm_building_operations.2
 	hide_window = yes
 	is_triggered_only = yes
-	
 	trigger = {
 		new_building_content_enabled = yes
-		fromfrom = { 
-			any_planet = { 								
-				OR = {					
+		fromfrom = {
+			any_planet = {
+				OR = {
 					is_habitat = yes
 					is_ringworld = yes
 					has_planet_flag = megastructure
@@ -722,76 +811,59 @@ country_event = {
 				is_colonizable = yes
 				NOT = { has_planet_flag = megastructure_nodes_spawned }
 			}
-		}				
+		}
 	}
-	
 	immediate = {
 		fromfrom = {
-			every_system_planet = { 
-				limit = { 
-					OR = {					
+			every_system_planet = {
+				limit = {
+					OR = {
 						is_habitat = yes
 						is_ringworld = yes
 						has_planet_flag = megastructure
 						is_planet_class_pc_squareworld_habitable = yes
 					}
 					is_colonizable = yes
-					NOT = { has_planet_flag = megastructure_nodes_spawned }			
-					NAND = { 
-						gse_enabled = yes
-						is_planet_class_pc_virtual_world = yes										
-					}								
+					NOT = { has_planet_flag = megastructure_nodes_spawned }
+					NAND = { gse_enabled = yes is_planet_class_pc_virtual_world = yes }
 				}
 				planet_event = { id = cgm_building_operations.3 }
-			}	
+			}
 		}
-	}	
+	}
 }
-
 planet_event = {
 	id = cgm_building_operations.3
 	hide_window = yes
 	is_triggered_only = yes
-	
-	immediate = { 
-		if = { 
-			limit = { 
+	immediate = {
+		if = {
+			limit = {
 				OR = {
 					is_habitat = yes
-					AND = {
-						has_planet_flag = megastructure
-						is_ringworld = no
-					}					
+					AND = { has_planet_flag = megastructure is_ringworld = no }
 				}
-				NAND = { 
-					gse_enabled = yes
-					is_planet_class_pc_squareworld_habitable = yes
-				}		
-				NAND = { 
-					kugelring_enabled = yes
-					is_planet_class_pc_kugelring_habitable = yes
-				}					
-			}	
-			spawn_initial_megastructure_nodes_habitat = yes	
-			every_tile = { 
-				limit = { has_building = yes } 
+				NAND = { gse_enabled = yes is_planet_class_pc_squareworld_habitable = yes }
+				NAND = { kugelring_enabled = yes is_planet_class_pc_kugelring_habitable = yes }
+			}
+			spawn_initial_megastructure_nodes_habitat = yes
+			every_tile = {
+				limit = { has_building = yes }
 				switch = {
 					trigger = has_building
 					building_hab_astro_mining_facility = { set_building = building_manufacturing_complex_3 }
 					building_hab_solar_power_processor = { set_building = building_economic_district_3 }
 					building_hab_agri_bay = { set_building = building_hydroponic_farm_3 }
 					building_hab_laboratory_module = {
-						random_list = { 
+						random_list = {
 							33.3 = { set_building = building_physics_campus_3 }
 							33.3 = { set_building = building_engineering_campus_3 }
 							33.3 = { set_building = building_sociological_campus_3 }
-						}						
+						}
 					}
 				}
-			}						
+			}
 		}
-		else = {
-			spawn_initial_megastructure_nodes_ringworld = yes
-		}			
+		else = { spawn_initial_megastructure_nodes_ringworld = yes }
 	}
 }

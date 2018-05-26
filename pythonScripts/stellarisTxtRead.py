@@ -448,6 +448,11 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         self.vals[i].deleteOnLowestLevel(func, *argList)
       if func(self.getAllI(i),*argList):
         self.removeIndex(i)
+  def applyOnAllLevel(self, func):
+    func(self)
+    for val in self:
+      if isinstance(val, TagList):
+        val.applyOnAllLevel(func)
   def twoConditionRemove(self, condParent, condChild, condParentSatisfied=False):
     i=0
     while i<len(self):
