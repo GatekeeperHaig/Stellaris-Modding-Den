@@ -330,7 +330,7 @@ def processBuilding(varList, outTags, potential, val,name, modifierName, buildin
     outTags[specPotentialString].add("if", ifLoc)
     if not buildingUnique:
       elseTagList=TagList()
-      ifLoc.add("else", elseTagList)
+      outTags[specPotentialString].add("else", elseTagList) #fixed 2.1
       outTags[specPotentialString]=elseTagList
 
 def addBlockers(outTags, name, val, args,varList):
@@ -343,10 +343,10 @@ def addBlockers(outTags, name, val, args,varList):
     ifLoc=TagList("limit", TagList("has_blocker", name)).add("prevprev", prev)
     addFinalModifier(varList, val.get("adjacency_bonus"), prev, "","tile_building_resource_")
     elseTagList=TagList()
-    ifLoc.add("else", elseTagList)
     if len(prev)>0:
       outTags[0].add("if", ifLoc)
-      outTags[0]=elseTagList
+      outTags[0].add("else", elseTagList) #fixed 2.1
+      outTags[0]=elseTagList 
 
 
 def addFinalModifier(varList, input, output, extraName="", searchFor="tile_resource_"):

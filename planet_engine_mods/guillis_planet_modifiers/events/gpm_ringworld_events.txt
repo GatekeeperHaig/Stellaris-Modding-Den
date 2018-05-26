@@ -24,12 +24,12 @@ event = {
 					log = "---- rolling modifiers on ringworld ----"
 					
 					# IDEA: wipe all deposits and do something else with ringworld tiles/deposits
-					every_tile = {
-						limit = {
-							has_deposit = yes
-						}
-						clear_deposits = yes
-					}
+					# every_tile = {
+						# limit = {
+							# has_deposit = yes
+						# }
+						# clear_deposits = yes
+					# }
 					
 					# First we try to apply a construction bonus modifier (low chance)
 					random_list = {
@@ -38,17 +38,46 @@ event = {
 					}
 					
 					#  Bonus additional modifier
-					random_list = {
-						50 = {}
-						50 = { gpm_spawn_ringworld_modifier = yes }
+					# If low amount of modifiers is chosen at the start:
+					if = {
+						limit = { has_global_flag = gpm_modifier_amount_low	}
+						random_list = {
+							75 = {}
+							25 = { gpm_spawn_ringworld_modifier = yes }
+						}
+						random_list = {
+							75 = {}
+							25 = { gpm_spawn_ringworld_modifier = yes }
+						}
 					}
-					random_list = {
-						55 = {}
-						45 = { gpm_spawn_ringworld_modifier = yes }
+					# If normal amount of modifiers is chosen at the start:
+					if = {
+						limit = { has_global_flag = gpm_modifier_amount_normal	}
+						random_list = {
+							50 = {}
+							50 = { gpm_spawn_ringworld_modifier = yes }
+						}
+						random_list = {
+							55 = {}
+							45 = { gpm_spawn_ringworld_modifier = yes }
+						}
+						random_list = {
+							60 = {}
+							40 = { gpm_spawn_ringworld_modifier = yes }
+						}
 					}
-					random_list = {
-						60 = {}
-						40 = { gpm_spawn_ringworld_modifier = yes }
+					# If high amount of modifiers is chosen at the start:
+					if = {
+						limit = { has_global_flag = gpm_modifier_amount_high	}
+						gpm_spawn_ringworld_modifier = yes
+						random_list = {
+							55 = {}
+							45 = { gpm_spawn_ringworld_modifier = yes }
+						}
+						random_list = {
+							60 = {}
+							40 = { gpm_spawn_ringworld_modifier = yes }
+						}
 					}
 					set_planet_flag = gpm_new_ringworld_flag
 				}

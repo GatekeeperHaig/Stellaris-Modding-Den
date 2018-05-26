@@ -182,7 +182,7 @@ def main():
   empireStandardBuildEventImmediate.add("if", buildSomeThing)
   planetBuildSomeThing=TagList()
   buildSomeThing.createReturnIf(variableOpNew("check","cgm_bestWeight_1", 0 ,">")).add("event_target:cgm_best_planet", planetBuildSomeThing)
-  buildSpecial=buildSomeThing.addReturn("else")
+  buildSpecial=empireStandardBuildEventImmediate.addReturn("else") #fixed 2.1
   buildSpecial=buildSpecial.createReturnIf(variableOpNew("check","cgm_special_bestWeight", 0 ,">"))
   buildSpecial=buildSpecial.addReturn("event_target:cgm_best_planet_for_special")
   redoCalcForWorstTile=buildSpecial.createReturnIf(variableOpNew("check","cgm_worstWeight",pseudoInf))
@@ -207,21 +207,18 @@ def main():
   buildSpecial.variableOp("set", "cgm_worstWeight", pseudoInf)
 
 
-  # buildSomeThing.add("else", TagList("set_country_flag", "cgm_noAutobuildPlanetFound"))
   ifTypeBest=planetBuildSomeThing
   for i, weightType in enumerate(weightTypes+["special_resource"]):
-    ifTypeBest=ifTypeBest.createReturnIf(TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1)))
-    # ifTypeBest= 
-    # planetBuildSomeThing.add("if", ifTypeBest)
-    ifTypeBest.variableOp("set", "cgm_curTile",0)
-    everyTileBuild=ifTypeBest.addReturn("every_tile")
+    ifTypeBestIf=ifTypeBest.createReturnIf(TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1)))
+    ifTypeBestIf.variableOp("set", "cgm_curTile",0)
+    everyTileBuild=ifTypeBestIf.addReturn("every_tile")
     everyTileBuild.addReturn("prev").variableOp("change", "cgm_curTile",1)
     buildIt=everyTileBuild.createReturnIf(TagList("prev",variableOpNew("check", "cgm_curTile", "cgm_bestTile_1")))
     if debug:
       buildIt.add("log", '"trying to build on tile [planet.cgm_bestTile_1]"')
       buildIt.add("log", '"trying to build category {}"'.format(weightType))
     buildIt.add("add_"+weightType+"_building","yes" )
-    ifTypeBest=ifTypeBest.addReturn("else")
+    ifTypeBest=ifTypeBest.addReturn("else")#fixed 2.1
     
     effect=TagList()
     outEffects.insert(0,"add_"+weightType+"_building",effect)
@@ -240,8 +237,7 @@ def main():
       for varToMove in varsToMove:
         locSubIf.variableOp("set", "cgm_best"+varToMove+"_{!s}".format(k-1),"cgm_best"+varToMove+"_{!s}".format(k))
     locSubIf.variableOp("set", "cgm_bestWeight_{!s}".format(j), 0)
-    curSubLevel=TagList()
-    locSubIf.add("else", curSubLevel)
+    curSubLevel=curSubLevel.addReturn("else") #fixed 2.1
   curSubLevel.variableOp("set", "cgm_bestWeight_1".format(j), 0)
     # ifTypeBest.add("Find correct tile and build")
 
@@ -292,7 +288,8 @@ def main():
   for name in cgmCompEffect.names:
     if "check_pop_traits" in name:
       if name=="check_pop_traits_additional_traits":
-        popTraits.createReturnIf(TagList("additional_traits_enabled", "no")).add("check_vanilla_pop_traits", yes).add("else", TagList(name, yes))
+        popTraits.createReturnIf(TagList("additional_traits_enabled", "no")).add("check_vanilla_pop_traits", yes)
+        popTraits.add("else", TagList(name, yes)) #fixed 2.1
       else:
         popTraits.add(name,"yes")
   popTraits.add("vanilla_pop_modifiers",yes)
@@ -333,8 +330,8 @@ def main():
   planetFindBestEventImmediate.variableOp("set", "cgm_worstWeight".format(varToMove),pseudoInf)
 
 
-  planetFindBestEventImmediate=planetFindBestEventImmediate.createReturnIf(TagList("NOT", TagList("any_owned_pop", TagList("is_being_purged", "no")))).add("set_planet_flag", "purged_planet")
-  planetFindBestEventImmediate=planetFindBestEventImmediate.addReturn("else")
+  planetFindBestEventImmediate.createReturnIf(TagList("NOT", TagList("any_owned_pop", TagList("is_being_purged", "no")))).add("set_planet_flag", "purged_planet")
+  planetFindBestEventImmediate=planetFindBestEventImmediate.addReturn("else") #fixed 2.1
   planetFindBestEventImmediate.add("remove_planet_flag", "purged_planet")
   planetFindBestEventImmediate.addComment("modifiers are updated yearly!")
 
@@ -355,7 +352,8 @@ def main():
   for name in cgmCompEffect.names:
     if "check_planet_modifiers" in name:
       if name=="check_planet_modifiers_gpm":
-        recheckModifiers.createReturnIf(TagList("gpm_enabled", "no")).add("check_vanilla_planet_modifiers", yes).add("else", TagList(name, yes))
+        recheckModifiers.createReturnIf(TagList("gpm_enabled", "no")).add("check_vanilla_planet_modifiers", yes)
+        recheckModifiers.add("else", TagList(name, yes)) #fixed 2.1
       else:
         recheckModifiers.add(name,"yes")
     # if "check_planet_modifiers" in name:
@@ -394,6 +392,7 @@ def main():
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_pop")
     planetSpecificWeight=planetFindBestEventImmediate.createReturnIf(TagList("has_planet_flag", "cgm_player_focus_"+resource))
     nonSpecific=TagList()
+    planetFindBestEventImmediate.add("else", nonSpecific) #fixed 2.1
     if resource=="food":
       planetSpecificWeight.variableOp("set", resource+"_country_weight_TILE", "cgm_focus_strength")
       nonSpecific.variableOp("set", resource+"_country_weight_TILE", "owner")
@@ -402,7 +401,6 @@ def main():
       planetSpecificWeight.variableOp("set", resource+"_country_weight", "cgm_focus_strength")
       nonSpecific.variableOp("set", resource+"_country_weight", "owner")
       planetFindBestEventImmediate.variableOp("multiply", resource+"_mult_planet", resource+"_country_weight")
-    planetSpecificWeight.add("else", nonSpecific)
 
   everyTileSearch=TagList()
   planetFindBestEventImmediate.add("every_tile", everyTileSearch)
@@ -418,8 +416,8 @@ def main():
   specialResourcePossible.variableOp("set", "cgm_curWeight", 50)
   specialResourcePossible.variableOp("set", "cgm_curType", len(weightTypes)+1)
 
-  everyTileSearchNoSpecial=everyTileSearchSub.addReturn("else")
-
+  everyTileSearchNoSpecial=everyTileSearch.addReturn("else") #fixed 2.1
+ 
   everyTileSearchNoSpecial.add("calculate_tile_weight","yes")
   everyTileSearchNoSpecial=everyTileSearchNoSpecial.addReturn("prev")
   for resource in resources:
@@ -466,14 +464,11 @@ def main():
       for k in reversed(storedValsRange[i:j]):
         for varToMove in varsToMove:
           locSubIf.variableOp("set", "cgm_best"+varToMove+"_{!s}".format(k),"cgm_best"+varToMove+"_{!s}".format(k-1))
-      curSubLevel=TagList()
-      locSubIf.add("else", curSubLevel)
-    # locPrev=locIf.addReturn("prev")
+      curSubLevel=curSubLevel.addReturn("else") #fixed 2.1
     for varToMove in varsToMove:
       locIf.variableOp("set", "cgm_best{}_{!s}".format(varToMove,i),"cgm_cur{}".format(varToMove))
 
-    curLevel=TagList()
-    locIf.add("else", curLevel)
+    curLevel=curLevel.addReturn("else") #fixed 2.1
 
   #finding the worst of the best: best over weightTypes, worst over tiles
   locIf=everyTileSearch.createReturnIf(variableOp(TagList(), "check", "cgm_curWeight", "cgm_worstWeight", "<").add("prev",TagList("has_any_tile_strategic_resource", "no")))
@@ -495,11 +490,11 @@ def main():
   empireWeightsEventImmediate.add("set_timed_country_flag", TagList( "flag", "cgm_empire_weights_computed_timed").add("days", 180))
   playerWeight=empireWeightsEventImmediate.createReturnIf(TagList("AND", TagList("is_ai", "no").add("NOT", TagList("has_country_flag","cgm_player_focus_as_ai"))))
   for resource in resources:
-    resourceFocus=playerWeight.createReturnIf(TagList("has_country_flag","cgm_player_focus_"+resource))
-    resourceFocus.variableOp("set", resource+"_country_weight", "cgm_focus_strength")
-    resourceFocus.add("else",variableOpNew("set", resource+"_country_weight", 1) )
+    resourceFocusIf=playerWeight.createReturnIf(TagList("has_country_flag","cgm_player_focus_"+resource))
+    resourceFocusIf.variableOp("set", resource+"_country_weight", "cgm_focus_strength")
+    playerWeight.add("else",variableOpNew("set", resource+"_country_weight", 1) ) #fixed 2.1
   playerWeight.variableOp("set", "food_country_weight_TILE", "food_country_weight")
-  AIWeight=playerWeight.addReturn("else")
+  AIWeight=empireWeightsEventImmediate.addReturn("else") #fixed 2.1
   # for resource in resources:
   #   empireWeightsEventImmediate.add("determine_surplus_"+resource,"yes")
   for resource in resources:
@@ -518,25 +513,16 @@ def main():
     negativeResourceSub.variableOp("multiply", "cgm_tmp",  -1)
     negativeResourceSub.variableOp("set", "cgm_months_to_starvation",  resource+"_reserve")
     negativeResourceSub.variableOp("divide", "cgm_months_to_starvation",  resource+"_income")
-    negativeResourceSub=negativeResourceSub.createReturnIf(variableOpNew("check", "cgm_months_to_starvation", 2, "<")).variableOp("change", resource+"_country_weight", starvationWeight)
+    negativeResourceSubIf=negativeResourceSub.createReturnIf(variableOpNew("check", "cgm_months_to_starvation", 2, "<")).variableOp("change", resource+"_country_weight", starvationWeight)
     if resource=="food":
-      negativeResourceSub.variableOp("set", resource+"_country_weight_TILE", resource+"_country_weight")
-    negativeResourceSub=negativeResourceSub.addReturn("else")
+      negativeResourceSubIf.variableOp("set", resource+"_country_weight_TILE", resource+"_country_weight")
+    negativeResourceSub=negativeResourceSub.addReturn("else") #fixed 2.1
     negativeResourceSub.variableOp("set", "cgm_tmp",  starvationWeight)
     negativeResourceSub.variableOp("divide", "cgm_tmp",  "cgm_months_to_starvation")
     negativeResourceSub.variableOp("change", resource+"_country_weight", "cgm_tmp")
     if resource=="food":
       negativeResourceSub.variableOp("set", resource+"_country_weight_TILE", resource+"_country_weight")
-    # food_reserve
 
-
-    # empireWeightsEventImmediate=empireWeightsEventImmediate.createReturnIf(variableOpNew("check", resource+"_log", 0, "<"))
-    # empireWeightsEventImmediate.addComment("Give a factor of 2-4 depending on how negative we are.")
-    # empireWeightsEventImmediate.variableOp("set", "cgm_tmp",  resource+"_log")
-    # empireWeightsEventImmediate.variableOp("divide", "cgm_tmp",  (-countToNeg[-1]-1)/2)
-    # empireWeightsEventImmediate.variableOp("change", "cgm_tmp",  1)
-    # empireWeightsEventImmediate.variableOp("change", resource+"_country_weight", "cgm_tmp")
-    # empireWeightsEventImmediate=empireWeightsEventImmediate.addReturn("else")
 
 
   empireWeightsEventAllPositive=AIWeight.createReturnIf(allPosLimit)
@@ -549,10 +535,10 @@ def main():
       if factor!=factor25 or factor!=factor50:
         factorEarlyGame=empireWeightsEventAllPositive.createReturnIf(TagList("years_passed", 25, "", "<"))
         factorEarlyGame.variableOp("change","cgm_tmp", math.log(factor,2))
-        factorMidGame=factorEarlyGame.addReturn("else")
-        factorMidGame=factorMidGame.createReturnIf(TagList("years_passed", 50, "", "<"))
-        factorMidGame.variableOp("change","cgm_tmp", math.log(factor25,2))
-        factorLateGame=factorMidGame.addReturn("else")
+        factorMidGame=empireWeightsEventAllPositive.addReturn("else") #fixed 2.1
+        factorMidGameIf=factorMidGame.createReturnIf(TagList("years_passed", 50, "", "<"))
+        factorMidGameIf.variableOp("change","cgm_tmp", math.log(factor25,2))
+        factorLateGame=factorMidGame.addReturn("else") #fixed 2.1
         factorLateGame.variableOp("change","cgm_tmp", math.log(factor50,2))
       else:
         empireWeightsEventAllPositive.variableOp("change","cgm_tmp", math.log(factor,2))
@@ -568,15 +554,15 @@ def main():
         empireWeightsEventAllPositive.addComment("check if the food is really needed: If there are few growing planets, we reduce the amount! _TILE remains unchanged as food on tile can be used for energy")
         noFoodNeeded=empireWeightsEventAllPositive.createReturnIf(TagList("is_food_delimited", "yes"))
         noFoodNeeded.variableOp("set", "food_country_weight_TILE", "energy_country_weight")
-        foodNeeded=noFoodNeeded.addReturn("else")
+        foodNeeded=empireWeightsEventAllPositive.addReturn("else") #fixed 2.1
         foodNeeded.variableOp("set", resource+"_country_weight_TILE", resource+"_country_weight")
         foodNeeded.variableOp("set", "cgm_max_useful_food", 0)
         searchGrowingPlanets=foodNeeded.addReturn("every_owned_planet")
         searchGrowingPlanets.add("limit", TagList("has_growing_pop", "yes"))
         searchGrowingPlanets.add("prev", variableOpNew("change", "cgm_max_useful_food", 100))
-        reduceFoodWeight=foodNeeded.createReturnIf(variableOpNew("check", "food_income", "cgm_max_useful_food", ">"))
-        reduceFoodWeight.variableOp("set", "food_country_weight", 0)
-        reduceFoodWeight=reduceFoodWeight.addReturn("else")
+        reduceFoodWeightIf=foodNeeded.createReturnIf(variableOpNew("check", "food_income", "cgm_max_useful_food", ">"))
+        reduceFoodWeightIf.variableOp("set", "food_country_weight", 0)
+        reduceFoodWeight=foodNeeded.addReturn("else") #fixed 2.1
         reduceFoodWeight.variableOp("divide", "cgm_max_useful_food", 2)
         reduceFoodWeight=reduceFoodWeight.createReturnIf(variableOpNew("check", "food_income", "cgm_max_useful_food", ">"))
         reduceFoodWeight.addComment("Reduction as soon as we have more than half the limit: *1 for half the limit. *0.5 for 3/4 the limit. *0 for limit. Linear interpolation in between. 2*(1-x) Where x is income/max_required. '*-1' instead of '*-2' as we divided the nominator by 2 already")
@@ -622,10 +608,10 @@ def main():
     tileWeightSummary.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", 0, "", ">"))).add("check_"+resource+"_deposit","yes")
     curEffect=newTileCheckFile.addReturn("check_"+resource+"_deposit")
     for i in range(1,10):
-      curEffect=curEffect.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", i, "", "=")))
+      curEffectIf=curEffect.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", i, "", "=")))
       # curEffect.add("prev", variableOpNew("change", resource+"_weight", round(i*math.sqrt(i),3)))
-      curEffect.add("prev", variableOpNew("change", resource+"_weight", 2*i))
-      curEffect=curEffect.addReturn("else")
+      curEffectIf.add("prev", variableOpNew("change", resource+"_weight", 2*i))
+      curEffect=curEffect.addReturn("else") #fixed 2.1
   #adjacency:
   for resource in resources:
     if resource!="unity":
@@ -633,14 +619,10 @@ def main():
       tileWeightSummary.add("check_"+resource+"_adjacency","yes")
       curEffect=newTileCheckFile.addReturn("check_"+resource+"_adjacency")
       curEffect=curEffect.addReturn("every_neighboring_tile")
-      buildingAndPop=curEffect.createReturnIf(TagList("has_building","yes").add("has_grown_pop","yes"))
-      buildingAndPop.createReturnIf(TagList("pop", TagList("pop_produces_resource",TagList("type", resource).add("amount",0,"",">")))).add("prevprev",variableOpNew("change", resource+"_adjacency_weight", 3))
-      noBuildingOrPop=buildingAndPop.addReturn("else")
+      buildingAndPopIf=curEffect.createReturnIf(TagList("has_building","yes").add("has_grown_pop","yes"))
+      buildingAndPopIf.createReturnIf(TagList("pop", TagList("pop_produces_resource",TagList("type", resource).add("amount",0,"",">")))).add("prevprev",variableOpNew("change", resource+"_adjacency_weight", 3))
+      noBuildingOrPop=curEffect.addReturn("else")   #fixed 2.1
       noBuildingOrPop.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", 0, "", ">"))).add("prevprev",variableOpNew("change", resource+"_adjacency_weight", 2.5))
-        # curEffect=curEffect.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", i, "", "=")))
-        # # curEffect.add("prev", variableOpNew("change", resource+"_weight", round(i*math.sqrt(i),3)))
-        # curEffect.add("prev", variableOpNew("change", resource+"_weight", 2*i))
-        # curEffect=curEffect.addReturn("else")
   tileWeightSummary.add("check_neighboring_adj_bonus_buildings","yes")
   tileWeightSummary.add("check_adj_bonus_blockers","yes")
 
@@ -821,30 +803,30 @@ def main():
     for resource in resources:
       curEffect=checkResourceEffect.addReturn("determine_surplus_"+resource)
       if resource in ["energy", "minerals", "food"]:
-        curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",0 ,"", "<")))
-        curNegEffect=curEffect
+        curEffectIf=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",0 ,"", "<")))
+        curNegEffect=curEffectIf
         for i in countToNeg:
-          curNegEffect=curNegEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",funNeg(i) ,"", ">")))
-          curNegEffect.variableOp("set", resource+"_log", -i)
-          curNegEffect.variableOp("set", resource+"_income", round(funNeg(i-0.5),3))
-          curNegEffect=curNegEffect.addReturn("else")
-          curNegEffect.variableOp("set", resource+"_log", -i-1)
+          curNegEffectIf=curNegEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",funNeg(i) ,"", ">")))
+          curNegEffectIf.variableOp("set", resource+"_log", -i)
+          curNegEffectIf.variableOp("set", resource+"_income", round(funNeg(i-0.5),3))
+          curNegEffect=curNegEffect.addReturn("else") #fixed 2.1
+        curNegEffect.variableOp("set", resource+"_log", -i-1)
         curNegEffect.variableOp("set", resource+"_income", round(funNeg(i+0.5),3))
           # curEffect.variableOp("set", resource+"_income", -1)
-        curEffect=curEffect.addReturn("else")
+        curEffect=curEffect.addReturn("else") #fixed 2.1
       for i in countToPos:
-        curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",fun(i) ,"", "<")))
-        curEffect.variableOp("set", resource+"_log", i)
+        curEffectIf=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",fun(i) ,"", "<")))
+        curEffectIf.variableOp("set", resource+"_log", i) #possible todo: also output log for the more precise one!
         if i>3 and resource=="minerals":
-          curSubEffect=curEffect
+          curSubEffect=curEffectIf
           for j in subCount:
-            curSubEffect=curSubEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",round(fun(i-1+j/10),3) ,"", "<")))
-            curSubEffect.variableOp("set", resource+"_income", round(fun(i-1+(j-0.5)/10),3))
-            curSubEffect=curSubEffect.addReturn("else")
+            curSubEffectIf=curSubEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",round(fun(i-1+j/10),3) ,"", "<")))
+            curSubEffectIf.variableOp("set", resource+"_income", round(fun(i-1+(j-0.5)/10),3))
+            curSubEffect=curSubEffect.addReturn("else") #fixed 2.1
           curSubEffect.variableOp("set", resource+"_income", round(fun(i-1+(j+0.5)/10),3))
         else:
-          curEffect.variableOp("set", resource+"_income", round(fun(i-0.5),3))
-        curEffect=curEffect.addReturn("else")
+          curEffectIf.variableOp("set", resource+"_income", round(fun(i-0.5),3))
+        curEffect=curEffect.addReturn("else") #fixed 2.1
       curEffect.variableOp("set", resource+"_log", i+1)
       curEffect.variableOp("set", resource+"_income", round(fun(i+0.5),3))
     outputToFolderAndFile(checkResourceEffect, "common/scripted_effects", "cgm_income_record_effects.txt",2, "../CGM/buildings_script_source")
@@ -1451,8 +1433,8 @@ def addCheckBeforeAnyBuildingConstruction(tagList):
     if isinstance(valTop, TagList):
       cur=outTag.addReturn(nameTop)
       for name,val in valTop.getNameVal():
-        cur=cur.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building",yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
-        cur=cur.addReturn("else")
+        cur.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building",yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
+        cur=cur.addReturn("else")  #fixed 2.1
         cur.add(name, val)
   return outTag
 
@@ -1483,10 +1465,10 @@ def createEffectDecisionStuff(modName="cgm_buildings"):
     if len(prev)<2:
       break
     if len(prev)>2:
-      curTag=curTag.createReturnIf(cond)
+      curTagIf=curTag.createReturnIf(cond)
     for j in range(1,4):
-      curTag.add("add_building_construction", buildingsDict[resource]+str(j))
-    curTag=curTag.addReturn("else")
+      curTagIf.add("add_building_construction", buildingsDict[resource]+str(j))
+    curTag=curTag.addReturn("else") #fixed 2.1 POSSIBLE TODO: This probably need to be manually added to the right place! Possible write a script to do that automatically
   outputToFolderAndFile(outTag, modName, "megastructure_node_stuff.txt",2, ".")
 
 

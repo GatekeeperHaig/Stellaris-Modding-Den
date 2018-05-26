@@ -1039,9 +1039,9 @@ def main():
   rootUpdateMenu.add("immediate",immediate)
   ifSimple=TagList("limit",TagList("has_global_flag", "custom_difficulty_activate_simple_mode"))
   ifSimple.add("if", ifDelay(name_countryUpdateEventSimple))
-  ifSimple.add("else", TagList("every_country", TagList("country_event", TagList("id", name_countryUpdateEventSimple))))
+  ifSimple.add("else", TagList("every_country", TagList("country_event", TagList("id", name_countryUpdateEventSimple)))) #fixed 2.1
   immediate.add("if", ifSimple)
-  immediate.add("else", TagList("if",ifDelay(name_countryUpdateEvent)).add("else", TagList("every_country", TagList("country_event", TagList("id", name_countryUpdateEvent)))))
+  immediate.add("else", TagList("if",ifDelay(name_countryUpdateEvent)).add("else", TagList("every_country", TagList("country_event", TagList("id", name_countryUpdateEvent))))) #fixed 2.1
 
 
 
@@ -1291,47 +1291,17 @@ def main():
   cgm_ImbalancedDifficultyBonusesEffect.add("check_country_imbalanced_difficulty_bonuses",effect)
 
   for i in range(7):
-    effect=effect.createReturnIf(variableOpNew("check","custom_difficulty_minerals_value", round(pow(2,(i+1)/10*5+0.05)*100-100), "<"))
-    subEffect=effect
+    effectIf=effect.createReturnIf(variableOpNew("check","custom_difficulty_minerals_value", round(pow(2,(i+1)/10*5+0.05)*100-100), "<"))
+    subEffect=effectIf
     for j in range(1,5):
-      subEffect=subEffect.createReturnIf(variableOpNew("check","custom_difficulty_minerals_value", round(pow(2,(i+j/5)/10*5+0.05)*100-100), "<"))
-      subEffect.variableOp("set", "cgm_difficutly_imbalance_log", round((i+j/5)/10*5,1))
-      subEffect=subEffect.addReturn("else")
+      subEffectIf=subEffect.createReturnIf(variableOpNew("check","custom_difficulty_minerals_value", round(pow(2,(i+j/5)/10*5+0.05)*100-100), "<"))
+      subEffectIf.variableOp("set", "cgm_difficutly_imbalance_log", round((i+j/5)/10*5,1))
+      subEffect=subEffect.addReturn("else")  #fixed 2.1
     subEffect.variableOp("set", "cgm_difficutly_imbalance_log", round((i+1)/10*5,1))
-    effect=effect.addReturn("else")
+    effect=effect.addReturn("else") #fixed 2.1
 
-  # for i in range(35):
-  #   effect=effect.createReturnIf(variableOpNew("check","custom_difficulty_minerals_value", round(pow(2,(i+0.5)/10)*100-100), "<"))
-  #   effect.variableOp("set", "cgm_difficutly_imbalance_log", i/10)
-  #   effect=effect.addReturn("else")
-  # for i in range(11):
-  #   effect=effect.createReturnIf(variableOpNew("check","custom_difficulty_minerals_value", pow(2,i), "<"))
-  #   effect.variableOp("set", "cgm_difficutly_imbalance_log", math.log(1+pow(2,i)/100,2))
-  #   effect=effect.addReturn("else")
-  # effect.add("custom_difficulty_minerals_value")
   outputToFolderAndFile(cgm_ImbalancedDifficultyBonusesEffect , "common/scripted_effects", "custom_difficulty_cgm_effects.txt")
 
-
-#     check_imbalanced_difficulty_bonuses = { #one time check! Main reason this is needed is that difficulty bonuses are different: minerals,food, energy and unity are on income, while science is applied on increasing tech research speed, rather than income. This prevents that harder AIs will go crazy research heavy.
-#   every_playable_country = {
-#     switch = {
-#       trigger = is_difficulty
-#       1 = { set_variable = { which = cgm_difficutly_imbalance_log value = 0.321 } } # Factor 1.25 from difficulty. Applied log_2
-#       2 = { set_variable = { which = cgm_difficutly_imbalance_log value = 0.584 } } # Factor 1.5 from difficulty. Applied log_2
-#       3 = { set_variable = { which = cgm_difficutly_imbalance_log value = 0.807 } } # Factor 1.75 from difficulty. Applied log_2
-#       4 = { set_variable = { which = cgm_difficutly_imbalance_log value = 1 } } # Factor 2 from difficulty. Applied log_2
-#     }
-#   }
-# }
-
-
-  # locClass=locClassCopy
-  # locClass.translateRest=True
-  # for language in locClass.languages:
-  #   outFolderLoc="../gratak_mods/custom_difficulty_translate_new/localisation/"+language
-  #   if not os.path.exists(outFolderLoc):
-  #     os.makedirs(outFolderLoc)
-  #   locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
 
 
 def outputToFolderAndFile(tagList, folder, file, level=2, modFolder="../gratak_mods/custom_difficulty", warningText=True):

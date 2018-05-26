@@ -677,10 +677,6 @@ class TagList: #Basically everything is stored recursively in objects of this cl
                 # pass
           sumExtraLines+=extraLines
         else:
-          # print("else")
-          # print(name)
-          # print(occurenceIndex)
-          # print(curLineIndexTmp)
           output=self.getN_th(name,occurenceIndex)
           if isinstance(output,TagList):
             output=" ".join(output.names)
