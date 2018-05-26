@@ -619,9 +619,9 @@ def main():
     tileWeightSummary.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", 0, "", ">"))).add("check_"+resource+"_deposit","yes")
     curEffect=newTileCheckFile.addReturn("check_"+resource+"_deposit")
     for i in range(1,10):
-      curEffect=curEffect.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", i, "", "=")))
+      curEffectIf=curEffect.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", i, "", "=")))
       # curEffect.add("prev", variableOpNew("change", resource+"_weight", round(i*math.sqrt(i),3)))
-      curEffect.add("prev", variableOpNew("change", resource+"_weight", 2*i))
+      curEffectIf.add("prev", variableOpNew("change", resource+"_weight", 2*i))
       curEffect=curEffect.addReturn("else")
   #adjacency:
   for resource in resources:
@@ -632,7 +632,7 @@ def main():
       curEffect=curEffect.addReturn("every_neighboring_tile")
       buildingAndPopIf=curEffect.createReturnIf(TagList("has_building","yes").add("has_grown_pop","yes"))
       buildingAndPopIf.createReturnIf(TagList("pop", TagList("pop_produces_resource",TagList("type", resource).add("amount",0,"",">")))).add("prevprev",variableOpNew("change", resource+"_adjacency_weight", 3))
-      noBuildingOrPop=curEffect.addReturn("else")
+      noBuildingOrPop=curEffect.addReturn("else")   #fixed 2.1
       noBuildingOrPop.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", 0, "", ">"))).add("prevprev",variableOpNew("change", resource+"_adjacency_weight", 2.5))
   tileWeightSummary.add("check_neighboring_adj_bonus_buildings","yes")
   tileWeightSummary.add("check_adj_bonus_blockers","yes")
