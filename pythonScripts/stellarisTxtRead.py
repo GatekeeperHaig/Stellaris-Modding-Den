@@ -448,6 +448,11 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         self.vals[i].deleteOnLowestLevel(func, *argList)
       if func(self.getAllI(i),*argList):
         self.removeIndex(i)
+  def applyOnAllLevel(self, func):
+    func(self)
+    for val in self:
+      if isinstance(val, TagList):
+        val.applyOnAllLevel(func)
   def twoConditionRemove(self, condParent, condChild, condParentSatisfied=False):
     i=0
     while i<len(self):
@@ -905,6 +910,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           first=i
         last=i
     return first,last
+  def lower(self):
+    return None #compatibility function. If you want to compare with a string, you might want to apply lower before you compare. But you can't do that unless this function exists or you first make sure the val is not a taglist.
 
           
 class NamedTagList(TagList): #derived from TagList with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
