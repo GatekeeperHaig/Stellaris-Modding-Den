@@ -492,11 +492,11 @@ def main():
   empireWeightsEventImmediate.add("set_timed_country_flag", TagList( "flag", "cgm_empire_weights_computed_timed").add("days", 180))
   playerWeight=empireWeightsEventImmediate.createReturnIf(TagList("AND", TagList("is_ai", "no").add("NOT", TagList("has_country_flag","cgm_player_focus_as_ai"))))
   for resource in resources:
-    resourceFocus=playerWeight.createReturnIf(TagList("has_country_flag","cgm_player_focus_"+resource))
-    resourceFocus.variableOp("set", resource+"_country_weight", "cgm_focus_strength")
-    resourceFocus.add("else",variableOpNew("set", resource+"_country_weight", 1) )
+    resourceFocusIf=playerWeight.createReturnIf(TagList("has_country_flag","cgm_player_focus_"+resource))
+    resourceFocusIf.variableOp("set", resource+"_country_weight", "cgm_focus_strength")
+    playerWeight.add("else",variableOpNew("set", resource+"_country_weight", 1) ) #fixed 2.1
   playerWeight.variableOp("set", "food_country_weight_TILE", "food_country_weight")
-  AIWeight=playerWeight.addReturn("else")
+  AIWeight=empireWeightsEventImmediate.addReturn("else") #fixed 2.1
   # for resource in resources:
   #   empireWeightsEventImmediate.add("determine_surplus_"+resource,"yes")
   for resource in resources:
