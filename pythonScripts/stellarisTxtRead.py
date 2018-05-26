@@ -910,6 +910,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           first=i
         last=i
     return first,last
+  def lower(self):
+    return None #compatibility function. If you want to compare with a string, you might want to apply lower before you compare. But you can't do that unless this function exists or you first make sure the val is not a taglist.
 
           
 class NamedTagList(TagList): #derived from TagList with four extra variables and a custom initialiser. Stores main tag of each building (and the reduntantly stored building name)
