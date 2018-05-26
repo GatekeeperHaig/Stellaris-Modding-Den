@@ -1,6 +1,49 @@
 
 namespace = gpm_game_start
 
+####################################################################################
+## TEMP EVENT to check for PD and give it a global flag until PD does this itself ##
+####################################################################################
+event = {
+	id = gpm_game_start.9999
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	immediate = {
+		random_planet = {
+			limit = {
+				OR = {
+					is_planet_class = pc_desertislands			# Planetary Diversity
+					is_planet_class = pc_cascadian				# Planetary Diversity
+					is_planet_class = pc_swamp					# Planetary Diversity
+					is_planet_class = pc_oasis					# Planetary Diversity
+					is_planet_class = pc_steppe					# Planetary Diversity
+					is_planet_class = pc_geothermal				# Planetary Diversity
+					is_planet_class = pc_hadesert				# Planetary Diversity
+					is_planet_class = pc_frozen_desert			# Planetary Diversity
+					is_planet_class = pc_mesa					# Planetary Diversity
+					is_planet_class = pc_subarctic				# Planetary Diversity
+					is_planet_class = pc_sandsea				# Planetary Diversity
+					is_planet_class = pc_glacial				# Planetary Diversity
+					is_planet_class = pc_antarctic				# Planetary Diversity
+					is_planet_class = pc_mangrove				# Planetary Diversity
+					is_planet_class = pc_hajungle				# Planetary Diversity
+					is_planet_class = pc_graveyard				# Planetary Diversity
+					is_planet_class = pc_mushroom				# Planetary Diversity
+					is_planet_class = pc_city					# Planetary Diversity
+					is_planet_class = pc_crystal				# Planetary Diversity
+					is_planet_class = pc_floating				# Planetary Diversity
+					is_planet_class = pc_tidallylocked			# Planetary Diversity	
+				}
+			}
+			set_global_flag = has_planetary_diversity_mod
+		}
+	}
+}
+####################################################################################
+####################################################################################
+
 ### Initialiser
 # if multiplayer -> spawn engine with default settings
 # if not multiplayer -> show menu and let user decide
@@ -42,7 +85,7 @@ country_event = {
 	}
 
 	immediate = {
-		set_country_flag = gpm_fallen_empire_lost_colony
+		set_country_flag = gpm_death_world
 		random_owned_planet ={
 			limit = { is_capital = yes }
 			set_planet_flag = gpm_civic_start_planet
@@ -50,16 +93,6 @@ country_event = {
 			add_modifier = { modifier = "gpm_Death_world" days = -1	}
 			every_tile = {
 				remove_blocker = yes
-			}
-			random_list = {
-				10 = { set_planet_size = 18 }
-				10 = { set_planet_size = 19 }
-				10 = { set_planet_size = 20 }
-				10 = { set_planet_size = 21 }
-				10 = { set_planet_size = 22 }
-				10 = { set_planet_size = 23 }
-				10 = { set_planet_size = 24 }
-				10 = { set_planet_size = 25 }
 			}
 			gpm_random_dangerous_modifiers = yes
 			gpm_random_dangerous_modifiers = yes
@@ -115,22 +148,22 @@ country_event = {
 			owner = {
 				add_food = 100
 			}
-			random_list = {
-				10 = { set_planet_size = 18 }
-				10 = { set_planet_size = 19 }
-				10 = { set_planet_size = 20 }
-				10 = { set_planet_size = 21 }
-				10 = { set_planet_size = 22 }
-				10 = { set_planet_size = 23 }
-				10 = { set_planet_size = 24 }
-				10 = { set_planet_size = 25 }
-			}
 			every_tile = {
 				remove_blocker = yes
 				if = {
 					limit = {
 						has_building = yes
-						NOT = { has_building = building_capital_1 }
+						NOR = {
+							has_building = building_colony_shelter
+							has_building = building_capital_1
+							has_building = building_capital_2
+							has_building = building_capital_3
+							has_building = building_deployment_post
+							has_building = building_machine_capital_1
+							has_building = building_machine_capital_2
+							has_building = building_machine_capital_3
+							has_building = building_hab_capital
+						}
 					}
 					kill_pop = yes
 					remove_building = yes
@@ -141,27 +174,27 @@ country_event = {
 					has_building = no
 				}
 				clear_deposits = yes
-				set_building = building_ancient_factory
+				set_building = gpm_building_precursor_factory
 			}
 			random_tile = {
 				limit = {
 					has_building = no
 				}
 				clear_deposits = yes
-				set_building = building_dark_matter_power_plant
+				set_building = gpm_building_precursor_power_plant
 			}
 			random_tile = {
 				limit = {
 					has_building = no
 				}
 				clear_deposits = yes
-				set_building = building_agri_processing_complex
+				set_building = gpm_building_precursor_processing_complex
 			}
 			while = {
 				limit = {
 					count_tile = {
 						limit = { has_blocker = no has_building = no has_pop = no }
-						count > 4
+						count > 3
 					}
 				}
 				random_list = {
@@ -185,6 +218,7 @@ country_event = {
 					}
 				}
 			}
+			# Random List with good buffs
 			random_list = {
 				100 = {
 					add_modifier = { days = -1 modifier = "Precursor_Remnants" }
@@ -192,14 +226,6 @@ country_event = {
 					# TWeaks #
 					# Not with these modifiers #
 					modifier = { factor = 0 has_modifier = "Precursor_Remnants" }
-					set_planet_flag = "gpm_is_precursor_world"
-				}
-				100 = {
-					add_modifier = { days = -1 modifier = "Precursor_Satalite_Grid" }
-					# On these planets #
-					# TWeaks #
-					# Not with these modifiers #
-					modifier = { factor = 0 has_modifier = "Precursor_Satalite_Grid" }
 					set_planet_flag = "gpm_is_precursor_world"
 				}
 				100 = {
@@ -218,14 +244,11 @@ country_event = {
 					modifier = { factor = 0 has_modifier = "Precursor_Floating_City" }
 					set_planet_flag = "gpm_is_precursor_world"
 				}
-				100 = {
-					add_modifier = { days = -1 modifier = "Precursor_Communication_Hub" }
-					# On these planets #
-					# TWeaks #
-					# Not with these modifiers #
-					modifier = { factor = 0 has_modifier = "Precursor_Communication_Hub" }
-					set_planet_flag = "gpm_is_precursor_world"
-				}
+				
+
+			}
+			# Random List with Defensive buffs
+			random_list = {
 				100 = {
 					add_modifier = { days = -1 modifier = "Precursor_Planetary_Gun" }
 					# On these planets #
@@ -243,24 +266,15 @@ country_event = {
 					set_planet_flag = "gpm_is_precursor_world"
 				}
 				100 = {
-					add_modifier = { days = -1 modifier = "Precursor_Mechs" }
+					add_modifier = { days = -1 modifier = "Precursor_Planetary_Shield" }
+					gpm_set_precursor_planetary_shields = yes
 					# On these planets #
 					# TWeaks #
 					# Not with these modifiers #
-					modifier = { factor = 0 has_modifier = "Precursor_Mechs" }
-					set_planet_flag = "gpm_is_precursor_world"
-				}
-				100 = {
-					add_modifier = { days = -1 modifier = "Precursor_Eternal_Fortress" }
-					# On these planets #
-					# TWeaks #
-					# Not with these modifiers #
-					modifier = { factor = 0 has_modifier = "Precursor_Eternal_Fortress" }
+					modifier = { factor = 0 has_modifier = "Precursor_Planetary_Shield" }
 					set_planet_flag = "gpm_is_precursor_world"
 				}
 			}
-			add_modifier = { days = -1 modifier = "Precursor_Planetary_Shield" }
-			gpm_set_precursor_planetary_shields = yes
 		}
 	}
 }
@@ -279,16 +293,6 @@ country_event = {
 		random_owned_planet ={
 			limit = { is_capital = yes }
 			set_planet_flag = gpm_civic_start_planet
-			random_list = {
-				10 = { set_planet_size = 18 }
-				10 = { set_planet_size = 19 }
-				10 = { set_planet_size = 20 }
-				10 = { set_planet_size = 21 }
-				10 = { set_planet_size = 22 }
-				10 = { set_planet_size = 23 }
-				10 = { set_planet_size = 24 }
-				10 = { set_planet_size = 25 }
-			}
 			every_tile = {
 				remove_blocker = yes
 			}
@@ -297,17 +301,31 @@ country_event = {
 					limit = {
 						has_building = building_power_plant_1
 					}
-					kill_pop = yes
-					set_building = building_dark_matter_power_plant
-					set_ruined = yes
+					set_building = gpm_building_dark_matter_power_plant
+					clear_deposits = yes
 				}
 				random_tile = {
 					limit = {
 						has_building = building_mining_network_1
 					}
 					kill_pop = yes
-					set_building = building_ancient_factory
-					set_ruined = yes
+					set_building = gpm_building_ancient_factory
+					clear_deposits = yes
+				}
+				random_tile = {
+					limit = {
+						has_building = building_hydroponics_farm_1
+					}
+					set_building = gpm_building_agri_processing_complex
+					clear_deposits = yes
+				}
+				random_tile = {
+					limit = {
+						has_building = building_basic_science_lab_1
+					}
+					kill_pop = yes
+					set_building = gpm_building_ancient_archives
+					clear_deposits = yes
 				}
 			}
 			every_tile = {
@@ -324,7 +342,7 @@ country_event = {
 				kill_pop = yes
 				remove_building = yes
 			}
-			random_tile = {
+			every_tile = {
 				limit = {
 					has_building = building_hydroponics_farm_1
 				}
@@ -335,20 +353,14 @@ country_event = {
 				limit = {
 					count_tile = {
 						limit = { has_blocker = no has_building = no has_pop = no }
-						count > 8
+						count > 5
 					}
 				}
 				random_list = {
-					50 = { 
+					90 = { 
 						random_tile = {
 							limit = { has_blocker = no has_building = no has_pop = no }
 							set_blocker = "tb_ancient_ruins"
-						}
-					}
-					40 = { 
-						random_tile = {
-							limit = { has_blocker = no has_building = no has_pop = no }
-							set_blocker = "tb_ancient_cryo_chambers"
 						}
 					}
 					10 = { 
@@ -496,7 +508,7 @@ country_event = {
 			}
 			if = {
 				limit = {
-					NOT = {  		# Check if it's a modded planet class
+					NOR = {  		# Check if it's a modded planet class
 						habitable_planet = yes
 						gpm_is_planet_ringworld = yes
 						gpm_is_planet_habitat = yes
@@ -518,20 +530,14 @@ country_event = {
 				limit = {
 					count_tile = {
 						limit = { has_blocker = no has_building = no has_pop = no }
-						count > 6
+						count > 5
 					}
 				}
 				random_list = {
-					50 = { 
+					90 = { 
 						random_tile = {
 							limit = { has_blocker = no has_building = no has_pop = no }
 							set_blocker = "tb_ancient_ruins"
-						}
-					}
-					40 = { 
-						random_tile = {
-							limit = { has_blocker = no has_building = no has_pop = no }
-							set_blocker = "tb_ancient_cryo_chambers"
 						}
 					}
 					10 = { 
@@ -543,7 +549,125 @@ country_event = {
 				}
 			}
 			add_modifier = { days = -1 modifier = Living_Infrastructure }
-			gpm_spawn_fallen_empire_modifier = yes
+			random_list = {
+				100 = {
+					add_modifier = { days = -1 modifier = "Utopian_World" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Utopian_World" }
+					set_planet_flag = "gpm_is_fallen_empire_start_world"
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Utopian_Services" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Utopian_Services" }
+					set_planet_flag = "gpm_is_fallen_empire_start_world"
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Planetary_Shielding_FE" }
+					gpm_set_fallen_empire_planetary_shields = yes
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Planetary_Shielding_FE" }
+					set_planet_flag = "gpm_is_fallen_empire_start_world"
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Galactic_Databanks" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Galactic_Databanks" }
+					set_planet_flag = "gpm_is_fallen_empire_start_world"
+				}
+			}
+		}
+	}
+}
+
+### Life Seeded civic gamestart
+country_event = {
+	id = gpm_game_start.4
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = { 
+		has_civic = civic_life_seeded 
+	}
+
+	immediate = {
+		random_owned_planet ={
+			limit = { is_capital = yes }
+			set_planet_flag = gpm_civic_start_planet
+			gpm_spawn_terraform_modifier = yes
+			gpm_spawn_terraform_modifier = yes
+		}
+	}
+}
+
+### Post Apocalypse civic gamestart
+country_event = {
+	id = gpm_game_start.5
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = { 
+		has_civic = civic_post_apocalyptic 
+	}
+
+	immediate = {
+		random_owned_planet ={
+			limit = { is_capital = yes }
+			set_planet_flag = gpm_civic_start_planet
+			random_list = {
+				100 = {
+					add_modifier = { days = -1 modifier = "Ruined_Battlefield" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Ruined_Battlefield" }
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Recent_Mass_Extinction" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Recent_Mass_Extinction" }
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Surface_Of_Bones" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Surface_Of_Bones" }
+				}
+			}
+			random_list = {
+				100 = {
+					add_modifier = { days = -1 modifier = "Ruined_Battlefield" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Ruined_Battlefield" }
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Recent_Mass_Extinction" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Recent_Mass_Extinction" }
+				}
+				100 = {
+					add_modifier = { days = -1 modifier = "Surface_Of_Bones" }
+					# On these planets #
+					# TWeaks #
+					# Not with these modifiers #
+					modifier = { factor = 0 has_modifier = "Surface_Of_Bones" }
+				}
+			}
 		}
 	}
 }

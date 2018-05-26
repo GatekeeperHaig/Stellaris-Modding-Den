@@ -16,8 +16,13 @@ country_event = {
 		every_planet = {
 			if = {
 				limit = {
-					gpm_is_planet_habitable = yes
 					exists = owner
+					OR = {
+						gpm_is_planet_habitable = yes
+						gpm_is_planet_machine = yes
+						gpm_is_planet_ringworld = yes
+						gpm_is_planet_habitat = yes
+					}
 					is_fallen_empire_planet = yes
 				}
 				planet_event = { id = gpm_spawn_engine.1 days = 3}	# Fallen Empire Planet Modifiers + Effects
@@ -94,6 +99,16 @@ country_event = {
 			if = { limit = { solar_system = { has_star_flag = gpm_guardians_ego_system } }
 				planet_event = { id = gpm_guardian.1 days = 1 } # spawn Ego
 			}
+			
+			# Remove x% of uncontrolled space mineral and energy deposits from specific planets to balance out increased deposit spawns.
+			if = {
+				limit = {
+					solar_system = {
+						NOT = { exists = space_owner }
+					}
+				}
+				gpm_deposit_reduction_generator = yes
+			}
 		}
 
 		# Further initialisations:
@@ -110,36 +125,78 @@ planet_event = {
 	immediate = {
 		if = {
 			limit = {
-				is_capital = yes
+				has_global_flag = gpm_modifier_amount_low
 			}
-			# Remove all bad planet modifiers
-			gpm_remove_negative_modifiers = yes
-			# Spawn two guaranteed fallen empire modifier for capital worlds
-			gpm_spawn_fallen_empire_modifier = yes
-			gpm_spawn_fallen_empire_modifier = yes
-			# Chance to spawn one fallen empire modifier
-			random_list = {
-				50 = {}
-				50 = { gpm_spawn_fallen_empire_modifier = yes }
+			if = {
+				limit = {
+					is_capital = yes
+				}
+				# Remove all bad planet modifiers
+				gpm_remove_negative_modifiers = yes
+				# Spawn two guaranteed fallen empire modifier for capital worlds
+				gpm_spawn_fallen_empire_modifier = yes
+				gpm_spawn_fallen_empire_modifier = yes
+				# Chance to spawn one fallen empire modifier
+				random_list = {
+					50 = {}
+					50 = { gpm_spawn_fallen_empire_modifier = yes }
+				}
+			}
+			if = {
+				limit = {
+					NOT = { is_capital = yes }
+					is_colony = yes
+				}
+				# Remove all bad planet modifiers
+				gpm_remove_negative_modifiers = yes
+				# Spawn one guaranteed fallen empire modifier for colonies
+				gpm_spawn_fallen_empire_modifier = yes
+				random_list = {
+					50 = {}
+					50 = { gpm_spawn_fallen_empire_modifier = yes }
+				}
 			}
 		}
 		if = {
 			limit = {
-				NOT = { is_capital = yes }
-				is_colony = yes
+				OR = {
+					has_global_flag = gpm_modifier_amount_normal
+					has_global_flag = gpm_modifier_amount_high
+				}
 			}
-			# Remove all bad planet modifiers
-			gpm_remove_negative_modifiers = yes
-			# Spawn one guaranteed fallen empire modifier for colonies
-			gpm_spawn_fallen_empire_modifier = yes
-			random_list = {
-				50 = {}
-				50 = { gpm_spawn_fallen_empire_modifier = yes }
+			if = {
+				limit = {
+					is_capital = yes
+				}
+				# Remove all bad planet modifiers
+				gpm_remove_negative_modifiers = yes
+				# Spawn two guaranteed fallen empire modifier for capital worlds
+				gpm_spawn_fallen_empire_modifier = yes
+				gpm_spawn_fallen_empire_modifier = yes
+				# Chance to spawn one fallen empire modifier
+				random_list = {
+					50 = {}
+					50 = { gpm_spawn_fallen_empire_modifier = yes }
+				}
 			}
-			# Chance to spawn one fallen empire modifier
-			random_list = {
-				50 = {}
-				50 = { gpm_spawn_fallen_empire_modifier = yes }
+			if = {
+				limit = {
+					NOT = { is_capital = yes }
+					is_colony = yes
+				}
+				# Remove all bad planet modifiers
+				gpm_remove_negative_modifiers = yes
+				# Spawn one guaranteed fallen empire modifier for colonies
+				gpm_spawn_fallen_empire_modifier = yes
+				random_list = {
+					50 = {}
+					50 = { gpm_spawn_fallen_empire_modifier = yes }
+				}
+				# Chance to spawn one fallen empire modifier
+				random_list = {
+					50 = {}
+					50 = { gpm_spawn_fallen_empire_modifier = yes }
+				}
 			}
 		}
 	}
@@ -158,11 +215,18 @@ planet_event = {
 			}
 			if = { limit = { NOT = { num_modifiers > 2} }
 				random_list = {
-					900 = {}
-					99 = { gpm_spawn_planet_modifier = yes }
-					1 = {
+					900 = {
+						#this ensures dead worlds arent so boring without affecting habitable worlds
+						modifier = { factor = 0.90
+								gpm_is_planet_uninhabitable = yes
+								gpm_is_planet_gas_giant = yes
+							}
+						}
+					98 = { gpm_spawn_planet_modifier = yes }
+					2 = {
 						gpm_spawn_precursor_modifier = yes
-						modifier = { factor = 6 gpm_is_planet_habitable = yes } # Higher chance of habitable
+						modifier = { factor = 2.5 gpm_is_planet_habitable = yes } # Higher chance of habitable
+						modifier = { factor = 0.75 gpm_is_planet_uninhabitable = yes }
 						modifier = { factor = 0
 							solar_system = {
 								any_planet = {
@@ -176,11 +240,12 @@ planet_event = {
 			if = { limit = { NOT = { num_modifiers > 2} }
 				random_list = {
 					975 = {}
-					24 = { gpm_spawn_planet_modifier = yes }
-					1 = {
+					23 = { gpm_spawn_planet_modifier = yes }
+					2 = {
 						gpm_spawn_precursor_modifier = yes
-						modifier = { factor = 6 gpm_is_planet_habitable = yes } # Higher chance of habitable
-						modifier = { factor = 20 gpm_has_precursor_modifiers = yes } # Higher chance if there are already precursor modifiers
+						modifier = { factor = 2.5 gpm_is_planet_habitable = yes } # Higher chance of habitable
+						modifier = { factor = 0.75 gpm_is_planet_uninhabitable = yes }
+						modifier = { factor = 30 gpm_has_precursor_modifiers = yes } # Higher chance if there are already precursor modifiers
 						modifier = { factor = 0
 							solar_system = {
 								any_planet = {
@@ -199,11 +264,18 @@ planet_event = {
 			}
 			if = { limit = { NOT = { num_modifiers > 3} }
 				random_list = {
-					700 = {}
-					298 = { gpm_spawn_planet_modifier = yes }
-					1 = {
+					650 = {
+						#this ensures dead worlds arent so boring without affecting habitable worlds
+						modifier = { factor = 0.5
+								gpm_is_planet_uninhabitable = yes
+								gpm_is_planet_gas_giant = yes
+							}
+						}
+					245 = { gpm_spawn_planet_modifier = yes }
+					5 = {
 						gpm_spawn_precursor_modifier = yes
-						modifier = { factor = 12 gpm_is_planet_habitable = yes } # Higher chance of habitable
+						modifier = { factor = 3 gpm_is_planet_habitable = yes } # Higher chance of habitable
+						modifier = { factor = 0.3 gpm_is_planet_uninhabitable = yes }modifier = { add = 10 gpm_is_planet_habitable = yes } # Higher chance of habitable
 						modifier = { factor = 0
 							solar_system = {
 								any_planet = {
@@ -217,11 +289,12 @@ planet_event = {
 			if = { limit = { NOT = { num_modifiers > 3} }
 				random_list = {
 					750 = {}
-					248 = { gpm_spawn_planet_modifier = yes }
-					1 = { 
+					245 = { gpm_spawn_planet_modifier = yes }
+					5 = { 
 						gpm_spawn_precursor_modifier = yes
-						modifier = { factor = 8 gpm_is_planet_habitable = yes } # Higher chance of habitable
-						modifier = { factor = 20 gpm_has_precursor_modifiers = yes } # Higher chance if there are already precursor modifiers
+						modifier = { factor = 3 gpm_is_planet_habitable = yes } # Higher chance of habitable
+						modifier = { factor = 0.3 gpm_is_planet_uninhabitable = yes }
+						modifier = { factor = 30 gpm_has_precursor_modifiers = yes } # Higher chance if there are alreadyalready precursor modifiers
 						modifier = { factor = 0
 							solar_system = {
 								any_planet = {
@@ -235,11 +308,12 @@ planet_event = {
 			if = { limit = { NOT = { num_modifiers > 3} }
 				random_list = {
 					800 = {}
-					198 = { gpm_spawn_planet_modifier = yes }
-					1 = { 
+					195 = { gpm_spawn_planet_modifier = yes }
+					5 = { 
 						gpm_spawn_precursor_modifier = yes
-						modifier = { factor = 8 gpm_is_planet_habitable = yes } # Higher chance of habitable
-						modifier = { factor = 20 gpm_has_precursor_modifiers = yes } # Higher chance if there are already precursor modifiers
+						modifier = { factor = 3 gpm_is_planet_habitable = yes } # Higher chance of habitable
+						modifier = { factor = 0.3 gpm_is_planet_uninhabitable = yes }
+						modifier = { factor = 30 gpm_has_precursor_modifiers = yes } # Higher chance if there are alreadyalready precursor modifiers
 						modifier = { factor = 0
 							solar_system = {
 								any_planet = {
@@ -259,9 +333,10 @@ planet_event = {
 			if = { limit = { NOT = { num_modifiers > 3} }
 				random_list = {
 					997 = { gpm_spawn_planet_modifier = yes }
-					2 = { 
+					5 = { 
 						gpm_spawn_precursor_modifier = yes
-						modifier = { factor = 10 gpm_is_planet_habitable = yes } # Higher chance of habitable
+						modifier = { factor = 3 gpm_is_planet_habitable = yes } # Higher chance of habitable
+						modifier = { factor = 0.3 gpm_is_planet_uninhabitable = yes }
 						modifier = { factor = 0
 							solar_system = {
 								any_planet = {
@@ -275,11 +350,12 @@ planet_event = {
 			if = { limit = { NOT = { num_modifiers > 3} }
 				random_list = {
 					800 = {} # higher because we already guarantee 1 modifier
-					198 = { gpm_spawn_planet_modifier = yes }
-					2 = { 
+					197 = { gpm_spawn_planet_modifier = yes }
+					5 = { 
 						gpm_spawn_precursor_modifier = yes
-						modifier = { factor = 5 gpm_is_planet_habitable = yes } # Higher chance of habitable
-						modifier = { factor = 20 gpm_has_precursor_modifiers = yes } # Higher chance if there are already precursor modifiers
+						modifier = { factor = 3 gpm_is_planet_habitable = yes } # Higher chance of habitable
+						modifier = { factor = 0.3 gpm_is_planet_uninhabitable = yes }
+						modifier = { factor = 30 gpm_has_precursor_modifiers = yes } # Higher chance if there are alreadyalready precursor modifiers
 						modifier = { factor = 0
 							solar_system = {
 								any_planet = {
@@ -293,11 +369,12 @@ planet_event = {
 			if = { limit = { NOT = { num_modifiers > 3} }
 				random_list = {
 					900 = {} # higher because we already guarantee 1 modifier
-					98 = { gpm_spawn_planet_modifier = yes }
-					2 = { 
+					97 = { gpm_spawn_planet_modifier = yes }
+					5 = { 
 						gpm_spawn_precursor_modifier = yes
-						modifier = { factor = 5 gpm_is_planet_habitable = yes } # Higher chance of habitable
-						modifier = { factor = 20 gpm_has_precursor_modifiers = yes } # Higher chance if there are already precursor modifiers
+						modifier = { factor = 4 gpm_is_planet_habitable = yes } # Higher chance of habitable
+						modifier = { factor = 0.3 gpm_is_planet_uninhabitable = yes }
+						modifier = { factor = 30 gpm_has_precursor_modifiers = yes } # Higher chance if there are already already precursor modifiers
 						modifier = { factor = 0
 							solar_system = {
 								any_planet = {
@@ -441,12 +518,12 @@ planet_event = {
 	
 	immediate = {
 		random_list = {
-			700 = {}
-			300 = { gpm_spawn_asteroid_modifier = yes }
+			750 = {}
+			250 = { gpm_spawn_asteroid_modifier = yes }
 		}
 		random_list = {
-			800 = {}
-			200 = { gpm_spawn_asteroid_modifier = yes }
+			850 = {}
+			150 = { gpm_spawn_asteroid_modifier = yes }
 		}
 	}
 }

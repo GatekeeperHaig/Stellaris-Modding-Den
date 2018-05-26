@@ -12,6 +12,16 @@ planet_event = { id = gpm_colony.1 hide_window = yes is_triggered_only = yes
 			}
 			owner = {
 				is_ai = yes
+				# new 21/04/2018 -guilli
+				NOT = {
+                    OR = {
+                        is_country_type = swarm
+                        is_country_type = extradimensional
+                        is_country_type = extradimensional_2
+                        is_country_type = extradimensional_3
+                        is_country_type = ai_empire
+                    }
+                }
 			}
 		}
 	}
@@ -3351,12 +3361,13 @@ planet_event = {
 		NOT = { 
 			has_planet_flag = gpm_colony_forest_growth_event
 		}
+		gpm_is_planet_habitable = yes
 		count_tile = {
 			limit = { 
 				OR = { 
-					has_pop = no 
-					has_building = no 
-					has_blocker = no 
+					has_pop = no
+					has_building = no
+					has_blocker = no
 				}
 			}
 			count > 2
@@ -6268,7 +6279,7 @@ planet_event = {
 ### Fallen Empire Events ###
 ############################
 
-# On colonizing of new world.
+# Fallen Empire Colony development start event
 planet_event = {
 	id = gpm_colony.7000
 	hide_window = yes
@@ -6279,32 +6290,16 @@ planet_event = {
 	trigger = {
 		exists = owner
 		is_fallen_empire_planet = yes
-		NOT = {
-			has_planet_flag = gpm_colony_fallen_empire_modifier_event
-		}
+		NOT = { has_planet_flag = fallen_empire_world } # This excludes worlds the fallen empire started with.
 	}
 	
 	immediate = {
 		log = "---- Fired Event gpm_colony.7000 ----"
-		log = "---- On Planet: [This.GetName] ----"
-		log = "---- spawn fallen empire colony modifiers ----"
-		set_planet_flag = gpm_colony_fallen_empire_modifier_event
-		
-		gpm_remove_negative_modifiers = yes
-		gpm_remove_neutral_modifiers = yes
-		# Spawn one guaranteed fallen empire modifier for colonies
-		gpm_spawn_fallen_empire_modifier = yes
-		# Chance to spawn one fallen empire modifier
-		random_list = {
-			50 = {}
-			50 = { gpm_spawn_fallen_empire_modifier = yes }
-		}
+		planet_event = { id = gpm_colony.7100 days = 720 }
 	}
 }
 
-# On gaining a new world trough other means (conquest, ..)
-#From = Country scope (new owner)
-#This = Planet scope
+# Fallen Empire Colony development Event
 planet_event = {
 	id = gpm_colony.7100
 	hide_window = yes
@@ -6315,25 +6310,16 @@ planet_event = {
 	trigger = {
 		exists = owner
 		is_fallen_empire_planet = yes
-		NOT = {
-			has_planet_flag = gpm_colony_fallen_empire_modifier_event
-		}
+		NOT = { has_planet_flag = gpm_developed_fallen_empire_world } # This excludes worlds the fallen empire already developed (incase of re-conquests)
 	}
 	
 	immediate = {
 		log = "---- Fired Event gpm_colony.7100 ----"
-		log = "---- On Planet: [This.GetName] ----"
-		log = "---- spawn fallen empire colony modifiers ----"
-		set_planet_flag = gpm_colony_fallen_empire_modifier_event
 		
 		gpm_remove_negative_modifiers = yes
 		gpm_remove_neutral_modifiers = yes
 		# Spawn one guaranteed fallen empire modifier for colonies
 		gpm_spawn_fallen_empire_modifier = yes
-		# Chance to spawn one fallen empire modifier
-		random_list = {
-			50 = {}
-			50 = { gpm_spawn_fallen_empire_modifier = yes }
-		}
+		set_planet_flag = gpm_developed_fallen_empire_world
 	}
 }
