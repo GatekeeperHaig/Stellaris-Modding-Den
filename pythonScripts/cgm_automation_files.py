@@ -391,6 +391,7 @@ def main():
     planetFindBestEventImmediate.variableOp("change", resource+"_mult_planet", resource+"_mult_planet_pop")
     planetSpecificWeight=planetFindBestEventImmediate.createReturnIf(TagList("has_planet_flag", "cgm_player_focus_"+resource))
     nonSpecific=TagList()
+    planetFindBestEventImmediate.add("else", nonSpecific) #fixed 2.1
     if resource=="food":
       planetSpecificWeight.variableOp("set", resource+"_country_weight_TILE", "cgm_focus_strength")
       nonSpecific.variableOp("set", resource+"_country_weight_TILE", "owner")
@@ -399,7 +400,6 @@ def main():
       planetSpecificWeight.variableOp("set", resource+"_country_weight", "cgm_focus_strength")
       nonSpecific.variableOp("set", resource+"_country_weight", "owner")
       planetFindBestEventImmediate.variableOp("multiply", resource+"_mult_planet", resource+"_country_weight")
-    planetSpecificWeight.add("else", nonSpecific)
 
   everyTileSearch=TagList()
   planetFindBestEventImmediate.add("every_tile", everyTileSearch)
@@ -415,8 +415,8 @@ def main():
   specialResourcePossible.variableOp("set", "cgm_curWeight", 50)
   specialResourcePossible.variableOp("set", "cgm_curType", len(weightTypes)+1)
 
-  everyTileSearchNoSpecial=everyTileSearch.addReturn("else")
-
+  everyTileSearchNoSpecial=everyTileSearch.addReturn("else") #fixed 2.1
+ 
   everyTileSearchNoSpecial.add("calculate_tile_weight","yes")
   everyTileSearchNoSpecial=everyTileSearchNoSpecial.addReturn("prev")
   for resource in resources:
