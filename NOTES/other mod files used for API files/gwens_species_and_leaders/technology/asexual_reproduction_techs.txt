@@ -1,0 +1,262 @@
+##################
+### TECH COSTS ###
+##################
+#If you change any of these, use replace in files so the values are the same across all files
+
+@tier1cost1 = 500
+@tier1cost2 = 750
+@tier1cost3 = 1000
+
+@tier2cost1 = 1500
+@tier2cost2 = 2000
+@tier2cost3 = 2500
+
+@tier3cost1 = 4000
+@tier3cost2 = 5000
+@tier3cost3 = 6000
+
+@tier4cost1 = 8000
+@tier4cost2 = 10000
+@tier4cost3 = 12000
+
+@tier5cost1 = 15000
+@tier5cost2 = 17500
+@tier5cost3 = 20000
+
+####################
+### TECH WEIGHTS ###
+####################
+
+@tier1weight1 = 100
+@tier1weight2 = 95
+@tier1weight3 = 90
+
+@tier2weight1 = 85
+@tier2weight2 = 75
+@tier2weight3 = 70
+
+@tier3weight1 = 65
+@tier3weight2 = 60
+@tier3weight3 = 50
+
+@tier4weight1 = 45
+@tier4weight2 = 40
+@tier4weight3 = 35
+
+@tier5weight1 = 30
+@tier5weight2 = 25
+@tier5weight3 = 20
+
+#Targeted Gene Expressions
+@tech_gene_expressions_POINTS = 1
+tech_asexual_reproduction_gene_modding = {
+	icon = "Blank-Slate Gene Modding"
+	cost = @tier3cost3
+	area = society
+	is_rare = yes
+	category = { biology }
+	tier = 3
+	prerequisites = { "tech_gene_tailoring" }
+	weight = @tier3weight3
+	
+	modifier = {
+		description_parameters = {
+			POINTS = @tech_gene_expressions_POINTS
+		}
+		BIOLOGICAL_species_trait_points_add = @tech_gene_expressions_POINTS
+	}
+	
+	potential = {
+		OR = {
+			NOT = { has_authority = auth_machine_intelligence }
+			has_civic = civic_machine_assimilator
+			has_civic = civic_machine_servitor
+		}
+	}
+	
+	weight_modifier = {
+		modifier = {
+			factor = 1.25
+			has_authority = auth_hive_mind
+		}		
+		modifier = {
+			factor = 0.50
+			NOR = {
+				research_leader = {
+					area = society
+					has_trait = "leader_trait_expertise_biology"
+				}
+				research_leader = {
+					area = society
+					has_trait = "leader_trait_curator"
+				}
+			}
+		}
+		modifier = {
+			factor = 1.50
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_spark_of_genius"
+			}
+		}
+		modifier = {
+			factor = 0
+			NOR = {
+				research_leader = {
+					area = society
+					has_trait = "Gwen_Adaptation_Asexual_Reproduction_Sci"
+				}
+			}
+		}
+	}	
+	
+	ai_weight = {
+		factor = 3 #rare tech
+		modifier = {
+			factor = 1.25
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_biology"
+			}
+		}
+	}
+}
+tech_asexual_reproduction_basic_asexual_cloning = {
+	icon = "Simple Asexual Cloning"
+	cost = @tier1cost2
+	area = society
+	tier = 1
+	is_rare = yes
+	category = { biology }
+	prerequisites = { "tech_genome_mapping" }
+	weight = @tier1weight2
+	
+	potential = {
+		OR = {
+			NOT = { has_authority = auth_machine_intelligence }
+			has_civic = civic_machine_assimilator
+		}
+	}
+	
+	weight_modifier = {
+		factor = 0.5
+		modifier = {
+			factor = 1.25
+			has_authority = auth_hive_mind
+		}
+		modifier = {
+			factor = 0.20
+			NOR = {
+				research_leader = {
+					area = society
+					has_trait = "leader_trait_expertise_biology"
+				}
+				research_leader = {
+					area = society
+					has_trait = "leader_trait_curator"
+				}
+			}
+		}		
+		modifier = {
+			factor = 1.25
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_spark_of_genius"
+			}
+		}
+		modifier = {
+			factor = 1.5
+			research_leader = {
+				area = society
+				has_level > 4
+			}
+		}
+		modifier = {
+			factor = 0.75
+			research_leader = {
+				area = society
+				has_level < 2
+			}
+		}
+		modifier = {
+			factor = 0
+			NOR = {
+				research_leader = {
+					area = society
+					has_trait = "Gwen_Adaptation_Asexual_Reproduction_Sci"
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 3 #rare tech
+		modifier = {
+			factor = 1.25
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_biology"
+			}
+		}
+	}
+}
+#Cloning
+tech_asexual_reproduction_brood_home = {
+	icon = "Brood Home (Tech)"
+	cost = @tier2cost2
+	area = society
+	tier = 2
+	is_rare = yes
+	category = { biology }	
+	prerequisites = { "tech_cloning" "tech_asexual_reproduction_basic_asexual_cloning" }
+	weight = @tier2weight2
+	
+	modifier = {
+#		 country_occupation_armies_add = 1
+	}
+
+	potential = {
+		OR = {
+			NOT = { has_authority = auth_machine_intelligence }
+			has_civic = civic_machine_assimilator
+		}
+	}
+	
+	weight_modifier = {
+		factor = 1.5 	# genetech needs to be a bit more common
+		modifier = {
+			factor = 1.25
+			has_authority = auth_hive_mind
+		}
+		modifier = {
+			factor = 1.25
+			has_tradition = tr_supremacy_adopt
+		}
+		modifier = {
+			factor = 1.25
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_biology"
+			}
+		}
+		modifier = {
+			factor = 0
+			NOR = {
+				research_leader = {
+					area = society
+					has_trait = "Gwen_Adaptation_Asexual_Reproduction_Sci"
+				}
+			}
+		}
+	}
+	
+	ai_weight = {
+		modifier = {
+			factor = 1.25
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_biology"
+			}
+		}
+	}
+}
