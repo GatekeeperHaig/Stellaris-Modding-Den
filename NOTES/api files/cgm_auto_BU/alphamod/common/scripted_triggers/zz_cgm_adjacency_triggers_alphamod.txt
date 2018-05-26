@@ -10,7 +10,10 @@ food_adjacency_any_building_available_alphamod = {
 			prev = {
 				planet = {
 					NOT = { has_modifier = "capital" }
-					owner = { not = { has_ethic = ethic_gestalt_consciousness } }
+					owner = {
+						exists = owner
+						not = { has_ethic = ethic_gestalt_consciousness }
+					}
 				}
 			}
 			prev = {
@@ -46,6 +49,7 @@ food_adjacency_any_building_available_alphamod = {
 				planet = {
 					NOT = { has_modifier = "capital" }
 					owner = {
+						exists = owner
 						not = { has_technology = tech_alpha_colony_control }
 						not = { has_ethic = ethic_gestalt_consciousness }
 					}
@@ -129,6 +133,8 @@ food_adjacency_any_building_available_alphamod = {
 						is_planet_class = pc_savannah
 						is_planet_class = pc_nuked
 					}
+					exists = owner
+					owner = { not = { has_authority = auth_machine_intelligence } }
 				}
 			}
 			NOR = {
@@ -138,7 +144,13 @@ food_adjacency_any_building_available_alphamod = {
 			}
 		}
 		AND = {
-			prev = { planet = { is_planet_class = pc_ocean } }
+			prev = {
+				planet = {
+					is_planet_class = pc_ocean
+					exists = owner
+					owner = { not = { has_authority = auth_machine_intelligence } }
+				}
+			}
 			NOR = { has_building = building_desalinator }
 		}
 		AND = {
@@ -299,7 +311,10 @@ minerals_adjacency_any_building_available_alphamod = {
 			prev = {
 				planet = {
 					NOT = { has_modifier = "capital" }
-					owner = { not = { has_ethic = ethic_gestalt_consciousness } }
+					owner = {
+						exists = owner
+						not = { has_ethic = ethic_gestalt_consciousness }
+					}
 				}
 			}
 			prev = {
@@ -371,6 +386,20 @@ minerals_adjacency_any_building_available_alphamod = {
 			NOR = { has_building = building_exo_ops }
 		}
 		AND = {
+			prev = {
+				planet = { any_tile = { has_mountains = yes } }
+			}
+			prev = {
+				custom_tooltip = {
+					text = "requirement_mountains"
+					tile = {
+						any_neighboring_tile = { has_mountains = yes has_building_construction = no }
+					}
+				}
+			}
+			NOR = { has_building = building_mountain_quarry }
+		}
+		AND = {
 			owner = { has_technology = "tech_alpha_natfuel_sourcing_3" }
 			prev = { planet = { has_natural_fuels_sourcer = yes } }
 			prev = {
@@ -417,25 +446,14 @@ engineering_research_adjacency_any_building_available_alphamod = {
 			owner = { has_technology = "tech_alpha_fanatic_materialism_2" }
 			prev = {
 				planet = {
-					owner = {
-						OR = {
-							has_ethic = ethic_materialist
-							has_ethic = ethic_fanatic_materialist
-							has_ethic = ethic_egalitarian
-							has_ethic = ethic_fanatic_egalitarian
-						}
-					}
+					exists = owner
+					owner = { has_egalitarian_or_materialist_ethos = yes }
 				}
 			}
 			prev = {
 				custom_tooltip = {
 					text = "requires_science_deposit"
-					tile = {
-						or = {
-							has_resource = { type = society_research amount > 0 }
-							has_resource = { type = physics_research amount > 0 }
-						}
-					}
+					tile = { has_society_or_physics_deposit = yes }
 				}
 			}
 		}
@@ -450,6 +468,7 @@ society_research_adjacency_any_building_available_alphamod = {
 			prev = {
 				planet = {
 					has_building = "building_templeofrule"
+					exists = owner
 					owner = { has_spiritualist_ethos = yes }
 				}
 			}

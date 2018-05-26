@@ -57,7 +57,12 @@ building_open_embassy = {
 	produced_resources = { society_research = 2 unity = 1 }
 	produced_resource_trigger = {
 		modifier = {
-			or = { has_ethic = ethic_xenophile has_ethic = ethic_fanatic_xenophile }
+			or = {
+				has_ethic = ethic_xenophile
+				has_ethic = ethic_fanatic_xenophile
+				has_ethic = ethic_fanatic_pacifist
+			}
+			nor = { has_ethic = ethic_xenophobe has_ethic = ethic_fanatic_xenophobe }
 			resources = { sr_ambassadors = 1 }
 		}
 	}
@@ -69,11 +74,22 @@ building_open_embassy = {
 		country_resource_influence_add = 0.1
 	}
 	prerequisites = { "tech_alpha_open_embassies" }
-	 # ai_special_building = yes
+	ai_allow = {
+		has_society_deposit = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
 	ai_replace = no
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
 	potential = {
 		planet = {
-			owner = { not = { has_country_flag = cf_openembassies_5 } }
+			exists = owner
+			owner = {
+				not = { has_country_flag = cf_openembassies_5 }
+				not = { has_authority = auth_machine_intelligence }
+			}
 			solar_system = {
 				any_neighbor_system = {
 					exists = space_owner
@@ -181,24 +197,21 @@ building_open_embassy = {
 			}
 		}
 	}
-	ai_allow = {
-		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
-	}
 }
 building_refuge = {
 	base_buildtime = 180
 	planet_unique = yes
 	cost = { minerals = 100 energy = 150 }
 	required_resources = { energy = 1 }
+	produced_resources = { food = 1 }
 	potential = {
 		planet = {
 			solar_system = {
 				any_neighbor_system = {
 					exists = space_owner
 					space_owner = {
-						is_ai = yes
 						or = {
-							is_country_type = neutral_zone
+							 # is_country_type = neutral_zone
 							is_at_war = yes
 							has_ethic = ethic_militarist
 							has_ethic = ethic_fanatic_militarist
@@ -212,26 +225,11 @@ building_refuge = {
 			}
 		}
 	}
-	planet_modifier = {
-		 # planet_border_mult = 0.25
-	}
-	 # triggered_planet_modifier = {
-	 # key = refuge_inactive
-	 # potential = {
-	 # owner = {
-	 # is_at_war = yes
-	 # }
-	 # }
-	 # modifier = {
-	 # # planet_border_mult = -0.25
-	 # }
-	 # }
 	triggered_planet_modifier = {
 		key = refuge_onstandby
 		potential = {
-			 # owner = {
-			 # is_at_war = no
-			 # }
+			exists = owner
+			owner = { is_at_war = no }
 			not = {
 				solar_system = {
 					any_neighbor_system = {
@@ -241,14 +239,12 @@ building_refuge = {
 				}
 			}
 		}
-		modifier = { planet_migration_xeno_pull = 0.1 pop_ethic_pacifist_attraction_mult = 0.1 }
+		modifier = { planet_migration_xeno_pull = 0.25 pop_ethic_pacifist_attraction_mult = 0.1 }
 	}
 	triggered_planet_modifier = {
 		key = refuge_more_active
 		potential = {
-			 # owner = {
-			 # is_at_war = no
-			 # }
+			exists = owner
 			solar_system = {
 				any_neighbor_system = {
 					exists = space_owner
@@ -256,19 +252,17 @@ building_refuge = {
 				}
 			}
 		}
-		modifier = { planet_migration_xeno_pull = 0.8 pop_ethic_pacifist_attraction_mult = 0.25 }
+		modifier = { planet_migration_xeno_pull = 1.0 pop_ethic_pacifist_attraction_mult = 0.25 }
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
 	}
 	prerequisites = { "tech_alpha_pacifism" }
-	ai_weight = {
-		weight = @weightuseful
-		modifier = {
-			factor = 0
-			from = { sector_controlled = yes }
-		}
-	}
-	 # ai_special_building = yes
+	ai_weight = { weight = @weightuseful }
 	ai_replace = no
 	ai_allow = {
+		or = { has_resource = no has_food_deposit = yes }
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
 }
@@ -287,15 +281,19 @@ building_xeno_diplomacy_corp = {
 	}
 	required_resources = { energy = 2 }
 	produced_resources = { society_research = 3 }
+	produced_resource_trigger = {
+		modifier = {
+			has_ethic = ethic_xenophile
+			resources = { sr_ambassadors = 2 }
+		}
+		modifier = {
+			has_ethic = ethic_fanatic_xenophile
+			resources = { sr_ambassadors = 3 }
+		}
+	}
 	country_modifier = { diplomacy_influence_cost = -0.05 country_trust_growth = 0.05 }
 	potential = {
-		planet = {
-			OR = {
-				has_building = "building_capital_1"
-				has_building = "building_capital_2"
-				has_building = "building_capital_3"
-			}
-		}
+		planet = { has_capital_bio = yes }
 		NAND = {
 			owner = { has_technology = "tech_alpha_mediation" }
 			NOT = { owner = { has_country_flag = display_low_tier_flag } }
@@ -303,8 +301,10 @@ building_xeno_diplomacy_corp = {
 		}
 	}
 	prerequisites = { "tech_alpha_diplomatic_corps" }
-	upgrades = { building_peace_corps }
-	 # ai_special_building = yes
+	destroy_if = {
+		exists = owner
+		owner = { not = { has_technology = tech_alpha_diplomatic_corps } }
+	}
 	ai_replace = no
 	ai_weight = {
 		weight = @weightimportant
@@ -329,6 +329,7 @@ building_xeno_diplomacy_corp = {
 			from = { sector_controlled = yes }
 		}
 	}
+	upgrades = { building_peace_corps }
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
@@ -353,6 +354,14 @@ building_peace_corps_direct_build = {
 			or = { has_ethic = ethic_pacifist has_ethic = ethic_fanatic_pacifist }
 			resources = { sr_signs_peace = 3 }
 		}
+		modifier = {
+			has_ethic = ethic_xenophile
+			resources = { sr_ambassadors = 2 }
+		}
+		modifier = {
+			has_ethic = ethic_fanatic_xenophile
+			resources = { sr_ambassadors = 3 }
+		}
 	}
 	country_modifier = {
 		country_resource_influence_add = 0.25
@@ -360,8 +369,11 @@ building_peace_corps_direct_build = {
 		country_trust_growth = 0.1
 		pop_ethic_militarist_attraction_mult = -0.1
 	}
+	destroy_if = {
+		exists = owner
+		owner = { not = { has_technology = tech_alpha_mediation } }
+	}
 	prerequisites = { "tech_alpha_mediation" }
-	 # ai_special_building = yes
 	ai_replace = no
 	ai_weight = { weight = @weightcritical }
 	ai_allow = {
@@ -396,6 +408,14 @@ building_peace_corps = {
 			or = { has_ethic = ethic_pacifist has_ethic = ethic_fanatic_pacifist }
 			resources = { sr_signs_peace = 3 }
 		}
+		modifier = {
+			has_ethic = ethic_xenophile
+			resources = { sr_ambassadors = 2 }
+		}
+		modifier = {
+			has_ethic = ethic_fanatic_xenophile
+			resources = { sr_ambassadors = 3 }
+		}
 	}
 	country_modifier = {
 		country_resource_influence_add = 0.25
@@ -403,8 +423,11 @@ building_peace_corps = {
 		country_trust_growth = 0.1
 		pop_ethic_militarist_attraction_mult = -0.1
 	}
+	destroy_if = {
+		exists = owner
+		owner = { not = { has_technology = tech_alpha_mediation } }
+	}
 	prerequisites = { "tech_alpha_mediation" }
-	 # ai_special_building = yes
 	ai_replace = no
 	ai_weight = { weight = @weightcritical }
 	ai_allow = {
@@ -442,17 +465,12 @@ building_comms_hub = {
 	}
 	planet_modifier = { tile_resource_unity_mult = 0.05 }
 	country_modifier = { country_resource_unity_mult = 0.05 tradition_cost_num_colonies_mult = -0.1 }
-	potential = {
-		planet = {
-			OR = {
-				has_building = "building_capital_1"
-				has_building = "building_capital_2"
-				has_building = "building_capital_3"
-			}
-		}
+	destroy_if = {
+		exists = owner
+		owner = { not = { has_technology = tech_alpha_centralised_comms } }
 	}
+	potential = { planet = { has_capital_bio = yes } }
 	prerequisites = { "tech_alpha_centralised_comms" }
-	 # ai_special_building = yes
 	ai_replace = no
 	ai_weight = {
 		weight = @weightimportant
@@ -527,15 +545,19 @@ building_tradestation = {
 			has_policy_flag = trade_regulation_moderate
 			resources = { energy = 1 }
 		}
+		modifier = {
+			has_ascension_perk = ap_trade_guilds
+			resources = { energy = 1 }
+		}
 	}
 	potential = {
-		 # planet = {
-		 # has_spaceport = yes
-		 # }
 		planet = {
-			solar_system = {
-				exists = starbase
-				starbase = { has_starbase_size >= starbase_starport has_starbase_module = trading_hub }
+			or = {
+				is_planet_class = pc_habitat
+				solar_system = {
+					exists = starbase
+					starbase = { has_starbase_size >= starbase_starport has_starbase_module = trading_hub }
+				}
 			}
 		}
 		NAND = {
@@ -543,7 +565,7 @@ building_tradestation = {
 			custom_tooltip = {
 				text = "requires_level_2_capital"
 				planet = {
-					OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
+					OR = { has_building = "building_hab_capital" has_capital_bio_level2 = yes }
 				}
 			}
 			NOT = { owner = { has_country_flag = display_low_tier_flag } }
@@ -554,32 +576,33 @@ building_tradestation = {
 		custom_tooltip = {
 			text = "requires_level_1_capital_and_spaceport"
 			planet = {
-				 #has_spaceport = yes
-				OR = {
-					has_building = "building_capital_1"
-					has_building = "building_capital_2"
-					has_building = "building_capital_3"
-				}
+				OR = { has_building = "building_hab_capital" has_capital_bio = yes }
 			}
 		}
 	}
-	 # destroy_if = {
-	 # planet = { has_spaceport = no }
-	 # }
 	planet_modifier = { planet_resource_food_add = -2 }
 	triggered_planet_modifier = {
 		key = restrictive_regulation_ts
-		potential = { planet.owner = { has_policy_flag = trade_regulation_restrictive } }
+		potential = {
+			exists = owner
+			owner = { has_policy_flag = trade_regulation_restrictive }
+		}
 		modifier = { tile_resource_unity_mult = 0.05 planet_resource_food_add = 2 }
 	}
 	triggered_planet_modifier = {
 		key = moderate_regulation_ts
-		potential = { planet.owner = { has_policy_flag = trade_regulation_moderate } }
+		potential = {
+			exists = owner
+			owner = { has_policy_flag = trade_regulation_moderate }
+		}
 		modifier = { pop_citizen_happiness = 0.025 planet_resource_food_add = 1 }
 	}
 	triggered_planet_modifier = {
 		key = lax_regulation_ts
-		potential = { planet.owner = { has_policy_flag = trade_regulation_lax } }
+		potential = {
+			exists = owner
+			owner = { has_policy_flag = trade_regulation_lax }
+		}
 		modifier = { pop_consumer_goods_mult = -0.05 }
 	}
 	prerequisites = { "tech_trade_ports" }
@@ -598,8 +621,11 @@ building_tradestation = {
 			factor = 2.0
 			from = { planet_size > 15 }
 		}
+		modifier = {
+			factor = 500
+			from = { has_planet_flag = pf_tradebuilding_promoted }
+		}
 	}
-	 # ai_special_building = yes
 	ai_replace = no
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
@@ -610,7 +636,7 @@ building_trade_company_direct_build = {
 	planet_unique = yes
 	cost = { minerals = 300 energy = 400 }
 	required_resources = { minerals = 3 }
-	produced_resources = { sr_tradegoods = 1 sr_luxuries = 1 }
+	produced_resources = { sr_tradegoods = 2 sr_luxuries = 1 }
 	produced_resource_trigger = {
 		modifier = {
 			has_policy_flag = trade_regulation_restrictive
@@ -624,57 +650,52 @@ building_trade_company_direct_build = {
 			has_policy_flag = trade_regulation_lax
 			resources = { influence = 0.1 }
 		}
+		modifier = {
+			has_ascension_perk = ap_trade_guilds
+			resources = { energy = 2 }
+		}
 	}
 	planet_modifier = { planet_resource_food_add = -1 }
-	 # triggered_planet_modifier = {
-	 # key = restrictive_regulation_mc
-	 # potential = {
-	 # planet.owner = {
-	 # has_policy_flag = trade_regulation_restrictive
-	 # }
-	 # }
-	 # modifier = {
-	 # tile_resource_unity_mult = 0.1
-	 # planet_resource_food_add = 2
-	 # }
-	 # }
-	 # triggered_planet_modifier = {
-	 # key = moderate_regulation_mc
-	 # potential = {
-	 # planet.owner = {
-	 # has_policy_flag = trade_regulation_moderate
-	 # }
-	 # }
-	 # modifier = {
-	 # pop_citizen_happiness = 0.05
-	 # planet_resource_food_add = 1
-	 # }
-	 # }
-	 # triggered_planet_modifier = {
-	 # key = lax_regulation_mc
-	 # potential = {
-	 # planet.owner = {
-	 # has_policy_flag = trade_regulation_lax
-	 # }
-	 # }
-	 # modifier = {
-	 # pop_consumer_goods_mult = -0.1
-	 # }
-	 # }
-	 # destroy_if = {
-	 # planet = { has_spaceport = no }
-	 # }
+	triggered_planet_modifier = {
+		key = restrictive_regulation_ts
+		potential = {
+			exists = owner
+			owner = { has_policy_flag = trade_regulation_restrictive }
+		}
+		modifier = { tile_resource_unity_mult = 0.05 planet_resource_food_add = 1 }
+	}
+	triggered_planet_modifier = {
+		key = moderate_regulation_ts
+		potential = {
+			exists = owner
+			owner = { has_policy_flag = trade_regulation_moderate }
+		}
+		modifier = { pop_citizen_happiness = 0.025 planet_resource_food_add = 1 }
+	}
+	triggered_planet_modifier = {
+		key = lax_regulation_ts
+		potential = {
+			exists = owner
+			owner = { has_policy_flag = trade_regulation_lax }
+		}
+		modifier = { pop_consumer_goods_mult = -0.05 }
+	}
 	allow = {
 		custom_tooltip = {
 			text = "requires_level_2_capital"
 			planet = {
-				OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
+				OR = { has_building = "building_hab_capital" has_capital_bio_level2 = yes }
 			}
 		}
 	}
 	prerequisites = { "tech_merchant_companies" }
-	ai_weight = { weight = @weightimportant }
-	 # ai_special_building = yes
+	ai_weight = {
+		weight = @weightimportant
+		modifier = {
+			factor = 250
+			from = { has_planet_flag = pf_tradebuilding_promoted }
+		}
+	}
 	ai_replace = no
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
@@ -693,7 +714,7 @@ building_trade_company = {
 	is_listed = no
 	cost = { minerals = 200 energy = 250 }
 	required_resources = { minerals = 3 }
-	produced_resources = { sr_tradegoods = 1 sr_luxuries = 1 }
+	produced_resources = { sr_tradegoods = 2 sr_luxuries = 1 }
 	produced_resource_trigger = {
 		modifier = {
 			has_policy_flag = trade_regulation_restrictive
@@ -707,57 +728,52 @@ building_trade_company = {
 			has_policy_flag = trade_regulation_lax
 			resources = { influence = 0.1 }
 		}
+		modifier = {
+			has_ascension_perk = ap_trade_guilds
+			resources = { energy = 2 }
+		}
 	}
 	planet_modifier = { planet_resource_food_add = -1 }
-	 # triggered_planet_modifier = {
-	 # key = restrictive_regulation_mc
-	 # potential = {
-	 # planet.owner = {
-	 # has_policy_flag = trade_regulation_restrictive
-	 # }
-	 # }
-	 # modifier = {
-	 # tile_resource_unity_mult = 0.1
-	 # planet_resource_food_add = 2
-	 # }
-	 # }
-	 # triggered_planet_modifier = {
-	 # key = moderate_regulation_mc
-	 # potential = {
-	 # planet.owner = {
-	 # has_policy_flag = trade_regulation_moderate
-	 # }
-	 # }
-	 # modifier = {
-	 # pop_citizen_happiness = 0.05
-	 # planet_resource_food_add = 1
-	 # }
-	 # }
-	 # triggered_planet_modifier = {
-	 # key = lax_regulation_mc
-	 # potential = {
-	 # planet.owner = {
-	 # has_policy_flag = trade_regulation_lax
-	 # }
-	 # }
-	 # modifier = {
-	 # pop_consumer_goods_mult = -0.1
-	 # }
-	 # }
-	 # destroy_if = {
-	 # planet = { has_spaceport = no }
-	 # }
+	triggered_planet_modifier = {
+		key = restrictive_regulation_ts
+		potential = {
+			exists = owner
+			owner = { has_policy_flag = trade_regulation_restrictive }
+		}
+		modifier = { tile_resource_unity_mult = 0.05 planet_resource_food_add = 1 }
+	}
+	triggered_planet_modifier = {
+		key = moderate_regulation_ts
+		potential = {
+			exists = owner
+			owner = { has_policy_flag = trade_regulation_moderate }
+		}
+		modifier = { pop_citizen_happiness = 0.025 planet_resource_food_add = 1 }
+	}
+	triggered_planet_modifier = {
+		key = lax_regulation_ts
+		potential = {
+			exists = owner
+			owner = { has_policy_flag = trade_regulation_lax }
+		}
+		modifier = { pop_consumer_goods_mult = -0.05 }
+	}
 	allow = {
 		custom_tooltip = {
 			text = "requires_level_2_capital"
 			planet = {
-				OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
+				OR = { has_building = "building_hab_capital" has_capital_bio_level2 = yes }
 			}
 		}
 	}
 	prerequisites = { "tech_merchant_companies" }
-	ai_weight = { weight = @weightimportant }
-	 # ai_special_building = yes
+	ai_weight = {
+		weight = @weightimportant
+		modifier = {
+			factor = 250
+			from = { has_planet_flag = pf_tradebuilding_promoted }
+		}
+	}
 	ai_replace = no
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
@@ -782,19 +798,19 @@ building_gravitic_comms_array = {
 		}
 	}
 	ai_replace = no
+	ai_allow = {
+		or = { has_resource = no has_physics_deposit = yes }
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
 	planet_modifier = {
 		tile_resource_society_research_mult = 0.05
 		tile_resource_engineering_research_mult = 0.05
 		tile_resource_unity_mult = 0.05
+		pop_government_ethic_attraction = 0.1
 	}
 	potential = {
 		planet = {
-			OR = {
-				has_building = "building_capital_1"
-				has_building = "building_capital_2"
-				has_building = "building_capital_3"
-				has_building = "building_hab_capital"
-			}
+			OR = { has_capital_bio = yes has_building = "building_hab_capital" }
 		}
 		NAND = {
 			owner = { has_technology = "tech_alpha_subspace_comms" }
@@ -802,7 +818,6 @@ building_gravitic_comms_array = {
 			has_global_flag = direct_build_enabled
 		}
 	}
-	upgrades = { building_subspace_comms_array }
 	prerequisites = { "tech_alpha_galactic_comms" }
 	ai_weight = {
 		weight = @weightuseful
@@ -819,9 +834,7 @@ building_gravitic_comms_array = {
 			from = { owner = { has_ethic = ethic_fanatic_materialist } }
 		}
 	}
-	ai_allow = {
-		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
-	}
+	upgrades = { building_subspace_comms_array }
 }
 building_subspace_comms_array_direct_build = {
 	base_buildtime = 900
@@ -836,10 +849,10 @@ building_subspace_comms_array_direct_build = {
 		}
 	}
 	planet_modifier = {
-		 # planet_border_mult = 0.1
 		tile_resource_society_research_mult = 0.05
 		tile_resource_engineering_research_mult = 0.05
 		tile_resource_unity_mult = 0.1
+		pop_government_ethic_attraction = 0.2
 	}
 	prerequisites = { "tech_alpha_subspace_comms" }
 	ai_weight = { weight = @weightnormal }
@@ -861,6 +874,7 @@ building_subspace_comms_array_direct_build = {
 	}
 	ai_replace = no
 	ai_allow = {
+		or = { has_resource = no has_physics_deposit = yes }
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
 	show_tech_unlock_if = { always = no }
@@ -885,10 +899,10 @@ building_subspace_comms_array = {
 		}
 	}
 	planet_modifier = {
-		 # planet_border_mult = 0.1
 		tile_resource_society_research_mult = 0.05
 		tile_resource_engineering_research_mult = 0.05
 		tile_resource_unity_mult = 0.1
+		pop_government_ethic_attraction = 0.2
 	}
 	prerequisites = { "tech_alpha_subspace_comms" }
 	ai_weight = { weight = @weightnormal }
@@ -916,12 +930,10 @@ building_subspace_comms_array = {
 }
 building_cantina = {
 	base_buildtime = 90
-	 #planet_unique = yes
 	cost = { minerals = 50 energy = 100 }
-	required_resources = { }
 	produced_resources = { energy = 1 unity = 1 }
 	adjacency_bonus = { tile_building_resource_unity_add = 1 }
-	planet_modifier = { pop_ethic_xenophile_attraction_mult = 0.05 planet_migration_xeno_pull = 0.05 }
+	planet_modifier = { pop_ethic_xenophile_attraction_mult = 0.1 planet_migration_xeno_pull = 0.1 }
 	produced_resource_trigger = {
 		modifier = {
 			has_tradition = tr_diplomacy_alien_tourism
@@ -931,27 +943,24 @@ building_cantina = {
 	triggered_planet_modifier = {
 		key = foreign_tourism_and_trade
 		potential = {
-			planet.owner = {
+			exists = owner
+			owner = {
 				not = { has_policy_flag = foreign_trade_embargo }
 				has_tradition = tr_diplomacy_alien_tourism
 			}
 		}
-		modifier = { pop_ethic_xenophile_attraction_mult = 0.05 planet_migration_xeno_pull = 0.05 }
+		modifier = { pop_ethic_xenophile_attraction_mult = 0.15 planet_migration_xeno_pull = 0.15 }
 	}
 	potential = {
 		planet = {
 			NOT = { has_modifier = "capital" }
-			or = { has_building = building_trade_company has_building = building_tradestation }
+			has_trade_building = yes
 		}
 	}
 	allow = {
 		custom_tooltip = {
 			text = "requirement_adjacent_trade"
-			tile = {
-				any_neighboring_tile = {
-					OR = { has_building = building_trade_company has_building = building_tradestation }
-				}
-			}
+			tile = { any_neighboring_tile = { has_trade_building = yes } }
 		}
 	}
 	prerequisites = { "tech_trade_ports" }
@@ -970,7 +979,21 @@ building_cantina = {
 			}
 		}
 	}
+	ai_allow = {
+		or = { has_resource = no has_energy_deposit = yes }
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
 	ai_replace = no
+}
+building_pirate_cantina = {
+	icon = "building_cantina"
+	is_listed = no
+	produced_resources = { energy = 1 food = 1 }
+	planet_modifier = {
+		pop_ethic_militarist_attraction_mult = 0.1
+		pop_ethic_xenophobe_attraction_mult = 0.1
+		pop_happiness = 0.05
+	}
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
@@ -989,10 +1012,6 @@ building_radio_telescope_array = {
 	produced_resources = { physics_research = 2 }
 	adjacency_bonus = { tile_building_resource_physics_research_add = 1 }
 	planet_modifier = { planet_sensor_range_add = 1 }
-	 # prerequisites = {
-	 # "tech_spaceport_1"
-	 # }
-	upgrades = { building_radio_telescope_array_2 }
 	ai_weight = {
 		weight = @weightnormal
 		modifier = {
@@ -1012,20 +1031,17 @@ building_radio_telescope_array = {
 			}
 		}
 	}
-	ai_replace = no
 	ai_allow = {
+		or = { has_resource = no has_physics_deposit = yes }
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
+	ai_replace = no
+	upgrades = { building_radio_telescope_array_2 }
 	potential = {
 		NAND = {
 			owner = { has_technology = "tech_alpha_gravitic_surveillance" }
 			planet = {
-				OR = {
-					has_building = "building_capital_1"
-					has_building = "building_capital_2"
-					has_building = "building_capital_3"
-					has_building = "building_hab_capital"
-				}
+				OR = { has_capital_bio = yes has_building = "building_hab_capital" }
 			}
 			NOT = { owner = { has_country_flag = display_low_tier_flag } }
 			has_global_flag = direct_build_enabled
@@ -1042,12 +1058,7 @@ building_radio_telescope_array_2_direct_build = {
 	planet_modifier = { planet_sensor_range_add = 2 }
 	potential = {
 		planet = {
-			OR = {
-				has_building = "building_capital_1"
-				has_building = "building_capital_2"
-				has_building = "building_capital_3"
-				has_building = "building_hab_capital"
-			}
+			OR = { has_capital_bio = yes has_building = "building_hab_capital" }
 		}
 		NOT = { has_building = building_radio_telescope_array_2 }
 		direct_build_enabled = yes
@@ -1058,10 +1069,11 @@ building_radio_telescope_array_2_direct_build = {
 		}
 	}
 	prerequisites = { "tech_alpha_gravitic_surveillance" }
-	upgrades = { building_radio_telescope_array_3 }
 	ai_weight = { weight = @weightuseful }
 	ai_replace = no
+	upgrades = { building_radio_telescope_array_3 }
 	ai_allow = {
+		or = { has_resource = no has_physics_deposit = yes }
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
 	show_tech_unlock_if = { always = no }
@@ -1078,18 +1090,13 @@ building_radio_telescope_array_2 = {
 	planet_modifier = { planet_sensor_range_add = 2 }
 	potential = {
 		planet = {
-			OR = {
-				has_building = "building_capital_1"
-				has_building = "building_capital_2"
-				has_building = "building_capital_3"
-				has_building = "building_hab_capital"
-			}
+			OR = { has_capital_bio = yes has_building = "building_hab_capital" }
 		}
 	}
 	prerequisites = { "tech_alpha_gravitic_surveillance" }
-	upgrades = { building_radio_telescope_array_3 }
 	ai_weight = { weight = @weightuseful }
 	ai_replace = no
+	upgrades = { building_radio_telescope_array_3 }
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
@@ -1103,10 +1110,11 @@ building_radio_telescope_array_3_direct_build = {
 	adjacency_bonus = { tile_building_resource_physics_research_add = 1.5 }
 	planet_modifier = { planet_sensor_range_add = 3 }
 	prerequisites = { "tech_alpha_subspace_surveillance" }
-	upgrades = { building_radio_telescope_array_4 }
 	ai_weight = { weight = @weightuseful }
 	ai_replace = no
+	upgrades = { building_radio_telescope_array_4 }
 	ai_allow = {
+		or = { has_resource = no has_physics_deposit = yes }
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
 	show_tech_unlock_if = { always = no }
@@ -1116,11 +1124,7 @@ building_radio_telescope_array_3_direct_build = {
 		NAND = {
 			owner = { has_technology = "tech_alpha_tachyon_surveillance" }
 			planet = {
-				OR = {
-					has_building = "building_capital_2"
-					has_building = "building_capital_3"
-					has_building = "building_hab_capital"
-				}
+				OR = { has_capital_bio_level2 = yes has_building = "building_hab_capital" }
 			}
 			NOT = { owner = { has_country_flag = display_low_tier_flag } }
 			has_global_flag = direct_build_enabled
@@ -1138,9 +1142,9 @@ building_radio_telescope_array_3 = {
 	adjacency_bonus = { tile_building_resource_physics_research_add = 1.5 }
 	planet_modifier = { planet_sensor_range_add = 3 }
 	prerequisites = { "tech_alpha_subspace_surveillance" }
-	upgrades = { building_radio_telescope_array_4 }
 	ai_weight = { weight = @weightuseful }
 	ai_replace = no
+	upgrades = { building_radio_telescope_array_4 }
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
@@ -1155,11 +1159,7 @@ building_radio_telescope_array_4_direct_build = {
 	planet_modifier = { planet_sensor_range_add = 4 }
 	potential = {
 		planet = {
-			OR = {
-				has_building = "building_capital_2"
-				has_building = "building_capital_3"
-				has_building = "building_hab_capital"
-			}
+			OR = { has_capital_bio_level2 = yes has_building = "building_hab_capital" }
 		}
 		NOT = { has_building = building_radio_telescope_array_4 }
 		direct_build_enabled = yes
@@ -1168,6 +1168,7 @@ building_radio_telescope_array_4_direct_build = {
 	ai_weight = { weight = @weightuseful }
 	ai_replace = no
 	ai_allow = {
+		or = { has_resource = no has_physics_deposit = yes }
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
 	show_tech_unlock_if = { always = no }
@@ -1185,11 +1186,7 @@ building_radio_telescope_array_4 = {
 	planet_modifier = { planet_sensor_range_add = 4 }
 	potential = {
 		planet = {
-			OR = {
-				has_building = "building_capital_2"
-				has_building = "building_capital_3"
-				has_building = "building_hab_capital"
-			}
+			OR = { has_capital_bio_level2 = yes has_building = "building_hab_capital" }
 		}
 	}
 	prerequisites = { "tech_alpha_tachyon_surveillance" }

@@ -97,7 +97,6 @@ building_planet_surveyors_corp = {
 		}
 	}
 	prerequisites = { "tech_alpha_survey_corps" }
-	 # ai_special_building = yes
 	ai_replace = no
 	ai_weight = {
 		weight = 0
@@ -119,6 +118,36 @@ building_planet_surveyors_corp = {
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
+}
+building_exo_mine_0 = {
+	base_buildtime = 180
+	cost = { minerals = 50 }
+	required_resources = { energy = 1 }
+	potential = {
+		planet = {
+			OR = {
+				is_planet_class = pc_asteroid_habitable
+				is_planet_class = pc_barren_habitable
+				is_planet_class = pc_nuked
+				is_planet_class = pc_toxic_habitable
+				is_planet_class = pc_molten_habitable
+				is_planet_class = pc_frozen_habitable
+			}
+			exists = owner
+			owner = { not = { has_technology = "tech_alpha_exo_mining" } }
+		}
+	}
+	produced_resources = { minerals = 3 }
+	planet_modifier = { pop_environment_tolerance = 0.01 }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	upgrades = { building_exo_mine }
+	ai_weight = { weight = 5 }
 }
 building_exo_mine = {
 	base_buildtime = 180
@@ -147,6 +176,44 @@ building_exo_mine = {
 	}
 	prerequisites = { "tech_alpha_exo_mining" }
 	ai_weight = { weight = 5 }
+}
+building_exo_labs_0 = {
+	base_buildtime = 180
+	cost = { minerals = 50 energy = 25 }
+	produced_resources = {
+		engineering_research = 2
+		physics_research = 2
+		society_research = 2
+	}
+	required_resources = { energy = 2 }
+	potential = {
+		planet = {
+			OR = {
+				is_planet_class = pc_asteroid_habitable
+				is_planet_class = pc_barren_habitable
+				is_planet_class = pc_nuked
+				is_planet_class = pc_toxic_habitable
+				is_planet_class = pc_molten_habitable
+				is_planet_class = pc_frozen_habitable
+				is_planet_class = pc_gas_giant_habitable
+			}
+			exists = owner
+			owner = { not = { has_technology = "tech_alpha_exo_ops" } }
+		}
+	}
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+			has_resource = { type = food amount > 0 }
+			has_resource = { type = minerals amount > 0 }
+			has_resource = { type = energy amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	planet_modifier = { pop_environment_tolerance = 0.01 }
+	upgrades = { building_exo_labs }
+	ai_weight = { factor = 3 }
 }
 building_exo_labs = {
 	base_buildtime = 180
@@ -181,8 +248,87 @@ building_exo_labs = {
 		}
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
+	upgrades = { building_exo_labs2 }
 	planet_modifier = { pop_environment_tolerance = 0.025 }
 	ai_weight = { factor = 3 }
+}
+building_exo_labs2 = {
+	base_buildtime = 360
+	planet_unique = yes
+	is_listed = no
+	cost = { minerals = 150 energy = 100 }
+	produced_resources = {
+		engineering_research = 4
+		physics_research = 4
+		society_research = 4
+	}
+	required_resources = { energy = 3 }
+	adjacency_bonus = {
+		tile_building_resource_engineering_research_add = 1
+		tile_building_resource_physics_research_add = 1
+		tile_building_resource_society_research_add = 1
+	}
+	potential = {
+		planet = {
+			OR = {
+				is_planet_class = pc_asteroid_habitable
+				is_planet_class = pc_barren_habitable
+				is_planet_class = pc_nuked
+				is_planet_class = pc_toxic_habitable
+				is_planet_class = pc_molten_habitable
+				is_planet_class = pc_frozen_habitable
+				is_planet_class = pc_gas_giant_habitable
+			}
+			exists = owner
+			owner = {
+				has_technology = "tech_alpha_exo_ops"
+				has_technology = "tech_global_research_initiative"
+				has_ascension_perk = ap_technological_ascendancy
+			}
+		}
+	}
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+			has_resource = { type = food amount > 0 }
+			has_resource = { type = minerals amount > 0 }
+			has_resource = { type = energy amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	planet_modifier = { pop_environment_tolerance = 0.025 }
+	ai_weight = { factor = 3 }
+}
+building_exo_power_plant_0 = {
+	base_buildtime = @b2time
+	cost = { minerals = 75 }
+	potential = {
+		planet = {
+			OR = {
+				is_planet_class = pc_asteroid_habitable
+				is_planet_class = pc_barren_habitable
+				is_planet_class = pc_nuked
+				is_planet_class = pc_toxic_habitable
+				is_planet_class = pc_molten_habitable
+				is_planet_class = pc_frozen_habitable
+				is_planet_class = pc_gas_giant_habitable
+			}
+			exists = owner
+			owner = { not = { has_technology = "tech_alpha_exo_power" } }
+		}
+	}
+	produced_resources = { energy = 3 }
+	planet_modifier = { pop_environment_tolerance = 0.01 }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	upgrades = { building_exo_power_plant }
+	ai_weight = { weight = 5 }
 }
 building_exo_power_plant = {
 	base_buildtime = @b2time
@@ -290,12 +436,56 @@ building_exo_barracks = {
 				is_planet_class = pc_frozen_habitable
 				is_planet_class = pc_gas_giant_habitable
 			}
+			exists = owner
+			owner = { not = { has_authority = auth_machine_intelligence } }
 		}
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
 	}
 	required_resources = { energy = 2 }
 	produced_resources = { food = 3 }
 	planet_modifier = { pop_environment_tolerance = 0.1 }
 	prerequisites = { "tech_alpha_exo_barracks" }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 5 }
+}
+building_exo_barracks_0 = {
+	base_buildtime = 360
+	planet_unique = yes
+	cost = { minerals = 50 energy = 20 }
+	potential = {
+		planet = {
+			OR = {
+				is_planet_class = pc_asteroid_habitable
+				is_planet_class = pc_barren_habitable
+				is_planet_class = pc_nuked
+				is_planet_class = pc_toxic_habitable
+				is_planet_class = pc_molten_habitable
+				is_planet_class = pc_frozen_habitable
+				is_planet_class = pc_gas_giant_habitable
+			}
+			exists = owner
+			owner = {
+				not = { has_technology = "tech_alpha_exo_barracks" }
+				not = { has_authority = auth_machine_intelligence }
+			}
+		}
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	required_resources = { energy = 1 }
+	produced_resources = { food = 2 }
+	planet_modifier = { pop_environment_tolerance = 0.05 }
 	ai_allow = {
 		NOR = {
 			has_resource = { type = sr_betharian amount > 0 }

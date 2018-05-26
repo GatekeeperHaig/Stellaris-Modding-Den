@@ -193,6 +193,7 @@ building_ice_rig = {
 }
 building_geothermal_tap = {
 	base_buildtime = 360
+	planet_unique = yes
 	cost = { minerals = 150 energy = 100 }
 	produced_resources = { energy = 5 engineering_research = 2 }
 	potential = {
@@ -255,6 +256,52 @@ building_geothermal_tap = {
 		}
 	}
 	prerequisites = { "tech_tb_volcano" }
+	ai_weight = { weight = 2 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+building_mountain_quarry = {
+	base_buildtime = 360
+	planet_unique = yes
+	cost = { minerals = 75 energy = 25 }
+	required_resources = { energy = 1 }
+	produced_resources = { minerals = 1 engineering_research = 1 }
+	adjacency_bonus = { tile_building_resource_minerals_add = 1 }
+	potential = {
+		planet = { any_tile = { has_mountains = yes } }
+	}
+	allow = {
+		custom_tooltip = {
+			text = "requirement_mountains"
+			tile = {
+				any_neighboring_tile = { has_mountains = yes has_building_construction = no }
+			}
+		}
+	}
+	destroy_if = {
+		tile = {
+			not = { any_neighboring_tile = { has_mountains = yes } }
+		}
+	}
+	on_queued = {
+		tile = {
+			every_neighboring_tile = {
+				limit = { has_blocker = "tb_mountain_range" has_building_construction = no }
+				remove_blocker = yes
+				clear_deposits = yes
+				set_blocker = "tb_mountain_range_locked"
+			}
+			every_neighboring_tile = {
+				limit = { has_blocker = "tb_mountain_range_locked" }
+				clear_deposits = yes
+			}
+			every_neighboring_tile = {
+				limit = { has_blocker = "tb_alpha_mountain_range" }
+				clear_deposits = yes
+			}
+		}
+	}
 	ai_weight = { weight = 2 }
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }

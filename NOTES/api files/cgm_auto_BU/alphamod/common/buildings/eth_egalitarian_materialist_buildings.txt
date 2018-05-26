@@ -32,97 +32,127 @@
 @weightuseful = 10
 @weightimportant = 100
 @weightcritical = 1000
-building_energy_market = {
+building_stargate_hub = {
 	base_buildtime = 720
 	planet_unique = yes
-	cost = { minerals = 100 energy = 300 }
-	required_resources = { }
+	cost = { minerals = 250 energy = 300 }
+	required_resources = { energy = 3 }
+	produced_resources = { physics_research = 3 unity = 3 }
+	planet_modifier = {
+		pop_resettlement_cost_mult = -0.75
+		pop_growth_speed = 0.5
+		planet_migration_all_pull = 0.5
+		pop_migration_speed = 1.5
+	}
 	potential = {
 		planet = {
-			OR = {
-				has_building = "building_capital_1"
-				has_building = "building_capital_2"
-				has_building = "building_capital_3"
-			}
-			OR = { has_building = "building_power_hub_2" has_building = "building_power_hub_1" }
-			owner = {
-				AND = {
-					OR = {
-						has_ethic = ethic_materialist
-						has_ethic = ethic_fanatic_materialist
-						has_ethic = ethic_egalitarian
-						has_ethic = ethic_fanatic_egalitarian
-					}
+			has_capital_bio_level2 = yes
+			exists = owner
+			owner = { has_materialist_ethos = yes }
+			solar_system = {
+				or = {
+					any_system_megastructure = { is_megastructure_type = gateway_restored }
+					any_system_megastructure = { is_megastructure_type = gateway_final }
 				}
 			}
 		}
 	}
-	 # allow = {
-	 # planet = {
-	 # owner = {
-	 # }
-	 # }
-	 # }
-	produced_resources = {
-		energy = 10
-		sr_wealth = 1
-		unity = 3
+	destroy_if = {
+		planet = {
+			owner = { NOT = { has_materialist_ethos = yes } }
+		}
 	}
-	planet_modifier = { tile_resource_minerals_mult = -0.1 tile_resource_food_mult = -0.1 }
-	 # triggered_planet_modifier = {
-	 # key = world_of_opportunity_2
-	 # potential = {
-	 # owner = {
-	 # has_ethic = ethic_fanatic_egalitarian
-	 # }
-	 # }
-	 # modifier = {
-	 # pop_ethic_egalitarian_attraction_mult = 0.25
-	 # # planet_border_mult = 0.1
-	 # planet_migration_all_pull = 0.2
-	 # }
-	 # }
-	 # triggered_planet_modifier = {
-	 # key = world_of_opportunity_1
-	 # potential = {
-	 # owner = {
-	 # has_ethic = ethic_egalitarian
-	 # }
-	 # }
-	 # modifier = {
-	 # pop_ethic_egalitarian_attraction_mult = 0.1
-	 # # planet_border_mult = 0.05
-	 # planet_migration_all_pull = 0.1
-	 # }
-	 # }
-	country_modifier = { max_energy = 2500 }
-	 # destroy_if = {
-	 # planet = {
-	 # owner = {
-	 # NOR = {
-	 # has_ethic = ethic_materialist
-	 # has_ethic = ethic_fanatic_materialist
-	 # has_ethic = ethic_egalitarian
-	 # has_ethic = ethic_fanatic_egalitarian
-	 # }
-	 # }
-	 # }
-	 # }
-	prerequisites = { "tech_alpha_materialism" }
-	ai_weight = { factor = @weightimportant }
-	 # ai_special_building = yes
-	ai_replace = no
 	ai_allow = {
+		or = {
+			has_resource = no
+			has_resource = { type = physics_research amount > 0 }
+		}
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
+	ai_weight = {
+		factor = @weightimportant
+		modifier = {
+			factor = 2
+			from = { owner = { has_ethic = ethic_fanatic_materialist } }
+		}
+	}
+	ai_replace = no
+}
+building_energy_market = {
+	base_buildtime = 720
+	planet_unique = yes
+	cost = { minerals = 100 energy = 300 }
+	potential = {
+		planet = {
+			has_capital_bio = yes
+			has_power_hub = yes
+			exists = owner
+			owner = {
+				has_egalitarian_or_materialist_ethos = yes
+				not = { has_policy_flag = alp_private_businesses_prohibited }
+			}
+		}
+	}
+	produced_resources = { energy = 5 unity = 1 }
+	produced_resource_trigger = {
+		modifier = {
+			not = { has_policy_flag = alp_private_businesses_prohibited }
+			resources = { energy = 3 sr_wealth = 1 }
+		}
+		modifier = {
+			has_policy_flag = alp_private_businesses_freedom
+			resources = { energy = 2 unity = 2 }
+		}
+	}
+	planet_modifier = { tile_resource_minerals_mult = -0.1 tile_resource_food_mult = -0.1 }
+	triggered_planet_modifier = {
+		key = world_of_opportunity_2
+		potential = {
+			exists = owner
+			owner = { has_ethic = ethic_fanatic_egalitarian }
+		}
+		modifier = { pop_ethic_egalitarian_attraction_mult = 0.25 planet_migration_all_pull = 0.2 }
+	}
+	triggered_planet_modifier = {
+		key = world_of_opportunity_1
+		potential = {
+			exists = owner
+			owner = { has_ethic = ethic_egalitarian }
+		}
+		modifier = { pop_ethic_egalitarian_attraction_mult = 0.1 planet_migration_all_pull = 0.1 }
+	}
+	country_modifier = { max_energy = 2500 }
+	destroy_if = {
+		planet = {
+			owner = { NOT = { has_egalitarian_or_materialist_ethos = yes } }
+		}
+	}
+	ai_allow = {
+		or = {
+			has_resource = no
+			has_resource = { type = energy amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	prerequisites = { "tech_alpha_materialism" }
+	ai_weight = { factor = @weightimportant }
+	ai_replace = no
 }
 building_luxury_vacations = {
 	base_buildtime = 360
 	planet_unique = yes
 	cost = { minerals = 100 energy = 200 }
 	required_resources = { }
-	produced_resources = { sr_wealth = 1 food = 1 }
+	produced_resources = { food = 1 }
 	produced_resource_trigger = {
+		modifier = {
+			not = { has_policy_flag = alp_private_businesses_prohibited }
+			resources = { sr_wealth = 1 }
+		}
+		modifier = {
+			has_policy_flag = alp_private_businesses_freedom
+			resources = { energy = 1 }
+		}
 		modifier = {
 			has_tradition = tr_diplomacy_alien_tourism
 			resources = { energy = 1 }
@@ -134,52 +164,49 @@ building_luxury_vacations = {
 		pop_ethic_pacifist_attraction_mult = 0.1
 		pop_ethic_egalitarian_attraction_mult = 0.1
 	}
-	 # triggered_planet_modifier = {
-	 # key = foreign_tourism
-	 # potential = {
-	 # owner = {
-	 # has_tradition = tr_diplomacy_alien_tourism
-	 # }
-	 # }
-	 # modifier = {
-	 # pop_ethic_xenophobe_attraction_mult = -0.05
-	 # planet_migration_xeno_pull = 0.1
-	 # }
-	 # }
+	triggered_planet_modifier = {
+		key = foreign_tourism
+		potential = {
+			exists = owner
+			owner = {
+				has_tradition = tr_diplomacy_alien_tourism
+				not = { has_ethic = ethic_fanatic_xenophobe }
+				not = { has_ethic = ethic_xenophobe }
+			}
+		}
+		modifier = { pop_ethic_xenophobe_attraction_mult = -0.05 planet_migration_xeno_pull = 0.1 }
+	}
 	triggered_planet_modifier = {
 		key = foreign_vacationing
 		potential = {
+			exists = owner
+			owner = {
+				not = { has_ethic = ethic_fanatic_xenophobe }
+				not = { has_ethic = ethic_fanatic_authoritarian }
+				not = { has_ethic = ethic_xenophobe }
+			}
 			any_country = {
 				count_diplo_ties = {
 					count > 0
 					limit = {
 						has_diplo_migration_treaty = planet.owner
 						is_in_federation_with = planet.owner
-						 #has_alliance = planet.owner
 						has_defensive_pact = planet.owner
 					}
 				}
 			}
 		}
-		modifier = {
-			pop_ethic_xenophile_attraction_mult = 0.05
-			planet_migration_xeno_pull = 0.15
-			 # planet_border_mult = 0.1
+		modifier = { pop_ethic_xenophile_attraction_mult = 0.05 planet_migration_xeno_pull = 0.1 }
+	}
+	country_modifier = { leader_age = 1 country_resource_sr_luxuries_add = -1 }
+	destroy_if = {
+		planet = {
+			exists = owner
+			owner = {
+				OR = { has_ethic = ethic_fanatic_authoritarian has_ethic = ethic_fanatic_xenophobe }
+			}
 		}
 	}
-	country_modifier = { leader_age = 1 }
-	 # destroy_if = {
-	 # planet = {
-	 # owner = {
-	 # NOR = {
-	 # has_ethic = ethic_materialist
-	 # has_ethic = ethic_fanatic_materialist
-	 # has_ethic = ethic_egalitarian
-	 # has_ethic = ethic_fanatic_egalitarian
-	 # }
-	 # }
-	 # }
-	 # }
 	potential = {
 		planet = {
 			or = {
@@ -190,77 +217,100 @@ building_luxury_vacations = {
 				is_planet_class = pc_savannah
 				is_planet_class = pc_ocean
 			}
+			exists = owner
 			owner = {
-				OR = {
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-				}
+				has_country_strategic_resource = { type = sr_luxuries amount > 2 }
+				has_egalitarian_or_materialist_ethos = yes
 			}
-			has_building = building_luxuries_manufacturing
-			 #has_spaceport = yes
 		}
+	}
+	ai_allow = {
+		or = {
+			has_resource = no
+			has_resource = { type = food amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
 	prerequisites = { "tech_alpha_luxury_industries" }
 	ai_weight = { weight = @weightuseful }
-	 # ai_special_building = yes
 	ai_replace = no
-	ai_allow = {
-		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
-	}
 }
 building_luxuries_manufacturing = {
 	base_buildtime = 360
 	planet_unique = yes
 	cost = { minerals = 100 energy = 150 }
 	required_resources = { minerals = 1 }
-	produced_resources = { sr_luxuries = 1 energy = 2 }
+	produced_resources = { sr_luxuries = 1 energy = 1 }
+	produced_resource_trigger = {
+		modifier = {
+			not = { has_policy_flag = alp_private_businesses_prohibited }
+			resources = { energy = 1 }
+		}
+		modifier = {
+			has_policy_flag = alp_private_businesses_freedom
+			resources = { energy = 1 }
+		}
+	}
 	potential = {
 		planet = {
-			owner = {
-				OR = {
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-				}
-			}
+			exists = owner
+			owner = { has_egalitarian_or_materialist_ethos = yes }
 		}
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	ai_allow = {
+		or = {
+			has_resource = no
+			has_resource = { type = energy amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
 	prerequisites = { "tech_alpha_luxury_industries" }
 	ai_weight = { factor = @weightimportant }
-	 # ai_special_building = yes
 	ai_replace = no
-	ai_allow = {
-		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
-	}
 }
 building_food_retailer = {
 	base_buildtime = 360
 	planet_unique = yes
 	cost = { minerals = 100 energy = 150 }
-	produced_resources = { sr_wealth = 1 energy = 2 }
+	produced_resources = { energy = 1 }
+	produced_resource_trigger = {
+		modifier = {
+			not = { has_policy_flag = alp_private_businesses_prohibited }
+			resources = { energy = 1 sr_wealth = 1 }
+		}
+		modifier = {
+			has_policy_flag = alp_private_businesses_freedom
+			resources = { energy = 1 }
+		}
+	}
 	planet_modifier = { planet_resource_food_add = -3 pop_consumer_goods_mult = -0.1 }
 	potential = {
 		planet = {
+			exists = owner
 			owner = {
-				OR = {
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-				}
+				has_egalitarian_or_materialist_ethos = yes
+				not = { has_policy_flag = alp_private_businesses_prohibited }
 			}
 		}
 	}
-	prerequisites = { "tech_alpha_materialism" }
-	ai_weight = { factor = 0 }
-	 # ai_special_building = yes
-	ai_replace = no
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
 	ai_allow = {
+		or = {
+			has_resource = no
+			has_resource = { type = energy amount > 0 }
+		}
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
+	prerequisites = { "tech_alpha_materialism" }
+	ai_weight = { factor = 0 }
+	ai_replace = no
 }
 building_science_foundation = {
 	tags = { science_production }
@@ -270,7 +320,7 @@ building_science_foundation = {
 	produced_resources = { physics_research = 3 society_research = 3 }
 	produced_resource_trigger = {
 		modifier = {
-			or = { has_ethic = ethic_materialist has_ethic = ethic_fanatic_materialist }
+			has_materialist_ethos = yes
 			resources = { sr_data_archives = 1 }
 		}
 	}
@@ -282,30 +332,22 @@ building_science_foundation = {
 	planet_modifier = { pop_ethic_materialist_attraction_mult = 0.05 }
 	potential = {
 		planet = {
-			owner = {
-				OR = {
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-				}
-			}
+			exists = owner
+			owner = { has_egalitarian_or_materialist_ethos = yes }
 		}
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_ethic = ethic_fanatic_spiritualist }
 	}
 	allow = {
 		custom_tooltip = {
 			text = "requires_science_deposit"
-			tile = {
-				or = {
-					has_resource = { type = society_research amount > 0 }
-					has_resource = { type = physics_research amount > 0 }
-				}
-			}
+			tile = { has_society_or_physics_deposit = yes }
 		}
 	}
 	prerequisites = { "tech_alpha_fanatic_materialism_2" }
 	ai_weight = { factor = @weightimportant }
-	 # ai_special_building = yes
 	ai_replace = no
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
@@ -324,90 +366,111 @@ building_materials_manufacturing_pre = {
 	allow = {
 		custom_tooltip = {
 			text = "requirement_adjacent_fuel_sourcer"
-			tile = { any_neighboring_tile = { has_natural_fuels_sourcer = yes } }
+			tile = {
+				any_neighboring_tile = {
+					or = { has_natural_fuels_sourcer = yes has_building = building_materials_manufacturing_pre }
+				}
+			}
 		}
+	}
+	ai_allow = {
+		nor = {
+			has_resource = { type = energy amount > 0 }
+			has_resource = { type = food amount > 0 }
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
 	destroy_if = {
 		tile = {
 			not = { any_neighboring_tile = { has_natural_fuels_sourcer = yes } }
 		}
 	}
-	 # ai_special_building = yes
 	ai_replace = no
-	ai_allow = {
-		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
-	}
 }
 building_materials_manufacturing = {
 	base_buildtime = 360
 	cost = { minerals = 100 energy = 100 }
-	required_resources = { minerals = 2 energy = 1 }
-	produced_resources = { sr_standard_materials = 1 engineering_research = 3 }
-	planet_modifier = {
-		planet_building_cost_mult = -0.05
-		shipsize_corvette_build_cost_mult = -0.05
-		shipsize_destroyer_build_cost_mult = -0.05
-		shipsize_cruiser_build_cost_mult = -0.05
-		shipsize_battleship_build_cost_mult = -0.05
-		pop_environment_tolerance = -0.01
+	required_resources = { energy = 2 }
+	produced_resources = { engineering_research = 2 minerals = 1 }
+	produced_resource_trigger = {
+		modifier = {
+			has_policy_flag = alp_private_businesses_freedom
+			resources = { sr_standard_materials = 2 }
+		}
+		modifier = {
+			nor = { has_policy_flag = alp_private_businesses_freedom has_policy_flag = alp_private_businesses_prohibited }
+			resources = {
+				sr_standard_materials = 1
+				minerals = 1
+				engineering_research = 1
+			}
+		}
+		modifier = {
+			has_policy_flag = alp_private_businesses_prohibited
+			resources = {
+				sr_standard_materials = 1
+				minerals = 2
+				engineering_research = 2
+			}
+		}
 	}
+	planet_modifier = { planet_building_cost_mult = -0.05 pop_environment_tolerance = -0.01 }
 	potential = {
 		planet = {
-			has_natural_fuels_sourcer = yes
-			or = { has_building = building_mineral_processing_plant_2 has_building = building_mineral_processing_plant_1 }
-			owner = {
-				OR = {
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-				}
-			}
+			 # has_natural_fuels_sourcer = yes
+			exists = owner
+			owner = { has_egalitarian_or_materialist_ethos = yes }
 		}
 	}
-	allow = {
-		custom_tooltip = {
-			text = "requirement_adjacent_minerals_processing"
-			tile = {
-				any_neighboring_tile = {
-					or = { has_building = building_mineral_processing_plant_2 has_building = building_mineral_processing_plant_1 }
-				}
-			}
+	ai_allow = {
+		nor = {
+			has_resource = { type = energy amount > 0 }
+			has_resource = { type = food amount > 0 }
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
 		}
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
 	prerequisites = { "tech_alpha_fanatic_materialism" }
 	ai_weight = { factor = @weightuseful }
-	 # ai_special_building = yes
 	ai_replace = no
-	ai_allow = {
-		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
-	}
 }
 building_nano_alloys_manufacturing = {
 	base_buildtime = 360
 	planet_unique = yes
 	cost = { minerals = 100 energy = 100 }
-	required_resources = { minerals = 1 energy = 1 }
-	produced_resources = { sr_nano_alloys = 1 engineering_research = 3 }
-	planet_modifier = {
-		planet_building_cost_mult = -0.05
-		shipsize_corvette_build_cost_mult = -0.05
-		shipsize_destroyer_build_cost_mult = -0.05
-		shipsize_cruiser_build_cost_mult = -0.05
-		shipsize_battleship_build_cost_mult = -0.05
-		pop_environment_tolerance = -0.01
+	required_resources = { energy = 2 }
+	produced_resources = { engineering_research = 2 minerals = 1 }
+	produced_resource_trigger = {
+		modifier = {
+			has_policy_flag = alp_private_businesses_freedom
+			resources = { sr_nano_alloys = 2 }
+		}
+		modifier = {
+			nor = { has_policy_flag = alp_private_businesses_freedom has_policy_flag = alp_private_businesses_prohibited }
+			resources = {
+				sr_nano_alloys = 1
+				minerals = 1
+				engineering_research = 1
+			}
+		}
+		modifier = {
+			has_policy_flag = alp_private_businesses_prohibited
+			resources = {
+				sr_nano_alloys = 1
+				minerals = 2
+				engineering_research = 2
+			}
+		}
 	}
+	planet_modifier = { planet_building_cost_mult = -0.05 pop_environment_tolerance = -0.01 }
 	potential = {
 		planet = {
 			has_building = building_materials_manufacturing
-			owner = {
-				OR = {
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-				}
-			}
+			exists = owner
+			owner = { has_egalitarian_or_materialist_ethos = yes }
 		}
 	}
 	allow = {
@@ -416,9 +479,13 @@ building_nano_alloys_manufacturing = {
 			tile = { any_neighboring_tile = { has_building = building_materials_manufacturing } }
 		}
 	}
+	destroy_if = {
+		tile = {
+			not = { any_neighboring_tile = { has_building = building_materials_manufacturing } }
+		}
+	}
 	prerequisites = { "tech_advanced_nano_materials" }
 	ai_weight = { factor = @weightuseful }
-	 # ai_special_building = yes
 	ai_replace = no
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
@@ -428,27 +495,36 @@ building_nano_plastics_manufacturing = {
 	base_buildtime = 360
 	planet_unique = yes
 	cost = { minerals = 100 energy = 100 }
-	required_resources = { minerals = 1 energy = 1 }
-	produced_resources = { sr_nano_plastics = 1 engineering_research = 3 }
-	planet_modifier = {
-		planet_building_cost_mult = -0.05
-		shipsize_corvette_build_cost_mult = -0.05
-		shipsize_destroyer_build_cost_mult = -0.05
-		shipsize_cruiser_build_cost_mult = -0.05
-		shipsize_battleship_build_cost_mult = -0.05
-		pop_environment_tolerance = -0.01
+	required_resources = { energy = 2 }
+	produced_resources = { engineering_research = 2 minerals = 1 }
+	produced_resource_trigger = {
+		modifier = {
+			has_policy_flag = alp_private_businesses_freedom
+			resources = { sr_nano_plastics = 2 }
+		}
+		modifier = {
+			nor = { has_policy_flag = alp_private_businesses_freedom has_policy_flag = alp_private_businesses_prohibited }
+			resources = {
+				sr_nano_plastics = 1
+				minerals = 1
+				engineering_research = 1
+			}
+		}
+		modifier = {
+			has_policy_flag = alp_private_businesses_prohibited
+			resources = {
+				sr_nano_plastics = 1
+				minerals = 2
+				engineering_research = 2
+			}
+		}
 	}
+	planet_modifier = { planet_building_cost_mult = -0.05 pop_environment_tolerance = -0.01 }
 	potential = {
 		planet = {
 			has_building = building_materials_manufacturing
-			owner = {
-				OR = {
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-				}
-			}
+			exists = owner
+			owner = { has_egalitarian_or_materialist_ethos = yes }
 		}
 	}
 	allow = {
@@ -457,9 +533,13 @@ building_nano_plastics_manufacturing = {
 			tile = { any_neighboring_tile = { has_building = building_materials_manufacturing } }
 		}
 	}
+	destroy_if = {
+		tile = {
+			not = { any_neighboring_tile = { has_building = building_materials_manufacturing } }
+		}
+	}
 	prerequisites = { "tech_advanced_nano_materials" }
 	ai_weight = { factor = @weightuseful }
-	 # ai_special_building = yes
 	ai_replace = no
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
@@ -474,34 +554,24 @@ building_mineral_transformer = {
 	planet_modifier = { tile_resource_minerals_mult = 0.1 pop_environment_tolerance = -0.05 }
 	potential = {
 		planet = {
-			owner = {
-				OR = {
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-				}
-			}
-			OR = { has_building = "building_mineral_processing_plant_1" has_building = "building_mineral_processing_plant_2" }
-			OR = {
-				has_building = "building_capital_1"
-				has_building = "building_capital_2"
-				has_building = "building_capital_3"
-			}
+			exists = owner
+			owner = { has_egalitarian_or_materialist_ethos = yes }
+			has_minerals_processor = yes
+			has_capital_bio = yes
 		}
 	}
 	allow = {
 		custom_tooltip = {
 			text = "requirement_adjacent_minerals_processing"
-			tile = {
-				any_neighboring_tile = {
-					OR = { has_building = "building_mineral_processing_plant_1" has_building = "building_mineral_processing_plant_2" }
-				}
-			}
+			tile = { any_neighboring_tile = { has_minerals_processor = yes } }
+		}
+	}
+	destroy_if = {
+		tile = {
+			not = { any_neighboring_tile = { has_minerals_processor = yes } }
 		}
 	}
 	prerequisites = { "tech_matter_replication_alpha" }
-	 # ai_special_building = yes
 	ai_replace = no
 	ai_weight = {
 		weight = 0
@@ -522,61 +592,6 @@ building_mineral_transformer = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
 }
- # building_rocket_launchsite = {
- # base_buildtime = 360
- # planet_unique = yes
- # cost = {
- # minerals = 50
- # energy = 50
- # }
- # required_resources = {
- # minerals = 1
- # energy = 1
- # }
- # produced_resources = {
- # engineering_research = 1
- # }
- # planet_modifier = {
- # # spaceport_module_cost_mult = -0.1
- # # shipsize_science_construction_speed_mult = 0.1
- # shipsize_colonizer_build_cost_mult = -0.25
- # # shipsize_colonizer_construction_speed_mult = 0.05
- # }
- # potential = {
- # planet = {
- # owner = {
- # not = { has_technology = tech_alpha_shuttlecraft }
- # }
- # }
- # }
- # # prerequisites = {
- # # "tech_spaceport_1"
- # # }
- # upgrades = {
- # building_shuttle_port
- # }
- # ai_weight = {
- # weight = @weightimportant
- # modifier = {
- # factor = 2.0
- # from = {
- # any_tile = {
- # has_resource = {
- # type = engineering_research
- # amount > 1
- # }
- # }
- # }
- # }
- # # modifier = {
- # # factor = 0
- # # from = {
- # # NOT = { has_spaceport = yes }
- # # }
- # # }
- # }
- # ai_replace = no
- # }
 building_shuttle_port_hidden_tree_root = {
 	potential = { always = no }
 	planet_unique = yes
@@ -588,112 +603,64 @@ building_shuttle_port = {
 	cost = { minerals = 200 energy = 250 }
 	required_resources = { minerals = 1 energy = 1 }
 	potential = {
-		planet = {
-			 #has_spaceport = yes
-			OR = {
-				has_building = "building_capital_1"
-				has_building = "building_capital_2"
-				has_building = "building_capital_3"
-			}
-		}
+		planet = { has_capital_bio = yes }
 		NAND = {
 			owner = { has_technology = "tech_alpha_fanatic_materialism" }
 			planet = {
-				 # has_spaceport = yes
 				has_building = "building_materials_manufacturing"
-				OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
-				owner = {
-					OR = {
-						has_ethic = ethic_materialist
-						has_ethic = ethic_fanatic_materialist
-						has_ethic = ethic_egalitarian
-						has_ethic = ethic_fanatic_egalitarian
-					}
-				}
+				has_capital_bio_level2 = yes
+				exists = owner
+				owner = { has_egalitarian_or_materialist_ethos = yes }
 			}
 			NOT = { owner = { has_country_flag = display_low_tier_flag } }
 			has_global_flag = direct_build_enabled
 		}
 	}
 	produced_resources = { engineering_research = 3 }
-	 # destroy_if = {
-	 # planet = { has_spaceport = no }
-	 # }
-	planet_modifier = {
-		pop_resettlement_cost_mult = -0.2
-		 # spaceport_module_cost_mult = -0.1
-		 # shipsize_colonizer_build_cost_mult = -0.25
-		 # shipsize_colonizer_construction_speed_mult = 0.1
-		 # shipsize_science_construction_speed_mult = 0.15
-		pop_citizen_happiness = 0.025
+	planet_modifier = { pop_resettlement_cost_mult = -0.2 pop_citizen_happiness = 0.025 }
+	ai_allow = {
+		has_resource = { type = engineering_research amount > 0 }
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
 	prerequisites = { "tech_alpha_shuttlecraft" }
-	upgrades = { building_advanced_shuttleport }
+	ai_replace = no
 	ai_weight = {
 		weight = @weightimportant
 		modifier = {
-			factor = 2
-			from = {
-				any_tile = {
-					has_resource = { type = engineering_research amount > 1 }
-				}
-			}
+			factor = 1.5
+			from = { any_tile = { has_engineering_deposit = yes } }
 		}
-		 # modifier = {
-		 # factor = 2
-		 # from = { has_spaceport = yes }
-		 # }
 	}
-	ai_replace = no
-	ai_allow = {
-		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
-	}
+	upgrades = { building_advanced_shuttleport }
 }
 building_advanced_shuttleport_direct_build = {
 	base_buildtime = 1260
 	planet_unique = yes
 	cost = { minerals = 450 energy = 550 }
 	required_resources = { minerals = 1 energy = 2 }
-	produced_resources = { engineering_research = 4 sr_wealth = 1 }
-	planet_modifier = {
-		pop_resettlement_cost_mult = -0.25
-		 # spaceport_module_cost_mult = -0.2
-		 # shipsize_colonizer_build_cost_mult = -0.25
-		 # shipsize_colonizer_construction_speed_mult = 0.1
-		 # shipsize_science_construction_speed_mult = 0.15
-		pop_citizen_happiness = 0.05
+	produced_resources = { engineering_research = 4 }
+	produced_resource_trigger = {
+		modifier = {
+			has_policy_flag = alp_private_businesses_freedom
+			resources = { sr_wealth = 1 }
+		}
 	}
+	planet_modifier = { pop_resettlement_cost_mult = -0.25 pop_citizen_happiness = 0.05 }
 	potential = {
 		planet = {
-			 # has_spaceport = yes
 			has_building = "building_materials_manufacturing"
-			OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
-			owner = {
-				OR = {
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-				}
-			}
+			has_capital_bio_level2 = yes
+			exists = owner
+			owner = { has_egalitarian_or_materialist_ethos = yes }
 		}
 		NOT = { has_building = building_advanced_shuttleport }
 		direct_build_enabled = yes
 	}
-	 # destroy_if = {
-	 # planet = { has_spaceport = no }
-	 # }
 	prerequisites = { "tech_alpha_fanatic_materialism" }
-	ai_weight = {
-		factor = @weightimportant
-		modifier = {
-			factor = 0
-			from = { NOT = { has_building = "building_materials_manufacturing" } }
-		}
-	}
-	 # ai_special_building = yes
+	ai_weight = { factor = @weightimportant }
 	ai_replace = no
 	ai_allow = {
+		has_resource = { type = engineering_research amount > 0 }
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
 	show_tech_unlock_if = { always = no }
@@ -706,42 +673,24 @@ building_advanced_shuttleport = {
 	is_listed = no
 	cost = { minerals = 250 energy = 300 }
 	required_resources = { minerals = 1 energy = 2 }
-	produced_resources = { engineering_research = 4 sr_wealth = 1 }
-	planet_modifier = {
-		pop_resettlement_cost_mult = -0.25
-		 # spaceport_module_cost_mult = -0.2
-		 # shipsize_colonizer_build_cost_mult = -0.25
-		 # shipsize_colonizer_construction_speed_mult = 0.1
-		 # shipsize_science_construction_speed_mult = 0.15
-		pop_citizen_happiness = 0.05
+	produced_resources = { engineering_research = 4 }
+	produced_resource_trigger = {
+		modifier = {
+			has_policy_flag = alp_private_businesses_freedom
+			resources = { sr_wealth = 1 }
+		}
 	}
+	planet_modifier = { pop_resettlement_cost_mult = -0.25 pop_citizen_happiness = 0.05 }
 	potential = {
 		planet = {
-			 # has_spaceport = yes
 			has_building = "building_materials_manufacturing"
-			OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
-			owner = {
-				OR = {
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
-					has_ethic = ethic_egalitarian
-					has_ethic = ethic_fanatic_egalitarian
-				}
-			}
+			has_capital_bio_level2 = yes
+			exists = owner
+			owner = { has_egalitarian_or_materialist_ethos = yes }
 		}
 	}
-	 # destroy_if = {
-	 # planet = { has_spaceport = no }
-	 # }
 	prerequisites = { "tech_alpha_fanatic_materialism" }
-	ai_weight = {
-		factor = @weightimportant
-		modifier = {
-			factor = 0
-			from = { NOT = { has_building = "building_materials_manufacturing" } }
-		}
-	}
-	 # ai_special_building = yes
+	ai_weight = { factor = @weightimportant }
 	ai_replace = no
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
@@ -760,40 +709,39 @@ building_powerbank = {
 			resources = { sr_micro_cores = 1 }
 		}
 		modifier = {
-			or = { has_ethic = ethic_egalitarian has_ethic = ethic_fanatic_egalitarian }
+			has_egalitarian_ethos = yes
 			resources = { energy = 3 }
+		}
+		modifier = {
+			has_policy_flag = alp_private_businesses_freedom
+			resources = { sr_wealth = 1 }
 		}
 	}
 	planet_modifier = { tile_resource_energy_mult = 0.1 }
 	country_modifier = { max_energy = 2500 }
 	potential = {
-		planet = {
-			OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
-			OR = { has_building = "building_power_hub_2" has_building = "building_power_hub_1" }
-		}
+		planet = { has_capital_bio_level2 = yes has_power_hub = yes }
 	}
 	allow = {
 		custom_tooltip = {
 			text = "requirement_adjacent_power_hub"
-			tile = {
-				any_neighboring_tile = {
-					OR = { has_building = "building_power_hub_2" has_building = "building_power_hub_1" }
-				}
-			}
+			tile = { any_neighboring_tile = { has_power_hub = yes } }
+		}
+	}
+	destroy_if = {
+		tile = {
+			not = { any_neighboring_tile = { has_power_hub = yes } }
 		}
 	}
 	prerequisites = { "tech_power_banking" }
+	ai_replace = no
 	ai_weight = {
 		weight = 0
 		modifier = {
 			weight = 5
-			from = {
-				OR = { has_building = "building_power_hub_2" has_building = "building_power_hub_1" }
-			}
+			from = { has_power_hub = yes }
 		}
 	}
-	 # ai_special_building = yes
-	ai_replace = no
 	ai_allow = {
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
@@ -803,29 +751,49 @@ building_hypermall = {
 	planet_unique = yes
 	cost = { minerals = 200 energy = 50 }
 	required_resources = { minerals = 1 }
-	produced_resources = { sr_wealth = 1 energy = 2 }
+	produced_resources = { energy = 2 }
 	produced_resource_trigger = {
 		modifier = {
 			has_tradition = tr_diplomacy_alien_tourism
 			resources = { energy = 1 }
 		}
+		modifier = {
+			has_edict = value_added_tax
+			resources = { energy = 1 }
+		}
+		modifier = {
+			has_policy_flag = alp_private_businesses_freedom
+			resources = { sr_wealth = 1 }
+		}
 	}
 	planet_modifier = { pop_consumer_goods_mult = -0.1 pop_citizen_happiness = 0.05 }
+	triggered_planet_modifier = {
+		key = "VAT"
+		potential = {
+			exists = owner
+			owner = { has_edict = value_added_tax }
+		}
+		modifier = { pop_citizen_happiness = -0.05 }
+	}
+	country_modifier = { country_resource_sr_luxuries_add = -1 }
 	potential = {
 		planet = {
-			has_building = building_luxuries_manufacturing
-			OR = {
-				has_building = "building_capital_1"
-				has_building = "building_capital_2"
-				has_building = "building_capital_3"
+			has_capital_bio = yes
+			exists = owner
+			owner = {
+				has_country_strategic_resource = { type = sr_luxuries amount > 2 }
+				not = { has_policy_flag = alp_private_businesses_prohibited }
 			}
 		}
 	}
-	prerequisites = { "tech_alpha_luxury_industries" }
-	ai_weight = { weight = 5 }
-	 # ai_special_building = yes
-	ai_replace = no
 	ai_allow = {
+		or = {
+			has_resource = no
+			has_resource = { type = energy amount > 0 }
+		}
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
+	prerequisites = { "tech_alpha_luxury_industries" }
+	ai_weight = { weight = 5 }
+	ai_replace = no
 }

@@ -48,7 +48,57 @@ building_colony_control_pre = {
 		planet = {
 			NOT = { has_modifier = "capital" }
 			owner = {
+				exists = owner
 				not = { has_technology = tech_alpha_colony_control }
+				not = { has_ethic = ethic_gestalt_consciousness }
+			}
+		}
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
+	allow = {
+		custom_tooltip = {
+			text = "requirement_adjacent_colonyship"
+			tile = {
+				any_neighboring_tile = {
+					OR = {
+						has_building = "building_colony_shelter"
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_exo_ops"
+						has_building = "building_hab_capital"
+					}
+				}
+			}
+		}
+	}
+	ai_allow = {
+		has_food_or_minerals_deposit = yes
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_replace = no
+	ai_weight = { weight = 250 }
+	upgrades = { building_colony_control }
+}
+building_colony_control = {
+	base_buildtime = 90
+	planet_unique = yes
+	cost = { minerals = @mincostlow energy = @engcostcheap }
+	required_resources = { energy = 1 }
+	produced_resources = {
+		unity = 1
+		food = @b1effect
+		minerals = @b0effect
+	}
+	adjacency_bonus = { tile_building_resource_food_add = 1 tile_building_resource_minerals_add = 1 }
+	planet_modifier = { planet_building_build_speed_mult = 0.2 planet_migration_all_pull = 0.05 }
+	potential = {
+		planet = {
+			NOT = { has_modifier = "capital" }
+			owner = {
+				exists = owner
 				not = { has_ethic = ethic_gestalt_consciousness }
 			}
 		}
@@ -69,49 +119,17 @@ building_colony_control_pre = {
 			}
 		}
 	}
-	upgrades = { building_colony_control }
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
 	ai_allow = {
-		has_food_or_minerals_deposit = yes
+		or = { has_resource = no has_food_or_minerals_deposit = yes }
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
-	ai_replace = no
-	ai_weight = { weight = 250 }
-}
-building_colony_control = {
-	base_buildtime = 90
-	planet_unique = yes
-	cost = { minerals = @mincostlow energy = @engcostcheap }
-	required_resources = { energy = 1 }
-	produced_resources = {
-		unity = 1
-		food = @b1effect
-		minerals = @b0effect
-	}
-	adjacency_bonus = { tile_building_resource_food_add = 1 tile_building_resource_minerals_add = 1 }
-	planet_modifier = { planet_building_build_speed_mult = 0.2 planet_migration_all_pull = 0.05 }
-	potential = {
-		planet = {
-			NOT = { has_modifier = "capital" }
-			owner = { not = { has_ethic = ethic_gestalt_consciousness } }
-		}
-	}
-	allow = {
-		custom_tooltip = {
-			text = "requirement_adjacent_colonyship"
-			tile = {
-				any_neighboring_tile = {
-					OR = {
-						has_building = "building_colony_shelter"
-						has_building = "building_capital_1"
-						has_building = "building_capital_2"
-						has_building = "building_exo_ops"
-						has_building = "building_hab_capital"
-					}
-				}
-			}
-		}
-	}
 	prerequisites = { "tech_alpha_colony_control" }
+	ai_replace = no
+	ai_weight = { weight = 100 }
 	upgrades = {
 		building_libraryofadministration
 		building_chamberofexecutives
@@ -120,11 +138,6 @@ building_colony_control = {
 		building_templeofrule
 		building_councilhall
 		building_colony_control2
-	}
-	ai_replace = no
-	ai_weight = { weight = 100 }
-	ai_allow = {
-		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
 }
 building_colony_control2 = {
@@ -146,6 +159,13 @@ building_colony_control2 = {
 	}
 	potential = {
 		planet = {
+			OR = {
+				has_building = "building_capital_1"
+				has_building = "building_capital_2"
+				has_building = "building_exo_ops"
+				has_building = "building_hab_capital"
+			}
+			exists = owner
 			owner = {
 				or = {
 					has_technology = tech_colonial_administrations_alpha
@@ -157,6 +177,10 @@ building_colony_control2 = {
 				}
 			}
 		}
+	}
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
 	}
 	ai_replace = no
 	ai_weight = { weight = 0 }
