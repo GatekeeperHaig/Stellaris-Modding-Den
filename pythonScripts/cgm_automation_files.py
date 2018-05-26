@@ -546,10 +546,10 @@ def main():
       if factor!=factor25 or factor!=factor50:
         factorEarlyGame=empireWeightsEventAllPositive.createReturnIf(TagList("years_passed", 25, "", "<"))
         factorEarlyGame.variableOp("change","cgm_tmp", math.log(factor,2))
-        factorMidGame=factorEarlyGame.addReturn("else")
-        factorMidGame=factorMidGame.createReturnIf(TagList("years_passed", 50, "", "<"))
-        factorMidGame.variableOp("change","cgm_tmp", math.log(factor25,2))
-        factorLateGame=factorMidGame.addReturn("else")
+        factorMidGame=empireWeightsEventAllPositive.addReturn("else") #fixed 2.1
+        factorMidGameIf=factorMidGame.createReturnIf(TagList("years_passed", 50, "", "<"))
+        factorMidGameIf.variableOp("change","cgm_tmp", math.log(factor25,2))
+        factorLateGame=factorMidGame.addReturn("else") #fixed 2.1
         factorLateGame.variableOp("change","cgm_tmp", math.log(factor50,2))
       else:
         empireWeightsEventAllPositive.variableOp("change","cgm_tmp", math.log(factor,2))
