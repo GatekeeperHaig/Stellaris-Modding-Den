@@ -207,12 +207,9 @@ def main():
   buildSpecial.variableOp("set", "cgm_worstWeight", pseudoInf)
 
 
-  # buildSomeThing.add("else", TagList("set_country_flag", "cgm_noAutobuildPlanetFound"))
   ifTypeBest=planetBuildSomeThing
   for i, weightType in enumerate(weightTypes+["special_resource"]):
     ifTypeBest=ifTypeBest.createReturnIf(TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1)))
-    # ifTypeBest= 
-    # planetBuildSomeThing.add("if", ifTypeBest)
     ifTypeBest.variableOp("set", "cgm_curTile",0)
     everyTileBuild=ifTypeBest.addReturn("every_tile")
     everyTileBuild.addReturn("prev").variableOp("change", "cgm_curTile",1)
@@ -634,13 +631,9 @@ def main():
       curEffect=newTileCheckFile.addReturn("check_"+resource+"_adjacency")
       curEffect=curEffect.addReturn("every_neighboring_tile")
       buildingAndPop=curEffect.createReturnIf(TagList("has_building","yes").add("has_grown_pop","yes"))
-      buildingAndPop.createReturnIf(TagList("pop", TagList("pop_produces_resource",TagList("type", resource).add("amount",0,"",">")))).add("prevprev",variableOpNew("change", resource+"_adjacency_weight", 3))
+      createReturnIf(TagList("pop", TagList("pop_produces_resource",TagList("type", resource).add("amount",0,"",">")))).add("prevprev",variableOpNew("change", resource+"_adjacency_weight", 3))
       noBuildingOrPop=buildingAndPop.addReturn("else")
       noBuildingOrPop.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", 0, "", ">"))).add("prevprev",variableOpNew("change", resource+"_adjacency_weight", 2.5))
-        # curEffect=curEffect.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", i, "", "=")))
-        # # curEffect.add("prev", variableOpNew("change", resource+"_weight", round(i*math.sqrt(i),3)))
-        # curEffect.add("prev", variableOpNew("change", resource+"_weight", 2*i))
-        # curEffect=curEffect.addReturn("else")
   tileWeightSummary.add("check_neighboring_adj_bonus_buildings","yes")
   tileWeightSummary.add("check_adj_bonus_blockers","yes")
 
@@ -821,30 +814,30 @@ def main():
     for resource in resources:
       curEffect=checkResourceEffect.addReturn("determine_surplus_"+resource)
       if resource in ["energy", "minerals", "food"]:
-        curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",0 ,"", "<")))
-        curNegEffect=curEffect
+        curEffectIf=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",0 ,"", "<")))
+        curNegEffect=curEffectIf
         for i in countToNeg:
-          curNegEffect=curNegEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",funNeg(i) ,"", ">")))
-          curNegEffect.variableOp("set", resource+"_log", -i)
-          curNegEffect.variableOp("set", resource+"_income", round(funNeg(i-0.5),3))
-          curNegEffect=curNegEffect.addReturn("else")
-          curNegEffect.variableOp("set", resource+"_log", -i-1)
+          curNegEffectIf=curNegEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",funNeg(i) ,"", ">")))
+          curNegEffectIf.variableOp("set", resource+"_log", -i)
+          curNegEffectIf.variableOp("set", resource+"_income", round(funNeg(i-0.5),3))
+          curNegEffect=curNegEffect.addReturn("else") #fixed 2.1
+        curNegEffect.variableOp("set", resource+"_log", -i-1)
         curNegEffect.variableOp("set", resource+"_income", round(funNeg(i+0.5),3))
           # curEffect.variableOp("set", resource+"_income", -1)
-        curEffect=curEffect.addReturn("else")
+        curEffect=curEffect.addReturn("else") #fixed 2.1
       for i in countToPos:
-        curEffect=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",fun(i) ,"", "<")))
-        curEffect.variableOp("set", resource+"_log", i)
+        curEffectIf=curEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",fun(i) ,"", "<")))
+        curEffectIf.variableOp("set", resource+"_log", i) #possible todo: also output log for the more precise one!
         if i>3 and resource=="minerals":
-          curSubEffect=curEffect
+          curSubEffect=curEffectIf
           for j in subCount:
-            curSubEffect=curSubEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",round(fun(i-1+j/10),3) ,"", "<")))
-            curSubEffect.variableOp("set", resource+"_income", round(fun(i-1+(j-0.5)/10),3))
-            curSubEffect=curSubEffect.addReturn("else")
+            curSubEffectIf=curSubEffect.createReturnIf(TagList("has_monthly_income", TagList("resource", resource).add("value",round(fun(i-1+j/10),3) ,"", "<")))
+            curSubEffectIf.variableOp("set", resource+"_income", round(fun(i-1+(j-0.5)/10),3))
+            curSubEffect=curSubEffect.addReturn("else") #fixed 2.1
           curSubEffect.variableOp("set", resource+"_income", round(fun(i-1+(j+0.5)/10),3))
         else:
-          curEffect.variableOp("set", resource+"_income", round(fun(i-0.5),3))
-        curEffect=curEffect.addReturn("else")
+          curEffectIf.variableOp("set", resource+"_income", round(fun(i-0.5),3))
+        curEffect=curEffect.addReturn("else") #fixed 2.1
       curEffect.variableOp("set", resource+"_log", i+1)
       curEffect.variableOp("set", resource+"_income", round(fun(i+0.5),3))
     outputToFolderAndFile(checkResourceEffect, "common/scripted_effects", "cgm_income_record_effects.txt",2, "../CGM/buildings_script_source")
@@ -1451,8 +1444,8 @@ def addCheckBeforeAnyBuildingConstruction(tagList):
     if isinstance(valTop, TagList):
       cur=outTag.addReturn(nameTop)
       for name,val in valTop.getNameVal():
-        cur=cur.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building",yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
-        cur=cur.addReturn("else")
+        cur.createReturnIf(TagList("OR", TagList("has_building_construction", yes).add("has_building",yes))).add("owner", TagList("set_country_flag", "cgm_auto_built"))
+        cur=cur.addReturn("else")  #fixed 2.1
         cur.add(name, val)
   return outTag
 
@@ -1483,10 +1476,10 @@ def createEffectDecisionStuff(modName="cgm_buildings"):
     if len(prev)<2:
       break
     if len(prev)>2:
-      curTag=curTag.createReturnIf(cond)
+      curTagIf=curTag.createReturnIf(cond)
     for j in range(1,4):
-      curTag.add("add_building_construction", buildingsDict[resource]+str(j))
-    curTag=curTag.addReturn("else")
+      curTagIf.add("add_building_construction", buildingsDict[resource]+str(j))
+    curTag=curTag.addReturn("else") #fixed 2.1 POSSIBLE TODO: This probably need to be manually added to the right place! Possible write a script to do that automatically
   outputToFolderAndFile(outTag, modName, "megastructure_node_stuff.txt",2, ".")
 
 
