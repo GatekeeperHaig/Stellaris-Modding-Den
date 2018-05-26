@@ -182,7 +182,7 @@ def main():
   empireStandardBuildEventImmediate.add("if", buildSomeThing)
   planetBuildSomeThing=TagList()
   buildSomeThing.createReturnIf(variableOpNew("check","cgm_bestWeight_1", 0 ,">")).add("event_target:cgm_best_planet", planetBuildSomeThing)
-  buildSpecial=buildSomeThing.addReturn("else")
+  buildSpecial=empireStandardBuildEventImmediate.addReturn("else") #fixed 2.1
   buildSpecial=buildSpecial.createReturnIf(variableOpNew("check","cgm_special_bestWeight", 0 ,">"))
   buildSpecial=buildSpecial.addReturn("event_target:cgm_best_planet_for_special")
   redoCalcForWorstTile=buildSpecial.createReturnIf(variableOpNew("check","cgm_worstWeight",pseudoInf))
