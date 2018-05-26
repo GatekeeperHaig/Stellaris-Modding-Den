@@ -483,268 +483,299 @@ planet_event = {
 				NOT = { any_owned_pop = { is_being_purged = no } }
 			}
 			set_planet_flag = purged_planet
+		}
+		else = {
+			remove_planet_flag = purged_planet
+			 #modifiers are updated yearly!
+			if = {
+				limit = { NOT = { has_planet_flag = cgm_bonus_building_calc_done } }
+				set_variable = { which = energy_mult_planet_building value = 0 }
+				set_variable = { which = minerals_mult_planet_building value = 0 }
+				set_variable = { which = food_mult_planet_building value = 0 }
+				set_variable = { which = unity_mult_planet_building value = 0 }
+				set_variable = { which = society_research_mult_planet_building value = 0 }
+				set_variable = { which = physics_research_mult_planet_building value = 0 }
+				set_variable = { which = engineering_research_mult_planet_building value = 0 }
+				check_planet_bonus_buildings = yes
+				check_planet_bonus_buildings_alphamod = yes
+				check_planet_bonus_buildings_ag = yes
+				check_planet_bonus_buildings_eutab = yes
+				check_planet_bonus_buildings_gse = yes
+				check_planet_bonus_buildings_co = yes
+				check_planet_bonus_buildings_esap = yes
+				check_planet_bonus_buildings_est = yes
+				check_planet_bonus_buildings_gwen = yes
+				check_planet_bonus_buildings_tycoon = yes
+				check_planet_bonus_buildings_ut = yes
+				check_planet_bonus_buildings_ab = yes
+				check_planet_bonus_buildings_cgm_planets = yes
+				set_planet_flag = cgm_bonus_building_calc_done
+			}
+			if = {
+				limit = { NOT = { has_planet_flag = cgm_pop_calc_done } }
+				set_variable = { which = energy_mult_planet_pop value = 0 }
+				set_variable = { which = minerals_mult_planet_pop value = 0 }
+				set_variable = { which = food_mult_planet_pop value = 0 }
+				set_variable = { which = unity_mult_planet_pop value = 0 }
+				set_variable = { which = society_research_mult_planet_pop value = 0 }
+				set_variable = { which = physics_research_mult_planet_pop value = 0 }
+				set_variable = { which = engineering_research_mult_planet_pop value = 0 }
+				calculate_average_pop_multipliers = yes
+				set_planet_flag = cgm_pop_calc_done
+			}
+			set_variable = { which = energy_mult_planet value = 1 }
+			change_variable = { which = energy_mult_planet value = energy_mult_planet_base }
+			change_variable = { which = energy_mult_planet value = energy_mult_planet_building }
+			change_variable = { which = energy_mult_planet value = energy_mult_planet_pop }
+			if = {
+				limit = { has_planet_flag = cgm_player_focus_energy }
+				set_variable = { which = energy_country_weight value = cgm_focus_strength }
+			}
 			else = {
-				remove_planet_flag = purged_planet
-				 #modifiers are updated yearly!
-				if = {
-					limit = { NOT = { has_planet_flag = cgm_bonus_building_calc_done } }
-					set_variable = { which = energy_mult_planet_building value = 0 }
-					set_variable = { which = minerals_mult_planet_building value = 0 }
-					set_variable = { which = food_mult_planet_building value = 0 }
-					set_variable = { which = unity_mult_planet_building value = 0 }
-					set_variable = { which = society_research_mult_planet_building value = 0 }
-					set_variable = { which = physics_research_mult_planet_building value = 0 }
-					set_variable = { which = engineering_research_mult_planet_building value = 0 }
-					check_planet_bonus_buildings = yes
-					check_planet_bonus_buildings_alphamod = yes
-					check_planet_bonus_buildings_ag = yes
-					check_planet_bonus_buildings_eutab = yes
-					check_planet_bonus_buildings_gse = yes
-					check_planet_bonus_buildings_co = yes
-					check_planet_bonus_buildings_esap = yes
-					check_planet_bonus_buildings_est = yes
-					check_planet_bonus_buildings_gwen = yes
-					check_planet_bonus_buildings_tycoon = yes
-					check_planet_bonus_buildings_ut = yes
-					check_planet_bonus_buildings_ab = yes
-					check_planet_bonus_buildings_cgm_planets = yes
-					set_planet_flag = cgm_bonus_building_calc_done
+				set_variable = { which = energy_country_weight value = owner }
+			}
+			multiply_variable = { which = energy_mult_planet value = energy_country_weight }
+			set_variable = { which = minerals_mult_planet value = 1 }
+			change_variable = { which = minerals_mult_planet value = minerals_mult_planet_base }
+			change_variable = { which = minerals_mult_planet value = minerals_mult_planet_building }
+			change_variable = { which = minerals_mult_planet value = minerals_mult_planet_pop }
+			if = {
+				limit = { has_planet_flag = cgm_player_focus_minerals }
+				set_variable = { which = minerals_country_weight value = cgm_focus_strength }
+			}
+			else = {
+				set_variable = { which = minerals_country_weight value = owner }
+			}
+			multiply_variable = { which = minerals_mult_planet value = minerals_country_weight }
+			set_variable = { which = food_mult_planet value = 1 }
+			change_variable = { which = food_mult_planet value = food_mult_planet_base }
+			change_variable = { which = food_mult_planet value = food_mult_planet_building }
+			change_variable = { which = food_mult_planet value = food_mult_planet_pop }
+			if = {
+				limit = { has_planet_flag = cgm_player_focus_food }
+				set_variable = { which = food_country_weight_TILE value = cgm_focus_strength }
+			}
+			else = {
+				set_variable = { which = food_country_weight_TILE value = owner }
+			}
+			multiply_variable = { which = food_mult_planet value = food_country_weight_TILE }
+			set_variable = { which = unity_mult_planet value = 1 }
+			change_variable = { which = unity_mult_planet value = unity_mult_planet_base }
+			change_variable = { which = unity_mult_planet value = unity_mult_planet_building }
+			change_variable = { which = unity_mult_planet value = unity_mult_planet_pop }
+			if = {
+				limit = { has_planet_flag = cgm_player_focus_unity }
+				set_variable = { which = unity_country_weight value = cgm_focus_strength }
+			}
+			else = {
+				set_variable = { which = unity_country_weight value = owner }
+			}
+			multiply_variable = { which = unity_mult_planet value = unity_country_weight }
+			set_variable = { which = society_research_mult_planet value = 1 }
+			change_variable = { which = society_research_mult_planet value = society_research_mult_planet_base }
+			change_variable = { which = society_research_mult_planet value = society_research_mult_planet_building }
+			change_variable = { which = society_research_mult_planet value = society_research_mult_planet_pop }
+			if = {
+				limit = { has_planet_flag = cgm_player_focus_society_research }
+				set_variable = { which = society_research_country_weight value = cgm_focus_strength }
+			}
+			else = {
+				set_variable = { which = society_research_country_weight value = owner }
+			}
+			multiply_variable = { which = society_research_mult_planet value = society_research_country_weight }
+			set_variable = { which = physics_research_mult_planet value = 1 }
+			change_variable = { which = physics_research_mult_planet value = physics_research_mult_planet_base }
+			change_variable = { which = physics_research_mult_planet value = physics_research_mult_planet_building }
+			change_variable = { which = physics_research_mult_planet value = physics_research_mult_planet_pop }
+			if = {
+				limit = { has_planet_flag = cgm_player_focus_physics_research }
+				set_variable = { which = physics_research_country_weight value = cgm_focus_strength }
+			}
+			else = {
+				set_variable = { which = physics_research_country_weight value = owner }
+			}
+			multiply_variable = { which = physics_research_mult_planet value = physics_research_country_weight }
+			set_variable = { which = engineering_research_mult_planet value = 1 }
+			change_variable = { which = engineering_research_mult_planet value = engineering_research_mult_planet_base }
+			change_variable = { which = engineering_research_mult_planet value = engineering_research_mult_planet_building }
+			change_variable = { which = engineering_research_mult_planet value = engineering_research_mult_planet_pop }
+			if = {
+				limit = { has_planet_flag = cgm_player_focus_engineering_research }
+				set_variable = { which = engineering_research_country_weight value = cgm_focus_strength }
+			}
+			else = {
+				set_variable = { which = engineering_research_country_weight value = owner }
+			}
+			multiply_variable = { which = engineering_research_mult_planet value = engineering_research_country_weight }
+			every_tile = {
+				prev = {
+					change_variable = { which = cgm_curTile value = 1 }
 				}
 				if = {
-					limit = { NOT = { has_planet_flag = cgm_pop_calc_done } }
-					set_variable = { which = energy_mult_planet_pop value = 0 }
-					set_variable = { which = minerals_mult_planet_pop value = 0 }
-					set_variable = { which = food_mult_planet_pop value = 0 }
-					set_variable = { which = unity_mult_planet_pop value = 0 }
-					set_variable = { which = society_research_mult_planet_pop value = 0 }
-					set_variable = { which = physics_research_mult_planet_pop value = 0 }
-					set_variable = { which = engineering_research_mult_planet_pop value = 0 }
-					calculate_average_pop_multipliers = yes
-					set_planet_flag = cgm_pop_calc_done
-				}
-				set_variable = { which = energy_mult_planet value = 1 }
-				change_variable = { which = energy_mult_planet value = energy_mult_planet_base }
-				change_variable = { which = energy_mult_planet value = energy_mult_planet_building }
-				change_variable = { which = energy_mult_planet value = energy_mult_planet_pop }
-				if = {
-					limit = { has_planet_flag = cgm_player_focus_energy }
-					set_variable = { which = energy_country_weight value = cgm_focus_strength }
-				}
-				else = {
-					set_variable = { which = energy_country_weight value = owner }
-				}
-				multiply_variable = { which = energy_mult_planet value = energy_country_weight }
-				set_variable = { which = minerals_mult_planet value = 1 }
-				change_variable = { which = minerals_mult_planet value = minerals_mult_planet_base }
-				change_variable = { which = minerals_mult_planet value = minerals_mult_planet_building }
-				change_variable = { which = minerals_mult_planet value = minerals_mult_planet_pop }
-				if = {
-					limit = { has_planet_flag = cgm_player_focus_minerals }
-					set_variable = { which = minerals_country_weight value = cgm_focus_strength }
-				}
-				else = {
-					set_variable = { which = minerals_country_weight value = owner }
-				}
-				multiply_variable = { which = minerals_mult_planet value = minerals_country_weight }
-				set_variable = { which = food_mult_planet value = 1 }
-				change_variable = { which = food_mult_planet value = food_mult_planet_base }
-				change_variable = { which = food_mult_planet value = food_mult_planet_building }
-				change_variable = { which = food_mult_planet value = food_mult_planet_pop }
-				if = {
-					limit = { has_planet_flag = cgm_player_focus_food }
-					set_variable = { which = food_country_weight_TILE value = cgm_focus_strength }
-				}
-				else = {
-					set_variable = { which = food_country_weight_TILE value = owner }
-				}
-				multiply_variable = { which = food_mult_planet value = food_country_weight_TILE }
-				set_variable = { which = unity_mult_planet value = 1 }
-				change_variable = { which = unity_mult_planet value = unity_mult_planet_base }
-				change_variable = { which = unity_mult_planet value = unity_mult_planet_building }
-				change_variable = { which = unity_mult_planet value = unity_mult_planet_pop }
-				if = {
-					limit = { has_planet_flag = cgm_player_focus_unity }
-					set_variable = { which = unity_country_weight value = cgm_focus_strength }
-				}
-				else = {
-					set_variable = { which = unity_country_weight value = owner }
-				}
-				multiply_variable = { which = unity_mult_planet value = unity_country_weight }
-				set_variable = { which = society_research_mult_planet value = 1 }
-				change_variable = { which = society_research_mult_planet value = society_research_mult_planet_base }
-				change_variable = { which = society_research_mult_planet value = society_research_mult_planet_building }
-				change_variable = { which = society_research_mult_planet value = society_research_mult_planet_pop }
-				if = {
-					limit = { has_planet_flag = cgm_player_focus_society_research }
-					set_variable = { which = society_research_country_weight value = cgm_focus_strength }
-				}
-				else = {
-					set_variable = { which = society_research_country_weight value = owner }
-				}
-				multiply_variable = { which = society_research_mult_planet value = society_research_country_weight }
-				set_variable = { which = physics_research_mult_planet value = 1 }
-				change_variable = { which = physics_research_mult_planet value = physics_research_mult_planet_base }
-				change_variable = { which = physics_research_mult_planet value = physics_research_mult_planet_building }
-				change_variable = { which = physics_research_mult_planet value = physics_research_mult_planet_pop }
-				if = {
-					limit = { has_planet_flag = cgm_player_focus_physics_research }
-					set_variable = { which = physics_research_country_weight value = cgm_focus_strength }
-				}
-				else = {
-					set_variable = { which = physics_research_country_weight value = owner }
-				}
-				multiply_variable = { which = physics_research_mult_planet value = physics_research_country_weight }
-				set_variable = { which = engineering_research_mult_planet value = 1 }
-				change_variable = { which = engineering_research_mult_planet value = engineering_research_mult_planet_base }
-				change_variable = { which = engineering_research_mult_planet value = engineering_research_mult_planet_building }
-				change_variable = { which = engineering_research_mult_planet value = engineering_research_mult_planet_pop }
-				if = {
-					limit = { has_planet_flag = cgm_player_focus_engineering_research }
-					set_variable = { which = engineering_research_country_weight value = cgm_focus_strength }
-				}
-				else = {
-					set_variable = { which = engineering_research_country_weight value = owner }
-				}
-				multiply_variable = { which = engineering_research_mult_planet value = engineering_research_country_weight }
-				every_tile = {
-					prev = {
-						change_variable = { which = cgm_curTile value = 1 }
-					}
+					limit = { has_building = no has_blocker = no }
 					if = {
-						limit = { has_building = no has_blocker = no }
+						limit = { has_any_tile_strategic_resource = yes }
 						if = {
-							limit = { has_any_tile_strategic_resource = yes }
-							if = {
-								limit = { special_resource_any_building_available = yes }
-								prev = {
-									set_variable = { which = cgm_curWeight value = 50 }
-									set_variable = { which = cgm_curType value = 13 }
-								}
-							}
-						}
-						else = {
-							calculate_tile_weight = yes
+							limit = { special_resource_any_building_available = yes }
 							prev = {
-								subtract_variable = { which = energy_weight value = unity_weight }
-								multiply_variable = { which = energy_weight value = energy_mult_planet }
-								multiply_variable = { which = energy_adjacency_weight value = energy_mult_planet }
-								subtract_variable = { which = minerals_weight value = unity_weight }
-								multiply_variable = { which = minerals_weight value = minerals_mult_planet }
-								multiply_variable = { which = minerals_adjacency_weight value = minerals_mult_planet }
-								subtract_variable = { which = food_weight value = unity_weight }
-								multiply_variable = { which = food_weight value = food_mult_planet }
-								multiply_variable = { which = food_adjacency_weight value = food_mult_planet }
-								subtract_variable = { which = society_research_weight value = unity_weight }
-								multiply_variable = { which = society_research_weight value = society_research_mult_planet }
-								multiply_variable = { which = society_research_adjacency_weight value = society_research_mult_planet }
-								subtract_variable = { which = physics_research_weight value = unity_weight }
-								multiply_variable = { which = physics_research_weight value = physics_research_mult_planet }
-								multiply_variable = { which = physics_research_adjacency_weight value = physics_research_mult_planet }
-								subtract_variable = { which = engineering_research_weight value = unity_weight }
-								multiply_variable = { which = engineering_research_weight value = engineering_research_mult_planet }
-								multiply_variable = { which = engineering_research_adjacency_weight value = engineering_research_mult_planet }
-								if = {
-									limit = {
-										check_variable = { which = energy_weight value > cgm_curWeight }
-										energy_any_building_available = yes
-									}
-									set_variable = { which = cgm_curWeight value = energy_weight }
-									set_variable = { which = cgm_curType value = 1 }
-								}
-								if = {
-									limit = {
-										check_variable = { which = minerals_weight value > cgm_curWeight }
-										minerals_any_building_available = yes
-									}
-									set_variable = { which = cgm_curWeight value = minerals_weight }
-									set_variable = { which = cgm_curType value = 2 }
-								}
-								if = {
-									limit = {
-										check_variable = { which = food_weight value > cgm_curWeight }
-										food_any_building_available = yes
-									}
-									set_variable = { which = cgm_curWeight value = food_weight }
-									set_variable = { which = cgm_curType value = 3 }
-								}
-								if = {
-									limit = {
-										check_variable = { which = society_research_weight value > cgm_curWeight }
-										society_research_any_building_available = yes
-									}
-									set_variable = { which = cgm_curWeight value = society_research_weight }
-									set_variable = { which = cgm_curType value = 4 }
-								}
-								if = {
-									limit = {
-										check_variable = { which = physics_research_weight value > cgm_curWeight }
-										physics_research_any_building_available = yes
-									}
-									set_variable = { which = cgm_curWeight value = physics_research_weight }
-									set_variable = { which = cgm_curType value = 5 }
-								}
-								if = {
-									limit = {
-										check_variable = { which = engineering_research_weight value > cgm_curWeight }
-										engineering_research_any_building_available = yes
-									}
-									set_variable = { which = cgm_curWeight value = engineering_research_weight }
-									set_variable = { which = cgm_curType value = 6 }
-								}
-								if = {
-									limit = {
-										check_variable = { which = energy_adjacency_weight value > cgm_curWeight }
-										energy_adjacency_any_building_available = yes
-									}
-									set_variable = { which = cgm_curWeight value = energy_adjacency_weight }
-									set_variable = { which = cgm_curType value = 7 }
-								}
-								if = {
-									limit = {
-										check_variable = { which = minerals_adjacency_weight value > cgm_curWeight }
-										minerals_adjacency_any_building_available = yes
-									}
-									set_variable = { which = cgm_curWeight value = minerals_adjacency_weight }
-									set_variable = { which = cgm_curType value = 8 }
-								}
-								if = {
-									limit = {
-										check_variable = { which = food_adjacency_weight value > cgm_curWeight }
-										food_adjacency_any_building_available = yes
-									}
-									set_variable = { which = cgm_curWeight value = food_adjacency_weight }
-									set_variable = { which = cgm_curType value = 9 }
-								}
-								if = {
-									limit = {
-										check_variable = { which = society_research_adjacency_weight value > cgm_curWeight }
-										society_research_adjacency_any_building_available = yes
-									}
-									set_variable = { which = cgm_curWeight value = society_research_adjacency_weight }
-									set_variable = { which = cgm_curType value = 10 }
-								}
-								if = {
-									limit = {
-										check_variable = { which = physics_research_adjacency_weight value > cgm_curWeight }
-										physics_research_adjacency_any_building_available = yes
-									}
-									set_variable = { which = cgm_curWeight value = physics_research_adjacency_weight }
-									set_variable = { which = cgm_curType value = 11 }
-								}
-								if = {
-									limit = {
-										check_variable = { which = engineering_research_adjacency_weight value > cgm_curWeight }
-										engineering_research_adjacency_any_building_available = yes
-									}
-									set_variable = { which = cgm_curWeight value = engineering_research_adjacency_weight }
-									set_variable = { which = cgm_curType value = 12 }
-								}
+								set_variable = { which = cgm_curWeight value = 50 }
+								set_variable = { which = cgm_curType value = 13 }
 							}
 						}
+					}
+					else = {
+						calculate_tile_weight = yes
 						prev = {
+							subtract_variable = { which = energy_weight value = unity_weight }
+							multiply_variable = { which = energy_weight value = energy_mult_planet }
+							multiply_variable = { which = energy_adjacency_weight value = energy_mult_planet }
+							subtract_variable = { which = minerals_weight value = unity_weight }
+							multiply_variable = { which = minerals_weight value = minerals_mult_planet }
+							multiply_variable = { which = minerals_adjacency_weight value = minerals_mult_planet }
+							subtract_variable = { which = food_weight value = unity_weight }
+							multiply_variable = { which = food_weight value = food_mult_planet }
+							multiply_variable = { which = food_adjacency_weight value = food_mult_planet }
+							subtract_variable = { which = society_research_weight value = unity_weight }
+							multiply_variable = { which = society_research_weight value = society_research_mult_planet }
+							multiply_variable = { which = society_research_adjacency_weight value = society_research_mult_planet }
+							subtract_variable = { which = physics_research_weight value = unity_weight }
+							multiply_variable = { which = physics_research_weight value = physics_research_mult_planet }
+							multiply_variable = { which = physics_research_adjacency_weight value = physics_research_mult_planet }
+							subtract_variable = { which = engineering_research_weight value = unity_weight }
+							multiply_variable = { which = engineering_research_weight value = engineering_research_mult_planet }
+							multiply_variable = { which = engineering_research_adjacency_weight value = engineering_research_mult_planet }
 							if = {
 								limit = {
-									check_variable = { which = cgm_curWeight value > cgm_bestWeight_1 }
+									check_variable = { which = energy_weight value > cgm_curWeight }
+									energy_any_building_available = yes
+								}
+								set_variable = { which = cgm_curWeight value = energy_weight }
+								set_variable = { which = cgm_curType value = 1 }
+							}
+							if = {
+								limit = {
+									check_variable = { which = minerals_weight value > cgm_curWeight }
+									minerals_any_building_available = yes
+								}
+								set_variable = { which = cgm_curWeight value = minerals_weight }
+								set_variable = { which = cgm_curType value = 2 }
+							}
+							if = {
+								limit = {
+									check_variable = { which = food_weight value > cgm_curWeight }
+									food_any_building_available = yes
+								}
+								set_variable = { which = cgm_curWeight value = food_weight }
+								set_variable = { which = cgm_curType value = 3 }
+							}
+							if = {
+								limit = {
+									check_variable = { which = society_research_weight value > cgm_curWeight }
+									society_research_any_building_available = yes
+								}
+								set_variable = { which = cgm_curWeight value = society_research_weight }
+								set_variable = { which = cgm_curType value = 4 }
+							}
+							if = {
+								limit = {
+									check_variable = { which = physics_research_weight value > cgm_curWeight }
+									physics_research_any_building_available = yes
+								}
+								set_variable = { which = cgm_curWeight value = physics_research_weight }
+								set_variable = { which = cgm_curType value = 5 }
+							}
+							if = {
+								limit = {
+									check_variable = { which = engineering_research_weight value > cgm_curWeight }
+									engineering_research_any_building_available = yes
+								}
+								set_variable = { which = cgm_curWeight value = engineering_research_weight }
+								set_variable = { which = cgm_curType value = 6 }
+							}
+							if = {
+								limit = {
+									check_variable = { which = energy_adjacency_weight value > cgm_curWeight }
+									energy_adjacency_any_building_available = yes
+								}
+								set_variable = { which = cgm_curWeight value = energy_adjacency_weight }
+								set_variable = { which = cgm_curType value = 7 }
+							}
+							if = {
+								limit = {
+									check_variable = { which = minerals_adjacency_weight value > cgm_curWeight }
+									minerals_adjacency_any_building_available = yes
+								}
+								set_variable = { which = cgm_curWeight value = minerals_adjacency_weight }
+								set_variable = { which = cgm_curType value = 8 }
+							}
+							if = {
+								limit = {
+									check_variable = { which = food_adjacency_weight value > cgm_curWeight }
+									food_adjacency_any_building_available = yes
+								}
+								set_variable = { which = cgm_curWeight value = food_adjacency_weight }
+								set_variable = { which = cgm_curType value = 9 }
+							}
+							if = {
+								limit = {
+									check_variable = { which = society_research_adjacency_weight value > cgm_curWeight }
+									society_research_adjacency_any_building_available = yes
+								}
+								set_variable = { which = cgm_curWeight value = society_research_adjacency_weight }
+								set_variable = { which = cgm_curType value = 10 }
+							}
+							if = {
+								limit = {
+									check_variable = { which = physics_research_adjacency_weight value > cgm_curWeight }
+									physics_research_adjacency_any_building_available = yes
+								}
+								set_variable = { which = cgm_curWeight value = physics_research_adjacency_weight }
+								set_variable = { which = cgm_curType value = 11 }
+							}
+							if = {
+								limit = {
+									check_variable = { which = engineering_research_adjacency_weight value > cgm_curWeight }
+									engineering_research_adjacency_any_building_available = yes
+								}
+								set_variable = { which = cgm_curWeight value = engineering_research_adjacency_weight }
+								set_variable = { which = cgm_curType value = 12 }
+							}
+						}
+					}
+					prev = {
+						if = {
+							limit = {
+								check_variable = { which = cgm_curWeight value > cgm_bestWeight_1 }
+							}
+							if = {
+								limit = {
+									check_variable = { which = cgm_bestWeight_2 value > 0 }
+								}
+								set_variable = { which = cgm_bestWeight_3 value = cgm_bestWeight_2 }
+								set_variable = { which = cgm_bestTile_3 value = cgm_bestTile_2 }
+								set_variable = { which = cgm_bestType_3 value = cgm_bestType_2 }
+								set_variable = { which = cgm_bestWeight_2 value = cgm_bestWeight_1 }
+								set_variable = { which = cgm_bestTile_2 value = cgm_bestTile_1 }
+								set_variable = { which = cgm_bestType_2 value = cgm_bestType_1 }
+							}
+							else = {
+								if = {
+									limit = {
+										check_variable = { which = cgm_bestWeight_1 value > 0 }
+									}
+									set_variable = { which = cgm_bestWeight_2 value = cgm_bestWeight_1 }
+									set_variable = { which = cgm_bestTile_2 value = cgm_bestTile_1 }
+									set_variable = { which = cgm_bestType_2 value = cgm_bestType_1 }
+								}
+							}
+							set_variable = { which = cgm_bestWeight_1 value = cgm_curWeight }
+							set_variable = { which = cgm_bestTile_1 value = cgm_curTile }
+							set_variable = { which = cgm_bestType_1 value = cgm_curType }
+						}
+						else = {
+							if = {
+								limit = {
+									check_variable = { which = cgm_curWeight value > cgm_bestWeight_2 }
 								}
 								if = {
 									limit = {
@@ -753,74 +784,43 @@ planet_event = {
 									set_variable = { which = cgm_bestWeight_3 value = cgm_bestWeight_2 }
 									set_variable = { which = cgm_bestTile_3 value = cgm_bestTile_2 }
 									set_variable = { which = cgm_bestType_3 value = cgm_bestType_2 }
-									set_variable = { which = cgm_bestWeight_2 value = cgm_bestWeight_1 }
-									set_variable = { which = cgm_bestTile_2 value = cgm_bestTile_1 }
-									set_variable = { which = cgm_bestType_2 value = cgm_bestType_1 }
 								}
-								else = {
-									if = {
-										limit = {
-											check_variable = { which = cgm_bestWeight_1 value > 0 }
-										}
-										set_variable = { which = cgm_bestWeight_2 value = cgm_bestWeight_1 }
-										set_variable = { which = cgm_bestTile_2 value = cgm_bestTile_1 }
-										set_variable = { which = cgm_bestType_2 value = cgm_bestType_1 }
-									}
-								}
-								set_variable = { which = cgm_bestWeight_1 value = cgm_curWeight }
-								set_variable = { which = cgm_bestTile_1 value = cgm_curTile }
-								set_variable = { which = cgm_bestType_1 value = cgm_curType }
+								set_variable = { which = cgm_bestWeight_2 value = cgm_curWeight }
+								set_variable = { which = cgm_bestTile_2 value = cgm_curTile }
+								set_variable = { which = cgm_bestType_2 value = cgm_curType }
 							}
 							else = {
 								if = {
 									limit = {
-										check_variable = { which = cgm_curWeight value > cgm_bestWeight_2 }
+										check_variable = { which = cgm_curWeight value > cgm_bestWeight_3 }
 									}
-									if = {
-										limit = {
-											check_variable = { which = cgm_bestWeight_2 value > 0 }
-										}
-										set_variable = { which = cgm_bestWeight_3 value = cgm_bestWeight_2 }
-										set_variable = { which = cgm_bestTile_3 value = cgm_bestTile_2 }
-										set_variable = { which = cgm_bestType_3 value = cgm_bestType_2 }
-									}
-									set_variable = { which = cgm_bestWeight_2 value = cgm_curWeight }
-									set_variable = { which = cgm_bestTile_2 value = cgm_curTile }
-									set_variable = { which = cgm_bestType_2 value = cgm_curType }
-								}
-								else = {
-									if = {
-										limit = {
-											check_variable = { which = cgm_curWeight value > cgm_bestWeight_3 }
-										}
-										set_variable = { which = cgm_bestWeight_3 value = cgm_curWeight }
-										set_variable = { which = cgm_bestTile_3 value = cgm_curTile }
-										set_variable = { which = cgm_bestType_3 value = cgm_curType }
-									}
+									set_variable = { which = cgm_bestWeight_3 value = cgm_curWeight }
+									set_variable = { which = cgm_bestTile_3 value = cgm_curTile }
+									set_variable = { which = cgm_bestType_3 value = cgm_curType }
 								}
 							}
-							if = {
-								limit = {
-									check_variable = { which = cgm_curWeight value < cgm_worstWeight }
-									prev = { has_any_tile_strategic_resource = no }
-								}
-								set_variable = { which = cgm_worstWeight value = cgm_curWeight }
-								set_variable = { which = cgm_worstTile value = cgm_curTile }
-							}
-							set_variable = { which = cgm_curWeight value = 0 }
-							set_variable = { which = energy_weight value = 0 }
-							set_variable = { which = minerals_weight value = 0 }
-							set_variable = { which = food_weight value = 0 }
-							set_variable = { which = society_research_weight value = 0 }
-							set_variable = { which = physics_research_weight value = 0 }
-							set_variable = { which = engineering_research_weight value = 0 }
-							set_variable = { which = energy_adjacency_weight value = 0 }
-							set_variable = { which = minerals_adjacency_weight value = 0 }
-							set_variable = { which = food_adjacency_weight value = 0 }
-							set_variable = { which = society_research_adjacency_weight value = 0 }
-							set_variable = { which = physics_research_adjacency_weight value = 0 }
-							set_variable = { which = engineering_research_adjacency_weight value = 0 }
 						}
+						if = {
+							limit = {
+								check_variable = { which = cgm_curWeight value < cgm_worstWeight }
+								prev = { has_any_tile_strategic_resource = no }
+							}
+							set_variable = { which = cgm_worstWeight value = cgm_curWeight }
+							set_variable = { which = cgm_worstTile value = cgm_curTile }
+						}
+						set_variable = { which = cgm_curWeight value = 0 }
+						set_variable = { which = energy_weight value = 0 }
+						set_variable = { which = minerals_weight value = 0 }
+						set_variable = { which = food_weight value = 0 }
+						set_variable = { which = society_research_weight value = 0 }
+						set_variable = { which = physics_research_weight value = 0 }
+						set_variable = { which = engineering_research_weight value = 0 }
+						set_variable = { which = energy_adjacency_weight value = 0 }
+						set_variable = { which = minerals_adjacency_weight value = 0 }
+						set_variable = { which = food_adjacency_weight value = 0 }
+						set_variable = { which = society_research_adjacency_weight value = 0 }
+						set_variable = { which = physics_research_adjacency_weight value = 0 }
+						set_variable = { which = engineering_research_adjacency_weight value = 0 }
 					}
 				}
 			}

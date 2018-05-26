@@ -289,7 +289,8 @@ def main():
   for name in cgmCompEffect.names:
     if "check_pop_traits" in name:
       if name=="check_pop_traits_additional_traits":
-        popTraits.createReturnIf(TagList("additional_traits_enabled", "no")).add("check_vanilla_pop_traits", yes).add("else", TagList(name, yes))
+        popTraits.createReturnIf(TagList("additional_traits_enabled", "no")).add("check_vanilla_pop_traits", yes)
+        popTraits.add("else", TagList(name, yes))
       else:
         popTraits.add(name,"yes")
   popTraits.add("vanilla_pop_modifiers",yes)
@@ -330,8 +331,8 @@ def main():
   planetFindBestEventImmediate.variableOp("set", "cgm_worstWeight".format(varToMove),pseudoInf)
 
 
-  planetFindBestEventImmediate=planetFindBestEventImmediate.createReturnIf(TagList("NOT", TagList("any_owned_pop", TagList("is_being_purged", "no")))).add("set_planet_flag", "purged_planet")
-  planetFindBestEventImmediate=planetFindBestEventImmediate.addReturn("else")
+  planetFindBestEventImmediate.createReturnIf(TagList("NOT", TagList("any_owned_pop", TagList("is_being_purged", "no")))).add("set_planet_flag", "purged_planet")
+  planetFindBestEventImmediate=planetFindBestEventImmediate.addReturn("else") #fixed 2.1
   planetFindBestEventImmediate.add("remove_planet_flag", "purged_planet")
   planetFindBestEventImmediate.addComment("modifiers are updated yearly!")
 
