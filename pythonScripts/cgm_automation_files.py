@@ -209,16 +209,16 @@ def main():
 
   ifTypeBest=planetBuildSomeThing
   for i, weightType in enumerate(weightTypes+["special_resource"]):
-    ifTypeBest=ifTypeBest.createReturnIf(TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1)))
-    ifTypeBest.variableOp("set", "cgm_curTile",0)
-    everyTileBuild=ifTypeBest.addReturn("every_tile")
+    ifTypeBestIf=ifTypeBest.createReturnIf(TagList("check_variable", TagList("which", "cgm_bestType_1").add("value", i+1)))
+    ifTypeBestIf.variableOp("set", "cgm_curTile",0)
+    everyTileBuild=ifTypeBestIf.addReturn("every_tile")
     everyTileBuild.addReturn("prev").variableOp("change", "cgm_curTile",1)
     buildIt=everyTileBuild.createReturnIf(TagList("prev",variableOpNew("check", "cgm_curTile", "cgm_bestTile_1")))
     if debug:
       buildIt.add("log", '"trying to build on tile [planet.cgm_bestTile_1]"')
       buildIt.add("log", '"trying to build category {}"'.format(weightType))
     buildIt.add("add_"+weightType+"_building","yes" )
-    ifTypeBest=ifTypeBest.addReturn("else")
+    ifTypeBest=ifTypeBest.addReturn("else")#fixed 2.1
     
     effect=TagList()
     outEffects.insert(0,"add_"+weightType+"_building",effect)
