@@ -352,7 +352,8 @@ def main():
   for name in cgmCompEffect.names:
     if "check_planet_modifiers" in name:
       if name=="check_planet_modifiers_gpm":
-        recheckModifiers.createReturnIf(TagList("gpm_enabled", "no")).add("check_vanilla_planet_modifiers", yes).add("else", TagList(name, yes))
+        recheckModifiers.createReturnIf(TagList("gpm_enabled", "no")).add("check_vanilla_planet_modifiers", yes)
+        recheckModifiers.add("else", TagList(name, yes)) #fixed 2.1
       else:
         recheckModifiers.add(name,"yes")
     # if "check_planet_modifiers" in name:
