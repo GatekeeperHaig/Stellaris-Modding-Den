@@ -1,275 +1,261 @@
-### Effects in this file are ran on country scope.
+ ### Effects in this file are ran on country scope.
 check_income = {
 	if = {
 		limit = {
-			#NOT = {has_country_flag = ignore_next_check}#maybe we need this some day
+			 #NOT = {has_country_flag = ignore_next_check}#maybe we need this some day
 			has_global_flag = cgm_first_month_passed
-			#has_monthly_income gives false results during the first month after game start
+			 #has_monthly_income gives false results during the first month after game start
 		}
-		#log = "Check started"
-		
-		
-		###FOOD###
-		#update food_reserve, food_income, positive_food_reserve_month variables
-		#set/remove is_food_starved
-		#modify food_weight(country)
-		if = { 
-			limit = { 
+		 #log = "Check started"
+		 ###FOOD###
+		 #update food_reserve, food_income, positive_food_reserve_month variables
+		 #set/remove is_food_starved
+		 #modify food_weight(country)
+		if = {
+			limit = {
 				OR = {
-					is_machine_empire = no #machines don't like BANANAS!
+					is_machine_empire = no  #machines don't like BANANAS!
 					is_servitor = yes
 				}
-			}	
-			
-			#update reserve_month variable and remove starved flag
+			}
+			 #update reserve_month variable and remove starved flag
 			if = {
-				limit = { 
+				limit = {
 					food > 0
 					has_monthly_income = { resource = food value > 0 }
-				}			
-				if = { 
-					limit = { check_variable = { which = positive_food_reserve_month value > 0 } }
+				}
+				if = {
+					limit = {
+						check_variable = { which = positive_food_reserve_month value > 0 }
+					}
 					change_variable = { which = positive_food_reserve_month value = 1 }
-					else = { set_variable = { which = positive_food_reserve_month value = 1 } }
-				}			
+					else = {
+						set_variable = { which = positive_food_reserve_month value = 1 }
+					}
+				}
 				remove_country_flag = is_food_starved
 			}
-			
-			
-			#count full reserve and income
-			set_variable = { which = food_reserve value = 0 }		
+			 #count full reserve and income
+			set_variable = { which = food_reserve value = 0 }
 			set_variable = { which = food_income value = 0 }
 			set_variable = { which = reserve_transport value = 0 }
-			count_food_reserve = yes #ignores decimal places 			
+			count_food_reserve = yes  #ignores decimal places
 			restore_food_reserve = yes
 			determine_surplus_food = yes
-			
-			
-			#modify weight(country) and set starved flag
-			if = { 
-				limit = {food < 0.001}#limit = {NOT = {food > 0}}
-				set_variable = { which = positive_food_reserve_month value = 0 } 
+			 #modify weight(country) and set starved flag
+			if = {
+				limit = { food < 0.001 }  #limit = {NOT = {food > 0}}
+				set_variable = { which = positive_food_reserve_month value = 0 }
 				set_country_flag = is_food_starved
 			}
 			if = {
-				limit = {has_monthly_income = { resource = food value < 5 }}
+				limit = {
+					has_monthly_income = { resource = food value < 5 }
+				}
 				change_variable = { which = food_weight value = 3 }
-				if = { 
-					limit = { 
+				if = {
+					limit = {
 						has_monthly_income = { resource = food value < 1 }
-						OR = { 
+						OR = {
 							food < 1
-							any_owned_planet = { 
+							any_owned_planet = {
 								has_modifier = starvation
 								has_orbital_bombardment = no
 								has_ground_combat = no
 								is_occupied_flag = no
-							}	
-						}							
-					}	
+							}
+						}
+					}
 					set_country_flag = is_food_starved
 					change_variable = { which = food_weight value = 10 }
-				}	
+				}
 				if = {
-					limit = { has_monthly_income = { resource = food value < -10 } }
+					limit = {
+						has_monthly_income = { resource = food value < -10 }
+					}
 					change_variable = { which = food_weight value = 4 }
 				}
 				if = {
-					limit = { has_monthly_income = { resource = food value < -20 } }
+					limit = {
+						has_monthly_income = { resource = food value < -20 }
+					}
 					change_variable = { which = food_weight value = 5 }
 				}
 			}
 		}
-
-		
-		
-		###ENERGY###
-		#update energy_reserve, energy_income, positive_energy_reserve_month variables
-		#set/remove is_energy_starved
-		#modify energy_weight(country)
-		
-		
-		#update reserve_month variable and remove starved flag
+		 ###ENERGY###
+		 #update energy_reserve, energy_income, positive_energy_reserve_month variables
+		 #set/remove is_energy_starved
+		 #modify energy_weight(country)
+		 #update reserve_month variable and remove starved flag
 		if = {
-			limit = { 
+			limit = {
 				energy > 0
 				has_monthly_income = { resource = energy value > 0 }
-			}			
-			if = { 
-				limit = { check_variable = { which = positive_energy_reserve_month value > 0 } }
+			}
+			if = {
+				limit = {
+					check_variable = { which = positive_energy_reserve_month value > 0 }
+				}
 				change_variable = { which = positive_energy_reserve_month value = 1 }
-				else = { set_variable = { which = positive_energy_reserve_month value = 1 } }
-			}			
+				else = {
+					set_variable = { which = positive_energy_reserve_month value = 1 }
+				}
+			}
 			remove_country_flag = is_energy_starved
 		}
-		
-		
-		#count full reserve and income
-		set_variable = { which = energy_reserve value = 0 }		
+		 #count full reserve and income
+		set_variable = { which = energy_reserve value = 0 }
 		set_variable = { which = energy_income value = 0 }
 		set_variable = { which = reserve_transport value = 0 }
-		count_energy_reserve = yes #ignores decimal places 		
+		count_energy_reserve = yes  #ignores decimal places
 		restore_energy_reserve = yes
-		determine_surplus_energy = yes		
-		
-		#modify weight(country) and set starved flag
-		if = { 
-			limit = {energy < 0.001}
-			set_variable = { which = positive_energy_reserve_month value = 0 } 
+		determine_surplus_energy = yes
+		 #modify weight(country) and set starved flag
+		if = {
+			limit = { energy < 0.001 }
+			set_variable = { which = positive_energy_reserve_month value = 0 }
 			set_country_flag = is_energy_starved
 		}
 		if = {
-			limit = {has_monthly_income = { resource = energy value < 5 }}
+			limit = {
+				has_monthly_income = { resource = energy value < 5 }
+			}
 			change_variable = { which = energy_weight value = 3 }
-			if = { 
-				limit = { 
+			if = {
+				limit = {
 					has_monthly_income = { resource = energy value < 1 }
-					OR = { 
-						energy < 1
-						has_modifier = energy_deficit
-					}							
-				}	
+					OR = { energy < 1 has_modifier = energy_deficit }
+				}
 				set_country_flag = is_energy_starved
 				change_variable = { which = energy_weight value = 10 }
-			}	
+			}
 			if = {
-				limit = { has_monthly_income = { resource = food value < -10 } }
+				limit = {
+					has_monthly_income = { resource = food value < -10 }
+				}
 				change_variable = { which = energy_weight value = 4 }
 			}
 			if = {
-				limit = { has_monthly_income = { resource = food value < -20 } }
+				limit = {
+					has_monthly_income = { resource = food value < -20 }
+				}
 				change_variable = { which = energy_weight value = 5 }
 			}
 		}
-		
-		
-		
-		###MINERALS###
-		#update minerals_reserve, minerals_income, positive_minerals_reserve_month variables
-		#set/remove is_minerals_starved
-		#modify minerals_weight(country)
-		
-		
-		#update reserve_month variable and remove starved flag
+		 ###MINERALS###
+		 #update minerals_reserve, minerals_income, positive_minerals_reserve_month variables
+		 #set/remove is_minerals_starved
+		 #modify minerals_weight(country)
+		 #update reserve_month variable and remove starved flag
 		if = {
-			limit = { 
+			limit = {
 				minerals > 0
 				has_monthly_income = { resource = minerals value > 0 }
-			}			
-			if = { 
-				limit = { check_variable = { which = positive_minerals_reserve_month value > 0 } }
+			}
+			if = {
+				limit = {
+					check_variable = { which = positive_minerals_reserve_month value > 0 }
+				}
 				change_variable = { which = positive_minerals_reserve_month value = 1 }
-				else = { set_variable = { which = positive_minerals_reserve_month value = 1 } }
-			}			
+				else = {
+					set_variable = { which = positive_minerals_reserve_month value = 1 }
+				}
+			}
 			remove_country_flag = is_minerals_starved
 		}
-		
-		
-		#count full reserve and income
-		set_variable = { which = minerals_reserve value = 0 }		
+		 #count full reserve and income
+		set_variable = { which = minerals_reserve value = 0 }
 		set_variable = { which = minerals_income value = 0 }
 		set_variable = { which = reserve_transport value = 0 }
-		count_minerals_reserve = yes #ignores decimal places 		
-		restore_minerals_reserve = yes	
+		count_minerals_reserve = yes  #ignores decimal places
+		restore_minerals_reserve = yes
 		determine_surplus_minerals = yes
-		
-		#modify weight(country) and set starved flag
-		if = { 
-			limit = {minerals < 0.001}
-			set_variable = { which = positive_minerals_reserve_month value = 0 } 
+		 #modify weight(country) and set starved flag
+		if = {
+			limit = { minerals < 0.001 }
+			set_variable = { which = positive_minerals_reserve_month value = 0 }
 			set_country_flag = is_minerals_starved
 		}
 		if = {
-			limit = {has_monthly_income = { resource = minerals value < 5 }}
+			limit = {
+				has_monthly_income = { resource = minerals value < 5 }
+			}
 			change_variable = { which = minerals_weight value = 3 }
-			if = { 
-				limit = { 
+			if = {
+				limit = {
 					has_monthly_income = { resource = minerals value < 1 }
-					OR = { 
-						minerals < 1
-						has_modifier = mineral_deficit
-					}							
-				}	
+					OR = { minerals < 1 has_modifier = mineral_deficit }
+				}
 				set_country_flag = is_minerals_starved
 				change_variable = { which = minerals_weight value = 10 }
-			}	
+			}
 			if = {
-				limit = { has_monthly_income = { resource = food value < -10 } }
+				limit = {
+					has_monthly_income = { resource = food value < -10 }
+				}
 				change_variable = { which = minerals_weight value = 4 }
 			}
 			if = {
-				limit = { has_monthly_income = { resource = food value < -20 } }
+				limit = {
+					has_monthly_income = { resource = food value < -20 }
+				}
 				change_variable = { which = minerals_weight value = 5 }
 			}
 		}
-
-		
-		#stored research points will be updated after the on_action on_monthly_pulse
-		#=> the following code will show the stored points of the last month, if called by monthly_pulse
-		###PHYSICS###
-		#update physics_research_reserve, physics_research_income variables
-
-
-		#count stored points and check income
-		set_variable = { which = physics_research_reserve value = 0 }		
+		 #stored research points will be updated after the on_action on_monthly_pulse
+		 #=> the following code will show the stored points of the last month, if called by monthly_pulse
+		 ###PHYSICS###
+		 #update physics_research_reserve, physics_research_income variables
+		 #count stored points and check income
+		set_variable = { which = physics_research_reserve value = 0 }
 		set_variable = { which = physics_research_income value = 0 }
 		set_variable = { which = reserve_transport value = 0 }
-		count_physics_research_reserve = yes #ignores decimal places 		
+		count_physics_research_reserve = yes  #ignores decimal places
 		restore_physics_research_reserve = yes
-		determine_surplus_physics_research = yes		
-		
-		###SOCIETY###
-		#update society_research_reserve, society_research_income variables
-
-
-		#count stored points and check income
-		set_variable = { which = society_research_reserve value = 0 }		
+		determine_surplus_physics_research = yes
+		 ###SOCIETY###
+		 #update society_research_reserve, society_research_income variables
+		 #count stored points and check income
+		set_variable = { which = society_research_reserve value = 0 }
 		set_variable = { which = society_research_income value = 0 }
 		set_variable = { which = reserve_transport value = 0 }
-		count_society_research_reserve = yes #ignores decimal places 		
+		count_society_research_reserve = yes  #ignores decimal places
 		restore_society_research_reserve = yes
 		determine_surplus_society_research = yes
-		
-		###ENGINEERING###
-		#update engineering_research_reserve, engineering_research_income variables
-
-
-		#count stored points and check income
-		set_variable = { which = engineering_research_reserve value = 0 }		
+		 ###ENGINEERING###
+		 #update engineering_research_reserve, engineering_research_income variables
+		 #count stored points and check income
+		set_variable = { which = engineering_research_reserve value = 0 }
 		set_variable = { which = engineering_research_income value = 0 }
 		set_variable = { which = reserve_transport value = 0 }
-		count_engineering_research_reserve = yes #ignores decimal places 		
+		count_engineering_research_reserve = yes  #ignores decimal places
 		restore_engineering_research_reserve = yes
 		determine_surplus_engineering_research = yes
-		
-		###UNITY###
-		#update unity_income variables
-
-
-		#count stored points and check income
+		 ###UNITY###
+		 #update unity_income variables
+		 #count stored points and check income
 		set_variable = { which = unity_income value = 0 }
-		determine_surplus_unity = yes				
-		
-		#log = "food_reserve: [This.food_reserve]"
-		#log = "food_income: [This.food_income]"
-		#log = "energy_reserve: [This.energy_reserve]"
-		#log = "energy_income: [This.energy_income]"
-		#log = "minerals_reserve: [This.minerals_reserve]"
-		#log = "minerals_income: [This.minerals_income]"
-		#log = "society_research_reserve: [This.society_research_reserve]"
-		#log = "society_research_income: [This.society_research_income]"
-		#log = "physics_research_reserve: [This.physics_research_reserve]"
-		#log = "physics_research_income: [This.physics_research_income]"
-		#log = "engineering_research_reserve: [This.engineering_research_reserve]"
-		#log = "engineering_research_income: [This.engineering_research_income]"
-		#log = "unity_reserve: [This.unity_reserve]"
-		#log = "unity_income: [This.unity_income]"		
-		#else = {
-			#log = "Check ignored"
-		#}
+		determine_surplus_unity = yes
+		 #log = "food_reserve: [This.food_reserve]"
+		 #log = "food_income: [This.food_income]"
+		 #log = "energy_reserve: [This.energy_reserve]"
+		 #log = "energy_income: [This.energy_income]"
+		 #log = "minerals_reserve: [This.minerals_reserve]"
+		 #log = "minerals_income: [This.minerals_income]"
+		 #log = "society_research_reserve: [This.society_research_reserve]"
+		 #log = "society_research_income: [This.society_research_income]"
+		 #log = "physics_research_reserve: [This.physics_research_reserve]"
+		 #log = "physics_research_income: [This.physics_research_income]"
+		 #log = "engineering_research_reserve: [This.engineering_research_reserve]"
+		 #log = "engineering_research_income: [This.engineering_research_income]"
+		 #log = "unity_reserve: [This.unity_reserve]"
+		 #log = "unity_income: [This.unity_income]"
+		 #else = {
+		 #log = "Check ignored"
+		 #}
 	}
 }
-
 calculate_number_of_required_shipyard_systems = {
 	set_variable = { which = num_controlled_systems value = 0 }
 	set_variable = { which = num_existing_shipyard_systems value = 0 }
@@ -277,10 +263,10 @@ calculate_number_of_required_shipyard_systems = {
 		prev = {
 			change_variable = { which = num_controlled_systems value = 1 }
 		}
-		if = { 
+		if = {
 			limit = { has_star_flag = shipyard_system }
 			change_variable = { which = num_existing_shipyard_systems value = 1 }
-		}	
+		}
 	}
 	set_variable = { which = required_shipyard_systems value = num_controlled_systems }
 	divide_variable = { which = required_shipyard_systems value = 30 }
