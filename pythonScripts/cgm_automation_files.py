@@ -565,7 +565,7 @@ def main():
         empireWeightsEventAllPositive.addComment("check if the food is really needed: If there are few growing planets, we reduce the amount! _TILE remains unchanged as food on tile can be used for energy")
         noFoodNeeded=empireWeightsEventAllPositive.createReturnIf(TagList("is_food_delimited", "yes"))
         noFoodNeeded.variableOp("set", "food_country_weight_TILE", "energy_country_weight")
-        foodNeeded=noFoodNeeded.addReturn("else")
+        foodNeeded=empireWeightsEventAllPositive.addReturn("else") #fixed 2.1
         foodNeeded.variableOp("set", resource+"_country_weight_TILE", resource+"_country_weight")
         foodNeeded.variableOp("set", "cgm_max_useful_food", 0)
         searchGrowingPlanets=foodNeeded.addReturn("every_owned_planet")
