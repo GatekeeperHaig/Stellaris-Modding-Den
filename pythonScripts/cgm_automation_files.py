@@ -463,14 +463,11 @@ def main():
       for k in reversed(storedValsRange[i:j]):
         for varToMove in varsToMove:
           locSubIf.variableOp("set", "cgm_best"+varToMove+"_{!s}".format(k),"cgm_best"+varToMove+"_{!s}".format(k-1))
-      curSubLevel=TagList()
-      locSubIf.add("else", curSubLevel)
-    # locPrev=locIf.addReturn("prev")
+      curSubLevel=curSubLevel.addReturn("else") #fixed 2.1
     for varToMove in varsToMove:
       locIf.variableOp("set", "cgm_best{}_{!s}".format(varToMove,i),"cgm_cur{}".format(varToMove))
 
-    curLevel=TagList()
-    locIf.add("else", curLevel)
+    curLevel=curLevel.addReturn("else") #fixed 2.1
 
   #finding the worst of the best: best over weightTypes, worst over tiles
   locIf=everyTileSearch.createReturnIf(variableOp(TagList(), "check", "cgm_curWeight", "cgm_worstWeight", "<").add("prev",TagList("has_any_tile_strategic_resource", "no")))
