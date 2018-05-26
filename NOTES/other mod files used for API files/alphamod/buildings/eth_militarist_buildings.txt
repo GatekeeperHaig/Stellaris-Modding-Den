@@ -1,41 +1,17 @@
-@b0time = 120
-@b0cost = 30
-@b0effect = 1
-@b0upkeep = 1
-
-@b1time = 210
-@b1cost = 60
-@b1effect = 2
-@b1upkeep = 1
-
-@b2time = 180
-@b2cost = 90
-@b2effect = 3
-@b2upkeep = 1.5
-
-@b3time = 180
-@b3cost = 120
-@b3effect = 4
-@b3upkeep = 2
-
-@b4time = 180
-@b4cost = 150
-@b4effect = 5
-@b4upkeep = 2.5
-
-@b5time = 180
-@b5cost = 180
-@b5effect = 8
-@b5upkeep = 30
-
 @weightnormal = 2.5
 @weightuseful = 10
 @weightimportant = 100
 @weightcritical = 1000
 
+@buildquick = 90
+@buildnormal = 180
+@buildlong = 360
+@buildhuge = 1080
+
 building_military_base = {
-	base_buildtime = 360
+	base_buildtime = @buildlong
 	planet_unique = yes
+	defense_armies = 2
 	
 	cost = {
 		minerals = 200
@@ -43,13 +19,39 @@ building_military_base = {
 	}
 
 	produced_resources = {
-		sr_brands_fealty = 1
-		engineering_research = 2
+		engineering_research = 1
 	}
 	
 	produced_resource_trigger = {
 		modifier = {
+			or = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+			}
+			resources = {
+				sr_brands_fealty = 1
+			}
+		}
+		modifier = {
 			has_edict = mandatory_service
+			resources = {
+				unity = 1
+			}
+		}
+		modifier = {
+			is_at_war = no
+			resources = {
+				engineering_research = 1
+			}
+		}
+		modifier = {
+			is_at_war = yes
+			resources = {
+				minerals = 1
+			}
+		}
+		modifier = {		
+			has_valid_civic = civic_citizen_service
 			resources = {
 				unity = 1
 			}
@@ -67,45 +69,15 @@ building_military_base = {
 		planet_unrest_add = -10
 	}
 	
-    # triggered_planet_modifier = {
-		# key = has_mandatory_service
-        # potential = {
-           # owner = {
-               # has_edict = mandatory_service
-           # }
-        # }
-        # modifier = { 
-			# planet_army_build_speed_mult = 0.15
-			# pop_ethic_militarist_attraction_mult = 0.1
-			# pop_growth_speed = -0.1
-		# }
-   # }
-	
-	prerequisites = {
-		"tech_alpha_military_service"
-	}
-	
-	ai_allow = {
-		has_resource = {
-			type = engineering_research
-			amount > 0
-		}			
-	}
-	
-	# ai_special_building = yes
+	prerequisites = { "tech_alpha_military_service" }
+	ai_allow = { has_engineering_deposit = yes }
 	ai_replace = no
-	
-	ai_weight = {
-		factor = @weightcritical
-		modifier = {
-			factor = 0
-			from = { sector_controlled = yes }
-		}	
-	}
+	ai_weight = { factor = @weightcritical }
 }
 
 building_hunting_lodge = {
-	base_buildtime = 180
+	base_buildtime = @buildquick
+	planet_unique = yes
 	
 	cost = {
 		minerals = 25
@@ -113,72 +85,60 @@ building_hunting_lodge = {
 	}
 
 	required_resources = {
+		energy = 1
 	}
 	
 	produced_resources = {
 		food = 1
+		society_research = 1
 	}
 
 	army_modifier = {
-		army_damage_mult = 0.05
-		army_upkeep_mult = -0.05
+		army_damage_mult = 0.1
+		army_upkeep_mult = -0.1
 	}
 	
 	planet_modifier = {
-		pop_happiness = 0.025
-		pop_food_req_mult = -0.05
+		pop_citizen_happiness = 0.05
+		pop_food_req_mult = -0.1
 	}
 	
 	potential = {
 		planet = {
 			has_building = "building_warrior_house"
-			any_tile = {
-				has_blocker = "tb_dangerous_wildlife"	
-			}
+			any_tile = { has_wildlife = yes }
 		}
 	}
 	
 	allow = {
 		custom_tooltip = {
 			text = "requirement_dangerous_wildlife"
-			tile = {
-				any_neighboring_tile = {
-					has_blocker = "tb_dangerous_wildlife"
-					has_building_construction = no
-				}
-			}
+			tile = { has_adjacent_wildlife = yes }
 		}
 	}
 	
-	prerequisites = {
-		"tech_alpha_fanatic_military"
+	destroy_if = {
+		or = {
+			tile = { not = { any_neighboring_tile = { has_wildlife = yes }}}
+			planet = { not = { has_building = building_warrior_house }}
+		}
 	}
 	
-	ai_weight = {
-		factor = @weightuseful	
-	}
-	
-	ai_allow = {
-		has_resource = {
-			type = food
-			amount > 0
-		}			
-	}
-	
-	ai_replace = no
+	prerequisites = { "tech_alpha_fanatic_military" }	
+	ai_weight = { factor = @weightuseful }	
+	ai_allow = { has_society_or_food_deposit = yes }
+	ai_replace = no	
+	on_queued = { preserve_wildlife = yes }
 }
 
 building_war_monastery = {
-	base_buildtime = 360
+	base_buildtime = @buildlong
 	planet_unique = yes
 	
 	cost = {
 		minerals = 100
 		energy = 150
 		influence = 25
-	}
-
-	required_resources = {
 	}
 	
 	produced_resources = {
@@ -211,20 +171,24 @@ building_war_monastery = {
 		}
 	}
 	
-	prerequisites = {
-		"tech_alpha_fanatic_military_2"
+	destroy_if = { 
+		planet = {
+			or = {
+				is_occupied_flag = yes
+				not = { has_building = "building_warrior_house" }
+				not = { has_building = "building_military_base" }
+			}
+		}
 	}
 	
-	ai_weight = {
-		factor = @weightimportant
-	}
-	
-	# ai_special_building = yes
+	prerequisites = { "tech_alpha_fanatic_military_2" }
+	ai_weight = { factor = @weightimportant }
 	ai_replace = no
 }
 
 building_warrior_house = {
-	base_buildtime = 360
+	base_buildtime = @buildlong
+	defense_armies = 1
 	
 	cost = {
 		minerals = 50
@@ -237,12 +201,26 @@ building_warrior_house = {
 	
 	produced_resources = {
 		food = 1
-		sr_sacred_weapons = 1
 	}
 	
 	produced_resource_trigger = {
 		modifier = {
+			or = {
+				has_ethic = ethic_militarist
+				has_ethic = ethic_fanatic_militarist
+			}
+			resources = {
+				sr_sacred_weapons = 1
+			}
+		}
+		modifier = {
 			is_at_war = yes
+			resources = {
+				unity = 1
+			}
+		}
+		modifier = {		
+			has_valid_civic = civic_warrior_culture
 			resources = {
 				unity = 1
 			}
@@ -257,90 +235,23 @@ building_warrior_house = {
 	
 	planet_modifier = {
 		planet_army_build_cost_mult = -0.1
-		pop_ethic_militarist_attraction_mult = 0.05
+		pop_ethic_militarist_attraction_mult = 0.25
 	}
-	
-    # triggered_planet_modifier = {
-       # potential = {
-			# has_planet_flag = pf_ownerisatwar
-       # }
-       # modifier = {
-			# pop_citizen_happiness = 0.05
-		# }
-   # }
 		
 	potential = {
-		planet = {
-			not = { has_planet_flag = pf_warrior_house_2 }
-		}
+		planet = { not = { has_planet_flag = pf_warrior_house_2 }}
 	}
 	
-	prerequisites = {
-		"tech_alpha_military_service_3"
-	}
-	
-	ai_weight = {
-		factor = @weightimportant
-	}
-	
-	ai_allow = {
-		has_resource = {
-			type = food
-			amount > 0
-		}			
-	}
-	
-	on_queued = {
-		planet = {
-			if = {
-				limit = {
-					has_planet_flag = pf_warrior_house_1
-				}
-				set_planet_flag = pf_warrior_house_2
-				else = {
-					set_planet_flag = pf_warrior_house_1
-				}
-			}
-			owner = {
-				change_variable = {
-					which = "cv_warriorhousetotal" 
-					value = 1
-				}
-				country_event = { id = ethictekmx_events.2 }
-			}
-		}
-	}
-	
-	on_unqueued = {
-		planet = {
-			if = {
-				limit = {
-					has_planet_flag = pf_warrior_house_1
-				}
-				remove_planet_flag = pf_warrior_house_1
-			}
-			if = {
-				limit = {
-					has_planet_flag = pf_warrior_house_2
-				}
-				remove_planet_flag = pf_warrior_house_2
-				set_planet_flag = pf_warrior_house_1
-			}
-			owner = {
-				change_variable = {
-					which = "cv_warriorhousetotal" 
-					value = -1
-				}
-				country_event = { id = ethictekmx_events.2 }
-			}
-		}
-	}
-	
+	prerequisites = { "tech_alpha_military_service_3" }
+	ai_weight = { factor = @weightimportant }
+	ai_allow = { has_food_deposit = yes	}	
+	on_queued = { warrior_house_queued = yes }	
+	on_unqueued = { warrior_house_unqueued = yes }	
 	ai_replace = no
 }
 
 building_dry_dock = {
-	base_buildtime = 1800
+	base_buildtime = @buildhuge
 	empire_unique = yes
 	
 	cost = {
@@ -373,42 +284,21 @@ building_dry_dock = {
 	
 	potential = {
 		planet = {
-			or = {
-				has_building = "building_military_base"
-				has_building = "building_warrior_house"
-			}
+			has_military_facility = yes
 			not = { has_building = building_dry_dock_2 }
 			not = { has_building_construction = building_dry_dock_2 }
 		}
 	}
 	
-	prerequisites = {
-		"tech_alpha_military_service_2"
-	}
-	
-	ai_weight = {
-		factor = @weightimportant
-	}
-	
-	ai_allow = {
-		or = {
-			has_resource = {
-				type = engineering_research
-				amount > 0
-			}
-			has_resource = {
-				type = physics_research
-				amount > 0
-			}
-		}
-	}
-	
-	# ai_special_building = yes
+	prerequisites = { "tech_alpha_military_service_2" }	
+	ai_weight = { factor = @weightimportant }	
+	ai_allow = { has_engineering_or_physics_deposit = yes }	
+	destroy_if = { planet = { is_occupied_flag = yes }}
 	ai_replace = no
 }
 
 building_dry_dock_2 = {
-	base_buildtime = 1800
+	base_buildtime = @buildhuge
 	empire_unique = yes
 	icon = building_dry_dock
 	
@@ -428,9 +318,6 @@ building_dry_dock_2 = {
 		physics_research = 2
 	}
 	
-	planet_modifier = {
-	}
-	
 	country_modifier = {
 		country_naval_cap_mult = 0.05
 		country_command_limit_add = 5
@@ -442,36 +329,15 @@ building_dry_dock_2 = {
 	
 	potential = {
 		planet = {
-			or = {
-				has_building = "building_military_base"
-				has_building = "building_warrior_house"
-			}
+			has_military_facility = yes
 			not = { has_building = building_dry_dock }
 			not = { has_building_construction = building_dry_dock }
 		}
 	}
 	
-	prerequisites = {
-		"tech_alpha_military_service_2"
-	}
-	
-	ai_weight = {
-		factor = @weightimportant
-	}
-	
-	ai_allow = {
-		or = {
-			has_resource = {
-				type = engineering_research
-				amount > 0
-			}
-			has_resource = {
-				type = physics_research
-				amount > 0
-			}
-		}
-	}
-	
-	# ai_special_building = yes
+	prerequisites = { "tech_alpha_military_service_2" }	
+	ai_weight = { factor = @weightimportant }	
+	ai_allow = { has_engineering_or_physics_deposit = yes }
+	destroy_if = { planet = { is_occupied_flag = yes }}
 	ai_replace = no
 }

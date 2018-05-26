@@ -72,10 +72,16 @@ building_colony_control_pre = {
 		planet = {
 			NOT = { has_modifier = "capital" }
 			owner = {
+				exists = owner
 				not = { has_technology = tech_alpha_colony_control }
 				not = { has_ethic = ethic_gestalt_consciousness }
 			}
 		}	
+	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
 	}
 	
 	allow = {
@@ -95,13 +101,13 @@ building_colony_control_pre = {
 		}		
 	}
 	
-	upgrades = { building_colony_control }
+
 	
 	ai_allow = { has_food_or_minerals_deposit = yes }
-
-	ai_replace = no
-	
+	ai_replace = no	
 	ai_weight = { weight = 250 }
+
+	upgrades = { building_colony_control }
 }
 
 building_colony_control = {
@@ -137,6 +143,7 @@ building_colony_control = {
 		planet = {
 			NOT = { has_modifier = "capital" }
 			owner = {
+				exists = owner
 				not = { has_ethic = ethic_gestalt_consciousness }
 			}
 		}	
@@ -159,9 +166,21 @@ building_colony_control = {
 		}		
 	}
 	
-	prerequisites = {
-		"tech_alpha_colony_control"
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
 	}
+	
+	ai_allow = {
+		or = {
+			has_resource = no
+			has_food_or_minerals_deposit = yes
+		}
+	}
+	
+	prerequisites = { "tech_alpha_colony_control" }
+	ai_replace = no	
+	ai_weight = { weight = 100 }
 	
 	upgrades = {
 		building_libraryofadministration
@@ -171,12 +190,6 @@ building_colony_control = {
 		building_templeofrule
 		building_councilhall
 		building_colony_control2
-	}
-
-	ai_replace = no
-	
-	ai_weight = {
-		weight = 100
 	}
 }
 
@@ -213,6 +226,13 @@ building_colony_control2 = {
 	
 	potential = {
 		planet = {
+			OR = {
+				has_building = "building_capital_1"
+				has_building = "building_capital_2"
+				has_building = "building_exo_ops"
+				has_building = "building_hab_capital"
+			}
+			exists = owner
 			owner = {
 				or = {
 					has_technology = tech_colonial_administrations_alpha
@@ -225,10 +245,12 @@ building_colony_control2 = {
 			}
 		}
 	}
+	
+	destroy_if = {
+		exists = owner
+		owner = { has_authority = auth_machine_intelligence }
+	}
 
 	ai_replace = no
-	
-	ai_weight = {
-		weight = 0
-	}
+	ai_weight = { weight = 0 }
 }
