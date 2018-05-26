@@ -984,7 +984,7 @@ def priorityFileCheck(fileLists,reverse=False): #earlier -> higher prio
 
 
 
-def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], addedFoldersPriority=[], specialBuildingWeight=10, apiOutFolder="", buildingsIgnoredByBU=[]): #if multiple are added  in one category, earlier is higher priority
+def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], addedFoldersPriority=[], specialBuildingWeight=10, apiOutFolder="", buildingsIgnoredByBU=[],  fullModName=""): #if multiple are added  in one category, earlier is higher priority
 #AUTOMATED CREATION OF EFFECTS AND TRIGGERS USED FOR AUTOBUILD API
   additionString=""
   if modName!="cgm_buildings":
@@ -1390,13 +1390,19 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     outputToFolderAndFile(cgmCompEffect, "common/scripted_effects/", "00000_cgm_compatibility_effects.txt",2, "../CGM/buildings_script_source",False)
 
     
-
-  modFile=TagList()
-  modFile.add("name", '"!cgm_comp_{}"'.format(modName))
-  modFile.add("path", '"mod/cgm_auto_{}"'.format(modName))
-  modFile.add("tags", TagList('"BLUB"',""))
-  modFile.add("supported_version", '"2.0.*"')
-  outputToFolderAndFile(modFile, "", "cgm_auto_"+modName+".mod",2, "../../mod/")
+  if os.path.exists("../../modModding/") and modName!="cgm_buildings" and fullModName!="" and modName!="eutab":
+    foundBU=False
+    for file in glob.glob("../NOTES/api files/cgm_auto_BU/"+modName+"/common/buildings/*"):
+      if open(file, 'r').read().find('direct_build'):
+        foundBU=True
+        break
+    if foundBU:
+      modFile=TagList()
+      modFile.add("name", '"!!Patch: CGM Buildings - {}"'.format(fullModName))
+      modFile.add("path", '"modModding/NOTES/api files/cgm_auto_BU/{}"'.format(modName))
+      modFile.add("tags", TagList('"Build_Upgraded_Comp_Patch"',""))
+      modFile.add("supported_version", '"2.1.*"')
+      outputToFolderAndFile(modFile, "", "cgm_auto_"+modName+".mod",2, "../../mod/")
 
   # for key, item in buildingLists.items():
   #   print(key)

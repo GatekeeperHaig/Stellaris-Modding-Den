@@ -31,7 +31,7 @@ def main():
       # print("automatedCreationAutobuildAPI({},{},{})".format(modAbbr,lowPri,highPri))
       # if modAbbr!="gwen":
         # continue
-      automatedCreationAutobuildAPI(modAbbr,lowPri,highPri, 10,"",buildingsIgnoredByBU)
+      automatedCreationAutobuildAPI(modAbbr,lowPri,highPri, 10,"",buildingsIgnoredByBU, modName)
   cgm_planet_auto_API.main()
       
 
