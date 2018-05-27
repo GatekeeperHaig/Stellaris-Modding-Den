@@ -825,3 +825,113 @@ roll_terraformer_catastrophe = {
 		}
 	}
 }	
+generate_catastrophe = { 
+	set_variable = { which = pops_killed value = 0 }
+	set_variable = { which = buildings_destroyed value = 0 }
+	set_variable = { which = catastrophe_blockers_spawned value = 0 }
+	if = { 
+		limit = { any_tile = { has_building = yes has_pop = yes } }
+		random_tile = { 
+			limit = { has_building = yes has_pop = yes }
+			kill_pop = yes
+			remove_building = yes
+			if = { 
+				limit = { prev = { has_planet_flag = cgm_geothermal_tap } }
+				set_blocker = tb_catastrophe_mega_gayser
+			}
+			else_if = { 
+				limit = { prev = { has_planet_flag = cgm_deep_core_mining } }
+				random_list = { 
+					50 = { set_blocker = tb_catastrophe_erupting_volcano_1 }
+					50 = { set_blocker = tb_catastrophe_erupting_volcano_2 }
+				}	
+			}
+			else_if = { 
+				limit = { prev = { has_planet_flag = cgm_tectonic_engineering } }
+				set_blocker = tb_catastrophe_tectonic_fracture
+			}	
+			else_if = { 
+				limit = { prev = { has_planet_flag = cgm_terraforming_planet } }
+				set_blocker = tb_catastrophe_tectonic_fracture ##rework this later
+			}					
+			change_variable = { which = pops_killed value = 1 }
+			change_variable = { which = buildings_destroyed value = 1 }
+			change_variable = { which = catastrophe_blockers_spawned value = 1 }				
+			every_neighboring_tile = { 
+				if = { 
+					limit = { has_pop = yes has_building = yes }
+					random_list = { 
+						33.3 = { 
+							kill_pop = yes 
+							set_ruined = yes 
+							change_variable = { which = pops_killed value = 1 } 
+							change_variable = { which = buildings_destroyed value = 1 } 
+						} 	
+						33.3 = { 
+							kill_pop = yes 
+							remove_building = yes 
+							set_blocker = tb_lava_flows
+							change_variable = { which = pops_killed value = 1 } 
+							change_variable = { which = buildings_destroyed value = 1 } 
+							change_variable = { which = catastrophe_blockers_spawned value = 1 }				
+						} 
+						33.3 = { } 
+					}	
+				}	
+				else_if = { 
+					limit = { has_pop = yes has_building = no }
+					random_list = { 
+						33.3 = { 
+							kill_pop = yes
+							change_variable = { which = pops_killed value = 1 } 
+						} 	
+						33.3 = { 
+							kill_pop = yes 
+							set_blocker = tb_lava_flows
+							change_variable = { which = pops_killed value = 1 } 
+							change_variable = { which = catastrophe_blockers_spawned value = 1 }									
+						} 
+						33.3 = { } 
+					}					
+				}	
+				else_if = { 
+					limit = { has_pop = no has_building = yes }
+					random_list = { 
+						33.3 = { 
+							set_ruined = yes
+							change_variable = { which = buildings_destroyed value = 1 } 
+						} 	
+						33.3 = { 
+							set_ruined = yes 
+							set_blocker = tb_lava_flows
+							change_variable = { which = buildings_destroyed value = 1 } 
+							change_variable = { which = catastrophe_blockers_spawned value = 1 }									
+						} 
+						33.3 = { } 
+					}													
+				}
+				else_if = { 
+					limit = { has_pop = no has_building = no has_blocker = yes }
+					random_list = { 
+						50 = { } 	
+						50 = {
+							remove_blocker = yes 
+							set_blocker = tb_lava_flows
+							change_variable = { which = catastrophe_blockers_spawned value = 1 }									
+						} 
+					}													
+				}								
+				else = { 
+					random_list = { 
+						50 = { } 	
+						50 = { 
+							set_blocker = tb_lava_flows
+							change_variable = { which = catastrophe_blockers_spawned value = 1 }								
+						} 
+					}	
+				}	
+			}	
+		}
+	}
+}
+	
