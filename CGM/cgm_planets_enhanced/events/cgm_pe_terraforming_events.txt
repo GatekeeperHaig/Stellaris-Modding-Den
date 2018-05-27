@@ -30,12 +30,23 @@ planet_event = {
 							}
 							66.6 = { }
 						}	
-					}					
-					
+					}		
+					if = { 
+						limit = { has_planet_flag = baseline_terraformer_speed }
+						change_variable = { which = planet_terraforming_points value = -1 }	
+					}
+					else_if = { 
+						limit = { has_planet_flag = increased_terraformer_speed }
+						change_variable = { which = planet_terraforming_points value = -1.5 }
+					}
+					else = { change_variable = { which = planet_terraforming_points value = -2.25 } }
+					if = { 
+						limit = { check_variable = { which = planet_terraforming_points value > 0 }	}
+						planet_event = { id = cgm_pe_terraforming_events.1 days = 360 }
+					}
+					else = { planet_event = { id = cgm_pe_terraforming_events.2 } }					
 				}
 				else = { 
-					remove_planet_flag = cgm_terraforming_planet
-					set_planet_flag = cgm_terraformed_planet
 					planet_event = { id = cgm_pe_terraforming_events.2 }	
 				}					
 			}
@@ -45,18 +56,18 @@ planet_event = {
 				change_variable = { which = planet_terraforming_points value = 1 }
 				set_variable = { which = years_terraformer_inactive value = 1 }	
 				planet_event = { id = cgm_pe_terraforming_events.1 days = 360 }
-				planet_event = { id = cgm_pe_terraforming_events.3 }	
+				roll_terraformer_catastrophe = yes 				
 			}				
 		}	
 		else = { 
 			set_planet_flag = terraformer_inactive
-			planet_event = { id = cgm_pe_terraforming_events.1 days = 360 }					
-			planet_event = { id = cgm_pe_terraforming_events.3 }	
+			planet_event = { id = cgm_pe_terraforming_events.1 days = 360 }								
 			if = { 
 				limit = { check_variable = { which = years_terraformer_inactive value > 0 } }
 				change_variable = { which = years_terraformer_inactive value = 1 }
 			}
 			else = { set_variable = { which = years_terraformer_inactive value = 1 } }	
+			roll_terraformer_catastrophe = yes 					
 		}			
 	}
 }	
@@ -73,6 +84,8 @@ planet_event = {
 		remove_planet_flag = baseline_terraformer_speed
 		remove_planet_flag = increased_terraformer_speed
 		remove_planet_flag = maximal_terraformer_speed
+		remove_planet_flag = cgm_terraforming_planet
+		set_planet_flag = cgm_terraformed_planet		
 		random_tile = {
 			limit = { has_building = building_terraformer }
 			remove_building = yes										
@@ -124,19 +137,55 @@ planet_event = {
 planet_event = {
 	id = cgm_pe_terraforming_events.3
 	is_triggered_only = yes
-	hide_window = yes
-	
-	trigger = { 
-		OR = { 
-			has_planet_flag = baseline_terraformer_speed
-			has_planet_flag = increased_terraformer_speed
-			has_planet_flag = maximal_terraformer_speed		
-		}
-	}	
+	title = cgm_terraforming_catastrophe.title
+	desc = cgm_terraforming_catastrophe.desc		
 	
 	immediate = { 
-		remove_planet_flag = baseline_terraformer_speed
-		remove_planet_flag = increased_terraformer_speed
-		remove_planet_flag = maximal_terraformer_speed	
+		random_tile = { 
+			limit = { has_building = yes has_pop = yes }
+			kill_pop = yes
+			remove_building = yes
+			set_blocker = tb_catastrophe_tectonic_fracture
+			every_neighboring_tile = { 
+				if = { 
+					limit = { has_pop = yes has_building = yes }
+					random_list = { 
+						33.3 = { kill_pop = yes set_ruined = yes } 	
+						33.3 = { kill_pop = yes remove_building = yes set_blocker = tb_lava_flows } 
+						33.3 = { } 
+					}	
+				}	
+				else_if = { 
+					limit = { has_pop = yes has_building = no }
+					random_list = { 
+						33.3 = { kill_pop = yes } 	
+						33.3 = { kill_pop = yes set_blocker = tb_lava_flows } 
+						33.3 = { } 
+					}					
+				}	
+				else_if = { 
+					limit = { has_pop = no has_building = yes }
+					random_list = { 
+						33.3 = { set_ruined = yes } 	
+						33.3 = { set_ruined = yes set_blocker = tb_lava_flows } 
+						33.3 = { } 
+					}													
+				}
+				else_if = { 
+					limit = { has_pop = no has_building = no has_blocker = yes }
+					random_list = { 
+						50 = { } 	
+						50 = { remove_blocker = yes set_blocker = tb_lava_flows } 
+					}													
+				}								
+				else = { 
+					random_list = { 
+						50 = { } 	
+						50 = { set_blocker = tb_lava_flows } 
+					}	
+				}	
+			}
+		}
 	}
+	option = { name = OK }
 }	
