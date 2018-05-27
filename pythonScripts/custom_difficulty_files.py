@@ -122,8 +122,8 @@ def main():
 
 
 
-  # doTranslation=True
-  doTranslation=False
+  doTranslation=True
+  # doTranslation=False
   locClass=LocList(doTranslation)
   #global things: No translation needed (mod name and stuff taken from vanilla translations)
   locClass.addLoc("modName", "Dynamic Difficulty", "all")
