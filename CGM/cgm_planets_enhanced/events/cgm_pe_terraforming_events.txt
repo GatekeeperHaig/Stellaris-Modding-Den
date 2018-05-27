@@ -1,5 +1,7 @@
 namespace = cgm_pe_terraforming_events
 
+
+
 planet_event = { 
 	id = cgm_pe_terraforming_events.1
 	is_triggered_only = yes
@@ -9,46 +11,53 @@ planet_event = {
 	
 	immediate = { 
 		if = { 
-			limit = { 
-				any_tile = { 
-					has_building = building_terraformer
-				}
-				exists = owner 
-				OR = { 
-					has_planet_flag = baseline_terraformer_speed
-					has_planet_flag = increased_terraformer_speed
-					has_planet_flag = maximal_terraformer_speed
-				}	
-			}	
-			change_variable = { which = cgm_terraforming_years value = 1 }
+			limit = { has_planet_flag = terraformer_active }
 			if = { 
-				limit = { 
-					any_tile = { has_cgm_terraforming_blocker = yes }
-				}
-				random_list = { 
-					40 = { 
-						random_tile = { 
-							limit = { has_cgm_terraforming_blocker = yes }
-							remove_blocker = yes
+				limit = { exists = owner }
+				if = { 
+					limit = { check_variable = { which = planet_terraforming_points value > 0 }	}
+					if = { 
+						limit = { check_variable = { which = tb_points value > 0 } }
+						random_list = { 
+							33.3 = { 
+								random_tile = { 
+									limit = { has_cgm_terraforming_blocker = yes }
+									remove_blocker = yes
+									change_variable = { which = tb_points value = -1 }
+								}	
+								modifier = { factor = 1.5 has_planet_flag = increased_terraformer_speed }
+								modifier = { factor = 2.25 has_planet_flag = maximal_terraformer_speed }
+							}
+							66.6 = { }
 						}	
-						modifier = { factor = 1.25 has_planet_flag = increased_terraformer_speed }
-						modifier = { factor = 1.5 has_planet_flag = maximal_terraformer_speed }
-					}
-					60 = { }
-				}	
-			}	
-			if = { 
-				limit = { 
-					NOT = { any_tile = { has_cgm_terraforming_blocker = yes } } 
-					check_variable = { which = cgm_terraforming_years value > 25 }	
+					}					
+					
 				}
-				remove_planet_flag = cgm_terraforming_planet
-				set_planet_flag = cgm_terraformed_planet
-				planet_event = { id = cgm_pe_terraforming_events.2 }				
-			}	
-			else = { planet_event = { id = cgm_pe_terraforming_events.1 days = 360 } }
+				else = { 
+					remove_planet_flag = cgm_terraforming_planet
+					set_planet_flag = cgm_terraformed_planet
+					planet_event = { id = cgm_pe_terraforming_events.2 }	
+				}					
+			}
+			else = { 
+				remove_planet_flag = terraformer_active
+				set_planet_flag = terraformer_inactive								
+				change_variable = { which = planet_terraforming_points value = 1 }
+				set_variable = { which = years_terraformer_inactive value = 1 }	
+				planet_event = { id = cgm_pe_terraforming_events.1 days = 360 }
+				planet_event = { id = cgm_pe_terraforming_events.3 }	
+			}				
 		}	
-		else = { planet_event = { id = cgm_pe_terraforming_events.1 days = 360 } }
+		else = { 
+			set_planet_flag = terraformer_inactive
+			planet_event = { id = cgm_pe_terraforming_events.1 days = 360 }					
+			planet_event = { id = cgm_pe_terraforming_events.3 }	
+			if = { 
+				limit = { check_variable = { which = years_terraformer_inactive value > 0 } }
+				change_variable = { which = years_terraformer_inactive value = 1 }
+			}
+			else = { set_variable = { which = years_terraformer_inactive value = 1 } }	
+		}			
 	}
 }	
 
@@ -60,6 +69,7 @@ planet_event = {
 	desc = cgm_terraforming_successful.desc	
 	
 	immediate = { 
+		remove_planet_flag = terraformer_active
 		remove_planet_flag = baseline_terraformer_speed
 		remove_planet_flag = increased_terraformer_speed
 		remove_planet_flag = maximal_terraformer_speed
@@ -86,6 +96,26 @@ planet_event = {
 		else_if = { 	
 			limit = { is_planet_class_pc_frozen_terraforming = yes }
 			change_pc = pc_arctic
+		}	
+		else_if = { 	
+			limit = { is_planet_class_pc_hothouse_terraforming = yes }
+			change_pc = pc_desert
+		}			
+		else_if = { 	
+			limit = { is_planet_class_pc_geomorteus_terraforming = yes }
+			change_pc = pc_desert
+		}			
+		else_if = { 	
+			limit = { is_planet_class_pc_geomorteus_terraforming = yes }
+			change_pc = pc_tundra
+		}					
+		else_if = { 	
+			limit = { is_planet_class_pc_greenhouse_hot_terraforming = yes }
+			change_pc = pc_tropical
+		}			
+		else_if = { 	
+			limit = { is_planet_class_pc_greenhouse_cold_terraforming = yes }
+			change_pc = pc_ocean
 		}			
 	}
 	option = { name = OK }
