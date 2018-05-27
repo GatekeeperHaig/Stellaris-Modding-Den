@@ -343,11 +343,24 @@ event = {
 						}
 					}
 					set_country_flag = cgm_auto_built
+					set_variable = { which = building_construction_reserve_old value = -1 }
+					set_variable = { which = cgm_count_buildings value = 0 }
 					while = {
 						limit = {
 							check_variable = { which = building_construction_reserve value > @spending_threshold }
 							has_country_flag = cgm_auto_built  #stop if nothing was constructed anymore -> there seems to be nothing to do atm! possible TODO: return minerals?
 						}
+						change_variable = { which = cgm_count_buildings value = 1 }
+						if = {
+							limit = {
+								check_variable = { which = cgm_count_buildings value > 20 }
+								# NOT = { has_global_flag = cgm_instant_build_flag }
+								check_variable = { which = building_construction_reserve_old value = building_construction_reserve }
+							}
+							log = "Emergency break of cgm buildings automated construction. Possible infinite loop detected. Unless you have instant build active, please report this (on Steam or discord)."
+							break = yes
+						}
+						set_variable = { which = building_construction_reserve_old value = building_construction_reserve }
 						set_variable = { which = minerals_reserve value = 0 }
 						count_minerals_reserve = yes
 						set_variable = { which = cgm_original_mineral_reserve value = minerals_reserve }
