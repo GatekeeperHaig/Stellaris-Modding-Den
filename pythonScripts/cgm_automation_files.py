@@ -1390,7 +1390,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     outputToFolderAndFile(cgmCompEffect, "common/scripted_effects/", "00000_cgm_compatibility_effects.txt",2, "../CGM/buildings_script_source",False)
 
     
-  if os.path.exists("../../modModding/") and modName!="cgm_buildings" and fullModName!="" and modName!="eutab":
+  if os.path.exists("../../modModding/") and modName!="cgm_buildings" and fullModName!="" and modName!="eutab" and modName!="co":
     foundBU=False
     for file in glob.glob("../NOTES/api files/cgm_auto_BU/"+modName+"/common/buildings/*.txt"):
       if open(file, 'r').read().find('direct_build'):
@@ -1400,6 +1400,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
       modFile=TagList()
       modFile.add("name", '"!!Patch: CGM Buildings - {}"'.format(fullModName))
       modFile.add("path", '"modModding/NOTES/api files/cgm_auto_BU/{}"'.format(modName))
+      modFile.add("picture", '"../../compatibility_patch_thumb.png"')
       modFile.add("tags", TagList('"Build_Upgraded_Comp_Patch"',""))
       modFile.add("supported_version", '"2.1.*"')
       outputToFolderAndFile(modFile, "", "cgm_auto_"+modName+".mod",2, "../../mod/")
