@@ -793,7 +793,7 @@ class TabControlClass:
     self.tabClasses[-1].separateStart=False
     self.tabClasses[-1].helpText="Parses a Stellaris Format File and writes it again with a given style. In between, one can optionally delete all occurences of a certain tag, apply some replacement routine. Furthermore, in addition to simply writing each file again, this also allows you to merge them and write multiple files to a single one."
 
-    self.newTab("Create Comp Triggers",createCompTriggers,("text files",'*.txt;*.gfx'),[],[of,oll],"")
+    self.newTab("Create Comp Triggers",createCompTriggers,("text files",'*.txt;*.gfx'),[],[of,oll,jf],"")
     self.tabClasses[-1].separateStart=False
     self.tabClasses[-1].helpText="Parses a Stellaris Format File and searches for triggers to create: Star classes, Planet Classes, special resources. "
 
