@@ -1,5 +1,5 @@
  ## this is the main resource spawning effect. It is called by the menu event in the after field.
-cgm_resource_spawner = {
+cgm_spawn_engine = {
 	if = {
 		limit = { NOT = { has_global_flag = cgm_resources_disabled } }
 		while = {
@@ -42,6 +42,87 @@ cgm_resource_spawner = {
 			}
 		}
 	}
+	if = { 
+		limit = { NOT = { has_global_flag = cgm_no_capital_planet_resize } }
+		every_playable_country = { 
+			capital_scope = { 
+				if = { 
+					limit = { 
+						is_homeworld = yes
+						habitable_planet = yes
+					}
+					if = { 
+						limit = { has_global_flag = cgm_very_large_capital_planet_size }
+						while = { 
+							limit = { planet_size < 23 }
+							random_list = { 
+								33.3 = { change_planet_size = 1 }
+								33.3 = { change_planet_size = 2 }
+								33.3 = { change_planet_size = 3 }
+							}
+						}
+					}	
+					else_if = { 
+						limit = { has_global_flag = cgm_large_capital_planet_size }
+						while = { 
+							limit = { planet_size < 19 }
+							random_list = { 
+								33.3 = { change_planet_size = 1 }
+								33.3 = { change_planet_size = 2 }
+								33.3 = { change_planet_size = 3 }
+							}
+						}
+					}					
+					else_if = { 
+						limit = { has_global_flag = cgm_small_capital_planet_size }
+						while = { 
+							limit = { planet_size > 15 }
+							random_list = { 
+								33.3 = { change_planet_size = -1 }
+								33.3 = { change_planet_size = -2 }
+								33.3 = { change_planet_size = -3 }
+							}
+						}
+					}										
+					else_if = { 
+						limit = { has_global_flag = cgm_very_small_capital_planet_size }
+						while = { 
+							limit = { planet_size > 11 }
+							random_list = { 
+								33.3 = { change_planet_size = -1 }
+								33.3 = { change_planet_size = -2 }
+								33.3 = { change_planet_size = -3 }
+							}
+						}
+					}															
+				}
+			}
+		}	
+	}				
+	every_planet = {
+		limit = { 
+			has_global_flag = cgm_asteroid_colonization_enabled
+			is_asteroid = yes
+		}	
+		if = { 
+			limit = { is_colonizable = no } 
+			random_list = {
+				5 = { set_planet_size = 6 set_planet_flag = asteroidal_colonizable_candidate }
+				10 = { set_planet_size = 5 set_planet_flag = asteroidal_colonizable_candidate }
+				20 = { set_planet_size = 4 }
+				35 = { set_planet_size = 3 }
+				30 = { set_planet_size = 2 }
+			}    			
+		}
+		else_if = { 
+			limit = { is_colony = no } 
+			random_list = {
+				5 = { set_planet_size = 6 set_planet_flag = asteroidal_colonizable_candidate }
+				10 = { set_planet_size = 6 set_planet_flag = asteroidal_colonizable_candidate }
+				85 = { }				
+			}    		
+		}
+	}	
 	every_planet = {
 		limit = {
 			OR = {
@@ -66,7 +147,7 @@ cgm_resource_spawner = {
 				}
 			}
 		}
-		if = {
+		if = { 
 			limit = {
 				NOT = { has_global_flag = cgm_resources_disabled }
 				is_colonizable = no
@@ -934,4 +1015,33 @@ generate_catastrophe = {
 		}
 	}
 }
-	
+
+generate_asteroidal_planetoid = {
+	remove_planet_flag = asteroidal_colonizable_candidate
+	change_pc = pc_asteroidal_planetoid	
+	if = { 
+		limit = { is_planet_size = 6 } 
+		set_variable = { which = planet_size_var value = 6 } 
+	}
+	else = { set_variable = { which = planet_size_var value = 5 } }
+	every_tile = { 
+		random_list = { 
+			10 = { set_blocker = tb_pc_asteroidal_mineral_ultra_rich_rock }
+			10 = { set_blocker = tb_pc_asteroidal_energy_ultra_rich_rock }		
+			20 = { set_blocker = tb_pc_asteroidal_mineral_rich_rock }
+			20 = { set_blocker = tb_pc_asteroidal_energy_rich_rock }
+			40 = { set_blocker = tb_pc_asteroidal_regular_rock } 
+		}
+	}	
+	random_tile = { remove_blocker = yes } 
+	every_tile = { 
+		random_list = { 
+			70 = { cgm_pe_regular_deposit_spawn_table = yes }
+			30 = { }
+		}	
+	}
+}	
+			
+			
+			
+		

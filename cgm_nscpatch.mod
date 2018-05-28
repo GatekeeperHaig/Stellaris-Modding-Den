@@ -5,4 +5,4 @@ tags={
 }
 picture="CertifiedPatch.png"
 remote_file_id="1368180252"
-supported_version="2.0.*"
+supported_version="2.1.*"
