@@ -6,7 +6,7 @@ import argparse
 import re
 # import shlex
 
-splitSigns=[">=","<=","#"," ","\t","{","}","=",">","<"]
+splitSigns=["= hsv",">=","<=","#"," ","\t","{","}","=",">","<"]
 splitPattern="("
 for sign in splitSigns:
   splitPattern+=sign+"|"
@@ -531,7 +531,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           else:
             objectList[-1].comments[-1]=" "+comment
           break #rest of line is comment. Was already added, not being parsed to avoid special characters to have an impact in the comment
-        elif word in [">=","<=",">","<","="]:
+        elif word in [">=","<=",">","<","=","= hsv"]:
           objectList[-1].seperators[-1]=word
           expectingVal=True
         elif word=="log":
