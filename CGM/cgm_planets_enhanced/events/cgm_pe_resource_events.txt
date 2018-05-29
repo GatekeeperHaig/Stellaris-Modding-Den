@@ -221,6 +221,52 @@ event = {
 				}				
 				set_variable = { which = available_terraforming_points value = terraforming_points }
 				subtract_variable = { which = available_terraforming_points value = terraforming_points_used }
+				while 	
+					limit = { check_variable = { which = available_terraforming_points value < 0 } }
+					if = { 
+						limit = { any_owned_planet = { has_building = building_terraformer_maximal } }
+						random_owned_planet = { 
+							limit = { has_building = building_terraformer_maximal } 
+							remove_planet_flag = maximal_terraformer_speed
+							prev = { change_variable = { which = available_terraforming_points value = 1 } }
+							set_planet_flag = increased_terraformer_speed 
+							random_tile = { 
+								limit = { has_building = building_terraformer_maximal } 
+								remove_building = yes
+								set_building = building_terraformer_increased
+							}	
+						}
+					}
+					else_if = { 
+						limit = { any_owned_planet = { has_building = building_terraformer_increased } }
+						random_owned_planet = { 
+							limit = { has_building = building_terraformer_increased } 
+							remove_planet_flag = increased_terraformer_speed
+							prev = { change_variable = { which = available_terraforming_points value = 1 } }
+							set_planet_flag = baseline_terraformer_speed 
+							random_tile = { 
+								limit = { has_building = building_terraformer_increased } 
+								remove_building = yes
+								set_building = building_terraformer_baseline
+							}	
+						}
+					}					
+					else = { 
+						limit = { any_owned_planet = { has_building = building_terraformer_baseline } }
+						random_owned_planet = { 
+							limit = { has_building = building_terraformer_baseline } 
+							remove_planet_flag = baseline_terraformer_speed
+							prev = { change_variable = { which = available_terraforming_points value = 1 } }
+							remove_planet_flag = terraformer_active
+							set_planet_flag = terraformer_inactive
+							random_tile = { 
+								limit = { has_building = building_terraformer_baseline } 
+								remove_building = yes
+								set_building = building_terraformer_inactive
+							}	
+						}
+					}										
+				}						
 			}	
 		}	
 	}			
