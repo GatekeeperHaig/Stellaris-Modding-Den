@@ -85,9 +85,27 @@ country_event = {
 		hidden_effect = { 
 			set_timed_country_flag = { flag = cgm_pe_advanced_configuration days = 2 }				
 			remove_country_flag = level_0_menu
+			set_country_flag = level_1_menu
 			country_event = { id = cgm_pe_spawn_engine.1 }				
 		}
-	}					
+	}		
+	option = {
+		name = back
+		custom_gui = "cgm_pe_option"		
+		trigger = { 
+			has_country_flag = cgm_pe_advanced_configuration
+			cgm_menu_configuration_triggers = no					
+			has_country_flag = level_1_menu
+			NOT = { has_country_flag = level_0_menu }
+		}			
+		hidden_effect = { 
+			remove_country_flag = cgm_pe_advanced_configuration	
+			remove_spawn_and_configuration_global_flags = yes
+			set_default_configuration = yes
+			set_country_flag = level_0_menu
+			country_event = { id = cgm_pe_spawn_engine.1 }				
+		}
+	}	
 	#Level 1 menu options 
 	option = {
 		name = cgm_pe.configure_resources.name
@@ -182,13 +200,15 @@ country_event = {
 		custom_gui = "cgm_pe_option"		
 		trigger = { 
 			has_country_flag = cgm_pe_advanced_configuration
-			cgm_menu_configuration_triggers = no					
+			cgm_menu_configuration_triggers = yes					
+			has_country_flag = level_2_menu
+			NOT = { has_country_flag = level_1_menu }
 		}			
 		hidden_effect = { 
 			remove_country_flag = cgm_pe_advanced_configuration	
-			remove_spawn_and_configuration_global_flags = yes
-			set_default_configuration = yes
-			set_country_flag = level_0_menu
+			remove_configuration_global_flags = yes
+			remove_country_flag = level_2_menu
+			set_country_flag = level_1_menu
 			country_event = { id = cgm_pe_spawn_engine.1 }				
 		}
 	}
@@ -201,7 +221,7 @@ country_event = {
 			has_country_flag = cgm_pe_advanced_configuration
 			cgm_menu_configuration_triggers = no
 			cgm_has_flags_and_ready_to_launch = yes
-			NOT = { has_country_flag = level_0_menu }
+			has_country_flag = level_1_menu
 		}
 		hidden_effect = { country_event = { id = cgm_pe_spawn_engine.2 days = 1 } }
 	} 		
