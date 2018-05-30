@@ -12,6 +12,9 @@ event = {
 	is_triggered_only = yes
 	fire_only_once = yes
 	#This event fires only once.
+	
+	trigger = { NOT = { has_global_flag = new_worlds_active } }
+	
 	immediate = {
 		set_global_flag = new_worlds_active #this sets a global flag for this mod, to be used by other mods and the engine
 		set_timed_global_flag = { flag = deposit_recheck days = 91 }
@@ -23,7 +26,7 @@ event = {
 						solar_system = {
 							NOT = {
 								any_planet = {
-									NOT = { is_same_value = this }
+									NOT = { is_same_value = prevprev }
 									has_planet_flag = system_star_1
 								}
 							}
@@ -36,7 +39,7 @@ event = {
 						solar_system = {
 							NOT = {
 								any_planet = {
-									NOT = { is_same_value = this }
+									NOT = { is_same_value = prevprev }
 									has_planet_flag = system_star_2
 								}
 							}
@@ -44,17 +47,7 @@ event = {
 					}
 					set_planet_flag = system_star_2
 				}	
-				else_if = {
-					limit = {
-						solar_system = {
-							NOT = {
-								any_planet = {
-									NOT = { is_same_value = this }
-									has_planet_flag = system_star_3
-								}
-							}
-						}
-					}
+				else = {					
 					set_planet_flag = system_star_3
 				}
 			}	
@@ -120,6 +113,13 @@ planet_event = {
 			new_worlds_uninhabitable_planets_spawn_table = yes
 			new_worlds_adjust_gas_giant_planet_size = yes
 			new_worlds_adjust_asteroids_size = yes
+			if = { 
+				limit = { is_colonizable = yes }
+				while = { 
+					limit = { planet_size > 25 }
+					change_planet_size = -1
+				}
+			}	
 			if = {
 				limit = {
 					OR = { is_planet_class = pc_gas_giant is_planet_class = pc_ice_giant }
@@ -378,15 +378,21 @@ event = {
 			}			
 			if = { 
 				limit = { NOT = { any_tile = { has_blocker = yes } } }
-				random_tile = { 
+				every_tile = { 
 					limit = { has_building = no has_pop = no }
-					new_worlds_tile_blocker_spawn_table = yes
+					random_list = {
+						50 = { new_worlds_tile_blocker_spawn_table = yes }
+						50 = { }
+					}	
 				}	
 			}	
 			if = { 
 				limit = { NOT = { any_tile = { has_deposit = yes } } }
 				random_tile = { 
-					new_worlds_planetary_resource_spawn_table = yes
+					random_list = { 
+						50 = { new_worlds_planetary_resource_spawn_table = yes }
+						50 = { } 
+					}
 				}	
 			}				
 			while = {
@@ -491,8 +497,7 @@ country_event = {
 						type = hyperlane
 						min_jumps = 1
 						max_jumps = 3
-					}				
-					has_star_flag = empire_cluster
+					}									
 				}
 				has_planet_flag = prescripted_ideal	
 			}
