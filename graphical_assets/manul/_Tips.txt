@@ -1,0 +1,663 @@
+File ( layertodds.py )
+
+#!/usr/bin/python
+
+from gimpfu import pdb, PF_STRING, register, main,PF_FILE ,PF_BOOL,PF_INT
+import shlex
+
+def layerToDDS(timg, tdrawable,file,argumentFile, outFolder, byName,scaleBool,scaleTo):#, argumentFile,hmm,blub):
+    # num_layers, layer_ids = pdb.gimp_image_get_layers(image)
+    #with open("E:/out.txt",'w') as outTxt:
+      with open(argumentFile,'r') as argfile:
+        for l in argfile:
+          image = pdb.gimp_file_load(file, file)
+          if scaleBool:
+            if scaleTo:
+              pdb.gimp_image_resize(image,52,52,-26,-26)
+            else:
+              pdb.gimp_image_scale(image,52,52)
+          line=shlex.split(l)
+          outFile=outFolder+"/"+line[0]
+          if outFile[-4:]!=".dds":
+            outFile+=".dds"
+          for layer in image.layers:
+          #   layer = pdb.gimp_image_get_layer_by_name(image, id)
+            pdb.gimp_item_set_visible(layer, False)
+          layers=[]
+          for i,word in enumerate(line[1:]):
+            if byName:
+              if word[:4]=="MOVE":
+                word2=word[5:]
+                layer=pdb.gimp_image_get_layer_by_name(image, word2)
+                # pdb.gimp_item_set_visible(layer,True)
+                pdb.gimp_layer_scale(layer, 40, 40, False)
+                pdb.gimp_image_set_active_layer(image, layer)
+                drawable = pdb.gimp_image_get_active_layer(image)
+                if word[4]=="L":
+                  pdb.script_fu_move_layer_to(image, drawable, -2.5, 5)
+                elif word[4]=="R":
+                  pdb.script_fu_move_layer_to(image, drawable, 17.5, 5)
+                line[1+i]=line[1+i][5:]
+                # pdb.gimp_item_set_visible(layer,False)
+                  
+
+          for word in line[1:]:
+            #outTxt.write(word+"\n")
+            #layers.append(pdb.gimp_layer_copy(image.layers[int(word)],False))
+            #pdb.gimp_image_insert_layer(image, layer,image.layers[int(word)], 0)
+            if byName:
+              pdb.gimp_item_set_visible(pdb.gimp_image_get_layer_by_name(image, word),True)
+            else:
+              pdb.gimp_item_set_visible(image.layers[int(word)], True)
+          if scaleBool and scaleTo:
+            for word in line[2:]:
+              if byName:
+                layer=pdb.gimp_image_get_layer_by_name(image, word)
+              else:
+                layer=image.layers[int(word)]
+              pdb.gimp_layer_scale(layer, scaleTo, scaleTo, False)
+              pdb.gimp_layer_resize(layer, 52, 52, -1,-1)
+
+          # for layer in layers:
+          #   outTxt.write("{!s}".format(layer))
+          #   pdb.gimp_item_set_visible(layer, True)
+          #pdb.gimp_item_set_visible(image.layers[3], True)
+          #pdb.gimp_item_set_visible(image.layers[5], True)
+          layer = pdb.gimp_image_merge_visible_layers(image, 0)
+          pdb.gimp_image_set_active_layer(image, layer)
+          drawable = pdb.gimp_image_get_active_layer(image)
+          for layerIt in image.layers:
+            if layerIt!=layer or not scaleTo:
+              pdb.gimp_layer_resize_to_image_size(layerIt)
+          pdb.file_dds_save(image, drawable, outFile,outFile,0,0,0,0,0,0,0)
+          # pdb.gimp_image_remove_layer(image, layer)
+    #pdb.file_dds_save(image, drawable, "E:/test.dds","E:/test.dds")
+    #pdb.gimp_file_save(image, drawable, "E:/test.xcf","E:/test.xcf")
+    #pdb.gimp_image_delete(image)
+
+args = [
+(PF_FILE , 'file', 'Image file', '.'),
+(PF_FILE , 'argumentFile', 'Layer File', '.'),
+(PF_STRING , 'outFolder', 'Output folder', '.'),
+(PF_BOOL , 'byName', 'Layer by Name', True),
+(PF_BOOL , 'scaleBool', 'Tech Icon (52x52)', False),
+(PF_INT , 'scaleTo', 'Icon rescale to', 54)
+]
+#register('layertodds', "Saves layers to dds","Saves layers to dds","Gratak","Gratak",2017,"<Image>/Image/Save to dds", "RGB*, GRAY*",
+# [
+#                 (PF_INT, "max_width", "Maximum Width", 500),
+#                 (PF_INT, "max_height", "Maximum Height", 500),
+#                 (PF_BOOL, "copy", "Make a JPEG copy", TRUE),
+#         ], layerToDDS)
+register('layertodds', "Saves layers to dds","Saves layers to dds","Gratak","Gratak","2017","<Image>/Image/Save to dds",'', args, [], layerToDDS)
+
+main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------- SCRIPT FU SAVE ALL OPEN AS DDS (building in progress)
+				
+#TO RUN VIA CONSOLE - USE WITHOUT DEFINE, ONLY LET* BLOCK	
+#OR first define it and then run by printing its name like: (script-fu-save-all-dds)
+(define (script-fu-save-all-dds)
+  (let* ((i (car (gimp-image-list))) 
+         (image)) 
+    (while (> i 0) 
+      (set! image (vector-ref (cadr (gimp-image-list)) (- i 1))) 
+       (file-dds-save	RUN-NONINTERACTIVE ; Interactive, non-interactive
+				image ; input image
+				(car (gimp-image-get-active-layer image)) ; Drawable to save
+                (car (gimp-image-get-filename image)) ; The name of the file to save the image as
+                (car (gimp-image-get-filename image)) ; The name entered
+				
+				0 ; Compression format (0 = None, 1 = BC1/DXT1, 2 = BC2/DXT3, 3 = BC3/DXT5, 4 = BC3n/DXT5nm, 5 = BC4/ATI1N, 6 = BC5/ATI2N, 7 = RXGB (DXT5), 8 = Alpha Exponent (DXT5), 9 = YCoCg (DXT5), 10 = YCoCg scaled (DXT5))
+				
+				0 ; How to handle mipmaps (0 = No mipmaps, 1 = Generate mipmaps, 2 = Use existing mipmaps (layers))
+				
+				0 ; How to save the image (0 = selected layer, 1 = cube map, 2 = volume map, 3 = texture array)
+				
+				0 ; Custom pixel format (0 = default, 1 = R5G6B5, 2 = RGBA4, 3 = RGB5A1, 4 = RGB10A2)
+				
+				0 0 0 0 0 0 0 0 0
+				
+				)
+      (gimp-image-clean-all image) 
+      (set! i (- i 1))
+	)
+  )
+)
+
+
+----------------------- SCRIPT FU RECOLOR ALL
+#example
+#NORMAL
+#me blue icon: (script-fu-colorize-all-opened 210 100 0)
+#AZURE-GREEN - specific biology
+#me azure icon: (script-fu-colorize-all-opened 160 80 -40)
+
+
+(define (script-fu-colorize-all-opened input_hue input_saturation input_lightness)
+  (let* ((i (car (gimp-image-list))) 
+         (image)) 
+    (while (> i 0) 
+      (set! image (vector-ref (cadr (gimp-image-list)) (- i 1))) 
+        ; block of what to do with each open image
+		(gimp-colorize 
+			(car (gimp-image-get-active-layer image)) ; drawable
+			input_hue ; hue
+			input_saturation ; saturation
+			input_lightness ; lightness
+		)
+		; end block of what to do with each open image
+      (gimp-image-clean-all image) 
+      (set! i (- i 1))
+	)
+  )
+)
+
+
+#mass brightness/contrast used to correct overdarkened icons or on the other hand overlightened
+#this method doesnt work well, better use curves that selectively brightens mids and highlights
+#brighter: (script-fu-brightness-contrast-all-opened 20 26)
+
+(define (script-fu-brightness-contrast-all-opened input_brightness input_contrast)
+  (let* ((i (car (gimp-image-list))) 
+         (image)) 
+    (while (> i 0) 
+      (set! image (vector-ref (cadr (gimp-image-list)) (- i 1))) 
+        ; block of what to do with each open image
+		(gimp-brightness-contrast 
+			(car (gimp-image-get-active-layer image)) ; drawable
+			input_brightness ; Brightness adjustment (-127 <= brightness <= 127)
+			input_contrast ; Contrast adjustment (-127 <= contrast <= 127)
+		)
+		; end block of what to do with each open image
+      (gimp-image-clean-all image) 
+      (set! i (- i 1))
+	)
+  )
+)
+
+
+#brightening via curves
+# (script-fu-curves-all-opened v r g b)
+# (script-fu-curves-all-opened 10 0 0 0)
+0 0
+10 10
+20 20
+30 30
+44 55
+60 80
+100 120
+160 180
+235 255
+
+
+(define (script-fu-curves-all-opened v r g b)
+  (let* ((i (car (gimp-image-list))) 
+         (image))
+    (while (> i 0) 
+      (set! image (vector-ref (cadr (gimp-image-list)) (- i 1))) 
+        ; block of what to do with each open image
+		; VALUE (overall)
+		(gimp-curves-spline 
+			(car (gimp-image-get-active-layer image)) ; drawable
+			0 ; The channel to modify { HISTOGRAM-VALUE (0), HISTOGRAM-RED (1), HISTOGRAM-GREEN (2), HISTOGRAM-BLUE (3), HISTOGRAM-ALPHA (4), HISTOGRAM-RGB (5) }
+			18 ; The number of values in the control point
+			(list->vector (list
+			0 0
+			10 10
+			20 20
+			30 30
+			44 (+ 44 (/ v 2))
+			60 (+ 60 v)
+			100 (+ 100 v)
+			160 (+ 160 v)
+			(if (> v 0) (- 255 v) 255) ; last x
+				(if (> v 0) 255 (+ 255 v)) ; last y
+			)) ; The spline control points: { cp1.x, cp1.y, cp2.x, cp2.y, ... }
+		)
+		; RED
+		(gimp-curves-spline 
+			(car (gimp-image-get-active-layer image)) ; drawable
+			1 ; The channel to modify { HISTOGRAM-VALUE (0), HISTOGRAM-RED (1), HISTOGRAM-GREEN (2), HISTOGRAM-BLUE (3), HISTOGRAM-ALPHA (4), HISTOGRAM-RGB (5) }
+			18 ; The number of values in the control point
+			(list->vector (list
+			0 0
+			10 10
+			20 20
+			30 30
+			44 (+ 44 (/ r 2))
+			60 (+ 60 r)
+			100 (+ 100 r)
+			160 (+ 160 r)
+			(if (> r 0) (- 255 r) 255) ; last x
+				(if (> r 0) 255 (+ 255 r)) ; last y
+			)) ; The spline control points: { cp1.x, cp1.y, cp2.x, cp2.y, ... }
+		)
+		; GREEN
+		(gimp-curves-spline 
+			(car (gimp-image-get-active-layer image)) ; drawable
+			2 ; The channel to modify { HISTOGRAM-VALUE (0), HISTOGRAM-RED (1), HISTOGRAM-GREEN (2), HISTOGRAM-BLUE (3), HISTOGRAM-ALPHA (4), HISTOGRAM-RGB (5) }
+			18 ; The number of values in the control point
+			(list->vector (list
+			0 0
+			10 10
+			20 20
+			30 30
+			44 (+ 44 (/ g 2))
+			60 (+ 60 g)
+			100 (+ 100 g)
+			160 (+ 160 g)
+			(if (> g 0) (- 255 g) 255) ; last x
+				(if (> g 0) 255 (+ 255 g)) ; last y
+			)) ; The spline control points: { cp1.x, cp1.y, cp2.x, cp2.y, ... }
+		)
+		; BLUE
+		(gimp-curves-spline 
+			(car (gimp-image-get-active-layer image)) ; drawable
+			3 ; The channel to modify { HISTOGRAM-VALUE (0), HISTOGRAM-RED (1), HISTOGRAM-GREEN (2), HISTOGRAM-BLUE (3), HISTOGRAM-ALPHA (4), HISTOGRAM-RGB (5) }
+			18 ; The number of values in the control point
+			(list->vector (list
+			0 0
+			10 10
+			20 20
+			30 30
+			44 (+ 44 (/ b 2))
+			60 (+ 60 b)
+			100 (+ 100 b)
+			160 (+ 160 b)
+			(if (> b 0) (- 255 b) 255) ; last x
+				(if (> b 0) 255 (+ 255 b)) ; last y
+			)) ; The spline control points: { cp1.x, cp1.y, cp2.x, cp2.y, ... }
+		)
+		; end block of what to do with each open image
+      (gimp-image-clean-all image) 
+      (set! i (- i 1))
+	)
+  )
+)
+
+; Author: ManulKhan
+; 2018
+
+(define (script-fu-invertcolors-all-opened)
+  (let* ((i (car (gimp-image-list))) 
+         (image)) 
+    (while (> i 0) 
+      (set! image (vector-ref (cadr (gimp-image-list)) (- i 1))) 
+        ; block of what to do with each open image
+		(gimp-invert 
+			(car (gimp-image-get-active-layer image)) ; drawable
+		)
+		; end block of what to do with each open image
+      (gimp-image-clean-all image) 
+      (set! i (- i 1))
+	)
+  )
+)
+
+(define (script-fu-hue-saturation-all-opened r h l s)
+  (let* ((i (car (gimp-image-list))) 
+         (image)) 
+    (while (> i 0) 
+      (set! image (vector-ref (cadr (gimp-image-list)) (- i 1))) 
+        ; block of what to do with each open image
+		(gimp-hue-saturation
+			(car (gimp-image-get-active-layer image)) ; drawable
+			r ; Range of affected hues { ALL-HUES (0), RED-HUES (1), YELLOW-HUES (2), GREEN-HUES (3), CYAN-HUES (4), BLUE-HUES (5), MAGENTA-HUES
+			h l s ; hue lightness saturation
+		)
+		; end block of what to do with each open image
+      (gimp-image-clean-all image) 
+      (set! i (- i 1))
+	)
+  )
+)
+
+
+--- attempts to write curves loop functions
+; RED
+		(gimp-curves-spline 
+			(car (gimp-image-get-active-layer image)) ; drawable
+			1 ; The channel to modify { HISTOGRAM-VALUE (0), HISTOGRAM-RED (1), HISTOGRAM-GREEN (2), HISTOGRAM-BLUE (3), HISTOGRAM-ALPHA (4), HISTOGRAM-RGB (5) }
+			32 ; The number of values in the control point array (4 <= num-points <= 34)
+			(list->vector (list
+			(set! n 0) (set! p 0)
+				(while (< n 16)
+					(set! x p) (set! y p)
+					(if (> p thr)	(if (= inv 0) ; point is beyond threshold and the mode is not reverse
+										(if (> red 0) (set! y (+ p red)) (set! x (- p red)))
+										((set! x p) (set! y p)))
+									(if (= inv 1) ; point is before threshold and the mode is reverse
+										(if (> red 0) (set! y (+ p red)) (set! x (- p red)))
+										((set! x p) (set! y p)))
+					)
+					(if (> x 255) (set! x 255) (set! x x))
+					(if (> y 255) (set! y 255) (set! y y))
+					x y
+					(if (< p (+ thr 25)) (if (> p (- thr 25)) ((set! p (+ p 10))) ((set! p (+ p 30)))) ((set! p (+ p 30))))
+					(set! n (+ n 1))
+				)
+			)) ; The spline control points: { cp1.x, cp1.y, cp2.x, cp2.y, ... }
+
+		)
+		; GREEN
+		(gimp-curves-spline 
+			(car (gimp-image-get-active-layer image)) ; drawable
+			2 ; The channel to modify { HISTOGRAM-VALUE (0), HISTOGRAM-RED (1), HISTOGRAM-GREEN (2), HISTOGRAM-BLUE (3), HISTOGRAM-ALPHA (4), HISTOGRAM-RGB (5) }
+			32 ; The number of values in the control point array (4 <= num-points <= 34)
+			(list->vector (list
+			(set! n 0) (set! p 0)
+				(while (< n 16)
+					(set! x p) (set! y p)
+					(if (> p thr)	(if (= inv 0) ; point is beyond threshold and the mode is not reverse
+										(if (> green 0) (set! y (+ p green)) (set! x (- p green)))
+										((set! x p) (set! y p)))
+									(if (= inv 1) ; point is before threshold and the mode is reverse
+										(if (> green 0) (set! y (+ p green)) (set! x (- p green)))
+										((set! x p) (set! y p)))
+					)
+					(if (> x 255) (set! x 255) (set! x x))
+					(if (> y 255) (set! y 255) (set! y y))
+					x y
+					(if (< p (+ thr 25)) (if (> p (- thr 25)) ((set! p (+ p 10))) ((set! p (+ p 30)))) ((set! p (+ p 30))))
+					(set! n (+ n 1))
+				)
+			)) ; The spline control points: { cp1.x, cp1.y, cp2.x, cp2.y, ... }
+
+		)
+		; BLUE
+		(gimp-curves-spline 
+			(car (gimp-image-get-active-layer image)) ; drawable
+			3 ; The channel to modify { HISTOGRAM-VALUE (0), HISTOGRAM-RED (1), HISTOGRAM-GREEN (2), HISTOGRAM-BLUE (3), HISTOGRAM-ALPHA (4), HISTOGRAM-RGB (5) }
+			32 ; The number of values in the control point array (4 <= num-points <= 34)
+			(list->vector (list
+			(set! n 0) (set! p 0)
+				(while (< n 16)
+					(set! x p) (set! y p)
+					(if (> p thr)	(if (= inv 0) ; point is beyond threshold and the mode is not reverse
+										(if (> blue 0) (set! y (+ p blue)) (set! x (- p blue)))
+										((set! x p) (set! y p)))
+									(if (= inv 1) ; point is before threshold and the mode is reverse
+										(if (> blue 0) (set! y (+ p blue)) (set! x (- p blue)))
+										((set! x p) (set! y p)))
+					)
+					(if (> x 255) (set! x 255) (set! x x))
+					(if (> y 255) (set! y 255) (set! y y))
+					x y
+					(if (< p (+ thr 25)) (if (> p (- thr 25)) ((set! p (+ p 10))) ((set! p (+ p 30)))) ((set! p (+ p 30))))
+					(set! n (+ n 1))
+				)
+			)) ; The spline control points: { cp1.x, cp1.y, cp2.x, cp2.y, ... }
+
+		)
+		
+			(if (< p u_thr)	(if (> p l_thr)
+								(set! incr 10) ; point is in range of 25px from threshold
+								(set! incr 30)
+							)
+				(set! incr 30) ; if false
+			)
+		
+-------------------------
+
+
+
+#####################
+### JUST COMMANDS ###
+#####################
+
+#me blue icon:
+( script-fu-colorize-all-opened   210   100   0 )
+#AZURE-GREEN - specific biology
+#me azure icon:
+( script-fu-colorize-all-opened   160   80   -40 )
+#me habitability icon (azure) 150 50 -35
+#very negative - hue 0
+#very positive - hue 200
+#heroic stage 1 - hue 180
+#heroic 
+
+
+
+(script-fu-brightness-contrast-all-opened   20   26 )
+
+(script-fu-brightness-contrast-all-opened   92   84 )
+
+# (script-fu-curves-all-opened-shadows v r g b thr) #changing shadows
+# (script-fu-curves-all-opened-highlights v r g b thr) #changing highlights
+# (script-fu-curves-by-dots-all-opened channel x1 y1 x2 y2 x3 y3 x4 y4) #by dots
+# The channel to modify { HISTOGRAM-VALUE (0), HISTOGRAM-RED (1), HISTOGRAM-GREEN (2), HISTOGRAM-BLUE (3), HISTOGRAM-ALPHA (4), HISTOGRAM-RGB (5)
+
+
+( script-fu-curves-all-opened-shadows   0   0   0   22   30 ) #will 
+( script-fu-curves-all-opened-shadows   -10   0   0   0   50 )
+( script-fu-curves-all-opened-highlights   10   0   0   0   30 )
+( script-fu-curves-by-dots-all-opened   0   120   0   150   85   255   255   255   255 )
+( script-fu-curves-by-dots-all-opened   3   80   0   255   175   255   175   255   175 )
+( script-fu-curves-by-dots-all-opened   0   0   0   100   100   150   150   213   255 )
+( script-fu-curves-by-dots-all-opened   0   100   0   140   30   255   255   255   255 )
+( script-fu-curves-by-dots-all-opened   0   0   0   30   80   87   104   255   255 )
+
+( script-fu-invertcolors-all-opened )
+
+# (script-fu-hue-saturation-all-opened r h l s)
+# r ; Range of affected hues { ALL-HUES (0), RED-HUES (1), YELLOW-HUES (2), GREEN-HUES (3), CYAN-HUES (4), BLUE-HUES (5), MAGENTA-HUES
+# (-180 180       -100 100      -100 100)
+
+( script-fu-hue-saturation-all-opened   0   -20   0   0 )
+
+( script-fu-hue-saturation-all-opened   2   0   100   -100 )
+( script-fu-hue-saturation-all-opened   3   0   50   -100 )
+( script-fu-hue-saturation-all-opened   4   0   29   -50 )
+
+
+( script-fu-save-all-dds )
+
+( script-fu-save-all-png )
+
+######################
+### PYTHON SCRIPTS ###
+######################
+for img in gimp.image_list():
+	for layer in img.layers:
+		layer.name
+
+for img in gimp.image_list():
+	for layer in img.duplicate().layers:
+		pdb.file_png_save(img, layer, layer.name + ".png", layer.name + ".png", 0, 0, 0, 0, 0, 0, 0)
+		pdb.gimp_desaturate(layer)
+		pdb.file_png_save(img, layer, layer.name + "_grey.png", layer.name + "_grey.png", 0, 0, 0, 0, 0, 0, 0)
+		
+		
+for img in gimp.image_list():
+	for layer in img.duplicate().layers:		
+		pdb.file_dds_save(img, layer, "./_images/" + layer.name + ".dds", layer.name + ".dds", 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
+		pdb.gimp_desaturate(layer)
+		pdb.file_dds_save(img, layer, "./_images/" + layer.name + "_grey.dds", layer.name + "_grey.dds", 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+		
+# first check what's looping in image list, exclude user folder, will throw exceptions if tried to make directories there		
+for img in gimp.image_list():
+	abspath = pdb.gimp_image_get_filename(img)
+	dirname = os.path.dirname(os.path.abspath(abspath))
+	
+# then function
+import os
+for img in gimp.image_list():
+	abspath = pdb.gimp_image_get_filename(img)
+	dirname = os.path.dirname(os.path.abspath(abspath))
+	if not dirname == "C:\\Users":
+		directory = dirname + "/generated"
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+		for layer in img.duplicate().layers:	
+			pdb.file_dds_save(img, layer, directory + "/" + layer.name + ".dds", layer.name + ".dds", 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
+			pdb.gimp_desaturate(layer)
+			pdb.file_dds_save(img, layer, directory + "/" + layer.name + "_grey.dds", layer.name + "_grey.dds", 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+# modified to give names and extensions more accurately
+import os
+for img in gimp.image_list():
+	abspath = pdb.gimp_image_get_filename(img)
+	dirname = os.path.dirname(os.path.abspath(abspath))
+	if (dirname != "C:\\Users") and (dirname != "C:\\WINDOWS"):
+		directory = dirname + "/generated"
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+		for layer in img.duplicate().layers:
+			filename = layer.name.split(".",1)[0]
+			filename_color = filename + ".dds"
+			filename_grey = filename + "_grey.dds"
+			pdb.file_dds_save(img, layer, directory + "/" + filename_color, filename_color, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
+			pdb.gimp_desaturate(layer)
+			pdb.file_dds_save(img, layer, directory + "/" + filename_grey, filename_grey, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+			
+import os
+for img in gimp.image_list():
+	abspath = pdb.gimp_image_get_filename(img)
+	dirname = os.path.dirname(os.path.abspath(abspath))
+	if (dirname != "C:\\Users") and (dirname != "C:\\WINDOWS"):
+		directory = dirname + "/generated"
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+		for layer in img.duplicate().layers:
+			filename = layer.name.split(".",1)[0]
+			filename_color = filename + ".png"
+			filename_grey = filename + "_grey.png"
+			pdb.file_png_save(img, layer, directory + "/" + filename_color, filename_color, 0, 0, 0, 0, 0, 0, 0)
+			pdb.gimp_desaturate(layer)
+			pdb.file_png_save(img, layer, directory + "/" + filename_grey, filename_grey, 0, 0, 0, 0, 0, 0, 0)
+			
+			
+			
+#check
+img = gimp.image_list()[3]
+img.name
+#check all openned images
+import os
+for img in gimp.image_list():
+	abspath = pdb.gimp_image_get_filename(img)
+	os.path.dirname(os.path.abspath(abspath))
+
+#close all (including trash)
+for img in gimp.image_list():
+	gimp.pdb.gimp_image_delete(img)
+	
+# MAKING COMPOSITE ICONS
+# resize the image and all its layers (to gain some extra space for composition)
+# option with name selector RESIZE (you should first manually assemble all non-resized layers in some image, resize with this script)
+### 1: RESIZE
+import os
+for img in gimp.image_list():
+	abspath = pdb.gimp_image_get_filename(img)
+	dirname = os.path.dirname(os.path.abspath(abspath))
+	if (dirname != "C:\\Users") and (dirname != "C:\\WINDOWS") and (img.name != "icon_merger.xcf"):
+		pdb.gimp_image_resize(img, 25, 25, 0, 4)
+		for layer in img.layers:
+			pdb.gimp_layer_resize(layer, 25, 25, 0, 4)
+
+			
+# then transfer all (resized) layers to icon_merger.xcf using this
+# (icon_merger.xcf and images to get layers from must both be openned)
+### 2: TRANSFER
+target_file = "icon_merger.xcf"
+for copy_img in gimp.image_list():
+	if copy_img.name != target_file:
+		#get a layer from other file
+		for copy_layer in copy_img.layers:
+			for paste_img in gimp.image_list():
+				#paste (insert) layer to target file
+				if paste_img.name == target_file:
+					success = pdb.gimp_edit_copy(copy_layer)
+					floating = pdb.gimp_edit_paste(paste_img.layers[0], 0)
+					pdb.gimp_floating_sel_to_layer(floating)
+					pdb.gimp_layer_set_name(paste_img.layers[0], copy_layer.name)
+		
+
+# THEN: run this on icon_merger.xcf (script is written to be only applied on an image named icon_merger.xcf)
+#make merged pictures with all layers but one specified (which is pasted to others, calles "plus_sign" in this example
+### 3: GENERATE
+import os
+merge_layer_name = "merge_this"
+for img in gimp.image_list():
+	abspath = pdb.gimp_image_get_filename(img)
+	dirname = os.path.dirname(os.path.abspath(abspath))
+	#filter virtual images out
+	if (dirname != "C:\\Users") and (dirname != "C:\\WINDOWS") and (img.name == "icon_merger.xcf"):
+		directory = dirname + "/generated/dds"
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+		for original_layer in img.layers:
+			#for each layer aside from "merge_this", load an image and make visible only looped layer + "merge_this" layer
+			if original_layer.name != merge_layer_name:
+				#test output name
+				#original_layer.name
+				#end test
+				virtual_image = pdb.gimp_file_load(abspath, abspath)
+				#set visibility and name for output which is 1 of 2 layers left visible, not merge_layer_name
+				output_name = "_noname"
+				for virtual_layer in virtual_image.layers:
+					if (virtual_layer.name == original_layer.name) or (virtual_layer.name == merge_layer_name):
+						pdb.gimp_item_set_visible(virtual_layer, 1)
+						if virtual_layer.name == original_layer.name:
+							output_name = original_layer.name
+					else:
+						pdb.gimp_item_set_visible(virtual_layer, 0)
+				merged_layer = pdb.gimp_image_merge_visible_layers(virtual_image, 0)
+				pdb.gimp_layer_set_name(merged_layer, output_name)
+				filename = merged_layer.name.split(".",1)[0]
+				filename_1 = "static_planet_resource_" + filename + "_add.dds"
+				filename_2 = "country_resource_" + filename + "_add.dds"
+				pdb.file_dds_save(virtual_image, merged_layer, directory + "/" + filename_1, filename_1, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
+				pdb.file_dds_save(virtual_image, merged_layer, directory + "/" + filename_2, filename_2, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
+				gimp.pdb.gimp_image_delete(virtual_image)
+				
+				
+## png version
+import os
+merge_layer_name = "merge_this"
+for img in gimp.image_list():
+	abspath = pdb.gimp_image_get_filename(img)
+	dirname = os.path.dirname(os.path.abspath(abspath))
+	#filter virtual images out
+	if (dirname != "C:\\Users") and (dirname != "C:\\WINDOWS") and (img.name == "icon_merger.xcf"):
+		directory = dirname + "/generated/png"
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+		for original_layer in img.layers:
+			#for each layer aside from "merge_this", load an image and make visible only looped layer + "merge_this" layer
+			if original_layer.name != merge_layer_name:
+				#test output name
+				#original_layer.name
+				#end test
+				virtual_image = pdb.gimp_file_load(abspath, abspath)
+				#set visibility and name for output which is 1 of 2 layers left visible, not merge_layer_name
+				output_name = "_noname"
+				for virtual_layer in virtual_image.layers:
+					if (virtual_layer.name == original_layer.name) or (virtual_layer.name == merge_layer_name):
+						pdb.gimp_item_set_visible(virtual_layer, 1)
+						if virtual_layer.name == original_layer.name:
+							output_name = original_layer.name
+					else:
+						pdb.gimp_item_set_visible(virtual_layer, 0)
+				merged_layer = pdb.gimp_image_merge_visible_layers(virtual_image, 0)
+				pdb.gimp_layer_set_name(merged_layer, output_name)
+				filename = merged_layer.name.split(".",1)[0]
+				filename_1 = "static_planet_resource_" + filename + "_add.png"
+				filename_2 = "country_resource_" + filename + "_add.png"
+				pdb.file_png_save(virtual_image, merged_layer, directory + "/" + filename_1, filename_1, 0, 0, 0, 0, 0, 0, 0)
+				pdb.file_png_save(virtual_image, merged_layer, directory + "/" + filename_2, filename_2, 0, 0, 0, 0, 0, 0, 0)
+				gimp.pdb.gimp_image_delete(virtual_image)
