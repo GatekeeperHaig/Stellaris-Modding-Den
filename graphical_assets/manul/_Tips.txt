@@ -470,44 +470,8 @@ main()
 ######################
 ### PYTHON SCRIPTS ###
 ######################
-for img in gimp.image_list():
-	for layer in img.layers:
-		layer.name
 
-for img in gimp.image_list():
-	for layer in img.duplicate().layers:
-		pdb.file_png_save(img, layer, layer.name + ".png", layer.name + ".png", 0, 0, 0, 0, 0, 0, 0)
-		pdb.gimp_desaturate(layer)
-		pdb.file_png_save(img, layer, layer.name + "_grey.png", layer.name + "_grey.png", 0, 0, 0, 0, 0, 0, 0)
-		
-		
-for img in gimp.image_list():
-	for layer in img.duplicate().layers:		
-		pdb.file_dds_save(img, layer, "./_images/" + layer.name + ".dds", layer.name + ".dds", 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
-		pdb.gimp_desaturate(layer)
-		pdb.file_dds_save(img, layer, "./_images/" + layer.name + "_grey.dds", layer.name + "_grey.dds", 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
-
-		
-# first check what's looping in image list, exclude user folder, will throw exceptions if tried to make directories there		
-for img in gimp.image_list():
-	abspath = pdb.gimp_image_get_filename(img)
-	dirname = os.path.dirname(os.path.abspath(abspath))
-	
-# then function
-import os
-for img in gimp.image_list():
-	abspath = pdb.gimp_image_get_filename(img)
-	dirname = os.path.dirname(os.path.abspath(abspath))
-	if not dirname == "C:\\Users":
-		directory = dirname + "/generated"
-		if not os.path.exists(directory):
-			os.makedirs(directory)
-		for layer in img.duplicate().layers:	
-			pdb.file_dds_save(img, layer, directory + "/" + layer.name + ".dds", layer.name + ".dds", 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
-			pdb.gimp_desaturate(layer)
-			pdb.file_dds_save(img, layer, directory + "/" + layer.name + "_grey.dds", layer.name + "_grey.dds", 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
-
-# modified to give names and extensions more accurately
+#OUTPUT color image for each layer of all openned images
 import os
 for img in gimp.image_list():
 	abspath = pdb.gimp_image_get_filename(img)
@@ -516,13 +480,46 @@ for img in gimp.image_list():
 		directory = dirname + "/generated"
 		if not os.path.exists(directory):
 			os.makedirs(directory)
-		for layer in img.duplicate().layers:
+		duplicate = img.duplicate()
+		for layer in duplicate.layers:
+			filename = layer.name.split(".",1)[0]
+			filename_dds = filename + ".dds"
+			pdb.file_dds_save(img, layer, directory + "/" + filename_dds, filename_dds, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
+		gimp.pdb.gimp_image_delete(duplicate)
+		
+import os
+for img in gimp.image_list():
+	abspath = pdb.gimp_image_get_filename(img)
+	dirname = os.path.dirname(os.path.abspath(abspath))
+	if (dirname != "C:\\Users") and (dirname != "C:\\WINDOWS"):
+		directory = dirname + "/generated"
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+		duplicate = img.duplicate()
+		for layer in duplicate.layers:
+			filename = layer.name.split(".",1)[0]
+			filename_png = filename + ".png"
+			pdb.file_png_save(duplicate, layer, directory + "/" + filename_png, filename_png, 0, 0, 0, 0, 0, 0, 0)
+		gimp.pdb.gimp_image_delete(duplicate)
+
+# OUTPUT color and grey image for each layer of all openned images (won't work with layer groups - cant desaturate them so easily, first need to merge them together in some image)
+import os
+for img in gimp.image_list():
+	abspath = pdb.gimp_image_get_filename(img)
+	dirname = os.path.dirname(os.path.abspath(abspath))
+	if (dirname != "C:\\Users") and (dirname != "C:\\WINDOWS"):
+		directory = dirname + "/generated"
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+		duplicate = img.duplicate()
+		for layer in duplicate.layers:
 			filename = layer.name.split(".",1)[0]
 			filename_color = filename + ".dds"
 			filename_grey = filename + "_grey.dds"
 			pdb.file_dds_save(img, layer, directory + "/" + filename_color, filename_color, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
 			pdb.gimp_desaturate(layer)
 			pdb.file_dds_save(img, layer, directory + "/" + filename_grey, filename_grey, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0)
+		gimp.pdb.gimp_image_delete(duplicate)
 
 			
 import os
@@ -533,13 +530,15 @@ for img in gimp.image_list():
 		directory = dirname + "/generated"
 		if not os.path.exists(directory):
 			os.makedirs(directory)
-		for layer in img.duplicate().layers:
+		duplicate = img.duplicate()
+		for layer in duplicate.layers:
 			filename = layer.name.split(".",1)[0]
 			filename_color = filename + ".png"
 			filename_grey = filename + "_grey.png"
-			pdb.file_png_save(img, layer, directory + "/" + filename_color, filename_color, 0, 0, 0, 0, 0, 0, 0)
+			pdb.file_png_save(duplicate, layer, directory + "/" + filename_color, filename_color, 0, 0, 0, 0, 0, 0, 0)
 			pdb.gimp_desaturate(layer)
-			pdb.file_png_save(img, layer, directory + "/" + filename_grey, filename_grey, 0, 0, 0, 0, 0, 0, 0)
+			pdb.file_png_save(duplicate, layer, directory + "/" + filename_grey, filename_grey, 0, 0, 0, 0, 0, 0, 0)
+		gimp.pdb.gimp_image_delete(duplicate)
 			
 			
 			
