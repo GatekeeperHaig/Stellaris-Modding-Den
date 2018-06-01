@@ -99,125 +99,140 @@ planet_event = {
 		}			
 	}
 }
-planet_event = {
+country_event = {
 	id = spawn_engine_1.2
 	hide_window = yes
 	is_triggered_only = yes
-	trigger = { 
-		has_planet_flag = pd_deposit_recheck
-		deposit_and_blocker_threshold_limit = yes		
-	}
+	trigger = { NOT = { has_global_flag = planets_enhanced_game_start_flag } has_country_flag = pd_game_host }
 	immediate = {
-		while = {
-			limit = {
-				OR = {
+		every_planet = { 
+			limit = { 
+				habitable_planet = yes
+				OR = { 
 					NOT = { any_tile = { has_deposit = yes } }	
-					AND = {
-						planet_size > 19
-						count_tile = {
-							limit = { has_deposit = yes }
-							count < 6
+					NOT = { any_tile = { has_blocker = yes } }				
+					deposit_and_blocker_threshold_limit = yes		
+				}	
+			}				
+			while = {
+				limit = {
+					OR = {
+						NOT = { any_tile = { has_deposit = yes } }	
+						AND = {
+							planet_size > 19
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 6
+							}
 						}
+						AND = {
+							planet_size > 15
+							planet_size < 19
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 5
+							}
+						}
+						AND = {
+							planet_size > 10
+							planet_size < 16
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 4
+							}
+						}
+						AND = {
+							planet_size < 11
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 3
+							}
+						}					
 					}
-					AND = {
-						planet_size > 15
-						planet_size < 19
-						count_tile = {
-							limit = { has_deposit = yes }
-							count < 5
-						}
-					}
-					AND = {
-						planet_size > 10
-						planet_size < 16
-						count_tile = {
-							limit = { has_deposit = yes }
-							count < 4
-						}
-					}
-					AND = {
-						planet_size < 11
-						count_tile = {
-							limit = { has_deposit = yes }
-							count < 3
-						}
+				}
+				every_tile = {
+					limit = { has_blocker = no has_building = no has_pop = no }
+					random_list = {
+						50 = { planetary_diversity_planetary_resource_spawn_table = yes }
+						50 = { }
 					}					
 				}
+			}		
+			while = {
+				limit = {
+					OR = {
+						NOT = { any_tile = { has_blocker = yes } }
+						AND = {
+							planet_size > 19
+							NOT = { 
+								num_pops > 12
+							}	
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 6
+							}
+						}
+						AND = {
+							planet_size > 15
+							planet_size < 19
+							NOT = { 
+								num_pops > 10
+							}						
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 5
+							}
+						}
+						AND = {
+							planet_size > 10
+							planet_size < 16
+							NOT = { 
+								num_pops > 8
+							}										
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 4
+							}
+						}
+						AND = {
+							planet_size < 11
+							NOT = { 
+								num_pops > 5
+							}										
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 3
+							}
+						}
+					}
+				}			
+				every_tile = {
+					limit = { has_blocker = no has_building = no has_pop = no }
+					random_list = {
+						50 = { planetary_diversity_tile_blocker_spawn_table = yes }
+						50 = { }
+					}					
+				}									
 			}
-			every_tile = {
-				limit = { has_blocker = no has_building = no has_pop = no }
-				random_list = {
-					50 = { planetary_diversity_planetary_resource_spawn_table = yes }
-					50 = { }
-				}					
-			}
-		}		
-		while = {
-			limit = {
-				OR = {
-					NOT = { any_tile = { has_blocker = yes } }
-					AND = {
-						planet_size > 19
-						NOT = { 
-							num_pops > 12
-						}	
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 6
-						}
-					}
-					AND = {
-						planet_size > 15
-						planet_size < 19
-						NOT = { 
-							num_pops > 10
-						}						
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 5
-						}
-					}
-					AND = {
-						planet_size > 10
-						planet_size < 16
-						NOT = { 
-							num_pops > 8
-						}										
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 4
-						}
-					}
-					AND = {
-						planet_size < 11
-						NOT = { 
-							num_pops > 5
-						}										
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 3
-						}
-					}
+			if = { 
+				limit = { 
+					deposit_and_blocker_threshold_limit = no			
 				}
-			}			
-			every_tile = {
-				limit = { has_blocker = no has_building = no has_pop = no }
-				random_list = {
-					50 = { planetary_diversity_tile_blocker_spawn_table = yes }
-					50 = { }
-				}					
-			}									
-		}
-		if = { 
-			limit = { 
-				deposit_and_blocker_threshold_limit = no			
+				remove_planet_flag = pd_deposit_recheck
 			}
-			remove_planet_flag = pd_deposit_recheck
-		}
-		else = { planet_event = { id = spawn_engine_1.2 days = 1 } }
+			else = { planet_event = { id = spawn_engine_1.2 days = 1 } }
+		}	
 	}	
 }	
-
+country_event = { 
+	id = spawn_engine_1.4
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = { is_ai = no }
+	immediate = { set_country_flag = pd_game_host }
+}	
+	
 country_event = {
 	#this event is triggered by the first event
 	id = spawn_engine_1.3
