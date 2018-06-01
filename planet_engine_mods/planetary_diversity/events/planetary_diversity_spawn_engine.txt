@@ -23,55 +23,13 @@ event = {
 			limit = { planetary_diversity_special_planet = yes }
 			planetary_diversity_unique_planet_init = yes
 		}	
+		#the effect below is the firing effect of the spawn engine - 
+		#look in pd_engine_effects.txt 
+		#this effect is fired from CGM if the PD planets only setting is choosen. 
 		if = { 
 			limit = { NOT = { has_global_flag = planets_enhanced_game_start_flag } }			
-			every_planet = {
-				limit = { 
-					planetary_diversity_special_planet = no #we gate the special planets we don't want touched here. 
-					cgm_planet_engine_gate_conditions = yes #this is a scripted trigger that you can change - it will overwrite the trigger in CGM: Planets Enhanced, so you can always add you systems there. Also add other mod star flags there to create compatibility with prescripted system mods. The trigger can include plants from other mods
-				} 
-				if = {
-					limit = { is_star = yes }
-					#this effect block identifies star order in systems				
-					if = {
-						limit = {
-							solar_system = {
-								NOT = {
-									any_planet = {
-										NOT = { is_same_value = prevprev }
-										has_planet_flag = system_star_1
-									}
-								}
-							}
-						}
-						set_planet_flag = system_star_1
-					}	
-					else_if = {
-						limit = {
-							solar_system = {
-								NOT = {
-									any_planet = {
-										NOT = { is_same_value = prevprev }
-										has_planet_flag = system_star_2
-									}
-								}
-							}
-						}
-						set_planet_flag = system_star_2
-					}	
-					else = {					
-						set_planet_flag = system_star_3
-					}
-				}	
-				else_if = { #this effect checks for gas giants and adds the gas giant moon flag to their moons			
-					limit = { is_planet_class = pc_gas_giant has_moon = yes }
-					every_moon = { set_planet_flag = gas_giant_moon }
-				}
-				# these events occur one after the other.
-				planet_event = { id = spawn_engine_1.1 }
-			}	
-			every_playable_country = { country_event = { id = spawn_engine_1.3 } } #this is a fix for the prescripted ideal planets		
-		}	
+			planetary_diversity_regular_planet_init = yes
+		}
 	}
 }	
 planet_event = {
@@ -117,6 +75,7 @@ planet_event = {
 					planetary_diversity_regular_habitable_planet = yes #this trigger does no include the planetary_diversity_special_planet trigger and its planets.
 				}	
 				has_regular_vanilla_planet_modifier = yes
+				NOT = { has_global_flag = gpm_vanilla_spawn_engine_enabled }
 			}
 			remove_and_count_vanilla_regular_planet_modifiers = yes
 			while = {
