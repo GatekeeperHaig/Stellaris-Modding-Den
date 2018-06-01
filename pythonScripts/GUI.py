@@ -24,6 +24,17 @@ import createCompTriggers
 import pickle
 # from copy import deepcopy
 
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 class Logger(object):
     def __init__(self, tabControl,error=False):
         if error:
@@ -278,13 +289,13 @@ class TabClass:
       #b = tk.Button(self.extraLineMain, text="Add line", command=self.addLine)
       #b.pack(side=tk.RIGHT)
 
-      self.saveImg = ImageTk.PhotoImage(Image.open("Save-icon.png"))
+      self.saveImg = ImageTk.PhotoImage(Image.open(resource_path("Save-icon.png")))
       # self.saveImg = PhotoImage(file="Save-icon.gif")
       b = tk.Button(self.extraLineMain,text="",image=self.saveImg, command=self.save)
       b.pack(side=tk.RIGHT,expand=YES, fill="y")
       CreateToolTip(b, "Save Current Tab")
 
-      self.loadImg = ImageTk.PhotoImage(Image.open("Load-icon.png"))
+      self.loadImg = ImageTk.PhotoImage(Image.open(resource_path("Load-icon.png")))
       # self.loadImg = PhotoImage(file="Load-icon.gif")
       b = tk.Button(self.extraLineMain,text="",image=self.loadImg, command=lambda : self.load(False,True))
       b.pack(side=tk.RIGHT,expand=YES, fill="y")
@@ -740,8 +751,8 @@ class TabControlClass:
 
     self.predefinedPaths=["StellarisPath", "StellarisDocPath", "WorkshopPath"]
 
-    self.pathWindow=PathWindow(root, "Set Paths", ["StellarisIcon.png","StellarisDocumentIcon.png", 
-      "steam-workshop-logo.png"
+    self.pathWindow=PathWindow(root, "Set Paths", [resource_path("StellarisIcon.png"),resource_path("StellarisDocumentIcon.png"), 
+      resource_path("steam-workshop-logo.png")
       # "StellarisDocumentIcon.png"
       ],["Stellaris Main Game Path","Stellaris Documents Path", "Stellaris Steam Workshop Path"],self.predefinedPaths, self)
     # self.pathWindow.window.deiconify()
@@ -1087,6 +1098,8 @@ class MenuBar:
 
   
 def main():
+
+  # input("Press Enter to continue...")
   os.chdir(os.path.dirname(os.path.abspath(__file__)))
   root = Tk()
   root.title("Stellaris Python Script Helper")
