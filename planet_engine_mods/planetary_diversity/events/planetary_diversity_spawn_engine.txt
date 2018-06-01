@@ -25,7 +25,7 @@ event = {
 		}	
 		#the effect below is the firing effect of the spawn engine - 
 		#look in pd_engine_effects.txt 
-		#this effect is fired from CGM if the PD planets only setting is choosen. 
+		#this effect is fired from CGM if the PD planets only setting is chosen. 
 		if = { 
 			limit = { NOT = { has_global_flag = planets_enhanced_game_start_flag } }			
 			planetary_diversity_regular_planet_init = yes
@@ -57,7 +57,7 @@ planet_event = {
 				}					
 			}
 			every_tile = {
-				limit = { has_blocker = no has_building = no has_pop = no }
+				limit = { has_deposit = no }
 				random_list = {
 					50 = { planetary_diversity_planetary_resource_spawn_table = yes }
 					50 = { }
@@ -122,7 +122,7 @@ country_event = {
 							planet_size > 19
 							count_tile = {
 								limit = { has_deposit = yes }
-								count < 6
+								count < 9
 							}
 						}
 						AND = {
@@ -130,7 +130,7 @@ country_event = {
 							planet_size < 19
 							count_tile = {
 								limit = { has_deposit = yes }
-								count < 5
+								count < 7
 							}
 						}
 						AND = {
@@ -138,7 +138,7 @@ country_event = {
 							planet_size < 16
 							count_tile = {
 								limit = { has_deposit = yes }
-								count < 4
+								count < 5
 							}
 						}
 						AND = {
@@ -238,54 +238,55 @@ country_event = {
 	id = spawn_engine_1.3
 	hide_window = yes
 	is_triggered_only = yes
+	trigger = { NOT = { has_global_flag = planets_enhanced_game_start_flag } has_country_flag = pd_game_host }
 
 	immediate = { 
-		capital_scope = { 
-			save_event_target_as = capital_target
-			solar_system = { save_event_target_as = capital_system_target } 
-		}
-		every_planet = { 		
-			limit = { 							
-				solar_system = { 
-					NOT = { has_star_flag = empire_home_system }					
-					distance = { 
-						source = event_target:capital_system_target
-						type = hyperlane
-						min_jumps = 1
-						max_jumps = 3
-					}				
+		every_country = { 
+			limit = { is_country_type = default }
+			capital_scope = { 
+				every_planet = { 		
+					limit = { 							
+						NOT = { is_same_value = prev } 
+						habitable_planet = yes
+						has_planet_flag = prescripted_ideal					
+						distance = { 
+							source = prev
+							min_distance >= 1
+							max_distance =< 55
+						}					
+					}
+					if = { 
+						limit = { is_ideal_planet_class = { who = prevprev status = no } }
+						if = { limit = { prev = { is_planet_class = pc_tropical } } change_pc = pc_tropical }
+						else_if = { limit = { prev = { is_planet_class = pc_arid } } change_pc = pc_arid }
+						else_if = { limit = { prev = { is_planet_class = pc_continental } } change_pc = pc_continental }
+						else_if = { limit = { prev = { is_planet_class = pc_ocean } } change_pc = pc_ocean }
+						else_if = { limit = { prev = { is_planet_class = pc_tundra } } change_pc = pc_tundra }
+						else_if = { limit = { prev = { is_planet_class = pc_arctic } } change_pc = pc_arctic }
+						else_if = { limit = { prev = { is_planet_class = pc_alpine } } change_pc = pc_alpine }
+						else_if = { limit = { prev = { is_planet_class = pc_savannah } } change_pc = pc_savannah }
+						else_if = { limit = { prev = { is_planet_class = pc_tidallylocked } } change_pc = pc_tidallylocked }
+						else_if = { limit = { prev = { is_planet_class = pc_mangrove } } change_pc = pc_mangrove }
+						else_if = { limit = { prev = { is_planet_class = pc_desertislands } } change_pc = pc_desertislands }
+						else_if = { limit = { prev = { is_planet_class = pc_hajungle } } change_pc = pc_hajungle }
+						else_if = { limit = { prev = { is_planet_class = pc_cascadian } } change_pc = pc_cascadian }
+						else_if = { limit = { prev = { is_planet_class = pc_swamp } } change_pc = pc_swamp }
+						else_if = { limit = { prev = { is_planet_class = pc_subarctic } } change_pc = pc_subarctic }
+						else_if = { limit = { prev = { is_planet_class = pc_glacial } } change_pc = pc_glacial }
+						else_if = { limit = { prev = { is_planet_class = pc_geothermal } } change_pc = pc_geothermal }
+						else_if = { limit = { prev = { is_planet_class = pc_sandsea } } change_pc = pc_sandsea }
+						else_if = { limit = { prev = { is_planet_class = pc_mesa } } change_pc = pc_mesa }
+						else_if = { limit = { prev = { is_planet_class = pc_oasis } } change_pc = pc_oasis }
+						else_if = { limit = { prev = { is_planet_class = pc_hadesert } } change_pc = pc_hadesert }
+						else_if = { limit = { prev = { is_planet_class = pc_steppe } } change_pc = pc_steppe }
+						else_if = { limit = { prev = { is_planet_class = pc_frozen_desert } } change_pc = pc_frozen_desert }
+						else_if = { limit = { prev = { is_planet_class = pc_antarctic } } change_pc = pc_antarctic }
+						else_if = { limit = { prev = { is_planet_class = pc_ammonia } } change_pc = pc_ammonia }
+						else_if = { limit = { prev = { is_planet_class = pc_methane } } change_pc = pc_methane }				
+						planet_event = { id = spawn_engine_1.2 }
+					}
 				}
-				has_planet_flag = prescripted_ideal	
-			}
-			if = { 
-				limit = { is_ideal_planet_class = { who = root status = no } }
-				if = { limit = { event_target:capital_target = { is_planet_class = pc_tropical } } change_pc = pc_tropical }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_arid } } change_pc = pc_arid }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_continental } } change_pc = pc_continental }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_ocean } } change_pc = pc_ocean }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_tundra } } change_pc = pc_tundra }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_arctic } } change_pc = pc_arctic }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_alpine } } change_pc = pc_alpine }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_savannah } } change_pc = pc_savannah }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_tidallylocked } } change_pc = pc_tidallylocked }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_mangrove } } change_pc = pc_mangrove }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_desertislands } } change_pc = pc_desertislands }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_hajungle } } change_pc = pc_hajungle }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_cascadian } } change_pc = pc_cascadian }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_swamp } } change_pc = pc_swamp }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_subarctic } } change_pc = pc_subarctic }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_glacial } } change_pc = pc_glacial }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_geothermal } } change_pc = pc_geothermal }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_sandsea } } change_pc = pc_sandsea }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_mesa } } change_pc = pc_mesa }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_oasis } } change_pc = pc_oasis }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_hadesert } } change_pc = pc_hadesert }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_steppe } } change_pc = pc_steppe }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_frozen_desert } } change_pc = pc_frozen_desert }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_antarctic } } change_pc = pc_antarctic }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_ammonia } } change_pc = pc_ammonia }
-				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_methane } } change_pc = pc_methane }				
-			}
+			}	
 		}
 	}
-}
+}	
