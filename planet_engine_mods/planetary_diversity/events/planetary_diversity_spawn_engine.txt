@@ -13,83 +13,70 @@ event = {
 	fire_only_once = yes
 	#This event fires only once.
 	
-	trigger = { NOT = { has_global_flag = planetary_diversity_active } }
+	trigger = { 
+		NOT = { has_global_flag = planetary_diversity_active } #this ensures the global flag will be set up correctly on mod loadup - if load into savegame is enabled. 		
+	} 
 	
 	immediate = {
-		set_global_flag = planetary_diversity_active #this sets a global flag for this mod, to be used by other mods and the engine
-		if = { 
-			limit = { NOT = { has_global_flag = new_worlds_active } }
-			#spawn_unique_planets = yes
-			every_planet = {
-				limit = { is_star = yes }
-				if = {
-					limit = {
-						solar_system = {
-							NOT = {
-								any_planet = {
-									NOT = { is_same_value = prevprev }
-									has_planet_flag = system_star_1
-								}
-							}
-						}
-					}
-					set_planet_flag = system_star_1
-				}	
-				else_if = {
-					limit = {
-						solar_system = {
-							NOT = {
-								any_planet = {
-									NOT = { is_same_value = prevprev }
-									has_planet_flag = system_star_2
-								}
-							}
-						}
-					}
-					set_planet_flag = system_star_2
-				}	
-				else = {				
-					set_planet_flag = system_star_3
-				}
-			}	
-			every_planet = { 			
-				limit = { is_planet_class = pc_gas_giant has_moon = yes }
-				every_moon = { set_planet_flag = gas_giant_moon }
+		set_global_flag = planetary_diversity_active #this sets a global flag for this mod, to be used by other mods and the engine		
+		while = { 
+			limit = { any_planet = { planetary_diversity_special_planet = yes NOT = { has_planet_flag = processed_pd_special_planet } } }
+			random_planet = { 
+				limit = { planetary_diversity_special_planet = yes NOT = { has_planet_flag = processed_pd_special_planet } }
+				planetary_diversity_unique_planet_init = yes
 			}
-			every_planet = { 	
-				limit = {
-					solar_system = {
-						NOT = { any_planet = { has_owner = yes is_capital = yes  owner = { is_country_type = default } } }
-						NOR = {
-							has_star_flag = sol_system
-							has_star_flag = sol
-							has_star_flag = deneb_system
-							has_star_flag = custom_system
-							has_star_flag = floating_system
-							has_star_flag = crystal_system
-							has_star_flag = city_system
-							has_star_flag = empire_home_system
-							has_star_flag = graveyard_system
-							has_star_flag = mushroom_system
+		}	
+		if = { 
+			limit = { NOT = { has_global_flag = planets_enhanced_game_start_flag } }			
+			every_planet = {
+				limit = { 
+					planetary_diversity_special_planet = no #we gate the special planets we don't want touched here. 
+					cgm_planet_engine_gate_conditions = yes #this is a scripted trigger that you can change - it will overwrite the trigger in CGM: Planets Enhanced, so you can always add you systems there. Also add other mod star flags there to create compatibility with prescripted system mods. The trigger can include plants from other mods
+				} 
+				if = {
+					limit = { is_star = yes }
+					#this effect block identifies star order in systems				
+					if = {
+						limit = {
+							solar_system = {
+								NOT = {
+									any_planet = {
+										NOT = { is_same_value = prevprev }
+										has_planet_flag = system_star_1
+									}
+								}
+							}
 						}
-					}
-					OR = { 
-						NOT = { exists = owner }
-						owner = { is_country_type = primitive }
-						NOT = { any_owned_pop = { is_robot_pop = no } }
-						is_colony = no 								
+						set_planet_flag = system_star_1
 					}	
-					NOT = { has_planet_flag = prescripted_ideal }
+					else_if = {
+						limit = {
+							solar_system = {
+								NOT = {
+									any_planet = {
+										NOT = { is_same_value = prevprev }
+										has_planet_flag = system_star_2
+									}
+								}
+							}
+						}
+						set_planet_flag = system_star_2
+					}	
+					else = {					
+						set_planet_flag = system_star_3
+					}
 				}	
+				else_if = { #this effect checks for gas giants and adds the gas giant moon flag to their moons			
+					limit = { is_planet_class = pc_gas_giant has_moon = yes }
+					every_moon = { set_planet_flag = gas_giant_moon }
+				}
 				# these events occur one after the other.
 				planet_event = { id = spawn_engine_1.1 }
-				planet_event = { id = spawn_engine_1.2 }
-				planet_event = { id = spawn_engine_1.3 days = 1 } #these events are failsafe - in case there was some issue with the deposit/blocker spawn. 
-			}			
-			every_playable_country = { country_event = { id = spawn_engine_1.10 } }	
-		}
-	}	
-}
+			}	
+			every_playable_country = { country_event = { id = spawn_engine_1.3 } } #this is a fix for the prescripted ideal planets		
+		}	
+	}
+}	
 planet_event = {
 	id = spawn_engine_1.1
 	hide_window = yes
@@ -114,8 +101,8 @@ planet_event = {
 		if = {
 			limit = { 
 				OR = { 
-					uninhabitable_regular_planet = yes
-					habitable_planet = yes
+					is_vanilla_habitable_planet = yes
+					planetary_diversity_regular_habitable_planet = yes #this trigger does no include the planetary_diversity_special_planet trigger and its planets.
 				}	
 				has_regular_vanilla_planet_modifier = yes
 			}
@@ -127,6 +114,17 @@ planet_event = {
 				planet_modifier_spawn_table = yes
 				change_variable = { which = "pm_points" value = -1 }
 			}
+			if = { 
+				limit = {
+					OR = { 
+						NOT = { any_tile = { has_deposit = yes } }	
+						NOT = { any_tile = { has_blocker = yes } }
+						deposit_and_blocker_threshold_limit = yes
+					}
+					set_timed_planet_flag = { flag = pd_deposit_recheck days = 11 }
+					planet_event = { id = spawn_engine_1.2 }
+				}
+			}	
 		}			
 	}
 }
@@ -134,278 +132,15 @@ planet_event = {
 	id = spawn_engine_1.2
 	hide_window = yes
 	is_triggered_only = yes
-	trigger = { planetary_diversity_habitable_planet = yes }
-	immediate = {
-		if = { 
-			limit = { 
-				OR = { 
-					AND = { 
-						is_colonizable = no
-						is_colony = no
-						NOR = { 
-							has_strategic_resource = yes
-							has_vanilla_orbital_strategic_resource = no
-						} 
-					}						
-					AND = { 
-						has_strategic_resource = no
-						OR = { 
-							is_colonizable = yes
-							is_colony = yes
-						}	
-						OR = { 
-							NOT = { exists = owner }
-							owner = { is_ai = yes }
-						}
-					}
-				}						
-			}
-			reroll_deposits = yes	
-			if = { 
-				limit = { NOT = { any_tile = { has_deposit = yes } } }
-				every_tile = { 
-					random_list = {
-						50 = { planetary_diversity_planetary_resource_spawn_table = yes }
-						50 = { }
-					}	
-				}	
-			}		
-			while = {
-				limit = {
-					OR = {
-						AND = {
-							planet_size > 19
-							count_tile = {
-								limit = { has_deposit = yes }
-								count < 6
-							}
-						}
-						AND = {
-							planet_size > 15
-							planet_size < 19
-							count_tile = {
-								limit = { has_deposit = yes }
-								count < 5
-							}
-						}
-						AND = {
-							planet_size > 10
-							planet_size < 16
-							count_tile = {
-								limit = { has_deposit = yes }
-								count < 4
-							}
-						}
-						AND = {
-							planet_size < 11
-							count_tile = {
-								limit = { has_deposit = yes }
-								count < 3
-							}
-						}
-						
-					}
-				}
-				reroll_deposits = yes	
-			}		
-		}	
-		if = {
-			limit = { any_tile = { has_blocker = yes } }
-			every_tile = {
-				limit = { has_blocker = yes has_regular_vanilla_blocker = yes }
-				remove_blocker = yes
-				planetary_diversity_tile_blocker_spawn_table = yes
-			}
-		}
-		else_if = { 
-			limit = { NOT = { any_tile = { has_blocker = yes } } }
-			every_tile = { 
-				limit = { has_building = no has_pop = no }
-				random_list = { 
-					50 = { planetary_diversity_tile_blocker_spawn_table = yes }
-					50 = { }
-				}	
-			}	
-		}				
-		while = {
-			limit = {
-				OR = {
-					AND = {
-						planet_size > 19
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 6
-						}
-					}
-					AND = {
-						planet_size > 15
-						planet_size < 19
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 5
-						}
-					}
-					AND = {
-						planet_size > 10
-						planet_size < 16
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 4
-						}
-					}
-					AND = {
-						planet_size < 11
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 3
-						}
-					}
-				}
-			}
-			random_tile = {
-				limit = { has_blocker = no }
-				planetary_diversity_tile_blocker_spawn_table = yes
-			}									
-		}
-	}						
-}
-planet_event = {
-	id = spawn_engine_1.3
-	hide_window = yes	
-	is_triggered_only = yes
-	
-	trigger = {		
-		planets_enhanced_enabled = no 
-		habitable_planet = yes
-		OR = {
-			NOT = { any_tile = { has_blocker = yes } }
-			NOT = { any_tile = { has_deposit = yes } }
-			AND = {
-				planet_size > 19
-				count_tile = {
-					limit = { has_blocker = yes }
-					count < 6
-				}
-			}
-			AND = {
-				planet_size > 15
-				planet_size < 19
-				count_tile = {
-					limit = { has_blocker = yes }
-					count < 5
-				}
-			}
-			AND = {
-				planet_size > 10
-				planet_size < 16
-				count_tile = {
-					limit = { has_blocker = yes }
-					count < 4
-				}
-			}
-			AND = {
-				planet_size < 11
-				count_tile = {
-					limit = { has_blocker = yes }
-					count < 3
-				}
-			}
-			AND = {
-				planet_size > 19
-				count_tile = {
-					limit = { has_deposit = yes }
-					count < 6
-				}
-			}
-			AND = {
-				planet_size > 15
-				planet_size < 19
-				count_tile = {
-					limit = { has_deposit = yes }
-					count < 5
-				}
-			}
-			AND = {
-				planet_size > 10
-				planet_size < 16
-				count_tile = {
-					limit = { has_deposit = yes }
-					count < 4
-				}
-			}
-			AND = {
-				planet_size < 11
-				count_tile = {
-					limit = { has_deposit = yes }
-					count < 3
-				}
-			}			
-		}
+	trigger = { 
+		has_planet_flag = pd_deposit_recheck
+		deposit_and_blocker_threshold_limit = yes		
 	}
 	immediate = {
-		if = { 
-			limit = { NOT = { any_tile = { has_blocker = yes } } }
-			every_tile = { 
-				limit = { has_building = no has_pop = no }
-				random_list = { 
-					50 = { planetary_diversity_tile_blocker_spawn_table = yes }
-					50 = { }
-				}	
-			}	
-		}	
-		if = { 
-			limit = { NOT = { any_tile = { has_deposit = yes } } }
-			every_tile = { 
-				random_list = { 
-					50 = { planetary_diversity_planetary_resource_spawn_table = yes }
-					50 = { } 
-				}	
-			}	
-		}				
 		while = {
 			limit = {
 				OR = {
-					AND = {
-						planet_size > 19
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 6
-						}
-					}
-					AND = {
-						planet_size > 15
-						planet_size < 19
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 5
-						}
-					}
-					AND = {
-						planet_size > 10
-						planet_size < 16
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 4
-						}
-					}
-					AND = {
-						planet_size < 11
-						count_tile = {
-							limit = { has_blocker = yes }
-							count < 3
-						}
-					}
-					
-				}
-			}
-			random_tile = {
-				limit = { has_blocker = no }
-				planetary_diversity_tile_blocker_spawn_table = yes
-			}
-		}
-		while = {
-			limit = {
-				OR = {
+					NOT = { any_tile = { has_deposit = yes } }	
 					AND = {
 						planet_size > 19
 						count_tile = {
@@ -435,19 +170,83 @@ planet_event = {
 							limit = { has_deposit = yes }
 							count < 3
 						}
-					}
-					
+					}					
 				}
 			}
-			reroll_deposits = yes			
+			every_tile = { 
+				limit = { has_deposit = no }
+				random_list = {
+					40 = { planetary_diversity_planetary_resource_spawn_table = yes }
+					60 = { }
+				}	
+			}	
 		}		
+	}	
+	while = {
+		limit = {
+			OR = {
+				NOT = { any_tile = { has_blocker = yes } }
+				AND = {
+					planet_size > 19
+					NOT = { 
+						num_pops > 12
+					}	
+					count_tile = {
+						limit = { has_blocker = yes }
+						count < 6
+					}
+				}
+				AND = {
+					planet_size > 15
+					planet_size < 19
+					NOT = { 
+						num_pops > 10
+					}						
+					count_tile = {
+						limit = { has_blocker = yes }
+						count < 5
+					}
+				}
+				AND = {
+					planet_size > 10
+					planet_size < 16
+					NOT = { 
+						num_pops > 8
+					}										
+					count_tile = {
+						limit = { has_blocker = yes }
+						count < 4
+					}
+				}
+				AND = {
+					planet_size < 11
+					NOT = { 
+						num_pops > 5
+					}										
+					count_tile = {
+						limit = { has_blocker = yes }
+						count < 3
+					}
+				}
+			}
+		}
+		random_tile = {
+			limit = { has_blocker = no has_building = no has_pop = no }
+			planetary_diversity_tile_blocker_spawn_table = yes
+		}									
 	}
-	planet_event = { id = spawn_engine_1.3 } 
-}
+	if = { 
+		limit = { 
+			deposit_and_blocker_threshold_limit = no			
+		}
+		remove_planet_flag = pd_deposit_recheck
+	}
+	else = { planet_event = { id = spawn_engine_1.2 days = 1 } }
+}	
 
 country_event = {
 	#this event is triggered by the first event
-	id = spawn_engine_1.10
+	id = spawn_engine_1.3
 	hide_window = yes
 	is_triggered_only = yes
 
