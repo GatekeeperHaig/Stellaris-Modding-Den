@@ -1,0 +1,500 @@
+#This file was created by script!
+#Instead of editing it, you should change the origin files or the script and rerun the script!
+#Python files that can be directly used for a rerun (storing all parameters from the last run) should be in the main directory
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+ # Do not remove or rename this
+ # Possible Variables for Buildings:
+ # strategic_resource: strategic resource, deprecated, strategic resource used by the building.
+ # allow: trigger to check for allowing construction of building.
+ # prerequisites: Tech requirements for building.
+ # empire_unique: boolean, can only build one if set to true.
+ # cost: resource table, cost of building.
+ # is_orbital: boolean, can only be built in orbital station.
+ # modifier: modifier, deprecated, applies a modifier to planet; use planet_modifier instead.
+ # planet_modifier, country_modifier, army_modifier: applies modifier to planet/country/armies
+ # triggered_planet_modifier = { key (optional), potential, modifier }: applies conditional modifier to planet
+ # base_buildtime: int, number of days for construction.
+ # requires_pop, boolean, building will require a pop for production.
+ # required_resources, resource table, required resources for production.
+ # produced_resources, resource table, produced resources in production.
+ # upgrades, buildings list, buildings this building can upgrade into.
+ # is_listed, boolean, toggles if this building is shown in the non-upgrade buildable list.
+ # planet_unique, toggles if one can build multiple of this type on a single planet.
+ # ai_weight, weight for AI, default is set to one, weight set to 0 means that AI will never build it
+ #
+ # BALANCE
+ # can change the time and cost of all common buildings with these variables below
+@b0time = 120
+@b0cost = 30
+@b0effect = 1
+@b0upkeep = 0.5
+@b1time = 210
+@b1cost = 60
+@b1effect = 2
+@b1upkeep = 1
+@b2time = 180
+@b2cost = 90
+@b2effect = 3
+@b2upkeep = 1.5
+@b3time = 180
+@b3cost = 120
+@b3effect = 4
+@b3upkeep = 2
+@b4time = 180
+@b4cost = 150
+@b4effect = 5
+@b4upkeep = 2.5
+@b5time = 180
+@b5cost = 180
+@b5effect = 8
+@b5upkeep = 3
+@science1 = 1
+@science2 = 2
+@science3 = 3
+@science4 = 4
+@science5 = 6
+@natural_equilibrium_happiness = 0.02
+eac_building_planetary_proton_cannon_hidden_tree_root = {
+	potential = { always = no }
+	planet_unique = yes
+	icon = eac_building_planetary_proton_cannon
+}
+eac_building_planetary_proton_cannon = {
+	base_buildtime = 180
+	planet_unique = yes
+	cost = { minerals = 250 }
+	triggered_planet_modifier = {
+		key = eac_building_planetary_proton_cannon
+		potential = { has_planetary_shield_building = yes }
+		modifier = { planet_orbital_bombardment_damage = 0.15 }
+	}
+	required_resources = { energy = 6 }
+	produced_resources = { physics_research = 1 }
+	upgrades = { eac_building_planetary_neutron_cannon }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+		NOT = { has_global_flag = planet_development_overhaul_active }
+		NAND = {
+			owner = { has_technology = "tech_energy_torpedoes_2" }
+			if = {
+				limit = {
+					owner = { NOT = { has_authority = auth_machine_intelligence } }
+				}
+				custom_tooltip = {
+					text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_capital_1"
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"
+						}
+					}
+				}
+			}
+			if = {
+				limit = { owner = { has_authority = auth_machine_intelligence } }
+				custom_tooltip = {
+					text = "requires_building_machine_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_machine_capital_1"
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"
+						}
+					}
+				}
+			}
+			NOT = { owner = { has_country_flag = display_low_tier_flag } }
+			has_global_flag = direct_build_enabled
+		}
+	}
+	allow = {
+		if = {
+			limit = {
+				owner = { NOT = { has_authority = auth_machine_intelligence } }
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_authority = auth_machine_intelligence } }
+			custom_tooltip = {
+				text = "requires_building_machine_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+		}
+	}
+	prerequisites = { "tech_energy_torpedoes_1" }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+			has_resource = { type = eac_sr_rare_minerals amount > 0 }
+			has_resource = { type = eac_sr_fertile_land amount > 0 }
+			has_resource = { type = eac_sr_unusual_metals amount > 0 }
+			has_resource = { type = eac_sr_gravitational_anomaly amount > 0 }
+		}
+		fromfrom = { has_technology = tech_energy_torpedoes_1 }
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+eac_building_planetary_neutron_cannon_direct_build = {
+	base_buildtime = 382
+	planet_unique = yes
+	cost = { minerals = 625 }
+	triggered_planet_modifier = {
+		key = eac_building_planetary_neutron_cannon
+		potential = { has_planetary_shield_building = yes }
+		modifier = { planet_orbital_bombardment_damage = 0.15 }
+	}
+	required_resources = { energy = 8 }
+	produced_resources = { physics_research = 2 }
+	upgrades = { eac_building_planetary_tachyon_cannon }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+		NOT = { has_global_flag = planet_development_overhaul_active }
+		NOT = { has_building = eac_building_planetary_neutron_cannon }
+		direct_build_enabled = yes
+		NAND = {
+			owner = { has_technology = "tech_energy_lance_2" }
+			if = {
+				limit = {
+					owner = { NOT = { has_authority = auth_machine_intelligence } }
+				}
+				custom_tooltip = {
+					text = "requires_building_capital_2"
+					planet = {
+						OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
+					}
+				}
+			}
+			if = {
+				limit = { owner = { has_authority = auth_machine_intelligence } }
+				custom_tooltip = {
+					text = "requires_building_machine_capital_2"
+					planet = {
+						OR = { has_building = "building_machine_capital_2" has_building = "building_machine_capital_3" }
+					}
+				}
+			}
+			NOT = { owner = { has_country_flag = display_low_tier_flag } }
+			has_global_flag = direct_build_enabled
+		}
+	}
+	allow = {
+		if = {
+			limit = {
+				owner = { NOT = { has_authority = auth_machine_intelligence } }
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_authority = auth_machine_intelligence } }
+			custom_tooltip = {
+				text = "requires_building_machine_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+		}
+	}
+	prerequisites = { "tech_energy_torpedoes_2" }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+			has_resource = { type = eac_sr_rare_minerals amount > 0 }
+			has_resource = { type = eac_sr_fertile_land amount > 0 }
+			has_resource = { type = eac_sr_unusual_metals amount > 0 }
+			has_resource = { type = eac_sr_gravitational_anomaly amount > 0 }
+		}
+		fromfrom = { has_technology = tech_energy_torpedoes_1 }
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+	show_tech_unlock_if = { always = no }
+	icon = eac_building_planetary_neutron_cannon
+}
+eac_building_planetary_neutron_cannon = {
+	base_buildtime = 270
+	is_listed = no
+	planet_unique = yes
+	cost = { minerals = 375 }
+	triggered_planet_modifier = {
+		key = eac_building_planetary_neutron_cannon
+		potential = { has_planetary_shield_building = yes }
+		modifier = { planet_orbital_bombardment_damage = 0.15 }
+	}
+	required_resources = { energy = 8 }
+	produced_resources = { physics_research = 2 }
+	upgrades = { eac_building_planetary_tachyon_cannon }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+		NOT = { has_global_flag = planet_development_overhaul_active }
+	}
+	allow = {
+		if = {
+			limit = {
+				owner = { NOT = { has_authority = auth_machine_intelligence } }
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_authority = auth_machine_intelligence } }
+			custom_tooltip = {
+				text = "requires_building_machine_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+		}
+	}
+	prerequisites = { "tech_energy_torpedoes_2" }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+			has_resource = { type = eac_sr_rare_minerals amount > 0 }
+			has_resource = { type = eac_sr_fertile_land amount > 0 }
+			has_resource = { type = eac_sr_unusual_metals amount > 0 }
+			has_resource = { type = eac_sr_gravitational_anomaly amount > 0 }
+		}
+		fromfrom = { has_technology = tech_energy_torpedoes_2 }
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+}
+eac_building_planetary_tachyon_cannon_direct_build = {
+	base_buildtime = 652
+	planet_unique = yes
+	cost = { minerals = 1125 }
+	triggered_planet_modifier = {
+		key = eac_building_planetary_tachyon_cannon
+		potential = { has_planetary_shield_building = yes }
+		modifier = { planet_orbital_bombardment_damage = 0.15 }
+	}
+	required_resources = { energy = 10 }
+	produced_resources = { physics_research = 3 }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+		NOT = { has_global_flag = planet_development_overhaul_active }
+		NOT = { has_building = eac_building_planetary_tachyon_cannon }
+		direct_build_enabled = yes
+	}
+	allow = {
+		if = {
+			limit = {
+				owner = { NOT = { has_authority = auth_machine_intelligence } }
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_authority = auth_machine_intelligence } }
+			custom_tooltip = {
+				text = "requires_building_machine_capital_2"
+				planet = {
+					OR = { has_building = "building_machine_capital_2" has_building = "building_machine_capital_3" }
+				}
+			}
+		}
+	}
+	prerequisites = { "tech_energy_lance_2" }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+			has_resource = { type = eac_sr_rare_minerals amount > 0 }
+			has_resource = { type = eac_sr_fertile_land amount > 0 }
+			has_resource = { type = eac_sr_unusual_metals amount > 0 }
+			has_resource = { type = eac_sr_gravitational_anomaly amount > 0 }
+		}
+		fromfrom = { has_technology = tech_energy_torpedoes_1 }
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+	show_tech_unlock_if = { always = no }
+	icon = eac_building_planetary_tachyon_cannon
+	upgrades = { eac_building_planetary_proton_cannon_hidden_tree_root }
+}
+eac_building_planetary_tachyon_cannon = {
+	base_buildtime = 360
+	is_listed = no
+	planet_unique = yes
+	cost = { minerals = 500 }
+	triggered_planet_modifier = {
+		key = eac_building_planetary_tachyon_cannon
+		potential = { has_planetary_shield_building = yes }
+		modifier = { planet_orbital_bombardment_damage = 0.15 }
+	}
+	required_resources = { energy = 10 }
+	produced_resources = { physics_research = 3 }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+		NOT = { has_global_flag = planet_development_overhaul_active }
+	}
+	allow = {
+		if = {
+			limit = {
+				owner = { NOT = { has_authority = auth_machine_intelligence } }
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = { has_building = "building_capital_2" has_building = "building_capital_3" }
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_authority = auth_machine_intelligence } }
+			custom_tooltip = {
+				text = "requires_building_machine_capital_2"
+				planet = {
+					OR = { has_building = "building_machine_capital_2" has_building = "building_machine_capital_3" }
+				}
+			}
+		}
+	}
+	prerequisites = { "tech_energy_lance_2" }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+			has_resource = { type = eac_sr_rare_minerals amount > 0 }
+			has_resource = { type = eac_sr_fertile_land amount > 0 }
+			has_resource = { type = eac_sr_unusual_metals amount > 0 }
+			has_resource = { type = eac_sr_gravitational_anomaly amount > 0 }
+		}
+		fromfrom = { has_technology = tech_energy_torpedoes_2 has_technology = tech_energy_lance_2 }
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = { weight = 10 }
+	upgrades = { eac_building_planetary_proton_cannon_hidden_tree_root }
+}
+eac_building_nanites = {
+	base_buildtime = 0
+	is_listed = no
+	immune_to_bombardment = yes
+	cost = { minerals = 0 }
+	required_resources = { energy = 10 }
+	potential = {
+		planet = { NOT = { is_planet_class = pc_habitat } }
+	}
+	ai_weight = { weight = 0 }
+	ai_allow = {
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+}
+ # Increases the time it takes to bombard the planet
+eac_building_planetary_shield_generator = {
+	icon = "building_shield_generator"
+	base_buildtime = 360
+	planet_unique = yes
+	immune_to_bombardment = yes
+	cost = { minerals = 500 }
+	required_resources = { energy = 5 }
+	planet_modifier = { planet_orbital_bombardment_damage = -0.75 }
+	produced_resources = { engineering_research = 3 physics_research = 3 }
+	potential = {
+		planet = {
+			NOR = { is_planet_class = pc_habitat has_building = building_planetary_shield_generator }
+		}
+		owner = { is_ai = yes has_technology = tech_planetary_shield_generator }
+		NOT = { has_global_flag = planet_development_overhaul_active }
+	}
+	allow = {
+		if = {
+			limit = {
+				owner = { NOT = { has_authority = auth_machine_intelligence } }
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_capital_1"
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+		}
+		if = {
+			limit = { owner = { has_authority = auth_machine_intelligence } }
+			custom_tooltip = {
+				text = "requires_building_machine_capital_1"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_1"
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+		}
+	}
+	 # prerequisites = {
+	 # 	"tech_planetary_shield_generator"
+	 # }
+	ai_allow = {
+		NOR = {
+			has_resource = { type = sr_betharian amount > 0 }
+			has_resource = { type = sr_alien_pets amount > 0 }
+		}
+		fromfrom = { has_technology = tech_planetary_shield_generator }
+		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
+	}
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 0
+			NOT = { has_global_flag = eac_at_war_allow_ai_planetary_shield_generator }
+		}
+	}
+}
