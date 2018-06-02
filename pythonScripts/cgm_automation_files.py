@@ -1398,7 +1398,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
         break
     if foundBU:
       modFile=TagList()
-      modFile.add("name", '"!!Patch: CGM Buildings - {}"'.format(fullModName))
+      modFile.add("name", '"!Patch: CGM Buildings - {}"'.format(fullModName))
       modFile.add("path", '"modModding/NOTES/api files/cgm_auto_BU/{}"'.format(modName))
       modFile.add("picture", '"../../compatibility_patch_thumb.png"')
       modFile.add("tags", TagList('"Build_Upgraded_Comp_Patch"',""))
