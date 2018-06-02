@@ -16,10 +16,12 @@ cgm_spawn_engine = {
 						has_global_flag = cgm_new_worlds_enabled_planetary_diversity_enabled			
 					}
 				}
+				cgm_new_worlds_regular_planet_init = yes
+				planet_event = { id = 
 			}
 			else_if = { 
 				limit = { habitable_planet = yes }
-				planetary_diversity_regular_planet_init = yes
+				planetary_diversity_regular_planet_init = yes				
 			}			
 			if = { 
 				limit = { 
@@ -28,6 +30,17 @@ cgm_spawn_engine = {
 				prescripted_uninhabitable_planet_size_readjustment = yes
 				prescripted_inhabitable_planet_size_readjustment = yes
 				prescripted_asteroid_size_readjustment = yes
+				if = {
+					limit = { 
+						exists = owner
+						owner = { is_country_type = primitive } 
+					}	
+					cgm_new_worlds_species_change_table = = yes
+					if = { 
+						limit = { is_ideal_planet_class = { who = owner status = no } }
+						change_owner_species_to_this_planet_preference = yes			
+					}						
+				}	
 			}			
 		}
 	}	
@@ -1296,4 +1309,15 @@ prescripted_asteroid_size_readjustment = {
 			85 = { }				
 		}    		
 	}	
+}
+change_owner_species_to_this_planet_preference = {
+    every_owned_pop = {
+        limit = { is_exact_same_species = owner_species }
+        modify_species = {
+            species = this
+            ideal_planet_class = prev                            
+            base = none # makes this replace parent species
+        }
+    }
+    owner = { change_dominant_species = { species = last_created change_all = yes } }
 }
