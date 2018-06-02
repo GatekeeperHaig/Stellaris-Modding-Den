@@ -107,14 +107,14 @@ def main(args):
 
         potentialList=TagList(2)
         if properties[fromName,"habitable"]!=yes:
-          if properties[toName,"cybertronic"]!=yes:
+          # if properties[toName,"cybertronic"]!=yes:
             potentialList.add("is_terraforming_candidate",yes)
-        if properties[toName,"cybertronic"]==yes:
-          potentialList.add("is_cybertronic_candidate",yes)
+        # if properties[toName,"cybertronic"]==yes:
+        #   potentialList.add("is_cybertronic_candidate",yes)
         orFromList=TagList(3)
         orToList=TagList(3)
         for key in properties.colIdent:
-          if key!="habitable" and key!="cybertronic":
+          if key!="habitable":# and key!="cybertronic":
             if properties[fromName,key] == yes:
               orFromList.add(key,yes)
             if properties[toName, key] == yes:
