@@ -1375,6 +1375,8 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
             buildingOut.add(name, val, comment, seperator)
           outputToFolderAndFile(buildingOut, "/common/buildings/", file,2, apiOutFolder)
       BUArgV=[apiOutFolder+"/common/buildings/*.txt","../CGM/buildings_script_source/common/buildings/*.txt","--output_folder","../NOTES/api files/cgm_auto_BU/"+modName, "--custom_mod_name", "CGM - {}: Comp Patch".format(modName), "--load_order_priority", "--make_optional", "--scripted_variables",",".join(variableAllFiles),"--copy_folder_first", apiOutFolder,"--helper_file_list","01", "--skip_building", ",".join(buildingsIgnoredByBU) ]
+      if modName=="alphamod":
+        BUArgV.append("--copy_requirements_up")
       createUpgradedBuildings.main(createUpgradedBuildings.parse(BUArgV),BUArgV)
 
   #priority sorted output for potential autobuild. Joined into one file!
