@@ -63,6 +63,10 @@ building_traditional_farm = {
 		}
 		NAND = {
 			owner = { has_technology = "tech_alpha_preservations" }
+			custom_tooltip = {
+				text = "requirement_farmland"
+				tile = { has_food_deposit = yes }
+			}
 			NOT = { owner = { has_country_flag = display_low_tier_flag } }
 			has_global_flag = direct_build_enabled
 		}
@@ -260,11 +264,30 @@ building_preservation_direct_build = {
 		not = { has_biomass_deposit = yes }
 		NOT = { owner = { has_country_flag = cgm_disable_vanilla_building_AI } }
 	}
-	show_tech_unlock_if = { always = no }
+	allow = {
+		custom_tooltip = {
+			text = "requirement_farmland"
+			tile = { has_food_deposit = yes }
+		}
+	}
 	potential = {
+		planet = {
+			NOR = {
+				is_planet_class = pc_ocean
+				is_planet_class = pc_arctic
+				is_planet_class = pc_desert
+				is_planet_class = pc_tropical
+				is_planet_class = pc_nuked
+				is_hab_or_ringyard = yes
+			}
+			any_tile = { has_food_deposit = yes }
+			exists = owner
+			owner = { not = { has_authority = auth_machine_intelligence } }
+		}
 		NOT = { has_building = building_preservation }
 		direct_build_enabled = yes
 	}
+	show_tech_unlock_if = { always = no }
 	icon = building_preservation
 }
 building_preservation = {
@@ -413,6 +436,15 @@ building_food_hybridiser_direct_build = {
 			not = { is_hab_or_ringyard = yes }
 			exists = owner
 			owner = { not = { has_authority = auth_machine_intelligence } }
+		}
+		planet = {
+			any_tile = { has_exotic_foods_deposit = yes }
+			not = { is_hab_or_ringyard = yes }
+			exists = owner
+			owner = {
+				not = { has_authority = auth_machine_intelligence }
+				not = { has_technology = tech_alpha_food_hybrids }
+			}
 		}
 		NOT = { has_building = building_food_hybridiser }
 		direct_build_enabled = yes

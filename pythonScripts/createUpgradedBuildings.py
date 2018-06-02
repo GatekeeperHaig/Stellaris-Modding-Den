@@ -22,6 +22,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('-c','--cost_discount', default=0., type=float, help="Total cost of tier n will be: Cost(tier n-1)+Cost(upgrade tier n)*(1-discount), with the restriction that total cost will never be lower than 'Cost(upgrade tier n)'(default: %(default)s)")
   parser.add_argument('--custom_direct_build_AI_allow', action="store_true", help="By default, the script will replace the direct build AI_allows by the lowest tier AI_allow (since the checks of the lowest tiers are usually meant for tile validity which is also important for direct build high tier, but unessecary for upgrade). This will not happen with this option")
   parser.add_argument('--simplify_upgrade_AI_allow', action="store_true", help="Allows every single upgrade to AI (that means if the player would be able to build it, so does AI)")
+  parser.add_argument('--copy_requirements_up', action="store_true", help="If this option is active, requirements (potential+allow) of the lowest tier building will be copied to the direct build versions (unless they are obviously redundant)")
   parser.add_argument('-f','--just_copy_and_check', action="store_true", help="If any non-building file in your mod includes 'has_building' mentions on buildings that will be copied by this script, run this mode once with all such files as input instead of the building files. In this mode the script will simply replace all 'has_building = ...' with scripted_triggers also checking for direct_build versions. IMPORTANT: 1. You need to apply the main script FIRST! 2. --output_folder will have to include the subfolder for this call!")
   parser.add_argument('-o','--output_folder', default="BU", help="Main output folder name. Specific subfolder needs to be included for '--just_copy_and_check' (default: %(default)s)")
   parser.add_argument('--replacement_file', default="", help="Executes a very basic conditional replace on buildings. Example: 'IF unique in tagName and is_listed==no newline	ai_weight = { weight = @crucial_2 }': For all buildings that have 'unique' in their name and are not listed, set ai_weight to given value. Any number of such replaces can be in the file. An 'IF' at the very start of a line starts a replace. the next xyz = will be the tag used for replacing. You can also start a line with 'EVAL' instead of 'IF' to write an arbitrary condition. You need to know the class structure for this though.")
@@ -171,6 +172,7 @@ def readAndConvert(args, allowRestart=1):
       locData=[] #list of localisation links later to be saved in a file. One of the few times TagList class is NOT used
       for origBuildI in range(len(buildingNameToDataOrigVals)): #iterate through lowest tier buildings. Higher tier buildings will be ignored (via "is_listed = no",which is even set for tier 1 if tier 0 exists)
         baseBuildingData=buildingNameToDataOrigVals[origBuildI] #data of the lowest tier building
+        baseBuildingDataCopy=copy.deepcopy(baseBuildingData)
         if not isinstance(baseBuildingData,NamedTagList):
           continue
         if baseBuildingData.attemptGet("is_listed")=="no":
@@ -221,6 +223,12 @@ def readAndConvert(args, allowRestart=1):
             origUpgradeData=upgradeData  
             upgradeData=copy.deepcopy(buildingNameToData.get(upgradeName)) #now copy to prevent further editing
             if not secondVisit:
+              if args.copy_requirements_up:
+                for cat in ["allow", "potential"]:
+                  dat=copy.deepcopy(baseBuildingDataCopy.attemptGet(cat))
+                  if len(dat)>0:
+                    upgradeData.getOrCreate(cat).addTagList(dat)
+                # upgradeData.getOrCreate("potential").addTagList(copy.deepcopy(baseBuildingDataCopy.attemptGet("potential")))
               if not args.custom_direct_build_AI_allow:
                 try:
                   upgradeData.replace("ai_allow", baseBuildingData.get("ai_allow"))

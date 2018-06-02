@@ -25,6 +25,7 @@ resources=["energy", "minerals", "food","unity", "society_research", "physics_re
 def main():
 
   debug=False
+  tileWeightDebug=False
   os.chdir(os.path.dirname(os.path.abspath(__file__)))
   
   # weightTypes=["energy", "minerals", "food", "unity", "society_research", "physics_research", "engineering_research"]
@@ -600,12 +601,18 @@ def main():
   tileWeightSummary=newTileCheckFile.addReturn("calculate_tile_weight")
   # tileWeightSummary.createReturnIf(TagList("OR", TagList("has_deposit", "yes").add("any_neighboring_tile"))) #more efford than gain!
   for resource in resources:
+    prevTag=tileWeightSummary.addReturn("prev")
     if resource=="unity":
-      tileWeightSummary.addReturn("prev").variableOp("set", resource+"_weight", 0)
-      tileWeightSummary.addComment("Unity is layer subtracted from other weights on this tile as we build unity on the 'worst' tile. Thus it must not have a base value")
+      prevTag.variableOp("set", resource+"_weight", 0)
+      prevTag.addComment("Unity is later subtracted from other weights on this tile as we build unity on the 'worst' tile. Thus it must not have a base value")
     else:
-      tileWeightSummary.addReturn("prev").variableOp("set", resource+"_weight", 3)
-    tileWeightSummary.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", 0, "", ">"))).add("check_"+resource+"_deposit","yes")
+      prevTag.variableOp("set", resource+"_weight", 3)
+    if tileWeightDebug:
+      prevTag.add("log", '"Starting with {0}. Initial weight [this.{0}_weight]"'.format(resource))
+    tileHasResource=tileWeightSummary.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", 0, "", ">")))
+    tileHasResource.add("check_"+resource+"_deposit","yes")
+    if tileWeightDebug:
+      tileHasResource.add("log", '"Non empty tile regarding {0}. New weight [this.{0}_weight]"'.format(resource))
     curEffect=newTileCheckFile.addReturn("check_"+resource+"_deposit")
     for i in range(1,10):
       curEffectIf=curEffect.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", i, "", "=")))
@@ -623,8 +630,17 @@ def main():
       buildingAndPopIf.createReturnIf(TagList("pop", TagList("pop_produces_resource",TagList("type", resource).add("amount",0,"",">")))).add("prevprev",variableOpNew("change", resource+"_adjacency_weight", 3))
       noBuildingOrPop=curEffect.addReturn("else")   #fixed 2.1
       noBuildingOrPop.createReturnIf(TagList("has_resource", TagList("type", resource).add("amount", 0, "", ">"))).add("prevprev",variableOpNew("change", resource+"_adjacency_weight", 2.5))
+  if tileWeightDebug:
+    for resource in resources:
+      tileWeightSummary.add("log", '"After adjacency stuff: {0}: [prev.{0}_weight]"'.format(resource))
   tileWeightSummary.add("check_neighboring_adj_bonus_buildings","yes")
+  if tileWeightDebug:
+    for resource in resources:
+      tileWeightSummary.add("log", '"After neighbors stuff: {0}: [prev.{0}_weight]"'.format(resource))
   tileWeightSummary.add("check_adj_bonus_blockers","yes")
+  if tileWeightDebug:
+    for resource in resources:
+      tileWeightSummary.add("log", '"After blockers stuff (final): {0}: [prev.{0}_weight]"'.format(resource))
 
   newTileCheckFile.deleteOnLowestLevel(checkEmpty)
 
@@ -786,9 +802,12 @@ def main():
   outputToFolderAndFile(newTileCheckFile, "common/scripted_effects", "cgm_new_tile_checks.txt",2, "../CGM/buildings_script_source")
   outputToFolderAndFile(miscAutoEffects, "common/scripted_effects", "cgm_misc_auto_effects.txt",2, "../CGM/buildings_script_source")
   outputToFolderAndFile(outTag, "events", "cgm_auto.txt",2, "../CGM/buildings_script_source")
-  if debug:
-    outputToFolderAndFile(outTriggers, "common/scripted_triggers/WIP/", "cgm_auto_trigger_template.txt",2, "../CGM/buildings_script_source")
-    outputToFolderAndFile(outEffects, "common/scripted_effects/WIP/", "cgm_auto_effects_template.txt",2, "../CGM/buildings_script_source")
+  if debug and tileWeightDebug:
+    outputToFolderAndFile(outTag, "events", "cgm_auto.txt",2, "../CGM/debug_buildings_stuff")
+    outputToFolderAndFile(newTileCheckFile, "common/scripted_effects", "cgm_new_tile_checks.txt",2, "../CGM/debug_buildings_stuff")
+  # if debug:
+  #   outputToFolderAndFile(outTriggers, "common/scripted_triggers/WIP/", "cgm_auto_trigger_template.txt",2, "../CGM/buildings_script_source")
+  #   outputToFolderAndFile(outEffects, "common/scripted_effects/WIP/", "cgm_auto_effects_template.txt",2, "../CGM/buildings_script_source")
   # with open("test.txt", "w") as file:
   #   outTag.writeAll(file,args())
 
@@ -837,7 +856,8 @@ def main():
     outFolderLoc="../CGM/buildings_script_source/localisation/"+language
     if not os.path.exists(outFolderLoc):
       os.makedirs(outFolderLoc)
-    locList.write(outFolderLoc+"/cgm_automization_l_"+language+".yml",language)
+    if not (debug or tileWeightDebug):
+      locList.write(outFolderLoc+"/cgm_automization_l_"+language+".yml",language)
 def addUniqueFirst(key, element, dictList,building):
   usedSubList=dictList.getOrCreate(key)
   if building.attemptGet("planet_unique")=="yes" or building.attemptGet("empire_unique")=="yes":
@@ -1355,6 +1375,8 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
             buildingOut.add(name, val, comment, seperator)
           outputToFolderAndFile(buildingOut, "/common/buildings/", file,2, apiOutFolder)
       BUArgV=[apiOutFolder+"/common/buildings/*.txt","../CGM/buildings_script_source/common/buildings/*.txt","--output_folder","../NOTES/api files/cgm_auto_BU/"+modName, "--custom_mod_name", "CGM - {}: Comp Patch".format(modName), "--load_order_priority", "--make_optional", "--scripted_variables",",".join(variableAllFiles),"--copy_folder_first", apiOutFolder,"--helper_file_list","01", "--skip_building", ",".join(buildingsIgnoredByBU) ]
+      if modName=="alphamod":
+        BUArgV.append("--copy_requirements_up")
       createUpgradedBuildings.main(createUpgradedBuildings.parse(BUArgV),BUArgV)
 
   #priority sorted output for potential autobuild. Joined into one file!
@@ -1398,7 +1420,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
         break
     if foundBU:
       modFile=TagList()
-      modFile.add("name", '"!!Patch: CGM Buildings - {}"'.format(fullModName))
+      modFile.add("name", '"!Patch: CGM Buildings - {}"'.format(fullModName))
       modFile.add("path", '"modModding/NOTES/api files/cgm_auto_BU/{}"'.format(modName))
       modFile.add("picture", '"../../compatibility_patch_thumb.png"')
       modFile.add("tags", TagList('"Build_Upgraded_Comp_Patch"',""))
