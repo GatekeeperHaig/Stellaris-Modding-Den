@@ -37,6 +37,37 @@ country_event = {
 				set_planet_flag = gas_giant_moon
 			}
 		}	
+		every_planet = {
+			limit = { is_star = yes }
+			#this effect block identifies star order in systems				
+			if = {
+				limit = {
+					solar_system = {
+						NOT = {
+							any_planet = {
+								NOT = { is_same_value = prevprev }
+								has_planet_flag = system_star_1
+							}
+						}
+					}
+				}
+				set_planet_flag = system_star_1
+			}	
+			else_if = {
+				limit = {
+					solar_system = {
+						NOT = {
+							any_planet = {
+								NOT = { is_same_value = prevprev }
+								has_planet_flag = system_star_2
+							}
+						}
+					}
+				}
+				set_planet_flag = system_star_2
+			}	
+			else = { set_planet_flag = system_star_3 }
+		}				
 		set_default_configuration = yes 
 		set_country_flag = level_0_menu	
 		country_event = { id = cgm_pe_spawn_engine.1 }	
@@ -116,6 +147,8 @@ country_event = {
 			cgm_menu_configuration_triggers = no
 		}			
 		hidden_effect = {			
+			remove_global_flag = cgm_pe_configure_planets_prescripted_balance_enabled	
+			remove_global_flag = cgm_pe_configure_planets_prescripted_balance_disabled			
 			set_timed_country_flag = { flag = cgm_pe_configure_planets days = 2 }		
 			country_event = { id = cgm_pe_spawn_engine.1 }				
 		}
@@ -129,6 +162,9 @@ country_event = {
 			cgm_menu_configuration_triggers = no
 		}			
 		hidden_effect = {			
+			remove_global_flag = cgm_resources_enabled
+			remove_global_flag = cgm_resources_disabled
+			remove_global_flag = cgm_resource_spawn_disabled
 			set_timed_country_flag = { flag = cgm_pe_configure_resources days = 2 }		
 			country_event = { id = cgm_pe_spawn_engine.1 }				
 		}
@@ -230,7 +266,7 @@ country_event = {
 		custom_gui = "cgm_pe_option"		
 		trigger = { has_country_flag = cgm_pe_configure_planets planetary_diversity_enabled = no }		
 		hidden_effect = {
-			remove_resource_spawn_flags = yes
+			remove_planet_spawn_flags = yes
 			set_global_flag = cgm_new_worlds_disabled 			
 			remove_country_flag = cgm_pe_configure_planets
 			country_event = { id = cgm_pe_spawn_engine.1 }				
@@ -242,9 +278,9 @@ country_event = {
 		custom_gui = "cgm_pe_option"		
 		trigger = { has_country_flag = cgm_pe_configure_planets planetary_diversity_enabled = yes }		
 		hidden_effect = {
-			remove_resource_spawn_flags = yes
+			remove_planet_spawn_flags = yes
 			set_global_flag = cgm_new_worlds_disabled_planetary_diversity_enabled
-			remove_country_flag = cgm_pe_configure_planets
+			set_country_flag = cgm_pe_configure_planets_prescripted_balance_configuration
 			country_event = { id = cgm_pe_spawn_engine.1 }				
 		}
 	}		
@@ -254,9 +290,9 @@ country_event = {
 		custom_gui = "cgm_pe_option"		
 		trigger = { has_country_flag = cgm_pe_configure_planets planetary_diversity_enabled = no }		
 		hidden_effect = {
-			remove_resource_spawn_flags = yes
+			remove_planet_spawn_flags = yes
 			set_global_flag = cgm_new_worlds_enabled
-			remove_country_flag = cgm_pe_configure_planets
+			set_country_flag = cgm_pe_configure_planets_prescripted_balance_configuration
 			country_event = { id = cgm_pe_spawn_engine.1 }				
 		}
 	}		
@@ -266,29 +302,82 @@ country_event = {
 		custom_gui = "cgm_pe_option"		
 		trigger = { has_country_flag = cgm_pe_configure_planets planetary_diversity_enabled = yes }		
 		hidden_effect = {
-			remove_resource_spawn_flags = yes
+			remove_planet_spawn_flags = yes
 			set_global_flag = cgm_new_worlds_enabled_planetary_diversity_enabled
+			set_country_flag = cgm_pe_configure_planets_prescripted_balance_configuration
+			country_event = { id = cgm_pe_spawn_engine.1 }				
+		}
+	}			
+	option = {
+		name = cgm_pe.cgm_pe_configure_planets_prescripted_balance_enabled.name
+		custom_tooltip = cgm_pe.cgm_pe_configure_planets_prescripted_balance_enabled.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_planets_prescripted_balance_configuration }		
+		hidden_effect = {
+			set_global_flag = cgm_pe_configure_planets_prescripted_balance_enabled
+			remove_country_flag = cgm_pe_configure_planets_prescripted_balance_configuration
 			remove_country_flag = cgm_pe_configure_planets
 			country_event = { id = cgm_pe_spawn_engine.1 }				
 		}
 	}			
 	option = {
+		name = cgm_pe.cgm_pe_configure_planets_prescripted_balance_disabled.name
+		custom_tooltip = cgm_pe.cgm_pe_configure_planets_prescripted_balance_disabled.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { has_country_flag = cgm_pe_configure_planets_prescripted_balance_configuration }		
+		hidden_effect = {
+			set_global_flag = cgm_pe_configure_planets_prescripted_balance_disabled
+			remove_country_flag = cgm_pe_configure_planets_prescripted_balance_configuration
+			remove_country_flag = cgm_pe_configure_planets
+			country_event = { id = cgm_pe_spawn_engine.1 }				
+		}
+	}				
+	#Level 2 menu options - resources
+	option = {
 		name = cgm_pe.resources_disabled.name
 		custom_tooltip = cgm_pe.resources_disabled.desc
 		custom_gui = "cgm_pe_option"		
-		trigger = { has_country_flag = cgm_pe_configure_resources }		
+		trigger = { 
+			has_country_flag = cgm_pe_configure_resources
+			NOR = { 
+				has_global_flag = cgm_resources_disabled
+				has_global_flag = cgm_resources_enabled
+			}	
+		}		
 		hidden_effect = {
 			remove_resource_spawn_flags = yes
 			set_global_flag = cgm_resources_disabled 			
-			remove_country_flag = cgm_pe_configure_resources
 			country_event = { id = cgm_pe_spawn_engine.1 }				
 		}
 	}	
 	option = {
+		name = cgm_pe.cgm_resources_enabled.name
+		custom_tooltip = cgm_pe.cgm_resources_enabled.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { 
+			has_country_flag = cgm_pe_configure_resources
+			NOR = { 
+				has_global_flag = cgm_resources_disabled
+				has_global_flag = cgm_resources_enabled
+			}	
+		}		
+		hidden_effect = {
+			remove_resource_spawn_flags = yes
+			set_global_flag = cgm_resources_enabled 			
+			country_event = { id = cgm_pe_spawn_engine.1 }				
+		}
+	}		
+	option = {
 		name = cgm_pe.very_high_resources.name
 		custom_tooltip = cgm_pe.very_high_resources.desc
 		custom_gui = "cgm_pe_option"		
-		trigger = { has_country_flag = cgm_pe_configure_resources }		
+		trigger = { 
+			has_country_flag = cgm_pe_configure_resources
+			OR = { 
+				has_global_flag = cgm_resources_disabled
+				has_global_flag = cgm_resources_enabled
+			}	
+		}		
 		hidden_effect = {
 			remove_resource_spawn_flags = yes
 			set_global_flag = cgm_very_high_strategic_resources 			
@@ -300,7 +389,13 @@ country_event = {
 		name = cgm_pe.high_resources.name
 		custom_tooltip = cgm_pe.high_resources.desc
 		custom_gui = "cgm_pe_option"		
-		trigger = { has_country_flag = cgm_pe_configure_resources }		
+		trigger = { 
+			has_country_flag = cgm_pe_configure_resources
+			OR = { 
+				has_global_flag = cgm_resources_disabled
+				has_global_flag = cgm_resources_enabled
+			}	
+		}		
 		hidden_effect = {
 			remove_resource_spawn_flags = yes
 			set_global_flag = cgm_high_strategic_resources 			
@@ -312,10 +407,28 @@ country_event = {
 		name = cgm_pe.default_resources.name
 		custom_tooltip = cgm_pe.default_resources.desc
 		custom_gui = "cgm_pe_option"		
-		trigger = { has_country_flag = cgm_pe_configure_resources }		
+		trigger = { 
+			has_country_flag = cgm_pe_configure_resources
+			has_global_flag = cgm_resources_enabled
+		}		
 		hidden_effect = {
 			remove_resource_spawn_flags = yes
 			set_global_flag = cgm_default_strategic_resources 			
+			remove_country_flag = cgm_pe_configure_resources
+			country_event = { id = cgm_pe_spawn_engine.1 }				
+		}
+	}
+	option = {
+		name = cgm_pe.default_resources.name
+		custom_tooltip = cgm_pe.default_resources.desc
+		custom_gui = "cgm_pe_option"		
+		trigger = { 
+			has_country_flag = cgm_pe_configure_resources
+			has_global_flag = cgm_resources_disabled
+		}		
+		hidden_effect = {
+			remove_resource_spawn_flags = yes
+			set_global_flag = cgm_resource_spawn_disabled 			
 			remove_country_flag = cgm_pe_configure_resources
 			country_event = { id = cgm_pe_spawn_engine.1 }				
 		}
@@ -324,7 +437,13 @@ country_event = {
 		name = cgm_pe.low_resources.name
 		custom_tooltip = cgm_pe.low_resources.desc
 		custom_gui = "cgm_pe_option"		
-		trigger = { has_country_flag = cgm_pe_configure_resources }		
+		trigger = { 
+			has_country_flag = cgm_pe_configure_resources
+			OR = { 
+				has_global_flag = cgm_resources_disabled
+				has_global_flag = cgm_resources_enabled
+			}	
+		}	
 		hidden_effect = {
 			remove_resource_spawn_flags = yes
 			set_global_flag = cgm_low_strategic_resources 			
@@ -336,14 +455,20 @@ country_event = {
 		name = cgm_pe.very_low_resources.name
 		custom_tooltip = cgm_pe.very_low_resources.desc
 		custom_gui = "cgm_pe_option"		
-		trigger = { has_country_flag = cgm_pe_configure_resources }		
+		trigger = { 
+			has_country_flag = cgm_pe_configure_resources
+			OR = { 
+				has_global_flag = cgm_resources_disabled
+				has_global_flag = cgm_resources_enabled
+			}	
+		}	
 		hidden_effect = {
 			remove_resource_spawn_flags = yes
 			set_global_flag = cgm_very_low_strategic_resources 			
 			remove_country_flag = cgm_pe_configure_resources
 			country_event = { id = cgm_pe_spawn_engine.1 }				
 		}
-	}	
+	}		
 	#Level 2 menu options - deposits
 	option = {
 		name = cgm_pe.no_deposits_rebalance.name

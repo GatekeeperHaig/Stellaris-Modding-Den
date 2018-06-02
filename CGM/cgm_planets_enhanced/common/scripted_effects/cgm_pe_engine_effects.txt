@@ -1,10 +1,35 @@
  ## this is the main resource spawning effect. It is called by the menu event in the after field.
 cgm_spawn_engine = {
 	if = { 
-		limit = { NOT = { has_global_flag = cgm_prescripted_size_readjustment_disabled } }		
-		prescripted_uninhabitable_planet_size_readjustment = yes
-		prescripted_inhabitable_planet_size_readjustment = yes
-		prescripted_asteroid_size_readjustment = yes
+		limit = {
+			OR = { 
+				has_global_flag = cgm_new_worlds_enabled
+				has_global_flag = cgm_new_worlds_disabled_planetary_diversity_enabled
+				has_global_flag = cgm_new_worlds_enabled_planetary_diversity_enabled
+			}
+		}
+		every_planet = { 
+			if = { 
+				limit = {
+					OR = { 
+						has_global_flag = cgm_new_worlds_enabled				
+						has_global_flag = cgm_new_worlds_enabled_planetary_diversity_enabled			
+					}
+				}
+			}
+			else_if = { 
+				limit = { habitable_planet = yes }
+				planetary_diversity_regular_planet_init = yes
+			}			
+			if = { 
+				limit = { 
+					has_global_flag = cgm_pe_prescripted_planets_and_species_adjustment_enabled
+				}	
+				prescripted_uninhabitable_planet_size_readjustment = yes
+				prescripted_inhabitable_planet_size_readjustment = yes
+				prescripted_asteroid_size_readjustment = yes
+			}			
+		}
 	}	
 	if = {
 		limit = { NOT = { has_global_flag = cgm_resources_disabled } }
@@ -109,9 +134,9 @@ cgm_spawn_engine = {
 	}				
 	every_planet = {
 		limit = { 
-			has_global_flag = cgm_asteroid_colonization_enabled
-			has_global_flag = cgm_prescripted_size_readjustment_disabled
 			is_asteroid = yes
+			has_global_flag = cgm_asteroid_colonization_enabled
+			has_global_flag = cgm_pe_configure_planets_prescripted_balance_disabled			
 		}	
 		prescripted_asteroid_size_readjustment = yes
 	}		
