@@ -12,13 +12,13 @@ def main():
   # createEffectDecisionStuff()
   automatedCreationAutobuildAPI()
   #return
-  with open("../NOTES/other mod files used for API files/list of abbrevations used in API files.csv", 'r') as file:
+  with open("../NOTES/api_files/sources/modList.csv", 'r') as file:
     for line in file:
       lineSplit=list(map(lambda x:x.strip(),line.split(",")))
       modFolder, modAbbr, modName=lineSplit[:3]
       if len(lineSplit)>4:
         buildingsIgnoredByBU=lineSplit[4:]
-      modFolder="../NOTES/other mod files used for API files/"+modFolder
+      modFolder="../NOTES/api_files/sources/"+modFolder
       lowPri=[]
       highPri=[]
       if modName<"!Core Game Mechanics: Buildings":

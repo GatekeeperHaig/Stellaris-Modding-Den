@@ -791,12 +791,6 @@ def main():
   upgradeEvent.createReturnIf(TagList("has_building_construction","yes")).add("break","yes")
 
 
-  #return automatedCreationAutobuildAPI(resources)
-  # return automatedCreationAutobuildAPI(resources,"alphamod",["../NOTES/api files/cgm_api_files/alphamod/"]) #TODO!!!
-
-
-
-
 
   outputToFolderAndFile(edictOut, "common/edicts", "cgm_script_created_auto_edicts.txt",2, "../CGM/buildings_script_source")
   outputToFolderAndFile(newTileCheckFile, "common/scripted_effects", "cgm_new_tile_checks.txt",2, "../CGM/buildings_script_source")
@@ -1110,10 +1104,6 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   
 
   allTriggers=TagList()
-  # triggersFiles=glob.glob("../CGM/buildings_script_source/common/scripted_triggers/*.txt")#+glob.glob(...)
-  # effectFiles=glob.glob("../CGM/buildings_script_source/common/scripted_effects/*.txt")#+glob.glob(...)
-  # triggersFiles=list(reversed(sorted(triggersFiles, key=os.path.basename))) #earlier files in our list are prefered -> need to reverse order here
-  # effectFiles=sorted(effectFiles, key=os.path.basename)
 
   for file in triggerAllFiles:
     allTriggers.readFile(file)
@@ -1122,11 +1112,6 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   buildingContent.removeDuplicatesRec()
   # outputToFolderAndFile(allTriggers, "", "test.txt",2, ".")
   # return
-
-  # buildingContent=TagList()
-  # allVars=TagList()
-  # for buildingFile in glob.glob("../NOTES/api files/cgm_api_files/alphamod/buildings/*.txt"):
-  #   buildingContent.readFile(buildingFile,0,allVars)
 
 
   planetUniqueDict=uniquenessList(buildingContentOrig)
@@ -1350,7 +1335,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
   outputToFolderAndFile(autobuildCompTrigger, "common/scripted_triggers/", "00000_cgm_auto_compatibilty_triggers.txt",2, "../CGM/buildings_script_source", False)
 
   if apiOutFolder=="":
-    apiOutFolder="../NOTES/api files/cgm_auto/"+modName
+    apiOutFolder="../NOTES/api_files/cgm_auto/"+modName
     # apiOutFolder="../../mod/cgm_auto_"+modName
   if len(specialResourceTrigger):
     outputToFolderAndFile(specialResourceTrigger, "/common/scripted_triggers/", "zz_cgm_special_resource_trigger{}.txt".format(additionString),2,apiOutFolder )
@@ -1374,7 +1359,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
               val.removeDuplicatesRec()
             buildingOut.add(name, val, comment, seperator)
           outputToFolderAndFile(buildingOut, "/common/buildings/", file,2, apiOutFolder)
-      BUArgV=[apiOutFolder+"/common/buildings/*.txt","../CGM/buildings_script_source/common/buildings/*.txt","--output_folder","../NOTES/api files/cgm_auto_BU/"+modName, "--custom_mod_name", "CGM - {}: Comp Patch".format(modName), "--load_order_priority", "--make_optional", "--scripted_variables",",".join(variableAllFiles),"--copy_folder_first", apiOutFolder,"--helper_file_list","01", "--skip_building", ",".join(buildingsIgnoredByBU) ]
+      BUArgV=[apiOutFolder+"/common/buildings/*.txt","../CGM/buildings_script_source/common/buildings/*.txt","--output_folder","../NOTES/api_files/cgm_auto_BU/"+modName, "--custom_mod_name", "CGM - {}: Comp Patch".format(modName), "--load_order_priority", "--make_optional", "--scripted_variables",",".join(variableAllFiles),"--copy_folder_first", apiOutFolder,"--helper_file_list","01", "--skip_building", ",".join(buildingsIgnoredByBU) ]
       if modName=="alphamod":
         BUArgV.append("--copy_requirements_up")
       createUpgradedBuildings.main(createUpgradedBuildings.parse(BUArgV),BUArgV)
@@ -1414,14 +1399,14 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     
   if os.path.exists("../../modModding/") and modName!="cgm_buildings" and fullModName!="" and modName!="eutab" and modName!="co":
     foundBU=False
-    for file in glob.glob("../NOTES/api files/cgm_auto_BU/"+modName+"/common/buildings/*.txt"):
+    for file in glob.glob("../NOTES/api_files/cgm_auto_BU/"+modName+"/common/buildings/*.txt"):
       if open(file, 'r').read().find('direct_build'):
         foundBU=True
         break
     if foundBU:
       modFile=TagList()
       modFile.add("name", '"!Patch: CGM Buildings - {}"'.format(fullModName))
-      modFile.add("path", '"modModding/NOTES/api files/cgm_auto_BU/{}"'.format(modName))
+      modFile.add("path", '"modModding/NOTES/api_files/cgm_auto_BU/{}"'.format(modName))
       modFile.add("picture", '"../../compatibility_patch_thumb.png"')
       modFile.add("tags", TagList('"Build_Upgraded_Comp_Patch"',""))
       modFile.add("supported_version", '"2.1.*"')
