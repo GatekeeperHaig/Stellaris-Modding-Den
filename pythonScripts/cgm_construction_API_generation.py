@@ -16,6 +16,7 @@ def main():
     for line in file:
       lineSplit=list(map(lambda x:x.strip(),line.split(",")))
       modFolder, modAbbr, modName=lineSplit[:3]
+      buildingsIgnoredByBU=[]
       if len(lineSplit)>4:
         buildingsIgnoredByBU=lineSplit[4:]
       modFolder="../NOTES/api_files/sources/"+modFolder
