@@ -5,7 +5,7 @@ cgm_new_worlds_regular_planet_init = {
 			NOT = { has_planet_flag = prescripted_ideal }
 		}		
 		random_list = {
-			0 = { } # chance that the planet will not be rolled. }
+			0 = { } # chance that the planet will not be rolled.
 			100 = { cgm_new_worlds_planet_spawn_table_inhabitable = yes }
 		}	
 	}
@@ -13,7 +13,12 @@ cgm_new_worlds_regular_planet_init = {
 		limit = { is_vanilla_uninhabitable_planet = yes }
 		random_list = { 
 			0 = { }
-			100 = { cgm_new_worlds_planet_spawn_table_uninhabitable = yes }
+			100 = {
+				cgm_new_worlds_gas_giant_moon_check = yes 				# Assigns gas_giant_moon flag to any planet orbiting pc_gas_giant
+				cgm_new_worlds_planet_spawn_table_uninhabitable = yes	# Converts vanilla uninhabitables
+				cgm_new_worlds_gas_giant_moon_check = yes				# Checks again, to assign gas_giant_moon flag to any planet orbiting pc_ice_giant and pc_gas_giant_hot as well
+				prescripted_gas_giant_size_readjustment = yes			# Readjusts gas/ice giants' sizes, as some may have been converted from pc_molten or pc_frozen				
+			}
 		}				
 	}		
 	if = { 
@@ -22,21 +27,7 @@ cgm_new_worlds_regular_planet_init = {
 			limit = { planet_size > 25 }
 			change_planet_size = -1
 		}
-	}	
-	if = {
-		limit = {
-			OR = { 
-				is_planet_class = pc_gas_giant 
-				is_planet_class = pc_ice_giant
-			}
-			has_moon = yes
-			any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
-		}
-		every_moon = {
-			limit = { NOT = { has_planet_flag = gas_giant_moon } }
-			set_planet_flag = gas_giant_moon
-		}
-	}	
+	}		
 	if = {
 		limit = { 
 			NOT = { has_global_flag = gpm_vanilla_spawn_engine_enabled }
@@ -54,5 +45,21 @@ cgm_new_worlds_regular_planet_init = {
 			planet_modifier_spawn_table = yes
 			change_variable = { which = "pm_points" value = -1 }
 		}				
+	}
+}
+cgm_new_worlds_gas_giant_moon_check = {
+	if = {
+		limit = {
+			OR = { 
+				is_planet_class = pc_gas_giant 
+				is_planet_class = pc_ice_giant
+			}
+			has_moon = yes
+			any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
+		}
+		every_moon = {
+			limit = { NOT = { has_planet_flag = gas_giant_moon } }
+			set_planet_flag = gas_giant_moon
+		}
 	}
 }
