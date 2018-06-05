@@ -1,4 +1,4 @@
-name="Planetary Diversity Engine"
+name="Planetary Diversity"
 path="mod/planet_engine_mods/planetary_diversity"
 tags={
 	"Galaxy Generation"
