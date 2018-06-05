@@ -6,7 +6,7 @@ import argparse
 import re
 # import shlex
 
-splitSigns=["= hsv",">=","<=","#"," ","\t","{","}","=",">","<"]
+splitSigns=["= hsv",">=","<=","#"," ","\t","{","}","=",">","<",'"']
 splitPattern="("
 for sign in splitSigns:
   splitPattern+=sign+"|"
@@ -494,9 +494,15 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       objectList=[self]
     lineSplit=re.split(splitPattern,line)
     countEmpty=0
+    expectingQuote=False
     for wordI, word in enumerate(lineSplit):
       try:
-        word=word.strip()
+        if expectingQuote==False:
+          word=word.strip()
+          wordJointed=word
+        else:
+          # print("adding '{}'".format(word))
+          wordJointed+=word
         #empty
         if len(word)==0:
           countEmpty+=1
@@ -534,23 +540,36 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         elif word in [">=","<=",">","<","=","= hsv"]:
           objectList[-1].seperators[-1]=word
           expectingVal=True
-        elif word=="log":
-          objectList[-1].add("","","".join(lineSplit[wordI:]).strip())
-          break
-        elif expectingVal:
-          objectList[-1].vals[-1]+=word
+        elif not expectingQuote and word=='"':
+          # print(expectingQuote)
+          expectingQuote=True
+          # print("first quote")
+        # elif word=="log":
+        #   objectList[-1].add("","","".join(lineSplit[wordI:]).strip())
+        #   break
+        elif expectingVal and (not expectingQuote or word.strip()=='"'):
+          objectList[-1].vals[-1]+=wordJointed
           expectingVal=False
+          # if expectingQuote:
+            # print("second quote")
+          expectingQuote=False
 
         # elif expectingNameAddition:
         #   objectList[-1].names[-1]+=word
         #   expectingNameAddition=False
-        else:
-          objectList[-1].add(word)
+        elif (not expectingQuote or word.strip()=='"'):
+          objectList[-1].add(wordJointed)
+          expectingQuote=False
       except:
         print("Error reading line {}, word {}".format(lineI+1,wordI+1))
         print("Line content: {}".format(line),end='')
         print("Word: {}".format(word))
         raise
+    if expectingQuote:
+      print("Error: Line ended while waiting for quotation mark!")
+      class QuotationError(Exception):
+        pass
+      raise QuotationError
     return self, bracketLevel, expectingVal
 
 
@@ -567,6 +586,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           _,bracketLevel, expectingVal=self.readString(line, expectingVal,objectList,args, bracketLevel, useNamedTagList, lineI)
         except:
           print("In file: "+fileName)
+          print("Line number {!s}".format(lineI+1))
+          print("Line content: "+line)
           raise
 
     if isinstance(varsToValue,TagList):
