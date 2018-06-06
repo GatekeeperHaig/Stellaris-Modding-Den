@@ -41,9 +41,6 @@ cgm_spawn_engine = {
 					exists = owner
 					owner = { is_country_type = primitive } 
 				}	
-				random_owned_pop = { 
-					species = { set_species_homeworld = prevprev }
-				}	
 				cgm_new_worlds_species_change_table = yes
 				if = { 
 					limit = { is_ideal_planet_class = { who = owner status = no } }
@@ -402,18 +399,10 @@ cgm_spawn_engine = {
 						50 = { }
 						50 = { 
 							random_tile = {
-								limit = { has_capital_building = no } 
+								limit = { has_building = no has_pop = no }
 								if = { 
 									limit = { has_blocker = yes }
 									remove_blocker = yes
-								}
-								if = { 
-									limit = { has_pop = yes } 
-									kill_pop = yes 
-								}
-								if = { 
-									limit = { has_building = yes } 
-									remove_building = yes
 								}
 								set_blocker = tb_fe_submerged_city
 							}
@@ -1131,7 +1120,9 @@ generate_asteroidal_planetoid = {
 			if = { 
 				limit = { 
 					is_asteroid = yes
-					NOT = { is_planet_class = pc_ice_asteroid }
+					NOT = { 
+						is_planet_class = pc_ice_asteroid
+					}
 				}		
 				change_pc = pc_asteroidal_planetoid	
 				if = { 
@@ -1329,4 +1320,15 @@ prescripted_asteroid_size_readjustment = {
 			85 = { }				
 		}    		
 	}	
+}
+change_owner_species_to_this_planet_preference = {
+    every_owned_pop = {
+        limit = { is_exact_same_species = owner_species }
+        modify_species = {
+            species = this
+            ideal_planet_class = prev                            
+            base = none # makes this replace parent species
+        }
+    }
+    owner = { change_dominant_species = { species = last_created change_all = yes } }
 }
