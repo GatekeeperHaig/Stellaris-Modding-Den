@@ -1,0 +1,151 @@
+namespace = cgm_pe_colonization_automation
+
+event = { 
+	id = cgm_pe_colonization_automation.1
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = { 
+		every_country = { 
+			limit = { 
+				OR = { 
+					is_country_type = default
+					is_country_type = awakened_fallen_empire
+				}			
+			}
+			every_system_within_border = { 
+				limit = { NOT = { has_star_flag = cgm_colonization_processed } any_planet = { is_colonizable = yes is_colony = no } }
+				every_system_planet = { 
+					limit = { any_planet = { is_colonizable = yes is_colony = no } }
+					set_colonization_value = yes
+				}
+				set_timed_star_flag = { flag = cgm_colonization_processed days = 3600 }
+			}
+			country_event = { id = cgm_pe_colonization_automation.2 days = 1 random = 20 } 
+		}	
+	}	
+}	
+
+country_event = { 
+	id = cgm_pe_colonization_automation.2
+	hide_window = yes
+	is_triggered_only = yes	
+	
+	trigger = { 
+		trigger = { 
+			is_ai = yes
+			OR = { 
+				is_country_type = default
+				is_country_type = awakened_fallen_empire
+			}
+		}				
+		energy > 500 has_monthly_income = { resource = energy value > 0	} 
+	}		
+	
+	immediate = { 
+		while = { 
+			limit = { 
+				any_planet_within_border = { 
+					NOT = { has_modifier = holy_planet }
+					is_colonizable = yes
+					is_colony = no
+					can_colonize = { who = root status = yes }
+					solar_system = { 
+						any_ship_in_system = { is_ship_class = shipclass_starbase } 
+					}	
+					NOR = { 
+						prev = { 
+							any_planet_within_border = { 
+								NOT = { is_same_value = prev } 
+								can_colonize = { who = root status = yes }
+								check_variable = { which = colonization_value value > prev } 
+							}
+						}
+						NOR = { 
+							has_planet_flag = colonizer_assigned
+							has_planet_flag = no_colonizer_available
+						}	
+					}
+				}					
+			}	
+			random_planet_within_border = { 
+				limit = { 
+					NOT = { has_modifier = holy_planet }
+					is_colonizable = yes
+					is_colony = no
+					can_colonize = { who = root status = yes }
+					solar_system = { 
+						any_ship_in_system = { is_ship_class = shipclass_starbase } 
+					}	
+					NOR = { 
+						prev = { 
+							any_planet_within_border = { 
+								NOT = { is_same_value = prev } 
+								can_colonize = { who = root status = yes }
+								check_variable = { which = colonization_value value > prev } 
+							}
+						}
+						NOR = { 
+							has_planet_flag = colonizer_assigned
+							has_planet_flag = no_colonizer_available
+						}	
+					}
+				}	
+				if = { 
+					limit = {
+						any_owned_ship = { 
+							is_ship_class = shipclass_colonizer
+							NOT = { has_ship_flag = assigned_colonizer } 
+							species = {
+								habitability = { who = prevprev value > 0.34 }
+							}	
+						}	
+						random_owned_ship = { 
+							limit = { 
+								is_ship_class = shipclass_colonizer
+								species = {
+									habitability = { who = prevprev value > 0.34 }
+								}							
+							}
+							set_ship_flag = assigned_colonizer
+							fleet = { 
+								prevprevprev = { set_timed_planet_flag = { flag = colonizer_assigned days = 360 } }}
+								queue_actions = {
+									auto_move_to_planet = { target = prevprevprev clear_auto_move_on_arrival = yes }
+									orbit_planet = prevprevprev																							
+									wait = {
+										duration = 30									
+									}								 
+									effect = { 
+										id = cgm_pe_colonization_automation.effect.1
+										prev = { ship_event = { id = cgm_pe_colonization_automation.3 } } 
+									}
+								}	
+							}							
+						}	
+					}
+				}
+				else = { set_timed_planet_flag = { flag = no_colonizer_available days = 360 } }
+			}
+		}	
+	}
+}
+
+ship_event = { 
+	id = cgm_pe_colonization_automation.3
+	hide_window = yes
+	is_triggered_only = yes	
+	
+	immediate = { 
+		orbit = { 
+			planet = { 
+				start_colony = {
+					owner = root.owner
+					species = root.species
+				}
+			}
+		}
+		delete_ship = this
+	}
+}	
+		
