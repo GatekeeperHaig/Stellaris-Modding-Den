@@ -1,9 +1,35 @@
 cgm_terraforming_switch = {
-	remove_negative_planet_modifiers = yes
-	if = {
-		limit = { NOT = { has_modifier = terraformed } }
-		add_modifier = { modifier = "terraformed" days = -1 }
+	if = { 
+		limit = { has_global_flag = cgm_terraforming_after_effects_enabled }
+		from = { 
+			remove_negative_planet_modifiers = yes
+			if = {
+				limit = { NOT = { has_modifier = terraformed } }
+				add_modifier = { modifier = "terraformed" days = -1 }
+			}
+			if = { 
+				limit = { owner = { has_technology = tech_tectonic_engineering } planet_size < 25 NOT = { has_planet_flag = planet_size_increase_rolled } }
+				random_list = { 
+					20 = { }
+					20 = { change_planet_size = 1 }
+					20 = { 
+						change_planet_size = 2 
+						modifier = { factor = 0 planet_size > 23 }
+						modifier = { factor = 0.5 planet_size > 19 }
+						modifier = { factor = 1.5 planet_size < 12 }
+					}
+					20 = { 
+						change_planet_size = 3
+						modifier = { factor = 0 planet_size > 22 }
+						modifier = { factor = 0.5 planet_size > 18 }
+						modifier = { factor = 1.5 planet_size < 11 }					
+					}
+					20 = { } #catestrophe	
+				}
+				set_planet_flag = planet_size_increase_rolled			
+			}	
+		}				
 	}
-}
+}	
 
 cgm_same_class_terraforming_effect = { }
