@@ -1,1 +1,1 @@
-This repository hosts mod development for mods associated with the Stellaris Modding Den discord community and the ExO-EPRS Dev Team.
+This repository hosts mod development for several different mod authors associated with the Stellaris Modding Den discord community and the CGM Modding Team.
