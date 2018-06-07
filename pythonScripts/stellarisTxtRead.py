@@ -219,6 +219,9 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def writeAll(self,file,args=0,checkForHelpers=False, start=0, end=None): #formatted writing. Paradox style minus most whitespace tailing errors
     if end!=None:
       r=range(start,end)
+      # print(list(r))
+      # print(start)
+      # print(end)
     else:
       r=range(start, len(self.names))
     for i in r:
@@ -580,7 +583,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     expectingVal=False
     # expectingNameAddition=False
     with open(fileName,'r') as inputFile:
-      print("Start reading "+fileName)
+      if args==0 or not hasattr(args, "silent") or args.silent==False:
+        print("Start reading "+fileName)
       for lineI,line in enumerate(inputFile):
         try:
           _,bracketLevel, expectingVal=self.readString(line, expectingVal,objectList,args, bracketLevel, useNamedTagList, lineI)
@@ -923,13 +927,16 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       for i in range(extraLines-1):
         self.add(headerName, self.getN_th(headerName, n_th_occurence-1))
   def findFirstAndLastTagList(self):
-    first=0
+    first=None
     last=-1
     for i,val in enumerate(self.vals):
       if isinstance(val, TagList):
-        if first==0:
+        if first==None:
           first=i
         last=i
+    if first==None:
+      first=0
+      # last=0
     return first,last
   def lower(self):
     return None #compatibility function. If you want to compare with a string, you might want to apply lower before you compare. But you can't do that unless this function exists or you first make sure the val is not a taglist.
@@ -1069,8 +1076,8 @@ def readVal(line): #string needs to start with a "{"
   tmpTagList.readString(line, True)
   return tmpTagList.vals[0]
 
-def readFile(fileName):
-  return TagList().readFile(fileName)
+def readFile(fileName, args=0):
+  return TagList().readFile(fileName,args)
 
 def checkEmpty(item):
   name=item[0]
@@ -1101,3 +1108,7 @@ def insertToDictList(key, element, dictList, position=0):
   if not key in dictList:
     dictList[key]=[]
   dictList[key].insert(position, element)
+
+class argSilent:
+  def __init__(self):
+    self.silent=True
