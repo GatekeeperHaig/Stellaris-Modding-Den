@@ -477,8 +477,8 @@ def readAndConvert(args, allowRestart=1):
     #BUILDING OUTPUT
     if not args.different_same_name_vars: #only happens once if that is true.
       for nonHelperFile in mainFileList:
-        print(nonHelperFile)
-        origFileContent=readFile(nonHelperFile)
+        # print(nonHelperFile)
+        origFileContent=readFile(nonHelperFile,argSilent())
         outPutToThisFile=TagList()
         for name,val, comment,separator in buildingNameToData.getAll():
           for nameOrig,valOrig, commentOrig,separatorOrig in origFileContent.getAll():
@@ -498,6 +498,7 @@ def readAndConvert(args, allowRestart=1):
         startBuildingsOut, endBuildingsOut=outPutToThisFile.findFirstAndLastTagList()
         with open(args.outPath+os.path.basename(nonHelperFile),'w') as outputFile:
           outputFile.write(args.scriptDescription)
+          # print("writing "+os.path.basename(nonHelperFile))
           origFileContent.writeAll(outputFile,args,False,0,startBuildingsOrig)
           outPutToThisFile.writeAll(outputFile,args,False, startBuildingsOut, endBuildingsOut+1)
           origFileContent.writeAll(outputFile,args,False, endBuildingsOrig+1)
