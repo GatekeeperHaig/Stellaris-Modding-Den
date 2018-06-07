@@ -251,36 +251,29 @@ cgm_spawn_engine = {
 				limit = { NOT = { has_global_flag = no_planet_resize } }
 				set_variable = { which = planet_resize_factor value = planet_size_var }
 				random_list = {
-					20 = {
-						multiply_variable = { which = planet_resize_factor value = 1.3 }
+					25 = {
+						multiply_variable = { which = planet_resize_factor value = 1.4 }
 						modifier = { factor = 0 has_global_flag = cgm_very_small_planet_size }
 						modifier = { factor = 0 has_global_flag = cgm_small_planet_size }
 						modifier = { factor = 1 has_global_flag = cgm_large_planet_size }
 						modifier = { factor = 2 has_global_flag = cgm_very_large_planet_size }
 					}
-					20 = {
-						multiply_variable = { which = planet_resize_factor value = 1.15 }
+					25 = {
+						multiply_variable = { which = planet_resize_factor value = 1.2 }
 						modifier = { factor = 0 has_global_flag = cgm_very_small_planet_size }
 						modifier = { factor = 0 has_global_flag = cgm_small_planet_size }
 						modifier = { factor = 2 has_global_flag = cgm_large_planet_size }
 						modifier = { factor = 1 has_global_flag = cgm_very_large_planet_size }
 					}
-					20 = {
-						multiply_variable = { which = planet_resize_factor value = 1 }
-						modifier = { factor = 0 has_global_flag = cgm_very_small_planet_size }
-						modifier = { factor = 1 has_global_flag = cgm_small_planet_size }
-						modifier = { factor = 1 has_global_flag = cgm_large_planet_size }
-						modifier = { factor = 0 has_global_flag = cgm_very_large_planet_size }
-					}
-					20 = {
-						multiply_variable = { which = planet_resize_factor value = 0.85 }
+					25 = {
+						multiply_variable = { which = planet_resize_factor value = 0.8 }
 						modifier = { factor = 1 has_global_flag = cgm_very_small_planet_size }
 						modifier = { factor = 2 has_global_flag = cgm_small_planet_size }
 						modifier = { factor = 0 has_global_flag = cgm_large_planet_size }
 						modifier = { factor = 0 has_global_flag = cgm_very_large_planet_size }
 					}
-					20 = {
-						multiply_variable = { which = planet_resize_factor value = 0.7 }
+					25 = {
+						multiply_variable = { which = planet_resize_factor value = 0.6 }
 						modifier = { factor = 2 has_global_flag = cgm_very_small_planet_size }
 						modifier = { factor = 1 has_global_flag = cgm_small_planet_size }
 						modifier = { factor = 0 has_global_flag = cgm_large_planet_size }
@@ -291,6 +284,29 @@ cgm_spawn_engine = {
 					limit = {
 						check_variable = { which = planet_resize_factor value > planet_size_var }
 						planet_size < 25
+						AND = { 
+							is_moon = no
+							planet_size < 25
+						}
+						AND = { 
+							is_moon = yes
+							is_asteroid = no
+							OR = { 
+								AND = { 
+									is_gas_giant_moon = yes
+									planet_size < 16
+								}	
+								AND = { 
+									is_gas_giant_moon = no
+									planet_size < 11
+								}					
+							}	
+						}
+						AND = { 
+							is_moon = yes
+							is_asteroid = yes
+							planet_size < 6 
+						}									
 					}
 					change_planet_size = 1
 					change_variable = { which = planet_size_var value = 1 }
@@ -298,7 +314,31 @@ cgm_spawn_engine = {
 				while = {
 					limit = {
 						check_variable = { which = planet_resize_factor value < planet_size_var }
-						planet_size > 5
+						OR = { 
+							AND = { 
+								is_moon = no
+								planet_size > 10
+							}
+							AND = { 
+								is_moon = yes
+								is_asteroid = no
+								OR = { 
+									AND = { 
+										is_gas_giant_moon = yes
+										planet_size > 10
+									}	
+									AND = { 
+										is_gas_giant_moon = no
+										planet_size > 6
+									}					
+								}	
+							}
+							AND = { 
+								is_moon = yes
+								is_asteroid = yes
+								planet_size > 4
+							}							
+						}	
 					}
 					change_planet_size = -1
 					change_variable = { which = planet_size_var value = -1 }
