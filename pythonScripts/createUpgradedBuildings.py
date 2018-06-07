@@ -240,21 +240,23 @@ def readAndConvert(args, allowRestart=1):
             #   continue #todo: remove! not reason anymore afaik -> check for "planet_unique checks and add empire unique there"
 
             #new requirements: Only buildable if one of the conditions of the next higher tier is not satisfied.
-            poss=copy.deepcopy([upgradeData.attemptGet("prerequisites"),upgradeData.attemptGet("potential"),upgradeData.attemptGet("allow")])
-            for eI in range(len(poss[0].names)): #convert prerequ to potential
-              poss[0].vals[eI]='{ has_technology ='+' {} '.format(poss[0].names[eI])+'}'
-              poss[0].names[eI]='owner'
+            # don't set and new requirements for buildings with lower uniqueness requirements than their upgrade!
+            if (not "empire_unique" in upgradeData.names or upgradeData.get("empire_unique")=="no" or ("empire_unique" in buildingData.names and buildingData.get("empire_unique")=="yes")) and (not "planet_unique" in upgradeData.names or upgradeData.get("planet_unique")=="no" or ("planet_unique" in buildingData.names and buildingData.get("planet_unique")=="yes")):
+              poss=copy.deepcopy([upgradeData.attemptGet("prerequisites"),upgradeData.attemptGet("potential"),upgradeData.attemptGet("allow")])
+              for eI in range(len(poss[0].names)): #convert prerequ to potential
+                poss[0].vals[eI]='{ has_technology ='+' {} '.format(poss[0].names[eI])+'}'
+                poss[0].names[eI]='owner'
 
-            for p in poss:
-              for name,val in p.getNameVal():
-                #check if some potential of the upgrade is also a potential of the base, if so, do not use that in the newRequirement
-                addNameVal=True
-                for nameExist, valExists in buildingData.getOrCreate("potential").getNameVal():
-                  if name==nameExist and val==valExists:
-                    addNameVal=False
-                    break
-                if addNameVal:
-                  newRequirements.add(name,val)
+              for p in poss:
+                for name,val in p.getNameVal():
+                  #check if some potential of the upgrade is also a potential of the base, if so, do not use that in the newRequirement
+                  addNameVal=True
+                  for nameExist, valExists in buildingData.getOrCreate("potential").getNameVal():
+                    if name==nameExist and val==valExists:
+                      addNameVal=False
+                      break
+                  if addNameVal:
+                    newRequirements.add(name,val)
             
             
             if not secondVisit:
