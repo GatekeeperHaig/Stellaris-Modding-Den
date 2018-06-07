@@ -689,7 +689,7 @@ def createConvertEvent(args):
     print("ERROR: Custom mod name needed for create convert")
     return 1
   simpleModName=''.join(e for e in args.custom_mod_name if e.isalnum())
-  onActionTagList=TagList("on_building_complete", TagList("events", TagList("direct_build_{}.1".format(simpleModName),""))).add("on_building_replaced", TagList("events", TagList("direct_build_{}.1".format(simpleModName),"")))
+  onActionTagList=TagList("on_building_complete", TagList("events", TagList("direct_build_{}.1".format(simpleModName),""))).add("on_building_replaced", TagList("events", TagList("direct_build_{}.1".format(simpleModName),""))).addComment("make sure downgraded buildings are build upgraded for some strange reason:").add("on_planet_transfer", TagList("events", TagList("direct_build_{}.3".format(simpleModName),"")))
   eventTagList=TagList("namespace", "direct_build_{}".format(simpleModName))
   convertEvent=TagList("id", "direct_build_{}.1".format(simpleModName))
   eventTagList.add("planet_event", convertEvent)
