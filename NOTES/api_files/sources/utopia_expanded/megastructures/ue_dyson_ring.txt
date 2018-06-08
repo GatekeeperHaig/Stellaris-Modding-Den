@@ -1,0 +1,518 @@
+dyson_ring_1 = {
+	entity = "construction_platform_entity"
+	construction_entity = "construction_platform_entity"
+	portrait = "GFX_megastructure_construction_background"
+	place_entity_on_planet_plane = no
+	entity_offset = { x = -7 y = -7 }
+	construction_blocks_others = no	
+	build_time = 1800
+	build_cost = {
+		minerals = 10000
+		influence = 300
+	}
+
+	maintenance = {
+		energy = 5
+	}
+	
+	prerequisites = {
+		"tech_advanced_megastructure_engineering"
+	}
+	
+	potential = {
+		has_ascension_perk = ap_master_of_the_heavens
+	}
+	
+	possible = {
+		custom_tooltip = {
+			fail_text = "requires_inside_border"
+			is_inside_border = from
+		}
+		custom_tooltip = {
+			fail_text = "requires_surveyed_system"
+			NOT = {
+				any_planet = {
+					is_surveyed = {
+						who = prev.from
+						status = no
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_colonised_planets"
+			NOT = {
+				any_planet = {
+					OR = {
+						colonised_planet = yes
+						habitable_structure = yes
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			fail_text = "requires_no_black_hole_neutron_star_pulsar"
+			NOT = {
+				is_star_class = sc_black_hole
+				is_star_class = sc_neutron_star
+				is_star_class = sc_pulsar
+			}
+		}
+	}
+	
+	placement_rules = {
+		planet_possible = {
+			custom_tooltip = {
+				fail_text = "must_build_around_star"
+				is_star = yes
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_anomaly"
+				NOT = { has_anomaly = yes }
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				NOT = { solar_system = { has_any_megastructure = yes } }
+			}
+			custom_tooltip = {
+			fail_text = "requires_planets_for_material"
+			hidden:solar_system = { any_planet = { NOT = { is_star = yes } } }
+			}
+		}
+	}
+	
+	ai_weight = {
+		factor = 5
+	}
+	
+	on_build_start = {}
+	on_build_cancel = {}
+	on_build_complete = {
+		set_star_flag = dyson_ring_built
+	}
+}
+
+# Temporarily used for creating specific habitable or structural sections.
+dyson_ring_2_intermediate = {
+	entity = ""
+	construction_entity = "ringworld_seam_entity_01_full_entity"
+	portrait = "GFX_megastructure_construction_background"
+	upgrade_from = {
+		dyson_ring_1
+	}
+
+	construction_blocks_others = no	
+	build_time = 4800
+	build_cost = {
+		minerals = 20000
+	}
+	
+	on_build_start = {}
+	on_build_cancel = {}
+	on_build_complete = {
+		every_system_planet = { 
+			limit = { is_star = no }
+			remove_planet = yes 
+		}
+		random_system_planet = {
+			limit = { is_star = yes }
+			save_event_target_as = dyson_ring_star
+			orbital_deposit_tile = {
+				clear_deposits = yes
+			}
+		}
+		remove_megastructure = fromfrom
+		asteroids_distance = 0
+		spawn_megastructure = {
+			name = "NAME_Ring_Section_A"
+			type = "dyson_ring_2"
+			orbit_angle = 0
+			orbit_distance = 45
+			owner = from
+			graphical_culture = fromfrom
+			location = planet
+		}
+		spawn_megastructure = {
+			name = "NAME_Ring_Section_B"
+			type = "dyson_ring_2"
+			orbit_angle = 90
+			orbit_distance = 45
+			owner = from
+			graphical_culture = fromfrom
+			location = planet
+		}
+		spawn_megastructure = {
+			name = "NAME_Ring_Section_C"
+			type = "dyson_ring_2"
+			orbit_angle = 180
+			orbit_distance = 45
+			owner = from
+			graphical_culture = fromfrom
+			location = planet
+		}
+		spawn_megastructure = {
+			name = "NAME_Ring_Section_D"
+			type = "dyson_ring_2"
+			orbit_angle = 270
+			orbit_distance = 45
+			owner = from
+			graphical_culture = fromfrom
+			location = planet
+		}
+		spawn_megastructure = {
+			name = "Dyson Ring Core"
+			type = "dyson_ring_4"
+			orbit_angle = 0
+			orbit_distance = 0
+			owner = from
+			location = planet
+		}
+	}
+}
+
+dyson_ring_2 = {
+	entity = "ringworld_3x_seams_entity"
+	portrait = "GFX_megastructure_construction_background"
+	potential = {
+		always = no #used from script only
+	}
+	upgrade_from = {
+		dyson_ring_2_intermediate
+	}
+}
+
+dyson_ring_4 = {
+	entity = "dyson_sphere_phase_01_entity"
+	portrait = "GFX_megastructure_construction_background"
+	potential = {
+		always = no #used from script only
+	}
+	upgrade_from = {
+		dyson_ring_2_intermediate
+	}
+}
+
+dyson_ring_3_intermediate_synth = {
+	entity = ""
+	construction_entity = "ringworld_phase_3_construction_entity"
+	portrait = "GFX_megastructure_construction_background"
+	upgrade_from = {
+		dyson_ring_2
+	}
+	
+	possible = {
+		from = { 
+			can_build_machine_ringworlds = yes
+			has_technology = tech_advanced_megastructure_engineering
+		}	
+	}
+	
+	construction_blocks_others = no
+	build_time = 3600
+	build_cost = {
+		minerals = 20000
+	}
+	on_build_complete = {
+		spawn_planet = {
+			class = "pc_ringworld_tech"
+			location = fromfrom
+			orbit_angle_offset = 30
+			init_effect = {
+				set_name = "NAME_Circuit"
+				set_planet_entity = {
+					entity = "ringworld_tech_entity_01_entity"
+					graphical_culture = fromfrom
+				}
+				surveyed = {
+					set_surveyed = yes
+					surveyor = FROM
+				}
+				set_all_comms_surveyed = yes
+				set_planet_flag = megastructure
+			}
+		}
+		spawn_planet = {
+			class = "pc_ringworld_seam"
+			location = fromfrom
+			init_effect = {
+				set_name = "NAME_Superstructure"
+				set_planet_entity = {
+					entity = "ringworld_seam_entity_01_entity"
+					graphical_culture = fromfrom
+				}
+				surveyed = {
+					set_surveyed = yes
+					surveyor = FROM
+				}
+				set_all_comms_surveyed = yes
+				set_planet_flag = megastructure
+			}
+		}
+		spawn_planet = {
+			class = "pc_ringworld_habitable_machine"
+			location = fromfrom
+			orbit_angle_offset = -30
+			init_effect = {
+				set_name = "NAME_Machine_Complex_A"
+				set_planet_entity = {
+					entity = "ringworld_habitable_machine_entity_01_entity"
+					graphical_culture = fromfrom
+				}
+				surveyed = {
+					set_surveyed = yes
+					surveyor = FROM
+				}
+				set_all_comms_surveyed = yes
+				while = {
+					limit = {
+						any_tile = { has_blocker = yes }
+					}
+					random_tile = {
+						limit = { has_blocker = yes }
+						remove_blocker = yes
+					}
+				}
+				save_event_target_as = ring_section
+				trigger_megastructure_icon = yes
+				set_planet_flag = megastructure
+			}
+		}
+		fromfrom.planet = {
+			set_planet_flag = has_megastructure
+		}
+		remove_megastructure = fromfrom
+		if = {
+			limit = {
+				NOT = { has_star_flag = ring_section_1 }
+			}
+			set_star_flag = ring_section_1
+			event_target:ring_section = { set_name = "NAME_Machine_Complex_A" }
+			break = yes
+		}
+		if = {
+			limit = {
+				has_star_flag = ring_section_1
+				NOT = { has_star_flag = ring_section_2 }
+			}
+			set_star_flag = ring_section_2
+			event_target:ring_section = { set_name = "NAME_Machine_Complex_B" }
+			break = yes
+		}
+		if = {
+			limit = {
+				has_star_flag = ring_section_2
+				NOT = { has_star_flag = ring_section_3 }
+			}
+			set_star_flag = ring_section_3
+			event_target:ring_section = { set_name = "NAME_Machine_Complex_C" }
+			break = yes
+		}
+		if = {
+			limit = { has_star_flag = ring_section_3 }
+			#remove_star_flag = ring_section_1
+			#remove_star_flag = ring_section_2
+			#remove_star_flag = ring_section_3
+			event_target:ring_section = { set_name = "NAME_Machine_Complex_D" }
+			break = yes
+		}
+	}
+}
+
+dyson_ring_3_intermediate = {
+	entity = ""
+	construction_entity = "ringworld_phase_3_construction_entity"
+	portrait = "GFX_megastructure_construction_background"
+	upgrade_from = {
+		dyson_ring_2
+	}
+	
+	possible = {
+		from = { has_technology = tech_advanced_megastructure_engineering }	
+	}
+	
+	construction_blocks_others = no
+	build_time = 3600
+	build_cost = {
+		minerals = 20000
+	}
+	on_build_complete = {
+		spawn_planet = {
+			class = "pc_ringworld_tech"
+			location = fromfrom
+			orbit_angle_offset = 30
+			init_effect = {
+				set_name = "NAME_Ring_Section"
+				set_planet_entity = {
+					entity = "ringworld_tech_entity_01_entity"
+					graphical_culture = fromfrom
+				}
+				surveyed = {
+					set_surveyed = yes
+					surveyor = FROM
+				}
+				set_all_comms_surveyed = yes
+				set_planet_flag = megastructure
+			}
+		}
+		spawn_planet = {
+			class = "pc_ringworld_seam"
+			location = fromfrom
+			init_effect = {
+				set_name = "NAME_Ring_Section"
+				set_planet_entity = {
+					entity = "ringworld_seam_entity_01_entity"
+					graphical_culture = fromfrom
+				}
+				surveyed = {
+					set_surveyed = yes
+					surveyor = FROM
+				}
+				set_all_comms_surveyed = yes
+				set_planet_flag = megastructure
+			}
+		}
+		spawn_planet = {
+			class = "pc_ringworld_habitable"
+			location = fromfrom
+			orbit_angle_offset = -30
+			init_effect = {
+				set_name = "NAME_Habitable_Section_A"
+				set_planet_entity = {
+					entity = "ringworld_habitable_entity_01_entity"
+					graphical_culture = fromfrom
+				}
+				surveyed = {
+					set_surveyed = yes
+					surveyor = FROM
+				}
+				set_all_comms_surveyed = yes
+				while = {
+					limit = {
+						any_tile = { has_blocker = yes }
+					}
+					random_tile = {
+						limit = { has_blocker = yes }
+						remove_blocker = yes
+					}
+				}
+				save_event_target_as = ring_section
+				trigger_megastructure_icon = yes
+				set_planet_flag = megastructure
+			}
+		}
+		fromfrom.planet = {
+			set_planet_flag = has_megastructure
+		}
+		remove_megastructure = fromfrom
+		if = {
+			limit = {
+				NOT = { has_star_flag = ring_section_1 }
+			}
+			set_star_flag = ring_section_1
+			event_target:ring_section = { set_name = "NAME_Habitable_Section_A" }
+			break = yes
+		}
+		if = {
+			limit = {
+				has_star_flag = ring_section_1
+				NOT = { has_star_flag = ring_section_2 }
+			}
+			set_star_flag = ring_section_2
+			event_target:ring_section = { set_name = "NAME_Habitable_Section_B" }
+			break = yes
+		}
+		if = {
+			limit = {
+				has_star_flag = ring_section_2
+				NOT = { has_star_flag = ring_section_3 }
+			}
+			set_star_flag = ring_section_3
+			event_target:ring_section = { set_name = "NAME_Habitable_Section_C" }
+			break = yes
+		}
+		if = {
+			limit = { has_star_flag = ring_section_3 }
+			#remove_star_flag = ring_section_1
+			#remove_star_flag = ring_section_2
+			#remove_star_flag = ring_section_3
+			event_target:ring_section = { set_name = "NAME_Habitable_Section_D" }
+			break = yes
+		}
+	}
+}
+
+#Partial Dyson Sphere
+dyson_ring_5 = {
+	entity = "dyson_sphere_phase_02_entity"
+	construction_entity = "dyson_sphere_part_1_entity"
+	portrait = "GFX_megastructure_construction_background"
+	upgrade_from = {
+		dyson_ring_4
+	}
+
+	construction_blocks_others = no
+	build_time = 1800
+	build_cost = {
+		minerals = 10000
+	}
+	monthly_production = {
+		energy = 100
+	}
+}
+
+#Partial Dyson Sphere
+dyson_ring_6 = {
+	entity = "dyson_sphere_phase_03_entity"
+	construction_entity = "dyson_sphere_part_2_entity"
+	portrait = "GFX_megastructure_construction_background"
+	upgrade_from = {
+		dyson_ring_5
+	}
+
+	construction_blocks_others = no
+	build_time = 1800
+	build_cost = {
+		minerals = 10000
+	}
+	monthly_production = {
+		energy = 200
+	}
+}
+
+#Partial Dyson Sphere
+dyson_ring_7 = {
+	entity = "dyson_sphere_phase_04_entity"
+	construction_entity = "dyson_sphere_part_3_entity"
+	portrait = "GFX_megastructure_construction_background"
+	upgrade_from = {
+		dyson_ring_6
+	}
+	
+	construction_blocks_others = no
+	build_time = 1800
+	build_cost = {
+		minerals = 10000
+	}
+	monthly_production = {
+		energy = 300
+	}
+}
+
+#Dyson Sphere
+dyson_ring_8 = {
+	entity = "dyson_sphere_phase_05_entity"
+	construction_entity = "dyson_sphere_part_4_entity"
+	portrait = "GFX_megastructure_dyson_sphere_background"
+	upgrade_from = {
+		dyson_ring_7
+	}
+	
+	construction_blocks_others = no
+	build_time = 1800
+	build_cost = {
+		minerals = 10000
+	}
+	monthly_production = {
+		energy = 400
+	}
+}
