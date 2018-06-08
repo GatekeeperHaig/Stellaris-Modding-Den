@@ -21,6 +21,7 @@ def main():
       buildingsIgnoredByBU=[]
       if len(lineSplit)>4:
         buildingsIgnoredByBU=lineSplit[4]
+        print(buildingsIgnoredByBU)
       priority=False
       if len(lineSplit)>5 and lineSplit[5].lower()=="yes":
         priority=True
@@ -37,7 +38,7 @@ def main():
       # print("automatedCreationAutobuildAPI({},{},{})".format(modAbbr,lowPri,highPri))
       # if modAbbr!="gwen":
         # continue
-      automatedCreationAutobuildAPI(modAbbr,lowPri,highPri, 10,"",buildingsIgnoredByBU, modName)
+      automatedCreationAutobuildAPI(modAbbr,lowPri,highPri, 10,"",buildingsIgnoredByBU, modName, priority)
   cgm_planet_auto_API.main()
       
 
