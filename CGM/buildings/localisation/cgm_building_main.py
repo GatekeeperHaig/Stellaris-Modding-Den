@@ -813,6 +813,8 @@ locList.addEntry("engineering_research_building_tile","@engineering_research_bui
 locList.addEntry("physics_research_building_tile","@physics_research_building_tile")
 locList.addEntry("special_resource_tile","@special_resource_tile")
 locList.addEntry("d_megastructure_node","@d_megastructure_node")
+locList.addEntry("cgm_mineral_tmp_modifier","@cgm_mineral_tmp_modifier")
+locList.addEntry("cgm_mineral_tmp_modifier_desc","@cgm_mineral_tmp_modifier_desc")
 for language in locList.languages:
 	outFolderLoc=language
 	if not os.path.exists(outFolderLoc):

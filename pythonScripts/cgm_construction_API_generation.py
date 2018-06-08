@@ -13,12 +13,18 @@ def main():
   automatedCreationAutobuildAPI()
   #return
   with open("../NOTES/api_files/sources/modList.csv", 'r') as file:
-    for line in file:
-      lineSplit=list(map(lambda x:x.strip(),line.split(",")))
+    for i,line in enumerate(file):
+      if i==0:
+        continue #header
+      lineSplit=list(map(lambda x:x.strip(),line.split(";")))
       modFolder, modAbbr, modName=lineSplit[:3]
       buildingsIgnoredByBU=[]
       if len(lineSplit)>4:
-        buildingsIgnoredByBU=lineSplit[4:]
+        buildingsIgnoredByBU=lineSplit[4]
+        print(buildingsIgnoredByBU)
+      priority=False
+      if len(lineSplit)>5 and lineSplit[5].lower()=="yes":
+        priority=True
       modFolder="../NOTES/api_files/sources/"+modFolder
       lowPri=[]
       highPri=[]
@@ -32,7 +38,7 @@ def main():
       # print("automatedCreationAutobuildAPI({},{},{})".format(modAbbr,lowPri,highPri))
       # if modAbbr!="gwen":
         # continue
-      automatedCreationAutobuildAPI(modAbbr,lowPri,highPri, 10,"",buildingsIgnoredByBU, modName)
+      automatedCreationAutobuildAPI(modAbbr,lowPri,highPri, 10,"",buildingsIgnoredByBU, modName, priority)
   cgm_planet_auto_API.main()
       
 

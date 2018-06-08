@@ -498,7 +498,7 @@ def readAndConvert(args, allowRestart=1):
             #     break
         startBuildingsOrig, endBuildingsOrig=origFileContent.findFirstAndLastTagList()
         startBuildingsOut, endBuildingsOut=outPutToThisFile.findFirstAndLastTagList()
-        with open(args.outPath+os.path.basename(nonHelperFile),'w') as outputFile:
+        with open(args.outPath+prioFile+os.path.basename(nonHelperFile),'w') as outputFile:
           outputFile.write(args.scriptDescription)
           # print("writing "+os.path.basename(nonHelperFile))
           origFileContent.writeAll(outputFile,args,False,0,startBuildingsOrig)
