@@ -1239,6 +1239,84 @@ generate_asteroidal_planetoid = {
 				}
 			}
 			else_if = { 
+				limit = { 
+					is_planet_class_pc_dwarf_planet_asteroid = yes
+				}		
+				change_pc = pc_dwarf_planetoid	
+				if = { 
+					limit = { planet_size = 8 } 
+					set_variable = { which = planet_size_var value = 8 } 
+				}
+				else = { set_variable = { which = planet_size_var value = 7 } }
+				set_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value = 0 } 
+				set_variable = { which = tb_pc_asteroidal_mineral_rich_rock value = 0 } 
+				set_variable = { which = tb_pc_asteroidal_mineral_energy_ultra_rich_rock value = 0 } 
+				set_variable = { which = tb_pc_asteroidal_mineral_energy_rich_rock value = 0 } 
+				set_variable = { which = tb_pc_asteroidal_mineral_regular_rock value = 0 } 
+				every_tile = { 
+					random_list = { 
+						10 = { 
+							set_blocker = tb_pc_asteroidal_mineral_ultra_rich_rock change_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value = 1 } 
+							modifier = { 
+								factor = 0
+								NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
+							}
+						}
+						10 = { 
+							set_blocker = tb_pc_asteroidal_energy_ultra_rich_rock change_variable = { which = tb_pc_asteroidal_energy_ultra_rich_rock value = 1 }
+							modifier = { 
+								factor = 0
+								NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
+							}					
+						}
+						20 = { 
+							set_blocker = tb_pc_asteroidal_mineral_rich_rock change_variable = { which = tb_pc_asteroidal_mineral_rich_rock value = 1 }
+							modifier = { 
+								factor = 0
+								NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
+							}					
+						}
+						20 = { 
+							set_blocker = tb_pc_asteroidal_energy_rich_rock change_variable = { which = tb_pc_asteroidal_energy_rich_rock value = 1 }
+							modifier = { 
+								factor = 0
+								NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
+							}	
+						}
+						40 = { 
+							set_blocker = tb_pc_asteroidal_regular_rock change_variable = { which = tb_pc_asteroidal_regular_rock value = 1 }
+							modifier = { 
+								add = 20
+								prev = { 
+									OR = { 
+										check_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value > 0 } 
+										check_variable = { which = tb_pc_asteroidal_mineral_rich_rock value > 0 } 
+										check_variable = { which = tb_pc_asteroidal_mineral_energy_ultra_rich_rock value = 1 } 
+										check_variable = { which = tb_pc_asteroidal_mineral_energy_rich_rock value = 1 } 
+										check_variable = { which = tb_pc_asteroidal_mineral_regular_rock value < 2 } 						
+									}
+								}	
+							}	
+							modifier = { 
+								add = 40
+								prev = { 
+									OR = { 
+										check_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value > 1 } 
+										check_variable = { which = tb_pc_asteroidal_mineral_rich_rock value > 1 } 
+										check_variable = { which = tb_pc_asteroidal_mineral_energy_ultra_rich_rock value > 1 } 
+										check_variable = { which = tb_pc_asteroidal_mineral_energy_rich_rock value > 1 } 
+									}	
+								}	
+							}
+						}					
+					}
+				}
+				random_tile = { 
+					limit = { has_blocker = tb_pc_asteroidal_mineral_regular_rock }
+					remove_blocker = yes
+				}
+			}
+			else_if = { 
 				limit = { is_planet_class = pc_ice_asteroid }
 				change_pc = pc_ice_asteroidal_planetoid	
 				if = { 
@@ -1282,10 +1360,10 @@ prescripted_asteroid_size_readjustment = {
 	if = {
 		limit = { is_planet_class = pc_dwarf_planet_asteroid }
 		random_list = {
-			33.3 = { set_planet_size = 8 }
-			33.3 = { set_planet_size = 7 }
-			33.3 = { set_planet_size = 6 }
-		}	
+			50 = { set_planet_size = 8 }
+			50 = { set_planet_size = 7 }
+		}
+		set_planet_flag = asteroidal_colonizable_candidate
 	}
 	else_if = {
 		limit = { is_planet_class = pc_large_asteroid_moon }
