@@ -1,8 +1,45 @@
 set_colonization_value = { 
 	set_variable = { which = colonization_value value = planet_size_var }	
 	multiply_variable = { which = colonization_value value = 2 }
+	solar_system = { 
+		every_system_planet = { 
+			limit = { 
+				NOT = { is_same_value = prevprev }
+				OR = { 
+					AND = { 
+						is_colonizable = yes
+						NOT = { exists = owner } 
+					}	
+					AND = { 
+						exists = owner
+						owner = { is_same_value = root }
+					}
+				}	
+			}
+			prevprev = { change_variable = { which = colonization_value value = 4 } }
+		}	
+	}		
 	if = { 
-		limit = { is_gaia = yes }
+		limit = { 
+			OR = { 
+				AND = { 
+					space_owner = { 
+						OR = { 
+							is_machine_empire = no 
+							is_servitor = yes
+						}
+					}	
+					is_gaia = yes
+				}
+				AND = { 
+					space_owner = { 
+						is_machine_empire = yes
+					}	
+					is_planet_class = pc_machine
+				}				
+				habitable_structure = yes
+			}
+		}	
 		multiply_variable = { which = colonization_value value = 1.25 }
 	}	
 	set_variable = { which = energy_mult_planet_base value = 1 }
@@ -385,11 +422,12 @@ set_colonization_value = {
 					prev = { change_variable = { which = colonization_value value = 20 }} 
 				}	
 			}  	
-			if = { 
-				limit = { exists = pop pop = { is_sapient = no } }
-				prev = { change_variable = { which = colonization_value value = 2 }} 
-			}	
 		}	
+		if = { 
+			limit = { exists = pop pop = { is_sapient = no } }
+			prev = { change_variable = { which = colonization_value value = 2 }} 
+		}	
+			
 	}
 	multiply_variable = { which = minerals_weight value = minerals_mult_planet_base } 
 	multiply_variable = { which = energy_weight value = energy_mult_planet_base }
