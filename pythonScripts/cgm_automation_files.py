@@ -12,6 +12,7 @@ from functools import reduce
 import glob
 import createAIVarsFromModifiers
 import createUpgradedBuildings
+from shutil import rmtree
 
 
 #TODO: Prio List how to use this:
@@ -1348,7 +1349,7 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
     outputToFolderAndFile(upgradeEffect, "/common/scripted_effects/", "zz_cgm_upgrade_effects{}.txt".format(additionString),2, apiOutFolder)
   for modFolder in addedFolders+addedFoldersPriority:
     if modName!="cgm_planets": #those are written separately. this would mess things up!
-      createAIVarsFromModifiers.main(createAIVarsFromModifiers.parse([modFolder+"/buildings/*.txt",modFolder+"/static_modifiers/*.txt",modFolder+"/tile_blockers/*.txt",modFolder+"/traits/*.txt", "--effect_name", modName, "--output_folder", apiOutFolder]))
+      createAIVarsFromModifiers.main(createAIVarsFromModifiers.parse([modFolder+"/buildings/*.txt",modFolder+"/static_modifiers/*.txt",modFolder+"/tile_blockers/*.txt",modFolder+"/traits/*.txt", "--effect_name", modName, "--output_folder", apiOutFolder,"--output_used_things_to_extra_file"]))
       for dirpath, dirnames, files in os.walk(modFolder+"/buildings"):
         for file in files:
           buildingFileContent=readFile(os.path.join(dirpath, file))
@@ -1364,8 +1365,12 @@ def automatedCreationAutobuildAPI(modName="cgm_buildings", addedFolders=[], adde
         BUArgV.append("--copy_requirements_up")
       if priority:
         BUArgV.append("--load_order_priority")
-      print(BUArgV)
+      # print(BUArgV)
       createUpgradedBuildings.main(createUpgradedBuildings.parse(BUArgV),BUArgV)
+
+      rmtree(apiOutFolder+"/common/tile_blockers", True) #removes the backup files (that have been copied by BU into the comp patches already). ignores "does not exist errors"
+      rmtree(apiOutFolder+"/common/static_modifiers", True) #removes the backup files (that have been copied by BU into the comp patches already). ignores "does not exist errors"
+      rmtree(apiOutFolder+"/common/traits", True) #removes the backup files (that have been copied by BU into the comp patches already). ignores "does not exist errors"
 
   #priority sorted output for potential autobuild. Joined into one file!
   # buildingOut=TagList()

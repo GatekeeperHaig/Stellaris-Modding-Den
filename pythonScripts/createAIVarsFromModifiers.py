@@ -7,6 +7,7 @@ import math
 import glob
 from copy import deepcopy
 from stellarisTxtRead import *
+from custom_difficulty_files import *
 # import copy
 
 def parse(argv, returnParser=False):
@@ -21,6 +22,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('--no_buildings', action="store_true", help="Does NOT search for buildings in given files (for adjacency and planet bonuses)")
   parser.add_argument('--no_modifiers', action="store_true", help="Does NOT search for any static modifiers in given files. Supported at the time I write this: Pop and Planet modifier")
   parser.add_argument('--no_blocker', action="store_true", help="Does NOT search for adjacency bonus blockers in given files")
+  parser.add_argument('--output_used_things_to_extra_file', action="store_true", help="ignores buildings since they are copied by BU anyway!")
   # parser.add_argument('--multiple_bonus_buildings', action="store_true", help="Check number of planet wide bonus buildings, rather than checking whether at least one exists on a planet.")
   # parser.add_argument('--traits', default=True, help="")
   if returnParser:
@@ -32,8 +34,15 @@ def parse(argv, returnParser=False):
   
   return(args)
 
+traitsCollection=TagList()
+modifierCollection=TagList()
+blockerCollection=TagList()
+
 
 def main(args,*unused):
+  traitsCollection.clear()
+  modifierCollection.clear()
+  blockerCollection.clear()
   inputTagList=TagList()
   varList=TagList()
   outTagList=TagList()
@@ -202,6 +211,15 @@ def main(args,*unused):
       os.makedirs(effectFolder)
     with open(outFileEffects,'w') as file:
       outTagList.writeAll(file,args)
+
+  if args.output_used_things_to_extra_file:
+    if len(blockerCollection):
+      outputToFolderAndFile(blockerCollection, "common/tile_blockers", "00_cgm_used_blockers_backup_{}.txt".format(args.effect_name),2, args.output_folder)
+    if len(modifierCollection):
+      outputToFolderAndFile(modifierCollection, "common/static_modifiers", "00_cgm_used_modifiers_backup_{}.txt".format(args.effect_name),2, args.output_folder)
+    if len(traitsCollection):
+      outputToFolderAndFile(traitsCollection, "common/traits", "00_cgm_used_traits_backup_{}.txt".format(args.effect_name),2, args.output_folder)
+
   # print(outFileEffects)
   return outFileEffects
 
@@ -223,7 +241,8 @@ def addTrait(outTags, name, val,args, varList): #outTags[0]: any outTags[1]: bio
     cat=2
   prev=TagList()
   ifLoc=TagList("limit", TagList("has_trait", name)).add("prev", prev)
-  addFinalModifier(varList, val.get("modifier"), prev, "_planet_pop")
+  if addFinalModifier(varList, val.get("modifier"), prev, "_planet_pop"):
+    traitsCollection.add(name,val)
   # for modName, modVal in val.get("modifier").getNameVal():
   #   if "tile_resource_" in modName:
   #     prev.add("change_variable", TagList("which",modName.replace("tile_resource_","").replace("_add","_weight")+"_planet_pop").add("value",modVal))
@@ -233,7 +252,8 @@ def addTrait(outTags, name, val,args, varList): #outTags[0]: any outTags[1]: bio
 def addStaticModifiers(outTags, name, val, args, varList):
   if "icon" in val.names: #possibly planet
     ifLoc=TagList("limit", TagList("has_modifier", name))
-    addFinalModifier(varList, val, ifLoc, "_planet_base")
+    if addFinalModifier(varList, val, ifLoc, "_planet_base"):
+      modifierCollection.add(name,val)
     # for possibleModifierName, pmVal in val.getNameVal():
     #   if "tile_resource_" in possibleModifierName:
     #     ifLoc.add("change_variable", TagList(3).add("which",possibleModifierName.replace("tile_resource_","")).add("value",pmVal))
@@ -242,7 +262,8 @@ def addStaticModifiers(outTags, name, val, args, varList):
   elif name[:3]=="pop": #possibly pop
     prev=TagList()
     ifLoc=TagList("limit", TagList("has_modifier", name)).add("prev", prev)
-    addFinalModifier(varList, val, prev,"_planet_pop")
+    if addFinalModifier(varList, val, prev,"_planet_pop"):
+      modifierCollection.add(name,val)
     if len(prev)>0:
       outTags[1].add("if", ifLoc)
   else:
@@ -341,7 +362,8 @@ def addBlockers(outTags, name, val, args,varList):
   if "adjacency_bonus" in val.names:
     prev=TagList()
     ifLoc=TagList("limit", TagList("has_blocker", name)).add("prevprev", prev)
-    addFinalModifier(varList, val.get("adjacency_bonus"), prev, "","tile_building_resource_")
+    if addFinalModifier(varList, val.get("adjacency_bonus"), prev, "","tile_building_resource_"):
+      blockerCollection.add(name,val)
     elseTagList=TagList()
     if len(prev)>0:
       outTags[0].add("if", ifLoc)
