@@ -286,6 +286,8 @@ def addBuildings(outTags, name, val, args, varList):
       potential=TagList("NOT", potential)
   elif len(potential)>1: #don't think this case will ever happen but who knows...
     potential=TagList("NAND", potential)
+  if potential.getAnywhere("tile"): #ingore any potential with tile inside since we cannot/don't want to handle this
+    potential.clear()
 
   if "adjacency_bonus" in val.names:
     tagName="check_neighboring_adj_bonus_buildings_"+args.effect_name
