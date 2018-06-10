@@ -1,201 +1,175 @@
 generate_asteroidal_planetoid = {
-	random_list = { 
+	if = { 
+		limit = { 
+			is_asteroid = yes
+			NOR = { 
+				is_planet_class = pc_ice_asteroid
+				is_planet_class = pc_crystal_asteroid
+			}
+		}		
+		change_pc = pc_asteroidal_planetoid	
+		while = { 
+			limit = planet_size > 8 } 
+			change_planet_size = -1
+		}	
+		while = { 
+			limit = planet_size < 5 } 
+			change_planet_size = 1
+		}				
+			switch = {
+				trigger = planet_size
+				5 = { set_variable = { which = planet_size_var value = 5 } }
+				6 = { set_variable = { which = planet_size_var value = 6 } }
+				7 = { set_variable = { which = planet_size_var value = 7 } }
+				8 = { set_variable = { which = planet_size_var value = 8 } }
+			}	
+		set_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value = 0 } 
+		set_variable = { which = tb_pc_asteroidal_mineral_rich_rock value = 0 } 
+		set_variable = { which = tb_pc_asteroidal_mineral_energy_ultra_rich_rock value = 0 } 
+		set_variable = { which = tb_pc_asteroidal_mineral_energy_rich_rock value = 0 } 
+		set_variable = { which = tb_pc_asteroidal_mineral_regular_rock value = 0 } 
+		every_tile = { 
+			random_list = { 
+				10 = { 
+					set_blocker = tb_pc_asteroidal_mineral_ultra_rich_rock 
+					prev = { change_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value = 1 } }
+					modifier = { 
+						factor = 0
+						NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
+					}
+				}
+				10 = { 
+					set_blocker = tb_pc_asteroidal_energy_ultra_rich_rock 
+					prev = { change_variable = { which = tb_pc_asteroidal_energy_ultra_rich_rock value = 1 } }
+					modifier = { 
+						factor = 0
+						NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
+					}					
+				}
+				20 = { 
+					set_blocker = tb_pc_asteroidal_mineral_rich_rock 
+					prev = { change_variable = { which = tb_pc_asteroidal_mineral_rich_rock value = 1 } }
+					modifier = { 
+						factor = 0
+						NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
+					}					
+				}
+				20 = { 
+					set_blocker = tb_pc_asteroidal_energy_rich_rock 
+					prev = { change_variable = { which = tb_pc_asteroidal_energy_rich_rock value = 1 } }
+					modifier = { 
+						factor = 0
+						NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
+					}	
+				}
+				40 = { 
+					set_blocker = tb_pc_asteroidal_regular_rock 
+					prev = { change_variable = { which = tb_pc_asteroidal_regular_rock value = 1 } }
+					modifier = { 
+						add = 20
+						prev = { 
+							OR = { 
+								check_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value > 0 } 
+								check_variable = { which = tb_pc_asteroidal_mineral_rich_rock value > 0 } 
+								check_variable = { which = tb_pc_asteroidal_mineral_energy_ultra_rich_rock value = 1 } 
+								check_variable = { which = tb_pc_asteroidal_mineral_energy_rich_rock value = 1 } 
+								check_variable = { which = tb_pc_asteroidal_mineral_regular_rock value < 2 } 						
+							}
+						}	
+					}	
+					modifier = { 
+						add = 40
+						prev = { 
+							OR = { 
+								check_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value > 1 } 
+								check_variable = { which = tb_pc_asteroidal_mineral_rich_rock value > 1 } 
+								check_variable = { which = tb_pc_asteroidal_mineral_energy_ultra_rich_rock value > 1 } 
+								check_variable = { which = tb_pc_asteroidal_mineral_energy_rich_rock value > 1 } 
+							}	
+						}	
+					}
+				}					
+			}
+		}
+		random_tile = { 
+			limit = { has_blocker = tb_pc_asteroidal_mineral_regular_rock }
+			remove_blocker = yes
+			prev = { change_variable = { which = tb_pc_asteroidal_regular_rock value = -1 } }
+		}
+	}
+	else_if = { 
+		limit = { is_planet_class = pc_ice_asteroid }
+		random_list = { 
 		95 = { 
-			if = { 
-				limit = { 
-					is_asteroid = yes
-					NOR = { 
-						is_planet_class = pc_ice_asteroid
-						is_planet_class = pc_crystal_asteroid
-					}
-				}		
-				change_pc = pc_asteroidal_planetoid	
-				if = { 
-					limit = { planet_size = 6 } 
-					set_variable = { which = planet_size_var value = 6 } 
-				}
-				else = { set_variable = { which = planet_size_var value = 5 } }
-				set_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value = 0 } 
-				set_variable = { which = tb_pc_asteroidal_mineral_rich_rock value = 0 } 
-				set_variable = { which = tb_pc_asteroidal_mineral_energy_ultra_rich_rock value = 0 } 
-				set_variable = { which = tb_pc_asteroidal_mineral_energy_rich_rock value = 0 } 
-				set_variable = { which = tb_pc_asteroidal_mineral_regular_rock value = 0 } 
-				every_tile = { 
-					random_list = { 
-						10 = { 
-							set_blocker = tb_pc_asteroidal_mineral_ultra_rich_rock change_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value = 1 } 
-							modifier = { 
-								factor = 0
-								NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
-							}
-						}
-						10 = { 
-							set_blocker = tb_pc_asteroidal_energy_ultra_rich_rock change_variable = { which = tb_pc_asteroidal_energy_ultra_rich_rock value = 1 }
-							modifier = { 
-								factor = 0
-								NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
-							}					
-						}
-						20 = { 
-							set_blocker = tb_pc_asteroidal_mineral_rich_rock change_variable = { which = tb_pc_asteroidal_mineral_rich_rock value = 1 }
-							modifier = { 
-								factor = 0
-								NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
-							}					
-						}
-						20 = { 
-							set_blocker = tb_pc_asteroidal_energy_rich_rock change_variable = { which = tb_pc_asteroidal_energy_rich_rock value = 1 }
-							modifier = { 
-								factor = 0
-								NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
-							}	
-						}
-						40 = { 
-							set_blocker = tb_pc_asteroidal_regular_rock change_variable = { which = tb_pc_asteroidal_regular_rock value = 1 }
-							modifier = { 
-								add = 20
-								prev = { 
-									OR = { 
-										check_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value > 0 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_rich_rock value > 0 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_energy_ultra_rich_rock value = 1 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_energy_rich_rock value = 1 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_regular_rock value < 2 } 						
-									}
-								}	
-							}	
-							modifier = { 
-								add = 40
-								prev = { 
-									OR = { 
-										check_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value > 1 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_rich_rock value > 1 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_energy_ultra_rich_rock value > 1 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_energy_rich_rock value > 1 } 
-									}	
-								}	
-							}
-						}					
-					}
-				}
-				random_tile = { 
-					limit = { has_blocker = tb_pc_asteroidal_mineral_regular_rock }
-					remove_blocker = yes
-				}
-			}
-			else_if = { 
-				limit = { 
-					is_planet_class_pc_dwarf_planet_asteroid = yes
-				}		
-				change_pc = pc_dwarf_planetoid	
-				if = { 
-					limit = { planet_size = 8 } 
-					set_variable = { which = planet_size_var value = 8 } 
-				}
-				else = { set_variable = { which = planet_size_var value = 7 } }
-				set_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value = 0 } 
-				set_variable = { which = tb_pc_asteroidal_mineral_rich_rock value = 0 } 
-				set_variable = { which = tb_pc_asteroidal_mineral_energy_ultra_rich_rock value = 0 } 
-				set_variable = { which = tb_pc_asteroidal_mineral_energy_rich_rock value = 0 } 
-				set_variable = { which = tb_pc_asteroidal_mineral_regular_rock value = 0 } 
-				every_tile = { 
-					random_list = { 
-						10 = { 
-							set_blocker = tb_pc_asteroidal_mineral_ultra_rich_rock change_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value = 1 } 
-							modifier = { 
-								factor = 0
-								NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
-							}
-						}
-						10 = { 
-							set_blocker = tb_pc_asteroidal_energy_ultra_rich_rock change_variable = { which = tb_pc_asteroidal_energy_ultra_rich_rock value = 1 }
-							modifier = { 
-								factor = 0
-								NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
-							}					
-						}
-						20 = { 
-							set_blocker = tb_pc_asteroidal_mineral_rich_rock change_variable = { which = tb_pc_asteroidal_mineral_rich_rock value = 1 }
-							modifier = { 
-								factor = 0
-								NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
-							}					
-						}
-						20 = { 
-							set_blocker = tb_pc_asteroidal_energy_rich_rock change_variable = { which = tb_pc_asteroidal_energy_rich_rock value = 1 }
-							modifier = { 
-								factor = 0
-								NOT = { prev = { any_tile = { has_blocker = tb_pc_asteroidal_regular_rock } } }
-							}	
-						}
-						40 = { 
-							set_blocker = tb_pc_asteroidal_regular_rock change_variable = { which = tb_pc_asteroidal_regular_rock value = 1 }
-							modifier = { 
-								add = 20
-								prev = { 
-									OR = { 
-										check_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value > 0 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_rich_rock value > 0 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_energy_ultra_rich_rock value = 1 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_energy_rich_rock value = 1 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_regular_rock value < 2 } 						
-									}
-								}	
-							}	
-							modifier = { 
-								add = 40
-								prev = { 
-									OR = { 
-										check_variable = { which = tb_pc_asteroidal_mineral_ultra_rich_rock value > 1 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_rich_rock value > 1 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_energy_ultra_rich_rock value > 1 } 
-										check_variable = { which = tb_pc_asteroidal_mineral_energy_rich_rock value > 1 } 
-									}	
-								}	
-							}
-						}					
-					}
-				}
-				random_tile = { 
-					limit = { has_blocker = tb_pc_asteroidal_mineral_regular_rock }
-					remove_blocker = yes
-				}
-			}
-			else_if = { 
-				limit = { is_planet_class = pc_ice_asteroid }
-				change_pc = pc_ice_asteroidal_planetoid	
-				if = { 
-					limit = { planet_size = 6 } 
-					set_variable = { which = planet_size_var value = 6 } 
-				}
-				else = { set_variable = { which = planet_size_var value = 5 } }
-				set_variable = { which = tb_pc_asteroidal_primordial_ice value = 0 } 
-				every_tile = { 
-					set_blocker = tb_pc_asteroidal_primordial_ice
-				}
-				random_tile = { remove_blocker = yes }
+			change_pc = pc_ice_asteroidal_planetoid	
+			while = { 
+				limit = planet_size > 8 } 
+				change_planet_size = -1
+			}	
+			while = { 
+				limit = planet_size < 5 } 
+				change_planet_size = 1
+			}				
+			switch = {
+				trigger = planet_size
+				5 = { set_variable = { which = planet_size_var value = 5 } }
+				6 = { set_variable = { which = planet_size_var value = 6 } }
+				7 = { set_variable = { which = planet_size_var value = 7 } }
+				8 = { set_variable = { which = planet_size_var value = 8 } }
 			}		
+			set_variable = { which = tb_pc_ice_asteroidal_primordial_ice value = 0 } 
+			set_variable = { which = tb_pc_ice_asteroidal_frozen_exotic_matter value = 0 } 
+			every_tile = { 
+				random_list = { 
+					70 = { set_blocker = tb_pc_asteroidal_primordial_ice prev = { change_variable = { which = tb_pc_ice_asteroidal_primordial_ice value = 1 }}}
+					70 = { set_blocker = tb_pc_ice_asteroidal_frozen_exotic_matter prev = { change_variable = { which = tb_pc_ice_asteroidal_frozen_exotic_matter value = 1 }}}
+				}	
+			}
+			random_tile = { 
+				limit = { has_blocker = tb_pc_asteroidal_primordial_ice }					
+				remove_blocker = yes
+				prev = { change_variable = { which = tb_pc_ice_asteroidal_primordial_ice value = -1 } }
+			}					
 		}	
 		5 = { 
 			change_pc = pc_crystal_asteroidal_planetoid	
-			if = { 
-				limit = { planet_size = 6 } 
-				set_variable = { which = planet_size_var value = 6 } 
-			}
-			else = { set_variable = { which = planet_size_var value = 5 } }
-			set_variable = { which = tb_pc_asteroidal_anomaleous_crystal_formation_1 value = 0 } 
-			set_variable = { which = tb_pc_asteroidal_anomaleous_crystal_formation_2 value = 0 } 
-			set_variable = { which = tb_pc_asteroidal_regular_crystal_formation value = 0 } 
+			random_list = {
+				10 = { make_size_20 = yes }		
+				10 = { make_size_19 = yes }
+				10 = { make_size_18 = yes }
+				10 = { make_size_17 = yes }
+				10 = { make_size_16 = yes }
+				10 = { make_size_15 = yes }
+				10 = { make_size_14 = yes }
+				10 = { make_size_13 = yes }
+				10 = { make_size_12 = yes }
+				10 = { make_size_11 = yes }
+			}	
+			switch = {
+				trigger = planet_size
+				11 = { set_variable = { which = planet_size_var value = 11 } }
+				12 = { set_variable = { which = planet_size_var value = 12 } }
+				13 = { set_variable = { which = planet_size_var value = 13 } }
+				14 = { set_variable = { which = planet_size_var value = 14 } }
+				15 = { set_variable = { which = planet_size_var value = 15 } }
+				16 = { set_variable = { which = planet_size_var value = 16 } }
+				17 = { set_variable = { which = planet_size_var value = 17 } }
+				18 = { set_variable = { which = planet_size_var value = 18 } }
+				19 = { set_variable = { which = planet_size_var value = 19 } }
+				20 = { set_variable = { which = planet_size_var value = 20 } }
+			}			
+			set_variable = { which = tb_pc_crystal_asteroidal_crystal_formation value = 0 } 
+			set_variable = { which = tb_pc_crystal_asteroidal_dimensional_phenomena value = 0 } 
 			every_tile = { 
 				random_list = { 
-					20 = { set_blocker = tb_pc_asteroidal_anomaleous_crystal_formation_1 change_variable = { which = tb_pc_asteroidal_anomaleous_crystal_formation_1 value = 1 } }
-					20 = { set_blocker = tb_pc_asteroidal_anomaleous_crystal_formation_2 change_variable = { which = tb_pc_asteroidal_anomaleous_crystal_formation_2 value = 1 } }
-					60 = { set_blocker = tb_pc_asteroidal_regular_crystal_formation change_variable = { which = tb_pc_asteroidal_regular_crystal_formation value = 1 } }					
-				}
+					75 = { set_blocker = tb_pc_crystal_asteroidal_crystal_formation prev = { change_variable = { which = tb_pc_crystal_asteroidal_crystal_formation value = 1 }}}
+					25 = { set_blocker = tb_pc_crystal_asteroidal_dimensional_phenomena prev = { change_variable = { which = tb_pc_ice_asteroidal_frozen_exotic_matter value = 1 }}}
+				}	
 			}
 			random_tile = { 
-				limit = { has_blocker = tb_pc_asteroidal_regular_crystal_formation }
+				limit = { has_blocker = tb_pc_crystal_asteroidal_crystal_formation }					
 				remove_blocker = yes
+				prev = { change_variable = { which = tb_pc_crystal_asteroidal_crystal_formation value = -1 } }
 			}		
 		}			
 	}	
