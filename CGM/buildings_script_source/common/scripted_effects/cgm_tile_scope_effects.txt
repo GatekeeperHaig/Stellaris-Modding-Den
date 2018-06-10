@@ -487,17 +487,35 @@ check_neighboring_adj_bonus_buildings = {
 	}
 }
 check_adj_bonus_blockers = {
-	check_neighboring_adj_bonus_blockers_APIs = yes
 	every_neighboring_tile = {
-		limit = { has_blocker = tb_wandering_forest_reserve }
-		prev = {
-			change_variable = { which = society_research_weight value = 3 }
+		limit = { 
+			has_blocker = yes
+			NOR = { #take out the very common blockers that do nothing anyway
+				has_blocker = tb_mountain_range
+				has_blocker = tb_active_volcano
+				has_blocker = tb_dangerous_wildlife
+				has_blocker = tb_dense_jungle
+				has_blocker = tb_quicksand_basin
+				has_blocker = tb_noxious_swamp
+				has_blocker = tb_massive_glacier
+				has_blocker = tb_toxic_kelp
+				has_blocker = tb_deep_sinkhole
+			}
 		}
-	}
-	every_neighboring_tile = {
-		limit = { has_blocker = tb_tribal_settlement }
-		prev = {
-			change_variable = { which = society_research_weight value = 1 }
+		if = {
+			limit = { has_blocker = tb_wandering_forest_reserve }
+			prev = {
+				change_variable = { which = society_research_weight value = 3 }
+			}
+		}
+		else_if = {
+			limit = { has_blocker = tb_tribal_settlement }
+			prev = {
+				change_variable = { which = society_research_weight value = 1 }
+			}
+		}
+		else = {
+			check_neighboring_adj_bonus_blockers_APIs = yes
 		}
 	}
 }

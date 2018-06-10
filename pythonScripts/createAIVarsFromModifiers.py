@@ -116,10 +116,10 @@ def main(args,*unused):
     funsToApply.append(addBuildings)
   if not args.no_blocker:
     outSubTags=[]
-    effect=TagList()
+    # effect=TagList()
     ent=TagList()
-    outTagList.add("check_adj_bonus_blockers_"+args.effect_name, effect)
-    effect.add("every_neighboring_tile", ent)
+    outTagList.add("check_adj_bonus_blockers_"+args.effect_name, ent)
+    # effect.add("every_neighboring_tile", ent)
     outSubTags.append(ent)
     outSubTagLists.append(outSubTags)
     funsToApply.append(addBlockers)
