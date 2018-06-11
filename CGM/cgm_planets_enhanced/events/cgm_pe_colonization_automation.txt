@@ -34,6 +34,13 @@ event = { #on_monthly_pulse
 					can_colonize = { who = prev status = yes }	
 				}
 			}		
+			if = { 
+				limit = { is_ai = yes } 
+				every_owned_ship = { 
+					limit = { is_ship_class = shipclass_colonizer NOT = { has_ship_flag = assigned_colonizer } } 
+					set_event_locked = yes
+				}
+			}	
 			country_event = { id = cgm_pe_colonization_automation.2 days = 1 random = 20 } 
 		}
 	}
@@ -189,6 +196,7 @@ country_event = {
 						change_variable = { which = available_colony_targets value = -1 }
 						change_variable = { which = available_colony_ships value = -1 }
 					}						
+					set_event_locked = no
 					fleet = { 
 						fleet_event = { id = cgm_pe_colonization_automation.4 }
 					}			
@@ -206,13 +214,14 @@ fleet_event = {
 	hide_window = yes
 	is_triggered_only = yes	
 	
-	immediate = { 
+	immediate = { 		
 		random_owned_ship = { 
 			species = { save_event_target_as = cgm_colonizing_species }
 		}	
 		auto_move_to_planet = {
 			target = event_target:cgm_colonization_target
-			clear_auto_move_on_arrival = yes
+			destroy_on_arrival = no
+			clear_auto_move_on_arrival = yes			
 		}
 		set_event_locked = yes
 		if = { 
