@@ -794,7 +794,7 @@ class TabControlClass:
     self.tabClasses[-1].separateStart=False
     self.tabClasses[-1].helpText="Creates weight files to be used in AI buiding weights. Since options are global, it's best to create one 'project' for different tpyes, e.g. one for planet modifiers, one for buildings, one for blocker"
 
-    self.newTab("Loc Converter",locList,("yaml and ods files","*.yml;*.ods"),[],[of],"")
+    self.newTab("Loc Converter",locList,("yaml and ods files","*.yml;*.ods"),[],[of, "full_translate"],"")
     self.tabClasses[-1].separateStart=True
     self.tabClasses[-1].helpText="Converts yaml files into a python script to create multi-language yaml files the game can use. Missing things are replaced by the english locs."
     self.tabClasses[-1].singleEntryCheck="Create Main File"

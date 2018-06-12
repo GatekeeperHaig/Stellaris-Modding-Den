@@ -108,6 +108,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('inputFileNames', nargs = '*' )
   parser.add_argument('--output_folder',default="test/localisation/" )
   parser.add_argument('--create_main_file', action="store_true")
+  parser.add_argument('--full_translate', action="store_true")
   if returnParser:
     return parser
   parser.add_argument('--test_run', action="store_true", help="No Output.")
@@ -239,7 +240,10 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
         file.write("#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nimport os,sys,glob,io\n")
         file.write("os.chdir(os.path.dirname(os.path.abspath(__file__)))\n")
         file.write("sys.path.insert(1, '"+relPath+"')\n")
-        file.write("from locList import LocList\nlocList=LocList(1)\n")
+        if args.full_translate:
+          file.write("from locList import LocList\nlocList=LocList(2)\n")
+        else:
+          file.write("from locList import LocList\nlocList=LocList(1)\n")
         # file.write("import allModules,importlib\n")
         file.write("for fileName in glob.glob('locs/*.py'):\n")
         file.write("\twith io.open(fileName,'r', encoding='utf-8') as file:\n")
