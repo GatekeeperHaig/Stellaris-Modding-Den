@@ -3,6 +3,7 @@
 
 import sys, os, io
 import re
+from functools import reduce
 
 
 class LocList:
@@ -123,46 +124,96 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
   locList=LocList()
   outArray=[]
   trivialAssignment=[]
-  with io.open(filePath,'r', encoding="utf-8") as file:
-    for line in file:
-      try:
-        lineArray=shlex.split(line)
-      except:
-        print("Error in line "+line)
-        raise()
-      if not langCodeInFile and len(lineArray)!=0:
-        for lang, langCode in zip(locList.languages, locList.languageCodes):
-          if "l_"+lang in lineArray[0]:
-            langCodeInFile=langCode
-            languageInFile=lang
-            break
-        continue
-      # print(line)
-      outArray.append("")
-      if ":" in line:
-        locContent=lineArray[1]
-        pureRef=False
-        if locContent.count("$")==2 and locContent[0]=="$" and locContent[-1]=="$":
-          pureRef=True
-        key=lineArray[0].split(":")[0]
-        if pureRef:
-          del outArray[-1]
-        else:
-          outArray[-1]+='locList.addLoc("{}","{}","{}")'.format(key.replace(".","_"), lineArray[1],langCodeInFile)
-        if args.create_main_file:
+  if filePath.endswith(".yml"):
+    with io.open(filePath,'r', encoding="utf-8") as file:
+      for line in file:
+        try:
+          lineArray=shlex.split(line)
+        except:
+          print("Error in line "+line)
+          raise()
+        if not langCodeInFile and len(lineArray)!=0:
+          for lang, langCode in zip(locList.languages, locList.languageCodes):
+            if "l_"+lang in lineArray[0]:
+              langCodeInFile=langCode
+              languageInFile=lang
+              break
+          continue
+        # print(line)
+        outArray.append("")
+        if ":" in line:
+          locContent=lineArray[1]
+          pureRef=False
+          if locContent.count("$")==2 and locContent[0]=="$" and locContent[-1]=="$":
+            pureRef=True
+          key=lineArray[0].split(":")[0]
           if pureRef:
-            trivialAssignment.append('locList.addEntry("{}","{}")'.format(key,locContent))
+            del outArray[-1]
           else:
-            trivialAssignment.append('locList.addEntry("{}","@{}")'.format(key,key.replace(".","_")))
-        # contents.append(lineArray[1])
-      for i,entry in enumerate(lineArray):
-        if entry:
-          if entry[0]=="#":
-            outArray[-1]+=" ".join(lineArray[i:])
-            break
+            outArray[-1]+='locList.addLoc("{}","{}","{}")'.format(key.replace(".","_"), lineArray[1],langCodeInFile)
+          if args.create_main_file:
+            if pureRef:
+              trivialAssignment.append('locList.addEntry("{}","{}")'.format(key,locContent))
+            else:
+              trivialAssignment.append('locList.addEntry("{}","@{}")'.format(key,key.replace(".","_")))
+          # contents.append(lineArray[1])
+        for i,entry in enumerate(lineArray):
+          if entry:
+            if entry[0]=="#":
+              outArray[-1]+=" ".join(lineArray[i:])
+              break
+  else:
+    languageInFile="not_needed"
+    import pyexcel_ods
+    sheets=pyexcel_ods.get_data(filePath)
+    args.create_main_file=True
+    while 1:
+      try:
+        sheet=sheets.popitem()
+        if sheet[0].lower()=="localisations":
+          odsContent=sheet[1] #0 is the sheetname
+          odsContent=[[str(e) for e in line] for line in odsContent]
+          foundData=True
+        if foundData:
+          break
+      except KeyError:#KeyError: 'dictionary is empty'
+        break
+    if not foundData:
+      print("ERROR: Invalid ods file. 'Localisations' sheet missing! Exiting!")
+      return ""
+    languages=odsContent[0][1:]
+    for i in range(len(languages)):
+      if languages[i] in locList.languages:
+        languages[i]=locList.languageCodes[locList.languages.index(languages[i])]
+      if not languages[i] in locList.languageCodes:
+        print("ERROR! Invalid language: "+languages[i])
+    outArrays=[[] for _ in languages]
+    for line in odsContent[1:]:
+      # print(line)
+      try:
+        key=line[0]
+      except IndexError:
+        continue;
+      locKey=key.replace(".","_")
+      #check pure ref with first language (probably english)
+      pureRef=False
+      locContent=line[1]
+      if locContent.count("$")==2 and locContent[0]=="$" and locContent[-1]=="$":
+        pureRef=True
+
+      if pureRef:
+        trivialAssignment.append('locList.addEntry("{}","{}")'.format(key,locContent))
+      else:
+        trivialAssignment.append('locList.addEntry("{}","@{}")'.format(key,locKey))
+        for i,(language,locContent) in enumerate(zip(languages,line[1:])):
+          locContent=locContent.strip().replace('"',"")
+          if locContent!="":
+            outArrays[i].append('locList.addLoc("{}","{}","{}")'.format(locKey, locContent,language))
+    outArray=reduce(lambda x, y: x + y,outArrays)
+
 
   lastOutFile=""
-  outFile=args.output_folder+"/locs/"+fileName.replace(".yml",".py")
+  outFile=args.output_folder+"/locs/"+fileName.replace(".yml",".py").replace(".ods",".py")
   lastOutFile=outFile
   if not args.test_run:
     with io.open(outFile, "w", encoding='utf-8') as file:
@@ -171,7 +222,7 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
       for entry in outArray:
         file.write(entry+"\n")
         # file.write("\t"+entry+"\n")
-  simpleName=fileName.replace(".yml","").replace("_l_"+languageInFile, "")
+  simpleName=fileName.replace(".yml","").replace("_l_"+languageInFile, "").replace(".ods","")
   if args.create_main_file:
     outFile=args.output_folder+"/"+simpleName+"_main.py"
     # outFile=args.output_folder+"/"+fileName.replace(".yml","_main.py").replace("_l_"+languageInFile, "")
@@ -215,7 +266,7 @@ def main(args,*unused): #for gui compatibility
 
   lastOutFile=""
   for inputFileName in globbedList:
-    if inputFileName[-4:].lower()==".yml":
+    if inputFileName[-4:].lower() in [".yml",".ods"]:
       lastOutFile=readYMLCreatePy(args, inputFileName)
   return lastOutFile
 
