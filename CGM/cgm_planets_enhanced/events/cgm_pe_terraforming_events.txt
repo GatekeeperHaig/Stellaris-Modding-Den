@@ -5,57 +5,49 @@ planet_event = {
 	is_triggered_only = yes
 	hide_window = yes
 	
-	trigger = { has_planet_flag = cgm_terraforming_planet }
+	trigger = { 
+		has_planet_flag = cgm_terraforming_planet
+		exists = owner
+	}
 	
 	immediate = { 
 		if = { 
 			limit = { has_planet_flag = terraformer_active }
 			if = { 
-				limit = { exists = owner }
+				limit = { check_variable = { which = planet_terraforming_points value > 0 }	}
+				if = { 
+					limit = { check_variable = { which = tb_points value > 0 } }
+					random_list = { 
+						33.3 = { 
+							random_tile = { 
+								limit = { has_cgm_terraforming_blocker = yes }
+								remove_blocker = yes
+								change_variable = { which = tb_points value = -1 }
+							}	
+							modifier = { factor = 1.5 has_planet_flag = increased_terraformer_speed }
+							modifier = { factor = 2.25 has_planet_flag = maximal_terraformer_speed }
+						}
+						66.6 = { }
+					}	
+				}		
+				if = { 
+					limit = { has_planet_flag = baseline_terraformer_speed }
+					change_variable = { which = planet_terraforming_points value = -1 }	
+				}
+				else_if = { 
+					limit = { has_planet_flag = increased_terraformer_speed }
+					change_variable = { which = planet_terraforming_points value = -1.5 }
+				}
+				else = { change_variable = { which = planet_terraforming_points value = -2.25 } }
 				if = { 
 					limit = { check_variable = { which = planet_terraforming_points value > 0 }	}
-					if = { 
-						limit = { check_variable = { which = tb_points value > 0 } }
-						random_list = { 
-							33.3 = { 
-								random_tile = { 
-									limit = { has_cgm_terraforming_blocker = yes }
-									remove_blocker = yes
-									change_variable = { which = tb_points value = -1 }
-								}	
-								modifier = { factor = 1.5 has_planet_flag = increased_terraformer_speed }
-								modifier = { factor = 2.25 has_planet_flag = maximal_terraformer_speed }
-							}
-							66.6 = { }
-						}	
-					}		
-					if = { 
-						limit = { has_planet_flag = baseline_terraformer_speed }
-						change_variable = { which = planet_terraforming_points value = -1 }	
-					}
-					else_if = { 
-						limit = { has_planet_flag = increased_terraformer_speed }
-						change_variable = { which = planet_terraforming_points value = -1.5 }
-					}
-					else = { change_variable = { which = planet_terraforming_points value = -2.25 } }
-					if = { 
-						limit = { check_variable = { which = planet_terraforming_points value > 0 }	}
-						planet_event = { id = cgm_pe_terraforming_events.1 days = 300 random = 100 }
-					}
-					else = { planet_event = { id = cgm_pe_terraforming_events.2 } }					
+					planet_event = { id = cgm_pe_terraforming_events.1 days = 300 random = 100 }
 				}
-				else = { 
-					planet_event = { id = cgm_pe_terraforming_events.2 }	
-				}					
+				else = { planet_event = { id = cgm_pe_terraforming_events.2 } }					
 			}
 			else = { 
-				remove_planet_flag = terraformer_active
-				set_planet_flag = terraformer_inactive								
-				change_variable = { which = planet_terraforming_points value = 1 }
-				set_variable = { which = years_terraformer_inactive value = 1 }	
-				planet_event = { id = cgm_pe_terraforming_events.1 days = 300 random = 100 }
-				roll_terraformer_catastrophe = yes 				
-			}				
+				planet_event = { id = cgm_pe_terraforming_events.2 }	
+			}										
 		}	
 		else = { 
 			set_planet_flag = terraformer_inactive
