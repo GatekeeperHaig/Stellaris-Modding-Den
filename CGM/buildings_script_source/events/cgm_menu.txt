@@ -44,100 +44,179 @@ country_event = {
 	custom_gui = "cgm_main_menu"
 	force_open = yes
 	picture_event_data = { room = cgm_menu_room }
-	trigger = {
-		is_ai = no
-		OR = {
-			is_multiplayer = no
-			AND = { is_multiplayer = yes has_country_flag = cgm_game_host }
-		}
-	}
-	immediate = { }
+	trigger = {	has_country_flag = cgm_game_host }
+	
+	immediate = { 
+		#default configuration
+		remove_global_flag = cgm_disable_autobuild
+		set_global_flag = new_building_content_active
+		set_global_flag = overhauled_building_stats_active
+		set_global_flag = cgm_disable_vanilla_building_AI
+	}			
+	### level 1 menus
 	option = {
-		name = cgm_buildings_preset.enable_new_building_content.name
+		name = cgm_buildings.default_settings.name		
+		custom_tooltip = cgm_buildings.default_settings.desc
+		trigger = { 
+			NOT = { has_country_flag = cgm_buildings_advanced_configuration } 
+		}
 		custom_gui = "cgm_option"
-		custom_tooltip = cgm_buildings_preset.enable_new_building_content.desc
-		trigger = { NOT = { has_global_flag = new_building_content_active } }
+		hidden_effect = {	
+			every_country = {
+				limit = {
+					OR = {
+						is_country_type = default
+						is_country_type = fallen_empire
+						is_country_type = awakened_fallen_empire
+						is_country_type = ascended_empire
+					}
+				}
+				if = { 
+					limit = { is_ai = yes } 
+					set_country_flag = cgm_disable_vanilla_building_AI
+					remove_country_flag = cgm_disable_autobuild					
+				}	
+				country_event = { id = cgm_building_operations.1 }
+			}			
+		}
+	}	
+	option = {
+		name = cgm_buildings.advanced_configuration.name		
+		custom_tooltip = cgm_buildings.advanced_configuration.desc
+		trigger = { 
+			NOT = { has_country_flag = cgm_buildings_advanced_configuration } 
+		}
+		custom_gui = "cgm_option"
+		hidden_effect = {	
+			set_timed_country_flag = { flag = cgm_buildings_advanced_configuration days = 2 }
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
+	}	
+	### level 2 menus
+	option = {
+		name = cgm_buildings.configure_building_content.name		
+		custom_tooltip = cgm_buildings.configure_building_content.desc
+		trigger = { 
+			has_country_flag = cgm_buildings_advanced_configuration
+			cgm_buildings_menu_triggers = no
+		}
+		custom_gui = "cgm_option"
+		hidden_effect = {	
+			remove_building_content_flags = yes
+			set_timed_country_flag = { flag = cgm_buildings_building_content_configuration days = 2 }
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
+	}			
+	option = {
+		name = cgm_buildings.configure_ai.name		
+		custom_tooltip = cgm_buildings.configure_ai.desc
+		trigger = { 
+			has_country_flag = cgm_buildings_advanced_configuration
+			cgm_buildings_menu_triggers = no
+		}
+		custom_gui = "cgm_option"
+		hidden_effect = {	
+			set_timed_country_flag = { flag = cgm_buildings_ai_configuration days = 2 }
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
+	}		
+	option = {
+		name = cgm_buildings.configure_building_modifiers.name		
+		custom_tooltip = cgm_buildings.configure_building_modifiers.desc
+		trigger = { 
+			has_country_flag = cgm_buildings_advanced_configuration
+			cgm_buildings_menu_triggers = no
+		}
+		custom_gui = "cgm_option"
+		hidden_effect = {	
+			hidden_effect = { country_event = { id = core_game_mechanics_and_ai_base.10 } }
+		}
+	}				
+	### level 3 menus 
+	# buildin content
+	option = {
+		name = cgm_buildings.new_building_content_enabled.name		
+		custom_tooltip = cgm_buildings.new_building_content_enabled.desc
+		custom_gui = "cgm_option"
+		trigger = { 
+			has_country_flag = cgm_buildings_building_content_configuration
+			has_country_flag = cgm_buildings_advanced_configuration
+			NOR = { 
+				has_global_flag = new_building_content_active
+				has_global_flag = vanilla_building_content_active				
+			}	
+		}	
 		hidden_effect = {
 			set_global_flag = new_building_content_active
-			set_global_flag = overhauled_building_stats_active
-			hidden_effect = {
-				every_country = {
-					limit = {
-						OR = {
-							is_country_type = default
-							is_country_type = fallen_empire
-							is_country_type = awakened_fallen_empire
-							is_country_type = ascended_empire
-						}
-					}
-					country_event = { id = cgm_building_operations.1 }
-				}
-				country_event = { id = core_game_mechanics_and_ai_base.1 }
-			}
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
 		}
 	}
 	option = {
-		name = cgm_buildings_preset.keep_vanilla_building_content.name
+		name = cgm_buildings.new_building_content_disabled.name		
+		custom_tooltip = cgm_buildings.new_building_content_disabled.desc
 		custom_gui = "cgm_option"
-		custom_tooltip = cgm_buildings_preset.keep_vanilla_building_content.desc
-		trigger = {
-			NOR = { has_global_flag = new_building_content_active has_global_flag = vanilla_building_content_active }
-		}
+		trigger = { 
+			has_country_flag = cgm_buildings_building_content_configuration
+			has_country_flag = cgm_buildings_advanced_configuration
+			NOR = { 
+				has_global_flag = new_building_content_active
+				has_global_flag = vanilla_building_content_active				
+			}	
+		}	
 		hidden_effect = {
 			set_global_flag = vanilla_building_content_active
 			country_event = { id = core_game_mechanics_and_ai_base.1 }
 		}
-	}
+	}	
 	option = {
-		name = cgm_buildings_option.enable_overhauled_vanilla_building_stats.name
+		name = cgm_buildings.enable_overhauled_vanilla_building_stats.name		
+		custom_tooltip = cgm_buildings.enable_overhauled_vanilla_building_stats.desc
 		custom_gui = "cgm_option"
-		custom_tooltip = cgm_buildings_option.enable_overhauled_vanilla_building_stats.desc
 		trigger = {
-			has_global_flag = vanilla_building_content_active
-			NOT = { has_global_flag = overhauled_building_stats_active }
+			has_country_flag = cgm_buildings_building_content_configuration
+			has_country_flag = cgm_buildings_advanced_configuration
+			OR = { 
+				has_global_flag = new_building_content_active
+				has_global_flag = vanilla_building_content_active				
+			}				
 		}
 		hidden_effect = {
 			set_global_flag = overhauled_building_stats_active
+			remove_country_flag = cgm_buildings_building_content_configuration
 			country_event = { id = core_game_mechanics_and_ai_base.1 }
 		}
 	}
 	option = {
-		name = cgm_buildings_option.disable_overhauled_vanilla_building_stats.name
+		name = cgm_buildings.disable_overhauled_vanilla_building_stats.name		
+		custom_tooltip = cgm_buildings.disable_overhauled_vanilla_building_stats.desc
 		custom_gui = "cgm_option"
-		custom_tooltip = cgm_buildings_option.disable_overhauled_vanilla_building_stats.desc
-		trigger = { has_global_flag = vanilla_building_content_active has_global_flag = overhauled_building_stats_active }
+		trigger = {
+			has_country_flag = cgm_buildings_building_content_configuration
+			has_country_flag = cgm_buildings_advanced_configuration
+			OR = { 
+				has_global_flag = new_building_content_active
+				has_global_flag = vanilla_building_content_active				
+			}				
+		}
 		hidden_effect = {
+			remove_country_flag = cgm_buildings_building_content_configuration
 			remove_global_flag = overhauled_building_stats_active
 			country_event = { id = core_game_mechanics_and_ai_base.1 }
 		}
-	}
+	}	
+	# ai configuration
 	option = {
 		name = cgm_ai_preset.cgm_ai_routines.name
 		custom_gui = "cgm_option"
 		custom_tooltip = cgm_ai_preset.cgm_ai_routines.desc
 		trigger = {
-			OR = { has_global_flag = new_building_content_active has_global_flag = vanilla_building_content_active }
-			OR = {
-				NOT = { has_global_flag = cgm_disable_vanilla_building_AI }
-				has_global_flag = cgm_disable_autobuild
-			}
-			has_global_flag = cgm_ai_routines_update_active
+			has_country_flag = cgm_buildings_advanced_configuration
+			has_country_flag = cgm_buildings_ai_configuration
 		}
 		hidden_effect = {
 			set_global_flag = cgm_disable_vanilla_building_AI
 			remove_global_flag = cgm_disable_autobuild
-			every_country = {
-				limit = {
-					OR = {
-						is_country_type = default
-						is_country_type = ascended_empire
-						is_country_type = awakened_fallen_empire
-					}
-					is_ai = yes
-				}
-				set_country_flag = cgm_disable_vanilla_building_AI
-				remove_country_flag = cgm_disable_autobuild
-			}
+			remove_country_flag = cgm_buildings_ai_configuration
 			country_event = { id = core_game_mechanics_and_ai_base.1 }
 		}
 	}
@@ -146,25 +225,13 @@ country_event = {
 		custom_gui = "cgm_option"
 		custom_tooltip = cgm_ai_preset.mixed_ai_routines.desc
 		trigger = {
-			OR = { has_global_flag = new_building_content_active has_global_flag = vanilla_building_content_active }
-			OR = { has_global_flag = cgm_disable_vanilla_building_AI has_global_flag = cgm_disable_autobuild }
-			has_global_flag = cgm_ai_routines_update_active
+			has_country_flag = cgm_buildings_advanced_configuration
+			has_country_flag = cgm_buildings_ai_configuration
 		}
 		hidden_effect = {
 			remove_global_flag = cgm_disable_vanilla_building_AI
 			remove_global_flag = cgm_disable_autobuild
-			every_country = {
-				limit = {
-					OR = {
-						is_country_type = default
-						is_country_type = ascended_empire
-						is_country_type = awakened_fallen_empire
-					}
-					is_ai = yes
-				}
-				remove_country_flag = cgm_disable_vanilla_building_AI
-				remove_country_flag = cgm_disable_autobuild
-			}
+			remove_country_flag = cgm_buildings_ai_configuration
 			country_event = { id = core_game_mechanics_and_ai_base.1 }
 		}
 	}
@@ -173,46 +240,68 @@ country_event = {
 		custom_gui = "cgm_option"
 		custom_tooltip = cgm_ai_preset.vanilla_ai_routines.desc
 		trigger = {
-			OR = { has_global_flag = new_building_content_active has_global_flag = vanilla_building_content_active }
-			OR = {
-				has_global_flag = cgm_disable_vanilla_building_AI
-				NOT = { has_global_flag = cgm_disable_autobuild }
-			}
-			has_global_flag = cgm_ai_routines_update_active
+			has_country_flag = cgm_buildings_advanced_configuration
+			has_country_flag = cgm_buildings_ai_configuration
 		}
 		hidden_effect = {
 			remove_global_flag = cgm_disable_vanilla_building_AI
 			set_global_flag = cgm_disable_autobuild
+			remove_country_flag = cgm_buildings_ai_configuration
+			country_event = { id = core_game_mechanics_and_ai_base.1 }
+		}
+	}
+	option = {
+		name = cgm_buildings_main_menu_finish
+		custom_gui = "cgm_option"
+		trigger = {
+			has_country_flag = cgm_buildings_advanced_configuration
+			cgm_buildings_menu_triggers = no
+		}
+		hidden_effect = { 
 			every_country = {
 				limit = {
 					OR = {
 						is_country_type = default
 						is_country_type = ascended_empire
 						is_country_type = awakened_fallen_empire
-					}
-					is_ai = yes
+					}					
 				}
-				remove_country_flag = cgm_disable_vanilla_building_AI
-				set_country_flag = cgm_disable_autobuild
-			}
-			country_event = { id = core_game_mechanics_and_ai_base.1 }
-		}
-	}
-	option = {
-		name = cgm_buildings_option.advanced_building_configuration.name
-		custom_gui = "cgm_option"
-		custom_tooltip = cgm_buildings_option.advanced_building_configuration.desc
-		trigger = {
-			OR = { has_global_flag = vanilla_building_content_active has_global_flag = new_building_content_active }
-		}
-		hidden_effect = { country_event = { id = core_game_mechanics_and_ai_base.10 } }
-	}
-	option = {
-		name = cgm_main_menu.close.name
-		custom_gui = "cgm_option"
-		custom_tooltip = cgm_main_menu.close.desc
-		trigger = {
-			OR = { has_global_flag = vanilla_building_content_active has_global_flag = new_building_content_active }
-		}
+				if = { 
+					limit = { has_global_flag = new_building_content_active }
+					country_event = { id = cgm_building_operations.1 }
+				}	
+				if = { 
+					limit = { is_ai = yes } 
+					if = { 
+						limit = { 
+							has_global_flag = cgm_disable_vanilla_building_AI
+							NOT = { 							
+								has_global_flag = cgm_disable_autobuild
+							}
+						}						
+						set_country_flag = cgm_disable_vanilla_building_AI
+						remove_country_flag = cgm_disable_autobuild
+					}	
+					else_if = { 
+						limit = { 
+							NOT = { has_global_flag = cgm_disable_vanilla_building_AI }
+							has_global_flag = cgm_disable_autobuild
+						}						
+						remove_country_flag = cgm_disable_vanilla_building_AI
+						set_country_flag = cgm_disable_autobuild
+					}					
+					else_if = { 
+						limit = { 
+							NOR = { 
+								has_global_flag = cgm_disable_vanilla_building_AI
+								has_global_flag = cgm_disable_autobuild
+							}
+						}						
+						remove_country_flag = cgm_disable_vanilla_building_AI
+						remove_country_flag = cgm_disable_autobuild
+					}	
+				}	
+			}	
+		}	
 	}
 }
