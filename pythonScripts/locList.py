@@ -201,7 +201,7 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
       try:
         locContent=line[1]
       except IndexError:
-        locContent=""
+        locContent=" "
         pureRef=True
       if locContent.count("$")==2 and locContent[0]=="$" and locContent[-1]=="$":
         pureRef=True
