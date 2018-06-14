@@ -57,6 +57,10 @@ planet_event = {
 				fail_text = "requires_50_influence"
 				owner = { influence > 49 }				
 			}			
+			custom_tooltip = { 
+				fail_text = "deep_core_mining_potential_too_low"
+				check_variable = { which = deep_core_mining_potential value > 20 }
+			}				
 		}		
 		hidden_effect = { 
 			set_planet_flag = cgm_deep_core_mining
@@ -229,7 +233,7 @@ planet_event = {
 			custom_tooltip = {
 				fail_text = "requires_50_influence"
 				owner = { influence > 49 }				
-			}				
+			}
 		}		
 		hidden_effect = { 
 			set_planet_flag = cgm_harvest
@@ -347,46 +351,86 @@ planet_event = {
 
 	immediate = { 		
 		if = { 
-			limit = { has_modifier = cgm_deep_core_mining_stage_0 }
-			random_list = { 
-				99 = { 
-					remove_modifier = cgm_deep_core_mining_stage_0
-					add_modifier = { modifier = cgm_deep_core_mining_stage_1 days = -1 }
-					planet_event = { id = cgm_planetary_projects.11 }
+			limit = { 
+				OR = { 
+					has_modifier = cgm_deep_core_mining_stage_0					
+					AND = { 
+						remove_modifier = cgm_deep_core_mining_stage_1
+						check_variable = { which = deep_core_mining_potential value > 5 }
+					}					
+					AND = { 
+						remove_modifier = cgm_deep_core_mining_stage_2
+						check_variable = { which = deep_core_mining_potential value > 10 }
+					}										
+					AND = { 
+						remove_modifier = cgm_deep_core_mining_stage_3
+						check_variable = { which = deep_core_mining_potential value > 15 }
+					}															
 				}
-				1 = { planet_event = { id = cgm_planetary_projects.12 } }
+			}							
+			if = { 
+				limit = { has_modifier = cgm_deep_core_mining_stage_0 }
+				random_list = { 
+					95 = { 
+						remove_modifier = cgm_deep_core_mining_stage_0
+						add_modifier = { modifier = cgm_deep_core_mining_stage_1 days = -1 }
+						planet_event = { id = cgm_planetary_projects.11 }
+					}
+					5 = { planet_event = { id = cgm_planetary_projects.12 } }
+				}	
 			}	
+			else_if = { 
+				limit = { has_modifier = cgm_deep_core_mining_stage_1 }
+				change_variable = { which = deep_core_mining_potential value = -5 }
+				random_list = {
+					2 = { 
+						remove_modifier = cgm_deep_core_mining_stage_1
+						add_modifier = { modifier = cgm_deep_core_mining_stage_2 days = -1 }
+						planet_event = { id = cgm_planetary_projects.11 }	
+						modifier = { factor = 2 owner = { has_technology = "tech_advanced_deep_core_mining" } }
+					}
+					1 = { 
+						planet_event = { id = cgm_planetary_projects.12 }					
+					}	
+				}	
+			}
+			else_if = { 
+				limit = { has_modifier = cgm_deep_core_mining_stage_2 }
+				change_variable = { which = deep_core_mining_potential value = -10 }
+				random_list = { 
+					1.5 = { 
+						remove_modifier = cgm_deep_core_mining_stage_2
+						add_modifier = { modifier = cgm_deep_core_mining_stage_3 days = -1 }
+						planet_event = { id = cgm_planetary_projects.11 }	
+						modifier = { factor = 2 owner = { has_technology = "tech_advanced_deep_core_mining" } }
+					}
+					1 = { 
+						planet_event = { id = cgm_planetary_projects.12 }
+					}	
+				}	
+			}	
+			else_if = { 
+				limit = { has_modifier = cgm_deep_core_mining_stage_3 }
+				change_variable = { which = deep_core_mining_potential value = -15 }
+				random_list = { 
+					1.25 = { 
+						planet_event = { id = cgm_planetary_projects.11 }	
+						modifier = { factor = 2 owner = { has_technology = "tech_advanced_deep_core_mining" } }
+					}
+					1 = { 
+						planet_event = { id = cgm_planetary_projects.12 }
+					}	
+				}	
+			}				
 		}	
-		else_if = { 
-			limit = { has_modifier = cgm_deep_core_mining_stage_1 }
-			random_list = {
-				65 = { 
-					remove_modifier = cgm_deep_core_mining_stage_1
-					add_modifier = { modifier = cgm_deep_core_mining_stage_2 days = -1 }
-					planet_event = { id = cgm_planetary_projects.11 }	
-					modifier = { add = 10 owner = { has_ascension_perk = ap_world_shaper } }
-				}
-				35 = { 
-					planet_event = { id = cgm_planetary_projects.12 }
-					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_deep_core_mining" } }
-				}	
-			}	
-		}
-		else_if = { 
-			limit = { has_modifier = cgm_deep_core_mining_stage_2 }
-			random_list = { 
-				45 = { 
-					remove_modifier = cgm_deep_core_mining_stage_2
-					add_modifier = { modifier = cgm_deep_core_mining_stage_3 days = -1 }
-					planet_event = { id = cgm_planetary_projects.11 }	
-					modifier = { add = 10 owner = { has_ascension_perk = ap_world_shaper } }
-				}
-				55 = { 
-					planet_event = { id = cgm_planetary_projects.12 }
-					modifier = { factor = 0.5 owner = { has_technology = "tech_advanced_deep_core_mining" } }
-				}	
-			}	
-		}		
+		else = { 
+			remove_modifier = cgm_deep_core_mining_stage_0
+			remove_modifier = cgm_deep_core_mining_stage_1
+			remove_modifier = cgm_deep_core_mining_stage_2
+			remove_modifier = cgm_deep_core_mining_stage_3
+			add_modifier = { modifier = cgm_hollowed_planet days = -1 }
+			planet_event = { id = cgm_planetary_projects.13 }
+		}	
 	}
 }			
 
