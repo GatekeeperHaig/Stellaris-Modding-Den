@@ -198,7 +198,11 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
       locKey=key.replace(".","_")
       #check pure ref with first language (probably english)
       pureRef=False
-      locContent=line[1]
+      try:
+        locContent=line[1]
+      except IndexError:
+        locContent=""
+        pureRef=True
       if locContent.count("$")==2 and locContent[0]=="$" and locContent[-1]=="$":
         pureRef=True
 
