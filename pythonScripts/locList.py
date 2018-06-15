@@ -56,12 +56,23 @@ class LocList:
       translateRest=0
     else:
       translateRest=self.translateRest
-    for englishKey, englishLoc in self.dicts["en"].items():
+    nextStep=len(self.dicts["en"].items())//10
+    percent=10
+    for i,(englishKey, englishLoc) in enumerate(self.dicts["en"].items()):
+      if i==nextStep:
+        print("{}% done for language {}".format(percent, languageCode))
+        percent+=10
+        nextStep+=len(self.dicts["en"].items())//10
+
       if not englishKey in localDict:
         if (translateRest>0) and not "$" in englishLoc and not "£" in englishLoc: #full translate mode, or non empty dict and leftover translate mode
           if outputMissing:
             missingStuffFile.write('locList.addLoc("{}", "{}","{}")\n'.format(englishKey,englishLoc,languageCode))
-          localDict[englishKey]=translator.translate(text=englishLoc, src="en", dest=languageCode).text
+          try:
+            localDict[englishKey]=translator.translate(text=englishLoc, src="en", dest=languageCode).text
+          except:
+            print("Could not translate for key '{}' entry '{}'. Skipping".format(englishKey, englishLoc))
+            localDict[englishKey]=englishLoc
         else:
           localDict[englishKey]=englishLoc
     if languageCode!="en" and outputMissing:
