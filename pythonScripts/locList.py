@@ -201,8 +201,12 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
       try:
         locContent=line[1]
       except IndexError:
-        locContent=" "
+        locContent=""
         pureRef=True
+      if locContent.strip()=="":
+        # locContent=" "
+        pureRef=True
+
       if locContent.count("$")==2 and locContent[0]=="$" and locContent[-1]=="$":
         pureRef=True
 
@@ -213,7 +217,7 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
         for i,(language,locContent) in enumerate(zip(languages,line[1:])):
           locContent=locContent.strip().replace('"',"")
           if locContent!="":
-            outArrays[i].append('locList.addLoc("{}","{}","{}")'.format(locKey, locContent,language))
+            outArrays[i].append('locList.addLoc("{}","{} ","{}")'.format(locKey, locContent,language))
     outArray=reduce(lambda x, y: x + y,outArrays)
 
 
