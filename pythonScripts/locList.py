@@ -216,8 +216,10 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
         trivialAssignment.append('locList.addEntry("{}","@{}")'.format(key,locKey))
         for i,(language,locContent) in enumerate(zip(languages,line[1:])):
           locContent=locContent.strip().replace('"',"")
-          if locContent!="":
-            outArrays[i].append('locList.addLoc("{}","{} ","{}")'.format(locKey, locContent,language))
+          if locContent=="":
+            locContent=" "
+          # if locContent!="":
+          outArrays[i].append('locList.addLoc("{}","{}","{}")'.format(locKey, locContent,language))
     outArray=reduce(lambda x, y: x + y,outArrays)
 
 
