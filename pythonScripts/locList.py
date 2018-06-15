@@ -195,7 +195,7 @@ def readYMLCreatePy(args,filePath="../cgm_buildings_script_source/localisation/e
         key=line[0]
       except IndexError:
         continue;
-      locKey=key.replace(".","_")
+      locKey=key.replace(".","_").strip()
       #check pure ref with first language (probably english)
       pureRef=False
       try:
