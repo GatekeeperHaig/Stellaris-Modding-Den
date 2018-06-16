@@ -45,6 +45,8 @@ locList.addEntry("cgm_buildings.enable_overhauled_vanilla_building_stats.desc","
 locList.addEntry("cgm_buildings.disable_overhauled_vanilla_building_stats.name","@cgm_buildings_disable_overhauled_vanilla_building_stats_name")
 locList.addEntry("cgm_buildings.disable_overhauled_vanilla_building_stats.desc","@cgm_buildings_disable_overhauled_vanilla_building_stats_desc")
 locList.addEntry("cgm_buildings_main_menu_finish","@cgm_buildings_main_menu_finish")
+locList.addEntry("cgm.edict_menu.title","@cgm_edict_menu_title")
+locList.addEntry("cgm.edict_menu.desc","@cgm_edict_menu_desc")
 locList.addEntry("basic","@basic")
 locList.addEntry("improved","@improved")
 locList.addEntry("enhanced","@enhanced")
