@@ -119,9 +119,9 @@ def main():
   standard_build=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_sector_autobuild")))
   standard_build.add("set_country_flag", "cgm_core_world_auto", "#searching core worlds for standard buildings")
   standard_build.addComment("Search for possible Special buildings:")
-  standard_build.createEvent(name_empire_special_build_event)
+  standard_build.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_auto_upgrade_only"))).createEvent(name_empire_special_build_event)
   standard_build.addComment("Search for possible Standard buildings. Build best out of standard/special:")
-  standard_build.createEvent(name_empire_standard_build_event)
+  standard_build.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_auto_upgrade_only"))).createEvent(name_empire_standard_build_event)
   upgrade_build=standard_build.createReturnIf(TagList("is_ai", "no").add("not", TagList("has_country_flag", "cgm_auto_built")))
   upgrade_build.addComment("Try to upgrade something. Player only!")
   upgrade_build.createEvent(name_empire_upgrade_event)
@@ -129,9 +129,9 @@ def main():
   sectorBuild=empireMainBuildEventImmediate.createReturnIf(TagList("not", TagList("has_country_flag", "cgm_auto_built")))
   sectorBuild.add("remove_country_flag", "cgm_core_world_auto", "#searching sector worlds for standard buildings")
   sectorBuild.addComment("Search for possible Special buildings:")
-  sectorBuild.createEvent(name_empire_special_build_event)
+  sectorBuild.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_auto_upgrade_only"))).createEvent(name_empire_special_build_event)
   sectorBuild.addComment("Search for possible Standard buildings. Build best out of standard/special:")
-  sectorBuild.createEvent(name_empire_standard_build_event)
+  sectorBuild.createReturnIf(TagList("NOT", TagList("has_country_flag", "cgm_auto_upgrade_only"))).createEvent(name_empire_standard_build_event)
   empireMainBuildEventImmediate.createReturnIf(TagList("NOT", TagList("has_country_flag", "do_no_remove_low_tier_flag"))).add("remove_country_flag", "display_low_tier_flag")
 
 
@@ -160,6 +160,7 @@ def main():
   findBestPlanetLimit=findBestPlanet.addReturn("limit")
   findBestPlanetLimit.add("has_building_construction","no")
   findBestPlanetLimit.add("has_orbital_bombardment","no")
+  findBestPlanetLimit.add("NOT",TagList("has_planet_flag", "cgm_auto_upgrade_only"))
   findBestPlanetLimit.add("free_building_tiles", "0", "", ">")
   # findBestPlanetLimit.add("not",TagList("has_planet_flag", "purged_planet"))
   findBestPlanetLimit.add("or", TagList("and", TagList("sector_controlled","no").add("prev", TagList("has_country_flag", "cgm_core_world_auto"))).add("and", TagList("sector_controlled","yes").add("not", TagList("prev", TagList("has_country_flag", "cgm_core_world_auto")))))
@@ -256,6 +257,7 @@ def main():
   findBestPlanetLimit=findBestPlanet.addReturn("limit")
   findBestPlanetLimit.add("has_building_construction","no")
   findBestPlanetLimit.add("has_orbital_bombardment","no")
+  findBestPlanetLimit.add("NOT",TagList("has_planet_flag", "cgm_auto_upgrade_only"))
   findBestPlanetLimit.add("free_building_tiles", "0", "", ">")
   findBestPlanetLimit.add("not",TagList("has_planet_flag", "purged_planet"))
   findBestPlanetLimit.add("or", TagList("and", TagList("sector_controlled","no").add("prev", TagList("has_country_flag", "cgm_core_world_auto"))).add("and", TagList("sector_controlled","yes").add("not", TagList("prev", TagList("has_country_flag", "cgm_core_world_auto")))))
@@ -661,6 +663,8 @@ def main():
   locList.addLoc("asAI", "Same as AI")
   locList.addLoc("currently", "Currently")
   locList.addLoc("none", "None")
+  locList.addLoc("enableUpgradeOnly", "Enable Upgrade Only")
+  locList.addLoc("disableUpgradeOnly", "Disable Upgrade Only")
   
   locList.addLoc("FocusMenuTitle", "фокус автоматизации","ru")
   locList.addLoc("FocusMenuDesc", "Выберите предпочтительную категорию с определенным коэффициентом, который вы также можете выбрать здесь. «1» означало бы никаких изменений. «3» следует использовать с осторожностью, поскольку он, скорее всего, будет использовать плитки, которые в лучшем случае лучше подходят для других вещей.","ru")
@@ -764,6 +768,15 @@ def main():
           hiddenEffect.add("remove_{}_flag".format(scope), "cgm_player_focus_{}".format(res))
           hiddenEffect.add("remove_modifier",res+"_focused_automation")
 
+    option=e.addReturn("option")
+    option.add("name", locList.append(nameBase.format("enable_upgrade_only.name"),"@enableUpgradeOnly")).add("custom_gui","cgm_advanced_configuration_option_more_options")
+    option.addReturn("trigger").add("NOT", TagList("has_{}_flag".format(scope), "cgm_auto_upgrade_only"))
+    option.addReturn("hidden_effect").add("set_{}_flag".format(scope), "cgm_auto_upgrade_only").add(scope+"_event", TagList("id",e.get("id")))
+
+    option=e.addReturn("option")
+    option.add("name", locList.append(nameBase.format("disable_upgrade_only.name"),"@disableUpgradeOnly")).add("custom_gui","cgm_advanced_configuration_option_more_options")
+    option.addReturn("trigger").add("has_{}_flag".format(scope), "cgm_auto_upgrade_only")
+    option.addReturn("hidden_effect").add("remove_{}_flag".format(scope), "cgm_auto_upgrade_only").add(scope+"_event", TagList("id",e.get("id")))
 
 
     option=e.addReturn("option")
@@ -777,7 +790,7 @@ def main():
   upgradeEvent.triggeredHidden()
   upgradeEvent=upgradeEvent.addReturn("immediate")
   upgradeEvent=upgradeEvent.addReturn("every_owned_planet")
-  upgradeEvent.add("limit", TagList("has_building_construction", "no").add("sector_controlled","no"))
+  upgradeEvent.add("limit", TagList("has_building_construction", "no").add("sector_controlled","no").add("has_orbital_bombardment","no"))
   everyPop=upgradeEvent.addReturn("every_owned_pop")
   everyPop.add("limit",  TagList("OR", TagList("is_colony_pop", "yes").add("is_growing", "yes")).add("OR", TagList("is_being_purged", "no").add("has_purge_type", TagList("type", "purge_labor_camps"))))
   tileSwitch=everyPop.addReturn("tile")

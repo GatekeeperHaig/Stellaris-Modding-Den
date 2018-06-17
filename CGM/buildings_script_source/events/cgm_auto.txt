@@ -31,9 +31,15 @@ country_event = {
 			limit = { not = { has_country_flag = cgm_sector_autobuild } }
 			set_country_flag = cgm_core_world_auto #searching core worlds for standard buildings
 			 #Search for possible Special buildings:
-			country_event = { id = cgm_auto.11 }
+			if = {
+				limit = { NOT = { has_country_flag = cgm_auto_upgrade_only } }
+				country_event = { id = cgm_auto.11 }
+			}
 			 #Search for possible Standard buildings. Build best out of standard/special:
-			country_event = { id = cgm_auto.10 }
+			if = {
+				limit = { NOT = { has_country_flag = cgm_auto_upgrade_only } }
+				country_event = { id = cgm_auto.10 }
+			}
 			if = {
 				limit = {
 					is_ai = no
@@ -47,9 +53,15 @@ country_event = {
 			limit = { not = { has_country_flag = cgm_auto_built } }
 			remove_country_flag = cgm_core_world_auto #searching sector worlds for standard buildings
 			 #Search for possible Special buildings:
-			country_event = { id = cgm_auto.11 }
+			if = {
+				limit = { NOT = { has_country_flag = cgm_auto_upgrade_only } }
+				country_event = { id = cgm_auto.11 }
+			}
 			 #Search for possible Standard buildings. Build best out of standard/special:
-			country_event = { id = cgm_auto.10 }
+			if = {
+				limit = { NOT = { has_country_flag = cgm_auto_upgrade_only } }
+				country_event = { id = cgm_auto.10 }
+			}
 		}
 		if = {
 			limit = { NOT = { has_country_flag = do_no_remove_low_tier_flag } }
@@ -67,6 +79,7 @@ country_event = {
 			limit = {
 				has_building_construction = no
 				has_orbital_bombardment = no
+				NOT = { has_planet_flag = cgm_auto_upgrade_only }
 				free_building_tiles > 0
 				or = {
 					and = {
@@ -450,6 +463,7 @@ country_event = {
 			limit = {
 				has_building_construction = no
 				has_orbital_bombardment = no
+				NOT = { has_planet_flag = cgm_auto_upgrade_only }
 				free_building_tiles > 0
 				not = { has_planet_flag = purged_planet }
 				or = {
@@ -1693,6 +1707,24 @@ country_event = {
 		}
 	}
 	option = {
+		name = cgm_auto_enable_upgrade_only.name
+		custom_gui = cgm_advanced_configuration_option_more_options
+		trigger = { NOT = { has_country_flag = cgm_auto_upgrade_only } }
+		hidden_effect = {
+			set_country_flag = cgm_auto_upgrade_only
+			country_event = { id = cgm_auto.40 }
+		}
+	}
+	option = {
+		name = cgm_auto_disable_upgrade_only.name
+		custom_gui = cgm_advanced_configuration_option_more_options
+		trigger = { has_country_flag = cgm_auto_upgrade_only }
+		hidden_effect = {
+			remove_country_flag = cgm_auto_upgrade_only
+			country_event = { id = cgm_auto.40 }
+		}
+	}
+	option = {
 		name = cgm_main_menu.close.name
 		custom_gui = cgm_advanced_configuration_option_more_options
 		hidden_effect = { country_event = { id = cgm_auto.30 } }
@@ -1924,6 +1956,24 @@ planet_event = {
 			remove_modifier = engineering_research_focused_automation
 		}
 	}
+	option = {
+		name = cgm_auto_enable_upgrade_only.name
+		custom_gui = cgm_advanced_configuration_option_more_options
+		trigger = { NOT = { has_planet_flag = cgm_auto_upgrade_only } }
+		hidden_effect = {
+			set_planet_flag = cgm_auto_upgrade_only
+			planet_event = { id = cgm_auto.41 }
+		}
+	}
+	option = {
+		name = cgm_auto_disable_upgrade_only.name
+		custom_gui = cgm_advanced_configuration_option_more_options
+		trigger = { has_planet_flag = cgm_auto_upgrade_only }
+		hidden_effect = {
+			remove_planet_flag = cgm_auto_upgrade_only
+			planet_event = { id = cgm_auto.41 }
+		}
+	}
 	option = { name = cgm_main_menu.close.name custom_gui = cgm_advanced_configuration_option_more_options }
 }
 country_event = {
@@ -1932,7 +1982,11 @@ country_event = {
 	hide_window = yes
 	immediate = {
 		every_owned_planet = {
-			limit = { has_building_construction = no sector_controlled = no }
+			limit = {
+				has_building_construction = no
+				sector_controlled = no
+				has_orbital_bombardment = no
+			}
 			every_owned_pop = {
 				limit = {
 					OR = { is_colony_pop = yes is_growing = yes }
