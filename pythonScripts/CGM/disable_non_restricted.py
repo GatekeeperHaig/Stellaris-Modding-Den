@@ -22,7 +22,7 @@ def main():
         break
       if name!="" and val.attemptGet("is_listed").lower()!="no":
         prodRes=val.get("produced_resources").names[0]
-        val.get("potential").add("tile", TagList("NOT", TagList("has_resource", TagList("type", prodRes).add("amount", 0, "", ">"))))
+        val.get("potential").add("OR", TagList("tile", TagList("NOT", TagList("has_resource", TagList("type", prodRes).add("amount", 0, "", ">")))).add("planet_is_artificial", "yes"))
     else:
       if "### Non-restricted Resource Buildings" in comment:
         nonRestricted=True
