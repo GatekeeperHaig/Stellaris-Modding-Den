@@ -8,7 +8,7 @@ locList.addLoc("cgm_disable","§RDisable§!","en")
 locList.addLoc("cgm_full","§GFull§!","en")
 locList.addLoc("cgm_mixed","§YMixed§!","en")
 locList.addLoc("cgm_default","§HDefault§!","en")
-locList.addLoc("settings","§BCurrent Settings:§!\n§YBuilding Content:§! [root.GetCGMBuildingContent]\n§YVanilla Building Overhaul:§! [root.GetCGMBuildingOverhaul]\n§YAI and Autobuild:§! [root.GetCGMAutobuild]\n§YDirect Build:§! [root.GetCGMDirectBuild]","en")
+locList.addLoc("settings","§BCurrent Settings:§!\n§YBuilding Content:§! [root.GetCGMBuildingContent]\n§YVanilla Building Overhaul:§! [root.GetCGMBuildingOverhaul]\n§YAI and Autobuild:§! [root.GetCGMAutobuild]","en")
 locList.addLoc("configuration","Configuration","en")
 locList.addLoc("cgm_buildings_default_settings_name","$cgm_default$ Settings","en")
 locList.addLoc("cgm_buildings_advanced_configuration_name","Advanced Configuration","en")
@@ -37,7 +37,7 @@ locList.addLoc("cgm_buildings_disable_overhauled_vanilla_building_stats_name","$
 locList.addLoc("cgm_buildings_disable_overhauled_vanilla_building_stats_desc","The CGM vanilla building overhaul is $cgm_disabled$.","en")
 locList.addLoc("cgm_buildings_main_menu_finish","Finish","en")
 locList.addLoc("cgm_edict_menu_title","CGM: Buildings Optional Features Menu","en")
-locList.addLoc("cgm_edict_menu_desc","In this menu you can enable/disable mod features.\n\n$settings$","en")
+locList.addLoc("cgm_edict_menu_desc","In this menu you can enable/disable various mod elements. You can do this throughout the game.","en")
 locList.addLoc("basic","Basic","en")
 locList.addLoc("improved","Improved","en")
 locList.addLoc("enhanced","Enhanced","en")
@@ -98,9 +98,9 @@ locList.addLoc("cgm_ai_preset_vanilla_ai_routines_name","Vanilla AI Routines","e
 locList.addLoc("cgm_ai_preset_vanilla_ai_routines_desc","This option disables the CGM AI routines and autobuild. The vanilla AI routines will build using enhanced AI weights but with no script based AI enhancement.","en")
 locList.addLoc("cgm_buildings_option_advanced_building_configuration_name","$advanced$ Building Configuration","en")
 locList.addLoc("cgm_buildings_option_advanced_building_configuration_desc","This option opens the $advanced$ Building Configuration menu, which allows you to changes the building cost and building time of specific building categories.","en")
-locList.addLoc("cgm_main_menu_title","CGM: Buildings Settings","en")
+locList.addLoc("cgm_main_menu_title","CGM Main Menu","en")
 locList.addLoc("cgm_main_menu_desc","In this menu you can choose whether you'd like to play using the vanilla resource buildings or the CGM resource buildings.\n\n$settings$\n\nPlease note: if you enable CGM game content the mod will auto-convert existing vanilla buildings to the CGM new content. This cannot be undone.","en")
-locList.addLoc("cgm_main_menu_header","Core Game Mechanics: Buildings","en")
+locList.addLoc("cgm_main_menu_header","Core Game Mechanics","en")
 locList.addLoc("cgm_main_menu_close_name","Close Menu","en")
 
 #Allow
@@ -183,7 +183,7 @@ locList.addLoc("static_planet_resource_physics_research_add","Monthly Physics Re
 locList.addLoc("static_planet_resource_engineering_research_add","Monthly Engineering Research","en")
 locList.addLoc("static_planet_resource_society_research_add","Monthly Society Research","en")
 ### Triggered Planet Modifiers Keys
-
+locList.addLoc("capital_3_tile_resource_bonus_modifier","T5 Empire Capital Bonus","en")
 locList.addLoc("capital_3_resource_bonus_modifier","T5 Empire Capital Bonus","en")
 locList.addLoc("capital_3_resource_bonus_modifier_desc","This is a special bonus given by t5 resource building on a planet with an empire capital.","en")
 locList.addLoc("power_plant_5_regular_capital_modifier","T5 Power Plant Empire Capital Bonus","en")
@@ -404,23 +404,3 @@ locList.addLoc("building_hyperstorage_facility_2","$hyperstorage_facility$ II","
 locList.addLoc("building_hyperstorage_facility_3","$hyperstorage_facility$ III","en")
 
 ##### buildings that use a key for localisations
-
-# Debug Resource - these can be turned on to expose the AI logic
-
-locList.addLoc("sr_null_e_desc","REPLACE_ME","en")
-locList.addLoc("sr_null_e","Energy Building Tile","en")
-locList.addLoc("sr_null_en_desc","REPLACE_ME","en")
-locList.addLoc("sr_null_en","Engineering Building Tile","en")
-locList.addLoc("sr_null_f_desc","REPLACE_ME","en")
-locList.addLoc("sr_null_f","Food Building Tile","en")
-locList.addLoc("sr_null_m_desc","REPLACE_ME","en")
-locList.addLoc("sr_null_m","Minerals Building Tile","en")
-locList.addLoc("sr_null_py_desc","REPLACE_ME","en")
-locList.addLoc("sr_null_py","Physics Building Tile","en")
-locList.addLoc("sr_null_sc_desc","REPLACE_ME","en")
-locList.addLoc("sr_null_sc","Society Building Tile","en")
-locList.addLoc("sr_null_u_desc","REPLACE_ME","en")
-locList.addLoc("sr_null_u","Unity Building Tile","en")
-
-locList.addLoc("cgm_mineral_tmp_modifier","tmp modifier. Should have been removed!","en")
-locList.addLoc("cgm_mineral_tmp_modifier_desc","tmp modifier. Should have been removed!","en")
