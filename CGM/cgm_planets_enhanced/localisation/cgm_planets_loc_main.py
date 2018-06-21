@@ -4,7 +4,7 @@ import os,sys,glob,io
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(1, '..\..\../pythonScripts')
 from locList import LocList
-locList=LocList(1)
+locList=LocList(2)
 for fileName in glob.glob('locs/*.py'):
 	with io.open(fileName,'r', encoding='utf-8') as file:
 		 exec(file.read())
@@ -1563,6 +1563,16 @@ locList.addEntry("yurantic_discovered_country","@yurantic_discovered_country")
 locList.addEntry("yurantic_discovered_ship","$yurantic_discovered_country$")
 locList.addEntry("zro_discovered_country","@zro_discovered_country")
 locList.addEntry("zro_discovered_ship","$zro_discovered_country$")
+locList.addEntry("building_asteroidal_capital","@building_asteroidal_capital")
+locList.addEntry("building_asteroidal_capital_desc","@building_asteroidal_capital_desc")
+locList.addEntry("building_asteroidal_aeroponic_complex","@building_asteroidal_aeroponic_complex")
+locList.addEntry("building_asteroidal_aeroponic_complex_desc","@building_asteroidal_aeroponic_complex_desc")
+locList.addEntry("building_asteroidal_generator_complex","@building_asteroidal_generator_complex")
+locList.addEntry("building_asteroidal_generator_complex_desc","@building_asteroidal_generator_complex_desc")
+locList.addEntry("building_asteroidal_mining_bay","@building_asteroidal_mining_bay")
+locList.addEntry("building_asteroidal_mining_bay_desc","@building_asteroidal_mining_bay_desc")
+locList.addEntry("building_asteroidal_research_complex","@building_asteroidal_research_complex")
+locList.addEntry("building_asteroidal_research_complex_desc","@building_asteroidal_research_complex_desc")
 for language in locList.languages:
 	outFolderLoc=language
 	if not os.path.exists(outFolderLoc):
