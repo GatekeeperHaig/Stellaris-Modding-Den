@@ -285,7 +285,7 @@ planet_event = {
 			remove_modifier = "happymushrooms2"
 		}
 		owner = {
-			add_energy = -1000
+			add_energy = -2000
 		}
 	}
 	
@@ -575,28 +575,6 @@ planet_event = {
 				establish_communications_no_message = root.owner
 			}
 		}
-		create_species = {
-			name = "NAME_Mushroom"
-				class = "PRE_FUN"
-				portrait = fun11
-				traits = {
-					trait = random_presapient_trait
-				}
-				homeworld = FROM
-				sapient = no
-		}
-		create_army = {
-			name = "NAME_Mushroom_Monsters"
-			owner = last_created
-			species = last_created
-			type = "mutant_army"
-		}
-		create_army = {
-			name = "NAME_Mushroom_Monsters"
-			owner = last_created
-			species = last_created
-			type = "mutant_army"
-		}
 		create_army = {
 			name = "NAME_Mushroom_Monsters"
 			owner = last_created
@@ -643,7 +621,12 @@ country_event = {
 	option = {
 		name = pdmushroom.45.a
 		owner = {
-			add_society_research = 1000
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = 48
+				min = 500
+				max = 1500
+			}
 		}
 	}	
 }
@@ -675,6 +658,118 @@ country_event = {
 	
 	option = {
 		name = pdmushroom.46.a
+	}
+}
+
+# Liberated from Mutants
+country_event = {
+	id = pdmushroom.47
+	title = "pdmushroom.47.name"
+	desc = "pdmushroom.47.desc"
+	picture = GFX_evt_ground_combat
+	show_sound = event_ground_battle
+	location = FROMFROM
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		has_country_flag = mushroom_rampage_country
+		FROMFROM = { has_planet_flag = mushroom_rampage_won }
+	}
+	
+	immediate = {
+		remove_country_flag = mushroom_rampage_country
+		FROMFROM = {
+			set_planet_flag = mushroom_rampage_defeated
+			remove_planet_flag = mushroom_rampage_won
+			set_owner = ROOT
+			purge = no
+			every_owned_pop = {
+				remove_modifier = "pop_recently_conquered"
+				add_modifier = {
+					modifier = "pop_liberation_fever"
+					days = 3600
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = pdmushroom.47.a
+		hidden_effect = {
+			fromfrom = {
+				create_species = {
+				name = "NAME_Mushroom"
+					class = "FUN"
+					portrait = fun11
+					traits = {
+						trait = trait_intelligent
+						trait = trait_industrious
+						trait = trait_very_strong
+					}
+					homeworld = FROM
+			}	
+			while = { 
+				count = 3
+				create_pop = {
+					species = last_created
+					}
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = pdmushroom.47.b
+		hidden_effect = {
+			fromfrom = {
+			planet_event = { id = pdmushroom.48 days = 1 }
+			}
+		}
+	}
+}
+
+#No mushroom people, no problems
+planet_event = {
+	id = pdmushroom.48
+	title = pdmushroom.48.name
+	desc = pdmushroom.48.desc
+	picture = GFX_evt_mushroom2
+	show_sound = event_alien_nature
+	location = root
+
+	trigger = {
+		has_planet_flag = mushroom_planet
+		has_owner = yes
+		is_homeworld = no		
+		owner = {
+			NOT = {
+				has_authority = auth_machine_intelligence
+			}
+		}
+		has_ground_combat = no
+		is_occupied_flag = no
+	}
+
+	is_triggered_only = yes
+	
+	immediate = {
+		remove_modifier = "happymushrooms"
+		remove_modifier = "happymushrooms2"
+		remove_modifier = "badmushrooms"
+		remove_modifier = "badmushrooms2"
+	}
+	
+	option = {
+		name = pdmushroom.48.a
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = 48
+				min = 500
+				max = 1500
+			}
+		}
 	}
 }
 
