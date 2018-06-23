@@ -34,13 +34,6 @@ event = { #on_monthly_pulse
 					can_colonize = { who = prev status = yes }	
 				}
 			}		
-			if = { 
-				limit = { is_ai = yes } 
-				every_owned_ship = { 
-					limit = { is_ship_class = shipclass_colonizer NOT = { has_ship_flag = assigned_colonizer } } 
-					fleet = { set_event_locked = yes }
-				}
-			}	
 			country_event = { id = cgm_pe_colonization_automation.2 days = 1 random = 20 } 
 		}
 	}
@@ -196,10 +189,7 @@ country_event = {
 						change_variable = { which = available_colony_targets value = -1 }
 						change_variable = { which = available_colony_ships value = -1 }
 					}											
-					fleet = { 
-						set_event_locked = no
-						fleet_event = { id = cgm_pe_colonization_automation.4 }
-					}			
+					ship_event = { id = cgm_pe_colonization_automation.4 }								
 				}		
 				else = { 
 					root = { change_variable = { which = available_colony_ships value = -1 } } 
@@ -209,38 +199,42 @@ country_event = {
 	}
 }	
 
-fleet_event = { 
+ship_event = { 
 	id = cgm_pe_colonization_automation.4
 	hide_window = yes
 	is_triggered_only = yes	
 	
 	immediate = { 		
-		auto_move_to_planet = {
-			target = event_target:cgm_colonization_target
-			destroy_on_arrival = no
-			clear_auto_move_on_arrival = yes			
-		}		
-		set_event_locked = yes
-		if = { 
-			limit = { orbit = { NOT = { exists = owner } } }			
-			random_owned_ship = { 
-				species = { save_event_target_as = cgm_colonizing_species }
-			}				
-			orbit = { 
-				start_colony = {
-					owner = owner					
-					species = event_target:cgm_colonizing_species
-					#ethos = event_target:cgm_colonizing_species
-				}	
-			}								
-			delete_fleet = this
+		fleet = {
+			auto_move_to_planet = {
+				target = event_target:cgm_colonization_target
+				destroy_on_arrival = no
+				clear_auto_move_on_arrival = yes			
+			}		
+			set_event_locked = yes
+			if = { 
+				limit = { 
+					exists = orbit
+					orbit = { 
+						NOT = { exists = owner } 
+					} 			
+				}			
+				orbit = { 
+					start_colony = {
+						owner = owner					
+						species = root.species
+						#ethos = root.species
+					}	
+				}								
+				delete_fleet = this
+			}	
 		}	
 		else = { 			
-			random_owned_ship = { 
-				remove_ship_flag = assigned_colonizer
-			}
-			set_event_locked = no
-			owner = { country_event = { id = cgm_pe_colonization_automation.2 } }
+			remove_ship_flag = assigned_colonizer
+			fleet = { 
+				set_event_locked = no
+				owner = { country_event = { id = cgm_pe_colonization_automation.2 } }
+			}	
 		}			
 	}						
 }	
