@@ -18,10 +18,6 @@ event = { #on_monthly_pulse
 					is_country_type = default
 					is_country_type = awakened_fallen_empire
 				}			
-				any_owned_ship = { 
-					is_ship_class = shipclass_colonizer 
-					NOT = { has_ship_flag = assigned_colonizer }
-				}
 				any_planet_within_border = { 
 					NOR = { 
 						exists = owner
@@ -34,7 +30,94 @@ event = { #on_monthly_pulse
 					can_colonize = { who = prev status = yes }	
 				}
 			}		
-			country_event = { id = cgm_pe_colonization_automation.2 days = 1 random = 20 } 
+			set_variable = { which = available_colony_targets value = 0 }
+			every_planet_within_border = { 
+				limit = { 
+					NOR = { 
+						exists = owner					
+						has_planet_flag = colonizer_assigned
+						has_modifier = holy_planet
+					}					
+					is_colonizable = yes 
+					is_colony = no 		
+					is_under_colonization = no
+					can_colonize = { who = root status = yes }	
+					habitability = { who = root.species value > 0.19 } 
+				}
+				prev = { change_variable = { which = available_colony_targets value = 1 } }
+				set_planet_flag = cgm_colonization_target
+				if = { 
+					limit = { NOT = { has_planet_flag = cgm_colonization_processed } }
+					set_colonization_value = yes				
+					set_timed_planet_flag = { flag = cgm_colonization_processed days = 3600 }				
+				}	
+			}			
+			if = { 
+				limit = { 
+					any_owned_ship = { 
+						is_ship_class = shipclass_colonizer 
+						NOT = { has_ship_flag = assigned_colonizer }
+					}
+				}	
+				set_variable = { which = available_colony_ships value = 0 }
+				every_owned_ship = { 
+					limit = { is_ship_class = shipclass_colonizer NOT = { has_ship_flag = assigned_colonizer } }
+					prev = { change_variable = { which = available_colony_ships value = 1 } }
+				}	
+				country_event = { id = cgm_pe_colonization_automation.2 days = 1 random = 20 } 					
+			}
+			else_if = { 
+				limit = { 					
+					is_ai = yes
+					NOT = { 
+						any_owned_ship = { is_ship_class = shipclass_colonizer }
+					}		
+					has_monthly_income = { resource = energy value > 7 }					
+					has_monthly_income = { resource = minerals value > 10 }
+					energy > 100
+					minerals > 150
+				}
+				if = { 
+					limit = { NOT = { check_variable = { which = colonizer_minerals_budget value > 0 } } }												
+					add_minerals = -50	
+					set_variable = { which = colonizer_minerals_budget value = 50 }
+				}	
+				else_if = { 
+					limit = { check_variable = { which = colonizer_minerals_budget value < 300 } }
+					add_minerals = -50	
+					change_variable = { which = colonizer_minerals_budget value = 50 }					
+				}	
+				if = { 
+					limit = { check_variable = { which = colonizer_minerals_budget value > 299 } }					
+					change_variable = { which = colonizer_minerals_budget value = -300 }
+					create_fleet = {
+						name = random
+						effect = {
+							set_owner = prev
+							create_ship = {
+								name = random
+								random_existing_design = colonizer
+								#colonizer_species = prev.species
+								prefix = yes
+								upgradable = yes
+							}
+							set_location = {
+								target = prev.capital_scope
+								distance = 5
+								angle = random
+							}
+						}
+						settings = {
+							can_change_composition = no
+							can_change_leader = no
+							uses_naval_capacity = no
+							spawn_debris = no
+						}
+					}	
+					set_variable = { which = available_colony_ships value = 1 }					
+					country_event = { id = cgm_pe_colonization_automation.2 days = 1 random = 20 }
+				}		
+			}
 		}
 	}
 }
@@ -43,34 +126,7 @@ country_event = {
 	hide_window = yes
 	is_triggered_only = yes	
 	
-	immediate = { 	
-		set_variable = { which = available_colony_targets value = 0 }
-		every_planet_within_border = { 
-			limit = { 
-				NOR = { 
-					exists = owner					
-					has_planet_flag = colonizer_assigned
-					has_modifier = holy_planet
-				}					
-				is_colonizable = yes 
-				is_colony = no 		
-				is_under_colonization = no
-				can_colonize = { who = root status = yes }	
-				habitability = { who = root.species value > 0.19 } 
-			}
-			prev = { change_variable = { which = available_colony_targets value = 1 } }
-			set_planet_flag = cgm_colonization_target
-			if = { 
-				limit = { NOT = { has_planet_flag = cgm_colonization_processed } }
-				set_colonization_value = yes				
-				set_timed_planet_flag = { flag = cgm_colonization_processed days = 3600 }				
-			}	
-		}
-		set_variable = { which = available_colony_ships value = 0 }
-		every_owned_ship = { 
-			limit = { is_ship_class = shipclass_colonizer NOT = { has_ship_flag = assigned_colonizer } }
-			prev = { change_variable = { which = available_colony_ships value = 1 } }
-		}	
+	immediate = { 
 		while = { 
 			limit = { 
 				check_variable = { which = available_colony_ships value > 0 }
@@ -227,14 +283,12 @@ ship_event = {
 					}	
 				}								
 				delete_fleet = this
-			}	
-		}	
-		else = { 			
-			remove_ship_flag = assigned_colonizer
-			fleet = { 
+			}				
+			else = { 			
+				root = { remove_ship_flag = assigned_colonizer }
 				set_event_locked = no
 				owner = { country_event = { id = cgm_pe_colonization_automation.2 } }
-			}	
-		}			
+			}			
+		}	
 	}						
 }	
