@@ -88,10 +88,20 @@ event = { #on_monthly_pulse
 					change_variable = { which = colonizer_minerals_budget value = 50 }					
 				}	
 				if = { 
-					limit = { check_variable = { which = colonizer_minerals_budget value > 299 } }					
+					limit = { 
+						check_variable = { which = colonizer_minerals_budget value > 299 }
+						any_planet_within_border = { 
+							NOT = { has_planet_flag = colonizer_assigned }
+							colonization_candidate_prerequisite = yes
+							OR = { 
+								habitability = { who = this.species value > 0.29 }
+								cgm_planet = yes
+							}				
+						}						
+					}					
 					change_variable = { which = colonizer_minerals_budget value = -300 }
 					create_fleet = {
-						name = random
+						name = "CGM Colonizer"
 						effect = {
 							set_owner = prev
 							create_ship = {
