@@ -1,0 +1,294 @@
+# this = ship
+# root = country that kills ship
+can_spawn_debris = {	
+	root = { 
+		OR = {
+			is_country_type = default
+			is_country_type = ascended_empire
+			is_country_type = lost_empire
+		}
+	}
+	exists = owner
+	owner = { NOT = { has_ascension_perk = ap_enigmatic_engineering } }
+}
+
+#Root = planet
+#This = country
+can_release_vassal = {
+	custom_tooltip = {
+		fail_text = default
+		NOT = { has_valid_civic = civic_fanatic_purifiers }
+	}
+	custom_tooltip = {
+		fail_text = default
+		NOT = { has_valid_civic = civic_machine_terminator }
+	}
+	custom_tooltip = {
+		fail_text = default
+		NOT = { has_valid_civic = civic_machine_assimilator }
+	}
+	custom_tooltip = {
+		fail_text = default
+		NOT = { has_valid_civic = civic_hive_devouring_swarm }
+	}
+	custom_tooltip = {
+		fail_text = requires_domination_adopted
+		has_subjugation_req = yes
+	}
+	custom_tooltip = {
+		fail_text = default
+		NOT = { is_country_type = ascended_empire }
+	}	
+	custom_tooltip = {
+		fail_text = CANNOT_RELEASE_CULTURE_SHOCK
+		root = {
+			NOT = {
+				any_owned_pop = {
+					has_culture_shock = yes
+				}
+			}
+		}		
+	}
+}
+
+# Root = claimer
+# This = system
+can_add_claim = {	
+	hidden_trigger = {
+		if = {
+			limit = {
+				root = { 
+					NOR = { 
+						is_country_type = default 
+						is_country_type = ascended_empire
+					} 
+				}
+			}
+			always = yes
+		}
+	}
+	custom_tooltip = {
+		fail_text = CANNOT_ADD_CLAIM_POLICY
+		OR = {
+			root = { has_policy_flag = unrestricted_wars }		
+			AND = {
+				exists = owner
+				owner = {
+					any_war = {
+						any_attacker = { is_same_value = prevprev }
+						any_defender = { is_same_value = root }
+					}			
+				}				
+			}			
+		}
+	}
+	custom_tooltip = {
+		fail_text = CANNOT_ADD_CLAIM_NOT_VALID_EMPIRE 
+		NAND = {
+			exists = owner		
+			owner = {
+				NOR = {
+					is_country_type = default
+					is_country_type = fallen_empire
+					is_country_type = awakened_fallen_empire
+					is_country_type = ascended_empire
+					is_country_type = lost_empire
+				}
+			}
+		}
+	}	
+	custom_tooltip = {
+		fail_text = CANNOT_ADD_CLAIM_DEVOURING_SWARM
+		NOT = { root = { has_valid_civic = civic_hive_devouring_swarm }	}
+	}	
+	custom_tooltip = {
+		fail_text = CANNOT_ADD_CLAIM_ASSIMILATOR
+		NOT = { root = { has_valid_civic = civic_machine_assimilator }	}
+	}	
+	custom_tooltip = {
+		fail_text = CANNOT_ADD_CLAIM_PURIFIERS		 
+		NAND = {
+			exists = owner
+			root = { has_valid_civic = civic_fanatic_purifiers }		
+			NOT = {	owner = { is_same_species = root } }
+		}
+	}
+	custom_tooltip = {
+		fail_text = CANNOT_ADD_CLAIM_EXTERMINATOR
+		NAND = {
+			exists = owner
+			root = { has_valid_civic = civic_machine_terminator }
+			owner = {
+				NOR = {
+					is_same_species = root
+					has_country_flag = synthetic_empire
+					has_authority = auth_machine_intelligence
+				}
+			}
+		}
+	}
+	custom_tooltip = {
+		fail_text = CANNOT_ADD_CLAIM_THEY_COLOSSUS
+		NAND = {
+			exists = owner
+			NOT = { root = { has_ascension_perk = ap_colossus } }
+			owner = { has_technology = "tech_colossus" }
+			root = { is_neighbor_of = prev.owner }		
+		}
+	}	
+	custom_tooltip = {
+		fail_text = CANNOT_ADD_CLAIM_COLOSSUS
+		OR = {
+			AND = {
+				exists = owner
+				NOT = { root = { is_neighbor_of = prev.owner } }
+			}		
+			NOT = { root = { has_technology = "tech_colossus" } }
+		}	
+	}
+	custom_tooltip = {
+		fail_text = CANNOT_ADD_CLAIM_THEY_THREAT
+		NAND = {
+			exists = owner
+			owner = {
+				OR = {
+					has_valid_civic = civic_hive_devouring_swarm
+					has_valid_civic = civic_fanatic_purifiers
+					has_valid_civic = civic_machine_terminator
+					has_valid_civic = civic_machine_assimilator
+				}
+			}
+			root = {
+				NOR = {
+					has_valid_civic = civic_hive_devouring_swarm
+					has_valid_civic = civic_fanatic_purifiers
+					has_valid_civic = civic_machine_terminator		
+					has_valid_civic = civic_machine_assimilator
+				}
+			}			
+		}
+	}
+}
+
+# Root = Pop
+# From = Country
+# This = Pop
+pop_has_no_happiness = {
+	FROM = {
+		OR = {
+			is_country_type = default
+			is_country_type = ascended_empire
+		}
+	}
+	OR = {
+		AND = {
+			from = { has_authority = auth_machine_intelligence }
+			has_trait = trait_machine_unit # Native machine
+		}
+		AND = {
+			from = { 
+				OR = {
+					has_authority = auth_machine_intelligence 
+					has_policy_flag = ai_outlawed
+				}			
+			}
+			has_trait = trait_mechanical # Robot
+		}
+		AND = {
+			from = {
+				has_authority = auth_machine_intelligence
+				has_civic = civic_machine_assimilator # Assimilator empire
+			}
+			has_trait = trait_cybernetic # Cyborg pop
+		}
+	}
+}
+
+#Root = country, attacker
+#This = country, target
+#This rule is a condition for declaring war
+can_declare_war = {
+	custom_tooltip = {
+		fail_text = "ACTION_DECLARE_WAR_OVERLORD_ON_SUBJECT"
+		NOT = {
+			AND = {
+				OR = {
+					is_subject_type = "vassal"
+					is_subject_type = "protectorate"
+					is_subject_type = "signatory"
+					is_subject_type = "fe_clan_member"
+					is_subject_type = "fe_demilitarized_state"
+					is_subject_type = "fe_union_state"
+					is_subject_type = "fe_symbiote"
+					is_subject_type = "banished_ascendancy"
+				}
+				overlord = {
+					is_same_value = root
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			exists = root
+			ROOT = {
+				has_policy_flag = no_wars
+				OR = {
+					is_subject = no
+					overlord = {
+						is_same_value = root
+					}
+				}
+			}
+		}
+		custom_tooltip = {
+			text = "CAN_DECLARE_WAR_POLICY"
+			always = no
+		}
+	}
+}
+
+#Root = country
+#This = pop
+pop_can_flee_to_country = {
+	root = { 
+		OR = {
+			is_country_type = default
+			is_country_type = ascended_empire
+		}
+	}
+	NOT = { root = { has_policy_flag = refugees_not_allowed } }
+	OR = {
+		has_citizenship_type = { type = citizenship_full country = root }
+		has_citizenship_type = { type = citizenship_caste_system country = root }
+		has_citizenship_type = { type = citizenship_organic_trophy country = root }
+		AND = {
+			has_citizenship_type = { type = citizenship_limited country = root }
+			has_citizenship_type = { type = citizenship_caste_system_limited country = root }
+			root = { has_policy_flag = refugees_allowed }
+		}
+	}
+}
+
+#Root = country
+#This = pop
+#also evaluates true if pop_can_live_planet is false on current planet
+can_auto_migrate_pop = {
+	root = { 
+		OR = {
+			is_country_type = default
+			is_country_type = ascended_empire
+		}
+	}
+	is_sapient = yes
+	is_enslaved = no
+	is_being_purged = no
+	has_migration_control = no
+	is_robot_pop = no
+	OR = {
+		NOT = { has_trait = trait_self_modified }
+		is_same_species = root
+	}
+	NOT = { has_modifier = recently_migrated }
+	NOT = { has_modifier = recent_refugee }
+}

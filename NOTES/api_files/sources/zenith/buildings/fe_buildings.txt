@@ -1,0 +1,624 @@
+@b4time = 180
+@b4cost = 150
+@b4effect = 5
+@b4upkeep = 2.5
+
+@b5time = 180
+@b5cost = 180
+@b5effect = 8
+@b5upkeep = 3
+
+@feupkeep = 4
+@feproduction = 12
+@fecost = 500
+@fetime = 730
+
+
+# Vanilla Overwrites
+
+building_power_plant_5 = {
+	base_buildtime = @b5time
+	is_listed = no
+	
+	cost = {
+		minerals = @b4cost
+	}
+	
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+						has_building = "building_hab_capital"
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+						has_building = "building_hab_capital"
+					}		
+				}
+			}
+		}
+	}
+	
+	produced_resources = {
+		energy = 8
+	}
+	upgrades = {
+		building_fe_dark_matter_power_plant
+	}
+	
+	prerequisites = {
+		"tech_power_plant_4"
+	}
+	
+	ai_weight = {
+		factor = 1
+		modifier = {
+			factor = 0.25
+			is_slave_tile_or_planet = yes		
+		}
+	}
+}
+
+betharian_power_plant = {
+	base_buildtime = 240
+	icon = "building_betharian_power_plant_1"
+	
+	cost = {
+		minerals = 150
+	}
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }	
+		}
+	}
+	
+	produced_resources = {
+		energy = 10
+	}
+	
+	prerequisites = {
+		"tech_mine_betharian"
+	}
+	
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_capital_1"
+							has_building = "building_capital_2"
+							has_building = "building_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_betharian_stone"
+					tile = {
+						has_resource = {
+							type = sr_betharian
+							amount > 0
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			AND = {
+				custom_tooltip = {
+					fail_text = "requires_building_capital_1"
+					planet = {
+						OR = {
+							has_building = "building_machine_capital_1"
+							has_building = "building_machine_capital_2"
+							has_building = "building_machine_capital_3"
+						}
+					}
+				}
+				custom_tooltip = {
+					fail_text = "requires_betharian_stone"
+					tile = {
+						has_resource = {
+							type = sr_betharian
+							amount > 0
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	ai_allow = {
+		always = yes
+	}
+	
+	produced_resources = {
+		energy = 10
+	}
+	upgrades = {
+		building_fe_dark_matter_power_plant
+	}
+	
+	ai_weight = {
+		weight = 10	
+	}
+}
+
+building_hydroponics_farm_5 = {
+	tags = { hydroponics_farm }
+	
+	base_buildtime = @b5time
+	is_listed = no
+	
+	cost = {
+		minerals = @b5cost
+	}
+	
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+	
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }	
+		}
+	}
+	
+	destroy_if = {
+			AND = {
+				exists = owner
+				owner = { has_authority = auth_machine_intelligence }
+			}
+	}
+	
+    allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_2"
+			planet = {
+				OR = {
+					has_building = "building_capital_2"
+					has_building = "building_capital_3"
+					has_building = "building_hab_capital"
+				}
+			}
+		}
+	}
+	
+	produced_resources = {
+		food = 7
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			NOT = { has_swapped_tradition = tr_adaptability_finish }
+			resources = {
+				unity = 1
+			}
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			NOT = { has_valid_civic = civic_agrarian_idyll }
+			resources = {
+				minerals = 1
+			}
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			has_valid_civic = civic_agrarian_idyll
+			resources = {
+				unity = 1
+				minerals = 1
+			}
+		}		
+	}
+	
+	required_resources = {
+		energy = @b5upkeep
+	}
+	
+	upgrades = {
+		building_fe_agri_processing_complex
+	}
+	
+	prerequisites = {
+		"tech_nano_vitality_crops"
+	}	
+}
+
+building_mining_network_5 = {
+	tags = { mining_network }
+	
+	base_buildtime = @b5time
+	is_listed = no
+	
+	cost = {
+		minerals = @b5cost
+	}
+	
+	potential = {
+		planet = {
+			NOT = { is_planet_class = pc_habitat }	
+		}
+	}
+	
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = { 
+					OR = {
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}				
+				 }
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			custom_tooltip = {
+				text = "requires_building_machine_capital_2"
+				planet = { 
+					OR = {
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}
+				}
+			}
+		}
+	}
+	
+	produced_resources = {
+		minerals = 7
+	}
+	
+	required_resources = {
+		energy = @b5upkeep
+	}
+	upgrades = {
+		building_fe_ancient_factory		
+	}
+	
+	prerequisites = {
+		"tech_mining_network_4"
+	}	
+}
+
+# Organic Sanctuary (Servitors Only)
+building_organic_sanctuary = {
+	is_listed = no
+	
+	ai_replace = no
+	event_building = yes
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	produced_resources = {
+		unity = 1
+	}
+
+	allow = {
+		always = no
+	}
+	
+	destroy_if = {
+		exists = owner
+		NAND = {
+			owner = {
+				has_authority = auth_machine_intelligence
+				OR = {
+					has_government = gov_machine_servitor
+					has_government = gov_ascended_machine_servitor
+				}
+			}	
+			has_grown_pop = yes
+			pop = {
+				has_living_standard = {
+					country = planet.owner
+					type = living_standard_organic_trophy
+				}
+			}			
+		}		
+	}
+	
+	# Building requires bio-trophy pops to function
+	active = { # scope: pop
+		custom_tooltip = {
+			fail_text = "bio_trophy_tooltip_1"
+			has_living_standard = {
+				country = planet.owner
+				type = living_standard_organic_trophy
+			}
+		}
+	}
+
+	ai_replace = no
+	event_building = yes
+	can_demolish = no
+}
+
+# Organic Paradise (Servitors Only)
+building_organic_paradise = {
+	is_listed = no
+	
+	ai_replace = no
+	event_building = yes
+	
+	required_resources = {
+		energy = 1
+	}
+	
+	produced_resources = {
+		unity = 2
+	}
+
+	allow = {
+		always = no
+	}
+	
+	destroy_if = {
+		exists = owner
+		NAND = {
+			owner = {
+				has_authority = auth_machine_intelligence
+				OR = {
+					has_government = gov_machine_servitor
+					has_government = gov_ascended_machine_servitor
+				}
+			}	
+			has_grown_pop = yes
+			pop = {
+				has_living_standard = {
+					country = planet.owner
+					type = living_standard_organic_trophy
+				}
+			}			
+		}		
+	}
+	
+	# Building requires bio-trophy pops to function
+	active = { # scope: pop
+		custom_tooltip = {
+			fail_text = "bio_trophy_tooltip_1"
+			has_living_standard = {
+				country = planet.owner
+				type = living_standard_organic_trophy
+			}
+		}
+	}
+
+	ai_replace = no
+	event_building = yes
+	can_demolish = no
+}
+
+
+# Fallen Empire buildings
+
+building_fe_ancient_factory = {
+	icon = "building_ancient_factory"
+	base_buildtime = @fetime
+	is_listed = no
+	
+	cost = {
+		minerals = @fecost
+	}
+	
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+					}		
+				}
+			}
+		}
+	}
+	
+	produced_resources = {
+		minerals = @feproduction
+	}
+	
+	required_resources = {
+		energy = @feupkeep
+	}	
+	
+	prerequisites = { "tech_fe_ancient_factory" }
+	
+	ai_replace = no
+
+}
+
+building_fe_dark_matter_power_plant = {
+	icon = "building_dark_matter_power_plant"
+	base_buildtime = @fetime
+	is_listed = no
+	
+	cost = {
+		minerals = @fecost
+	}
+	
+	allow = {
+		if = {
+			limit = {
+				owner = {
+					NOT = { has_authority = auth_machine_intelligence }
+				}
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_capital_2"
+						has_building = "building_capital_3"
+						has_building = "building_hab_capital"
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				owner = { has_authority = auth_machine_intelligence }
+			}
+			custom_tooltip = {
+				text = "requires_building_capital_2"
+				planet = {
+					OR = {
+						has_building = "building_machine_capital_2"
+						has_building = "building_machine_capital_3"
+						has_building = "building_hab_capital"
+					}		
+				}
+			}
+		}
+	}
+	
+	produced_resources = {
+		energy = @feproduction
+	}
+	
+	prerequisites = { "tech_fe_dark_matter_power_plant" }
+	
+	ai_replace = no
+	
+}
+
+building_fe_agri_processing_complex = {
+	icon = "building_agri_processing_complex"
+	base_buildtime = @fetime
+	is_listed = no
+	
+	cost = {
+		minerals = @fecost
+	}
+
+	show_tech_unlock_if = { NOT = { has_authority = auth_machine_intelligence } }
+	
+	potential = {
+		NOT = {
+			owner = { has_authority = auth_machine_intelligence }
+		}
+		planet = {
+			NOT = { is_planet_class = pc_habitat }	
+		}
+	}
+	
+	destroy_if = {
+			AND = {
+				exists = owner
+				owner = { has_authority = auth_machine_intelligence }
+			}
+	}
+	
+   allow = {
+		custom_tooltip = {
+			text = "requires_building_capital_2"
+			planet = {
+				OR = {
+					has_building = "building_capital_2"
+					has_building = "building_capital_3"
+					has_building = "building_hab_capital"
+				}
+			}
+		}
+	}
+	
+	produced_resources = {
+		food = @feproduction
+	}
+	required_resources = {
+		energy = @feupkeep
+	}
+	
+	produced_resource_trigger = {
+		modifier = {
+			has_valid_civic = civic_agrarian_idyll
+			NOT = { has_swapped_tradition = tr_adaptability_finish }
+			resources = {
+				unity = 1
+			}
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			NOT = { has_valid_civic = civic_agrarian_idyll }
+			resources = {
+				minerals = 1
+			}
+		}
+		modifier = {
+			has_swapped_tradition = tr_adaptability_finish
+			has_valid_civic = civic_agrarian_idyll
+			resources = {
+				unity = 1
+				minerals = 1
+			}
+		}		
+	}
+	
+	prerequisites = { "tech_fe_agri_processing_complex" }
+	
+	ai_replace = no
+	
+}

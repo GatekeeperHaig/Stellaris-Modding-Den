@@ -1,0 +1,229 @@
+#my_casus_belli = {
+#	potential = { ... }		# trigger to make some CBs invalid for certain types of countries; this = attacker (CB owner); default: { always = yes }
+#	is_valid = { ... }		# trigger, evaluated daily to check if CB should be created or destroyed automatically, does not affect CBs granted via script;
+#								# this = attacker (CB owner), from = defender (target country); default: { always = yes }
+#	destroy_if = { ... }	# trigger, evaluated daily to destroy CBs that have been granted via script ahead of expiration date;
+#								# this = attacker (CB owner), from = defender (target country); default: { always = no }
+#	show_notification = no/yes	# optional (default = yes), flag to control whether this CB will generate a notification (to avoid duplicate 
+# 								# notification when a claim CB is generated)
+#}
+
+
+### Vanilla Overwrite
+
+cb_subjugation = {
+	show_in_diplomacy = yes
+	show_notification = yes
+	potential = {
+		OR = {
+			is_country_type = default
+			is_country_type = awakened_fallen_empire
+		}
+		is_subject = no
+	}
+	is_valid = { 
+		NOT = { is_overlord_to = FROM }
+		is_country_type = awakened_fallen_empire 
+		NOT = { has_authority = auth_machine_intelligence }
+		from = {
+			NOR = {
+				is_country_type = ascended_empire
+				is_country_type = lost_empire
+			}
+		}
+	}	
+}
+
+
+
+
+
+
+
+
+cb_ascended_empire_claim = {
+	show_in_diplomacy = yes
+	show_notification = no
+	potential = {
+		is_country_type = ascended_empire
+	}
+	is_valid = {
+		has_claim = FROM
+		NOT = { is_overlord_to = FROM }
+	}
+}
+
+cb_ascended_empire_subjugation = {
+	show_in_diplomacy = yes
+	show_notification = yes
+	potential = {
+		is_country_type = ascended_empire
+		NOR = {
+			has_valid_civic = civic_fanatic_purifiers
+			has_valid_civic = civic_hive_devouring_swarm
+			has_authority = auth_machine_intelligence
+		}
+	}
+	is_valid = {
+		from = {
+			is_country_type = default
+		}
+	}	
+}
+
+cb_ascended_empire_humiliation = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		is_country_type = ascended_empire
+	}
+	is_valid = {	
+		OR = {
+			NOT = { has_policy_flag = liberation_wars }
+			from = { has_ethic = ethic_gestalt_consciousness }
+		}
+		is_rival = FROM
+		from = { is_country_type = default }
+		NOT = { is_overlord_to = FROM }
+	}
+}
+
+cb_ascended_empire_ideology = {
+	show_in_diplomacy = yes
+	show_notification = yes
+	potential = {
+		is_country_type = ascended_empire
+		NOT = { has_ethic = ethic_gestalt_consciousness }
+	}
+	is_valid = {	
+		has_policy_flag = liberation_wars
+		is_neighbor_of = FROM
+		from = { is_country_type = default }
+		from = { NOT = { has_ethic = ethic_gestalt_consciousness } }
+		OR = {
+			AND = {
+				is_xenophile = yes
+				from = { is_xenophile = no }
+			}
+			AND = {
+				is_xenophobe = yes
+				from = { is_xenophobe = no }
+			}
+			AND = {
+				is_authoritarian = yes
+				from = { is_authoritarian = no }
+			}
+			AND = {
+				is_egalitarian = yes
+				from = { is_egalitarian = no }
+			}		
+			AND = {
+				is_spiritualist = yes
+				from = { is_spiritualist = no }
+			}		
+			AND = {
+				is_materialist = yes
+				from = { is_materialist = no }
+			}		
+			AND = {
+				is_militarist = yes
+				from = { is_militarist = no }
+			}		
+			AND = {
+				is_pacifist = yes
+				from = { is_pacifist = no }
+			}					
+		}
+		NOT = { is_overlord_to = FROM }
+	}
+}
+
+cb_ascended_empire_despoliation = {
+	show_in_diplomacy = yes
+	show_notification = yes
+	potential = {
+		is_country_type = ascended_empire
+		OR = {
+			has_valid_civic = civic_barbaric_despoilers
+			has_valid_civic = civic_fervid_xeno_collectors
+		}
+	}
+	is_valid = {
+		is_neighbor_of = from
+		NOT = { is_overlord_to = FROM }
+	}
+}
+
+cb_ascended_empire_colossus = {
+	show_in_diplomacy = yes
+	show_notification = yes
+	potential = {
+		is_country_type = ascended_empire
+		has_technology = "tech_colossus"
+		has_policy_flag = unrestricted_wars
+	}
+	is_valid = {
+		is_neighbor_of = from
+		any_ship = { is_ship_size = colossus }
+		NOT = { is_overlord_to = FROM }
+	}
+}
+
+cb_ascended_empire_stop_colossus = {
+	show_in_diplomacy = yes
+	show_notification = yes
+	potential = {
+		is_country_type = ascended_empire
+	}
+	is_valid = {
+		is_neighbor_of = from
+		from = { any_ship = { is_ship_size = colossus } }
+		NOT = { any_ship = { is_ship_size = colossus } }
+		NOT = { is_overlord_to = FROM }
+	}
+}
+
+cb_ascended_hunger = {
+	show_in_diplomacy = no
+	show_notification = no
+	potential = {
+		is_country_type = ascended_empire	
+		has_valid_civic = civic_hive_devouring_swarm	
+	}
+	is_valid = {
+		has_total_war_cb = yes
+		is_neighbor_of = from
+		NOT = { is_overlord_to = FROM }
+	}
+}
+
+cb_ascended_empire_containment = {
+	show_in_diplomacy = yes
+	show_notification = yes
+	potential = {
+		is_country_type = default	
+		NOR = {
+			has_valid_civic = civic_fanatic_purifiers
+			has_valid_civic = civic_machine_terminator	
+			has_valid_civic = civic_machine_assimilator
+			has_valid_civic = civic_hive_devouring_swarm
+		}
+	}
+	is_valid = {
+		has_total_war_cb = yes
+		OR = {
+			is_subject = no
+			overlord = { NOT = { is_same_value = from } }
+		}
+		from = {
+			is_country_type = ascended_empire
+			NOR = {
+				has_valid_civic = civic_fanatic_purifiers
+				has_valid_civic = civic_hive_devouring_swarm
+				has_valid_civic = civic_machine_assimilator
+				has_valid_civic = civic_machine_terminator	
+			}
+		}
+	}
+}
+
