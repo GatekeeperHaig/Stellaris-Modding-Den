@@ -39,13 +39,26 @@ planet_event = {
 					change_variable = { which = planet_terraforming_points value = -1.5 }
 				}
 				else = { change_variable = { which = planet_terraforming_points value = -2.25 } }
+				set_variable = { which = remaining_terraforming_time value = planet_terraforming_points }
+				if = { 
+					limit = { has_planet_flag = increased_terraformer_speed }
+					divide_variable = { which = remaining_terraforming_time value = 1.5 }
+				}
+				else_if = { 
+					limit = { has_planet_flag = maximal_terraformer_speed }
+					divide_variable = { which = remaining_terraforming_time value = 2.25 }
+				}				
 				if = { 
 					limit = { check_variable = { which = planet_terraforming_points value > 0 }	}
 					planet_event = { id = cgm_pe_terraforming_events.1 days = 300 random = 100 }
 				}
-				else = { planet_event = { id = cgm_pe_terraforming_events.2 } }					
+				else = { 
+					set_variable = { which = remaining_terraforming_time value = 0 }
+					planet_event = { id = cgm_pe_terraforming_events.2 } 
+				}					
 			}
 			else = { 
+				set_variable = { which = remaining_terraforming_time value = 0 }
 				planet_event = { id = cgm_pe_terraforming_events.2 }	
 			}										
 		}	
