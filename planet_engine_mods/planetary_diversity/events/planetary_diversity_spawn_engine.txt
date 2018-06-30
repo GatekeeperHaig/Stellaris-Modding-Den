@@ -6,12 +6,10 @@
 namespace = spawn_engine_1
 
 event = {
-	#this event triggers on game start and monthly pulse
+	#this event triggers on game start
 	id = spawn_engine_1.0
 	hide_window = yes
 	is_triggered_only = yes
-	fire_only_once = yes
-	#This event fires only once.
 	
 	trigger = { 
 		NOT = { has_global_flag = planetary_diversity_active } #this ensures the global flag will be set up correctly on mod loadup - if load into savegame is enabled. 		
@@ -87,11 +85,11 @@ planet_event = {
 			}
 			if = { 
 				limit = {
-					OR = { 
-						NOT = { any_tile = { has_deposit = yes } }	
-						NOT = { any_tile = { has_blocker = yes } }
-						deposit_and_blocker_threshold_limit = yes
-					}
+					NAND = { 
+						any_tile = { has_deposit = yes } 	
+						any_tile = { has_blocker = yes } 
+					}	
+					deposit_and_blocker_threshold_limit = yes					
 				}	
 				spawn_deposits_and_blockers = yes				
 			}	
@@ -107,11 +105,11 @@ country_event = {
 		every_planet = { 
 			limit = { 
 				habitable_planet = yes
-				OR = { 
-					NOT = { any_tile = { has_deposit = yes } }	
-					NOT = { any_tile = { has_blocker = yes } }				
-					deposit_and_blocker_threshold_limit = yes		
+				NAND = { 
+					any_tile = { has_deposit = yes } 	
+					any_tile = { has_blocker = yes } 
 				}	
+				deposit_and_blocker_threshold_limit = yes							
 			}				
 			spawn_deposits_and_blockers = yes												
 			if = { 
@@ -127,9 +125,15 @@ country_event = {
 	id = spawn_engine_1.4
 	hide_window = yes
 	is_triggered_only = yes
-	fire_only_once = yes
-	trigger = { is_ai = no }
-	immediate = { set_country_flag = pd_game_host }
+	
+	trigger = { 
+		is_ai = no 
+		NOT = { has_global_flag = pd_game_host_set } 
+	}
+	immediate = { 
+		set_country_flag = pd_game_host 
+		set_timed_global_flag = { flag = pd_game_host_set days = 1 } 
+	}
 }	
 	
 country_event = {
@@ -137,7 +141,16 @@ country_event = {
 	id = spawn_engine_1.3
 	hide_window = yes
 	is_triggered_only = yes
-	trigger = { has_country_flag = pd_game_host }
+	
+	trigger = { 
+		OR = { 
+			AND = { 
+				NOT = { has_global_flag = planets_enhanced_game_start_flag }
+				has_country_flag = pd_game_host
+			}	
+			has_country_flag = cgm_game_host
+		}	
+	}
 
 	immediate = { 
 		every_country = { 
@@ -203,8 +216,7 @@ country_event = {
 		capital_scope = {
 			every_tile = {
 				limit = {
-					has_deposit = no
-					has_building = no					
+					has_deposit = no									
 				}
 				random_list = {
 					65 = { planetary_diversity_planetary_resource_spawn_table = yes }
