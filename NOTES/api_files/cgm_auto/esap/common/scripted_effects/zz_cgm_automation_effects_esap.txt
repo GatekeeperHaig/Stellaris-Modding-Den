@@ -9,15 +9,51 @@ add_minerals_building_esap = {
 		owner = { set_country_flag = cgm_auto_built }
 	}
 	else = {
-		add_building_construction = building_esap_ecumenopolis_factory_1
+		add_building_construction = building_esap_adv_buildings_minerals
 		if = {
 			limit = {
 				OR = { has_building_construction = yes has_building = yes }
 			}
 			owner = { set_country_flag = cgm_auto_built }
 		}
-		else = { add_building_construction = building_esap_adv_buildings_minerals }
+		else = { add_building_construction = building_esap_ecumenopolis_factory_1 }
 	}
+}
+add_energy_building_esap = {
+	if = {
+		limit = {
+			OR = { has_building_construction = yes has_building = yes }
+		}
+		owner = { set_country_flag = cgm_auto_built }
+	}
+	else = {
+		add_building_construction = building_esap_adv_buildings_energy
+		if = {
+			limit = {
+				OR = { has_building_construction = yes has_building = yes }
+			}
+			owner = { set_country_flag = cgm_auto_built }
+		}
+		else = {
+			add_building_construction = building_esap_ecumenopolis_admin_1
+			if = {
+				limit = {
+					OR = { has_building_construction = yes has_building = yes }
+				}
+				owner = { set_country_flag = cgm_auto_built }
+			}
+			else = { add_building_construction = building_esap_ecumenopolis_finance_1 }
+		}
+	}
+}
+add_food_building_esap = {
+	if = {
+		limit = {
+			OR = { has_building_construction = yes has_building = yes }
+		}
+		owner = { set_country_flag = cgm_auto_built }
+	}
+	else = { add_building_construction = building_esap_adv_buildings_food }
 }
 cgm_add_special_building_esap = {
 	if = {
@@ -33,7 +69,7 @@ cgm_add_special_building_esap = {
 					check_variable = { which = cgm_special_bestBuilding value = -2113403.291 }
 				}
 			}
-			add_building_construction = building_esap_symbol_of_unity
+			add_building_construction = building_esap_ecumenopolis_leisure_1
 		}
 		if = {
 			limit = {
@@ -48,7 +84,7 @@ cgm_add_special_building_esap = {
 						check_variable = { which = cgm_special_bestBuilding value = -2079848.859 }
 					}
 				}
-				add_building_construction = building_esap_ecumenopolis_leisure_1
+				add_building_construction = building_esap_symbol_of_unity
 			}
 			if = {
 				limit = {
@@ -95,7 +131,11 @@ cgm_search_for_special_building_esap = {
 	else = {
 		if = {
 			limit = {
-				owner = { has_ascension_perk = ap_esap_xenophobe_2 }
+				owner = {
+					has_ascension_perk = ap_esap_ecumenopolis
+					Not = { has_ethic = ethic_gestalt_consciousness }
+				}
+				has_modifier = mod_esap_ecumenopolis
 				if = {
 					limit = {
 						owner = { NOT = { has_authority = auth_machine_intelligence } }
@@ -120,12 +160,11 @@ cgm_search_for_special_building_esap = {
 						}
 					}
 				}
-				Not = {
-					any_owned_pop = {
-						Not = { is_same_species = owner is_robot_pop = yes }
-					}
+				NOR = {
+					has_building = building_esap_ecumenopolis_leisure_1
+					has_building = building_esap_ecumenopolis_leisure_2
+					has_building = building_esap_ecumenopolis_leisure_3
 				}
-				NOR = { has_building = building_esap_symbol_of_unity }
 				owner = {
 					check_variable = { which = cgm_special_bestWeight value < 10 }
 				}
@@ -145,11 +184,7 @@ cgm_search_for_special_building_esap = {
 		else = {
 			if = {
 				limit = {
-					owner = {
-						has_ascension_perk = ap_esap_ecumenopolis
-						Not = { has_ethic = ethic_gestalt_consciousness }
-					}
-					has_modifier = mod_esap_ecumenopolis
+					owner = { has_ascension_perk = ap_esap_xenophobe_2 }
 					if = {
 						limit = {
 							owner = { NOT = { has_authority = auth_machine_intelligence } }
@@ -174,11 +209,12 @@ cgm_search_for_special_building_esap = {
 							}
 						}
 					}
-					NOR = {
-						has_building = building_esap_ecumenopolis_leisure_1
-						has_building = building_esap_ecumenopolis_leisure_2
-						has_building = building_esap_ecumenopolis_leisure_3
+					Not = {
+						any_owned_pop = {
+							Not = { is_same_species = owner is_robot_pop = yes }
+						}
 					}
+					NOR = { has_building = building_esap_symbol_of_unity }
 					owner = {
 						check_variable = { which = cgm_special_bestWeight value < 10 }
 					}
@@ -284,33 +320,6 @@ cgm_search_for_special_building_esap = {
 		}
 	}
 }
-add_energy_building_esap = {
-	if = {
-		limit = {
-			OR = { has_building_construction = yes has_building = yes }
-		}
-		owner = { set_country_flag = cgm_auto_built }
-	}
-	else = {
-		add_building_construction = building_esap_ecumenopolis_admin_1
-		if = {
-			limit = {
-				OR = { has_building_construction = yes has_building = yes }
-			}
-			owner = { set_country_flag = cgm_auto_built }
-		}
-		else = {
-			add_building_construction = building_esap_ecumenopolis_finance_1
-			if = {
-				limit = {
-					OR = { has_building_construction = yes has_building = yes }
-				}
-				owner = { set_country_flag = cgm_auto_built }
-			}
-			else = { add_building_construction = building_esap_adv_buildings_energy }
-		}
-	}
-}
 add_society_research_building_esap = {
 	if = {
 		limit = {
@@ -391,13 +400,4 @@ add_physics_research_adjacency_building_esap = {
 		owner = { set_country_flag = cgm_auto_built }
 	}
 	else = { add_building_construction = building_esap_ecumenopolis_inst_phys_1 }
-}
-add_food_building_esap = {
-	if = {
-		limit = {
-			OR = { has_building_construction = yes has_building = yes }
-		}
-		owner = { set_country_flag = cgm_auto_built }
-	}
-	else = { add_building_construction = building_esap_adv_buildings_food }
 }
