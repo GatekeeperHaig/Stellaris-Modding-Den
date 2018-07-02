@@ -1,0 +1,46 @@
+namespace = cgm_pe_update_events
+
+event = { #monthly pulse
+	id = cgm_pe_update_events.1
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = { 
+		if = { 
+			limit = { 
+				NOT = { exists = event_target:cgm_pe_variable_storage }
+			}
+			random_planet = { 
+				limit = { is_star = yes }
+				save_global_event_target_as = cgm_pe_variable_storage
+				set_planet_flag = cgm_pe_variable_storage
+				set_variable = { which = tb_sunflower_spawn value = 0 }			
+				set_variable = { which = tb_precursor_trading_outpost value = 0 } 
+				set_variable = { which = num_of_regular_habitable_planets value = 0 }			
+				every_planet = { 
+					limit = { habitable_planet = yes } 
+					prev = { change_variable = { which = num_of_regular_habitable_planets value = 1 } }
+				}
+				set_variable = { which = num_of_asteroidal_candidates value = num_of_regular_habitable_planets }
+				multiply_variable = { which = num_of_asteroidal_candidates value = 0.15 }			
+				while = { 
+					count = num_of_asteroidal_candidates
+					random_planet = { 
+						limit = { 
+							OR = { 
+								is_planet_class = pc_asteroid
+								is_planet_class = pc_ice_asteroid			
+								is_planet_class = pc_large_asteroid_moon
+								is_planet_class = pc_small_asteroid_moon
+								is_planet_class = pc_dwarf_planet_asteroid
+							}				
+							NOT = { has_planet_flag = asteroidal_candidate }				
+							planet_size > 4			
+						} 		
+						set_planet_flag = asteroidal_candidate
+					}
+				}					
+			}			
+		}
+	}	
+}
