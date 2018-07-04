@@ -646,30 +646,43 @@ cgm_spawn_engine = {
 					cgm_shared_regular_deposit_spawn_table = yes
 				}
 			}	
-			set_variable = { which = num_of_asteroidal_candidates value = num_of_regular_habitable_planets }
-			multiply_variable = { which = num_of_asteroidal_candidates value = 0.1 }
 			event_target:cgm_pe_variable_storage = {
 				while = { 
 					count = num_of_asteroidal_candidates
-					random_planet = { 
+					random_system = { 
 						limit = { 
-							OR = { 
-								is_planet_class = pc_asteroid
-								is_planet_class = pc_ice_asteroid			
-								is_planet_class = pc_large_asteroid_moon
-								is_planet_class = pc_small_asteroid_moon
-								is_planet_class = pc_dwarf_planet_asteroid
-							}				
-							NOT = { has_planet_flag = asteroidal_candidate }				
-							planet_size > 4			
-						} 		
-						set_planet_flag = asteroidal_candidate
-					}
+							any_planet = { 
+								OR = { 
+									is_planet_class = pc_asteroid
+									is_planet_class = pc_ice_asteroid			
+									is_planet_class = pc_large_asteroid_moon
+									is_planet_class = pc_small_asteroid_moon
+									is_planet_class = pc_dwarf_planet_asteroid
+								}				
+								NOT = { has_planet_flag = asteroidal_candidate }				
+								planet_size > 4											
+							}
+						}	
+						random_system_planet = { 
+							limit = { 
+								OR = { 
+									is_planet_class = pc_asteroid
+									is_planet_class = pc_ice_asteroid			
+									is_planet_class = pc_large_asteroid_moon
+									is_planet_class = pc_small_asteroid_moon
+									is_planet_class = pc_dwarf_planet_asteroid
+								}				
+								NOT = { has_planet_flag = asteroidal_candidate }				
+								planet_size > 4			
+							} 		
+							set_planet_flag = asteroidal_candidate
+						}
+					}	
 				}	
 			}				
 			if = { 
 				limit = { has_global_flag = cgm_game_start_auto_exploration }
-				every_country = {
+				every_playable_country = {
 					limit = { is_ai = no }
 					give_technology = { message = no tech = tech_cgm_automated_exploration_feature }
 				}	
@@ -680,7 +693,7 @@ cgm_spawn_engine = {
 					limit = { has_blocker = yes } 
 					remove_blocker = yes
 				}
-			}	
+			}				
 		}
 	}
 }
@@ -1214,3 +1227,236 @@ generate_catastrophe = {
 		}
 	}	
 }
+
+update_terraforming_time = { 
+	set_variable = { which = remaining_terraforming_time value = planet_terraforming_points }
+	if = { 
+		limit = { has_planet_flag = increased_terraformer_speed }
+		divide_variable = { which = remaining_terraforming_time value = 1.5 }
+	}
+	else_if = { 
+		limit = { has_planet_flag = maximal_terraformer_speed }
+		divide_variable = { which = remaining_terraforming_time value = 2.25 }
+	}		
+}	
+
+calculate_available_terraforming_points = { 
+	if = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 1 } } set_variable = { which =  country_terraforming_points value = 1 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 2 } } set_variable = { which =  country_terraforming_points value = 2 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 3 } } set_variable = { which =  country_terraforming_points value = 3 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 4 } } set_variable = { which =  country_terraforming_points value = 4 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 5 } } set_variable = { which =  country_terraforming_points value = 5 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 6 } } set_variable = { which =  country_terraforming_points value = 6 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 7 } } set_variable = { which =  country_terraforming_points value = 7 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 8 } } set_variable = { which =  country_terraforming_points value = 8 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 9 } } set_variable = { which =  country_terraforming_points value = 9 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 10 } } set_variable = { which =  country_terraforming_points value = 10 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 11 } } set_variable = { which =  country_terraforming_points value = 11 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 12 } } set_variable = { which =  country_terraforming_points value = 12 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 13 } } set_variable = { which =  country_terraforming_points value = 13 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 14 } } set_variable = { which =  country_terraforming_points value = 14 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 15 } } set_variable = { which =  country_terraforming_points value = 15 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 16 } } set_variable = { which =  country_terraforming_points value = 16 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 17 } } set_variable = { which =  country_terraforming_points value = 17 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 18 } } set_variable = { which =  country_terraforming_points value = 18 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 19 } } set_variable = { which =  country_terraforming_points value = 19 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 20 } } set_variable = { which =  country_terraforming_points value = 20 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 21 } } set_variable = { which =  country_terraforming_points value = 21 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 22 } } set_variable = { which =  country_terraforming_points value = 22 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 23 } } set_variable = { which =  country_terraforming_points value = 23 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 24 } } set_variable = { which =  country_terraforming_points value = 24 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 25 } } set_variable = { which =  country_terraforming_points value = 25 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 26 } } set_variable = { which =  country_terraforming_points value = 26 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 27 } } set_variable = { which =  country_terraforming_points value = 27 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 28 } } set_variable = { which =  country_terraforming_points value = 28 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 29 } } set_variable = { which =  country_terraforming_points value = 29 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 30 } } set_variable = { which =  country_terraforming_points value = 30 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 31 } } set_variable = { which =  country_terraforming_points value = 31 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 32 } } set_variable = { which =  country_terraforming_points value = 32 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 33 } } set_variable = { which =  country_terraforming_points value = 33 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 34 } } set_variable = { which =  country_terraforming_points value = 34 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 35 } } set_variable = { which =  country_terraforming_points value = 35 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 36 } } set_variable = { which =  country_terraforming_points value = 36 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 37 } } set_variable = { which =  country_terraforming_points value = 37 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 38 } } set_variable = { which =  country_terraforming_points value = 38 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 39 } } set_variable = { which =  country_terraforming_points value = 39 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 40 } } set_variable = { which =  country_terraforming_points value = 40 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 41 } } set_variable = { which =  country_terraforming_points value = 41 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 42 } } set_variable = { which =  country_terraforming_points value = 42 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 43 } } set_variable = { which =  country_terraforming_points value = 43 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 44 } } set_variable = { which =  country_terraforming_points value = 44 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 45 } } set_variable = { which =  country_terraforming_points value = 45 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 46 } } set_variable = { which =  country_terraforming_points value = 46 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 47 } } set_variable = { which =  country_terraforming_points value = 47 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 48 } } set_variable = { which =  country_terraforming_points value = 48 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 49 } } set_variable = { which =  country_terraforming_points value = 49 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 50 } } set_variable = { which =  country_terraforming_points value = 50 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 51 } } set_variable = { which =  country_terraforming_points value = 51 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 52 } } set_variable = { which =  country_terraforming_points value = 52 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 53 } } set_variable = { which =  country_terraforming_points value = 53 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 54 } } set_variable = { which =  country_terraforming_points value = 54 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 55 } } set_variable = { which =  country_terraforming_points value = 55 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 56 } } set_variable = { which =  country_terraforming_points value = 56 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 57 } } set_variable = { which =  country_terraforming_points value = 57 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 58 } } set_variable = { which =  country_terraforming_points value = 58 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 59 } } set_variable = { which =  country_terraforming_points value = 59 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 60 } } set_variable = { which =  country_terraforming_points value = 60 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 61 } } set_variable = { which =  country_terraforming_points value = 61 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 62 } } set_variable = { which =  country_terraforming_points value = 62 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 63 } } set_variable = { which =  country_terraforming_points value = 63 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 64 } } set_variable = { which =  country_terraforming_points value = 64 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 65 } } set_variable = { which =  country_terraforming_points value = 65 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 66 } } set_variable = { which =  country_terraforming_points value = 66 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 67 } } set_variable = { which =  country_terraforming_points value = 67 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 68 } } set_variable = { which =  country_terraforming_points value = 68 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 69 } } set_variable = { which =  country_terraforming_points value = 69 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 70 } } set_variable = { which =  country_terraforming_points value = 70 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 71 } } set_variable = { which =  country_terraforming_points value = 71 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 72 } } set_variable = { which =  country_terraforming_points value = 72 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 73 } } set_variable = { which =  country_terraforming_points value = 73 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 74 } } set_variable = { which =  country_terraforming_points value = 74 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 75 } } set_variable = { which =  country_terraforming_points value = 75 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 76 } } set_variable = { which =  country_terraforming_points value = 76 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 77 } } set_variable = { which =  country_terraforming_points value = 77 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 78 } } set_variable = { which =  country_terraforming_points value = 78 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 79 } } set_variable = { which =  country_terraforming_points value = 79 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 80 } } set_variable = { which =  country_terraforming_points value = 80 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 81 } } set_variable = { which =  country_terraforming_points value = 81 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 82 } } set_variable = { which =  country_terraforming_points value = 82 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 83 } } set_variable = { which =  country_terraforming_points value = 83 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 84 } } set_variable = { which =  country_terraforming_points value = 84 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 85 } } set_variable = { which =  country_terraforming_points value = 85 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 86 } } set_variable = { which =  country_terraforming_points value = 86 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 87 } } set_variable = { which =  country_terraforming_points value = 87 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 88 } } set_variable = { which =  country_terraforming_points value = 88 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 89 } } set_variable = { which =  country_terraforming_points value = 89 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 90 } } set_variable = { which =  country_terraforming_points value = 90 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 91 } } set_variable = { which =  country_terraforming_points value = 91 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 92 } } set_variable = { which =  country_terraforming_points value = 92 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 93 } } set_variable = { which =  country_terraforming_points value = 93 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 94 } } set_variable = { which =  country_terraforming_points value = 94 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 95 } } set_variable = { which =  country_terraforming_points value = 95 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 96 } } set_variable = { which =  country_terraforming_points value = 96 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 97 } } set_variable = { which =  country_terraforming_points value = 97 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 98 } } set_variable = { which =  country_terraforming_points value = 98 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 99 } } set_variable = { which =  country_terraforming_points value = 99 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 100 } } set_variable = { which =  country_terraforming_points value = 100 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 101 } } set_variable = { which =  country_terraforming_points value = 101 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 102 } } set_variable = { which =  country_terraforming_points value = 102 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 103 } } set_variable = { which =  country_terraforming_points value = 103 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 104 } } set_variable = { which =  country_terraforming_points value = 104 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 105 } } set_variable = { which =  country_terraforming_points value = 105 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 106 } } set_variable = { which =  country_terraforming_points value = 106 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 107 } } set_variable = { which =  country_terraforming_points value = 107 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 108 } } set_variable = { which =  country_terraforming_points value = 108 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 109 } } set_variable = { which =  country_terraforming_points value = 109 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 110 } } set_variable = { which =  country_terraforming_points value = 110 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 111 } } set_variable = { which =  country_terraforming_points value = 111 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 112 } } set_variable = { which =  country_terraforming_points value = 112 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 113 } } set_variable = { which =  country_terraforming_points value = 113 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 114 } } set_variable = { which =  country_terraforming_points value = 114 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 115 } } set_variable = { which =  country_terraforming_points value = 115 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 116 } } set_variable = { which =  country_terraforming_points value = 116 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 117 } } set_variable = { which =  country_terraforming_points value = 117 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 118 } } set_variable = { which =  country_terraforming_points value = 118 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 119 } } set_variable = { which =  country_terraforming_points value = 119 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 120 } } set_variable = { which =  country_terraforming_points value = 120 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 121 } } set_variable = { which =  country_terraforming_points value = 121 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 122 } } set_variable = { which =  country_terraforming_points value = 122 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 123 } } set_variable = { which =  country_terraforming_points value = 123 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 124 } } set_variable = { which =  country_terraforming_points value = 124 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 125 } } set_variable = { which =  country_terraforming_points value = 125 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 126 } } set_variable = { which =  country_terraforming_points value = 126 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 127 } } set_variable = { which =  country_terraforming_points value = 127 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 128 } } set_variable = { which =  country_terraforming_points value = 128 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 129 } } set_variable = { which =  country_terraforming_points value = 129 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 130 } } set_variable = { which =  country_terraforming_points value = 130 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 131 } } set_variable = { which =  country_terraforming_points value = 131 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 132 } } set_variable = { which =  country_terraforming_points value = 132 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 133 } } set_variable = { which =  country_terraforming_points value = 133 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 134 } } set_variable = { which =  country_terraforming_points value = 134 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 135 } } set_variable = { which =  country_terraforming_points value = 135 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 136 } } set_variable = { which =  country_terraforming_points value = 136 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 137 } } set_variable = { which =  country_terraforming_points value = 137 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 138 } } set_variable = { which =  country_terraforming_points value = 138 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 139 } } set_variable = { which =  country_terraforming_points value = 139 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 140 } } set_variable = { which =  country_terraforming_points value = 140 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 141 } } set_variable = { which =  country_terraforming_points value = 141 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 142 } } set_variable = { which =  country_terraforming_points value = 142 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 143 } } set_variable = { which =  country_terraforming_points value = 143 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 144 } } set_variable = { which =  country_terraforming_points value = 144 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 145 } } set_variable = { which =  country_terraforming_points value = 145 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 146 } } set_variable = { which =  country_terraforming_points value = 146 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 147 } } set_variable = { which =  country_terraforming_points value = 147 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 148 } } set_variable = { which =  country_terraforming_points value = 148 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 149 } } set_variable = { which =  country_terraforming_points value = 149 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 150 } } set_variable = { which =  country_terraforming_points value = 150 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 151 } } set_variable = { which =  country_terraforming_points value = 151 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 152 } } set_variable = { which =  country_terraforming_points value = 152 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 153 } } set_variable = { which =  country_terraforming_points value = 153 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 154 } } set_variable = { which =  country_terraforming_points value = 154 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 155 } } set_variable = { which =  country_terraforming_points value = 155 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 156 } } set_variable = { which =  country_terraforming_points value = 156 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 157 } } set_variable = { which =  country_terraforming_points value = 157 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 158 } } set_variable = { which =  country_terraforming_points value = 158 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 159 } } set_variable = { which =  country_terraforming_points value = 159 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 160 } } set_variable = { which =  country_terraforming_points value = 160 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 161 } } set_variable = { which =  country_terraforming_points value = 161 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 162 } } set_variable = { which =  country_terraforming_points value = 162 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 163 } } set_variable = { which =  country_terraforming_points value = 163 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 164 } } set_variable = { which =  country_terraforming_points value = 164 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 165 } } set_variable = { which =  country_terraforming_points value = 165 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 166 } } set_variable = { which =  country_terraforming_points value = 166 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 167 } } set_variable = { which =  country_terraforming_points value = 167 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 168 } } set_variable = { which =  country_terraforming_points value = 168 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 169 } } set_variable = { which =  country_terraforming_points value = 169 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 170 } } set_variable = { which =  country_terraforming_points value = 170 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 171 } } set_variable = { which =  country_terraforming_points value = 171 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 172 } } set_variable = { which =  country_terraforming_points value = 172 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 173 } } set_variable = { which =  country_terraforming_points value = 173 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 174 } } set_variable = { which =  country_terraforming_points value = 174 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 175 } } set_variable = { which =  country_terraforming_points value = 175 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 176 } } set_variable = { which =  country_terraforming_points value = 176 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 177 } } set_variable = { which =  country_terraforming_points value = 177 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 178 } } set_variable = { which =  country_terraforming_points value = 178 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 179 } } set_variable = { which =  country_terraforming_points value = 179 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 180 } } set_variable = { which =  country_terraforming_points value = 180 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 181 } } set_variable = { which =  country_terraforming_points value = 181 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 182 } } set_variable = { which =  country_terraforming_points value = 182 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 183 } } set_variable = { which =  country_terraforming_points value = 183 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 184 } } set_variable = { which =  country_terraforming_points value = 184 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 185 } } set_variable = { which =  country_terraforming_points value = 185 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 186 } } set_variable = { which =  country_terraforming_points value = 186 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 187 } } set_variable = { which =  country_terraforming_points value = 187 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 188 } } set_variable = { which =  country_terraforming_points value = 188 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 189 } } set_variable = { which =  country_terraforming_points value = 189 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 190 } } set_variable = { which =  country_terraforming_points value = 190 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 191 } } set_variable = { which =  country_terraforming_points value = 191 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 192 } } set_variable = { which =  country_terraforming_points value = 192 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 193 } } set_variable = { which =  country_terraforming_points value = 193 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 194 } } set_variable = { which =  country_terraforming_points value = 194 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 195 } } set_variable = { which =  country_terraforming_points value = 195 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 196 } } set_variable = { which =  country_terraforming_points value = 196 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 197 } } set_variable = { which =  country_terraforming_points value = 197 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 198 } } set_variable = { which =  country_terraforming_points value = 198 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 199 } } set_variable = { which =  country_terraforming_points value = 199 } }
+	else_If = { limit = { has_country_strategic_resource = { type = sr_terraforming_agents amount = 200 } } set_variable = { which =  country_terraforming_points value = 200 } }
+	###
+	set_variable = { which = available_terraforming_agents value = country_terraforming_points }
+	every_owned_planet = { 
+		limit = { has_planet_flag = terraformer_active }
+		switch = {
+			trigger = has_building
+			building_terraformer_baseline = { 
+				prev = { subtract_variable = { which = available_terraforming_agents value = 1 } }
+			}			
+			building_terraformer_increased = { 
+				prev = { subtract_variable = { which = available_terraforming_agents value = 2 } }
+			}	
+			building_terraformer_maximal = { 
+				prev = { subtract_variable = { which = available_terraforming_agents value = 3 } }
+			}	
+		}											
+	}
+	log = "Available Terraforming Points: [this.available_terraforming_agents]"
+}	
