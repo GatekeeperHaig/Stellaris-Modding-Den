@@ -646,30 +646,43 @@ cgm_spawn_engine = {
 					cgm_shared_regular_deposit_spawn_table = yes
 				}
 			}	
-			set_variable = { which = num_of_asteroidal_candidates value = num_of_regular_habitable_planets }
-			multiply_variable = { which = num_of_asteroidal_candidates value = 0.1 }
 			event_target:cgm_pe_variable_storage = {
 				while = { 
 					count = num_of_asteroidal_candidates
-					random_planet = { 
+					random_system = { 
 						limit = { 
-							OR = { 
-								is_planet_class = pc_asteroid
-								is_planet_class = pc_ice_asteroid			
-								is_planet_class = pc_large_asteroid_moon
-								is_planet_class = pc_small_asteroid_moon
-								is_planet_class = pc_dwarf_planet_asteroid
-							}				
-							NOT = { has_planet_flag = asteroidal_candidate }				
-							planet_size > 4			
-						} 		
-						set_planet_flag = asteroidal_candidate
-					}
+							any_planet = { 
+								OR = { 
+									is_planet_class = pc_asteroid
+									is_planet_class = pc_ice_asteroid			
+									is_planet_class = pc_large_asteroid_moon
+									is_planet_class = pc_small_asteroid_moon
+									is_planet_class = pc_dwarf_planet_asteroid
+								}				
+								NOT = { has_planet_flag = asteroidal_candidate }				
+								planet_size > 4											
+							}
+						}	
+						random_planet = { 
+							limit = { 
+								OR = { 
+									is_planet_class = pc_asteroid
+									is_planet_class = pc_ice_asteroid			
+									is_planet_class = pc_large_asteroid_moon
+									is_planet_class = pc_small_asteroid_moon
+									is_planet_class = pc_dwarf_planet_asteroid
+								}				
+								NOT = { has_planet_flag = asteroidal_candidate }				
+								planet_size > 4			
+							} 		
+							set_planet_flag = asteroidal_candidate
+						}
+					}	
 				}	
 			}				
 			if = { 
 				limit = { has_global_flag = cgm_game_start_auto_exploration }
-				every_country = {
+				every_playable_country = {
 					limit = { is_ai = no }
 					give_technology = { message = no tech = tech_cgm_automated_exploration_feature }
 				}	
