@@ -1,0 +1,497 @@
+namespace = ethic_rebuild_leaders
+
+
+# calc leaders capacity
+
+country_event = {
+	id = ethic_rebuild_leaders.0
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		not = {
+			has_global_flag = ethic_rebuild_disable_leaders
+		}
+		or = {
+			is_ai = no
+			is_country_type = default
+		}
+		has_tradition = tr_environmentalism_waste_recycling 		
+	}
+
+	immediate = {
+
+		ethic_rebuild_leaders_calc_leaders_num = yes
+		ethic_rebuild_leaders_calc_governor_capacity = yes
+		ethic_rebuild_leaders_calc_scientist_capacity = yes
+		ethic_rebuild_leaders_calc_admiral_capacity = yes
+		ethic_rebuild_leaders_calc_general_capacity = yes
+		if = {
+			limit = {
+				not = {
+					any_owned_leader = {
+						leader_class = governor
+					}
+				}
+			}
+			country_event = { id = ethic_rebuild_leaders.50 }
+		}
+		if = {
+			limit = {
+				not = {
+					any_owned_leader = {
+						leader_class = scientist
+					}
+				}
+			}
+			country_event = { id = ethic_rebuild_leaders.51 }
+		}
+		if = {
+			limit = {
+				not = {
+					any_owned_leader = {
+						leader_class = admiral
+					}
+				}
+			}
+			country_event = { id = ethic_rebuild_leaders.52 }
+		}
+		if = {
+			limit = {
+				not = {
+					any_owned_leader = {
+						leader_class = general
+					}
+				}
+			}
+			country_event = { id = ethic_rebuild_leaders.53 }
+		}
+	}
+}
+
+
+
+# on actions hucks to generate leaders 10 - 50
+# governor
+# on_building_complete # on_blocker_cleared
+planet_event = {
+	id = ethic_rebuild_leaders.10
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = { has_tradition = tr_environmentalism_waste_recycling }
+	}
+
+	immediate = {
+		random_list = {
+			35 = { }
+			1 = {
+				owner = {
+					country_event = { id = ethic_rebuild_leaders.50 }
+				}
+			}
+		}
+	}
+}
+
+
+
+# on_colonized
+planet_event = {
+	id = ethic_rebuild_leaders.12
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = { has_tradition = tr_environmentalism_waste_recycling }
+	}
+
+	immediate = {
+		random_list = {
+			12 = { }
+			1 = {
+				owner = {
+					country_event = { id = ethic_rebuild_leaders.50 }
+				}
+			}
+		}
+	}
+}
+
+
+
+# scientist
+# on_tech_increased
+country_event = {
+	id = ethic_rebuild_leaders.20
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+      has_tradition = tr_environmentalism_waste_recycling 
+	}
+
+	immediate = {
+		random_list = {
+			24 = { }
+			1 = {
+				country_event = { id = ethic_rebuild_leaders.51 }
+			}
+		}
+	}
+}
+
+# on_survey
+ship_event = {
+	id = ethic_rebuild_leaders.21
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		exists = owner
+		owner = { has_tradition = tr_environmentalism_waste_recycling }
+	}
+
+	immediate = {
+		random_list = {
+			35 = { }
+			1 = {
+				owner = {
+					country_event = { id = ethic_rebuild_leaders.51 }
+				}
+			}
+		}
+	}
+}
+
+# admiral
+# on_fleet_destroyed_perp
+country_event = {
+	id = ethic_rebuild_leaders.30
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_tradition = tr_environmentalism_waste_recycling 
+		exists = fromfrom
+		fromfrom = { is_ship_class = shipclass_military }
+		exists = fromfromfrom
+		fromfromfrom = { is_ship_class = shipclass_military }
+	}
+
+	immediate = {
+		random_list = {
+			15 = { }
+			1 = {
+				country_event = { id = ethic_rebuild_leaders.52 }
+			}
+		}
+	}
+}
+
+
+# gain general
+# on_planet_attackers_win on_planet_defenders_win
+country_event = {
+	id = ethic_rebuild_leaders.40
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		has_tradition = tr_environmentalism_waste_recycling 
+	}
+
+	immediate = {
+		random_list = {
+			15 = { }
+			1 = {
+				country_event = { id = ethic_rebuild_leaders.53 }
+			}
+		}
+	}
+}
+
+# gain governor 50
+country_event = {
+	id = ethic_rebuild_leaders.50
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		check_variable = {
+			which = ethic_rebuild_leaders_governor_capacity
+			value > 0
+		}
+	}
+
+	immediate = {
+		random_pool_leader = {
+			limit = {
+				leader_class = governor
+			}
+			exile_leader_as = ethic_rebuild_leaders_governor
+		}
+		create_fleet = {
+			name = "Science Ship"
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = random
+					random_existing_design = science
+				}
+				set_location = root.capital_scope
+				set_leader = ethic_rebuild_leaders_governor
+				leader = { unassign_leader = this }
+				delete_fleet = this
+			}
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_governor_capacity
+			value = -1
+		}
+		country_event = { id = ethic_rebuild_leaders.54 }
+	}
+}
+
+# gain scientist
+country_event = {
+	id = ethic_rebuild_leaders.51
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		check_variable = {
+			which = ethic_rebuild_leaders_scientist_capacity
+			value > 0
+		}
+	}
+
+	immediate = {
+		random_pool_leader = {
+			limit = {
+				leader_class = scientist
+			}
+			exile_leader_as = ethic_rebuild_leaders_scientist
+		}
+		create_fleet = {
+			name = "Science Ship"
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = random
+					random_existing_design = science
+				}
+				set_location = root.capital_scope
+				set_leader = ethic_rebuild_leaders_scientist
+				leader = { unassign_leader = this }
+				delete_fleet = this
+			}
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_scientist_capacity
+			value = -1
+		}
+		country_event = { id = ethic_rebuild_leaders.55 }
+	}
+}
+
+# gain admiral
+country_event = {
+	id = ethic_rebuild_leaders.52
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		check_variable = {
+			which = ethic_rebuild_leaders_admiral_capacity
+			value > 0
+		}
+	}
+
+	immediate = {
+		random_pool_leader = {
+			limit = {
+				leader_class = admiral
+			}
+			exile_leader_as = ethic_rebuild_leaders_admiral
+		}
+		create_fleet = {
+			name = "Science Ship"
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = random
+					random_existing_design = science
+				}
+				set_location = root.capital_scope
+				set_leader = ethic_rebuild_leaders_admiral
+				leader = { unassign_leader = this }
+				delete_fleet = this
+			}
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_admiral_capacity
+			value = -1
+		}
+		country_event = { id = ethic_rebuild_leaders.56 }
+	}
+}
+
+# gain general
+country_event = {
+	id = ethic_rebuild_leaders.53
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		check_variable = {
+			which = ethic_rebuild_leaders_general_capacity
+			value > 0
+		}
+	}
+
+	immediate = {
+		#log = "ethic_rebuild_leaders.53"
+		random_pool_leader = {
+			limit = {
+				leader_class = general
+			}
+			exile_leader_as = ethic_rebuild_leaders_general
+		}
+		create_fleet = {
+			name = "Science Ship"
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = random
+					random_existing_design = science
+				}
+				set_location = root.capital_scope
+				set_leader = ethic_rebuild_leaders_general
+				leader = { unassign_leader = this }
+				delete_fleet = this
+			}
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_general_capacity
+			value = -1
+		}
+		country_event = { id = ethic_rebuild_leaders.57 }
+	}
+}
+
+# notifications
+# governor
+country_event = {
+	id = ethic_rebuild_leaders.54
+	title = ethic_rebuild_leaders.54.name
+	desc = ethic_rebuild_leaders.54.desc
+	picture = GFX_evt_galactic_senate
+	show_sound = event_administrative_work
+	is_triggered_only = yes
+
+	trigger = {
+		is_ai = no
+		not = {
+			has_country_flag = ethic_rebuild_leaders_block
+		}
+	}
+
+	option = {
+		name = INTERESTING
+	}
+	option = {
+		name = ethic_rebuild_block
+ 		custom_tooltip = ethic_rebuild_leaders_block.tooltip
+ 		hidden_effect = {
+ 			set_country_flag = ethic_rebuild_leaders_block
+		}
+	}
+}
+
+# scientist
+country_event = {
+	id = ethic_rebuild_leaders.55
+	title = ethic_rebuild_leaders.55.name
+	desc = ethic_rebuild_leaders.55.desc
+	picture = GFX_evt_galactic_senate
+	show_sound = event_administrative_work
+	is_triggered_only = yes
+
+	trigger = {
+		is_ai = no
+		not = {
+			has_country_flag = ethic_rebuild_leaders_block
+		}
+	}
+
+	option = {
+		name = INTERESTING
+	}
+	option = {
+		name = ethic_rebuild_block
+ 		custom_tooltip = ethic_rebuild_leaders_block.tooltip
+ 		hidden_effect = {
+ 			set_country_flag = ethic_rebuild_leaders_block
+		}
+	}
+}
+
+# admiral
+country_event = {
+	id = ethic_rebuild_leaders.56
+	title = ethic_rebuild_leaders.56.name
+	desc = ethic_rebuild_leaders.56.desc
+	picture = GFX_evt_galactic_senate
+	show_sound = event_administrative_work
+	is_triggered_only = yes
+
+	trigger = {
+		is_ai = no
+		not = {
+			has_country_flag = ethic_rebuild_leaders_block
+		}
+	}
+
+	option = {
+		name = INTERESTING
+	}
+	option = {
+		name = ethic_rebuild_block
+ 		custom_tooltip = ethic_rebuild_leaders_block.tooltip
+ 		hidden_effect = {
+ 			set_country_flag = ethic_rebuild_leaders_block
+		}
+	}
+}
+
+# general
+country_event = {
+	id = ethic_rebuild_leaders.57
+	title = ethic_rebuild_leaders.57.name
+	desc = ethic_rebuild_leaders.57.desc
+	picture = GFX_evt_galactic_senate
+	show_sound = event_administrative_work
+	is_triggered_only = yes
+
+	trigger = {
+		is_ai = no
+		not = {
+			has_country_flag = ethic_rebuild_leaders_block
+		}
+	}
+
+	option = {
+		name = INTERESTING
+	}
+	option = {
+		name = ethic_rebuild_block
+ 		custom_tooltip = ethic_rebuild_leaders_block.tooltip
+ 		hidden_effect = {
+ 			set_country_flag = ethic_rebuild_leaders_block
+		}
+	}
+}

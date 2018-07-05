@@ -1,0 +1,846 @@
+#	Example:
+#
+#	example_effect = {
+#		add_energy = -100
+#	}
+#
+#
+#	In a script file:
+#
+#	effect = {
+#		example_effect = yes
+#	}
+#
+
+#	Example:
+#
+#	example_effect = {
+#		add_energy = -100
+#	}
+#
+#
+#	In a script file:
+#
+#	effect = {
+#		example_effect = yes
+#	}
+#
+
+# for country
+ethic_rebuild_leaders_calc_leaders_num = {
+	#log = "calc all leaders"
+	set_variable = {
+		which = ethic_rebuild_leaders_governor_num
+		value = 0
+	}
+	set_variable = {
+		which = ethic_rebuild_leaders_scientist_num
+		value = 0
+	}
+	set_variable = {
+		which = ethic_rebuild_leaders_admiral_num
+		value = 0
+	}
+	set_variable = {
+		which = ethic_rebuild_leaders_general_num
+		value = 0
+	}
+	every_owned_leader = {
+		if = {
+			limit = {
+				leader_class = governor
+			}
+			root = {
+				change_variable = {
+					which = ethic_rebuild_leaders_governor_num
+					value = 1
+				}
+			}
+			else = {
+				if = {
+					limit = {
+						leader_class = scientist
+					}
+					root = {
+						change_variable = {
+							which = ethic_rebuild_leaders_scientist_num
+							value = 1
+						}
+					}
+					else = {
+						if = {
+							limit = {
+								leader_class = admiral
+							}
+							root = {
+								change_variable = {
+									which = ethic_rebuild_leaders_admiral_num
+									value = 1
+								}
+							}
+							else = {
+								if = {
+									limit = {
+										leader_class = general
+									}
+									root = {
+										change_variable = {
+											which = ethic_rebuild_leaders_general_num
+											value = 1
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+ethic_rebuild_leaders_calc_governor_num = {
+	log = "calc governor num"
+	set_variable = {
+		which = ethic_rebuild_leaders_governor_num
+		value = 0
+	}
+	every_owned_leader = {
+		limit = {
+			leader_class = governor
+		}
+		root = {
+			change_variable = {
+				which = ethic_rebuild_leaders_governor_num
+				value = 1
+			}
+		}
+	}
+}
+
+ethic_rebuild_leaders_calc_governor_capacity = {
+	#log = "calc governor capacity"
+	set_variable = {
+		which = ethic_rebuild_leaders_governor_capacity
+		value = 1
+	}
+	every_owned_planet = {
+		limit = {
+			sector_controlled = no
+		}
+		root = {
+			change_variable = {
+				which = ethic_rebuild_leaders_governor_capacity
+				value = 0.7
+			}
+		}
+	}
+	every_sector = {
+		root = {
+			change_variable = {
+				which = ethic_rebuild_leaders_governor_capacity
+				value = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_ethic = ethic_pacifist
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_governor_capacity
+			value = 1
+		}
+	}
+	if = {
+		limit = {
+			has_ethic = ethic_fanatic_pacifist
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_governor_capacity
+			value = 2
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_domination_colonial_viceroys
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_governor_capacity
+			value = 2
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_harmony_finish
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_governor_capacity
+			value = 0.5
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_expansion_finish
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_governor_capacity
+			value = 0.5
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_prosperity_finish
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_governor_capacity
+			value = 0.5
+		}
+	}
+	# log = "[This.ethic_rebuild_leaders_governor_capacity]"
+	subtract_variable = {
+		which = ethic_rebuild_leaders_governor_capacity
+		value = ethic_rebuild_leaders_governor_num
+	}
+	# log = "[This.ethic_rebuild_leaders_governor_capacity]"
+}
+
+ethic_rebuild_leaders_calc_scientist_num = {
+	# log = "calc scientist num"
+	set_variable = {
+		which = ethic_rebuild_leaders_scientist_num
+		value = 0
+	}
+	every_owned_leader = {
+		limit = {
+			leader_class = scientist
+		}
+		root = {
+			change_variable = {
+				which = ethic_rebuild_leaders_scientist_num
+				value = 1
+			}
+		}
+	}
+}
+
+ethic_rebuild_leaders_calc_scientist_capacity = {
+	# log = "calc scientist capacity"
+	set_variable = {
+		which = ethic_rebuild_leaders_scientist_capacity
+		value = 6
+	}
+	if = {
+		limit = {
+			has_ethic = ethic_materialist
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_scientist_capacity
+			value = 1
+		}
+	}
+	if = {
+		limit = {
+			has_ethic = ethic_fanatic_materialist
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_scientist_capacity
+			value = 2
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_discovery_science_division
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_scientist_capacity
+			value = 2
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_expansion_adopt
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_scientist_capacity
+			value = 0.5
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_expansion_finish
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_scientist_capacity
+			value = 0.5
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_prosperity_finish
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_scientist_capacity
+			value = 0.5
+		}
+	}
+	subtract_variable = {
+		which = ethic_rebuild_leaders_scientist_capacity
+		value = ethic_rebuild_leaders_scientist_num
+	}
+}
+
+ethic_rebuild_leaders_calc_admiral_num = {
+	# log = "calc admiral num"
+	set_variable = {
+		which = ethic_rebuild_leaders_admiral_num
+		value = 0
+	}
+	every_owned_leader = {
+		limit = {
+			leader_class = admiral
+		}
+		root = {
+			change_variable = {
+				which = ethic_rebuild_leaders_admiral_num
+				value = 1
+			}
+		}
+	}
+}
+
+ethic_rebuild_leaders_calc_admiral_capacity = {
+	# log = "calc admiral capacity"
+	set_variable = {
+		which = ethic_rebuild_leaders_admiral_capacity
+		value = 1
+	}
+	if = {
+		limit = {
+			fleet_power > 1000
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_num_fleets
+			value = 1
+		}
+	}
+	if = {
+		limit = {
+			fleet_power > 5000
+		}
+		root = {
+			change_variable = {
+				which = ethic_rebuild_leaders_admiral_capacity
+				value = 1
+			}
+		}
+	}
+	if = {
+		limit = {
+			fleet_power > 20000
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_admiral_capacity
+			value = 1
+		}
+	}
+	if = {
+		limit = {
+			fleet_power > 50000
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_admiral_capacity
+			value = 1
+		}
+	}
+	if = {
+		limit = {
+			fleet_power > 100000
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_admiral_capacity
+			value = 1
+		}
+
+	}
+	if = {
+		limit = {
+			fleet_power > 200000
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_admiral_capacity
+			value = 1
+		}
+	}
+	if = {
+		limit = {
+			has_ethic = ethic_militarist
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_admiral_capacity
+			value = 1
+		}
+	}
+	if = {
+		limit = {
+			has_ethic = ethic_fanatic_militarist
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_admiral_capacity
+			value = 2
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_supremacy_war_games
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_admiral_capacity
+			value = 2
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_expansion_finish
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_admiral_capacity
+			value = 0.5
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_domination_finish
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_admiral_capacity
+			value = 1
+		}
+	}
+	subtract_variable = {
+		which = ethic_rebuild_leaders_admiral_capacity
+		value = ethic_rebuild_leaders_admiral_num
+	}
+}
+
+ethic_rebuild_leaders_calc_general_num = {
+	# log = "calc general num"
+	set_variable = {
+		which = ethic_rebuild_leaders_general_num
+		value = 0
+	}
+	every_owned_leader = {
+		limit = {
+			leader_class = general
+		}
+		root = {
+			change_variable = {
+				which = ethic_rebuild_leaders_general_num
+				value = 1
+			}
+		}
+	}
+}
+
+ethic_rebuild_leaders_calc_general_capacity = {
+	# log = "calc general capacity"
+	set_variable = {
+		which = ethic_rebuild_leaders_general_capacity
+		value = 1
+	}
+	every_owned_army = {
+		limit = {
+			nor = {
+				army_type = defense_army
+				army_type = garrison_army
+			}
+		}
+		root = {
+			change_variable = {
+				which = ethic_rebuild_leaders_general_capacity
+				value = 0.08
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_ethic = ethic_militarist
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_general_capacity
+			value = 1
+		}
+	}
+	if = {
+		limit = {
+			has_ethic = ethic_fanatic_militarist
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_general_capacity
+			value = 2
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_supremacy_war_games
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_general_capacity
+			value = 2
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_expansion_finish
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_general_capacity
+			value = 0.5
+		}
+	}
+	if = {
+		limit = {
+			has_tradition = tr_domination_finish
+		}
+		change_variable = {
+			which = ethic_rebuild_leaders_general_capacity
+			value = 1
+		}
+	}
+	# log = "[This.ethic_rebuild_leaders_general_capacity]"
+	subtract_variable = {
+		which = ethic_rebuild_leaders_general_capacity
+		value = ethic_rebuild_leaders_general_num
+	}
+	# log = "[This.ethic_rebuild_leaders_general_capacity]"
+}
+
+ethic_rebuild_leaders_add_random_trait = {
+	if = {
+		limit = {
+			leader_class = ruler
+		}
+		while = {
+			limit = {
+				NOT = { has_leader_flag = has_gained_trait }
+			}
+			random_list = {
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = ruler_trait_mark_of_infinity
+					}
+					add_trait = ruler_trait_mark_of_infinity
+					set_timed_leader_flag = { flag = gained_ruler_trait_mark_of_infinity days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = ruler_trait_resource_extraordinaire
+					}
+					add_trait = ruler_trait_resource_extraordinaire
+					set_timed_leader_flag = { flag = gained_ruler_trait_resource_extraordinaire days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = ruler_trait_transcendent
+					}
+					add_trait = ruler_trait_transcendent
+					set_timed_leader_flag = { flag = gained_ruler_trait_transcendent days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = ruler_trait_wealth_seeker
+					}
+					add_trait = ruler_trait_wealth_seeker
+					set_timed_leader_flag = { flag = gained_ruler_trait_wealth_seeker days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			leader_class = governor
+		}
+		while = {
+			limit = {
+				NOT = { has_leader_flag = has_gained_trait }
+			}
+			random_list = {
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = governor_trait_art_of_war
+					}
+					add_trait = governor_trait_art_of_war
+					set_timed_leader_flag = { flag = gained_governor_trait_art_of_war days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						or = {
+							has_trait = governor_trait_corrupted_state
+							allows_slavery = no
+						}
+					}
+					add_trait = governor_trait_corrupted_state
+					set_timed_leader_flag = { flag = gained_governor_trait_corrupted_state days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = governor_trait_mistrust
+					}
+					add_trait = governor_trait_mistrust
+					set_timed_leader_flag = { flag = gained_governor_trait_mistrust days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = governor_trait_stable_welfare
+					}
+					add_trait = governor_trait_stable_welfare
+					set_timed_leader_flag = { flag = gained_governor_trait_stable_welfare days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = governor_trait_dedicated_explorer
+					}
+					add_trait = governor_trait_dedicated_explorer
+					set_timed_leader_flag = { flag = gained_governor_trait_dedicated_explorer days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						or = {
+							has_trait = ethic_rebuild_governor_trait_sympathizes_slaves
+							allows_slavery = no
+						}
+					}
+					add_trait = ethic_rebuild_governor_trait_sympathizes_slaves
+					set_timed_leader_flag = { flag = gained_ethic_rebuild_governor_trait_sympathizes_slaves days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			leader_class = scientist
+		}
+		while = {
+			limit = {
+				NOT = { has_leader_flag = has_gained_trait }
+			}
+			random_list = {
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = scientist_trait_overthinker
+					}
+					add_trait = scientist_trait_overthinker
+					set_timed_leader_flag = { flag = gained_scientist_trait_overthinker days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = scientist_trait_hypochondriac
+					}
+					add_trait = scientist_trait_hypochondriac
+					set_timed_leader_flag = { flag = gained_scientist_trait_hypochondriac days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = scientist_trait_rash_decisions
+					}
+					add_trait = scientist_trait_rash_decisions
+					set_timed_leader_flag = { flag = gained_scientist_trait_rash_decisions days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = scientist_trait_shining_star
+					}
+					add_trait = scientist_trait_shining_star
+					set_timed_leader_flag = { flag = gained_scientist_trait_shining_star days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			leader_class = general
+		}
+		# while = {
+		# 	limit = {
+		# 		NOT = { has_leader_flag = has_gained_trait }
+		# 	}
+			random_list = {
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = general_trait_guerrilla_warfare
+					}
+					add_trait = general_trait_guerrilla_warfare
+					set_timed_leader_flag = { flag = gained_general_trait_guerrilla_warfare days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = general_trait_lost_voice
+					}
+					add_trait = general_trait_lost_voice
+					set_timed_leader_flag = { flag = gained_general_trait_lost_voice days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = ethic_rebuild_general_trait_engineer
+					}
+					add_trait = ethic_rebuild_general_trait_engineer
+					set_timed_leader_flag = { flag = gained_ethic_rebuild_general_trait_engineer days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+
+			}
+		#}
+	}
+	if = {
+		limit = {
+			leader_class = admiral
+		}
+		while = {
+			limit = {
+				NOT = { has_leader_flag = has_gained_trait }
+			}
+			random_list = {
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = admiral_trait_intergalactic_scurvy
+					}
+					add_trait = admiral_trait_intergalactic_scurvy
+					set_timed_leader_flag = { flag = gained_admiral_trait_intergalactic_scurvy days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = admiral_trait_swift_shot
+					}
+					add_trait = admiral_trait_swift_shot
+					set_timed_leader_flag = { flag = gained_admiral_trait_swift_shot days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = admiral_trait_goliath
+					}
+					add_trait = admiral_trait_goliath
+					set_timed_leader_flag = { flag = gained_admiral_trait_goliath days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = admiral_trait_slayer
+					}
+					add_trait = admiral_trait_slayer
+					set_timed_leader_flag = { flag = gained_admiral_trait_slayer days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = ethic_rebuild_admiral_trait_envious_to_fallen
+					}
+					add_trait = ethic_rebuild_admiral_trait_envious_to_fallen
+					set_timed_leader_flag = { flag = gained_ethic_rebuild_admiral_trait_envious_to_fallen days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = ethic_rebuild_admiral_trait_laser_lover
+					}
+					add_trait = ethic_rebuild_admiral_trait_laser_lover
+					set_timed_leader_flag = { flag = gained_ethic_rebuild_admiral_trait_laser_lover days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = ethic_rebuild_admiral_trait_pirate_hunter
+					}
+					add_trait = ethic_rebuild_admiral_trait_pirate_hunter
+					set_timed_leader_flag = { flag = gained_ethic_rebuild_admiral_trait_pirate_hunter days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = ethic_rebuild_admiral_trait_robot_hunter
+					}
+					add_trait = ethic_rebuild_admiral_trait_robot_hunter
+					set_timed_leader_flag = { flag = gained_ethic_rebuild_admiral_trait_robot_hunter days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+				5 = {
+					modifier = {
+						factor = 0
+						has_trait = ethic_rebuild_admiral_trait_afraid_demons
+					}
+					add_trait = ethic_rebuild_admiral_trait_afraid_demons
+					set_timed_leader_flag = { flag = gained_ethic_rebuild_admiral_trait_afraid_demons days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait days = 7 }
+					set_timed_leader_flag = { flag = has_gained_trait_good days = 7 }
+				}
+			}
+		}
+	}
+}

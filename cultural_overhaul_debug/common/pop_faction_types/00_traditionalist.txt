@@ -1,0 +1,703 @@
+##############################
+# Traditionalist Faction
+##############################
+
+traditionalist = {
+	election_header = "GFX_faction_header_yellow"
+	guiding_ethic = ethic_spiritualist
+	
+	unique = yes
+	support_multiplier = 1
+	
+	is_potential = {
+		years_passed > 10
+		has_encountered_other_species = yes
+		NOT = { has_ethic = ethic_gestalt_consciousness }
+	}
+	
+	parameters = {
+		empire = {
+			type = country
+			valid_objects = {
+				is_same_value = root
+			}
+		}
+	}
+	
+	can_join_faction = {
+		is_enslaved = no
+		is_shackled_robot = no
+		is_being_purged = no
+		has_culture_shock = no
+		NOT = { has_trait = trait_nerve_stapled }
+		OR = {
+			has_ethic = ethic_spiritualist
+			has_ethic = ethic_fanatic_spiritualist
+		}
+		is_robot_pop = no
+	}
+	
+	attraction = {
+		base = 150
+		
+		modifier = {
+			factor = 1.25
+			exists = from
+			from = {
+				exists = leader
+				leader = { leader_class = ruler }
+			}
+		}
+		
+		modifier = {
+			factor = 0.75
+			exists = from
+			from = {
+				NOT = { exists = leader }
+			}
+		}
+	}
+	
+	leader = {
+		base = 100
+		modifier = {
+			factor = 0
+			OR = {
+				has_trait = "trait_robotic_1"
+				has_trait = "trait_robotic_2"
+				has_trait = "trait_robotic_3"
+			}			
+		}
+
+		modifier = {
+			factor = 0.0
+			is_event_leader = yes
+		}		
+	}
+	
+	demand = {
+		title = "MATERIALIST_INDOCTRINATION"
+		unfulfilled_title = "NO_MATERIALIST_INDOCTRINATION"
+		desc = "MATERIALIST_INDOCTRINATION_DESC"
+
+		unfulfilled_effect = -7
+
+		potential = {
+			exists = owner
+			owner = {
+				has_country_edict = indoctrination_materialist
+			}
+		}
+
+		trigger = {
+			owner = {
+					NOR = { has_country_edict = indoctrination_materialist }
+			}
+		}
+	}	
+	
+
+
+		
+	
+	demand = {
+		title = "TRADITIONALIST_SPIRITUALISM"
+		unfulfilled_title = "TRADITIONALIST_NO_SPIRITUALISM"
+		desc = "TRADITIONALIST_SPIRITUALISM_DESC"
+
+		unfulfilled_effect = -15
+
+		potential = {
+			exists = owner
+			owner = {
+				OR = {
+                    has_tradition = tr_discovery_adopt
+				}
+			}
+		}
+
+		trigger = {
+		}
+	}
+	
+	
+
+	
+	
+	demand = {
+		title = "TRADITIONALIST_NO_SCIENCE"
+		unfulfilled_title = "TRADITIONALIST_SCIENCE"
+		desc = "TRADITIONALIST_SCIENCE_DESC"
+
+		unfulfilled_effect = -7
+
+		potential = { 
+			exists = owner
+			owner = { 
+			          OR = { 
+					         has_tradition = tr_discovery_faith_in_science						 
+							 }
+		}
+
+		trigger = {
+			owner = {
+				OR = {
+					has_tradition = tr_ascension_finish
+
+				}
+			}			
+		}
+	}		
+	
+	
+	
+	demand = { # "TRADITIONALIST_NO_ROBOTS"
+		title = "TRADITIONALIST_NO_ROBOTS"
+		unfulfilled_title = "TRADITIONALIST_ROBOTS"
+		desc = "TRADITIONALIST_NO_ROBOTS_DESC"
+		
+		unfulfilled_effect = -10
+		
+		potential = {
+			exists = owner
+			owner = {
+				has_technology = tech_robotic_workers
+			}
+		}
+		
+		trigger = {
+			owner = {
+				NOT = {
+					any_owned_pop = {
+						is_robot_pop = yes
+					}
+				}
+			}
+		}
+	}
+
+	demand = { # "TRADITIONALIST_NO_ROBOT_RIGHTS"
+		title = "TRADITIONALIST_NO_ROBOT_RIGHTS"
+		unfulfilled_title = "TRADITIONALIST_ROBOT_RIGHTS"
+		desc = "TRADITIONALIST_NO_ROBOT_RIGHTS_DESC"
+
+		unfulfilled_effect = -20
+
+		potential = {
+			exists = owner
+			owner = {
+				has_technology = tech_synthetic_workers
+			}
+		}
+
+		trigger = {
+			owner = {
+				NOT = { has_policy_flag = ai_full_rights }
+			}
+		}
+	}
+
+	demand = { # "TRADITIONALIST_SPIRITUALIST_GOVERNMENT"
+		title = "TRADITIONALIST_SPIRITUALIST_GOVERNMENT"
+		unfulfilled_title = "TRADITIONALIST_SECULAR_GOVERNMENT"
+		desc = "TRADITIONALIST_SPIRITUALIST_GOVERNMENT_DESC"
+		
+		fulfilled_effect = 5
+		unfulfilled_effect = -5
+		
+		potential = {
+			exists = owner
+		}
+		
+		trigger = {
+			owner = {
+				OR = {
+					has_government = gov_theocratic_monarchy
+					has_government = gov_theocratic_dictatorship
+					has_government = gov_theocratic_oligarchy
+					has_government = gov_theocratic_republic
+					has_government = gov_celestial_empire
+					has_government = gov_divine_empire
+					has_government = gov_holy_tribunal
+					has_government = gov_celestial_empire
+				}
+			}
+		}
+	}
+
+	demand = { # "TRADITIONALIST_NO_TOMB_WORLDS"
+		title = "TRADITIONALIST_NO_TOMB_WORLDS"
+		unfulfilled_title = "TRADITIONALIST_TOMB_WORLDS"
+		desc = "TRADITIONALIST_NO_TOMB_WORLDS_DESC"
+
+		unfulfilled_effect = -10
+
+		potential = {
+			exists = owner
+			owner = {
+				has_surveyed_class = pc_nuked
+			}
+		}
+
+		trigger = {
+			owner = {
+				NOT = {
+					any_owned_planet = {
+						is_planet_class = pc_nuked
+					}
+				}
+			}
+		}
+	}
+
+	demand = { # "TRADITIONALIST_GAIA_WORLDS"
+		title = "TRADITIONALIST_GAIA_WORLDS"
+		unfulfilled_title = "TRADITIONALIST_NO_GAIA_WORLDS"
+		desc = "TRADITIONALIST_GAIA_WORLDS_DESC"
+
+		fulfilled_effect = 5
+
+		potential = {
+			exists = owner
+			owner = {
+				has_surveyed_class = pc_gaia
+			}
+		}
+
+		trigger = {
+			owner = {
+				any_owned_planet = {
+					is_planet_class = pc_gaia
+				}
+			}
+		}
+	}
+
+	demand = { # "TRADITIONALIST_UNBLISSED"
+		title = "TRADITIONALIST_UNBLISSED"
+		unfulfilled_title = "TRADITIONALIST_BLISSED"
+		desc = "TRADITIONALIST_UNBLISSED_DESC"
+
+		unfulfilled_effect = -5
+
+		potential = {
+			exists = owner
+			owner = {
+				has_technology = tech_subdermal_stimulation
+			}
+		}
+
+		trigger = {
+			owner = {
+				NOT = {
+					any_owned_pop = {
+						has_living_standard = {
+							country = root.owner
+							type = chemical_bliss
+						}
+					}
+				}
+			}
+		}
+	}
+
+	demand = { # "TRADITIONALIST_PSIONIC_PURSUIT"
+		title = "TRADITIONALIST_PSIONIC_PURSUIT"
+		unfulfilled_title = "TRADITIONALIST_NO_PSIONIC_PURSUIT"
+		desc = "TRADITIONALIST_PSIONIC_PURSUIT_DESC"
+
+		fulfilled_effect = 10
+
+		potential = {
+			host_has_dlc = "Utopia"
+			exists = owner
+			owner = {
+				OR = {
+					num_ascension_perks > 0
+					num_ascension_perk_slots > 0
+				}
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_ascension_perk = ap_mind_over_matter
+			}
+		}
+	}
+
+	demand = { # "TRADITIONALIST_FLESH_IS_STRONG"
+		title = "TRADITIONALIST_FLESH_IS_STRONG"
+		unfulfilled_title = "TRADITIONALIST_FLESH_IS_WEAK"
+		desc = "TRADITIONALIST_FLESH_IS_STRONG_DESC"
+
+		fulfilled_effect = 3
+		unfulfilled_effect = -30
+
+		potential = {
+			exists = owner
+			owner = {
+				has_ascension_perk = ap_the_flesh_is_weak
+			}
+		}
+
+		trigger = {
+			owner = {
+				NOT = {
+					has_country_flag = flesh_weakened
+				}
+			}
+		}
+	}
+
+	demand = { # "TRADITIONALIST_SPIRITUALIST_POPS"
+		title = "TRADITIONALIST_SPIRITUALIST_POPS"
+		unfulfilled_title = "TRADITIONALIST_FEW_SPIRITUALIST_POPS"
+		desc = "TRADITIONALIST_SPIRITUALIST_POPS_DESC"
+
+		fulfilled_effect = 5
+
+		potential = {
+			exists = owner
+		}
+
+		trigger = {
+			owner = {
+				pop_percentage = {
+					percentage > 0.24
+					limit = { pop_has_ethic = ethic_spiritualist }
+				}
+			}
+		}
+	}
+
+	demand = { # "TRADITIONALIST_UNSPIRITUALIST"
+		title = "TRADITIONALIST_UNSPIRITUALIST"
+		unfulfilled_title = "TRADITIONALIST_NOT_UNSPIRITUALIST"
+		desc = "TRADITIONALIST_UNSPIRITUALIST_DESC"
+
+		unfulfilled_effect = -10
+
+		potential = {
+			exists = owner
+			#owner = {
+			#	pop_percentage = {
+			#		percentage < 0.10
+			#		limit = { pop_has_ethic = ethic_spiritualist }
+			#	}
+			#}
+		}
+
+		trigger = {
+			owner = {
+				pop_percentage = {
+					percentage > 0.09
+					limit = { pop_has_ethic = ethic_spiritualist }
+				}
+			}
+		}
+	}
+
+	demand = { # "TRADITIONALIST_SHROUD_BOON"
+		title = "TRADITIONALIST_SHROUD_BOON"
+		unfulfilled_title = "TRADITIONALIST_NO_SHROUD_BOON"
+		desc = "TRADITIONALIST_SHROUD_BOON_DESC"
+
+		fulfilled_effect = 5
+
+		potential = {
+			exists = owner
+			owner = {
+				has_country_flag = positive_shroud_outcome
+				#has_country_flag = breached_shroud
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = positive_shroud_outcome
+			}
+		}
+	}
+
+	demand = { # "TRADITIONALIST_SHROUD_CURSE"
+		title = "TRADITIONALIST_SHROUD_CURSE"
+		unfulfilled_title = "TRADITIONALIST_NO_SHROUD_CURSE"
+		desc = "TRADITIONALIST_SHROUD_CURSE_DESC"
+
+		fulfilled_effect = -5
+
+		potential = {
+			exists = owner
+			owner = {
+				has_country_flag = negative_shroud_outcome
+				#has_country_flag = breached_shroud
+			}
+		}
+
+		trigger = {
+			owner = {
+				has_country_flag = negative_shroud_outcome
+			}
+		}
+	}
+	
+
+	demand = {
+		title = "FANATIC_LIBERTARIAN_GOVERNMENT"
+		unfulfilled_title = "NO_FANATIC_LIBERTARIAN_GOVERNMENT"
+		desc = "FANATIC_LIBERTARIAN_GOVERNMENT_DESC"
+
+		fulfilled_effect = 5
+
+		potential = {
+			exists = owner
+			owner = {
+				has_ethic = civic_political_pluralism
+			}
+		}
+
+		trigger = {
+			owner = {
+					has_ethic = civic_political_pluralism
+			}
+		}
+	}		
+	
+
+
+	#demand = {
+	#	title = "TRADITIONALIST_PURITY_TRADITION"
+	#	unfulfilled_title = "TRADITIONALIST_NO_PURITY_TRADITION"
+	#	desc = "TRADITIONALIST_PURITY_TRADITION_DESC"
+    #
+	#	fulfilled_effect = 5
+    #
+	#	potential = {
+	#		exists = owner
+	#		owner = {
+	#			OR = {
+	#				has_tradition = "tr_purity_indoctrination"
+	#				has_tradition = "tr_purity_suffer_not_alien"
+	#				has_tradition = "tr_purity_the_chosen"
+	#				has_tradition = "tr_purity_never_surrender"
+	#				has_tradition = "tr_purity_natural_order"
+	#			}
+	#		}
+	#	}
+    #
+	#	trigger = {
+	#		owner = {
+	#			OR = {
+	#				has_tradition = "tr_purity_indoctrination"
+	#				has_tradition = "tr_purity_suffer_not_alien"
+	#				has_tradition = "tr_purity_the_chosen"
+	#				has_tradition = "tr_purity_never_surrender"
+	#				has_tradition = "tr_purity_natural_order"
+	#			}
+	#		}
+	#	}
+	#}
+	
+	on_create = {
+		pop_faction_event = { id = factions.1 }
+	}
+
+	on_destroy = {
+		if = {
+			limit = {
+				has_modifier = promoted_spiritualist
+			}
+			remove_modifier = promoted_spiritualist
+		}
+		if = {
+			limit = {
+				has_modifier = suppressed_spiritualist
+			}
+			remove_modifier = suppressed_spiritualist
+		}
+	}
+	
+	actions = {
+		embrace_faction = {
+			title = "EMBRACE_FACTION"
+			description = "EMBRACE_FACTION_DESC"
+			
+			cost = {
+				influence = 500
+			}
+			
+			potential = {
+				exists = owner
+				owner = {
+					OR = {
+						is_subject = no
+						NOT = { is_subject_type = dominion }
+					}
+				}
+			}
+			
+			valid = {
+				custom_tooltip = {
+					fail_text = EMBRACE_FACTION_COOLDOWN
+					parameter:empire = {
+						NOT = { has_modifier = embraced_faction_timer }
+					}
+				}
+				support > 0.20
+				parameter:empire = {
+					NOT = { has_ethic = "ethic_fanatic_spiritualist" }
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = embraced_faction days = 3600 }
+				parameter:empire = {
+					shift_ethic = ethic_spiritualist
+					hidden_effect = {
+						add_modifier = { modifier = embraced_faction_timer days = 3600 }
+						every_pop_faction = {
+							limit = { NOT = { is_same_value = root } }
+							add_modifier = { modifier = embraced_another_faction days = 3600 }
+						}
+					}
+				}
+				hidden_effect = {
+					save_event_target_as = TargetFaction
+					parameter:empire = {
+						every_relation = {
+							limit = {
+								is_ai = no
+								is_country_type = default			
+								has_communications = prev
+							}
+							country_event = { id = factions.2000 }
+						}
+					}				
+				}				
+			}
+			
+			ai_weight = {
+				base = 1
+				modifier = {
+					factor = 0
+					support < 0.50
+					owner = {
+						has_ethic = ethic_spiritualist
+					}
+				}
+				modifier = {
+					factor = 0
+					NOT = { 
+						owner = {
+							exists = ruler
+							ruler = {
+								leader_of_faction = traditionalist
+							}
+						}
+					}
+				}
+				modifier = {
+					factor = 0
+					owner = {
+						count_pop_factions = {
+							count < 4
+						}					
+					}
+				}				
+			}
+		}
+		promote_faction = {
+			title = "PROMOTE_FACTION"
+			description = "PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_spiritualist
+						has_modifier = promoted_spiritualist
+					}
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					add_modifier = { modifier = promoted_spiritualist days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_promote_faction = {
+			title = "CANCEL_PROMOTE_FACTION"
+			description = "CANCEL_PROMOTE_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = promoted_spiritualist
+				}
+			}
+
+			effect = {
+				parameter:empire = {
+					remove_modifier = promoted_spiritualist
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}		
+		suppress_faction = {
+			title = "SUPPRESS_FACTION"
+			description = "SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					NOR = {
+						has_modifier = suppressed_spiritualist
+						has_modifier = promoted_spiritualist
+					}
+				}
+			}
+
+			effect = {
+				add_modifier = { modifier = suppressed_faction days = -1 }
+				parameter:empire = {
+					add_modifier = { modifier = suppressed_spiritualist days = -1 }
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+		cancel_suppress_faction = {
+			title = "CANCEL_SUPPRESS_FACTION"
+			description = "CANCEL_SUPPRESS_FACTION_DESC"
+			
+			potential = {
+				exists = owner
+				parameter:empire = {
+					has_modifier = suppressed_spiritualist
+				}
+			}
+
+			effect = {
+				remove_modifier = suppressed_faction
+				parameter:empire = {
+					remove_modifier = suppressed_spiritualist
+				}
+			}
+			
+			ai_weight = {
+				base = 0
+			}
+		}
+	}
+}

@@ -1,0 +1,344 @@
+
+@cost = 56
+
+#Discovery
+#materialist 
+#unhappy: spiritualist
+
+tr_discovery_adopt = {
+	
+	
+	possible = {
+         NOR = { has_ethic = ethic_fanatic_spiritualist }	
+    }
+	
+	modifier = {
+	    
+		science_ship_survey_speed = 0.35
+		shipclass_science_ship_disengage_mult = 0.5
+		pop_ethic_materialist_attraction_mult = 0.1
+		
+	}
+	
+	
+	tradition_swap = {
+		name = tr_discovery_adopt_machine
+		inherit_effects = yes
+		#inherit_icon = no
+		inherit_name = no
+		trigger = {
+			has_authority = auth_machine_intelligence
+		}
+
+
+		weight = {
+			factor = 1
+		}
+	}
+
+	tradition_swap = {
+		name = tr_discovery_adopt_hive
+		inherit_effects = yes
+		#inherit_icon = no
+		inherit_name = no
+		trigger = {
+			has_authority = auth_hive_mind
+		}
+
+
+		weight = {
+			factor = 1
+		}
+	}	
+	
+	ai_weight = {
+		factor = 10
+		modifier = {
+			factor = 5
+			years_passed < 10
+		}
+		modifier = {
+			factor = 2
+			has_ethic = ethic_materialist
+		}
+		modifier = {
+			factor = 3
+			has_ethic = ethic_fanatic_materialist
+		}			
+	}		
+		
+
+			
+}
+
+
+tr_discovery_finish = {
+
+	
+	modifier = {
+		ascension_perks_add = 1
+	}
+
+	tradition_swap = {
+		name = tr_discovery_finish_machine
+		inherit_effects = no
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {
+			has_authority = auth_machine_intelligence
+		}
+
+		modifier = {
+			all_technology_research_speed = 0.10
+			ascension_perks_add = 1
+		}
+
+		weight = {
+			factor = 1
+		}
+	}
+
+	tradition_swap = {
+		name = tr_discovery_finish_hive
+		inherit_effects = no
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {
+			has_authority = auth_hive_mind
+		}
+
+		modifier = {
+			all_technology_research_speed = 0.10
+			ascension_perks_add = 1
+		}
+
+		weight = {
+			factor = 1
+		}
+	}
+	
+	
+}
+
+
+
+
+tr_discovery_to_boldly_go = {
+	
+
+	possible = {
+	NOR = { has_ethic = ethic_fanatic_spiritualist }
+    }	
+
+	
+	modifier = {
+		ship_anomaly_fail_risk = -0.15
+		ship_anomaly_generation_chance_mult = 0.15
+        ship_anomaly_research_speed_mult = 0.15		
+		pop_ethic_materialist_attraction_mult = 0.1		
+	}
+	
+	tradition_swap = {
+		name = tr_discovery_to_boldly_go_machine
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {
+			has_authority = auth_machine_intelligence
+		}
+
+		weight = {
+			factor = 1
+		}
+	}
+
+	tradition_swap = {
+		name = tr_discovery_to_boldly_go_hive
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {
+			has_authority = auth_hive_mind
+		}
+
+		weight = {
+			factor = 1
+		}
+	}	
+	
+	ai_weight = {
+		factor = 5000	# AI should prefer this one first, more useful early
+	}
+}
+
+
+
+tr_discovery_databank_uplinks = {
+	possible = {
+		has_tradition = tr_discovery_to_boldly_go
+		NOR = { has_ethic = ethic_fanatic_spiritualist }
+	}
+
+	on_enabled = {
+		give_technology = { message = no tech = tech_databank_uplinks }
+	}
+	
+	ai_weight = {
+		factor = 5000
+	}
+}
+
+
+
+
+
+#Science Division
+tr_discovery_seti = {
+	
+	
+	possible = {	
+    NOR = { has_ethic = ethic_fanatic_spiritualist }	
+	}	
+
+	modifier = {	    
+	    leader_scientist_cost = -0.15
+	    num_tech_alternatives_add = 1
+		pop_ethic_materialist_attraction_mult = 0.1		
+	}
+	
+	
+	tradition_swap = {
+		name = tr_discovery_science_division_machine
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {
+			has_authority = auth_machine_intelligence
+		}
+
+		weight = {
+			factor = 1
+		}
+	}
+
+	tradition_swap = {
+		name = tr_discovery_science_division_hive
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {
+			has_authority = auth_hive_mind
+		}
+
+		weight = {
+			factor = 1
+		}
+	}	
+	
+	ai_weight = {
+		factor = 1000
+	}
+}
+
+
+
+
+#Coordinated Research
+tr_discovery_coordinated_research = {
+	
+
+	possible = {
+		has_tradition = tr_discovery_seti
+		NOR = { has_ethic = ethic_fanatic_spiritualist }
+	}
+	
+	#unlocks building "Research Coordination Facility"
+	
+	modifier = {	    
+	    
+		pop_ethic_materialist_attraction_mult = 0.1		
+	}
+	
+	
+	
+	ai_weight = {
+		factor = 3000
+	}
+}
+
+
+
+
+tr_discovery_faith_in_science = {
+	
+
+
+	possible = {
+		has_tradition = tr_discovery_coordinated_research	
+		has_tradition = tr_discovery_databank_uplinks
+		
+		NOR = { 
+		       has_ethic = ethic_spiritualist
+			   has_ethic = ethic_fanatic_spiritualist
+		}		
+	}	
+	
+	
+	on_enabled = {
+		set_country_flag = faith_in_science
+	}
+	
+	#unity to labs
+	
+	modifier = {	    
+		pop_ethic_materialist_attraction_mult = 0.1		
+	}	
+
+
+	tradition_swap = {
+		name = tr_discovery_faith_in_science_machine
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {
+			has_authority = auth_machine_intelligence
+		}
+
+		weight = {
+			factor = 1
+		}
+	}
+
+	tradition_swap = {
+		name = tr_discovery_faith_in_science_hive
+		inherit_effects = yes
+		inherit_icon = yes
+		inherit_name = no
+		trigger = {
+			has_authority = auth_hive_mind
+		}
+
+		weight = {
+			factor = 1
+		}
+	}	
+	
+	ai_weight = {
+		factor = 3000
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
