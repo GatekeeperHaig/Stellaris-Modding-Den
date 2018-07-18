@@ -86,7 +86,10 @@ def main(args,unused=0):
       
     keyStrings=["key","name","id"]  
     if fileName[-4:]!=".txt" and fileName[-4:]!=".gfx" and fileName[-6:]!=".asset":
-      print("Non .txt/.gfx file!")
+      if args.to_txt:
+        print("Invalid input file endings. Needs '.txt{0}'/'.gfx{0}'/'.asset{0}'".format(tableFileEnding))
+      else:
+        print("Non .txt/.gfx/.asset file!")
       continue
     # else:
       # if fileName.replace(".txt",tableFileEnding)!=fileName:
