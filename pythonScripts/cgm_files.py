@@ -206,9 +206,9 @@ def main():
         optName=locList.append(eventNames.format("change_"+str(changeStep).replace("-", "neg")), "@changeBy {}%".format(changeStep))
         bonusMenu.add("option", TagList("name", optName).add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_Change[catI]+bonusI))).add(ET, TagList("change_variable", TagList("which", "cgm_{}_{}_value".format(cat, bonusName)).add("value", changeStep)))))
       bonusMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_subMainMenuEvent+catI)))))
-      bonusMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
+      # bonusMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
     mainSubMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",name_mainMenuEvent))))
-    mainSubMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
+    # mainSubMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
   
   locList.addEntry("enable_direct_build.name", "@enableBU")
   locList.addEntry("disable_direct_build.name", "@disableBU")
@@ -217,8 +217,8 @@ def main():
   # mainMenu.add("option", TagList("name", locList.addEntry("disable_direct_build.name", "@disableBU")).add("custom_gui", "cgm_option").add("trigger", TagList("has_global_flag", "direct_build_enabled")).add("hidden_effect", TagList("remove_global_flag", "direct_build_enabled").createEvent(name_mainMenuEvent)))
   # mainMenu.add("option", TagList("name", locList.addEntry("enable_direct_build.name", "@enableBU")).add("custom_gui", "cgm_option").add("trigger", TagList("not", TagList("has_global_flag", "direct_build_enabled"))).add("hidden_effect", TagList("set_global_flag", "direct_build_enabled").add("remove_global_flag", "display_low_tier_flag").add("remove_global_flag", "do_no_remove_low_tier_flag").createEvent(name_mainMenuEvent)))
   # mainMenu.add("option", TagList("name", locList.addEntry("disable_direct_build.name", "@disableBU")).add("custom_gui", "cgm_option").add("trigger", TagList("has_global_flag", "direct_build_enabled")).add("hidden_effect", TagList("remove_global_flag", "direct_build_enabled").add("set_global_flag", "display_low_tier_flag").add("set_global_flag", "do_no_remove_low_tier_flag").createEvent(name_mainMenuEvent)))
-  mainMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(2))).add("country_event", TagList("id",name_updateEvent))))
-  mainMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
+  mainMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(1))).add("country_event", TagList("id",name_updateEvent))))
+  # mainMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
 
   updateEvent=TagList("id", name_updateEvent)
   buildingOptionsFile.add("event", updateEvent)
