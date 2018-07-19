@@ -1,0 +1,179 @@
+
+#############
+#	COST	#
+#############
+
+@cost_1S = 10
+@cost_1M = 20
+@cost_1L = 40
+           
+@cost_2S = 13
+@cost_2M = 26
+@cost_2L = 52
+
+@cost_3S = 17
+@cost_3M = 34
+@cost_3L = 68
+           
+@cost_4S = 22
+@cost_4M = 44
+@cost_4L = 88
+           
+@cost_5S = 28
+@cost_5M = 56
+@cost_5L = 112
+           
+@cost_6S = 36
+@cost_6M = 72
+@cost_6L = 144
+
+### Variables
+
+@shipAuraRange = 80
+@stationSmallAuraRange = 70
+@stationMediumAuraRange = 90
+@stationLargeAuraRange = 110
+
+
+# #################
+#  Auras
+# #################
+
+#Offensive
+utility_component_template = {
+	key = "SHIP_AURA_SSTAM_STEAM_TITAN"
+	size = medium
+	icon = "GFX_Steam_Vents"
+	icon_frame = 1
+	power = 0
+	cost = 0
+	
+	size_restriction = { titan }
+	prerequisites = { "Tech_SSTAM_Signal_Jamming_Vapors" }
+	component_set = "Component_Set_Aura_SSTAM_Steam_Titan"
+	
+	hostile_aura = {
+		name = "Aura_SSTAM_Steam_Titan"
+		radius = @shipAuraRange
+		apply_on = ships
+		
+		stack_info = {			#A ship can only be affected by one aura of a certain id. If multiple auras have the same ID the one with the highest priority will be applied.
+			id = hostile_shield_dampener
+			priority = 1
+		}
+		
+		modifier = {
+			ship_accuracy_mult = -0.10
+			ship_tracking_mult = -0.10
+		}
+		
+		graphics = {
+			area_effect = {
+				entity = "circle_area_entity"
+				dynamic_scale = yes
+			}
+			ship_effect = {
+				entity = "ship_aura_negative_entity"
+				dynamic_scale = no
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = 10
+		modifier = {
+			factor = 2
+			is_ai = yes
+			is_preferred_weapons = weapon_type_energy
+		}
+	}
+}
+utility_component_template = {
+	key = "STARBASE_AURA_SSTAM_STEAM_TITAN"
+	size = medium
+	icon = "GFX_Steam_Vents"
+	icon_frame = 1
+	power = 0
+	cost = 0
+
+	class_restriction = { shipclass_starbase }
+	prerequisites = { "Tech_SSTAM_Signal_Jamming_Vapors" }
+	component_set = "Component_Set_Aura_SSTAM_Steam_Starbase"
+
+	hostile_aura = {
+		name = "Aura_SSTAM_Steam_Starbase"
+		system_wide = yes
+
+		stack_info = {
+			id = hostile_flt_inhibitor_aura
+			priority = 10
+		}
+
+		modifier = {
+			ship_accuracy_mult = -0.10
+			ship_tracking_mult = -0.10
+		}
+
+		graphics = {
+			ship_effect = {
+				entity = "ship_aura_negative_entity"
+				dynamic_scale = no
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = 2
+	}
+}
+#############
+# UTILITIES #
+#############
+
+utility_component_template = {
+	key = "SHIP_PARTS_STEAM_VENTS_1"
+	size = small
+	icon = "GFX_Steam_Vents"
+	icon_frame = 1
+	power = 0
+	cost = @cost_1S
+	modifier = {
+		ship_hull_add = -83.25
+		ship_evasion_add = 4.15
+	}
+	
+	prerequisites = { "Tech_SSTAM_steambot_ship_designs" }
+	component_set = "SHIP_PARTS_STEAM_VENTSSET"
+}
+
+utility_component_template = {
+	key = "SHIP_PARTS_STEAM_VENTS_2"
+	size = medium
+	icon = "GFX_Steam_Vents"
+	icon_frame = 1
+	power = 0
+	cost = @cost_1M
+	modifier = {
+		ship_hull_add = -187.5
+		ship_evasion_add = 6.1
+	}
+	
+	prerequisites = { "Tech_SSTAM_steambot_ship_designs" }
+	component_set = "SHIP_PARTS_STEAM_VENTSSET"
+}
+
+utility_component_template = {
+	key = "SHIP_PARTS_STEAM_VENTS_3"
+	size = large
+	icon = "GFX_Steam_Vents"
+	icon_frame = 1
+	power = 0
+	cost = @cost_1L
+	modifier = {
+		ship_hull_add = -450
+		ship_evasion_add = 9
+	}
+	
+	prerequisites = { "Tech_SSTAM_steambot_ship_designs" }
+	component_set = "SHIP_PARTS_STEAM_VENTSSET"
+}
