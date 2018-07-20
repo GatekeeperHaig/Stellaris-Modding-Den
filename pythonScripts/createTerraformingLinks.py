@@ -7,16 +7,16 @@ import math
 from stellarisTxtRead import *
 import pyexcel_ods
 
-def parse(argv):
+def parse(argv, returnParser=False):
   #print(argv)
   parser = argparse.ArgumentParser(description="", formatter_class=RawTextHelpFormatter)
-  parser.add_argument('inputFileName', help="ods file. Has to be in certain format. There is an example in the git repository" )
-  parser.add_argument('outputFileName', help="txt file")
+  parser.add_argument('inputFileName',default=None, nargs='?',help="ods file. Has to be in certain format. There is an example in the git repository" )
+  parser.add_argument('outputFileName', default=None, nargs='?', help="txt file")
   addCommonArgs(parser)
   
-  
-  if isinstance(argv, str):
-    argv=argv.split()
+  if returnParser:
+    return parser
+
   args=parser.parse_args(argv)
   # args.t0_buildings=args.t0_buildings.split(",")
   
@@ -54,7 +54,11 @@ class dictMatrix:
     return outStr
 
         
-def main(args):
+def main(args,*unused):
+  if args.inputFileName==None:
+    return ""
+  if args.outputFileName==None:
+    args.outputFileName=args.inputFileName.replace(".ods", ".txt")
 
 
   sheets=pyexcel_ods.get_data(args.inputFileName)
@@ -144,8 +148,10 @@ def main(args):
         newEntry.add("ai_weight",TagList(2).add("weight","0"))
 
         outList.add("terraform_link",newEntry)
-  with open(args.outputFileName,'w') as file:
-    outList.writeAll(file,args)
+  if not args.test_run:
+    with open(args.outputFileName,'w') as file:
+      outList.writeAll(file,args)
+  return args.outputFileName
 
   # costDict=dict()
   # for row in costs[1:]:

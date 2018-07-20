@@ -22,6 +22,7 @@ import parseAndWrite
 import locList
 import createCompTriggers
 import pickle
+import createTerraformingLinks
 # from copy import deepcopy
 
 
@@ -807,6 +808,10 @@ class TabControlClass:
     self.newTab("Create Comp Triggers",createCompTriggers,("text files",'*.txt;*.gfx'),[],[of,oll,jf],"")
     self.tabClasses[-1].separateStart=False
     self.tabClasses[-1].helpText="Parses a Stellaris Format File and searches for triggers to create: Star classes, Planet Classes, special resources. "
+
+    self.newTab("Create Terraforming Links",createTerraformingLinks,("ods files",'*.ods'),[],[oll],"")
+    self.tabClasses[-1].separateStart=True
+    self.tabClasses[-1].helpText="Creates terraforming links between different planets. Ods file must be in specific format (example in repository) "
 
     nb.pack(expand=1, fill="both")  # Pack to make visible
   def newTab(self,name, command, fileFilter, fixedOptions, options, extraAddButton):
