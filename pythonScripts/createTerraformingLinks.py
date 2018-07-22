@@ -141,9 +141,9 @@ def main(args,*unused):
         if len(potentialList)>0:
           newEntry.add("potential",potentialList)
 
-        newEntry.add("effect",TagList(2).add("ex_terraforming_switch",yes))
+        newEntry.add("effect",TagList(2).add("cgm_terraforming_switch",yes))
         if fromName==toName:
-          newEntry.get("effect").add("ex_terraforming_menu",yes)
+          newEntry.get("effect").add("cgm_same_class_terraforming_effect",yes)
 
         newEntry.add("ai_weight",TagList(2).add("weight","0"))
 
