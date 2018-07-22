@@ -207,7 +207,7 @@ def main():
         bonusMenu.add("option", TagList("name", optName).add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_Change[catI]+bonusI))).add(ET, TagList("change_variable", TagList("which", "cgm_{}_{}_value".format(cat, bonusName)).add("value", changeStep)))))
       bonusMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",eventNameSpace.format(id_subMainMenuEvent+catI)))))
       # bonusMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
-    mainSubMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",name_mainMenuEvent))))
+    mainSubMenu.add("option", TagList("name", "BACK").add("custom_gui","cgm_option").add("hidden_effect", TagList("country_event", TagList("id",name_mainMenuEvent))))
     # mainSubMenu.add("option", TagList("name", "cgm_main_menu.close.name").add("custom_gui","cgm_option").add("country_event", TagList("id",name_updateEvent)))
   
   locList.addEntry("enable_direct_build.name", "@enableBU")
@@ -265,8 +265,10 @@ def main():
   # updateEvent.add("after",after)
   for catI,cat in enumerate(cats):
     bonusModifiers=[[entry+"_"+cat] for entry in bonusNames[catI] if entry !="all"]
-    if "all" in bonusName[catI]:
+    print(bonusName[catI])
+    if "all" in bonusNames[catI]:
       bonusModifiers.append(reduce(lambda x,y: x+y, bonusModifiers))
+      print(bonusModifiers)
     immediate.addComment(cat)
     # ifTagList=TagList()
     # immediate.add("if",ifTagList)
