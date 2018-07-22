@@ -18,12 +18,22 @@ event = {
 					is_country_type = fallen_empire
 					is_ai = no
 				}
-				OR = { 
-					has_country_flag = has_terraforming_agents
-					has_country_strategic_resource = { type = sr_terraform_gases amount > 0 } 
-					has_country_strategic_resource = { type = sr_terraform_liquids amount > 0 }
-					has_country_strategic_resource = { type = sr_meta_organics amount > 0 }
-				}
+			}	
+			if = { 
+				limit = {
+					OR = { 
+						has_country_flag = has_terraforming_agents
+						has_country_strategic_resource = { type = sr_terraform_gases amount > 0 } 
+						has_country_strategic_resource = { type = sr_terraform_liquids amount > 0 }
+						has_country_strategic_resource = { type = sr_meta_organics amount > 0 }
+						any_owned_planet = { 
+							any_tile = { 
+								has_building = building_terraforming_bacteria_germinator
+								exists = pop
+							}
+						}
+					}
+				}	
 			}	
 			set_variable = { which = terraforming_points value = 0 }
 			if = { 
@@ -99,6 +109,12 @@ event = {
 						has_country_strategic_resource = { type = sr_terraform_gases amount > 0 } 
 						has_country_strategic_resource = { type = sr_terraform_liquids amount > 0 }
 						has_country_strategic_resource = { type = sr_meta_organics amount > 0 }
+						any_owned_planet = { 
+							any_tile = { 
+								has_building = building_terraforming_bacteria_germinator
+								exists = pop 
+							}
+						}						
 					}
 				}	
 				if = { 
@@ -169,7 +185,7 @@ event = {
 					else_if = { limit = { has_country_strategic_resource = { type = sr_meta_organics amount = 18 } } change_variable = { which = terraforming_points value = 18 } }
 					else_if = { limit = { has_country_strategic_resource = { type = sr_meta_organics amount = 19 } } change_variable = { which = terraforming_points value = 19 } }
 					else_if = { limit = { has_country_strategic_resource = { type = sr_meta_organics amount = 20 } } change_variable = { which = terraforming_points value = 20 } }
-				}	
+				}
 				###
 				if = { limit = { check_variable = { which = terraforming_points value = 1 } } set_country_flag = has_terraforming_agents add_modifier = { modifier = add_1_monthly_terraforming_agent days = -1 } }
 				else_if = { limit = { check_variable = { which = terraforming_points value = 2 } } set_country_flag = has_terraforming_agents add_modifier = { modifier = add_2_monthly_terraforming_agent days = -1 } }
@@ -232,7 +248,118 @@ event = {
 				else_if = { limit = { check_variable = { which = terraforming_points value = 59 } } set_country_flag = has_terraforming_agents add_modifier = { modifier = add_59_monthly_terraforming_agent days = -1 } }
 				else_if = { limit = { check_variable = { which = terraforming_points value = 60 } } set_country_flag = has_terraforming_agents add_modifier = { modifier = add_60_monthly_terraforming_agent days = -1 } }
 				###
+				if = { 
+					limit = { 
+						any_owned_planet = { 
+							any_tile = { 
+								has_building = building_terraforming_bacteria_germinator							
+								exists = pop
+							}
+						}
+					}
+					every_owned_planet = { 
+						limit = { 
+							any_tile = { 
+								has_building = building_terraforming_bacteria_germinator							
+								exists = pop
+							}	
+						} 
+						every_tile = { 
+							limit = { 
+								has_building = building_terraforming_bacteria_germinator
+								exists = pop
+							} 	
+							prevprev = { change_variable = { which = terraforming_points value = 1 } }
+						}	
+					}
+				}					
 			}	
+			if = { 
+				limit = { 
+					any_owned_planet = { 
+						has_planet_flag = cgm_terraforming_planet						
+					}
+				}	
+				set_variable = { which = available_terraforming_points value = terraforming_points }
+				every_owned_planet = { 
+					limit = { 
+						has_planet_flag = cgm_terraforming_planet 
+						has_planet_flag = terraformer_active		
+					}
+					if = { 
+						limit = { has_building = building_terraformer_baseline } 
+						prev = { change_variable = { which = available_terraforming_points value = -1 } }
+					}	
+					else_if = { 
+						limit = { has_building = building_terraformer_increased } 
+						prev = { change_variable = { which = available_terraforming_points value = -2 } }
+					}						
+					else_if = { 
+						limit = { has_building = building_terraformer_maximal } 
+						prev = { change_variable = { which = available_terraforming_points value = -3 } }
+					}
+				}
+				while = { 
+					limit = { 
+						check_variable = { which = available_terraforming_points value < 0 } 						
+					}
+					if = { 
+						limit = { 
+							any_owned_planet = { 
+								has_planet_flag = maximal_terraformer_speed
+							}
+							random_owned_planet = { 
+								limit = { has_planet_flag = maximal_terraformer_speed }
+								random_tile = { 
+									limit = { has_terraformer = yes }
+									remove_building = yes
+									set_building = building_terraformer_increased
+								}	
+								remove_planet_flag = maximal_terraformer_speed 
+								set_planet_flag = increased_terraformer_speed
+								update_terraforming_time = yes
+							}	
+						}
+					}	
+					else_if = { 
+						limit = { 
+							any_owned_planet = { 
+								has_planet_flag = increased_terraformer_speed
+							}
+							random_owned_planet = { 
+								limit = { has_planet_flag = increased_terraformer_speed }
+								random_tile = { 
+									limit = { has_terraformer = yes }
+									remove_building = yes
+									set_building = building_terraformer_baseline
+								}	
+								remove_planet_flag = increased_terraformer_speed 
+								set_planet_flag = baseline_terraformer_speed
+								update_terraforming_time = yes
+							}	
+						}
+					}					
+					else_if = { 
+						limit = { 
+							any_owned_planet = { 
+								has_planet_flag = baseline_terraformer_speed
+							}
+							random_owned_planet = { 
+								limit = { has_planet_flag = baseline_terraformer_speed }
+								random_tile = { 
+									limit = { has_terraformer = yes }
+									remove_building = yes
+									set_building = building_terraformer_inactive
+								}	
+								remove_planet_flag = baseline_terraformer_speed 
+								remove_planet_flag = terraformer_active
+								set_planet_flag = terraformer_inactive
+								update_terraforming_time = yes
+							}	
+						}
+					}										
+				}
+			}
 		}	
 	}			
 }	
