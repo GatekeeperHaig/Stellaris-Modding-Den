@@ -705,6 +705,7 @@ def createConvertEvent(args):
     return 1
   simpleModName=''.join(e for e in args.custom_mod_name if e.isalnum())
   onActionTagList=TagList("on_building_complete", TagList("events", TagList("direct_build_{}.1".format(simpleModName),""))).add("on_building_replaced", TagList("events", TagList("direct_build_{}.1".format(simpleModName),""))).addComment("make sure downgraded buildings are build upgraded for some strange reason:").add("on_planet_transfer", TagList("events", TagList("direct_build_{}.3".format(simpleModName),"")))
+  onActionTagList.add("on_bi_yearly_pulse",TagList("events", TagList("direct_build_{}.2".format(simpleModName),"")))
   eventTagList=TagList("namespace", "direct_build_{}".format(simpleModName))
   convertEvent=TagList("id", "direct_build_{}.1".format(simpleModName))
   eventTagList.add("planet_event", convertEvent)
@@ -724,9 +725,9 @@ def createConvertEvent(args):
   convertPlanetEvent.add("is_triggered_only","yes")
   convertPlanetEvent.add("immediate", TagList("every_tile", TagList("limit", TagList("has_building","yes")).add("switch", immediateSwitch)))
   convertAllEvent=TagList("id","direct_build_{}.2".format(simpleModName))
-  eventTagList.add("country_event", convertAllEvent)
-  convertAllEvent.add("hide_window", "yes").add("fire_only_once","yes")
-  convertAllEvent.add("immediate", TagList("every_playable_country", TagList("every_owned_planet", TagList("planet_event", TagList("id", "direct_build_{}.3".format(simpleModName))))))
+  eventTagList.add("event", convertAllEvent)
+  convertAllEvent.add("hide_window", "yes").add("is_triggered_only","yes")
+  convertAllEvent.add("immediate", TagList("every_playable_country", TagList("every_owned_planet", TagList("planet_event", TagList("id", "direct_build_{}.3".format(simpleModName)).add("days", 1).add("random", 25)))))
 
   if not args.test_run:
     if not os.path.exists(args.output_folder+"/common/on_actions/"):
