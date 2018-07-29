@@ -215,8 +215,12 @@ def readAndConvert(args, allowRestart=1):
               # print(upgradeName)
               # raise
               
+            wasListed=False
             #this is a higher tier building. If there is no pure upgrade version yet, create it now. A direct build one will be created anyway!
-            upgradeData.replace("is_listed","no") #creates if does not exist
+            if not upgradeData.attemptGet("is_listed")=="no":
+              upgradeData.replace("is_listed","no") #creates if does not exist
+              wasListed=True
+              baseBuildingDataCopy=copy.deepcopy(upgradeData) #requirements of the original base building now irrelevant as this one was also constructable by itself
             upgradeData.wasVisited=1
             
               
@@ -224,7 +228,7 @@ def readAndConvert(args, allowRestart=1):
             origUpgradeData=upgradeData  
             upgradeData=copy.deepcopy(buildingNameToData.get(upgradeName)) #now copy to prevent further editing
             if not secondVisit:
-              if args.copy_requirements_up:
+              if args.copy_requirements_up and not wasListed:
                 for cat in ["allow", "potential"]:
                   dat=copy.deepcopy(baseBuildingDataCopy.attemptGet(cat))
                   if len(dat)>0:
