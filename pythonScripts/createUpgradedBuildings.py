@@ -18,7 +18,7 @@ def parse(argv, returnParser=False):
   parser.add_argument('buildingFileNames', nargs = '*', help='File(s)/Path(s) to file(s) to be parsed or .mod file (see "--create_standalone_mod_from_mod). Output is named according to each file name with some extras. Globbing star(*) can be used (even under windows :P)')
   parser.add_argument('-l','--languages', default="braz_por,english,french,german,polish,russian,spanish", help="Languages for which files should be created. Comma separated list. Only creates links to existing titles/descriptions (but needs to do so for every language)(default: %(default)s)")
   parser.add_argument('-s','--t0_buildings', default='building_colony_shelter,building_deployment_post', help="Does not change building requirements for buildings in this comma separated list. Furthermore, their cost will not be added to the t1 buildings (but deducted from the upgrade version) (default: %(default)s)")
-  parser.add_argument('--primitive_buildings', default='building_primitive_farm,building_primitive_factory', help="Non-listed buildings with listed upgrades. Normally, direct build would eventually make those upgrade unavaiable. This adds an extra condition to them to make sure they stay available as an upgrade!")
+  # parser.add_argument('--primitive_buildings', default='building_primitive_farm,building_primitive_factory', help="Non-listed buildings with listed upgrades. Normally, direct build would eventually make those upgrade unavaiable. This adds an extra condition to them to make sure they stay available as an upgrade!")
   parser.add_argument('-t','--time_discount', default=0.25, type=float, help="Total time of tier n will be: Time(tier n-1)+Time(upgrade tier n)*(1-discount), with the restriction that total time will never be lower than 'Time(upgrade tier n)' (default: %(default)s)")
   parser.add_argument('-c','--cost_discount', default=0., type=float, help="Total cost of tier n will be: Cost(tier n-1)+Cost(upgrade tier n)*(1-discount), with the restriction that total cost will never be lower than 'Cost(upgrade tier n)'(default: %(default)s)")
   parser.add_argument('--custom_direct_build_AI_allow', action="store_true", help="By default, the script will replace the direct build AI_allows by the lowest tier AI_allow (since the checks of the lowest tiers are usually meant for tile validity which is also important for direct build high tier, but unessecary for upgrade). This will not happen with this option")
@@ -199,6 +199,7 @@ def readAndConvert(args, allowRestart=1):
               continue
             try:
               upgradeData=buildingNameToData.get(upgradeName) #allow editing
+              upgradeData.isUpgrade=True
             except ValueError:
               print("WARNING: Upgrade building {} not found for {}. Either missing or in different file. Cannot apply script to this! In different file will work with '--join_files' option.".format(upgradeName, buildingData.tagName))
               if "planet_unique" in buildingData.names or "empire_unique" in buildingData.names:
@@ -332,16 +333,17 @@ def readAndConvert(args, allowRestart=1):
 
     #take care of primitive buildings
     if not args.just_copy_and_check:  
-      primitiveBuildings=args.primitive_buildings.split(",")
+      # primitiveBuildings=args.primitive_buildings.split(",")
       for origBuildI,baseBuildingData in enumerate(buildingNameToDataOrigVals): 
         if not isinstance(baseBuildingData,NamedTagList):
           continue
-        if baseBuildingData.attemptGet("is_listed")=="no" and baseBuildingData.tagName in primitiveBuildings:
+        if baseBuildingData.attemptGet("is_listed")=="no" and not hasattr(baseBuildingData, "isUpgrade"):
           upgradeList=baseBuildingData.attemptGet("upgrades").names
           for upgradeName in upgradeList:
             pot=buildingNameToData.get(upgradeName).get("potential")
             occ=pot.count("NAND")
-            pot.getN_th("NAND", occ-1).add("NOT", TagList("tile", TagList("has_building",baseBuildingData.tagName)))
+            if occ>0:
+              pot.getN_th("NAND", occ-1).add("NOT", TagList("tile", TagList("has_building",baseBuildingData.tagName)))
             
 
     if args.simplify_upgrade_AI_allow:
