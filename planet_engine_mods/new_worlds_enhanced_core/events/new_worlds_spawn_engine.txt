@@ -1,0 +1,570 @@
+###### Written by ExNihil
+#
+#	This mod uses a configurable spawn engine. If you'd like to integrate a version of this engine please join our discord server The Stellaris Modding Den
+#	Server invite: https://discord.gg/ZhvBXhh
+
+namespace = spawn_engine_0
+
+event = {
+	#this event triggers on game start and monthly pulse
+	id = spawn_engine_0.0
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	#This event fires only once.
+	
+	trigger = { NOT = { has_global_flag = new_worlds_active } }
+	
+	immediate = {
+		set_global_flag = new_worlds_active #this sets a global flag for this mod, to be used by other mods and the engine
+		set_global_flag = planetary_diversity_active #this sets a global flag for this mod, to be used by other mods and the engine
+		set_timed_global_flag = { flag = deposit_recheck days = 91 }
+		every_planet = {
+			if = {
+				limit = { is_star = yes }
+				if = {
+					limit = {
+						solar_system = {
+							NOT = {
+								any_planet = {
+									NOT = { is_same_value = prevprev }
+									has_planet_flag = system_star_1
+								}
+							}
+						}
+					}
+					set_planet_flag = system_star_1
+				}	
+				else_if = {
+					limit = {
+						solar_system = {
+							NOT = {
+								any_planet = {
+									NOT = { is_same_value = prevprev }
+									has_planet_flag = system_star_2
+								}
+							}
+						}
+					}
+					set_planet_flag = system_star_2
+				}	
+				else = {					
+					set_planet_flag = system_star_3
+				}
+			}	
+			else_if = { 			
+				limit = { is_planet_class = pc_gas_giant has_moon = yes }
+				every_moon = { set_planet_flag = gas_giant_moon }
+			}
+			if = {
+				limit = {
+					NOR = { 
+						AND = { 
+							exists = owner 
+							owner = { is_country_type = default }
+							OR = { 
+								is_capital = yes
+								is_homeworld = yes
+							}
+						}	
+						AND = { 
+							exists = owner 
+							NAND = { 
+								owner = { is_country_type = primitive } 
+								any_owned_pop = { is_robot_pop = no } 
+							}
+						}	
+						solar_system = {
+							OR = {
+								any_planet = { exists = owner owner = { is_country_type = default } is_capital = yes }
+								has_star_flag = sol_system
+								has_star_flag = custom_system
+								has_star_flag = floating_system
+								has_star_flag = crystal_system
+								has_star_flag = city_system
+								has_star_flag = empire_home_system
+								has_star_flag = cgm_ignored_system
+							}
+						}
+					}						
+				}	
+				# these events occur one after the other.
+				planet_event = { id = spawn_engine_0.1 days = 1 }
+				planet_event = { id = spawn_engine_0.2 days = 1 }				
+			}
+		}
+		every_playable_country = { country_event = { id = spawn_engine_0.10 } }
+	}
+}
+
+planet_event = {
+	id = spawn_engine_0.1
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = { is_vanilla_habitable_planet = yes NOT = { has_planet_flag = prescripted_ideal } }			
+			new_worlds_adjust_inhabitable_planet_size = yes
+			new_worlds_habitable_planets_spawn_table = yes
+			if = {
+				limit = { 
+					exists = owner
+					owner = { is_country_type = primitive } 
+				}			
+				new_worlds_species_change_table = yes
+				if = { 
+					limit = { is_ideal_planet_class = { who = owner status = no } }
+					change_owner_species_to_this_planet_preference = yes			
+				}	
+			}		
+		}	
+		else_if = { 
+			limit = { is_vanilla_uninhabitable_planet = yes }					
+			new_worlds_adjust_uninhabitable_planet_size = yes
+			new_worlds_uninhabitable_planets_spawn_table = yes
+			new_worlds_adjust_gas_giant_planet_size = yes
+			new_worlds_adjust_asteroids_size = yes
+			if = { 
+				limit = { is_colonizable = yes }
+				while = { 
+					limit = { planet_size > 25 }
+					change_planet_size = -1
+				}
+			}	
+			if = {
+				limit = {
+					OR = { is_planet_class = pc_gas_giant is_planet_class = pc_ice_giant }
+					has_moon = yes
+					any_moon = { NOT = { has_planet_flag = gas_giant_moon } }
+				}
+				every_moon = {
+					limit = { NOT = { has_planet_flag = gas_giant_moon } }
+					set_planet_flag = gas_giant_moon
+				}
+			}	
+		}	
+		if = {
+			limit = { 
+				OR = { 
+					uninhabitable_regular_planet = yes
+					habitable_planet = yes
+				}	
+				has_regular_vanilla_planet_modifier = yes
+			}
+			remove_and_count_vanilla_regular_planet_modifiers = yes
+			while = {
+				limit = {
+					check_variable = { which = "pm_points" value > 0 }
+				}
+				planet_modifier_spawn_table = yes
+				change_variable = { which = "pm_points" value = -1 }
+			}
+		}		
+	}
+}
+
+planet_event = {
+	id = spawn_engine_0.2
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		if = { 
+			limit = { 
+				OR = { 
+					AND = { 
+						is_colonizable = no
+						is_colony = no
+						NOR = { 
+							has_strategic_resource = yes
+							has_vanilla_orbital_strategic_resource = no
+						} 
+					}						
+					AND = { 
+						has_strategic_resource = no
+						OR = { 
+							is_colonizable = yes
+							is_colony = yes
+						}	
+						OR = { 
+							NOT = { exists = owner }
+							owner = { is_ai = yes }
+						}
+					}
+				}						
+			}
+			every_tile = { 
+				limit = { has_regular_vanilla_deposit = yes has_building = no }
+				cgm_shared_regular_deposit_spawn_table = yes
+			}		
+			while = {
+				limit = {
+					OR = {
+						AND = {
+							planet_size > 19
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 6
+							}
+						}
+						AND = {
+							planet_size > 15
+							planet_size < 19
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 5
+							}
+						}
+						AND = {
+							planet_size > 10
+							planet_size < 16
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 4
+							}
+						}
+						AND = {
+							planet_size < 11
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 3
+							}
+						}
+						
+					}
+				}
+				random_tile = { 
+					limit = { has_deposit = no }
+					cgm_shared_regular_deposit_spawn_table = yes
+				}		
+			}				
+		}	
+		else = { 
+			every_tile = {
+				limit = { has_regular_vanilla_deposit = yes	has_building = no }
+				cgm_shared_regular_deposit_spawn_table = yes				
+			}			
+		}	
+		if = {
+			limit = { any_tile = { has_blocker = yes has_regular_vanilla_blocker = yes } }
+			every_tile = {
+				limit = { has_blocker = yes has_regular_vanilla_blocker = yes }
+				remove_blocker = yes
+				new_worlds_tile_blocker_spawn_table = yes
+			}
+		}
+		else_if = { 
+			limit = { NOT = { any_tile = { has_blocker = yes } } }
+			every_tile = { 
+				limit = { has_building = no has_pop = no }
+				random_list = { 
+					50 = { new_worlds_tile_blocker_spawn_table = yes }
+					50 = { }
+				}	
+			}	
+		}				
+		else_if = { 
+			limit = { NOT = { any_tile = { has_blocker = yes has_regular_vanilla_blocker = yes } } }
+			while = {
+				limit = {
+					OR = {
+						AND = {
+							planet_size > 19
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 6
+							}
+						}
+						AND = {
+							planet_size > 15
+							planet_size < 19
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 5
+							}
+						}
+						AND = {
+							planet_size > 10
+							planet_size < 16
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 4
+							}
+						}
+						AND = {
+							planet_size < 11
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 3
+							}
+						}
+					}
+				}
+				random_tile = {
+					limit = { has_blocker = no }
+					new_worlds_tile_blocker_spawn_table = yes
+				}
+			}						
+		}																
+	}
+}
+
+event = {
+	id = spawn_engine_0.3
+	hide_window = yes	
+	is_triggered_only = yes
+	
+	trigger = { has_global_flag = deposit_recheck }
+	
+	immediate = {
+		every_planet = { 
+			limit = {
+				habitable_planet = yes
+				OR = {
+					NOT = { any_tile = { has_blocker = yes } }
+					NOT = { any_tile = { has_deposit = yes } }
+					AND = {
+						planet_size > 19
+						count_tile = {
+							limit = { has_blocker = yes }
+							count < 6
+						}
+					}
+					AND = {
+						planet_size > 15
+						planet_size < 19
+						count_tile = {
+							limit = { has_blocker = yes }
+							count < 5
+						}
+					}
+					AND = {
+						planet_size > 10
+						planet_size < 16
+						count_tile = {
+							limit = { has_blocker = yes }
+							count < 4
+						}
+					}
+					AND = {
+						planet_size < 11
+						count_tile = {
+							limit = { has_blocker = yes }
+							count < 3
+						}
+					}
+					AND = {
+						planet_size > 19
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 6
+						}
+					}
+					AND = {
+						planet_size > 15
+						planet_size < 19
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 5
+						}
+					}
+					AND = {
+						planet_size > 10
+						planet_size < 16
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 4
+						}
+					}
+					AND = {
+						planet_size < 11
+						count_tile = {
+							limit = { has_deposit = yes }
+							count < 3
+						}
+					}			
+				}
+			}			
+			if = { 
+				limit = { NOT = { any_tile = { has_blocker = yes } } }
+				every_tile = { 
+					limit = { has_building = no has_pop = no }
+					random_list = {
+						50 = { new_worlds_tile_blocker_spawn_table = yes }
+						50 = { }
+					}	
+				}	
+			}	
+			if = { 
+				limit = { NOT = { any_tile = { has_deposit = yes } } }
+				every_tile = { 
+					random_list = { 
+						50 = { cgm_shared_regular_deposit_spawn_table = yes }
+						50 = { } 
+					}
+				}	
+			}				
+			while = {
+				limit = {
+					OR = {
+						AND = {
+							planet_size > 19
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 6
+							}
+						}
+						AND = {
+							planet_size > 15
+							planet_size < 19
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 5
+							}
+						}
+						AND = {
+							planet_size > 10
+							planet_size < 16
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 4
+							}
+						}
+						AND = {
+							planet_size < 11
+							count_tile = {
+								limit = { has_blocker = yes }
+								count < 3
+							}
+						}
+						
+					}
+				}
+				random_tile = {
+					limit = { has_blocker = no has_pop = no }
+					new_worlds_tile_blocker_spawn_table = yes
+				}
+			}
+			while = {
+				limit = {
+					OR = {
+						AND = {
+							planet_size > 19
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 6
+							}
+						}
+						AND = {
+							planet_size > 15
+							planet_size < 19
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 5
+							}
+						}
+						AND = {
+							planet_size > 10
+							planet_size < 16
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 4
+							}
+						}
+						AND = {
+							planet_size < 11
+							count_tile = {
+								limit = { has_deposit = yes }
+								count < 3
+							}
+						}
+						
+					}
+				}
+				random_tile = { 
+					limit = { has_deposit = no }
+					cgm_shared_regular_deposit_spawn_table = yes
+				}			
+			}		
+		}
+	}
+}	
+country_event = { 
+	id = spawn_engine_0.9
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	immediate = {
+		capital_scope = {
+			every_tile = {
+				limit = {
+					NOR = { 
+						has_deposit = yes
+						has_building = yes
+					}
+				}
+				random_list = {
+					65 = { cgm_shared_regular_deposit_spawn_table = yes }
+					35 = { }
+				}
+			}
+		}
+	}
+}
+country_event = {
+	#this event is triggered by the first event
+	id = spawn_engine_0.10
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = { 
+		capital_scope = { 
+			save_event_target_as = capital_target
+			solar_system = { save_event_target_as = capital_system_target } 
+		}
+		every_planet = { 		
+			limit = { 							
+				solar_system = { 
+					NOT = { has_star_flag = empire_home_system }					
+					distance = { 
+						source = event_target:capital_system_target
+						type = hyperlane
+						min_jumps = 1
+						max_jumps = 3
+					}									
+				}
+				has_planet_flag = prescripted_ideal	
+			}
+			if = { 
+				limit = { is_ideal_planet_class = { who = root status = no } }
+				if = { limit = { event_target:capital_target = { is_planet_class = pc_tropical } } change_pc = pc_tropical }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_arid } } change_pc = pc_arid }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_continental } } change_pc = pc_continental }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_ocean } } change_pc = pc_ocean }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_tundra } } change_pc = pc_tundra }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_arctic } } change_pc = pc_arctic }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_alpine } } change_pc = pc_alpine }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_savannah } } change_pc = pc_savannah }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_tidallylocked } } change_pc = pc_tidallylocked }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_mangrove } } change_pc = pc_mangrove }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_desertislands } } change_pc = pc_desertislands }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_hajungle } } change_pc = pc_hajungle }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_cascadian } } change_pc = pc_cascadian }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_swamp } } change_pc = pc_swamp }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_subarctic } } change_pc = pc_subarctic }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_glacial } } change_pc = pc_glacial }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_geothermal } } change_pc = pc_geothermal }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_sandsea } } change_pc = pc_sandsea }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_mesa } } change_pc = pc_mesa }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_oasis } } change_pc = pc_oasis }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_hadesert } } change_pc = pc_hadesert }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_steppe } } change_pc = pc_steppe }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_frozen_desert } } change_pc = pc_frozen_desert }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_antarctic } } change_pc = pc_antarctic }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_ammonia } } change_pc = pc_ammonia }
+				else_if = { limit = { event_target:capital_target = { is_planet_class = pc_methane } } change_pc = pc_methane }
+			}
+		}
+	}
+}
