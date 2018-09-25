@@ -1354,6 +1354,7 @@ pd_init_mushroom = {
 	}	
 }
 
+#Archive World
 pd_init_archive = {
 	class = "rl_binary_stars"
 	usage = misc_system_init
@@ -1622,6 +1623,139 @@ pd_init_archive = {
 		
 		moon = {			
 			count = { min = 0 max = 2 }
+			orbit_distance = 10
+		}
+	}
+}
+
+#Biolumen World
+pd_init_biolumen = {
+	class = "rl_trinary_stars"
+	usage = misc_system_init
+	max_instances = 1
+	spawn_chance = 100	
+	usage_odds = 100
+	
+	flags = { biolumen_system }
+		
+    planet = {
+        count = 1
+        class = star
+        orbit_distance = 25
+        orbit_angle = 0
+        size = { min = 25 max = 30 }
+        has_ring = no
+    }
+
+    planet = {
+        count = 1
+        class = star
+        orbit_distance = { min = 0 max = 20 }
+        orbit_angle = 120
+        size = { min = 25 max = 30 }
+        has_ring = no
+    }
+
+    planet = {
+        count = 1
+        class = star
+        orbit_distance = { min = 0 max = 20 }
+        orbit_angle = 120
+        size = { min = 25 max = 30 }
+        has_ring = no
+    }
+		
+	change_orbit = 45
+	
+	planet = {
+		count = { min = 2 max = 2 }
+		class = random_non_colonizable
+		orbit_distance = 25
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {			
+			count = { min = 0 max = 0 }
+			orbit_distance = 5
+		}
+	}
+	
+	change_orbit = 30
+
+	
+	planet = {
+		class = "pc_biolumen"
+		orbit_distance = 0
+		orbit_angle = 85
+		size = 25
+		has_ring = yes
+		tile_blockers = none
+		modifiers = none
+		
+		init_effect = {
+			set_planet_flag = biolumen_planet
+			prevent_anomaly = yes
+			save_event_target_as = biolumen_planet
+			create_country = {
+				name = "Smugglers"
+				type = pirate
+				name_list = "PRT1"
+			}
+			last_created_country = {
+				set_country_flag = biolumen_country
+				create_fleet = {
+					name = "Smugglers"
+					settings = { spawn_debris = no }
+					effect = {
+								set_owner = PREV
+								create_ship_design = {
+									design = "NAME_Reaver"
+								}
+								while = {
+									count = 25
+									create_ship = {
+										name = random
+										design = last_created_design
+										graphical_culture = "pirate_01"
+									}
+								}
+								create_ship_design = {
+									design = "NAME_Lancer"
+								}
+								while = {
+									count = 15
+									create_ship = {
+										name = random
+										design = last_created_design
+										graphical_culture = "pirate_01"
+									}
+								}
+								set_fleet_stance = aggressive
+								set_aggro_range_measure_from = self
+								set_aggro_range = 150			
+						set_location = event_target:biolumen_planet
+						add_modifier = {
+							modifier = sanctuary_power
+							days = -1														
+					}
+				}
+			}
+		}
+	}
+			
+	}
+		
+	change_orbit = 30
+		
+	planet = {
+		count = { min = 6 max = 8 }
+		class = random_non_colonizable
+		orbit_distance = { min = 30 max = 40 }
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {			
+			count = { min = 0 max = 3 }
 			orbit_distance = 10
 		}
 	}
