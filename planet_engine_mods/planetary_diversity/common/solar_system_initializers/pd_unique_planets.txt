@@ -1760,3 +1760,120 @@ pd_init_biolumen = {
 		}
 	}
 }
+
+
+pd_init_technoorganic = {
+	class = "sc_g"
+	usage = misc_system_init
+	max_instances = 1
+	spawn_chance = 100	
+	usage_odds = 100
+	
+	flags = { technoorganic_system }
+
+    planet = {
+        count = 1
+        class = "pc_g_star"
+        orbit_distance = 0
+        orbit_angle = 1
+        size = { min = 25 max = 30 }
+        has_ring = no
+    }
+		
+	change_orbit = 45
+	
+	planet = {
+		count = { min = 3 max = 3 }
+		class = random_non_colonizable
+		orbit_distance = 25
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {			
+			count = { min = 0 max = 0 }
+			orbit_distance = 5
+		}
+	}
+	
+	change_orbit = 30
+
+	
+	planet = {
+		class = "pc_technoorganic"
+		orbit_distance = 0
+		orbit_angle = 85
+		size = 25
+		tile_blockers = none
+		modifiers = none
+		
+		init_effect = {
+			set_planet_flag = technoorganic_planet
+			prevent_anomaly = yes
+			save_event_target_as = technoorganic_planet
+			create_country = {
+				name = "Defenders"
+				type = faction
+			}
+			last_created_country = {
+				set_country_flag = technoorganic_country
+				create_fleet = {
+					name = "Mining Drones"
+					settings = { spawn_debris = no }
+					effect = {
+								set_owner = PREV
+								create_ship_design = {
+									design = "NAME_Ancient_Destroyer"
+								}
+								while = {
+									count = 25
+									create_ship = {
+										name = random
+										design = last_created_design
+									}
+								}
+								create_ship_design = {
+									design = "NAME_Ancient_Combat_Drone"
+								}
+								while = {
+									count = 15
+									create_ship = {
+										name = random
+										design = last_created_design
+									}
+								}
+								set_fleet_stance = aggressive
+								set_aggro_range_measure_from = self
+								set_aggro_range = 150			
+						set_location = event_target:technoorganic_planet
+						add_modifier = {
+							modifier = sanctuary_power
+							days = -1														
+					}
+				}
+			}
+		}
+	}
+		
+	moon = {			
+		count = { min = 1 max = 1 }
+		orbit_distance = 12
+		class = "pc_barren_cold"
+	}
+			
+	}
+		
+	change_orbit = 30
+		
+	planet = {
+		count = { min = 5 max = 7 }
+		class = random_non_colonizable
+		orbit_distance = { min = 30 max = 40 }
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {			
+			count = { min = 0 max = 3 }
+			orbit_distance = 10
+		}
+	}
+}
