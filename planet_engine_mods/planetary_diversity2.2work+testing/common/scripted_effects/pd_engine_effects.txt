@@ -1,0 +1,523 @@
+planetary_diversity_regular_planet_init = {
+	every_planet = {
+		limit = { 
+			planetary_diversity_special_planet = no #we gate the special planets we don't want touched here. 
+			cgm_planet_engine_gate_conditions = yes #this is a scripted trigger that you can change - it will overwrite the trigger in CGM: Planets Enhanced, so you can always add you systems there. Also add other mod star flags there to create compatibility with prescripted system mods. The trigger can include plants from other mods
+		} 
+		if = { #this effect checks for gas giants and adds the gas giant moon flag to their moons			
+			limit = { is_planet_class = pc_gas_giant has_moon = yes }
+			every_moon = { set_planet_flag = gas_giant_moon }
+		}
+		# these events occur one after the other.
+		planet_event = { id = spawn_engine_1.1 }
+	}		
+}	
+
+spawn_deposits_and_blockers = { 
+	while = {
+		limit = {
+			OR = {
+				NOT = { any_tile = { has_deposit = yes } }	
+				AND = {
+					planet_size > 19
+					count_tile = {
+						limit = { has_deposit = yes }
+						count < 9
+					}
+				}
+				AND = {
+					planet_size > 15
+					planet_size < 19
+					count_tile = {
+						limit = { has_deposit = yes }
+						count < 7
+					}
+				}
+				AND = {
+					planet_size > 10
+					planet_size < 16
+					count_tile = {
+						limit = { has_deposit = yes }
+						count < 5
+					}
+				}
+				AND = {
+					planet_size < 11
+					count_tile = {
+						limit = { has_deposit = yes }
+						count < 3
+					}
+				}					
+			}
+		}
+		every_tile = {
+			limit = { has_deposit = no }
+			random_list = {
+				50 = { planetary_diversity_planetary_resource_spawn_table = yes }
+				50 = { }
+			}					
+		}
+	}		
+	while = {
+		limit = {
+			OR = {
+				NOT = { any_tile = { has_blocker = yes } }
+				AND = {
+					planet_size > 19
+					NOT = { 
+						num_pops > 12
+					}	
+					count_tile = {
+						limit = { has_blocker = yes }
+						count < 6
+					}
+				}
+				AND = {
+					planet_size > 15
+					planet_size < 19
+					NOT = { 
+						num_pops > 10
+					}						
+					count_tile = {
+						limit = { has_blocker = yes }
+						count < 5
+					}
+				}
+				AND = {
+					planet_size > 10
+					planet_size < 16
+					NOT = { 
+						num_pops > 8
+					}										
+					count_tile = {
+						limit = { has_blocker = yes }
+						count < 4
+					}
+				}
+				AND = {
+					planet_size < 11
+					NOT = { 
+						num_pops > 5
+					}										
+					count_tile = {
+						limit = { has_blocker = yes }
+						count < 3
+					}
+				}
+			}
+		}			
+		every_tile = {
+			limit = { has_blocker = no has_building = no has_pop = no }
+			random_list = {
+				50 = { planetary_diversity_tile_blocker_spawn_table = yes }
+				50 = { }
+			}					
+		}	
+	}
+}	
+
+make_mammalian = {
+	random_owned_pop = {
+		limit = { 
+			is_robot_pop = no
+			is_mammalian = no				
+			is_exact_same_species = prev.owner
+		}	
+		species = { save_event_target_as = target_species } 
+		create_species = {
+			name = this
+			plural = this
+			class = MAM
+			portrait = random
+			homeworld = prev
+			traits = this
+			sapient = yes
+			is_mod = no
+			immortal = no
+		}	
+	}	
+	every_owned_pop = {
+		limit = { is_same_species = event_target:target_species }	
+		change_species = last_created					
+	}
+	owner = { change_dominant_species = { species = last_created change_all = yes } }		
+
+}		
+make_avian = {
+	random_owned_pop = {
+		limit = { 
+			is_robot_pop = no
+			is_mammalian = no				
+			is_exact_same_species = prev.owner
+		}	
+		species = { save_event_target_as = target_species } 
+		create_species = {
+			name = this
+			plural = this
+			class = AVI
+			portrait = random
+			homeworld = prev
+			traits = this
+			sapient = yes
+			is_mod = no
+			immortal = no
+		}	
+	}	
+	every_owned_pop = {
+		limit = { is_same_species = event_target:target_species }	
+		change_species = last_created					
+	}
+	owner = { change_dominant_species = { species = last_created change_all = yes } }		
+}	
+make_molluscoid = {
+	random_owned_pop = {
+		limit = { 
+			is_robot_pop = no
+			is_mammalian = no				
+			is_exact_same_species = prev.owner
+		}	
+		species = { save_event_target_as = target_species } 
+		create_species = {
+			name = this
+			plural = this
+			class = MOL
+			portrait = random
+			homeworld = prev
+			traits = this
+			sapient = yes
+			is_mod = no
+			immortal = no
+		}	
+	}	
+	every_owned_pop = {
+		limit = { is_same_species = event_target:target_species }	
+		change_species = last_created					
+	}
+	owner = { change_dominant_species = { species = last_created change_all = yes } }		
+
+}		
+make_fungoid = {
+	random_owned_pop = {
+		limit = { 
+			is_robot_pop = no
+			is_mammalian = no				
+			is_exact_same_species = prev.owner
+		}	
+		species = { save_event_target_as = target_species } 
+		create_species = {
+			name = this
+			plural = this
+			class = FUN
+			portrait = random
+			homeworld = prev
+			traits = this
+			sapient = yes
+			is_mod = no
+			immortal = no
+		}	
+	}	
+	every_owned_pop = {
+		limit = { is_same_species = event_target:target_species }	
+		change_species = last_created					
+	}
+	owner = { change_dominant_species = { species = last_created change_all = yes } }		
+
+}		
+make_arthropoid = {
+	random_owned_pop = {
+		limit = { 
+			is_robot_pop = no
+			is_mammalian = no				
+			is_exact_same_species = prev.owner
+		}	
+		species = { save_event_target_as = target_species } 
+		create_species = {
+			name = this
+			plural = this
+			class = ART
+			portrait = random
+			homeworld = prev
+			traits = this
+			sapient = yes
+			is_mod = no
+			immortal = no
+		}	
+	}	
+	every_owned_pop = {
+		limit = { is_same_species = event_target:target_species }	
+		change_species = last_created					
+	}
+	owner = { change_dominant_species = { species = last_created change_all = yes } }		
+
+}		
+make_reptilian = {
+	random_owned_pop = {
+		limit = { 
+			is_robot_pop = no
+			is_mammalian = no				
+			is_exact_same_species = prev.owner
+		}	
+		species = { save_event_target_as = target_species } 
+		create_species = {
+			name = this
+			plural = this
+			class = REP
+			portrait = random
+			homeworld = prev
+			traits = this
+			sapient = yes
+			is_mod = no
+			immortal = no
+		}	
+	}	
+	every_owned_pop = {
+		limit = { is_same_species = event_target:target_species }	
+		change_species = last_created					
+	}
+	owner = { change_dominant_species = { species = last_created change_all = yes } }		
+
+}		
+make_humanoid = {
+	random_owned_pop = {
+		limit = { 
+			is_robot_pop = no
+			is_mammalian = no				
+			is_exact_same_species = prev.owner
+		}	
+		species = { save_event_target_as = target_species } 
+		create_species = {
+			name = this
+			plural = this
+			class = HUM
+			portrait = random
+			homeworld = prev
+			traits = this
+			sapient = yes
+			is_mod = no
+			immortal = no
+		}	
+	}	
+	every_owned_pop = {
+		limit = { is_same_species = event_target:target_species }	
+		change_species = last_created					
+	}
+	owner = { change_dominant_species = { species = last_created change_all = yes } }		
+}		
+make_plantoid = {
+	random_owned_pop = {
+		limit = { 
+			is_robot_pop = no
+			is_mammalian = no				
+			is_exact_same_species = prev.owner
+		}	
+		species = { save_event_target_as = target_species } 
+		create_species = {
+			name = this
+			plural = this
+			class = PLANT
+			portrait = random
+			homeworld = prev
+			traits = this
+			sapient = yes
+			is_mod = no
+			immortal = no
+		}	
+	}	
+	every_owned_pop = {
+		limit = { is_same_species = event_target:target_species }	
+		change_species = last_created					
+	}
+	owner = { change_dominant_species = { species = last_created change_all = yes } }		
+
+}		
+remove_and_count_vanilla_regular_planet_modifiers = {
+	set_variable = { which = pm_points value = 0 }
+	if = {
+		limit = { has_modifier = hazardous_weather }
+		remove_modifier = hazardous_weather
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = dangerous_wildlife }
+		remove_modifier = dangerous_wildlife
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = weak_magnetic_field }
+		remove_modifier = weak_magnetic_field
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = strong_magnetic_field }
+		remove_modifier = strong_magnetic_field
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = unstable_tectonics }
+		remove_modifier = unstable_tectonics
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = tidal_locked }
+		remove_modifier = tidal_locked
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = chthonian_planet }
+		remove_modifier = chthonian_planet
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = asteroid_impacts }
+		remove_modifier = asteroid_impacts
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = extensive_moon_system }
+		remove_modifier = extensive_moon_system
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = carbon_world }
+		remove_modifier = carbon_world
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = wild_storms }
+		remove_modifier = wild_storms
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = low_gravity }
+		remove_modifier = low_gravity
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = high_gravity }
+		remove_modifier = high_gravity
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = mineral_rich }
+		remove_modifier = mineral_rich
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = ultra_rich }
+		remove_modifier = ultra_rich
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = mineral_poor }
+		remove_modifier = mineral_poor
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = titanic_life }
+		remove_modifier = titanic_life
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = asteroid_belt }
+		remove_modifier = asteroid_belt
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = natural_beauty }
+		remove_modifier = natural_beauty
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = atmospheric_aphrodisiac }
+		remove_modifier = atmospheric_aphrodisiac
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = atmospheric_hallucinogen }
+		remove_modifier = atmospheric_hallucinogen
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = lush_planet }
+		remove_modifier = lush_planet
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = bleak_planet }
+		remove_modifier = bleak_planet
+		change_variable = { which = pm_points value = 1 }
+	}
+	if = {
+		limit = { has_modifier = irradiated_planet }
+		remove_modifier = irradiated_planet
+		change_variable = { which = pm_points value = 1 }
+	}
+}
+
+remove_negative_planet_modifiers = {
+	if = {
+		limit = { has_modifier = atmospheric_hallucinogen }
+		remove_modifier = atmospheric_hallucinogen
+	}
+	if = {
+		limit = { has_modifier = atmospheric_aphrodisiac }
+		remove_modifier = atmospheric_aphrodisiac
+	}
+	if = {
+		limit = { has_modifier = bleak_planet }
+		remove_modifier = bleak_planet
+	}
+	if = {
+		limit = { has_modifier = wild_storms }
+		remove_modifier = wild_storms
+	}
+	if = {
+		limit = { has_modifier = asteroid_impacts }
+		remove_modifier = asteroid_impacts
+	}
+	if = {
+		limit = { has_modifier = unstable_tectonics }
+		remove_modifier = unstable_tectonics
+	}
+	if = {
+		limit = { has_modifier = weak_magnetic_field }
+		remove_modifier = weak_magnetic_field
+	}
+	if = {
+		limit = { has_modifier = hazardous_weather }
+		remove_modifier = hazardous_weather
+	}
+	if = {
+		limit = { has_modifier = dangerous_wildlife }
+		remove_modifier = dangerous_wildlife
+	}
+	if = {
+		limit = { has_modifier = irradiated_planet }
+		remove_modifier = irradiated_planet
+	}
+	if = {
+		limit = { has_modifier = exofungus }
+		remove_modifier = exofungus
+	}
+	if = {
+		limit = { has_modifier = first_league_homeworld }
+		remove_modifier = first_league_homeworld
+	}
+	if = {
+		limit = { has_modifier = abandoned_terraforming }
+		remove_modifier = abandoned_terraforming
+		owner = { end_event_chain = "abandoned_terraforming_chain" }
+	}
+}
+
+change_owner_species_to_this_planet_preference = {
+    every_owned_pop = {
+        limit = { is_exact_same_species = prev.owner }
+        modify_species = {
+            species = this
+            ideal_planet_class = prev                            
+            base = none # makes this replace parent species
+        }
+    }
+    owner = { change_dominant_species = { species = last_created change_all = yes } }
+}

@@ -1,0 +1,471 @@
+###########
+# example #
+###########
+#	if = { 
+#		limit = { is_planet_class = pc_arid } <----- the vanilla planet class that will be converted
+#		random_list = { <----- this effect will roll effects - the chance of each occuring is dependent on its relative weight respective of the other items. Its therefore best to keep it in a range of 1 - 100#								
+#			3.33 = { 
+#				change_pc = pc_planet_name set_planet_entity = { entity = "planet_name_01_entity" }
+#				#modifier = { factor = 0 has_moon = yes } <------ modifiers change the base value, you use either factor = int, which is multiplactive, or add = int, which is additive. if the weight is 0 this option will not be picked. Useful factor = 0 to gate options. Use fractions and negative values to decrease the chance of something occuring.
+#				#modifier = { factor = 0 is_moon = yes }
+#				#modifier = { factor = 0 is_gas_giant_moon = yes }
+#				#modifier = { factor = 0 is_inside_nebula = yes }
+#				#modifier = { factor = 0 has_ring = yes }
+#			}
+#			3.33 = { 
+#				change_pc = pc_planet_name set_planet_entity = { entity = "planet_name_01_entity" }
+#				#modifier = { factor = 0 has_moon = yes }
+#				#modifier = { factor = 0 is_moon = yes }
+#				#modifier = { factor = 0 is_gas_giant_moon = yes }
+#				#modifier = { factor = 0 is_inside_nebula = yes }
+#				#modifier = { factor = 0 has_ring = yes }
+#			}
+#			3.33 = { 
+#				change_pc = pc_planet_name set_planet_entity = { entity = "planet_name_01_entity" }
+#				#modifier = { factor = 0 has_moon = yes }
+#				#modifier = { factor = 0 is_moon = yes }
+#				#modifier = { factor = 0 is_gas_giant_moon = yes }
+#				#modifier = { factor = 0 is_inside_nebula = yes }
+#				#modifier = { factor = 0 has_ring = yes }
+#			}
+#		}
+#	}
+#####################
+# modifier triggers #
+#####################
+#  
+#  You can of course many triggers in the modifier = { factor = int <trigger> } field for the random list. Below is a list of custom triggers
+#
+#    has_moon = yes/no
+#    is_moon = yes/no
+#    is_gas_giant_moon = yes/no
+#    is_inside_nebula = yes/no
+#    has_ring = yes/no
+#	 regular_star_system = yes/no - means the system has a single star
+#	 binary_star_system = yes/no - 2 stars in the system
+#	 ternary_star_system = yes/no - 3 stars in the system
+#
+### Vanilla Star Classes - these triggers will always have an effect
+#
+#     solar_system_is_star_class_sc_b = yes/no 
+#     solar_system_is_star_class_sc_a = yes/no 
+#     solar_system_is_star_class_sc_f = yes/no 
+#     solar_system_is_star_class_sc_g = yes/no 
+#     solar_system_is_star_class_sc_k = yes/no 
+#     solar_system_is_star_class_sc_m = yes/no 
+#     orbits_sc_black_hole = yes/no 
+#     orbits_sc_neutron_star = yes/no 
+#     orbits_sc_pulsar = yes/no 
+#
+### Real Space Star Classes - these triggers will only have an effect when Real Space is present
+#
+#     solar_system_is_star_class_sc_o = yes/no 
+#     solar_system_is_star_class_sc_o_super = yes/no 
+#     solar_system_is_star_class_sc_o_hyper = yes/no 
+#     solar_system_is_star_class_sc_b_super = yes/no 
+#     solar_system_is_star_class_sc_a_super = yes/no 
+#     solar_system_is_star_class_sc_f_super = yes/no 
+#     solar_system_is_star_class_sc_g_giant = yes/no 
+#     solar_system_is_star_class_sc_g_super = yes/no 
+#     solar_system_is_star_class_sc_k_giant = yes/no 
+#     solar_system_is_star_class_sc_k_super = yes/no 
+#     solar_system_is_star_class_sc_m_giant = yes/no 
+#     solar_system_is_star_class_sc_m_super = yes/no 
+#     solar_system_is_star_class_sc_m_hyper = yes/no 
+#     solar_system_is_star_class_sc_l = yes/no 
+#     solar_system_is_star_class_sc_d = yes/no 
+#     solar_system_is_star_class_sc_gm = yes/no 
+#     solar_system_is_star_class_sc_c_giant = yes/no 
+#     solar_system_is_star_class_sc_s_giant = yes/no 
+#     solar_system_is_star_class_sc_w_azure = yes/no 
+#     solar_system_is_star_class_sc_w_red = yes/no 
+#     solar_system_is_star_class_sc_w_green = yes/no 
+#     solar_system_is_star_class_sc_w_purple = yes/no 
+#     solar_system_is_star_class_sc_no va_1 = yes/no 
+#     solar_system_is_star_class_sc_no va_2 = yes/no 
+#     solar_system_is_star_class_sc_collapsar = yes/no 
+#     solar_system_is_star_class_sc_protostar = yes/no 
+#     solar_system_is_star_class_sc_lbv_blue = yes/no 
+#     solar_system_is_star_class_sc_lbv_green = yes/no 
+#     solar_system_is_star_class_sc_lbv_red = yes/no 
+#     solar_system_is_star_class_sc_tt_red = yes/no 
+#     solar_system_is_star_class_sc_tt_orange = yes/no 
+#     solar_system_is_star_class_sc_tt_white = yes/no 
+#     solar_system_is_star_class_sc_ae = yes/no 
+#     solar_system_is_star_class_sc_magnetar = yes/no 
+
+
+planetary_diversity_habitable_planets_spawn_table = {	
+	random_list = { #remove from the list the planets you don't want converted, add entities for whatever you do want and re-adjust the list numbers according to the number of options it has. 						
+		2.8 = { 
+			change_pc = pc_tidallylocked
+			set_entity_tidallylocked = yes
+			add_modifier = { modifier = tidal_locked2 days = -1 }
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }
+    		modifier = { factor = 0 is_moon = yes }
+		}					
+		3.8 = { 
+			change_pc = pc_continental
+			set_entity_continental = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}				
+		3.8 = { 
+			change_pc = pc_tropical
+			set_entity_tropical = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}				
+		3.8 = { 
+			change_pc = pc_ocean
+			set_entity_ocean = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}			
+		3.8 = { 
+			change_pc = pc_mangrove
+			set_entity_mangrove = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}			
+		3.8 = { 
+			change_pc = pc_desertislands
+			set_entity_desertislands = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}	
+		3.8 = { 
+			change_pc = pc_hajungle
+			set_entity_hajungle = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}				
+		3.8 = { 
+			change_pc = pc_arctic
+			set_entity_arctic = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}	
+		3.8 = { 
+			change_pc = pc_cascadian
+			set_entity_cascadian = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}
+		3.8 = { 
+			change_pc = pc_swamp
+			set_entity_swamp = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}		
+		3.8 = { 
+			change_pc = pc_subarctic
+			set_entity_subarctic = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}		
+		3.8 = { 
+			change_pc = pc_glacial
+			set_entity_glacial = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}
+		3.8 = { 
+			change_pc = pc_geothermal
+			set_entity_geothermal = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}				
+		3.8 = { 
+			change_pc = pc_desert
+			set_entity_desert = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}				
+		3.8 = { 
+			change_pc = pc_arid
+			set_entity_arid = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}				
+		3.8 = { 
+			change_pc = pc_savannah
+			set_entity_savannah = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}		
+		3.8 = { 
+			change_pc = pc_sandsea
+			set_entity_sandsea = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}	
+		3.8 = { 
+			change_pc = pc_mesa
+			set_entity_mesa = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}	
+		3.8 = { 
+			change_pc = pc_oasis
+			set_entity_oasis = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}				
+		3.8 = { 
+			change_pc = pc_tundra
+			set_entity_tundra = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}				
+		3.8 = { 
+			change_pc = pc_alpine
+			set_entity_alpine = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}	
+		3.8 = { 
+			change_pc = pc_hadesert
+			set_entity_hadesert = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}	
+		3.8 = { 
+			change_pc = pc_steppe
+			set_entity_steppe = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}	
+		3.8 = { 
+			change_pc = pc_frozen_desert
+			set_entity_frozen_desert = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}	
+		3.8 = { 
+			change_pc = pc_boreal
+			set_entity_boreal = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}		
+		3 = { 
+			change_pc = pc_ammonia
+			set_entity_ammonia = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }				
+		}	
+		3 = { 
+			change_pc = pc_methane
+			set_entity_methane = yes
+			modifier = { factor = 1 is_planet_class = pc_desert }
+			modifier = { factor = 1 is_planet_class = pc_tropical }
+			modifier = { factor = 1 is_planet_class = pc_arid }
+			modifier = { factor = 1 is_planet_class = pc_continental }
+			modifier = { factor = 1 is_planet_class = pc_ocean }
+			modifier = { factor = 1 is_planet_class = pc_tundra }
+			modifier = { factor = 1 is_planet_class = pc_arctic }
+			modifier = { factor = 1 is_planet_class = pc_alpine }
+			modifier = { factor = 1 is_planet_class = pc_savannah }										
+		}
+	}
+}	
+
+planetary_diversity_uninhabitable_planets_spawn_table = {
+	random_list = {
+		90 = { }
+		10 = {
+			change_pc = pc_hothouse
+			set_entity_hothouse = yes
+			modifier = { factor = 1 is_planet_class = pc_barren }
+			modifier = { factor = 0 is_planet_class = pc_barren_cold }
+			modifier = { factor = 2 is_planet_class = pc_toxic }
+			modifier = { factor = 0 is_planet_class = pc_frozen }
+			modifier = { factor = 1 is_planet_class = pc_molten }
+			modifier = { factor = 0 is_planet_class = pc_gas_giant }
+			modifier = { factor = 0 is_planet_class = pc_asteroid }
+		}
+	}	
+}	
