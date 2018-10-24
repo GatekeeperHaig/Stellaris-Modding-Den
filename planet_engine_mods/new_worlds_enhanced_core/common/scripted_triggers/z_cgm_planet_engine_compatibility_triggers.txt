@@ -1,0 +1,408 @@
+can_destroy_planet_with_PLANET_KILLER_CRACKER = {
+	custom_tooltip = {
+		fail_text = is_not_a_standard_planet_or_megastructure
+		is_a_planet_megastructure = yes
+	}
+	custom_tooltip = {
+		fail_text = is_shielded
+		NOR = {
+			is_planet_class = pc_shielded
+			is_planet_class = pc_ringworld_shielded
+			is_planet_class = pc_habitat_shielded
+		}
+	}
+	#custom_tooltip = {
+		#fail_text = is_not_hostile
+		OR = {
+			custom_tooltip = {
+				text = is_not_hostile_cracker
+				OR = {
+					AND = {
+						exists = space_owner
+						space_owner = {
+							OR = {
+								is_at_war_with = from.owner
+								is_country_type = swarm
+								is_country_type = extradimensional
+								is_country_type = extradimensional_2
+								is_country_type = extradimensional_3
+								is_country_type = ai_empire
+							}
+						}
+					}
+					AND = { # colony
+						exists = owner
+						owner = {
+							OR = {
+								is_at_war_with = from.owner
+								is_country_type = swarm
+								is_country_type = extradimensional
+								is_country_type = extradimensional_2
+								is_country_type = extradimensional_3
+								is_country_type = ai_empire
+							}
+						}
+					}
+					AND = { # primitive
+						exists = space_owner
+						exists = owner
+						owner = {
+							is_primitive = yes
+						}
+						space_owner = {
+							OR = {
+								is_at_war_with = from.owner
+								is_country_type = swarm
+								is_country_type = extradimensional
+								is_country_type = extradimensional_2
+								is_country_type = extradimensional_3
+								is_country_type = ai_empire
+							}
+						}
+					}
+				}
+			}
+			custom_tooltip = {
+				text = not_barren_molten_frozen_toxic_test_fire
+				NOT = { exists = owner }
+				OR = {
+					NOT = { exists = space_owner }
+					AND = {
+						exists = space_owner
+						space_owner = { is_same_value = from.owner }
+					}
+				}
+				OR = {
+					habitable_planet = yes
+					uninhabitable_regular_planet = yes
+					habitable_structure = yes
+					cgm_planet = yes
+				}
+			}
+		}
+	#}
+}
+
+is_a_planet = {
+	is_star = no
+	NOR = {
+		is_gas_giant = yes
+		is_asteroid = yes
+		is_planet_class = pc_habitat
+		is_planet_class = pc_shrouded
+		is_planet_class = pc_ringworld_habitable
+		is_planet_class = pc_ringworld_habitable_damaged
+	}
+}
+
+is_a_planet_megastructure = {
+	NOR = {
+		is_star = yes
+		is_gas_giant = yes
+		is_asteroid = yes
+		is_planet_class = pc_shrouded
+		is_planet_class = pc_broken
+		is_planet_class = pc_shattered
+	}
+}
+
+is_a_habitable_planet_megastructure = {
+	OR = {
+		is_planet_class = pc_nuked
+		is_planet_class = pc_infested
+		habitable_planet = yes
+		habitable_structure = yes
+		cgm_planet = yes
+	}
+}
+###General Triggers
+
+is_vanilla_habitable_planet = {
+	OR = {
+		is_planet_class = pc_desert
+		is_planet_class = pc_tropical
+		is_planet_class = pc_arid
+		is_planet_class = pc_continental
+		is_planet_class = pc_ocean
+		is_planet_class = pc_tundra
+		is_planet_class = pc_arctic
+		is_planet_class = pc_alpine
+		is_planet_class = pc_savannah		
+	}
+}
+
+is_vanilla_special_planet = {
+	OR = {
+		is_planet_class = pc_gaia
+		is_planet_class = pc_nuked
+		is_planet_class = pc_machine
+	}
+}	
+
+is_vanilla_uninhabitable_planet = {
+	OR = {
+		is_planet_class = pc_molten
+		is_planet_class = pc_barren
+		is_planet_class = pc_barren_cold
+		is_planet_class = pc_toxic
+		is_planet_class = pc_frozen
+		is_planet_class = pc_asteroid
+		is_planet_class = pc_gas_giant		
+	}
+}
+
+habitable_planet = {
+	OR = {
+		is_vanilla_habitable_planet = yes
+		is_vanilla_special_planet = yes
+		new_worlds_habitable_planet = yes
+		planetary_diversity_regular_habitable_planet = yes
+		planetary_diversity_special_planet = yes
+	}
+}
+
+habitable_structure = {
+    OR = {
+        is_planet_class = pc_ringworld_habitable
+        is_planet_class = pc_habitat
+    }
+}
+
+uninhabitable_regular_planet = {
+	OR = {
+		is_planet_class = pc_molten
+		is_planet_class = pc_barren
+		is_planet_class = pc_barren_cold
+		is_planet_class = pc_toxic
+		is_planet_class = pc_frozen	
+		new_worlds_uninhabitable_regular_planet = yes
+	}
+}
+
+uninhabitable_mineral_planet = {
+	OR = {
+		is_planet_class = pc_molten
+		is_planet_class = pc_barren
+		is_planet_class = pc_barren_cold
+		is_planet_class = pc_frozen	
+		is_planet_class_pc_orbiting_asteroid = yes
+		is_planet_class_pc_dwarf_planetoid = yes	
+		is_planet_class_pc_radiated = yes
+		is_planet_class_pc_volcanic = yes
+		is_planet_class_pc_shattered = yes
+		is_planet_class_pc_broken = yes
+		is_asteroid = yes
+	}
+}
+
+uninhabitable_mixed_planet = {
+	OR = {
+		is_planet_class = pc_toxic	
+		is_planet_class_pc_cold_reducing = yes
+		is_planet_class_pc_hot_reducing = yes
+	}
+}
+
+uninhabitable_energy_planet = {
+	OR = {
+		is_planet_class = pc_gas_giant
+		is_planet_class_pc_hot_giant = yes
+		is_planet_class_pc_ice_giant = yes
+		is_planet_class_pc_t_star = yes
+	}
+}
+
+is_gas_giant = {
+	OR = {
+		is_planet_class = pc_gas_giant
+		is_planet_class_pc_hot_giant = yes
+		is_planet_class_pc_ice_giant = yes
+	}
+}	
+
+## These are for habitable planets only:
+is_gaia = { 
+	OR = {
+		is_planet_class = pc_gaia
+		is_planet_class_pc_floating = yes
+		is_planet_class_pc_crystal = yes
+		is_planet_class_pc_graveyard = yes
+		is_planet_class_pc_city = yes
+	}
+}
+
+is_inhospitable = {									# Any world class with a toxic non oxygen-based atmosphere, or suffering from high levels of radiation
+	OR = {
+		is_planet_class = pc_nuked
+		is_planet_class_pc_irradiated_grassland = yes
+		is_planet_class_pc_irradiated_plains = yes
+		is_planet_class_pc_primordial = yes
+		is_planet_class_pc_methane = yes
+		is_planet_class_pc_ammonia = yes
+	}
+}
+
+is_hot_dry_planet = {								# Although these can get cold at night (except tidally locked), we should consider day climate which is hot and dry
+	OR = {
+		is_planet_class = pc_desert					# This is actually pc_dunesea, used as a primary biome for brown marble, so any empires designed to used desert homeworld will start in a brown marble with dunesea art
+		is_planet_class = pc_desert_marginal		# This is vanilla pc_desert, used as marginal desert primary biome
+		is_planet_class = pc_tidallylocked_hot		# This uses vanilla pc_desert, a biome option for the tidally-locked (day side)
+		is_planet_class = pc_hadesert				# Atacama ecostable's biome, also used as secondary biome for brownmarble class
+	}	
+}	
+
+is_temperate_wet_planet = {							# Any class with an average temperature between 0 and 40ºC with abundant rainfall during wet seasons fits here
+	OR = {
+		is_planet_class = pc_continental			# Should be considered a temperate grassland/woodland biome, used as primary biome for blue marble, as well as secondary biome for white marble
+		is_planet_class = pc_tropical				# This is a green marble primary biome option, any empire designed to use tropical homeworld will start in a green marble with tropical art
+		is_planet_class = pc_mangrove				# This is the oceanic pangea class primary biome, coastal tropical biome with shallow seas
+		is_planet_class = pc_ocean					# Primary biome for the oceanic pelagic class, any empire designed to use ocean homeworld will start in a pelagic with ocean art
+		is_planet_class = pc_jungle					# Primary biome for the marginal jungle class
+		is_planet_class = pc_tidallylocked			# Primary temperate biome for the tidally-locked, uses pc_continental art
+		is_planet_class = pc_lush					# Ecostable biome for the lush class, uses pc_continental art
+		is_planet_class = pc_mushroom				# Ecostable biome for the mycelium class
+	}	
+}
+
+is_temperate_dry_planet = {							# Any class with an average temperature between 0 and 40ºC with low rainfall fits here
+	OR = {
+		is_planet_class = pc_arid					# This is actually pc_mesa, used as another primary biome for brown marble, so any empires designed to use arid homeworld will start in a brown marble with mesa art
+		is_planet_class = pc_savannah				# Used as another primary biome for the oceanic pangea class, so any empires designed to use savannah homeworld will start in a pangea with savannah art
+		is_planet_class = pc_oasis					# Used as a secondary biome for the marginal desert class
+		is_planet_class = pc_sandsteppe				# Ecostable biome for the sandsteppe class, uses vanilla pc_arid art
+		is_planet_class = pc_desertislands			# Ecostable oceanic world, suggest we change this to temperate_dry, would look cool as a landmass around the equator with ocean to the north and another to the south # done
+	}
+}	
+
+is_cold_wet_planet = {								# Any class with an average temperature between -20 and 20ºC with abundant rainfall during wet seasons fits here
+	OR = {
+		is_planet_class = pc_boreal					# This is another primary biome for the greenmarble class, also used as secondary biome for the whitemarble
+		is_planet_class = pc_swamp					# Primary biome for the marginal mire class
+		is_planet_class = pc_highlands				# Secondary biome for the marginal mire class, bluemarble and oceanic pangea class
+		is_planet_class = pc_geothermal				# Secondary biome for the marginal glaciated class
+		is_planet_class = pc_alpine					# This is actually pc_cascadian, used as another primary biome for the greenmarble class, so any empires designed to use pc_alpine homeworld will start in a greenmarble with cascadian art
+		is_planet_class = pc_hajungle				# Secondary biome for the marginal jungle class
+		is_planet_class = pc_retinal				# Ecostable biome for the retinal class
+		is_planet_class = pc_biolumen				# Ecostable biome for the bioluminescence class
+	}
+}	
+
+is_cold_dry_planet = {								# Too cold to have much water in liquid state, including rain, except possibly in short warmer seasons
+	OR = {
+		is_planet_class = pc_arctic					# Primary biome for the whitemarble class
+		is_planet_class = pc_tundra					# This is actually pc_steppe, used as another primary biome for the whitemarble class, so any empires designed to use tundra homeworld will start in a whitemarble with steppe art
+		is_planet_class = pc_subarctic				# Secondary biome for the oceanic pelagic class
+		is_planet_class = pc_glacial				# Primary biome for the marginal glaciated class
+		is_planet_class = pc_tidallylocked_cold		# This uses pc_glacial, a biome option for the tidally-locked (night side)
+		is_planet_class = pc_frozen_desert			# Ecostable biome for the frigid desert class
+		is_planet_class = pc_permafrost				# This uses vanilla pc_tundra, ecostable biome for the permafrost class, also used as secondary biome for the brownmarble and irradiated class
+	}	
+}	
+
+is_special_planet = { 								# Special cases
+	OR = { 
+		is_planet_class = pc_gaia
+		is_planet_class = pc_machine
+		is_planet_class = pc_subterranean_rocky
+		planetary_diversity_special_planet = yes
+	}
+}	
+
+planetary_diversity_special_planet = { 
+	OR = { 
+		is_planet_class = pc_crystal
+		is_planet_class = floating
+		is_planet_class = pc_graveyard
+		is_planet_class = pc_city
+		is_planet_class = pc_deadcity
+		is_planet_class = pc_archive
+		is_planet_class = pc_technoorganic
+	}
+}	
+
+planetary_diversity_regular_habitable_planet = {
+	OR = { 
+		is_planet_class_pc_tidallylocked = yes
+		is_planet_class_pc_mangrove = yes
+		is_planet_class_pc_desertislands = yes
+		is_planet_class_pc_hajungle = yes
+		is_planet_class_pc_cascadian = yes
+		is_planet_class_pc_swamp = yes
+		is_planet_class_pc_subarctic = yes
+		is_planet_class_pc_glacial = yes
+		is_planet_class_pc_geothermal = yes
+		is_planet_class_pc_sandsea = yes
+		is_planet_class_pc_mesa = yes
+		is_planet_class_pc_oasis = yes
+		is_planet_class_pc_hadesert = yes
+		is_planet_class_pc_steppe = yes
+		is_planet_class_pc_frozen_desert = yes
+		is_planet_class_pc_boreal = yes
+		is_planet_class_pc_ammonia = yes
+		is_planet_class_pc_methane = yes
+		is_planet_class_pc_mushroom = yes
+		is_planet_class_pc_biolumen = yes
+	}
+}
+
+new_worlds_uninhabitable_regular_planet = {
+	OR = {
+		is_planet_class_pc_orbiting_asteroid = yes
+		is_planet_class_pc_dwarf_planetoid = yes	
+		is_planet_class_pc_radiated = yes
+		is_planet_class_pc_volcanic = yes
+		is_planet_class_pc_cold_reducing = yes
+		is_planet_class_pc_hot_reducing = yes	
+	}
+}
+
+new_worlds_habitable_planet = {
+	OR = {
+		is_planet_class_pc_primordial = yes
+		is_planet_class_pc_irradiated_plains = yes
+		is_planet_class_pc_retinal = yes
+		is_planet_class_pc_lush = yes
+		is_planet_class_pc_irradiated_grassland = yes
+	}
+}
+
+###Synergy Triggers
+
+is_planet_class_pc_orbiting_asteroid = { is_planet_class = pc_orbiting_asteroid }
+is_planet_class_pc_retinal = { is_planet_class = pc_retinal }
+is_planet_class_pc_hot_reducing = { is_planet_class = pc_hot_reducing }
+is_planet_class_pc_cold_reducing = { is_planet_class = pc_cold_reducing }
+is_planet_class_pc_irradiated_grassland = { is_planet_class = pc_irradiated_grassland }
+is_planet_class_pc_lush = { is_planet_class = pc_lush }
+is_planet_class_pc_volcanic = { is_planet_class = pc_volcanic }
+is_planet_class_pc_primordial = { is_planet_class = pc_primordial }
+is_planet_class_pc_cambrian = { is_planet_class = pc_cambrian }
+is_planet_class_pc_radiated = { is_planet_class = pc_radiated }
+is_planet_class_pc_dwarf_planetoid = { is_planet_class = pc_dwarf_planetoid }
+is_planet_class_pc_hot_giant = { is_planet_class = pc_hot_giant }
+is_planet_class_pc_ice_giant = { is_planet_class = pc_ice_giant }
+is_planet_class_pc_irradiated_plains = { is_planet_class = pc_irradiated_plains }
+is_planet_class_pc_crystal = { is_planet_class = pc_crystal }
+is_planet_class_pc_floating = { is_planet_class = pc_floating }
+is_planet_class_pc_graveyard = { is_planet_class = pc_graveyard }
+is_planet_class_pc_mushroom = { is_planet_class = pc_mushroom }
+is_planet_class_pc_city = { is_planet_class = pc_city }
+is_planet_class_pc_tidallylocked = { is_planet_class = pc_tidallylocked }
+is_planet_class_pc_glacial = { is_planet_class = pc_glacial }
+is_planet_class_pc_frozen_desert = { is_planet_class = pc_frozen_desert }
+is_planet_class_pc_steppe = { is_planet_class = pc_steppe }
+is_planet_class_pc_hadesert = { is_planet_class = pc_hadesert }
+is_planet_class_pc_boreal = { is_planet_class = pc_boreal }
+is_planet_class_pc_sandsea = { is_planet_class = pc_sandsea }
+is_planet_class_pc_subarctic = { is_planet_class = pc_subarctic }
+is_planet_class_pc_geothermal = { is_planet_class = pc_geothermal }
+is_planet_class_pc_cascadian = { is_planet_class = pc_cascadian }
+is_planet_class_pc_swamp = { is_planet_class = pc_swamp }
+is_planet_class_pc_mangrove = { is_planet_class = pc_mangrove }
+is_planet_class_pc_desertislands = { is_planet_class = pc_desertislands }
+is_planet_class_pc_mesa = { is_planet_class = pc_mesa }
+is_planet_class_pc_oasis = { is_planet_class = pc_oasis }
+is_planet_class_pc_hajungle = { is_planet_class = pc_hajungle }
+is_planet_class_pc_methane = { is_planet_class = pc_methane }
+is_planet_class_pc_ammonia = { is_planet_class = pc_ammonia }
+is_planet_class_pc_biolumen = { is_planet_class = pc_biolumen }
