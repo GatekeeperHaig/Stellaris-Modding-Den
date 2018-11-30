@@ -1,0 +1,146 @@
+############################################
+# HORIZON SIGNAL - THE WORM-IN-WAITING	   #
+# Written and designed by Alexis Kennedy   #
+# Scripted and edited by Maximilian Olbers #
+############################################
+
+namespace = akx
+
+@tier1unityreward = 6
+@tier1unitymin = 100
+@tier1unitymax = 500
+@tier2unityreward = 12
+@tier2unitymin = 150
+@tier2unitymax = 1000
+@tier3unityreward = 18
+@tier3unitymin = 250
+@tier3unitymax = 1500
+@tier4unityreward = 24
+@tier4unitymin = 350
+@tier4unitymax = 2000
+@tier5unityreward = 48
+@tier5unitymin = 700
+@tier5unitymax = 4000
+
+planet_event = {
+	id = akx.10020
+	title = akx.10020.name
+	desc = akx.10020.desc
+	picture = GFX_evt_black_hole
+	show_sound = event_activating_unknown_technology
+	location = root
+
+	is_triggered_only = yes
+
+	trigger = { owner = { is_ai = no } }
+
+	immediate = {
+		solar_system = {
+			every_system_planet = {
+				limit = {
+					NOR = {
+						is_asteroid = yes
+						is_planet_class = pc_gas_giant
+						is_planet_class = pc_ringworld_habitable
+						is_planet_class = pc_ringworld_habitable_damaged
+						is_planet_class = pc_ringworld_tech
+						is_planet_class = pc_ringworld_tech_damaged
+						is_planet_class = pc_ringworld_seam
+						is_planet_class = pc_ringworld_seam_damaged
+						is_planet_class = pc_habitat
+						is_star = yes
+					}
+					planet_size > 9
+					planet_size < 26
+				}
+				every_owned_pop = {
+					limit = {
+						is_robot_pop = no
+						is_sapient = yes
+					}
+					modify_species = {
+						species = this
+						ideal_planet_class = pc_nuked
+						#base = none # makes this replace parent species
+					}
+					if = {
+						limit = {
+							NOT = { has_trait = trait_natural_physicists }
+						}
+						modify_species = {
+							species = this
+							add_trait = trait_natural_physicists
+						}
+					}
+					if = {
+						limit = {
+							NOT = { has_trait = trait_repugnant }
+						}
+						modify_species = {
+							species = this
+							add_trait = trait_repugnant
+						}
+					}
+				}
+				change_pc = pc_nuked
+			}
+			every_system_planet = {
+				limit = {
+					OR = {
+						is_planet_class = pc_ringworld_habitable
+						is_planet_class = pc_habitat
+					}
+				}
+				every_owned_pop = {
+					limit = {
+						is_robot_pop = no
+						is_sapient = yes
+					}
+					modify_species = {
+						species = this
+						ideal_planet_class = pc_nuked
+						#base = none # makes this replace parent species
+					}
+					if = {
+						limit = {
+							NOT = { has_trait = trait_natural_physicists }
+						}
+						modify_species = {
+							species = this
+							add_trait = trait_natural_physicists
+						}
+					}
+					if = {
+						limit = {
+							NOT = { has_trait = trait_repugnant }
+						}
+						modify_species = {
+							species = this
+							add_trait = trait_repugnant
+						}
+					}
+				}
+			}
+			random_system_planet = {
+				limit = { is_star = yes }
+				# explosion ambient object
+				change_pc = pc_black_hole
+			}
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			owner = {
+				remove_country_flag = worm_events_available
+				set_country_flag = worm_awaited
+				set_country_flag = worm_tomb_ending
+			}
+		}
+	}
+
+	option = {
+		name = akx.10020.a
+		owner = { end_event_chain = WORM_CHAIN_2 }
+	}
+}
