@@ -70,6 +70,49 @@ def main():
   "planet_building_upkeep_mult",
   "country_starbase_upkeep_mult","army_upkeep_mult","pop_robot_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
   possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","£navy_size","£military_power","£ship_stats_hitpoints","£ship_stats_armor","£ship_stats_shield","£ship_stats_maintenance","£pops"]
+
+# playable_ai_empire = {
+#   diplomacy_upkeep_mult = -0.5 GFX_evt_arguing_senate "E"
+# }
+
+  # stations_produces_mult = 1 GFX_evt_mining_station £systems "T"
+  # planet_jobs_produces_mult = 1 GFX_evt_metropolis £job "M"
+  # country_naval_cap_mult = 0.6 busy_spaceport £navy_size "G"
+  # ships_upkeep_mult = -0.4 cargoship_caravan £ship_stats_maintenance "Y"
+  # starbase_shipyard_build_cost_mult = -0.4 GFX_evt_hangar_bay £ship_stats_build_cost "W"
+  # planet_stability_add = 20 alien_propaganda £stability "P"
+
+  #UNCHANGED
+  # ship_weapon_damage = 0.50
+  # ship_hull_mult = 0.50
+  # ship_armor_mult = 0.50
+  # ship_shield_mult = 0.50
+
+
+  #SEE gfx/interface/icons/text_icons/ or interface/texticons.gfx
+  #mod_planet_jobs_produces_mult:0 "Resources from £job£ Jobs"
+  # 5131:  SHIP_STAT_COST_INLINE:0 "£ship_stats_build_cost£ $SHIP_STAT_COST$:"
+ # 5132:  SHIP_STAT_BUILD_TIME_INLINE:0 "£ship_stats_build_time£ $SHIP_STAT_BUILD_TIME$:"
+ # 5133:  SHIP_STAT_MINERAL_MAINTENENCE_INLINE:0 "£ship_stats_maintenance£ $SHIP_STAT_MINERAL_MAINTENENCE$:"
+ # 5134:  SHIP_STAT_ENERGY_MAINTENENCE_INLINE:0 "£ship_stats_maintenance£ SHIP_STAT_ENERGY_MAINTENENCE:"
+ # 5135:  SHIP_STAT_POWER_USAGE_INLINE:0 "£ship_stats_power£ $SHIP_STAT_POWER_USAGE$:"
+ # 5136:  SHIP_STAT_HITPOINTS_INLINE:0 "£ship_stats_hitpoints£ $SHIP_STAT_HITPOINTS$:"
+ # 5137:  SHIP_STAT_ARMOR_INLINE:0 "£ship_stats_armor£ $SHIP_STAT_ARMOR$:"
+ # 5138:  SHIP_STAT_SHIELDS_INLINE:0 "£ship_stats_shield£ $SHIP_STAT_SHIELDS$:"
+ # 5139:  SHIP_STAT_COMBAT_SPEED_INLINE:0 "£ship_stats_speed£ $SHIP_STAT_COMBAT_SPEED$:"
+ # 5140:  SHIP_STAT_EVASION_INLINE:0 "£ship_stats_evasion£ $SHIP_STAT_EVASION$:"
+ # 5141:  SHIP_STAT_DAMAGE_INLINE:0 "£ship_stats_damage£ $SHIP_STAT_DAMAGE$:"
+ # 5142:  SHIP_STAT_SPECIAL_INLINE:0 "£ship_stats_special£ $SHIP_STAT_SPECIAL$:"
+ # 5143:  SHIP_STAT_SPEED_INLINE:0 "£ship_stats_speed£ $SHIP_STAT_SPEED$:"
+ # 5144:  SHIP_STAT_RANK_INLINE:0 "£ship_stats_special£ Rank:"
+ # 5145:  SHIP_STAT_HULL_REGENERATION_INLINE:0 "£ship_stats_hitpoints£ $SHIP_STAT_HULL_REGENERATION$:"
+ # 5146   SHIP_STAT_HULL_REGENERATION_STATIC_INLINE:0 "$SHIP_STAT_HULL_REGENERATION_INLINE$"
+ # 5147:  SHIP_STAT_ARMOR_REGENERATION_INLINE:0 "£ship_stats_armor£ $SHIP_STAT_ARMOR_REGENERATION$:"
+ # 5148   SHIP_STAT_ARMOR_REGENERATION_STATIC_INLINE:0 "$SHIP_STAT_ARMOR_REGENERATION_INLINE$"
+ # 5149:  SHIP_STAT_SHIELD_REGENERATION_INLINE:0 "£ship_stats_shield£ $SHIP_STAT_SHIELD_RECHARGE$:"
+ # 5150   SHIP_STAT_SHIELD_REGENERATION_STATIC_INLINE:0 "$SHIP_STAT_SHIELD_REGENERATION_INLINE$"
+ # 5151  
+
   possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
 
   bonusesListNames=["all","resourceProd","humanResources", "allShip"]
@@ -99,7 +142,7 @@ def main():
   ["default"], 
   ["default"],
   ["fallen_empire", "awakened_fallen_empire","ascended_empire"],
-  ["guardian", "guardian_dragon", "guardian_stellarite","guardian_wraith","guardian_hiver","guardian_horror","guardian_fortress","guardian_dreadnought", "guardian_sphere"],
+  ["guardian", "guardian_dragon", "guardian_stellarite","guardian_wraith","guardian_hiver","guardian_horror","guardian_fortress","guardian_dreadnought", "guardian_sphere","guardian_scavenger_bot","guardian_elderly_tiyanki","ldragon_country","guardian_hatchling"],
   [],
   ["swarm", "extradimensional", "extradimensional_2", "extradimensional_3", "ai_empire","cybrex_empire","sentinels", "portal_holders", "feral_prethoryn","feral_prethoryn_infighting"],
   ["dormant_marauders","ruined_marauders", "awakened_marauders","marauder_raiders"],
@@ -109,6 +152,7 @@ def main():
   catColors="BHBBGRBB"
 
   difficulties=["easy", "no_player_bonus", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
+  # difficulties=["easy", "no_player_bonus", "cadet", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
   vanillaDefaultDifficultyNames=difficulties[2:]
   ai_non_scaling_DifficultyNames=difficulties[2:-2]
 
@@ -139,6 +183,7 @@ def main():
   locClass.addLoc("shield", "$SHIELD$","all")
   locClass.addLoc("upkeep", "$MAINTENANCE$","all")
   locClass.addLoc("growth", "$POPULATION_GROWTH$","all") #Any Pop Growth Speed","all")
+  locClass.addLoc("cadet", "$DIFFICULTY_CADET$","all")
   locClass.addLoc("ensign", "$DIFFICULTY_ENSIGN$","all")
   locClass.addLoc("captain", "$DIFFICULTY_CAPTAIN$","all")
   locClass.addLoc("commodore", "$DIFFICULTY_COMMODORE$","all")
