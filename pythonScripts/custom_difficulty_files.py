@@ -63,13 +63,57 @@ def main():
     changeSteps.append(-s)
   for s in reversed(changeStepYears):
     changeStepYears.append(-s)
-  possibleBoniNames=["minerals", "energy","food", "research", "unity", "influence", "cap", "damage", "hull","armor","shield","upkeep", "growth"]
-  npcBoni=[           False,      False,   False,   False,    False,    False,      False,  True,   True,     True, True,   False,    False]
-  possibleBoniPictures=["GFX_evt_mining_station","GFX_evt_dyson_sphere","GFX_evt_animal_wildlife", "GFX_evt_think_tank", "GFX_evt_unity_symbol","GFX_evt_arguing_senate","GFX_evt_hangar_bay", "GFX_evt_debris", "GFX_evt_sabotaged_ship","GFX_evt_pirate_armada","GFX_evt_fleet_neutral","GFX_evt_city_ruins","GFX_evt_metropolis"]
-  possibleBoniModifier=["country_resource_minerals_mult", "country_resource_energy_mult", "country_resource_food_mult", "all_technology_research_speed", "country_resource_unity_mult","country_resource_influence_mult","country_naval_cap_mult","ship_weapon_damage","ship_hull_mult","ship_armor_mult","ship_shield_mult",["ship_upkeep_mult",
-  "planet_building_upkeep_mult",
-  "country_starbase_upkeep_mult","army_upkeep_mult","pop_robot_upkeep_mult"],["pop_growth_speed","pop_robot_build_speed_mult"]]
-  possibleBoniIcons=["£minerals","£energy", "£food", "£physics £society £engineering","£unity", "£influence","£navy_size","£military_power","£ship_stats_hitpoints","£ship_stats_armor","£ship_stats_shield","£ship_stats_maintenance","£pops"]
+  possibleBoniNames=["station", "jobs",  "cap",   "upkeep", "ship_cost","stability", "diplo_upkeep", "damage","hull","armor","shield"] #, "growth"
+  npcBoni=[           False,      False,   False,   False,    False,    False       ,False          ,True,   True,     True, True]
+  # boniFactor= [         1,          1,      1,    -1,           -1,         0.2,        -1,             1,      1,      1,      1]
+  boniUnit=dict()
+  for bonus in possibleBoniNames:
+    boniUnit[bonus]="%"
+  boniUnit["stability"]="" #continued for groups below
+  boniFactor=dict()
+  for bonus in possibleBoniNames:
+    boniFactor[bonus]=1
+  boniFactor["stability"]=0.2
+  boniFactor["upkeep"]=-1
+  boniFactor["ship_cost"]=-1
+  boniFactor["diplo_upkeep"]=-1
+
+  possibleBoniPictures=[
+  "GFX_evt_mining_station",
+  "GFX_evt_metropolis",
+  "GFX_evt_busy_spaceport", 
+  "GFX_evt_cargoship_caravan", 
+  "GFX_evt_hangar_bay",
+  "GFX_evt_alien_propaganda", 
+  "GFX_evt_arguing_senate",
+  "GFX_evt_debris", 
+  "GFX_evt_sabotaged_ship",
+  "GFX_evt_pirate_armada",
+  "GFX_evt_fleet_neutral"]
+  possibleBoniModifier=[
+  "stations_produces_mult", 
+  "planet_jobs_produces_mult", 
+  "country_naval_cap_mult", 
+  "ships_upkeep_mult", 
+  "starbase_shipyard_build_cost_mult",
+  "planet_stability_add",
+  "diplomacy_upkeep_mult",
+  "ship_weapon_damage",
+  "ship_hull_mult",
+  "ship_armor_mult",
+  "ship_shield_mult",
+  # ["ship_upkeep_mult","planet_building_upkeep_mult","country_starbase_upkeep_mult","army_upkeep_mult","pop_robot_upkeep_mult"]#,
+  # ["pop_growth_speed","pop_robot_build_speed_mult"]
+  ]
+  possibleBoniIcons=["£systems","£job", "£navy_size", "£ship_stats_maintenance","£ship_stats_build_cost", "£stability", "£influence","£military_power","£ship_stats_hitpoints","£ship_stats_armor","£ship_stats_shield"
+  # ,"£ship_stats_maintenance","£pops"
+  ]
+  possibleBoniColor=["E","B","G","P","Y","H","M","R","G","H","B"
+  # ,"T","G"
+  ]
+  defaultEmpireBonusMult=[0.25,0.25,0.15,-0.1,-0.1,5,0,0,0,0]
+  npcBonusAdd=0.05
+  npcBonusBase=0.3
 
 # playable_ai_empire = {
 #   diplomacy_upkeep_mult = -0.5 GFX_evt_arguing_senate "E"
@@ -113,16 +157,18 @@ def main():
  # 5150   SHIP_STAT_SHIELD_REGENERATION_STATIC_INLINE:0 "$SHIP_STAT_SHIELD_REGENERATION_INLINE$"
  # 5151  
 
-  possibleBoniColor=["P","Y","G","M","E","B","W","R","G","H","B","T","G"]
 
-  bonusesListNames=["all","resourceProd","humanResources", "allShip"]
+  bonusesListNames=["all","planets","systems", "allShip"]
+  for bonus in bonusesListNames:
+    boniUnit[bonus]="@steps"
+    boniFactor[bonus]=1
   representGroup=dict()
-  representGroup["minerals"]="resourceProd"
-  representGroup["research"]="humanResources"
+  representGroup["jobs"]="planets"
+  representGroup["station"]="systems"
   representGroup["damage"]="allShip"
   bonusListNPC=[    False,   False, False,  True]
-  bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2],[3,4,6], [7,8,9,10]]
-  bonusesListPictures=["GFX_evt_alien_city", "GFX_evt_mining_operations", "GFX_evt_ancient_alien_temple","GFX_evt_federation_fleet"]
+  bonusesListEntries=[[i for i in range(len(possibleBoniNames))], [1,5,6],[0,2,3,4], [7,8,9,10]]
+  bonusesListPictures=["GFX_evt_alien_city", "GFX_evt_galactic_market", "GFX_evt_satellite_in_orbit","GFX_evt_federation_fleet"]
   # bonusesListNames=["all","default", "allShip"]
   # bonusListNPC=[    True,   False,    False]
   # bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
@@ -151,38 +197,36 @@ def main():
   catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire_awakes","GFX_evt_wraith","GFX_evt_towel","GFX_evt_ai_planet","GFX_evt_khan_throne_room","GFX_evt_unknown_ships"]
   catColors="BHBBGRBB"
 
-  difficulties=["easy", "no_player_bonus", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
-  # difficulties=["easy", "no_player_bonus", "cadet", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
+  # difficulties=["easy", "no_player_bonus", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
+  difficulties=["easy", "no_player_bonus", "cadet", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
   vanillaDefaultDifficultyNames=difficulties[2:]
   ai_non_scaling_DifficultyNames=difficulties[2:-2]
 
   vanillaDefaultDifficulty=[]
   # possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep", "Any Pop growth speed"]
-  aiDefault=[True, True, True, True, True, False, True, False, False, False, False, False, False]
-  aiDefaultPrecise=[2, 2, 2, 1, 1, 0, 1, 0,0,0,0,0,0]
-  npcDefault=[False,False,False,False,False,False,False, True, True, True, True, False, False]
-  catsWithNPCDefaultBoni=["fe","leviathan","marauders", "other"]
-  vanillaAItoNPCIndex=7
+  # aiDefault=[True, True, True, True, True, False, True, False, False, False, False, False, False]
+  # aiDefaultPrecise=[2, 2, 2, 1, 1, 0, 1, 0,0,0,0,0,0]
+  catsWithnpcBoniBoni=["fe","leviathan","marauders", "other"]
 
 
 
-  doTranslation=True
+  doTranslation=False
   # doTranslation=False
   locClass=LocList(doTranslation)
   #global things: No translation needed (mod name and stuff taken from vanilla translations)
   locClass.addLoc("modName", "Dynamic Difficulty", "all")
-  locClass.addLoc("minerals", "$minerals$","all")
-  locClass.addLoc("energy", "$energy$","all")
-  locClass.addLoc("food", "$food$","all")
-  locClass.addLoc("research", "$RESEARCH$","all")
-  locClass.addLoc("unity", "$unity$","all")
-  locClass.addLoc("influence", "$influence$","all")
+  locClass.addLoc("station", "Station Output","all")
+  locClass.append("mod_stations_produces_mult", "@station") #paradox seems to have forgotten this one!
+  locClass.addLoc("jobs", "$mod_planet_jobs_produces_mult$","all")
+  locClass.addLoc("ship_cost", "$MOD_STARBASE_SHIPYARD_BUILD_COST_MULT$","all")
+  locClass.addLoc("stability", "$PLANET_STABILITY_TITLE$","all")
+  locClass.addLoc("diplo_upkeep", "$mod_diplomacy_upkeep_mult$","all")
   locClass.addLoc("cap", "$NAVY_SIZE_TITLE$","all")
   locClass.addLoc("hull", "$HULL$","all")
   locClass.addLoc("armor", "$ARMOR$","all")
   locClass.addLoc("shield", "$SHIELD$","all")
-  locClass.addLoc("upkeep", "$MAINTENANCE$","all")
-  locClass.addLoc("growth", "$POPULATION_GROWTH$","all") #Any Pop Growth Speed","all")
+  locClass.addLoc("upkeep", "$mod_ships_upkeep_mult$","all")
+  # locClass.addLoc("growth", "$POPULATION_GROWTH$","all") #Any Pop Growth Speed","all")
   locClass.addLoc("cadet", "$DIFFICULTY_CADET$","all")
   locClass.addLoc("ensign", "$DIFFICULTY_ENSIGN$","all")
   locClass.addLoc("captain", "$DIFFICULTY_CAPTAIN$","all")
@@ -198,10 +242,14 @@ def main():
   locClass.addLoc("all", "All")
   locClass.addLoc("allDesc", "Change all available bonuses at once.")
   locClass.addLoc("default", "Standard")
-  locClass.addLoc("resourceProd", "Resource Production")
-  locClass.addLoc("resourceProdDesc", "Change mineral, energy and food bonuses.")
-  locClass.addLoc("humanResources", "Human Resources")
-  locClass.addLoc("humanResourcesDesc", "Change unity, research and naval capacity bonuses.")
+  locClass.addLoc("planets", "Planet Bonuses")
+  locClass.addLoc("planetsDesc", "Change job production and stability.")
+  locClass.addLoc("systems", "Space Bonuses")
+  locClass.addLoc("systemsDesc", "Change space production, naval cap and ships cost bonuses.")
+  # locClass.addLoc("resourceProd", "Resource Production")
+  # locClass.addLoc("resourceProdDesc", "Change mineral, energy and food bonuses.")
+  # locClass.addLoc("humanResources", "Human Resources")
+  # locClass.addLoc("humanResourcesDesc", "Change unity, research and naval capacity bonuses.")
   locClass.addLoc("allShip", "All Combat")
   locClass.addLoc("allShipDesc", "Change combat bonuses: weapon damage, hull, shields and armor.")
   #cats
@@ -226,6 +274,8 @@ def main():
   #less important
 
   locClass.addLoc("easy", "Easy")
+  locClass.addLoc("steps", "step(s)")
+  locClass.addLoc("step", "step")
   locClass.addLoc("damage", "Weapon Damage")
   locClass.addLoc("curBon", "Current Bonuses")
   locClass.addLoc("bonus", "Bonus")
@@ -332,6 +382,7 @@ def main():
   locClass.addEntry("custom_difficulty_choose", "@choosePreDef.§R @delWarn§! @combineText")
   locClass.addEntry("custom_difficulty_easy.name", "§G@easy - 20% @bonus @allCat @forPlayer§!")
   locClass.addEntry("custom_difficulty_no_player_bonus.name", "§G@no @bonus @forPlayer§!")
+  locClass.addEntry("custom_difficulty_cadet.name", "§B@cadet - 30-50% @bonus @forPlayer§. @no @bonus @forAI. @no @bonus @forNPCs§!")
   locClass.addEntry("custom_difficulty_ensign.name", "§B@ensign - @no @bonus @forAI. @no @bonus @forNPCs§!")
   locClass.addEntry("custom_difficulty_captain.name", "§B@captain - 15-25% @bonus @forAI. 25% @forNPCs§!")
   locClass.addEntry("custom_difficulty_commodore.name", "§B@commodore - 30-50% @bonus @forAI. 50% @forNPCs§!")
@@ -420,8 +471,8 @@ def main():
           trigger.add("success_text",TagList().add("text",localDescIncName).add(ET,TagList().add("check_variable", checkVar)).add("has_global_flag", "custom_difficulty_activate_simple_mode"))
           checkVar=TagList().add("which", localVarName).add("value","0","","<")
           trigger.add("success_text",TagList().add("text",localDescDecName).add(ET,TagList().add("check_variable", checkVar)).add("has_global_flag", "custom_difficulty_activate_simple_mode"))
-          locClass.addEntry("custom_difficulty_{}_{}_inc_desc".format(cat,bonusesListName),"{0} @{1} : 1% @increase @every [this.custom_difficulty_{2}_{3}_value] @years".format(icons, bonusesListName, cat,firstVarName)) #local tmp var
-          locClass.addEntry("custom_difficulty_{}_{}_dec_desc".format(cat,bonusesListName),"{0} @{1} : 1% @decrease @every [this.custom_difficulty_{2}_{3}_value] @years".format(icons, bonusesListName, cat,firstVarName)) #local tmp var
+          locClass.addEntry("custom_difficulty_{}_{}_inc_desc".format(cat,bonusesListName),"{0} @{1} : 1 @step @increase @every [this.custom_difficulty_{2}_{3}_value] @years".format(icons, bonusesListName, cat,firstVarName)) #local tmp var
+          locClass.addEntry("custom_difficulty_{}_{}_dec_desc".format(cat,bonusesListName),"{0} @{1} : 1 @step @decrease @every [this.custom_difficulty_{2}_{3}_value] @years".format(icons, bonusesListName, cat,firstVarName)) #local tmp var
           #create a local variable and make sure it is positive!
           immediate.add("set_variable", TagList().add("which", localVarName).add("value",ET))
           immediateIf=TagList().add("limit",TagList().add("check_variable",checkVar)) #<0
@@ -438,8 +489,8 @@ def main():
         trigger.add("success_text",TagList().add("text","custom_difficulty_{}_{}_inc_desc".format(cat,bonus)).add(ET,TagList().add("check_variable", checkVar)).add("has_global_flag", "custom_difficulty_activate_custom_mode"))
         checkVar=TagList().add("which", localVarName).add("value","0","","<")
         trigger.add("success_text",TagList().add("text","custom_difficulty_{}_{}_dec_desc".format(cat,bonus)).add(ET,TagList().add("check_variable", checkVar)).add("has_global_flag", "custom_difficulty_activate_custom_mode"))
-        locClass.addEntry("custom_difficulty_{}_{}_inc_desc".format(cat,bonus),"{} §{}@{} : 1% @increase @every [this.custom_difficulty_{}_{}_value] @years".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonus)) #local tmp var
-        locClass.addEntry("custom_difficulty_{}_{}_dec_desc".format(cat,bonus),"{} §{}@{} : 1% @decrease @every [this.custom_difficulty_{}_{}_value] @years".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonus)) #local tmp var
+        locClass.addEntry("custom_difficulty_{}_{}_inc_desc".format(cat,bonus),"{} §{}@{} : 1 @step @increase @every [this.custom_difficulty_{}_{}_value] @years".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonus)) #local tmp var
+        locClass.addEntry("custom_difficulty_{}_{}_dec_desc".format(cat,bonus),"{} §{}@{} : 1 @step @decrease @every [this.custom_difficulty_{}_{}_value] @years".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonus)) #local tmp var
         #create a local variable and make sure it is positive!
         immediate.add("set_variable", TagList().add("which", localVarName).add("value",ET))
         immediateIf=TagList().add("limit",TagList().add("check_variable",checkVar)) #<0
@@ -451,12 +502,12 @@ def main():
         trigger.add("success_text",TagList()
           .add("text","custom_difficulty_{}_{}_desc".format(cat,bonus)).add(ET,TagList()
             .add("not", TagList("check_variable", checkVar))).add("has_global_flag", "custom_difficulty_activate_custom_mode"))
-        locClass.append("custom_difficulty_{}_{}_desc".format(cat,bonus),"{} §{}@{} : [{}.custom_difficulty_{}_{}_value]% ".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, ET, cat,bonus))
+        locClass.append("custom_difficulty_{}_{}_desc".format(cat,bonus),"{} §{}@{} : [{}.custom_difficulty_{}_{}_value] {}".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, ET, cat,bonus, boniUnit[bonus]))
 
       #stuff that is added here will be output AFTER all trigger (as the whole trigger is added before the loop)
       option=TagList().add("name", "custom_difficulty_{}_change_{}_button.name".format(cat,bonus))
       option.add("trigger", TagList().add("NOR", TagList().add("custom_difficulty_allow_changes", "no").add("has_global_flag", "custom_difficulty_activate_simple_mode")))
-      locClass.append("custom_difficulty_{}_change_{}_button.name".format(cat,bonus), "@change @{} ({} ) @bonuses".format(bonus,possibleBoniIcons[bonusI]))
+      locClass.append("custom_difficulty_{}_change_{}_button.name".format(cat,bonus), "§{}@change @{} ({} ) @bonuses§!".format(possibleBoniColor[bonusI],bonus,possibleBoniIcons[bonusI]))
       option.add("hidden_effect", TagList().add("country_event",TagList().add("id", eventNameSpace.format(mainIndex*id_ChangeEvents+optionIndex*id_subChangeEvents))))
       if not catToModifierType[cat]=="crisis" or npcBoni[bonusI]:
         choiceEvent.add("option",option) 
@@ -503,26 +554,30 @@ def main():
           if changeStep>0:
             option=TagList().add("name","custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep))
             if cat=="ai_yearly":
-              locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), "§G@increase @{} @years by {}".format(bonus, changeStep))
+              locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), 
+                "§G@increase @{} @years by {}".format(bonus, changeStep))
             else:
-              locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), "§G@increase @{} @bonuses by {}%".format(bonus, changeStep))
+              locClass.append("custom_difficulty_{}_{}_increase_{!s}".format(cat,bonus, changeStep), 
+                "§G@increase @{} @bonuses by {} {}".format(bonus, changeStep*boniFactor[bonus], boniUnit[bonus]))
           else:
             option=TagList().add("name","custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep))
             if cat=="ai_yearly":
-              locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), "§R@decrease @{} @years by {}".format(bonus, -changeStep))
+              locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), 
+                "§R@decrease @{} @years by {}".format(bonus, -changeStep))
             else:
-              locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), "§R@decrease @{} @bonuses by {}%".format(bonus, -changeStep))
+              locClass.append("custom_difficulty_{}_{}_decrease_{!s}".format(cat,bonus, -changeStep), 
+                "§R@decrease @{} @bonuses by {} {}".format(bonus, -changeStep*boniFactor[bonus], boniUnit[bonus]))
 
           hidden_effect=TagList()
           if bonusIndex>len(bonusesListNames):
-            hidden_effect.add(ET,TagList().add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value",str(changeStep))))
+            hidden_effect.add(ET,TagList().add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value",str(changeStep*boniFactor[bonus]))))
           else:
             et=TagList()
             hidden_effect.add(ET,et)
             for bonusListIndex in bonusesListEntries[bonusIndex-1]:
               if not catToModifierType[cat]=="crisis" or npcBoni[bonusListIndex]:
                 bonusListValue=possibleBoniNames[bonusListIndex]
-                et.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusListValue)).add("value",str(changeStep)))
+                et.add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonusListValue)).add("value",str(changeStep*boniFactor[possibleBoniNames[bonusListIndex]])))
           hidden_effect.add("country_event", TagList().add("id",eventNameSpace.format(mainIndex*id_ChangeEvents+bonusIndex*id_subChangeEvents)))
           if cat=="player":
             hidden_effect.add("country_event", TagList().add("id",name_resetPlayerFlagsEvent)) #remove flags
@@ -565,32 +620,34 @@ def main():
   defaultEvents.add("","","#Events from {} blocked up to {}".format(id_defaultEvents,id_defaultEvents+99))
 
 
-  condVal = lambda x,y: x if y else 0
-  condValPrec = lambda x1,x2,y: x1 if y==1 else (x2 if y==2  else 0)
+  # condVal = lambda x,y: x if y else 0
+  # condValPrec = lambda x1,x2,y: x1 if y==1 else (x2 if y==2  else 0)
   difficultiesPresetProperties=dict()
   for difficulty in difficulties:
     difficultiesPresetProperties[difficulty]=dict()
-  difficultiesPresetProperties["easy"]["player"]=[20 for b in possibleBoniNames]
-  difficultiesPresetProperties["no_player_bonus"]["player"]=[0 for b in possibleBoniNames]
-  difficultiesPresetProperties["scaling"]["ai_yearly"]=[condVal(4,s) for s in aiDefault]
-  difficultiesPresetProperties["no_scaling"]["ai_yearly"]=[0 for b in possibleBoniNames]
+  # difficultiesPresetProperties["easy"]["player"]=[20 for b in possibleBoniNames]
+  # difficultiesPresetProperties["no_player_bonus"]["player"]=[0 for b in possibleBoniNames]
+  # difficultiesPresetProperties["scaling"]["ai_yearly"]=[condVal(4,s) for s in aiDefault]
+  # difficultiesPresetProperties["no_scaling"]["ai_yearly"]=[0 for b in possibleBoniNames]
 
-  diffLevels=dict() 
-  diffLevels["ensign"]=[30, 0,0 ] # crisis, high ai and npc, low ai
-  diffLevels["captain"]=[35, 25,15 ]
-  diffLevels["commodore"]=[40, 50,30 ]
-  diffLevels["admiral"]=[45, 75,45 ]
-  diffLevels["grand_admiral"]=[50, 100,60 ]
+
+  ## TODO!!
+  # diffLevels=dict() 
+  # diffLevels["ensign"]=[30, 0,0 ] # crisis, high ai and npc, low ai
+  # diffLevels["captain"]=[35, 25,15 ]
+  # diffLevels["commodore"]=[40, 50,30 ]
+  # diffLevels["admiral"]=[45, 75,45 ]
+  # diffLevels["grand_admiral"]=[50, 100,60 ]
   # diffLevels["ensign"]=[0, 0,0 ] # npc, high ai, low ai
   # diffLevels["captain"]=[25, 25,15 ]
   # diffLevels["commodore"]=[50, 50,30 ]
   # diffLevels["admiral"]=[75, 75,45 ]
   # diffLevels["grand_admiral"]=[100, 100,60 ]
-  for diff, level in diffLevels.items():
-    difficultiesPresetProperties[diff]["ai"]=[condValPrec(level[2], level[1],b) for b in aiDefaultPrecise]
-    difficultiesPresetProperties[diff]["crisis"]=[condVal(level[0],b) for b in npcDefault]
-    for cat in catsWithNPCDefaultBoni:
-      difficultiesPresetProperties[diff][cat]=[condVal(level[1],b) for b in npcDefault]
+  # for diff, level in diffLevels.items():
+  #   difficultiesPresetProperties[diff]["ai"]=[condValPrec(level[2], level[1],b) for b in aiDefaultPrecise]
+  #   difficultiesPresetProperties[diff]["crisis"]=[condVal(level[0],b) for b in npcBoni]
+  #   for cat in catsWithnpcBoniBoni:
+  #     difficultiesPresetProperties[diff][cat]=[condVal(level[1],b) for b in npcBoni]
 
   #CRISIS DEFAULTS scheint nicht zu klappen!
   #get_galaxy_setup_value = { 
@@ -810,7 +867,11 @@ def main():
             i=abs(i)
             if cat!="player":
               i-=1
-            changeVal=modifierFuns[cat](i)
+            changeValOrig=modifierFuns[cat](i)
+            changeVal=sign*abs(boniFactor[bonus])*changeValOrig
+            changeValModifier=changeVal
+            if boniUnit[bonus]=="%":
+              changeValModifier/=100
             ifModifierApplied=TagList()
             if sign>0:
               addIFChanged.insert(addIFChanged.names.index("if"),"if", ifModifierApplied)
@@ -818,28 +879,35 @@ def main():
               addIFChanged.add("if", ifModifierApplied)
             ifModifierApplied.add("limit",TagList().add("check_variable",
               TagList().add("which","custom_difficulty_tmp")
-              .add("value", str(sign*(changeVal-0.1)),"",compSign)))
+              .add("value", "{:.3f}".format(changeVal-sign*0.01),"",compSign)))
             if groupUpdate:
               modifierName="custom_difficulty_{:02d}_{}_{}_{}_value".format(i,representGroup[bonus],signName,cat)
             else:
               modifierName="custom_difficulty_{:02d}_{}_{}_{}_value".format(i,bonus,signName,cat)
             modifier=TagList()
             if groupUpdate:
-              bonusModifier=[]
               for i in bonusesListEntries[bonusesListNames.index(representGroup[bonus])]:
+                bonusModifier=[]
                 localModifier=possibleBoniModifier[i]
+                localBonus=possibleBoniNames[i]
                 if isinstance(localModifier,list):
                   bonusModifier+=localModifier
                 else:
                   bonusModifier.append(localModifier)
+                changeValLoc=sign*boniFactor[localBonus]*changeValOrig #NO ABS HERE. WE ACTUALLY NEED NEGATIVE
+                if boniUnit[localBonus]=="%":
+                  changeValLoc/=100
+                for modifierEntry in bonusModifier:
+                  modifier.add(modifierEntry,str(changeValLoc))
             else:
               if not isinstance(bonusModifier,list):
                 bonusModifier=[bonusModifier]
-            for modifierEntry in bonusModifier:
-              if bonus=="upkeep":
-                modifier.add(modifierEntry,str(-sign*changeVal/100))
-              else:
-                modifier.add(modifierEntry,str(sign*changeVal/100))
+              for modifierEntry in bonusModifier:
+                modifier.add(modifierEntry,str(changeValModifier))
+              # if bonus=="upkeep":
+                # modifier.add(modifierEntry,str(-sign*changeVal/100))
+              # else:
+                # modifier.add(modifierEntry,str(sign*changeVal/100))
             locClass.append(modifierName,"@difficulty")
             staticModifiers.add(modifierName,modifier)
             ifModifierApplied.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
@@ -848,7 +916,7 @@ def main():
             removeIFChanged.add("remove_modifier", modifierName)
             if debugMode and i==1:
               removeIFChanged.add("log",'"removing modifiers (all of them, not only 1) {}"'.format(modifierName))
-            ifModifierApplied.add("change_variable",TagList().add("which","custom_difficulty_tmp").add("value", str(-1*sign*changeVal)))
+            ifModifierApplied.add("change_variable",TagList().add("which","custom_difficulty_tmp").add("value", str(-1*changeVal)))
       for modifierCat in modifierCats:
         ifModifierCat=TagList("limit", TagList("has_country_flag","custom_difficulty_{}_modifier_active".format(modifierCat)))
         if groupUpdate:
@@ -979,6 +1047,7 @@ def main():
   scriptedModifiers.add("difficulty_commodore",TagList())
   scriptedModifiers.add("difficulty_captain",TagList())
   scriptedModifiers.add("difficulty_ensign",TagList())
+  scriptedModifiers.add("difficulty_cadet_player",TagList())
   scriptedModifiers.add("","","# For non-playable empires, scales to setting in country type")
   scriptedModifiers.add("difficulty_scaling_npc",TagList())
   scriptedModifiers.add("difficulty_grand_admiral_npc",TagList())
@@ -996,6 +1065,7 @@ def main():
   scriptedModifiers.add("difficulty_scaled_very_hard",TagList())
   scriptedModifiers.add("difficulty_scaled_hard",TagList())
   scriptedModifiers.add("difficulty_scaled_normal",TagList())
+  scriptedModifiers.add("playable_ai_empire",TagList())
   outputToFolderAndFile(scriptedModifiers, "common/static_modifiers","!_custom_difficulty_00_static_modifier.txt")
 
 
@@ -1161,8 +1231,8 @@ def main():
   # flag is going to be "custom_difficulty_"+key
   # name "custom_difficulty_"+key
   # desc "custom_difficulty_"+key+".desc"
-  optionWithInverse["activate_simple_mode"]=["activate_custom_mode"]
   optionWithInverse["activate_custom_mode"]=["activate_simple_mode"]
+  optionWithInverse["activate_simple_mode"]=["activate_custom_mode"]
   optionWithInverse["deactivate_player_vassal_ai_boni"]=["activate_player_vassal_ai_boni"]
   optionWithInverse["activate_player_vassal_ai_boni"]=["deactivate_player_vassal_ai_boni"]
   optionWithInverse["deactivate_delay_mode"]=["activate_delay_mode"]
@@ -1329,23 +1399,6 @@ def main():
       os.makedirs(outFolderLoc)
     locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
 
-
-  cgm_ImbalancedDifficultyBonusesEffect=TagList()
-  effect=cgm_ImbalancedDifficultyBonusesEffect.addReturn("check_imbalanced_difficulty_bonuses")
-  effect=effect.addReturn("every_playable_country")
-  cgm_ImbalancedDifficultyBonusesEffect.add("check_country_imbalanced_difficulty_bonuses",effect)
-
-  for i in range(7):
-    effectIf=effect.createReturnIf(variableOpNew("check","custom_difficulty_minerals_value", round(pow(2,(i+1)/10*5+0.05)*100-100), "<"))
-    subEffect=effectIf
-    for j in range(1,5):
-      subEffectIf=subEffect.createReturnIf(variableOpNew("check","custom_difficulty_minerals_value", round(pow(2,(i+j/5)/10*5+0.05)*100-100), "<"))
-      subEffectIf.variableOp("set", "cgm_difficutly_imbalance_log", round((i+j/5)/10*5,1))
-      subEffect=subEffect.addReturn("else")  #fixed 2.1
-    subEffect.variableOp("set", "cgm_difficutly_imbalance_log", round((i+1)/10*5,1))
-    effect=effect.addReturn("else") #fixed 2.1
-
-  outputToFolderAndFile(cgm_ImbalancedDifficultyBonusesEffect , "common/scripted_effects", "custom_difficulty_cgm_effects.txt")
 
 
 
