@@ -111,9 +111,14 @@ def main():
   possibleBoniColor=["E","B","G","P","Y","H","M","R","G","H","B"
   # ,"T","G"
   ]
-  defaultEmpireBonusMult=[0.25,0.25,0.15,-0.1,-0.1,5,0,0,0,0]
-  npcBonusAdd=0.05
-  npcBonusBase=0.3
+  defaultEmpireBonusMultList=[25,25,15,-10,-10,5,-15,0,0,0,0]
+  defaultEmpireBonusMult=dict()
+  for i,bonus in enumerate(possibleBoniNames):
+    defaultEmpireBonusMult[bonus]=defaultEmpireBonusMultList[i]
+    # print(defaultEmpireBonusMult[bonus])
+    # print(bonus)
+  npcBonusAdd=5
+  npcBonusBase=30
 
 # playable_ai_empire = {
 #   diplomacy_upkeep_mult = -0.5 GFX_evt_arguing_senate "E"
@@ -198,15 +203,16 @@ def main():
   catColors="BHBBGRBB"
 
   # difficulties=["easy", "no_player_bonus", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
-  difficulties=["easy", "no_player_bonus", "cadet", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
-  vanillaDefaultDifficultyNames=difficulties[2:]
-  ai_non_scaling_DifficultyNames=difficulties[2:-2]
+  difficulties=[#"easy", "no_player_bonus",
+  "cadet", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
+  vanillaDefaultDifficultyNames=difficulties[0:]
+  ai_non_scaling_DifficultyNames=difficulties[0:-2]
 
   vanillaDefaultDifficulty=[]
   # possibleBoniNames=["Minerals", "Energy","Food", "Research", "Unity", "Influence", "Naval capacity", "Weapon Damage", "Hull","Armor","Shield","Upkeep", "Any Pop growth speed"]
   # aiDefault=[True, True, True, True, True, False, True, False, False, False, False, False, False]
   # aiDefaultPrecise=[2, 2, 2, 1, 1, 0, 1, 0,0,0,0,0,0]
-  catsWithnpcBoniBoni=["fe","leviathan","marauders", "other"]
+  catsWithnpcBoniBoni=["crisis","fe","leviathan","marauders", "other"]
 
 
 
@@ -273,7 +279,7 @@ def main():
 
   #less important
 
-  locClass.addLoc("easy", "Easy")
+  # locClass.addLoc("easy", "Easy")
   locClass.addLoc("steps", "step(s)")
   locClass.addLoc("step", "step")
   locClass.addLoc("damage", "Weapon Damage")
@@ -380,9 +386,9 @@ def main():
   locClass.append("custom_difficulty_customize_colored.name","§Y@difficulty @customization")
   locClass.append("custom_difficulty_customize.name","§Y@difficulty @customization")
   locClass.addEntry("custom_difficulty_choose", "@choosePreDef.§R @delWarn§! @combineText")
-  locClass.addEntry("custom_difficulty_easy.name", "§G@easy - 20% @bonus @allCat @forPlayer§!")
+  # locClass.addEntry("custom_difficulty_easy.name", "§G@easy - 20% @bonus @allCat @forPlayer§!")
   locClass.addEntry("custom_difficulty_no_player_bonus.name", "§G@no @bonus @forPlayer§!")
-  locClass.addEntry("custom_difficulty_cadet.name", "§B@cadet - 30-50% @bonus @forPlayer§. @no @bonus @forAI. @no @bonus @forNPCs§!")
+  locClass.addEntry("custom_difficulty_cadet.name", "§B@cadet - 30-50% @bonus @forPlayer. @no @bonus @forAI. @no @bonus @forNPCs§!")
   locClass.addEntry("custom_difficulty_ensign.name", "§B@ensign - @no @bonus @forAI. @no @bonus @forNPCs§!")
   locClass.addEntry("custom_difficulty_captain.name", "§B@captain - 15-25% @bonus @forAI. 25% @forNPCs§!")
   locClass.addEntry("custom_difficulty_commodore.name", "§B@commodore - 30-50% @bonus @forAI. 50% @forNPCs§!")
@@ -620,15 +626,27 @@ def main():
   defaultEvents.add("","","#Events from {} blocked up to {}".format(id_defaultEvents,id_defaultEvents+99))
 
 
-  # condVal = lambda x,y: x if y else 0
+  condVal = lambda x,y: x if y else 0
   # condValPrec = lambda x1,x2,y: x1 if y==1 else (x2 if y==2  else 0)
   difficultiesPresetProperties=dict()
   for difficulty in difficulties:
     difficultiesPresetProperties[difficulty]=dict()
   # difficultiesPresetProperties["easy"]["player"]=[20 for b in possibleBoniNames]
   # difficultiesPresetProperties["no_player_bonus"]["player"]=[0 for b in possibleBoniNames]
-  # difficultiesPresetProperties["scaling"]["ai_yearly"]=[condVal(4,s) for s in aiDefault]
-  # difficultiesPresetProperties["no_scaling"]["ai_yearly"]=[0 for b in possibleBoniNames]
+  difficultiesPresetProperties["scaling"]["ai_yearly"]=[condVal(4,defaultEmpireBonusMult[bonus]) for bonus in possibleBoniNames]
+  difficultiesPresetProperties["no_scaling"]["ai_yearly"]=[0 for b in possibleBoniNames]
+
+  for i, diff in enumerate(difficulties[ difficulties.index("ensign") : difficulties.index("grand_admiral")+1 ]):
+    difficultiesPresetProperties[diff]["ai"]=[defaultEmpireBonusMult[bonus]*i for bonus in possibleBoniNames]
+    difficultiesPresetProperties[diff]["player"]=[0 for _ in possibleBoniNames]
+    for cat in catsWithnpcBoniBoni:
+      difficultiesPresetProperties[diff][cat]=[condVal(1,s)*(npcBonusBase+i*npcBonusAdd) for s in npcBoni]
+      if cat != "crisis":
+        difficultiesPresetProperties[diff][cat]=[f/2 for f in difficultiesPresetProperties[diff][cat]]
+  difficultiesPresetProperties["cadet"]=deepcopy(difficultiesPresetProperties["ensign"])
+  difficultiesPresetProperties["cadet"]["player"]=difficultiesPresetProperties["commodore"]["ai"]
+
+  # print(difficultiesPresetProperties)
 
 
   ## TODO!!
@@ -670,9 +688,9 @@ def main():
     if "scaling" in difficulty:
       immediate.add("country_event",TagList().add("id",name_resetYearlyFlagsEvent))
       scalingFlags.add("remove_global_flag","custom_difficulty_"+difficulty)
-    elif "player" in difficulty or "easy" in difficulty:
-      immediate.add("country_event",TagList().add("id",name_resetPlayerFlagsEvent))
-      playerFlags.add("remove_global_flag","custom_difficulty_"+difficulty)
+    # elif "player" in difficulty or "easy" in difficulty:
+    #   immediate.add("country_event",TagList().add("id",name_resetPlayerFlagsEvent))
+    #   playerFlags.add("remove_global_flag","custom_difficulty_"+difficulty)
     else:
       immediate.add("country_event",TagList().add("id",name_resetAIFlagsEvent))
       otherFlags.add("remove_global_flag","custom_difficulty_"+difficulty)
@@ -1022,10 +1040,11 @@ def main():
 
 
 
-  edict=TagList().add("name","custom_difficulty").add("length","0").add("cost",TagList())
+  edict=TagList().add("length","0")
+  edict.add("resources", TagList("category", "edicts").add("cost",TagList()))
   edict.add("effect", TagList("hidden_effect",TagList("country_event",TagList("id",name_mainMenuEvent))))
   edict.add("potential", TagList("is_ai","no").add("not",TagList("has_global_flag", "custom_difficulty_deactivate_edict")))
-  edictFile=TagList().add("country_edict", edict)
+  edictFile=TagList().add("custom_difficulty", edict)
   outputToFolderAndFile(edictFile, "common/edicts", "custom_difficulty_edict.txt")
 
   onActions=TagList()
