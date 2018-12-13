@@ -166,7 +166,7 @@ def main():
 
 
 
-  doTranslation=True
+  doTranslation=False
   # doTranslation=False
   locClass=LocList(doTranslation)
   #global things: No translation needed (mod name and stuff taken from vanilla translations)
@@ -270,7 +270,9 @@ def main():
   locClass.addLoc("initDesc", "Thank you for using Dynamic Difficulty. Start the event menu via 'ModMenu' or edict.")
   locClass.addLoc("crisisInit","Since it seems to be impossible to read crisis strength in a mod, you'll have to enter it here."+
     " The option chosen during game start will not have an effect anymore."+
-    " The value chosen below is translated into a bonus using the same formula as Vanilla Stellaris and can be customized at any time.")
+    " The value chosen below is translated into a bonus using the same formula as Vanilla Stellaris and can be customized at any time." +
+    " \\n§RYou are using the 2.1.x version of this mod. It does not work on 2.2+. If you are having a newer version of Stellaris, please search the workshop for the newer version of this mod.§!"
+    )
   locClass.addLoc("noCrisisInit","This game has crisis disabled via the game start options. Crisis options are thus also disabled in this mod. You can activate crisis only with a new game or a save-game edit.")
   locClass.addLoc("crisisStrength","Crisis Strength")
   locClass.addLoc("current_options", "Currently active options")
