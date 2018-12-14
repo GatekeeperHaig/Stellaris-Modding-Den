@@ -8,8 +8,8 @@ from functools import reduce
 
 class LocList:
   def __init__(self, translateRest=0):
-    self.languages=["braz_por","english","french","german","polish","russian","spanish"]
-    self.languageCodes=["pt","en","fr", "de","pl","ru", "es"]
+    self.languages=["braz_por","english","french","german","polish","russian","spanish","simp_chinese"]
+    self.languageCodes=["pt","en","fr", "de","pl","ru", "es","zh"]
     # self.entries=[]
     self.entries=dict()
     self.dicts=dict()
