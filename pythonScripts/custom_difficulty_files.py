@@ -22,6 +22,7 @@ name_defaultMenuEvent="custom_difficulty.1"
 name_customMenuEvent="custom_difficulty.2"
 name_optionsEvent="custom_difficulty.3"
 name_gameStartFireOnlyOnce="custom_difficulty.10"
+name_randomDiffFireOnlyOnce="custom_difficulty.11"
 name_resetEvent="custom_difficulty.20" # same as above with triggered_only instead of fire_only_once
 name_resetConfirmationEvent="custom_difficulty.21" # same as above with triggered_only instead of fire_only_once
 name_resetFlagsEvent="custom_difficulty.22"
@@ -1196,6 +1197,7 @@ def main():
   gameStartInitEvent.add("trigger", TagList("is_ai","no").add("or", TagList("NOR", t_anyOption).add("not", TagList("has_global_flag", "custom_difficulty_active"))))
   immediate=TagList()
   gameStartInitEvent.add("immediate",immediate)
+  immediate.createEvent(name_randomDiffFireOnlyOnce)
   immediate.add("set_country_flag", "custom_difficulty_game_host")
   immediate.add("if", TagList("limit", TagList("NOR", t_anyOption).add("has_global_flag", "custom_difficulty_active"))
     .add("country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent")
@@ -1225,6 +1227,22 @@ def main():
     gameStartAfter.add("","","#"+difficulty)
     gameStartAfter.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", eventNameSpace.format(id_defaultEvents+i))))
   gameStartAfter.add("country_event", TagList("id", name_rootUpdateEvent))
+
+  mainFileContent.addComment("Assign a variable to each default country that will decide how much their difficulty modifiers are decreased by randomness")
+  randomInitEvent=mainFileContent.addReturn("country_event")
+  randomInitEvent.add("id", name_randomDiffFireOnlyOnce)
+  randomInitEvent.add("hide_window",yes)
+  randomInitEvent.add("trigger", TagList("NOT", TagList("has_global_flag", "custom_difficulty_random_difficulty_given")))
+  immediate=randomInitEvent.addReturn("immediate")
+  immediate.add("set_global_flag", "custom_difficulty_random_difficulty_given")
+  immediateEachCountry=immediate.addReturn("every_country")
+  immediateEachCountry.add("limit", TagList("is_country_type","default").add("is_ai", "yes"))
+  randomList=immediateEachCountry.addReturn("random_list")
+  maxRandVal=20
+  for i in range(maxRandVal+1): #nbr of random steps
+    e=randomList.addReturn("1") #uniform chance
+    e.variableOp("set", "custom_difficulty_random_handicap",i)
+  immediateEachCountry.add("log",'"[this.GetName]:[this.custom_difficulty_random_handicap]"')
 
 
 
