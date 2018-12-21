@@ -281,6 +281,7 @@ def main():
   #less important
 
   # locClass.addLoc("easy", "Easy")
+  locClass.addLoc("randomHandicap", "Randomly Decreased Bonuses per Empire")
   locClass.addLoc("steps", "step(s)")
   locClass.addLoc("step", "step")
   locClass.addLoc("damage", "Weapon Damage")
@@ -288,6 +289,7 @@ def main():
   locClass.addLoc("bonus", "Bonus")
   locClass.addLoc("bonuses", "Bonuses")
   locClass.addLoc("cur", "Currently")
+  locClass.addLoc("max", "Max")
   locClass.addLoc("yearlyDesc","Positive year count gives increase, negative year count decrease. Every year is fastest possible. Zero (not displayed) means no change")
   locClass.addLoc("back", "Back")
   locClass.addLoc("cancel", "Cancel and Back")
@@ -315,6 +317,7 @@ def main():
   locClass.addLoc("confirmation", "Confirmation")
   locClass.addLoc("allCat", "in all Categories")
   locClass.addLoc("no", "No")
+  locClass.addLoc("by", "by")
   locClass.addLoc("increase", "Increase")
   locClass.addLoc("decrease", "Decrease")
   locClass.addLoc("change", "Change")
@@ -794,11 +797,22 @@ def main():
     for catI,cat in enumerate(cats):
       if catToModifierType[cat]=="none":
         continue
+        
       immediate.addComment(cat)
+        
       ifTagList=TagList()
       immediate.add("if",ifTagList)
       limit=TagList()
       ifTagList.add("limit",limit)
+
+      if cat=="ai":
+        handicapChangedTest=ifTagList.createReturnIf(TagList("NOT",variableOpNew("check", "custom_difficulty_random_handicap_perc", ET)))
+        for bonus in possibleBoniNames:
+          if not groupUpdate or bonus in representGroup:
+            handicapChangedTest.add("set_country_flag", "custom_difficulty_{}_changed".format(bonus))
+        handicapChangedTest.variableOp("set", "custom_difficulty_random_handicap_perc", ET)
+
+
       et=TagList()
       ifTagList.add(ET,et)
       if len(catCountryType[catI])>1:
@@ -871,6 +885,8 @@ def main():
             addModifierImmediates[cat].add("if",addIFChanged)
           addIFChanged.add("remove_country_flag","custom_difficulty_{}_changed".format(bonus) )
           addIFChanged.add("set_variable",TagList("which", "custom_difficulty_tmp").add("value","custom_difficulty_{}_value".format(bonus)))
+          if cat == "ai":
+            addIFChanged.variableOp("multiply", "custom_difficulty_tmp", "custom_difficulty_randomness_factor")
           for i in range(modifierRange[cat][0],modifierRange[cat][1]+1):
             #compare signs and stop for i==0
             if i<0:
@@ -1238,11 +1254,12 @@ def main():
   immediateEachCountry=immediate.addReturn("every_country")
   immediateEachCountry.add("limit", TagList("is_country_type","default").add("is_ai", "yes"))
   randomList=immediateEachCountry.addReturn("random_list")
-  maxRandVal=20
+  maxRandVal=20 #if you change this, you need to also change the 20 in createModifierEvents (where I was to lazy to add this as input!)
   for i in range(maxRandVal+1): #nbr of random steps
     e=randomList.addReturn("1") #uniform chance
     e.variableOp("set", "custom_difficulty_random_handicap",i)
-  immediateEachCountry.add("log",'"[this.GetName]:[this.custom_difficulty_random_handicap]"')
+  if debugMode:
+    immediateEachCountry.add("log",'"[this.GetName]:[this.custom_difficulty_random_handicap]"')
 
 
 
@@ -1329,9 +1346,30 @@ def main():
     option.add("hidden_effect", effect)
   optionsEvent.add("option", TagList("name","custom_difficulty_lock.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id",name_lockEvent))))
   hostOrNotMP=TagList("OR", TagList("is_multiplayer", "no").add("has_country_flag", "custom_difficulty_game_host"))
+  increaseRandomOpt=optionsEvent.addReturn("option")
+  decreaseRandomOpt=optionsEvent.addReturn("option")
   optionsEvent.add("option", TagList("name","custom_difficulty_remove.name").add("trigger", hostOrNotMP).add("custom_tooltip","custom_difficulty_remove.desc").add("hidden_effect", TagList("country_event", TagList("id",name_removeEvent))))
   optionsEvent.add("option", t_backMainOption )
   optionsEvent.add("option", t_closeOption)
+
+
+  # enableUpdateEffect=TagList("every_country",TagList("limit",TagList("is_country_type","default").add("is_ai","yes")).add("set_country_flag", "custom_difficulty_{}_changed".format(bonus)))
+
+
+  successText=descTrigger.addReturn("success_text")
+  successText.add("text", "custom_difficulty_random_handicap.desc")
+  successText.addReturn(ET).addReturn("not").variableOp("check","custom_difficulty_random_handicap_perc",0) #.addReturn("trigger")
+  locClass.append("custom_difficulty_random_handicap.desc","§P@randomHandicap: @max [{}.custom_difficulty_random_handicap_perc] %§!".format(ET))
+  decreaseRandomOpt.addReturn("trigger").add("custom_difficulty_allow_changes","yes").addReturn(ET).variableOp("check", "custom_difficulty_random_handicap_perc",0,">")
+  decreaseRandomOpt.add("name", "custom_difficulty_random_handicap_dec.desc")
+  decreaseRandomOpt.addReturn("hidden_effect").add_event("name_optionsEvent").addReturn(ET).variableOp("change","custom_difficulty_random_handicap_perc",-10)
+  # decreaseRandomOpt.addReturn("hidden_effect").add_event("name_optionsEvent").addTagList(enableUpdateEffect).addReturn(ET).variableOp("change","custom_difficulty_random_handicap_perc",-5)
+  locClass.append("custom_difficulty_random_handicap_dec.desc","§P@decrease @randomHandicap @by 10%§!")
+  increaseRandomOpt.addReturn("trigger").add("custom_difficulty_allow_changes","yes")
+  increaseRandomOpt.add("name", "custom_difficulty_random_handicap_inc.desc")
+  increaseRandomOpt.addReturn("hidden_effect").add_event("name_optionsEvent").addReturn(ET).variableOp("change","custom_difficulty_random_handicap_perc",10)
+  # increaseRandomOpt.addReturn("hidden_effect").add_event("name_optionsEvent").addTagList(enableUpdateEffect).addReturn(ET).variableOp("change","custom_difficulty_random_handicap_perc",5)
+  locClass.append("custom_difficulty_random_handicap_inc.desc","§P@increase @randomHandicap @by 10%§!")
 
   optionEventUnlock=deepcopy(optionsEvent)
   optionEventUnlock.insert(-2,"option",TagList("name","custom_difficulty_unlock.name").add("trigger", TagList("has_global_flag","custom_difficulty_locked")).add("hidden_effect",TagList("remove_global_flag", "custom_difficulty_locked").add("country_event", t_mainMenuEvent)))
@@ -1463,6 +1501,7 @@ def add_event(tagList, name):
     return
   tagList.add("country_event", TagList("id", eval(name))," #"+name.replace("name_",""))
   return tagList
+TagList.add_event=add_event
 
 def ifDelay(name):
   self=TagList()
@@ -1525,6 +1564,13 @@ def createModifierEvents(inDict, outDict, eventTaglist, id, addBool, eventNameSp
       item[1].add("set_country_flag", eventNameSpace.format("")[:-1]+"_{}_modifier_active".format(item[0]))
     else:
       item[1].add("remove_country_flag", eventNameSpace.format("")[:-1]+"_{}_modifier_active".format(item[0]))
+    if addBool and item[0]=="ai":
+      item[1].variableOp("set", "custom_difficulty_randomness_factor",1)
+      item[1].variableOp("set", "custom_difficulty_tmp","custom_difficulty_random_handicap")
+      item[1].variableOp("multiply", "custom_difficulty_tmp","custom_difficulty_random_handicap_perc")
+      item[1].variableOp("divide", "custom_difficulty_tmp",100*20) #100 for from perc, 20 as max handicap
+      item[1].variableOp("subtract", "custom_difficulty_randomness_factor","custom_difficulty_tmp")
+
 
 if __name__ == "__main__":
   main()
