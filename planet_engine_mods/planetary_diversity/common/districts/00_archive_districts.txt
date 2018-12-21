@@ -48,7 +48,7 @@ district_archive_housing = {
 	ai_weight = {
 		weight = 1
 		modifier = {
-			factor = 4
+			factor = 15
 			free_housing < 0
 		}
 	}
@@ -118,7 +118,12 @@ district_archive_energy = {
 
 		modifier = {
 			factor = 3
-			any_owned_pop = { is_unemployed = yes }
+			any_owned_pop = { 
+				OR = { 
+					is_unemployed = yes 
+					has_job = servant 
+				}
+			}
 		}
 
 		# No one to work it anyway
@@ -126,7 +131,12 @@ district_archive_energy = {
 			factor = 0
 			free_housing > 0
 			NOT = {
-				any_owned_pop = { is_unemployed = yes }
+				any_owned_pop = { 
+					OR = { 
+						is_unemployed = yes 
+						has_job = servant 
+					}
+				}
 			}
 		}
 	}
@@ -145,10 +155,12 @@ district_archive_cultural = {
 	
 	show_on_uncolonized = {
 		is_planet_class = pc_archive
+		from = { is_gestalt = no }
 	}
 	
 	potential = {
 		is_planet_class = pc_archive
+		owner = { is_gestalt = no }
 	}
 	
 	resources = {
@@ -162,8 +174,8 @@ district_archive_cultural = {
 	}
 		
 	planet_modifier = {
-		job_entertainer_add = 1
-		job_culture_worker_add = 1
+		job_entertainer_add = 2
+		job_culture_worker_add = 2
 	}
 	
 	triggered_desc = {
@@ -177,15 +189,11 @@ district_archive_cultural = {
 	ai_weight = {
 		weight = 1
 
-		# Boost if low on amenities
-		#modifier = 
-		#{
-		#	factor = 2
-		#	has_monthly_income = {
-		#		resource = 
-		#		value < 0
-		#	}
-		#}
+		modifier = 
+		{
+			factor = 3
+			free_amenities < 2
+		}
 	}
 
 	ai_resource_production = {
@@ -273,7 +281,7 @@ district_archive_science = {
 	}	
 	
 	ai_weight = {
-		weight = 1
+		weight = 2
 	}
 
 	#ai_resource_production = {
@@ -282,4 +290,54 @@ district_archive_science = {
 	#		always = yes
 	#	}
 	#}
+}
+
+district_archive_commercial = {
+	base_buildtime = 240
+	is_capped_by_modifier = no
+	
+	show_on_uncolonized = {
+		is_planet_class = pc_archive
+		from = { is_gestalt = no }
+	}
+	
+	potential = {
+		is_planet_class = pc_archive
+		owner = { is_gestalt = no }
+	}
+	
+	resources = {
+		category = planet_districts
+		cost = {
+			minerals = @archive_cost
+		}
+		upkeep = {
+			energy = @archive_maintenance
+		}		
+	}
+		
+	planet_modifier = {
+		job_clerk_add = 3
+	}
+	
+	triggered_desc = {
+		text = job_clerk_effect_desc
+	}	
+	
+	ai_weight = {
+		weight = 1
+
+		modifier = 
+		{
+			factor = 5
+			free_amenities < 2
+		}
+	}
+
+	ai_resource_production = {
+		consumer_goods = 1
+		trigger = {
+			always = yes
+		}
+	}
 }
