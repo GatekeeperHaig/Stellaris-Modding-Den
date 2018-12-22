@@ -631,13 +631,14 @@ def main():
 
 
   condVal = lambda x,y: x if y else 0
+  condValSign = lambda x,y: x*abs(y)/y if y else 0
   # condValPrec = lambda x1,x2,y: x1 if y==1 else (x2 if y==2  else 0)
   difficultiesPresetProperties=dict()
   for difficulty in difficulties:
     difficultiesPresetProperties[difficulty]=dict()
   # difficultiesPresetProperties["easy"]["player"]=[20 for b in possibleBoniNames]
   # difficultiesPresetProperties["no_player_bonus"]["player"]=[0 for b in possibleBoniNames]
-  difficultiesPresetProperties["scaling"]["ai_yearly"]=[condVal(4,defaultEmpireBonusMult[bonus]) for bonus in possibleBoniNames]
+  difficultiesPresetProperties["scaling"]["ai_yearly"]=[condValSign(4,defaultEmpireBonusMult[bonus]) for bonus in possibleBoniNames]
   difficultiesPresetProperties["no_scaling"]["ai_yearly"]=[0 for b in possibleBoniNames]
 
   for i, diff in enumerate(difficulties[ difficulties.index("ensign") : difficulties.index("grand_admiral")+1 ]):
