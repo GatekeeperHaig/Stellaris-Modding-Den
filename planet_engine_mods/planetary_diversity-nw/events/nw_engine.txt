@@ -1,0 +1,154 @@
+namespace = nwengine
+
+event = {
+	id = nwengine.00
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	immediate = { 
+		set_global_flag = planetarydiversity-nw
+		every_planet = { 
+			if = { 			
+				limit = { is_planet_class = pc_gas_giant has_moon = yes }
+				every_moon = { set_planet_flag = gas_giant_moon }
+			}
+			if = { 			
+				limit = { is_asteroid = yes }
+				new_worlds_adjust_asteroids_size = yes
+			}
+			
+		}
+		every_planet = { 
+			if = {
+				limit = {
+					NOR = { 
+						AND = { 
+							exists = owner 
+							owner = { is_country_type = default }
+							OR = { 
+								is_capital = yes
+								is_homeworld = yes
+							}
+						}	
+						AND = { 
+							exists = owner 
+							NAND = { 
+								owner = { is_country_type = primitive } 
+								any_owned_pop = { is_robot_pop = no } 
+							}
+						}	
+						solar_system = {
+							OR = {
+								any_planet = { exists = owner owner = { is_country_type = default } is_capital = yes }
+								has_star_flag = cgm_ignored_system
+								has_star_flag = sol_system
+								has_star_flag = custom_system
+								has_star_flag = floating_system
+								has_star_flag = crystal_system
+								has_star_flag = city_system
+								has_star_flag = empire_home_system
+								has_star_flag = primitive_sol
+								has_star_flag = eilistraee_system
+								has_star_flag = tulshar_system
+								has_star_flag = elven_system
+								has_star_flag = lunari_system
+								has_star_flag = elven_ring_system
+							}
+						}
+					}						
+				}	
+				# these events occur one after the other.
+				planet_event = { id = nwengine.01 days = 1 }
+				planet_event = { id = nwengine.02 days = 1 }				
+				planet_event = { id = nwengine.03 days = 2 }				
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = nwengine.01 # HABITABLE SPAWNER / SIZE ADJUSTMENT
+	hide_window = yes
+	is_triggered_only = yes
+	#fire_only_once = yes
+	
+	immediate = {
+		if = {
+			limit = { 
+				NOR = {
+					is_capital = yes
+					has_planet_flag = fallen_empire_world
+					exists = owner
+					has_planet_flag = prescripted_ideal
+				}
+			}
+			# Adjusts planet sizes to be more random while at the same time make them look better
+			new_worlds_adjust_inhabitable_planet_size = yes
+			if = {
+				limit = { 
+					exists = owner
+					owner = { is_country_type = primitive } 
+				}
+				# Changes primitives to a class more logical to the the planet
+				new_worlds_species_change_table = yes
+				if = { 
+					limit = { is_ideal_planet_class = { who = owner status = no } }
+					change_owner_species_to_this_planet_preference = yes			
+				}	
+			}
+			# Add marginal planets later
+		}
+	}
+}
+
+planet_event = {
+	id = nwengine.02 # UNINHABITABLE SPAWNER / SIZE ADJUSTMENT
+	hide_window = yes
+	is_triggered_only = yes
+	#fire_only_once = yes
+	
+	immediate = {
+			if = { 
+				limit = { is_vanilla_uninhabitable_planet = yes }					
+				new_worlds_adjust_uninhabitable_planet_size = yes
+				new_worlds_adjust_gas_giant_planet_size = yes
+				uninhabitable_planets_spawn_table = yes
+				reroll_modifier = yes
+			}
+	}
+}
+
+planet_event = {
+	id = nwengine.03 # ORBITAL RESOURCE SPAWNER
+	hide_window = yes
+	is_triggered_only = yes
+	#fire_only_once = yes
+	
+	immediate = {
+			if = { 
+				limit = {
+					OR = {
+						uninhabitable_planet = yes
+						is_star = yes
+					}
+				}
+				nw_orbital_resource_spawn_table = yes
+			}
+	}
+}
+
+event = {
+		id = nwengine.08
+		hide_window = yes
+		is_triggered_only = yes
+		fire_only_once = yes
+		immediate = {
+			every_planet = {
+				#limit = { is_planet_class = pc_primordial }
+				#set_planet_flag = nwprimordial
+			}
+			
+		}
+}
+
+	
