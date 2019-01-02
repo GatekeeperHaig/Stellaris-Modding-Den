@@ -60,7 +60,8 @@ class LocList:
     percent=10
     for i,(englishKey, englishLoc) in enumerate(self.dicts["en"].items()):
       if i==nextStep:
-        print("{}% done for language {}".format(percent, languageCode))
+        if self.translateRest:
+          print("{}% done for language {}".format(percent, languageCode))
         percent+=10
         nextStep+=len(self.dicts["en"].items())//10
 

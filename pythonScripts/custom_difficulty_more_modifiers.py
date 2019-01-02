@@ -20,6 +20,7 @@ name_gameStartFireOnlyOnce=eventNameSpace.format(0)
 name_mainMenuEvent=eventNameSpace.format(1)
 name_rootUpdateEvent=eventNameSpace.format(2)
 id_groupEvents=10 #reserved to 19
+id_modifierEventMenus=100 #reserved to 199
 
 # t_notLockedTrigger=TagList("not", TagList("has_global_flag", "custom_difficulty_locked"))
 # t_notLockedTrigger=TagList("custom_difficulty_allow_changes", "yes")
@@ -45,6 +46,7 @@ def main():
   mainFileContent=TagList("namespace", eventNameSpace.format("")[:-1])
   staticModifierFile=TagList()
   # groupFileContent=TagList("namespace", eventNameSpace.format("")[:-1])
+  modifierMenuFileContent=TagList("namespace", eventNameSpace.format("")[:-1])
 
 
 
@@ -75,26 +77,53 @@ def main():
   mainFileContent.add("","","#more modifiers main event")
   mainMenuEvent=mainFileContent.addReturn("country_event")
   mainMenuEvent.add("id", name_mainMenuEvent)
+  mainMenuEvent.add("is_triggered_only", "yes")
   mainMenuEvent.add("title","custom_difficulty_MM" )
   mainMenuEvent.add("desc", "custom_difficulty_choose_descMM")
   locList.append("custom_difficulty_MM", "Dynamic Difficulty - More Modifiers")
   mainMenuEvent.add("picture","GFX_evt_synth_sabotage" )
+
+  mainFileContent.add("","","#more modifiers update event")
+  updateEvent=mainFileContent.addReturn("country_event")
+  updateEvent.add("id", name_rootUpdateEvent)
+  updateEvent.add("hide_window","yes" )
+  updateEvent.add("is_triggered_only", "yes")
+
+
   curIdGroupEvent=id_groupEvents
+  curIdModifierEvent=id_modifierEventMenus
   for group in groupList:
     option=mainMenuEvent.addReturn("option")
     option.add("name", group.name)
     callEvent=option.addReturn("hidden_effect")
     groupEvent=mainFileContent.addReturn("country_event")
     groupEvent.add("id", eventNameSpace.format(curIdGroupEvent))
-    callEvent.createEvent(eventNameSpace.format(curIdGroupEvent))
-    curIdGroupEvent+=1
+    groupEvent.add("is_triggered_only", "yes")
     groupEvent.add("title",group.name )
-    groupEvent.add("desc", "custom_difficulty_choose_descMM")
+    groupEvent.add("desc", "custom_difficulty_choose_descMM") #todo: change to display of current bonuses
     groupEvent.add("picture","GFX_evt_synth_sabotage" )
+    callEvent.createEvent(eventNameSpace.format(curIdGroupEvent))
+    for modifier in group.modifiers:
+      modifierName=modifier.toStaticModifierFiles(staticModifierFile, locList)
+      option=groupEvent.addReturn("option")
+      option.add("name", modifierName)
+      callEvent=option.addReturn("hidden_effect")
+      modifierEvent=modifierMenuFileContent.addReturn("country_event")
+      modifierEvent.add("id", eventNameSpace.format(curIdModifierEvent))
+      modifierEvent.add("is_triggered_only", "yes")
+      modifierEvent.add("title",modifierName )
+      modifierEvent.add("desc", "change_bonusTODO")
+      modifierEvent.add("picture","GFX_evt_synth_sabotage" )
+      callEvent.createEvent(eventNameSpace.format(curIdModifierEvent))
+      modifierEvent.addReturn("option").add("name", "custom_difficulty_backMM").createEvent( eventNameSpace.format(curIdGroupEvent))
+      modifierEvent.add("option",t_closeOption)
+      curIdModifierEvent+=1
+
+
+
     groupEvent.addReturn("option").add("name", "custom_difficulty_backMM").createEvent(name_mainMenuEvent)
     groupEvent.add("option",t_closeOption)
-    for modifier in group.modifiers:
-      modifier.toStaticModifierFiles(staticModifierFile, locList)
+    curIdGroupEvent+=1
 
 
   mainMenuEvent.add("option",t_backMainOption)
@@ -111,6 +140,7 @@ def main():
   #OUTPUT TO FILE
   custom_difficulty_files.outputToFolderAndFile(onActions, "common/on_actions", "custom_difficultyMM_on_action.txt",2,"../gratak_mods/custom_difficultyMM")
   custom_difficulty_files.outputToFolderAndFile(mainFileContent , "events", "custom_difficultyMM_main.txt" ,2,"../gratak_mods/custom_difficultyMM")
+  custom_difficulty_files.outputToFolderAndFile(modifierMenuFileContent , "events", "custom_difficultyMM_modifier_menus.txt" ,2,"../gratak_mods/custom_difficultyMM")
   custom_difficulty_files.outputToFolderAndFile(staticModifierFile , "common/static_modifiers", "custom_difficultyMM.txt" ,2,"../gratak_mods/custom_difficultyMM")
   locList.writeToMod("../gratak_mods/custom_difficultyMM","custom_difficultyMM")
 
@@ -154,7 +184,7 @@ def loadFile(locList):
         if extraProperty=="%":
           currentModifier.setUnit("%")
         elif extraProperty.startswith('"'):
-          currentModifier.addToName(extraProperty)
+          currentModifier.changeName(extraProperty.strip('"'))
         else:
           currentModifier.addMultiplier(extraProperty)
   return groupList
@@ -198,13 +228,15 @@ class Modifier:
     if "_mult" in modifier:
       self.setUnit("%")
     self.name="$MOD_"+modifier.upper()+"$"
+    self.name+="$mod_"+modifier.lower()+"$" #some are lower, some are upper. Game does not complain if something misses so I just add both...
 
   def addMultiplier(self, mult):
     mult=float(mult)
     self.multiplier*=mult
 
-  def addToName(self, extra):
-    self.name+=extra
+  def changeName(self, extra):
+    self.name=extra.replace("<this>",self.name)
+    # self.name+=extra
 
   def setUnit(self,unit):
     self.unit=unit
@@ -224,17 +256,22 @@ class Modifier:
     elif self.unit!="" and self.unit!="1":
       print("ERROR: INVALID UNIT")
 
+
     for m in rangeUsed:
       if m==0:
         continue
       if not locList is None:
-        modName="custom_difficulty_MM_{}_{!s}".format(self.modifier, m)
+        modName="custom_difficulty_MM_mod_{}_{!s}".format(self.modifier, m)
         modifierList=modifierTagList.addReturn(modName)
         locList.append(modName, "$FE_DIFFICULTY$: "+self.name)
       else:
         modifierList=modifierTagList #used by ModifierSubGroup
       modifierList.add(self.modifier,"{:.3f}".format(value*m) )
 
+    if not locList is None:
+      modOptionName="custom_difficulty_MM_mod_{}".format(self.modifier)
+      locList.append(modOptionName, "§B"+self.name+"§!")
+      return modOptionName
 
 
 class ModifierSubGroup(Modifier):
@@ -262,6 +299,9 @@ class ModifierSubGroup(Modifier):
       locList.append(modName, "$FE_DIFFICULTY:$"+self.name)
       for mod in self.modifiers:
         mod.toStaticModifierFiles(modifierList,None, range(m,m+1))
+    modOptionName="custom_difficulty_MM_mod_{}".format(self.name.replace(" ","_"))
+    locList.append(modOptionName, "§B"+self.name+"§!")
+    return modOptionName
 
 if __name__ == "__main__":
   main()
