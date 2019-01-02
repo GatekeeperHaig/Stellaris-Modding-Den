@@ -1124,6 +1124,8 @@ def main():
     mainMenu.add("option", TagList("name","custom_difficulty_crisis_colored.name").add("trigger", TagList("is_crises_allowed", yes)).add("hidden_effect", TagList("country_event", TagList("id", eventNameSpace.format(id_ChangeEvents+cats.index("crisis")*id_ChangeEvents))).add("remove_global_flag","custom_difficulty_menu_crisis_from_custom")))
     mainMenu.add("option", TagList("name","custom_difficulty_customize_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_customMenuEvent))))
     mainMenu.add("option", TagList("name","custom_difficulty_options.name").add("hidden_effect", TagList("country_event", TagList("id", name_optionsEvent))))
+    mainMenu.add("option", TagList("name","custom_difficulty_mainMenuMM.name").add("trigger", TagList("has_global_flag", "custom_difficultyMM_active")).add("hidden_effect", TagList("country_event", TagList("id", "custom_difficulty_mm.{!s}".format(1)))))
+    locClass.append("custom_difficulty_mainMenuMM.name", "§BMore Modifiers§!")
 
     mainMenu.add("option", t_closeOption)
 

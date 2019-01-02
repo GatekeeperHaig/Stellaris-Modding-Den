@@ -109,6 +109,12 @@ class LocList:
         if yml:
           file.write('"')
         file.write("\n")
+  def writeToMod(self,path,fileNameBase):
+    for language in self.languages:
+      outFolderLoc=path+"/localisation/"+language
+      if not os.path.exists(outFolderLoc):
+        os.makedirs(outFolderLoc)
+      self.write(outFolderLoc+"/"+fileNameBase+"_l_"+language+".yml",language)
 
 import shlex
 import argparse
