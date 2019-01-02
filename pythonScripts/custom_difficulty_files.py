@@ -1479,10 +1479,12 @@ def globalAddLocs(locClass):
   locClass.addLoc("allShipDesc", "Change combat bonuses: weapon damage, hull, shields and armor.")
   #cats
   locClass.addLoc("ai", "AI")
+  locClass.addLoc("AI", "AI")
   locClass.addLoc("ai_yearly", "AI Yearly Change")
   locClass.addLoc("fe", "Fallen and Awakened Empires")
   locClass.addLoc("leviathan", "Leviathans")
   locClass.addLoc("player", "Player")
+  locClass.addLoc("Player", "Player")
   locClass.addLoc("crisis", "Crisis")
   locClass.addLoc("marauders", "Marauders")
   locClass.addLoc("other", "Other")

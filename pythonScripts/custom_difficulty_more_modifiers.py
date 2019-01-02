@@ -8,7 +8,7 @@ from googletrans import Translator
 import re
 from locList import LocList
 import math
-import custom_difficulty_files
+import custom_difficulty_files as cdf
 import re
 
 ETMM = "event_target:custom_difficulty_MM_var_storage"
@@ -29,7 +29,7 @@ t_rootUpdateEvent=TagList("id",name_rootUpdateEvent)
 # t_backMainOption=TagList("name","custom_difficulty_back").add("hidden_effect", TagList("country_event",TagList("id", name_mainMenuEvent)))
 # t_closeOption=TagList("name", "custom_difficulty_close.name").add("hidden_effect", TagList("country_event", t_rootUpdateEvent))
 
-t_backMainOption=TagList("name","custom_difficulty_backMM").add("hidden_effect", TagList("country_event",TagList("id", custom_difficulty_files.name_mainMenuEvent)))
+t_backMainOption=TagList("name","custom_difficulty_backMM").add("hidden_effect", TagList("country_event",TagList("id", cdf.name_mainMenuEvent)))
 t_closeOption=TagList("name", "custom_difficulty_closeMM").add("hidden_effect", TagList("country_event", t_rootUpdateEvent))
 
 def main():
@@ -37,7 +37,7 @@ def main():
   # debugMode=False
 
   locList=LocList()
-  custom_difficulty_files.globalAddLocs(locList)
+  cdf.globalAddLocs(locList)
 
   #TODO: File that is overwritten by standard DD that makes sure there is a reduced main menu
 
@@ -55,6 +55,7 @@ def main():
   locList.addEntry("custom_difficulty_backMM", "@back")
   locList.addEntry("custom_difficulty_closeMM", "@close @modName @menu")
   locList.addEntry("custom_difficulty_choose_descMM", "@choose")
+  locList.addEntry("custom_difficulty_current_bonusesMM","@curBon:")
 
 
 
@@ -68,7 +69,7 @@ def main():
   gameStartInitEvent.add("immediate",immediate)
   # immediate.add_event("name_randomDiffFireOnlyOnce")
   immediate.add("set_country_flag", "custom_difficulty_game_host")
-  immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficultyMM_var_storage"))
+  immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_MM_var_storage"))
   gameStartAfter=TagList()
   gameStartInitEvent.add("after",TagList("hidden_effect", gameStartAfter))
   gameStartAfter.add("set_global_flag", "custom_difficultyMM_active")
@@ -95,26 +96,48 @@ def main():
   for group in groupList:
     option=mainMenuEvent.addReturn("option")
     option.add("name", group.name)
-    callEvent=option.addReturn("hidden_effect")
+    option.addReturn("hidden_effect").createEvent(eventNameSpace.format(curIdGroupEvent))
     groupEvent=mainFileContent.addReturn("country_event")
     groupEvent.add("id", eventNameSpace.format(curIdGroupEvent))
     groupEvent.add("is_triggered_only", "yes")
     groupEvent.add("title",group.name )
-    groupEvent.add("desc", "custom_difficulty_choose_descMM") #todo: change to display of current bonuses
+    # groupEvent.add("desc", "custom_difficulty_choose_descMM") #todo: change to display of current bonuses
+    desc=groupEvent.addReturn("desc")
+    desc=desc.addReturn("trigger")
+    desc.add("text", "custom_difficulty_current_bonusesMM")
     groupEvent.add("picture","GFX_evt_synth_sabotage" )
-    callEvent.createEvent(eventNameSpace.format(curIdGroupEvent))
     for modifier in group.modifiers:
       modifierName=modifier.toStaticModifierFiles(staticModifierFile, locList)
       option=groupEvent.addReturn("option")
       option.add("name", modifierName)
-      callEvent=option.addReturn("hidden_effect")
+      option.addReturn("hidden_effect").createEvent(eventNameSpace.format(curIdModifierEvent))
       modifierEvent=modifierMenuFileContent.addReturn("country_event")
       modifierEvent.add("id", eventNameSpace.format(curIdModifierEvent))
       modifierEvent.add("is_triggered_only", "yes")
       modifierEvent.add("title",modifierName )
-      modifierEvent.add("desc", "change_bonusTODO")
+      modifierEvent.add("desc",TagList("trigger",desc ))
       modifierEvent.add("picture","GFX_evt_synth_sabotage" )
-      callEvent.createEvent(eventNameSpace.format(curIdModifierEvent))
+
+      for who in ["AI", "Player", "Both"]:
+        for amount in [5,1,-1,-5]:
+          addChangeOption(modifierEvent, modifier, modifierName, amount, who, locList)
+      # addChangeOption(modifierEvent, modifier, modifierName, 5, "AI", locList)
+      # addChangeOption(modifierEvent, modifier, modifierName, -1, "Player", locList)
+      
+      # successText=TagList().add("text","custom_difficulty_locked.name").add("custom_difficulty_allow_changes", "no") #TODO!
+      # trigger.add("success_text",successText)
+      for category in ["AI", "Player"]:
+        for comp in ["<",">"]:
+          if (modifier.multiplier<0) == (comp=="<"):
+            color="G" #checking smaller than zero and negative is good or checking larger and negativ is bad
+          else:
+            color="R"
+          name="custom_difficulty_MM_{}_{}_curVal_{}".format(modifierName, category,color)
+          desc.add("success_text", TagList("text", name).add(ETMM, cdf.variableOpNew("check", modifierName+"_"+category, 0,comp)))
+          # desc.add("success_text", TagList("text", name).add(ETMM, TagList("NOT",cdf.variableOpNew("check", modifierName+"_"+category, 0,"="))))
+          locList.append(name, "${1}$: §{4}[{0}.{1}_{2}]{3} @for{2}§!".format(ETMM, modifierName, category, modifier.unit, color))
+
+
       modifierEvent.addReturn("option").add("name", "custom_difficulty_backMM").createEvent( eventNameSpace.format(curIdGroupEvent))
       modifierEvent.add("option",t_closeOption)
       curIdModifierEvent+=1
@@ -138,11 +161,54 @@ def main():
 
   onActions=TagList("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
   #OUTPUT TO FILE
-  custom_difficulty_files.outputToFolderAndFile(onActions, "common/on_actions", "custom_difficultyMM_on_action.txt",2,"../gratak_mods/custom_difficultyMM")
-  custom_difficulty_files.outputToFolderAndFile(mainFileContent , "events", "custom_difficultyMM_main.txt" ,2,"../gratak_mods/custom_difficultyMM")
-  custom_difficulty_files.outputToFolderAndFile(modifierMenuFileContent , "events", "custom_difficultyMM_modifier_menus.txt" ,2,"../gratak_mods/custom_difficultyMM")
-  custom_difficulty_files.outputToFolderAndFile(staticModifierFile , "common/static_modifiers", "custom_difficultyMM.txt" ,2,"../gratak_mods/custom_difficultyMM")
+  cdf.outputToFolderAndFile(onActions, "common/on_actions", "custom_difficultyMM_on_action.txt",2,"../gratak_mods/custom_difficultyMM")
+  cdf.outputToFolderAndFile(mainFileContent , "events", "custom_difficultyMM_main.txt" ,2,"../gratak_mods/custom_difficultyMM")
+  cdf.outputToFolderAndFile(modifierMenuFileContent , "events", "custom_difficultyMM_modifier_menus.txt" ,2,"../gratak_mods/custom_difficultyMM")
+  cdf.outputToFolderAndFile(staticModifierFile , "common/static_modifiers", "custom_difficultyMM.txt" ,2,"../gratak_mods/custom_difficultyMM")
   locList.writeToMod("../gratak_mods/custom_difficultyMM","custom_difficultyMM")
+
+def addChangeOption(event, modifier, modifierName, amount, category, locList):
+  option=event.addReturn("option")
+  # if isinstance(modifier, Modifier):
+  name="custom_difficulty_change_{}_{!s}_{}".format(modifierName,amount, category)
+  option.add("name",name)
+  val=amount*modifier.multiplier
+  forWhom="@for"
+  if category=="Both":
+    forWhom+="AI + @Player"
+    categories=["AI", "Player"]
+  else:
+    forWhom+=category
+    categories=[category]
+  if amount<0:
+    color="R"
+  else:
+    color="G"
+  if val<0:
+    locList.append(name,"§{}@decrease ${}$ @by {:g}{} {}§!".format(color,modifierName,-val, modifier.unit, forWhom) )
+  else:
+    locList.append(name,"§{}@increase ${}$ @by {:g}{} {}§!".format(color,modifierName,val, modifier.unit, forWhom) )
+
+  trigger=option.addReturn("trigger").addReturn(ETMM)
+  effect=option.addReturn("hidden_effect")
+  et=effect.addReturn(ETMM)
+
+  for category in categories:
+    if amount>0:
+      limit=modifier.rangeUsed[-1]
+      # trigger.variableOp("check", modifierName+"_"+category, modifier.rangeUsed[-1]-amount+1, "<")
+    else:
+      limit=modifier.rangeUsed[0]
+    if val<0:
+      comp=">"
+    else:
+      comp="<"
+    # trigger.variableOp("check", modifierName+"_"+category, modifier.rangeUsed[0]-amount-1, ">")
+    trigger.variableOp("check", modifierName+"_"+category, "{:.3f}".format((limit*modifier.multiplier-val)*1.01), comp)
+
+
+    et.variableOp("change",modifierName+"_"+category,val)
+  effect.createEvent(event.get("id"))
 
 
 def loadFile(locList):
@@ -218,7 +284,7 @@ class Modifier:
     modifier=modifier.lower()
     self.modifier=modifier
     self.multiplier=1
-    self.unit="1"
+    self.unit=""
     if "_cost" in modifier or "_upkeep" in modifier:
       self.multiplier*=-1
     # if "_add" in modifier:
@@ -250,6 +316,7 @@ class Modifier:
 
 
   def toStaticModifierFiles(self, modifierTagList, locList, rangeUsed=range(-2,11)):
+    self.rangeUsed=rangeUsed
     value=self.multiplier;
     if self.unit=="%":
       value/=100
@@ -281,6 +348,8 @@ class ModifierSubGroup(Modifier):
     # self.multiplier=multiplier
   def addModifier(self, modifier):
     self.modifiers.append(modifier)
+    self.multiplier=modifier.multiplier
+    self.unit=modifier.unit
   def __str__(self):
     out="Group Name: {}, ".format(self.name)
     for mod in self.modifiers:
@@ -291,6 +360,7 @@ class ModifierSubGroup(Modifier):
 
 
   def toStaticModifierFiles(self, modifierTagList, locList, rangeUsed=range(-2,11)):
+    self.rangeUsed=rangeUsed
     for m in rangeUsed:
       if m==0:
         continue
