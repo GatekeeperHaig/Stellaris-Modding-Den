@@ -169,6 +169,7 @@ def main():
     etUpdate=localUpdateImmediate.addReturn(ETMM)
 
     if category=="AI":
+      localUpdateImmediate.addComment("Update randomness")
       localUpdateImmediate.variableOp("set", "custom_difficulty_randomness_factor",1)
       localUpdateImmediate.variableOp("set", "custom_difficulty_tmp","custom_difficulty_random_handicap")
       localUpdateImmediate.variableOp("multiply", "custom_difficulty_tmp","custom_difficulty_random_handicap_perc")
@@ -178,8 +179,15 @@ def main():
     for group in groupList:
       for modifier in group.modifiers:
         etUpdate.variableOp("set", modifier.modifiername, modifier.modifiername+"_"+category)
-        someThingChanged=localUpdateImmediate.createReturnIf(TagList("NOT",cdf.variableOpNew("check", modifier.modifiername, ETMM)))
-        someThingChanged.variableOp("set", modifier.modifiername, ETMM)
+        if category=="AI":
+          localUpdateImmediate.addComment("first copy a backup of the old value, then take new value and update with randomnessfactor. If old value is different from new, update modifiers")
+          localUpdateImmediate.variableOp("set", "custom_difficulty_tmp",modifier.modifiername)
+          localUpdateImmediate.variableOp("set", modifier.modifiername, ETMM)
+          localUpdateImmediate.variableOp("multiply", modifier.modifiername, "custom_difficulty_randomness_factor")
+          someThingChanged=localUpdateImmediate.createReturnIf(TagList("NOT",cdf.variableOpNew("check", modifier.modifiername, "custom_difficulty_tmp")))
+        else:
+          someThingChanged=localUpdateImmediate.createReturnIf(TagList("NOT",cdf.variableOpNew("check", modifier.modifiername, ETMM)))
+          someThingChanged.variableOp("set", modifier.modifiername, ETMM)
         removeOld=TagList()
         addNew=TagList("if", TagList("limit",cdf.variableOpNew("check", modifier.modifiername,0)))
         # addNew=cdf.createReturnIf(TagList(), cdf.variableOpNew("check", modifier.modifiername,0))
