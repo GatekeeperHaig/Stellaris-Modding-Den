@@ -1,0 +1,297 @@
+ # This file was created by script!
+ # Instead of editing it, you should change the python script.
+ # Changes to the file will be overwritten the next time the script is run.
+namespace = custom_difficulty
+ #main menu
+country_event = {
+	id = custom_difficulty.0
+	is_triggered_only = yes
+	title = edict_custom_difficulty
+	picture = GFX_evt_custom_difficulty_pyra
+	desc = {
+		trigger = {
+			fail_text = {
+				text = custom_difficulty_choose_desc
+				custom_difficulty_allow_changes = no
+			}
+			success_text = {
+				text = custom_difficulty_locked.desc
+				custom_difficulty_allow_changes = no
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_options.name
+		hidden_effect = { country_event = { id = custom_difficulty.3 } }
+	}
+	option = {
+		name = custom_difficulty_mainMenuMM.name
+		trigger = { has_global_flag = custom_difficultyMM_active }
+		hidden_effect = { country_event = { id = custom_difficulty_mm.1 } }
+	}
+	option = {
+		name = custom_difficulty_close.name
+		hidden_effect = {
+			country_event = { id = custom_difficulty.40 }
+			if = {
+				limit = { has_global_flag = custom_difficultyMM_active }
+				country_event = { id = custom_difficulty_mm.2 }
+			}
+		}
+	}
+}
+ #options Event
+country_event = {
+	id = custom_difficulty.3
+	is_triggered_only = yes
+	title = custom_difficulty_options.name
+	picture = GFX_evt_towel
+	desc = {
+		trigger = {
+			success_text = {
+				text = custom_difficulty_locked.desc
+				custom_difficulty_allow_changes = no
+			}
+			text = custom_difficulty_current_options
+			success_text = {
+				text = custom_difficulty_activate_edict.desc
+				has_global_flag = custom_difficulty_activate_edict
+			}
+			success_text = {
+				text = custom_difficulty_deactivate_edict.desc
+				has_global_flag = custom_difficulty_deactivate_edict
+			}
+			success_text = {
+				text = custom_difficulty_activate_host_only.desc
+				has_global_flag = custom_difficulty_activate_host_only
+				is_multiplayer = yes
+			}
+			success_text = {
+				text = custom_difficulty_deactivate_host_only.desc
+				has_global_flag = custom_difficulty_deactivate_host_only
+				is_multiplayer = yes
+			}
+			success_text = {
+				text = custom_difficulty_random_handicap.desc
+				event_target:custom_difficulty_var_storage = {
+					not = {
+						check_variable = {
+							which = custom_difficulty_random_handicap_perc
+							value = 0
+						}
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_activate_edict.name
+		custom_tooltip = custom_difficulty_activate_edict.desc
+		trigger = {
+			custom_difficulty_allow_changes = yes
+			not = { has_global_flag = custom_difficulty_activate_edict }
+		}
+		hidden_effect = {
+			set_global_flag = custom_difficulty_activate_edict
+			remove_global_flag = custom_difficulty_deactivate_edict
+			country_event = { id = custom_difficulty.3 }  #optionsEvent
+		}
+	}
+	option = {
+		name = custom_difficulty_deactivate_edict.name
+		custom_tooltip = custom_difficulty_deactivate_edict.desc
+		trigger = {
+			custom_difficulty_allow_changes = yes
+			not = { has_global_flag = custom_difficulty_deactivate_edict }
+		}
+		hidden_effect = {
+			set_global_flag = custom_difficulty_deactivate_edict
+			remove_global_flag = custom_difficulty_activate_edict
+			country_event = { id = custom_difficulty.3 }  #optionsEvent
+		}
+	}
+	option = {
+		name = custom_difficulty_activate_host_only.name
+		custom_tooltip = custom_difficulty_activate_host_only.desc
+		trigger = {
+			custom_difficulty_allow_changes = yes
+			not = { has_global_flag = custom_difficulty_activate_host_only }
+			is_multiplayer = yes
+			has_country_flag = custom_difficulty_game_host
+		}
+		hidden_effect = {
+			set_global_flag = custom_difficulty_activate_host_only
+			remove_global_flag = custom_difficulty_deactivate_host_only
+			country_event = { id = custom_difficulty.3 }  #optionsEvent
+		}
+	}
+	option = {
+		name = custom_difficulty_deactivate_host_only.name
+		custom_tooltip = custom_difficulty_deactivate_host_only.desc
+		trigger = {
+			custom_difficulty_allow_changes = yes
+			not = { has_global_flag = custom_difficulty_deactivate_host_only }
+			is_multiplayer = yes
+			has_country_flag = custom_difficulty_game_host
+		}
+		hidden_effect = {
+			set_global_flag = custom_difficulty_deactivate_host_only
+			remove_global_flag = custom_difficulty_activate_host_only
+			country_event = { id = custom_difficulty.3 }  #optionsEvent
+		}
+	}
+	option = {
+		name = custom_difficulty_lock.name
+		trigger = { custom_difficulty_allow_changes = yes }
+		hidden_effect = { country_event = { id = custom_difficulty.60 } }
+	}
+	option = {
+		trigger = { custom_difficulty_allow_changes = yes }
+		name = custom_difficulty_random_handicap_inc.desc
+		hidden_effect = {
+			country_event = { id = custom_difficulty.3 }  #optionsEvent
+			event_target:custom_difficulty_var_storage = {
+				change_variable = {
+					which = custom_difficulty_random_handicap_perc
+					value = 10
+				}
+			}
+		}
+	}
+	option = {
+		trigger = {
+			custom_difficulty_allow_changes = yes
+			event_target:custom_difficulty_var_storage = {
+				check_variable = {
+					which = custom_difficulty_random_handicap_perc
+					value > 0
+				}
+			}
+		}
+		name = custom_difficulty_random_handicap_dec.desc
+		hidden_effect = {
+			country_event = { id = custom_difficulty.3 }  #optionsEvent
+			event_target:custom_difficulty_var_storage = {
+				change_variable = {
+					which = custom_difficulty_random_handicap_perc
+					value = -10
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_remove.name
+		trigger = {
+			OR = {
+				is_multiplayer = no
+				has_country_flag = custom_difficulty_game_host
+			}
+		}
+		custom_tooltip = custom_difficulty_remove.desc
+		hidden_effect = { country_event = { id = custom_difficulty.29 } }
+	}
+	option = {
+		name = custom_difficulty_back
+		hidden_effect = { country_event = { id = custom_difficulty.0 } }
+	}
+	option = {
+		name = custom_difficulty_close.name
+		hidden_effect = {
+			country_event = { id = custom_difficulty.40 }
+			if = {
+				limit = { has_global_flag = custom_difficultyMM_active }
+				country_event = { id = custom_difficulty_mm.2 }
+			}
+		}
+	}
+}
+ #root update event
+event = {
+	id = custom_difficulty.40
+	is_triggered_only = yes
+	hide_window = yes
+	immediate = {
+		if = {
+			limit = { has_global_flag = custom_difficulty_activate_simple_mode }
+			if = {
+				limit = { has_global_flag = custom_difficulty_activate_delay_mode }
+				every_country = {
+					country_event = {
+						id = custom_difficulty.51
+						days = 1
+						random = 180
+					}
+				}
+			}
+			else = {
+				every_country = { country_event = { id = custom_difficulty.51 } }
+			}
+		}
+		else = {
+			if = {
+				limit = { has_global_flag = custom_difficulty_activate_delay_mode }
+				every_country = {
+					country_event = {
+						id = custom_difficulty.50
+						days = 1
+						random = 180
+					}
+				}
+			}
+			else = {
+				every_country = { country_event = { id = custom_difficulty.50 } }
+			}
+		}
+	}
+}
+ #lock confirmation
+country_event = {
+	id = custom_difficulty.60
+	is_triggered_only = yes
+	title = custom_difficulty_lock.name
+	desc = custom_difficulty_lock.desc
+	picture = GFX_evt_towel
+	option = {
+		name = OK
+		hidden_effect = {
+			set_global_flag = custom_difficulty_locked
+			country_event = { id = custom_difficulty.40 }
+		}
+	}
+	option = {
+		name = custom_difficulty_cancel
+		hidden_effect = { country_event = { id = custom_difficulty.3 } }
+	}
+}
+ #all flags
+country_event = {
+	id = custom_difficulty.22
+	is_triggered_only = yes
+	hide_window = yes
+	immediate = {
+		remove_global_flag = custom_difficulty_advanced_configuration_player
+		remove_global_flag = custom_difficulty_advanced_configuration_scaling
+		remove_global_flag = custom_difficulty_advanced_configuration_other
+	}
+}
+ #player flags
+country_event = {
+	id = custom_difficulty.25
+	is_triggered_only = yes
+	hide_window = yes
+	immediate = { remove_global_flag = custom_difficulty_advanced_configuration_player }
+}
+ #scaling flags
+country_event = {
+	id = custom_difficulty.24
+	is_triggered_only = yes
+	hide_window = yes
+	immediate = { remove_global_flag = custom_difficulty_advanced_configuration_scaling }
+}
+ #other flags
+country_event = {
+	id = custom_difficulty.23
+	is_triggered_only = yes
+	hide_window = yes
+	immediate = { remove_global_flag = custom_difficulty_advanced_configuration_other }
+}

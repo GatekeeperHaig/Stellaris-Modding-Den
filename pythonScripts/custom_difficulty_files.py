@@ -54,6 +54,11 @@ t_rootUpdateEvent=TagList("id",name_rootUpdateEvent)
 t_backMainOption=TagList("name","custom_difficulty_back").add("hidden_effect", TagList("country_event",TagList("id", name_mainMenuEvent)))
 t_closeOption=TagList("name", "custom_difficulty_close.name").add("hidden_effect", TagList("country_event", t_rootUpdateEvent).add("if", TagList("limit", TagList("has_global_flag", "custom_difficultyMM_active")).add("country_event", TagList("id","custom_difficulty_mm.2"))))
 
+
+playerFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_player")
+scalingFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_scaling")
+otherFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_other")
+
 def main():
   os.chdir(os.path.dirname(os.path.abspath(__file__)))
   debugMode=False
@@ -206,7 +211,6 @@ def main():
   # difficulties=["easy", "no_player_bonus", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
   difficulties=[#"easy", "no_player_bonus",
   "cadet", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
-  vanillaDefaultDifficultyNames=difficulties[0:]
   ai_non_scaling_DifficultyNames=difficulties[0:-2]
 
   vanillaDefaultDifficulty=[]
@@ -542,9 +546,7 @@ def main():
   #scale_by = 3
   #}
 
-  playerFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_player")
-  scalingFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_scaling")
-  otherFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_other")
+
 
   for difficultyIndex, difficulty in enumerate(difficulties):
     defaultDifficultyEvent=TagList("id", eventNameSpace.format(id_defaultEvents+difficultyIndex))
@@ -920,13 +922,7 @@ def main():
 
 
 
-
-  edict=TagList().add("length","0")
-  edict.add("resources", TagList("category", "edicts").add("cost",TagList()))
-  edict.add("effect", TagList("hidden_effect",TagList("country_event",TagList("id",name_mainMenuEvent))))
-  edict.add("potential", TagList("is_ai","no").add("not",TagList("has_global_flag", "custom_difficulty_deactivate_edict")))
-  edictFile=TagList().add("custom_difficulty", edict)
-  outputToFolderAndFile(edictFile, "common/edicts", "custom_difficulty_edict.txt")
+  createEdictFile()
 
   onActions=TagList()
   onActions.add("on_yearly_pulse", TagList("events",TagList().add(name_rootYearlyEvent,""," #rootYearly").add(name_rootUpdateEvent,""," #rootUpdate")))
@@ -968,7 +964,18 @@ def main():
   scriptedModifiers.add("playable_ai_empire",TagList())
   outputToFolderAndFile(scriptedModifiers, "common/static_modifiers","!_custom_difficulty_00_static_modifier.txt")
 
+  createMenuFile(locClass, cats, catColors,difficulties,debugMode)
 
+  createTriggerFile()
+
+  locClassCopy=deepcopy(locClass)
+  for language in locClass.languages:
+    outFolderLoc="../gratak_mods/custom_difficulty/localisation/"+language
+    if not os.path.exists(outFolderLoc):
+      os.makedirs(outFolderLoc)
+    locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
+
+def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, modFolder="../gratak_mods/custom_difficulty", reducedMenu=True, gameStartAfter=None):
   mainFileContent=TagList("namespace","custom_difficulty")
   mainFileContent.add("","","#main menu")
   # main Menu (including unlock output)
@@ -983,9 +990,10 @@ def main():
     mainMenu.add("desc", TagList("trigger", trigger))
     trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("custom_difficulty_allow_changes", "no"))
     trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("custom_difficulty_allow_changes", "no"))
-    mainMenu.add("option", TagList("name","custom_difficulty_predefined_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
-    mainMenu.add("option", TagList("name","custom_difficulty_crisis_colored.name").add("trigger", TagList("is_crises_allowed", yes)).add("hidden_effect", TagList("country_event", TagList("id", eventNameSpace.format(id_ChangeEvents+cats.index("crisis")*id_ChangeEvents))).add("remove_global_flag","custom_difficulty_menu_crisis_from_custom")))
-    mainMenu.add("option", TagList("name","custom_difficulty_customize_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_customMenuEvent))))
+    if not reducedMenu:
+      mainMenu.add("option", TagList("name","custom_difficulty_predefined_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
+      mainMenu.add("option", TagList("name","custom_difficulty_crisis_colored.name").add("trigger", TagList("is_crises_allowed", yes)).add("hidden_effect", TagList("country_event", TagList("id", eventNameSpace.format(id_ChangeEvents+cats.index("crisis")*id_ChangeEvents))).add("remove_global_flag","custom_difficulty_menu_crisis_from_custom")))
+      mainMenu.add("option", TagList("name","custom_difficulty_customize_colored.name").add("hidden_effect", TagList("country_event", TagList("id", name_customMenuEvent))))
     mainMenu.add("option", TagList("name","custom_difficulty_options.name").add("hidden_effect", TagList("country_event", TagList("id", name_optionsEvent))))
     mainMenu.add("option", TagList("name","custom_difficulty_mainMenuMM.name").add("trigger", TagList("has_global_flag", "custom_difficultyMM_active")).add("hidden_effect", TagList("country_event", TagList("id", "custom_difficulty_mm.{!s}".format(1)))))
     locClass.append("custom_difficulty_mainMenuMM.name", "§BMore Modifiers§!")
@@ -993,55 +1001,55 @@ def main():
     mainMenu.add("option", t_closeOption)
 
 
+  if not reducedMenu:
+    customMenu=TagList()
+    mainFileContent.addComment("custom Menu")
+    mainFileContent.add("country_event",customMenu)
+    customMenu.add("id", name_customMenuEvent)
+    customMenu.add("is_triggered_only", yes)
+    customMenu.add("title", "custom_difficulty_customize.name")
+    customMenu.add("picture", "GFX_evt_custom_difficulty")
+    trigger=TagList()
+    customMenu.add("desc", TagList("trigger", trigger))
+    trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("custom_difficulty_allow_changes", "no"))
+    trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("custom_difficulty_allow_changes", "no"))
+    for i,cat in enumerate(cats):
+      hidden_effect=TagList("country_event", TagList("id", eventNameSpace.format(id_ChangeEvents+i*id_ChangeEvents)))
+      option=TagList("name","custom_difficulty_{}_colored.name".format(cat))
+      customMenu.add("option",option)
+      if cat=="crisis":
+        hidden_effect.add("set_global_flag","custom_difficulty_menu_crisis_from_custom")
+        option.add("trigger", TagList("is_crises_allowed", yes))
+      option.add("hidden_effect", hidden_effect)
+      locClass.addEntry("custom_difficulty_{}_colored.name".format(cat), "§{}@change @{} @bonuses§!".format(catColors[i],cat))
+    customMenu.add("option", t_backMainOption)
+    customMenu.add("option", t_closeOption)
 
-  customMenu=TagList()
-  mainFileContent.addComment("custom Menu")
-  mainFileContent.add("country_event",customMenu)
-  customMenu.add("id", name_customMenuEvent)
-  customMenu.add("is_triggered_only", yes)
-  customMenu.add("title", "custom_difficulty_customize.name")
-  customMenu.add("picture", "GFX_evt_custom_difficulty")
-  trigger=TagList()
-  customMenu.add("desc", TagList("trigger", trigger))
-  trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("custom_difficulty_allow_changes", "no"))
-  trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("custom_difficulty_allow_changes", "no"))
-  for i,cat in enumerate(cats):
-    hidden_effect=TagList("country_event", TagList("id", eventNameSpace.format(id_ChangeEvents+i*id_ChangeEvents)))
-    option=TagList("name","custom_difficulty_{}_colored.name".format(cat))
-    customMenu.add("option",option)
-    if cat=="crisis":
-      hidden_effect.add("set_global_flag","custom_difficulty_menu_crisis_from_custom")
-      option.add("trigger", TagList("is_crises_allowed", yes))
-    option.add("hidden_effect", hidden_effect)
-    locClass.addEntry("custom_difficulty_{}_colored.name".format(cat), "§{}@change @{} @bonuses§!".format(catColors[i],cat))
-  customMenu.add("option", t_backMainOption)
-  customMenu.add("option", t_closeOption)
-
-  mainFileContent.add("","","#default menu")
-  defaultMenuEvent=TagList("id", name_defaultMenuEvent)
-  mainFileContent.add("country_event", defaultMenuEvent)
-  defaultMenuEvent.add("is_triggered_only", yes)
-  defaultMenuEvent.add("title", "custom_difficulty_predef_head.name")
-  defaultMenuEvent.add("picture", "GFX_evt_towel")
-  trigger=TagList()
-  defaultMenuEvent.add("desc", TagList("trigger", trigger))
-  trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("custom_difficulty_allow_changes", "no"))
-  trigger.add("text", "custom_difficulty_current_bonuses")
-  for difficulty in difficulties:
-    trigger.add("success_text", TagList("text", "custom_difficulty_{}.name".format(difficulty)).add("has_global_flag", "custom_difficulty_{}".format(difficulty)))
-  trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration_player.name").add("has_global_flag", "custom_difficulty_advanced_configuration_player"))
-  trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration.name").add("has_global_flag", "custom_difficulty_advanced_configuration"))
-  trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration_scaling.name").add("has_global_flag", "custom_difficulty_advanced_configuration_scaling"))
-  # trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration_crisis.name").add("has_global_flag", "custom_difficulty_advanced_configuration_crisis"))
-  trigger.add("fail_text", TagList("text", "custom_difficulty_choose").add("custom_difficulty_allow_changes", "no"))
-  for i,difficulty in enumerate(difficulties):
-    option=TagList("name","custom_difficulty_{}.name".format(difficulty))
-    defaultMenuEvent.add("option", option)
-    option.add("trigger", deepcopy(t_notLockedTrigger).add("not",TagList("has_global_flag", "custom_difficulty_{}".format(difficulty))))
-    option.add("hidden_effect", TagList("country_event", TagList("id", eventNameSpace.format(id_defaultEvents+i))).add("country_event", TagList("id", name_defaultMenuEvent)))
-  defaultMenuEvent.add("option", TagList("name", "custom_difficulty_reset.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id", name_resetConfirmationEvent))))
-  defaultMenuEvent.add("option", t_backMainOption)
-  defaultMenuEvent.add("option", t_closeOption)
+    mainFileContent.add("","","#default menu")
+    defaultMenuEvent=TagList("id", name_defaultMenuEvent)
+    mainFileContent.add("country_event", defaultMenuEvent)
+    defaultMenuEvent.add("is_triggered_only", yes)
+    defaultMenuEvent.add("title", "custom_difficulty_predef_head.name")
+    defaultMenuEvent.add("picture", "GFX_evt_towel")
+    trigger=TagList()
+    defaultMenuEvent.add("desc", TagList("trigger", trigger))
+    trigger.add("success_text", TagList().add("text", "custom_difficulty_locked.desc").add("custom_difficulty_allow_changes", "no"))
+    trigger.add("text", "custom_difficulty_current_bonuses")
+    for difficulty in difficulties:
+      trigger.add("success_text", TagList("text", "custom_difficulty_{}.name".format(difficulty)).add("has_global_flag", "custom_difficulty_{}".format(difficulty)))
+    trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration_player.name").add("has_global_flag", "custom_difficulty_advanced_configuration_player"))
+    trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration.name").add("has_global_flag", "custom_difficulty_advanced_configuration"))
+    trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration_scaling.name").add("has_global_flag", "custom_difficulty_advanced_configuration_scaling"))
+    # trigger.add("success_text", TagList("text", "custom_difficulty_advanced_configuration_crisis.name").add("has_global_flag", "custom_difficulty_advanced_configuration_crisis"))
+    trigger.add("fail_text", TagList("text", "custom_difficulty_choose").add("custom_difficulty_allow_changes", "no"))
+    for i,difficulty in enumerate(difficulties):
+      option=TagList("name","custom_difficulty_{}.name".format(difficulty))
+      defaultMenuEvent.add("option", option)
+      option.add("trigger", deepcopy(t_notLockedTrigger).add("not",TagList("has_global_flag", "custom_difficulty_{}".format(difficulty))))
+      option.add("hidden_effect", TagList("country_event", TagList("id", eventNameSpace.format(id_defaultEvents+i))).add("country_event", TagList("id", name_defaultMenuEvent)))
+    defaultMenuEvent.add("option", TagList("name", "custom_difficulty_reset.name").add("trigger", t_notLockedTrigger).add("hidden_effect", TagList("country_event", TagList("id", name_resetConfirmationEvent))))
+    defaultMenuEvent.add("option", t_backMainOption)
+    defaultMenuEvent.add("option", t_closeOption)
 
   optionsEvent=TagList()
   mainFileContent.addComment("options Event")
@@ -1062,70 +1070,73 @@ def main():
 
 
 
-
-  mainFileContent.add("","","#game start init")
-  gameStartInitEvent=TagList("id", name_gameStartFireOnlyOnce)
-  gameStartInitEvent.add("title","custom_difficulty_init" )
-  gameStartInitEvent.add("picture","GFX_evt_custom_difficulty")
-  trigger=TagList()
-  gameStartInitEvent.add("desc", TagList("trigger", trigger)) #"" )
-  trigger.add("text","custom_difficulty_init_desc")
-  trigger.add("success_text", TagList("text","custom_difficulty_init_crisis_desc").add("is_crises_allowed", "yes"))
-  trigger.add("success_text", TagList("text", "custom_difficulty_init_no_crisis_desc").add("is_crises_allowed", "no"))
-  mainFileContent.add("country_event", gameStartInitEvent)
-  gameStartInitEvent.add("fire_only_once", yes)
-  # gameStartInitEvent.add("hide_window", yes)
-  t_anyOption=TagList()
-  gameStartInitEvent.add("trigger", TagList("is_ai","no").add("or", TagList("NOR", t_anyOption).add("not", TagList("has_global_flag", "custom_difficulty_active"))))
-  immediate=TagList()
-  gameStartInitEvent.add("immediate",immediate)
-  immediate.createEvent(name_randomDiffFireOnlyOnce)
-  immediate.add("set_country_flag", "custom_difficulty_game_host")
-  immediate.add("if", TagList("limit", TagList("NOR", t_anyOption).add("has_global_flag", "custom_difficulty_active"))
-    .add("country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent")
-    .add("country_event", TagList("id", name_removeEventTarget)," #removeEventTarget"))
+  if not reducedMenu:
+    mainFileContent.add("","","#game start init")
+    gameStartInitEvent=TagList("id", name_gameStartFireOnlyOnce)
+    gameStartInitEvent.add("title","custom_difficulty_init" )
+    gameStartInitEvent.add("picture","GFX_evt_custom_difficulty")
+    trigger=TagList()
+    gameStartInitEvent.add("desc", TagList("trigger", trigger)) #"" )
+    trigger.add("text","custom_difficulty_init_desc")
+    trigger.add("success_text", TagList("text","custom_difficulty_init_crisis_desc").add("is_crises_allowed", "yes"))
+    trigger.add("success_text", TagList("text", "custom_difficulty_init_no_crisis_desc").add("is_crises_allowed", "no"))
+    mainFileContent.add("country_event", gameStartInitEvent)
+    gameStartInitEvent.add("fire_only_once", yes)
+    # gameStartInitEvent.add("hide_window", yes)
+    t_anyOption=TagList()
+    gameStartInitEvent.add("trigger", TagList("is_ai","no").add("or", TagList("NOR", t_anyOption).add("not", TagList("has_global_flag", "custom_difficulty_active"))))
+    immediate=TagList()
+    gameStartInitEvent.add("immediate",immediate)
+    immediate.createEvent(name_randomDiffFireOnlyOnce)
+    immediate.add("set_country_flag", "custom_difficulty_game_host")
+    immediate.add("if", TagList("limit", TagList("NOR", t_anyOption).add("has_global_flag", "custom_difficulty_active"))
+      .add("country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent")
+      .add("country_event", TagList("id", name_removeEventTarget)," #removeEventTarget"))
     # .add("every_country",TagList("country_event", TagList("id", name_removeOLDModifiers)," #removeOldModifiers")))
 
-  # resetEvent.get("immediate").insert(0, "country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent").insert(0, "country_event", TagList("id", name_removeEventTarget)," #removeEventTarget")
-  immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
-  for strength in [0.25, 0.5, 1, 2,3,4,5]:
-    gameStartInitEvent.add("option", TagList("name", "custom_difficulty_{!s}_crisis.name".format(strength))
-      .add("trigger", TagList("is_crises_allowed", yes))
-      .add("hidden_effect", TagList(ET,TagList("set_variable", TagList("which","custom_difficulty_crisis_strength").add("value",str(strength))))))
-    locClass.addEntry("custom_difficulty_{!s}_crisis.name".format(strength), "§R{}x @crisisStrength§!".format(strength))
-  gameStartInitEvent.add("option", TagList("name", "OK").add("trigger", TagList("is_crises_allowed", "no")))
-  gameStartAfter=TagList()
-  gameStartInitEvent.add("after",TagList("hidden_effect", gameStartAfter))
-  gameStartAfter.add("set_global_flag", "custom_difficulty_active")
-  gameStartAfter.add("set_global_flag","custom_difficulty_no_player_bonus")
-  gameStartAfter.add("set_global_flag","custom_difficulty_no_scaling")
-  for i, difficulty in enumerate(difficulties):
-    if difficulty=="scaling":
-      continue
-    elif difficulty in vanillaDefaultDifficultyNames:
-      k=vanillaDefaultDifficultyNames.index(difficulty)
-    else:
-      continue #those cannot be preset in game creation
-    gameStartAfter.add("","","#"+difficulty)
-    gameStartAfter.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", eventNameSpace.format(id_defaultEvents+i))))
-  gameStartAfter.add("country_event", TagList("id", name_rootUpdateEvent))
+    # resetEvent.get("immediate").insert(0, "country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent").insert(0, "country_event", TagList("id", name_removeEventTarget)," #removeEventTarget")
+    immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
+    for strength in [0.25, 0.5, 1, 2,3,4,5]:
+      gameStartInitEvent.add("option", TagList("name", "custom_difficulty_{!s}_crisis.name".format(strength))
+        .add("trigger", TagList("is_crises_allowed", yes))
+        .add("hidden_effect", TagList(ET,TagList("set_variable", TagList("which","custom_difficulty_crisis_strength").add("value",str(strength))))))
+      locClass.addEntry("custom_difficulty_{!s}_crisis.name".format(strength), "§R{}x @crisisStrength§!".format(strength))
+    gameStartInitEvent.add("option", TagList("name", "OK").add("trigger", TagList("is_crises_allowed", "no")))
+    gameStartAfter=TagList()
+    gameStartInitEvent.add("after",TagList("hidden_effect", gameStartAfter))
+    gameStartAfter.add("set_global_flag", "custom_difficulty_active")
+    gameStartAfter.add("set_global_flag","custom_difficulty_no_player_bonus")
+    gameStartAfter.add("set_global_flag","custom_difficulty_no_scaling")
 
-  mainFileContent.addComment("Assign a variable to each default country that will decide how much their difficulty modifiers are decreased by randomness")
-  randomInitEvent=mainFileContent.addReturn("country_event")
-  randomInitEvent.add("id", name_randomDiffFireOnlyOnce)
-  randomInitEvent.add("hide_window",yes)
-  randomInitEvent.add("trigger", TagList("NOT", TagList("has_global_flag", "custom_difficulty_random_difficulty_given")))
-  immediate=randomInitEvent.addReturn("immediate")
-  immediate.add("set_global_flag", "custom_difficulty_random_difficulty_given")
-  immediateEachCountry=immediate.addReturn("every_country")
-  immediateEachCountry.add("limit", TagList("is_country_type","default").add("is_ai", "yes"))
-  randomList=immediateEachCountry.addReturn("random_list")
-  maxRandVal=20 #if you change this, you need to also change the 20 in createModifierEvents (where I was to lazy to add this as input!)
-  for i in range(maxRandVal+1): #nbr of random steps
-    e=randomList.addReturn("1") #uniform chance
-    e.variableOp("set", "custom_difficulty_random_handicap",i)
-  if debugMode:
-    immediateEachCountry.add("log",'"[this.GetName]:[this.custom_difficulty_random_handicap]"')
+    vanillaDefaultDifficultyNames=difficulties[0:]
+    for i, difficulty in enumerate(difficulties):
+      if difficulty=="scaling":
+        continue
+      elif difficulty in vanillaDefaultDifficultyNames:
+        k=vanillaDefaultDifficultyNames.index(difficulty)
+      else:
+        continue #those cannot be preset in game creation
+      gameStartAfter.add("","","#"+difficulty)
+      gameStartAfter.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", eventNameSpace.format(id_defaultEvents+i))))
+    gameStartAfter.add("country_event", TagList("id", name_rootUpdateEvent))
+
+    mainFileContent.addComment("Assign a variable to each default country that will decide how much their difficulty modifiers are decreased by randomness")
+    randomInitEvent=mainFileContent.addReturn("country_event")
+    randomInitEvent.add("id", name_randomDiffFireOnlyOnce)
+    randomInitEvent.add("hide_window",yes)
+    randomInitEvent.add("trigger", TagList("NOT", TagList("has_global_flag", "custom_difficulty_random_difficulty_given")))
+    immediate=randomInitEvent.addReturn("immediate")
+    immediate.add("set_global_flag", "custom_difficulty_random_difficulty_given")
+    immediateEachCountry=immediate.addReturn("every_country")
+    immediateEachCountry.add("limit", TagList("is_country_type","default").add("is_ai", "yes"))
+    randomList=immediateEachCountry.addReturn("random_list")
+    maxRandVal=20 #if you change this, you need to also change the 20 in createModifierEvents (where I was to lazy to add this as input!)
+    for i in range(maxRandVal+1): #nbr of random steps
+      e=randomList.addReturn("1") #uniform chance
+      e.variableOp("set", "custom_difficulty_random_handicap",i)
+    if debugMode:
+      immediateEachCountry.add("log",'"[this.GetName]:[this.custom_difficulty_random_handicap]"')
+
 
 
 
@@ -1151,12 +1162,13 @@ def main():
   # flag is going to be "custom_difficulty_"+key
   # name "custom_difficulty_"+key
   # desc "custom_difficulty_"+key+".desc"
-  optionWithInverse["activate_custom_mode"]=["activate_simple_mode"]
-  optionWithInverse["activate_simple_mode"]=["activate_custom_mode"]
-  optionWithInverse["deactivate_player_vassal_ai_boni"]=["activate_player_vassal_ai_boni"]
-  optionWithInverse["activate_player_vassal_ai_boni"]=["deactivate_player_vassal_ai_boni"]
-  optionWithInverse["deactivate_delay_mode"]=["activate_delay_mode"]
-  optionWithInverse["activate_delay_mode"]=["deactivate_delay_mode"]
+  if not reducedMenu:
+    optionWithInverse["activate_custom_mode"]=["activate_simple_mode"]
+    optionWithInverse["activate_simple_mode"]=["activate_custom_mode"]
+    optionWithInverse["deactivate_player_vassal_ai_boni"]=["activate_player_vassal_ai_boni"]
+    optionWithInverse["activate_player_vassal_ai_boni"]=["deactivate_player_vassal_ai_boni"]
+    optionWithInverse["deactivate_delay_mode"]=["activate_delay_mode"]
+    optionWithInverse["activate_delay_mode"]=["deactivate_delay_mode"]
   optionWithInverse["activate_edict"]=["deactivate_edict"]
   optionWithInverse["deactivate_edict"]=["activate_edict"]
   optionWithInverse["activate_host_only"]=["deactivate_host_only"]
@@ -1192,7 +1204,8 @@ def main():
       trigger.add("is_multiplayer","yes") 
       # immediate.add("set_country_flag", "custom_difficulty_game_host")
       trigger.add("has_country_flag", "custom_difficulty_game_host") 
-    t_anyOption.add("has_global_flag", "custom_difficulty_"+key)
+    if not reducedMenu:
+      t_anyOption.add("has_global_flag", "custom_difficulty_"+key)
     effect=TagList("set_global_flag", "custom_difficulty_"+key)
     inverseIsDefault=False
     for inverse in inverses:
@@ -1237,52 +1250,53 @@ def main():
   # increaseRandomOpt.addReturn("hidden_effect").add_event("name_optionsEvent").addTagList(enableUpdateEffect).addReturn(ET).variableOp("change","custom_difficulty_random_handicap_perc",5)
   locClass.append("custom_difficulty_random_handicap_inc.desc","§P@increase @randomHandicap @by 10%§!")
 
-  optionEventUnlock=deepcopy(optionsEvent)
-  optionEventUnlock.insert(-2,"option",TagList("name","custom_difficulty_unlock.name").add("trigger", TagList("has_global_flag","custom_difficulty_locked")).add("hidden_effect",TagList("remove_global_flag", "custom_difficulty_locked").add("country_event", t_mainMenuEvent)))
-  mainFileUnlock=TagList("namespace", "custom_difficulty")
-  mainFileUnlock.add("country_event", optionEventUnlock)
-  outputToFolderAndFile(mainFileUnlock, "events", "!_custom_difficulty_unlock.txt", 1, "../gratak_mods/custom_difficulty_unlock_new/")
+  if not reducedMenu:
+    optionEventUnlock=deepcopy(optionsEvent)
+    optionEventUnlock.insert(-2,"option",TagList("name","custom_difficulty_unlock.name").add("trigger", TagList("has_global_flag","custom_difficulty_locked")).add("hidden_effect",TagList("remove_global_flag", "custom_difficulty_locked").add("country_event", t_mainMenuEvent)))
+    mainFileUnlock=TagList("namespace", "custom_difficulty")
+    mainFileUnlock.add("country_event", optionEventUnlock)
+    outputToFolderAndFile(mainFileUnlock, "events", "!_custom_difficulty_unlock.txt", 1, "../gratak_mods/custom_difficulty_unlock_new/")
 
+  if not reducedMenu: #todo: might need some of this!
+    mainFileContent.add("","","#reset event")
+    resetEvent=deepcopy(gameStartInitEvent)
+    resetEvent.replace("id", name_resetEvent)
+    resetEvent.remove("fire_only_once")
+    resetEvent.remove("trigger")
+    resetEvent.add("is_triggered_only",yes)
+    resetEvent.get("immediate").remove("if")
+    resetEvent.get("immediate").insert(0, "country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent").insert(0, "country_event", TagList("id", name_removeEventTarget)," #removeEventTarget")
+    mainFileContent.add("country_event", resetEvent)
 
-  mainFileContent.add("","","#reset event")
-  resetEvent=deepcopy(gameStartInitEvent)
-  resetEvent.replace("id", name_resetEvent)
-  resetEvent.remove("fire_only_once")
-  resetEvent.remove("trigger")
-  resetEvent.add("is_triggered_only",yes)
-  resetEvent.get("immediate").remove("if")
-  resetEvent.get("immediate").insert(0, "country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent").insert(0, "country_event", TagList("id", name_removeEventTarget)," #removeEventTarget")
-  mainFileContent.add("country_event", resetEvent)
+    mainFileContent.add("","","#reset confirmation")
+    resetConfirmation=TagList("id", name_resetConfirmationEvent)
+    mainFileContent.add("country_event", resetConfirmation)
+    resetConfirmation.add("is_triggered_only",yes)
+    resetConfirmation.add("title","custom_difficulty_reset_conf.name")
+    resetConfirmation.add("desc","custom_difficulty_reset.desc")
+    resetConfirmation.add("picture", "GFX_evt_towel")
+    effect=TagList()
+    add_event(effect, "name_resetFlagsEvent")
+    add_event(effect, "name_resetEvent")
+    resetConfirmation.add("option", TagList("name", "OK").add("hidden_effect", effect))
+    resetConfirmation.add("option", TagList("name", "custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
 
-  mainFileContent.add("","","#reset confirmation")
-  resetConfirmation=TagList("id", name_resetConfirmationEvent)
-  mainFileContent.add("country_event", resetConfirmation)
-  resetConfirmation.add("is_triggered_only",yes)
-  resetConfirmation.add("title","custom_difficulty_reset_conf.name")
-  resetConfirmation.add("desc","custom_difficulty_reset.desc")
-  resetConfirmation.add("picture", "GFX_evt_towel")
-  effect=TagList()
-  add_event(effect, "name_resetFlagsEvent")
-  add_event(effect, "name_resetEvent")
-  resetConfirmation.add("option", TagList("name", "OK").add("hidden_effect", effect))
-  resetConfirmation.add("option", TagList("name", "custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_defaultMenuEvent))))
-
-  mainFileContent.add("","","#remove confirmation")
-  removeConfirmation=TagList("id", name_removeEvent)
-  mainFileContent.add("country_event", removeConfirmation)
-  removeConfirmation.add("is_triggered_only",yes)
-  removeConfirmation.add("title","custom_difficulty_remove.name")
-  locClass.addEntry("custom_difficulty_remove.name", "@uninstall @modName")
-  locClass.addEntry("custom_difficulty_remove.desc", "@uninstallDesc")
-  removeConfirmation.add("desc","custom_difficulty_remove.desc")
-  removeConfirmation.add("picture", "GFX_evt_towel")
-  effect=TagList()
-  add_event(effect, "name_resetFlagsEvent")
-  add_event(effect, "name_resetEvent")
-  add_event(effect, "name_removeAllModifiers")
-  effect.add("remove_global_flag", "custom_difficulty_active")
-  removeConfirmation.add("option", TagList("name", "OK").add("hidden_effect", effect))
-  removeConfirmation.add("option", TagList("name", "custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_optionsEvent))))
+    mainFileContent.add("","","#remove confirmation")
+    removeConfirmation=TagList("id", name_removeEvent)
+    mainFileContent.add("country_event", removeConfirmation)
+    removeConfirmation.add("is_triggered_only",yes)
+    removeConfirmation.add("title","custom_difficulty_remove.name")
+    locClass.addEntry("custom_difficulty_remove.name", "@uninstall @modName")
+    locClass.addEntry("custom_difficulty_remove.desc", "@uninstallDesc")
+    removeConfirmation.add("desc","custom_difficulty_remove.desc")
+    removeConfirmation.add("picture", "GFX_evt_towel")
+    effect=TagList()
+    add_event(effect, "name_resetFlagsEvent")
+    add_event(effect, "name_resetEvent")
+    add_event(effect, "name_removeAllModifiers")
+    effect.add("remove_global_flag", "custom_difficulty_active")
+    removeConfirmation.add("option", TagList("name", "OK").add("hidden_effect", effect))
+    removeConfirmation.add("option", TagList("name", "custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_optionsEvent))))
 
 
   mainFileContent.add("","","#lock confirmation")
@@ -1324,16 +1338,7 @@ def main():
 
 
 
-  outputToFolderAndFile(mainFileContent , "events", "custom_difficulty_main.txt",1 )
-
-  createTriggerFile()
-
-  locClassCopy=deepcopy(locClass)
-  for language in locClass.languages:
-    outFolderLoc="../gratak_mods/custom_difficulty/localisation/"+language
-    if not os.path.exists(outFolderLoc):
-      os.makedirs(outFolderLoc)
-    locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
+  outputToFolderAndFile(mainFileContent , "events", "custom_difficulty_main.txt",1, modFolder )
 
 def createTriggerFile(modFolder="../gratak_mods/custom_difficulty"):
   scriptedTriggers=TagList()
@@ -1341,9 +1346,16 @@ def createTriggerFile(modFolder="../gratak_mods/custom_difficulty"):
   allowChangesTrigger.add("NOT", TagList("has_global_flag", "custom_difficulty_locked"))
   allowChangesTrigger.add("OR", TagList("is_multiplayer", "no").add("has_country_flag","custom_difficulty_game_host").add("not", TagList("has_global_flag","custom_difficulty_activate_host_only")))
 
-  outputToFolderAndFile(scriptedTriggers , "common/scripted_triggers", "custom_difficulty_triggers.txt",1,modFolder )
+  outputToFolderAndFile(scriptedTriggers , "common/scripted_triggers", "custom_difficulty_triggers.txt",2,modFolder )
 
+def createEdictFile(modFolder="../gratak_mods/custom_difficulty"):
 
+  edict=TagList().add("length","0")
+  edict.add("resources", TagList("category", "edicts").add("cost",TagList()))
+  edict.add("effect", TagList("hidden_effect",TagList("country_event",TagList("id",name_mainMenuEvent))))
+  edict.add("potential", TagList("is_ai","no").add("not",TagList("has_global_flag", "custom_difficulty_deactivate_edict")))
+  edictFile=TagList().add("custom_difficulty", edict)
+  outputToFolderAndFile(edictFile, "common/edicts", "custom_difficulty_edict.txt",2, modFolder)
 
 
 def outputToFolderAndFile(tagList, folder, fileName, level=2, modFolder="../gratak_mods/custom_difficulty", warningText=True):

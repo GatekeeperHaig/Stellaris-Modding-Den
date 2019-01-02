@@ -70,7 +70,8 @@ def main():
   gameStartInitEvent.add("hide_window", "yes")
   immediate=TagList()
   gameStartInitEvent.add("immediate",immediate)
-  # immediate.add_event("name_randomDiffFireOnlyOnce")
+  # gameStartAfter=gameStartInitEvent.addReturn("after")
+  immediate.add_event("name_randomDiffFireOnlyOnce")
   immediate.add("set_country_flag", "custom_difficulty_game_host")
   immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_MM_var_storage"))
   gameStartAfter=TagList()
@@ -216,6 +217,7 @@ def main():
 
 
 
+  cdf.createMenuFile(locList, None, None, None, False, "../gratak_mods/custom_difficultyMM", True,gameStartAfter)
   onActions=TagList("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
   #OUTPUT TO FILE
   cdf.outputToFolderAndFile(onActions, "common/on_actions", "custom_difficultyMM_on_action.txt",2,"../gratak_mods/custom_difficultyMM")
@@ -224,6 +226,7 @@ def main():
   cdf.outputToFolderAndFile(updateFileContent , "events", "custom_difficultyMM_modifier_update.txt" ,2,"../gratak_mods/custom_difficultyMM")
   cdf.outputToFolderAndFile(staticModifierFile , "common/static_modifiers", "custom_difficultyMM.txt" ,2,"../gratak_mods/custom_difficultyMM")
   cdf.createTriggerFile("../gratak_mods/custom_difficultyMM")
+  cdf.createEdictFile("../gratak_mods/custom_difficultyMM")
   locList.writeToMod("../gratak_mods/custom_difficultyMM","custom_difficultyMM")
 
 def addChangeOption(event, modifier, modifierName, amount, category, locList):
