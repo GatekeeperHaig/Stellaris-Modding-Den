@@ -18,24 +18,44 @@ eventNameSpace="custom_difficulty_mm.{!s}"
 # name_randomDiffFireOnlyOnce="custom_difficulty.11"
 name_gameStartFireOnlyOnce=eventNameSpace.format(0)
 name_mainMenuEvent=eventNameSpace.format(1)
+name_rootUpdateEvent=eventNameSpace.format(2)
+id_groupEvents=10 #reserved to 19
 
 # t_notLockedTrigger=TagList("not", TagList("has_global_flag", "custom_difficulty_locked"))
 # t_notLockedTrigger=TagList("custom_difficulty_allow_changes", "yes")
 # t_mainMenuEvent=TagList("id",name_mainMenuEvent)
-# t_rootUpdateEvent=TagList("id",name_rootUpdateEvent)
+t_rootUpdateEvent=TagList("id",name_rootUpdateEvent)
 # t_backMainOption=TagList("name","custom_difficulty_back").add("hidden_effect", TagList("country_event",TagList("id", name_mainMenuEvent)))
 # t_closeOption=TagList("name", "custom_difficulty_close.name").add("hidden_effect", TagList("country_event", t_rootUpdateEvent))
+
+t_backMainOption=TagList("name","custom_difficulty_backMM").add("hidden_effect", TagList("country_event",TagList("id", custom_difficulty_files.name_mainMenuEvent)))
+t_closeOption=TagList("name", "custom_difficulty_closeMM").add("hidden_effect", TagList("country_event", t_rootUpdateEvent))
 
 def main():
   os.chdir(os.path.dirname(os.path.abspath(__file__)))
   # debugMode=False
 
   locList=LocList()
+  custom_difficulty_files.globalAddLocs(locList)
+
+  #TODO: File that is overwritten by standard DD that makes sure there is a reduced main menu
 
   groupList=loadFile(locList)
-  mainFileContent=TagList()
 
-  mainFileContent.add("namespace", eventNameSpace.format("")[:-1])
+  mainFileContent=TagList("namespace", eventNameSpace.format("")[:-1])
+  staticModifierFile=TagList()
+  # groupFileContent=TagList("namespace", eventNameSpace.format("")[:-1])
+
+
+
+
+
+  locList.addEntry("custom_difficulty_backMM", "@back")
+  locList.addEntry("custom_difficulty_closeMM", "@close @modName @menu")
+  locList.addEntry("custom_difficulty_choose_descMM", "@choose")
+
+
+
   mainFileContent.add("","","#game start init")
   gameStartInitEvent=mainFileContent.addReturn("country_event")
   gameStartInitEvent.add("id", name_gameStartFireOnlyOnce)
@@ -55,19 +75,43 @@ def main():
   mainFileContent.add("","","#more modifiers main event")
   mainMenuEvent=mainFileContent.addReturn("country_event")
   mainMenuEvent.add("id", name_mainMenuEvent)
-  mainMenuEvent.add("title","test" )
+  mainMenuEvent.add("title","custom_difficulty_MM" )
+  mainMenuEvent.add("desc", "custom_difficulty_choose_descMM")
+  locList.append("custom_difficulty_MM", "Dynamic Difficulty - More Modifiers")
   mainMenuEvent.add("picture","GFX_evt_synth_sabotage" )
+  curIdGroupEvent=id_groupEvents
   for group in groupList:
     option=mainMenuEvent.addReturn("option")
     option.add("name", group.name)
+    callEvent=option.addReturn("hidden_effect")
+    groupEvent=mainFileContent.addReturn("country_event")
+    groupEvent.add("id", eventNameSpace.format(curIdGroupEvent))
+    callEvent.createEvent(eventNameSpace.format(curIdGroupEvent))
+    curIdGroupEvent+=1
+    groupEvent.add("title",group.name )
+    groupEvent.add("desc", "custom_difficulty_choose_descMM")
+    groupEvent.add("picture","GFX_evt_synth_sabotage" )
+    groupEvent.addReturn("option").add("name", "custom_difficulty_backMM").createEvent(name_mainMenuEvent)
+    groupEvent.add("option",t_closeOption)
+    for modifier in group.modifiers:
+      modifier.toStaticModifierFiles(staticModifierFile, locList)
 
-  onActions=TagList()
-  onActions.add("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
-  # onActions.add("on_game_start", TagList("events",TagList().add(name_rootUpdateEvent))) #is called by "fire only once"
+
+  mainMenuEvent.add("option",t_backMainOption)
+  mainMenuEvent.add("option",t_closeOption)
+
+
+
+
+
+
+
+
+  onActions=TagList("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
+  #OUTPUT TO FILE
   custom_difficulty_files.outputToFolderAndFile(onActions, "common/on_actions", "custom_difficultyMM_on_action.txt",2,"../gratak_mods/custom_difficultyMM")
-
-
   custom_difficulty_files.outputToFolderAndFile(mainFileContent , "events", "custom_difficultyMM_main.txt" ,2,"../gratak_mods/custom_difficultyMM")
+  custom_difficulty_files.outputToFolderAndFile(staticModifierFile , "common/static_modifiers", "custom_difficultyMM.txt" ,2,"../gratak_mods/custom_difficultyMM")
   locList.writeToMod("../gratak_mods/custom_difficultyMM","custom_difficultyMM")
 
 
@@ -107,7 +151,9 @@ def loadFile(locList):
       else:
         currentGroup.add(currentModifier)
       for extraProperty in lineSplit[1:]:
-        if extraProperty.startswith('"'):
+        if extraProperty=="%":
+          currentModifier.setUnit("%")
+        elif extraProperty.startswith('"'):
           currentModifier.addToName(extraProperty)
         else:
           currentModifier.addMultiplier(extraProperty)
@@ -129,24 +175,28 @@ def loadFile(locList):
 
 class ModifierGroup:
   def __init__(self, name, locList):
-    self.name="custom_difficulty_mm_group_"+name.replace(" ","_").replace("$","")
+    self.name="custom_difficulty_mm_group_"+name.replace(" ","_").replace("$","").lower()
     self.modifiers=[]
-    locList.append(self.name, name)
+    locList.append(self.name, "§B"+name+"§!")
   def add(self, modifier):
     self.modifiers.append(modifier)
 
 class Modifier:
   def __init__(self, modifier):
     # self.name=name
-    percentDefault=10
-    self.modifier=modifier.lower()
-    self.multiplier=percentDefault 
-    self.unit="%"
+    # percentDefault=10
+    modifier=modifier.lower()
+    self.modifier=modifier
+    self.multiplier=1
+    self.unit="1"
     if "_cost" in modifier or "_upkeep" in modifier:
       self.multiplier*=-1
-    if "_add" in modifier:
-      self.unit="1"
-      self.multiplier/=percentDefault
+    # if "_add" in modifier:
+    #   self.unit="1"
+    #   self.multiplier/=percentDefault
+    #   print(modifier)
+    if "_mult" in modifier:
+      self.setUnit("%")
     self.name="$MOD_"+modifier.upper()+"$"
 
   def addMultiplier(self, mult):
@@ -156,13 +206,18 @@ class Modifier:
   def addToName(self, extra):
     self.name+=extra
 
+  def setUnit(self,unit):
+    self.unit=unit
+    if unit=="%":
+      self.multiplier*=10 #default percent value
+
   def __str__(self):
     return "Mod: {}, Name: {}, Mult: {!s}, Unit: {}".format(self.modifier, self.name, self.multiplier,self.unit)
   def __repr__(self):
     return self.__str__()+"\n"
 
 
-  def toStaticModifierFiles(self, modifierTagList, locClass, rangeUsed=range(-2,11)):
+  def toStaticModifierFiles(self, modifierTagList, locList, rangeUsed=range(-2,11)):
     value=self.multiplier;
     if self.unit=="%":
       value/=100
@@ -172,10 +227,10 @@ class Modifier:
     for m in rangeUsed:
       if m==0:
         continue
-      if not locClass is None:
+      if not locList is None:
         modName="custom_difficulty_MM_{}_{!s}".format(self.modifier, m)
         modifierList=modifierTagList.addReturn(modName)
-        locClass.append(modName, "$FE_DIFFICULTY$: "+self.name)
+        locList.append(modName, "$FE_DIFFICULTY$: "+self.name)
       else:
         modifierList=modifierTagList #used by ModifierSubGroup
       modifierList.add(self.modifier,"{:.3f}".format(value*m) )
@@ -198,13 +253,13 @@ class ModifierSubGroup(Modifier):
     return self.__str__()+"\n"
 
 
-  def toStaticModifierFiles(self, modifierTagList, locClass, rangeUsed=range(-2,11)):
+  def toStaticModifierFiles(self, modifierTagList, locList, rangeUsed=range(-2,11)):
     for m in rangeUsed:
       if m==0:
         continue
       modName="custom_difficulty_MM_{}_{!s}".format(self.name.replace(" ","_"), m)
       modifierList=modifierTagList.addReturn(modName)
-      locClass.append(modName, "$FE_DIFFICULTY:$"+self.name)
+      locList.append(modName, "$FE_DIFFICULTY:$"+self.name)
       for mod in self.modifiers:
         mod.toStaticModifierFiles(modifierList,None, range(m,m+1))
 
