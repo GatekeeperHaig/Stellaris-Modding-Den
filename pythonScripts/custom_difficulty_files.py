@@ -52,7 +52,7 @@ t_notLockedTrigger=TagList("custom_difficulty_allow_changes", "yes")
 t_mainMenuEvent=TagList("id",name_mainMenuEvent)
 t_rootUpdateEvent=TagList("id",name_rootUpdateEvent)
 t_backMainOption=TagList("name","custom_difficulty_back").add("hidden_effect", TagList("country_event",TagList("id", name_mainMenuEvent)))
-t_closeOption=TagList("name", "custom_difficulty_close.name").add("hidden_effect", TagList("country_event", t_rootUpdateEvent))
+t_closeOption=TagList("name", "custom_difficulty_close.name").add("hidden_effect", TagList("country_event", t_rootUpdateEvent).add("if", TagList("limit", TagList("has_global_flag", "custom_difficultyMM_active")).add("country_event", TagList("id","custom_difficulty_mm.2"))))
 
 def main():
   os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -1326,12 +1326,7 @@ def main():
 
   outputToFolderAndFile(mainFileContent , "events", "custom_difficulty_main.txt",1 )
 
-  scriptedTriggers=TagList()
-  allowChangesTrigger=scriptedTriggers.addReturn("custom_difficulty_allow_changes")
-  allowChangesTrigger.add("NOT", TagList("has_global_flag", "custom_difficulty_locked"))
-  allowChangesTrigger.add("OR", TagList("is_multiplayer", "no").add("has_country_flag","custom_difficulty_game_host").add("not", TagList("has_global_flag","custom_difficulty_activate_host_only")))
-
-  outputToFolderAndFile(scriptedTriggers , "common/scripted_triggers", "custom_difficulty_triggers.txt",1 )
+  createTriggerFile()
 
   locClassCopy=deepcopy(locClass)
   for language in locClass.languages:
@@ -1339,6 +1334,14 @@ def main():
     if not os.path.exists(outFolderLoc):
       os.makedirs(outFolderLoc)
     locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
+
+def createTriggerFile(modFolder="../gratak_mods/custom_difficulty"):
+  scriptedTriggers=TagList()
+  allowChangesTrigger=scriptedTriggers.addReturn("custom_difficulty_allow_changes")
+  allowChangesTrigger.add("NOT", TagList("has_global_flag", "custom_difficulty_locked"))
+  allowChangesTrigger.add("OR", TagList("is_multiplayer", "no").add("has_country_flag","custom_difficulty_game_host").add("not", TagList("has_global_flag","custom_difficulty_activate_host_only")))
+
+  outputToFolderAndFile(scriptedTriggers , "common/scripted_triggers", "custom_difficulty_triggers.txt",1,modFolder )
 
 
 

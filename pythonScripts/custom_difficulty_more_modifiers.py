@@ -31,12 +31,11 @@ t_rootUpdateEvent=TagList("id",name_rootUpdateEvent)
 # t_closeOption=TagList("name", "custom_difficulty_close.name").add("hidden_effect", TagList("country_event", t_rootUpdateEvent))
 
 t_backMainOption=TagList("name","custom_difficulty_backMM").add("hidden_effect", TagList("country_event",TagList("id", cdf.name_mainMenuEvent)))
-t_closeOption=TagList("name", "custom_difficulty_closeMM").add("hidden_effect", TagList("country_event", t_rootUpdateEvent))
+t_closeOption=TagList("name", "custom_difficulty_closeMM").add("hidden_effect", TagList("country_event", t_rootUpdateEvent).add("if", TagList("limit", TagList("has_global_flag", "custom_difficulty_active")).add("country_event", cdf.t_rootUpdateEvent)))
 
 def main():
   os.chdir(os.path.dirname(os.path.abspath(__file__)))
   # debugMode=False
-  #todo: make normal custom difficulty leave menu event call MM update and vise versa
 
   locList=LocList()
   cdf.globalAddLocs(locList)
@@ -59,6 +58,7 @@ def main():
   locList.addEntry("custom_difficulty_closeMM", "@close @modName @menu")
   locList.addEntry("custom_difficulty_choose_descMM", "@choose")
   locList.addEntry("custom_difficulty_current_bonusesMM","@curBon:")
+  locList.addEntry("custom_difficulty_lockedMM.name", "@lockActive")
 
 
 
@@ -107,15 +107,16 @@ def main():
     groupEvent.add("id", eventNameSpace.format(curIdGroupEvent))
     groupEvent.add("is_triggered_only", "yes")
     groupEvent.add("title",group.name )
-    # groupEvent.add("desc", "custom_difficulty_choose_descMM") #todo: change to display of current bonuses
     desc=groupEvent.addReturn("desc")
     desc=desc.addReturn("trigger")
     desc.add("text", "custom_difficulty_current_bonusesMM")
+    desc.add("success_text", TagList("text","custom_difficulty_lockedMM.name").add("custom_difficulty_allow_changes", "no"))
     groupEvent.add("picture","GFX_evt_synth_sabotage" )
     for modifier in group.modifiers:
       modifierName=modifier.toStaticModifierFiles(staticModifierFile, locList)
       option=groupEvent.addReturn("option")
       option.add("name", modifierName)
+      option.add("trigger", TagList("custom_difficulty_allow_changes", "yes"))
       option.addReturn("hidden_effect").createEvent(eventNameSpace.format(curIdModifierEvent))
       modifierEvent=modifierMenuFileContent.addReturn("country_event")
       modifierEvent.add("id", eventNameSpace.format(curIdModifierEvent))
@@ -130,8 +131,6 @@ def main():
       # addChangeOption(modifierEvent, modifier, modifierName, 5, "AI", locList)
       # addChangeOption(modifierEvent, modifier, modifierName, -1, "Player", locList)
       
-      # successText=TagList().add("text","custom_difficulty_locked.name").add("custom_difficulty_allow_changes", "no") #TODO!
-      # trigger.add("success_text",successText)
       for category in ["AI", "Player"]:
         for comp in ["<",">"]:
           if (modifier.multiplier<0) == (comp=="<"):
@@ -207,7 +206,6 @@ def main():
         someThingChanged.addTagList(removeOld)
         someThingChanged.addTagList(addNew)
 
-        #TODO: remove existing modifiers
 
     cur_id_updateEvents+=1
 
@@ -225,6 +223,7 @@ def main():
   cdf.outputToFolderAndFile(modifierMenuFileContent , "events", "custom_difficultyMM_modifier_menus.txt" ,2,"../gratak_mods/custom_difficultyMM")
   cdf.outputToFolderAndFile(updateFileContent , "events", "custom_difficultyMM_modifier_update.txt" ,2,"../gratak_mods/custom_difficultyMM")
   cdf.outputToFolderAndFile(staticModifierFile , "common/static_modifiers", "custom_difficultyMM.txt" ,2,"../gratak_mods/custom_difficultyMM")
+  cdf.createTriggerFile("../gratak_mods/custom_difficultyMM")
   locList.writeToMod("../gratak_mods/custom_difficultyMM","custom_difficultyMM")
 
 def addChangeOption(event, modifier, modifierName, amount, category, locList):
