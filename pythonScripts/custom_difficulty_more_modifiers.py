@@ -19,8 +19,12 @@ eventNameSpace="custom_difficulty_mm.{!s}"
 name_gameStartFireOnlyOnce=eventNameSpace.format(0)
 name_mainMenuEvent=eventNameSpace.format(1)
 name_rootUpdateEvent=eventNameSpace.format(2)
+name_resetConfirmationEvent=eventNameSpace.format(3)
+name_removeConfirmationEvent=eventNameSpace.format(4)
 id_groupEvents=10 #reserved to 19
 id_updateEvents=20 #reserved to 21
+name_removeModifiers=eventNameSpace.format(30)
+# name_removeEventTarget=eventNameSpace.format(31)
 id_modifierEventMenus=100 #reserved to 199
 
 # t_notLockedTrigger=TagList("not", TagList("has_global_flag", "custom_difficulty_locked"))
@@ -30,8 +34,9 @@ t_rootUpdateEvent=TagList("id",name_rootUpdateEvent)
 # t_backMainOption=TagList("name","custom_difficulty_back").add("hidden_effect", TagList("country_event",TagList("id", name_mainMenuEvent)))
 # t_closeOption=TagList("name", "custom_difficulty_close.name").add("hidden_effect", TagList("country_event", t_rootUpdateEvent))
 
-t_backMainOption=TagList("name","custom_difficulty_backMM").add("hidden_effect", TagList("country_event",TagList("id", cdf.name_mainMenuEvent)))
-t_closeOption=TagList("name", "custom_difficulty_closeMM").add("hidden_effect", TagList("country_event", t_rootUpdateEvent).add("if", TagList("limit", TagList("has_global_flag", "custom_difficulty_active")).add("country_event", cdf.t_rootUpdateEvent)))
+if __name__== "__main__":
+  t_backMainOption=TagList("name","custom_difficulty_backMM").add("hidden_effect", TagList("country_event",TagList("id", cdf.name_mainMenuEvent)))
+  t_closeOption=TagList("name", "custom_difficulty_closeMM").add("hidden_effect", TagList("country_event", t_rootUpdateEvent).add("if", TagList("limit", TagList("has_global_flag", "custom_difficulty_active")).add("country_event", cdf.t_rootUpdateEvent)))
 
 def main():
   os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -49,6 +54,7 @@ def main():
   # groupFileContent=TagList("namespace", eventNameSpace.format("")[:-1])
   modifierMenuFileContent=TagList("namespace", eventNameSpace.format("")[:-1])
   updateFileContent=TagList("namespace", eventNameSpace.format("")[:-1])
+  removeStuffFileContent=TagList("namespace", eventNameSpace.format("")[:-1])
 
 
 
@@ -105,6 +111,15 @@ def main():
   isPlayable.createReturnIf(TagList("is_ai", "yes")).createEvent(eventNameSpace.format(id_updateEvents))
   isPlayable.addReturn("else").createEvent(eventNameSpace.format(id_updateEvents+1))
 
+  mainFileContent.addComment("removeAllModifiers")
+  removeALLmodifiersEvent=removeStuffFileContent.addReturn("country_event")
+  removeALLmodifiersEvent.add("id", name_removeModifiers)
+  removeALLmodifiersEvent.add("is_triggered_only","yes")
+  removeALLmodifiersEvent.add("hide_window","yes")
+  removeAllModifiersImmediate=removeALLmodifiersEvent.addReturn("immediate")
+  removeAllModifiersEt=removeAllModifiersImmediate.addReturn(ETMM)
+  removeAllModifiersImmediate=removeAllModifiersImmediate.addReturn("every_country")
+
   curIdGroupEvent=id_groupEvents
   curIdModifierEvent=id_modifierEventMenus
   for group in groupList:
@@ -139,7 +154,10 @@ def main():
       # addChangeOption(modifierEvent, modifier, modifierName, 5, "AI", locList)
       # addChangeOption(modifierEvent, modifier, modifierName, -1, "Player", locList)
       
+      removeAllModifiersEt.variableOp("set", modifierName, 0)
+      removeAllModifiersImmediate.variableOp("set", modifierName,0)
       for category in ["AI", "Player"]:
+        removeAllModifiersEt.variableOp("set", modifierName+"_"+category, 0)
         for comp in ["<",">"]:
           if (modifier.multiplier<0) == (comp=="<"):
             color="G" #checking smaller than zero and negative is good or checking larger and negativ is bad
@@ -164,6 +182,33 @@ def main():
 
   mainMenuEvent.add("option",t_backMainOption)
   mainMenuEvent.add("option",t_closeOption)
+
+
+  # locList.addEntry("custom_difficultyMM_remove.name", "@uninstall @modName : More Modifiers")
+  # locList.addEntry("custom_difficultyMM_remove.desc", "@uninstallDescMM")
+  # locList.addEntry("custom_difficultyMM_reset.name", "@reset @for @modName : More Modifiers")
+  # locList.addEntry("custom_difficultyMM_reset.desc", "@resetDescMM")
+
+
+
+
+  for t in ["reset", "remove"]:
+    mainFileContent.add("","","#{} confirmation".format(t))
+    conf=mainFileContent.addReturn("country_event")
+    conf.add("id", globals()["name_{}ConfirmationEvent".format(t)])
+    conf.add("title", "custom_difficultyMM_{}.name".format(t))
+    conf.add("desc", "custom_difficultyMM_{}.desc".format(t))
+    conf.add("picture", "GFX_evt_synth_sabotage")
+    conf.add("is_triggered_only", "yes")
+    ok=conf.addReturn("option")
+    ok.add("name", "OK")
+    effect=ok.addReturn("hidden_effect")
+    effect.add_event("name_removeModifiers", globals())
+    if t=="remove":
+      # effect.add_event("name_removeEventTarget", globals())
+      effect.add("remove_global_flag", "custom_difficultyMM_active")
+    conf.add("option", TagList("name", "custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_mainMenuEvent))))
+
 
   cur_id_updateEvents=id_updateEvents
   for category in ["AI", "Player"]:
@@ -203,6 +248,7 @@ def main():
         # addNew=cdf.createReturnIf(TagList(),TagList("NOT", cdf.variableOpNew("check", modifier.modifiername,0)))
         for r,name in zip(modifier.rangeUsed, modifier.modNames):
           removeOld.add("remove_modifier", name)
+          removeAllModifiersImmediate.add("remove_modifier", name)
           elseif=addNew.addReturn("else_if")
           value=modifier.multiplier*(r+0.5)
           value="{:.3f}".format(value)
@@ -232,6 +278,7 @@ def main():
   #OUTPUT TO FILE
   cdf.outputToFolderAndFile(onActions, "common/on_actions", "custom_difficultyMM_on_action.txt",2,"../gratak_mods/custom_difficultyMM")
   cdf.outputToFolderAndFile(mainFileContent , "events", "custom_difficultyMM_main.txt" ,2,"../gratak_mods/custom_difficultyMM")
+  cdf.outputToFolderAndFile(removeStuffFileContent , "events", "custom_difficultyMM_remove_stuff.txt" ,2,"../gratak_mods/custom_difficultyMM")
   cdf.outputToFolderAndFile(modifierMenuFileContent , "events", "custom_difficultyMM_modifier_menus.txt" ,2,"../gratak_mods/custom_difficultyMM")
   cdf.outputToFolderAndFile(updateFileContent , "events", "custom_difficultyMM_modifier_update.txt" ,2,"../gratak_mods/custom_difficultyMM")
   cdf.outputToFolderAndFile(staticModifierFile , "common/static_modifiers", "custom_difficultyMM.txt" ,2,"../gratak_mods/custom_difficultyMM")

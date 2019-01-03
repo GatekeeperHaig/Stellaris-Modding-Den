@@ -8,6 +8,7 @@ from googletrans import Translator
 import re
 from locList import LocList
 import math
+import custom_difficulty_more_modifiers as cdmm
 
 
 ET = "event_target:custom_difficulty_var_storage"
@@ -29,6 +30,8 @@ name_resetFlagsEvent="custom_difficulty.22"
 name_resetAIFlagsEvent="custom_difficulty.23"
 name_resetYearlyFlagsEvent="custom_difficulty.24"
 name_resetPlayerFlagsEvent="custom_difficulty.25"
+# name_resetConfEventMM="custom_difficulty.27"
+# name_removeConfEventMM="custom_difficulty.28"
 name_removeEvent="custom_difficulty.29"
 name_rootYearlyEvent="custom_difficulty.30"
 name_rootUpdateEvent="custom_difficulty.40"
@@ -989,7 +992,10 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
     mainMenu.add("id", name_mainMenuEvent)
     mainMenu.add("is_triggered_only", yes)
     mainMenu.add("title", "edict_custom_difficulty")
-    mainMenu.add("picture", "GFX_evt_custom_difficulty_pyra")
+    if reducedMenu:
+      mainMenu.add("picture", "GFX_evt_synth_sabotage")
+    else:
+      mainMenu.add("picture", "GFX_evt_custom_difficulty_pyra")
     trigger=TagList()
     mainMenu.add("desc", TagList("trigger", trigger))
     trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("custom_difficulty_allow_changes", "no"))
@@ -1237,6 +1243,23 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
   decreaseRandomOpt=optionsEvent.addReturn("option")
   if not reducedMenu:
     optionsEvent.add("option", TagList("name","custom_difficulty_remove.name").add("trigger", hostOrNotMP).add("custom_tooltip","custom_difficulty_remove.desc").add("hidden_effect", TagList("country_event", TagList("id",name_removeEvent))))
+  resetMM=optionsEvent.addReturn("option")
+  removeMM=optionsEvent.addReturn("option")
+  trigger=TagList("trigger", TagList("has_global_flag", "custom_difficultyMM_active"))
+  resetMM.addTagList(trigger)
+  removeMM.addTagList(trigger)
+  resetMM.add("name", "custom_difficultyMM_reset.name")
+  removeMM.add("name", "custom_difficultyMM_remove.name")
+  resetMM.add("custom_tooltip", "custom_difficultyMM_reset.desc")
+  removeMM.add("custom_tooltip", "custom_difficultyMM_remove.desc")
+  resetMM.addReturn("hidden_effect").createEvent(cdmm.name_resetConfirmationEvent)
+  removeMM.addReturn("hidden_effect").createEvent(cdmm.name_removeConfirmationEvent)
+
+  locClass.addEntry("custom_difficultyMM_remove.name", "@uninstall @modName : More Modifiers")
+  locClass.addEntry("custom_difficultyMM_remove.desc", "@uninstallDescMM")
+  locClass.addEntry("custom_difficultyMM_reset.name", "@reset @for @modName : More Modifiers")
+  locClass.addEntry("custom_difficultyMM_reset.desc", "@resetDescMM")
+
   optionsEvent.add("option", t_backMainOption )
   optionsEvent.add("option", t_closeOption)
 
@@ -1385,11 +1408,13 @@ def t_back(name):
 
 
 
-def add_event(tagList, name):
+def add_event(tagList, name, env=None):
+  if env is None:
+    env=globals()
   if name[:5]!="name_":
     print("add_event only works with predefined event names")
     return
-  tagList.add("country_event", TagList("id", eval(name))," #"+name.replace("name_",""))
+  tagList.add("country_event", TagList("id", env[name])," #"+name.replace("name_",""))
   return tagList
 TagList.add_event=add_event
 
@@ -1513,6 +1538,7 @@ def globalAddLocs(locClass):
   locClass.addLoc("marauders", "Marauders")
   locClass.addLoc("other", "Other")
 
+  locClass.addLoc("for", "for")
   locClass.addLoc("forAI", "for AI")
   locClass.addLoc("forNPCs", "for NPCs")
   locClass.addLoc("forPlayer", "for Player")
@@ -1558,6 +1584,7 @@ def globalAddLocs(locClass):
   locClass.addLoc("nonPlayer", "Non-Player")
   locClass.addLoc("reset", "Reset all settings")
   locClass.addLoc("resetDesc", "Undo all changes and reset to difficulty set before game start")
+  locClass.addLoc("resetDescMM", "Resets to clear state of the mod: Removes all modifiers and changed settings")
   locClass.addLoc("confirmation", "Confirmation")
   locClass.addLoc("allCat", "in all Categories")
   locClass.addLoc("no", "No")
@@ -1580,6 +1607,7 @@ def globalAddLocs(locClass):
   locClass.addLoc("current_options", "Currently active options")
   locClass.addLoc("uninstall", "Uninstall")
   locClass.addLoc("uninstallDesc", "Removes all modifiers, flags and variables. The mod can only be reinstalled in the same save-game via calling 'event custom_difficulty.20' in the console.")
+  locClass.addLoc("uninstallDescMM", "Removes all modifiers, flags and variables. Quit the game and disable the mod directly after doing this. Waiting for even a day will re-initialize the mod.")
 
   #options loc
   locClass.addLoc("activate_custom_mode", "Activate Custom Mode")
