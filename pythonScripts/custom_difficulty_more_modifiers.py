@@ -371,6 +371,9 @@ def loadFile(locList):
           currentModifier.setUnit("%")
         elif extraProperty.startswith('"'):
           currentModifier.changeName(extraProperty.strip('"'))
+        elif extraProperty.startswith('RANGE'):
+          s=extraProperty.split(":")
+          currentModifier.rangeUsed=range(int(s[1]),int(s[2]))
         else:
           currentModifier.addMultiplier(extraProperty)
   return groupList
@@ -405,6 +408,7 @@ class Modifier:
     self.modifier=modifier
     self.multiplier=1
     self.unit=""
+    self.rangeUsed=range(-2,11)
     if "_cost" in modifier or "_upkeep" in modifier:
       self.multiplier*=-1
     # if "_add" in modifier:
@@ -437,7 +441,9 @@ class Modifier:
     return self.__str__()+"\n"
 
 
-  def toStaticModifierFiles(self, modifierTagList, locList, rangeUsed=range(-2,11)):
+  def toStaticModifierFiles(self, modifierTagList, locList, rangeUsed=None):
+    if rangeUsed==None:
+      rangeUsed=self.rangeUsed
     if 0 in rangeUsed:
       rangeUsed=list(rangeUsed)
       rangeUsed.remove(0)
@@ -475,6 +481,7 @@ class ModifierSubGroup(Modifier):
     self.name=name
     self.modifiers=[]
     self.modNames=[]
+    self.rangeUsed=range(-2,11)
     # self.multiplier=multiplier
   def addModifier(self, modifier):
     self.modifiers.append(modifier)
@@ -490,12 +497,11 @@ class ModifierSubGroup(Modifier):
     return self.__str__()+"\n"
 
 
-  def toStaticModifierFiles(self, modifierTagList, locList, rangeUsed=range(-2,11)):
-    if 0 in rangeUsed:
-      rangeUsed=list(rangeUsed)
-      rangeUsed.remove(0)
-    self.rangeUsed=rangeUsed
-    for m in rangeUsed:
+  def toStaticModifierFiles(self, modifierTagList, locList):
+    if 0 in self.rangeUsed:
+      self.rangeUsed=list(self.rangeUsed)
+      self.rangeUsed.remove(0)
+    for m in self.rangeUsed:
       if m==0:
         continue
       modName="custom_difficulty_MM_{}_{!s}".format(self.name.replace(" ","_"), m)
