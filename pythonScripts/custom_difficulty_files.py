@@ -1301,7 +1301,7 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
     removeConfirmation.add("picture", "GFX_evt_towel")
     effect=TagList()
     add_event(effect, "name_resetFlagsEvent")
-    add_event(effect, "name_resetEvent")
+    # add_event(effect, "name_resetEvent")
     add_event(effect, "name_removeAllModifiers")
     effect.add("remove_global_flag", "custom_difficulty_active")
     removeConfirmation.add("option", TagList("name", "OK").add("hidden_effect", effect))
