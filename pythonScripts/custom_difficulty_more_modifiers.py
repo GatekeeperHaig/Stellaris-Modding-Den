@@ -216,8 +216,10 @@ def main():
 
 
 
+  mainModLocList=LocList()
+  cdf.globalAddLocs(mainModLocList)
 
-  cdf.createMenuFile(locList, None, None, None, False, "../gratak_mods/custom_difficultyMM", True,gameStartAfter)
+  cdf.createMenuFile(mainModLocList, None, None, None, False, "../gratak_mods/custom_difficultyMM", True,gameStartAfter)
   onActions=TagList("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
   #OUTPUT TO FILE
   cdf.outputToFolderAndFile(onActions, "common/on_actions", "custom_difficultyMM_on_action.txt",2,"../gratak_mods/custom_difficultyMM")
@@ -228,6 +230,7 @@ def main():
   cdf.createTriggerFile("../gratak_mods/custom_difficultyMM")
   cdf.createEdictFile("../gratak_mods/custom_difficultyMM")
   locList.writeToMod("../gratak_mods/custom_difficultyMM","custom_difficultyMM")
+  mainModLocList.writeToMod("../gratak_mods/custom_difficultyMM","custom_difficulty")
 
 def addChangeOption(event, modifier, modifierName, amount, category, locList):
   option=event.addReturn("option")
