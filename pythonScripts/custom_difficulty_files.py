@@ -1099,7 +1099,10 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
     # .add("every_country",TagList("country_event", TagList("id", name_removeOLDModifiers)," #removeOldModifiers")))
 
     # resetEvent.get("immediate").insert(0, "country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent").insert(0, "country_event", TagList("id", name_removeEventTarget)," #removeEventTarget")
-    immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
+    createEventTarget=immediate.createReturnIf(TagList("has_global_flag","MM_was_active_before_custom_difficulty"))
+    createEventTarget.add("remove_global_flag","MM_was_active_before_custom_difficulty")
+    createEventTarget=immediate.addReturn("else")
+    createEventTarget.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
     for strength in [0.25, 0.5, 1, 2,3,4,5]:
       gameStartInitEvent.add("option", TagList("name", "custom_difficulty_{!s}_crisis.name".format(strength))
         .add("trigger", TagList("is_crises_allowed", yes))
@@ -1124,22 +1127,22 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
       gameStartAfter.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", eventNameSpace.format(id_defaultEvents+i))))
     gameStartAfter.add("country_event", TagList("id", name_rootUpdateEvent))
 
-    mainFileContent.addComment("Assign a variable to each default country that will decide how much their difficulty modifiers are decreased by randomness")
-    randomInitEvent=mainFileContent.addReturn("country_event")
-    randomInitEvent.add("id", name_randomDiffFireOnlyOnce)
-    randomInitEvent.add("hide_window",yes)
-    randomInitEvent.add("trigger", TagList("NOT", TagList("has_global_flag", "custom_difficulty_random_difficulty_given")))
-    immediate=randomInitEvent.addReturn("immediate")
-    immediate.add("set_global_flag", "custom_difficulty_random_difficulty_given")
-    immediateEachCountry=immediate.addReturn("every_country")
-    immediateEachCountry.add("limit", TagList("is_country_type","default").add("is_ai", "yes"))
-    randomList=immediateEachCountry.addReturn("random_list")
-    maxRandVal=20 #if you change this, you need to also change the 20 in createModifierEvents (where I was to lazy to add this as input!)
-    for i in range(maxRandVal+1): #nbr of random steps
-      e=randomList.addReturn("1") #uniform chance
-      e.variableOp("set", "custom_difficulty_random_handicap",i)
-    if debugMode:
-      immediateEachCountry.add("log",'"[this.GetName]:[this.custom_difficulty_random_handicap]"')
+  mainFileContent.addComment("Assign a variable to each default country that will decide how much their difficulty modifiers are decreased by randomness")
+  randomInitEvent=mainFileContent.addReturn("country_event")
+  randomInitEvent.add("id", name_randomDiffFireOnlyOnce)
+  randomInitEvent.add("hide_window",yes)
+  randomInitEvent.add("trigger", TagList("NOT", TagList("has_global_flag", "custom_difficulty_random_difficulty_given")))
+  immediate=randomInitEvent.addReturn("immediate")
+  immediate.add("set_global_flag", "custom_difficulty_random_difficulty_given")
+  immediateEachCountry=immediate.addReturn("every_country")
+  immediateEachCountry.add("limit", TagList("is_country_type","default").add("is_ai", "yes"))
+  randomList=immediateEachCountry.addReturn("random_list")
+  maxRandVal=20 #if you change this, you need to also change the 20 in createModifierEvents (where I was to lazy to add this as input!)
+  for i in range(maxRandVal+1): #nbr of random steps
+    e=randomList.addReturn("1") #uniform chance
+    e.variableOp("set", "custom_difficulty_random_handicap",i)
+  if debugMode:
+    immediateEachCountry.add("log",'"[this.GetName]:[this.custom_difficulty_random_handicap]"')
 
 
 

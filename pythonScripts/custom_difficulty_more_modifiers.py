@@ -77,6 +77,13 @@ def main():
   gameStartAfter=TagList()
   gameStartInitEvent.add("after",TagList("hidden_effect", gameStartAfter))
   gameStartAfter.add("set_global_flag", "custom_difficultyMM_active")
+  cdNotActive=gameStartAfter.createReturnIf(TagList("NOT", TagList("has_global_flag", "custom_difficulty_active")))
+  cdNotActive.addComment("make sure mod menu works:")
+  cdNotActive.add("set_global_flag", "custom_difficulty_active")
+  cdNotActive.addComment("make sure the original init function still works:")
+  cdNotActive.add("set_global_flag", "MM_was_active_before_custom_difficulty")
+  cdNotActive.addComment("main mod event target to save randomnessfactor:")
+  cdNotActive.add("save_global_event_target_as", cdf.ET.replace("event_target:",""))
 
 
   mainFileContent.add("","","#more modifiers main event")
@@ -172,6 +179,7 @@ def main():
       localUpdateImmediate.addComment("Update randomness")
       localUpdateImmediate.variableOp("set", "custom_difficulty_randomness_factor",1)
       localUpdateImmediate.variableOp("set", "custom_difficulty_tmp","custom_difficulty_random_handicap")
+      localUpdateImmediate.variableOp("set", "custom_difficulty_random_handicap_perc",cdf.ET)
       localUpdateImmediate.variableOp("multiply", "custom_difficulty_tmp","custom_difficulty_random_handicap_perc")
       localUpdateImmediate.variableOp("divide", "custom_difficulty_tmp",100*20) #100 for from perc, 20 as max handicap
       localUpdateImmediate.variableOp("subtract", "custom_difficulty_randomness_factor","custom_difficulty_tmp")
