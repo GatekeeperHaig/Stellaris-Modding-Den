@@ -1064,13 +1064,14 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
   mainFileContent.add("event", rootUpdateMenu)
   rootUpdateMenu.add("is_triggered_only", yes)
   rootUpdateMenu.add("hide_window", yes)
-  immediate=TagList()
-  rootUpdateMenu.add("immediate",immediate)
-  ifSimple=TagList("limit",TagList("has_global_flag", "custom_difficulty_activate_simple_mode"))
-  ifSimple.add("if", ifDelay(name_countryUpdateEventSimple))
-  ifSimple.add("else", TagList("every_country", TagList("country_event", TagList("id", name_countryUpdateEventSimple)))) #fixed 2.1
-  immediate.add("if", ifSimple)
-  immediate.add("else", TagList("if",ifDelay(name_countryUpdateEvent)).add("else", TagList("every_country", TagList("country_event", TagList("id", name_countryUpdateEvent))))) #fixed 2.1
+  if not reducedMenu:
+    immediate=TagList()
+    rootUpdateMenu.add("immediate",immediate)
+    ifSimple=TagList("limit",TagList("has_global_flag", "custom_difficulty_activate_simple_mode"))
+    ifSimple.add("if", ifDelay(name_countryUpdateEventSimple))
+    ifSimple.add("else", TagList("every_country", TagList("country_event", TagList("id", name_countryUpdateEventSimple)))) #fixed 2.1
+    immediate.add("if", ifSimple)
+    immediate.add("else", TagList("if",ifDelay(name_countryUpdateEvent)).add("else", TagList("every_country", TagList("country_event", TagList("id", name_countryUpdateEvent))))) #fixed 2.1
 
 
 
@@ -1234,7 +1235,8 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
   hostOrNotMP=TagList("OR", TagList("is_multiplayer", "no").add("has_country_flag", "custom_difficulty_game_host"))
   increaseRandomOpt=optionsEvent.addReturn("option")
   decreaseRandomOpt=optionsEvent.addReturn("option")
-  optionsEvent.add("option", TagList("name","custom_difficulty_remove.name").add("trigger", hostOrNotMP).add("custom_tooltip","custom_difficulty_remove.desc").add("hidden_effect", TagList("country_event", TagList("id",name_removeEvent))))
+  if not reducedMenu:
+    optionsEvent.add("option", TagList("name","custom_difficulty_remove.name").add("trigger", hostOrNotMP).add("custom_tooltip","custom_difficulty_remove.desc").add("hidden_effect", TagList("country_event", TagList("id",name_removeEvent))))
   optionsEvent.add("option", t_backMainOption )
   optionsEvent.add("option", t_closeOption)
 
