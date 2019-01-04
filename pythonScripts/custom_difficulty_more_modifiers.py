@@ -218,6 +218,7 @@ def main():
     localUpdateEvent.add("hide_window","yes" )
     localUpdateEvent.add("is_triggered_only", "yes")
     localUpdateImmediate=localUpdateEvent.addReturn("immediate")
+    localUpdateImmediate.add("set_country_flag", "custom_difficulty_mm_country_known")
     etUpdate=localUpdateImmediate.addReturn(ETMM)
 
     if category=="AI":
@@ -263,6 +264,15 @@ def main():
 
 
     cur_id_updateEvents+=1
+  localUpdateEvent=updateFileContent.addReturn("country_event")
+  localUpdateEvent.add("id", eventNameSpace.format(cur_id_updateEvents))
+  localUpdateEvent.addComment("update newly created countries without having to open menu")
+  localUpdateEvent.add("hide_window","yes" )
+  localUpdateEvent.add("is_triggered_only", "yes")
+  localUpdateEvent.addReturn("trigger").add("NOT", TagList("has_country_flag", "custom_difficulty_mm_country_known"))
+  localUpdateImmediate=localUpdateEvent.addReturn("immediate")
+  localUpdateImmediate.createReturnIf(TagList("is_ai","yes")).createEvent(eventNameSpace.format(id_updateEvents))
+  localUpdateImmediate.addReturn("else").createEvent(eventNameSpace.format(id_updateEvents+1))
 
 
 
@@ -275,6 +285,7 @@ def main():
 
   cdf.createMenuFile(mainModLocList, None, None, None, False, "../gratak_mods/custom_difficulty_mm", True,gameStartAfter)
   onActions=TagList("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
+  onActions.addReturn("on_ruler_set").addReturn("events").add(eventNameSpace.format(cur_id_updateEvents))
   #OUTPUT TO FILE
   cdf.outputToFolderAndFile(onActions, "common/on_actions", "custom_difficultyMM_on_action.txt",2,"../gratak_mods/custom_difficulty_mm")
   cdf.outputToFolderAndFile(mainFileContent , "events", "custom_difficultyMM_main.txt" ,2,"../gratak_mods/custom_difficulty_mm")
