@@ -89,7 +89,7 @@ def main():
   cdNotActive.addComment("make sure the original init function still works:")
   cdNotActive.add("set_global_flag", "MM_was_active_before_custom_difficulty")
   cdNotActive.addComment("main mod event target to save randomnessfactor:")
-  cdNotActive.add("save_global_event_target_as", cdf.ET.replace("event_target:",""))
+  cdNotActive.add("random_planet", TagList("save_global_event_target_as", cdf.ET.replace("event_target:","")))
 
 
   mainFileContent.add("","","#more modifiers main event")
@@ -273,19 +273,19 @@ def main():
   mainModLocList=LocList()
   cdf.globalAddLocs(mainModLocList)
 
-  cdf.createMenuFile(mainModLocList, None, None, None, False, "../gratak_mods/custom_difficultyMM", True,gameStartAfter)
+  cdf.createMenuFile(mainModLocList, None, None, None, False, "../gratak_mods/custom_difficulty_mm", True,gameStartAfter)
   onActions=TagList("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
   #OUTPUT TO FILE
-  cdf.outputToFolderAndFile(onActions, "common/on_actions", "custom_difficultyMM_on_action.txt",2,"../gratak_mods/custom_difficultyMM")
-  cdf.outputToFolderAndFile(mainFileContent , "events", "custom_difficultyMM_main.txt" ,2,"../gratak_mods/custom_difficultyMM")
-  cdf.outputToFolderAndFile(removeStuffFileContent , "events", "custom_difficultyMM_remove_stuff.txt" ,2,"../gratak_mods/custom_difficultyMM")
-  cdf.outputToFolderAndFile(modifierMenuFileContent , "events", "custom_difficultyMM_modifier_menus.txt" ,2,"../gratak_mods/custom_difficultyMM")
-  cdf.outputToFolderAndFile(updateFileContent , "events", "custom_difficultyMM_modifier_update.txt" ,2,"../gratak_mods/custom_difficultyMM")
-  cdf.outputToFolderAndFile(staticModifierFile , "common/static_modifiers", "custom_difficultyMM.txt" ,2,"../gratak_mods/custom_difficultyMM")
-  cdf.createTriggerFile("../gratak_mods/custom_difficultyMM")
-  cdf.createEdictFile("../gratak_mods/custom_difficultyMM")
-  locList.writeToMod("../gratak_mods/custom_difficultyMM","custom_difficultyMM")
-  mainModLocList.writeToMod("../gratak_mods/custom_difficultyMM","custom_difficulty")
+  cdf.outputToFolderAndFile(onActions, "common/on_actions", "custom_difficultyMM_on_action.txt",2,"../gratak_mods/custom_difficulty_mm")
+  cdf.outputToFolderAndFile(mainFileContent , "events", "custom_difficultyMM_main.txt" ,2,"../gratak_mods/custom_difficulty_mm")
+  cdf.outputToFolderAndFile(removeStuffFileContent , "events", "custom_difficultyMM_remove_stuff.txt" ,2,"../gratak_mods/custom_difficulty_mm")
+  cdf.outputToFolderAndFile(modifierMenuFileContent , "events", "custom_difficultyMM_modifier_menus.txt" ,2,"../gratak_mods/custom_difficulty_mm")
+  cdf.outputToFolderAndFile(updateFileContent , "events", "custom_difficultyMM_modifier_update.txt" ,2,"../gratak_mods/custom_difficulty_mm")
+  cdf.outputToFolderAndFile(staticModifierFile , "common/static_modifiers", "custom_difficultyMM.txt" ,2,"../gratak_mods/custom_difficulty_mm")
+  cdf.createTriggerFile("../gratak_mods/custom_difficulty_mm")
+  cdf.createEdictFile("../gratak_mods/custom_difficulty_mm")
+  locList.writeToMod("../gratak_mods/custom_difficulty_mm","custom_difficultyMM")
+  mainModLocList.writeToMod("../gratak_mods/custom_difficulty_mm","custom_difficulty")
 
 def addChangeOption(event, modifier, modifierName, amount, category, locList):
   option=event.addReturn("option")
