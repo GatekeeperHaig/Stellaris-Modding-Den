@@ -442,6 +442,8 @@ class Modifier:
     # self.name+=extra
 
   def setUnit(self,unit):
+    if self.unit==unit:
+      return
     self.unit=unit
     if unit=="%":
       self.multiplier*=10 #default percent value
