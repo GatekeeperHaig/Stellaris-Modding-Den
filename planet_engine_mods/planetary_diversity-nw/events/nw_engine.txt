@@ -9,7 +9,7 @@ event = {
 		set_global_flag = planetarydiversity-nw
 		every_planet = { 
 			if = { 			
-				limit = { is_planet_class = pc_gas_giant has_moon = yes }
+				limit = { is_gas_giant = yes has_moon = yes }
 				every_moon = { set_planet_flag = gas_giant_moon }
 			}
 			if = { 			
@@ -44,8 +44,13 @@ event = {
 								has_star_flag = sol_system
 								has_star_flag = custom_system
 								has_star_flag = floating_system
-								has_star_flag = crystal_system
+								has_star_flag = pdcrystal_system
 								has_star_flag = city_system
+								has_star_flag = graveyard_system
+								has_star_flag = mushroom_system
+								has_star_flag = biolumen_system
+								has_star_flag = technoorganic_system
+								has_star_flag = archive_system
 								has_star_flag = empire_home_system
 								has_star_flag = primitive_sol
 								has_star_flag = eilistraee_system
@@ -102,7 +107,6 @@ planet_event = {
 					change_owner_species_to_this_planet_preference = yes			
 				}	
 			}
-			# Add marginal planets later
 		}
 	}
 }
@@ -155,4 +159,100 @@ event = {
 			}
 			
 		}
+}
+
+country_event = {
+    id = nwengine.09
+	title = nwengine.09.name
+	desc = nwengine.09.desc
+	picture = GFX_evt_drilling_for_gas
+	show_sound = event_default
+	location = root
+
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { is_ai = no }
+		solar_system = { has_star_flag = sol_system }
+	}
+
+	option = {
+		name = nwengine.09.a
+        every_planet = {
+            if = {
+                limit = {
+                    solar_system = { has_star_flag = sol }
+                    is_planet_class = pc_hot_reducing       
+                    NOT = { has_planet_flag = "pdvenusnoterraform" }
+				}
+                set_planet_flag = "pdvenusnoterraform"
+            }
+		}
+		every_planet = {
+            if = {
+                limit = {
+                    solar_system = { has_star_flag = sol }
+                    is_planet_class = pc_cold_reducing       
+                    NOT = { has_planet_flag = "pdtitannoterraform" }
+				}
+                set_planet_flag = "pdtitannoterraform"
+            }
+		}
+	}
+
+	option = {
+		name = nwengine.09.b
+        every_planet = {
+            if = {
+                limit = {
+                    solar_system = { has_star_flag = sol }
+                    is_planet_class = pc_hot_reducing       
+                    NOT = { has_planet_flag = "pdvenusnoterraform" }
+				}
+                add_modifier = { modifier = "terraforming_candidate" days = -1 }
+                set_planet_flag = "pdvenus"
+            }
+		}
+	}
+	
+	option = {
+		name = nwengine.09.c
+        every_planet = {
+            if = {
+                limit = {
+                    solar_system = { has_star_flag = sol }
+                    is_planet_class = pc_cold_reducing
+                    NOT = { has_planet_flag = "pdtitannoterraform" }
+				}
+                add_modifier = { modifier = "terraforming_candidate" days = -1 }
+                set_planet_flag = "pdtitan"
+            }
+		}
+	}
+
+	option = {
+		name = nwengine.09.d
+		every_planet = {
+			if = {
+				limit = {
+					solar_system = { has_star_flag = sol }
+					is_planet_class = pc_cold_reducing
+					NOT = { has_planet_flag = "pdtitannoterraform" }
+				}
+				add_modifier = { modifier = "terraforming_candidate" days = -1 }
+				set_planet_flag = "pdtitan"
+	      	}
+		}
+	    every_planet = {
+            if = {
+                limit = {
+					solar_system = { has_star_flag = sol }
+                    is_planet_class = pc_hot_reducing
+                    NOT = { has_planet_flag = "pdvenus" }
+				}
+                add_modifier = { modifier = "terraforming_candidate" days = -1 }
+                set_planet_flag = "pdvenus"
+			}
+		}	
+	}		
 }
