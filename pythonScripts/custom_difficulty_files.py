@@ -72,8 +72,8 @@ def main():
     changeSteps.append(-s)
   for s in reversed(changeStepYears):
     changeStepYears.append(-s)
-  possibleBoniNames=["station", "jobs",  "cap",   "upkeep", "ship_cost","stability", "diplo_upkeep", "damage","hull","armor","shield"] #, "growth"
-  npcBoni=[           False,      False,   False,   False,    False,    False       ,False          ,True,   True,     True, True]
+  possibleBoniNames=["station", "jobs",  "cap",   "upkeep", "ship_cost","stability", "diplo_upkeep", "damage","hull","armor","shield","fire_rate"] #, "growth"
+  npcBoni=[           False,      False,   False,   False,    False,    False       ,False          ,True,   True,     True, True,True]
   # boniFactor= [         1,          1,      1,    -1,           -1,         0.2,        -1,             1,      1,      1,      1]
   boniUnit=dict()
   for bonus in possibleBoniNames:
@@ -98,7 +98,9 @@ def main():
   "GFX_evt_debris", 
   "GFX_evt_sabotaged_ship",
   "GFX_evt_pirate_armada",
-  "GFX_evt_fleet_neutral"]
+  "GFX_evt_fleet_neutral",
+  "GFX_evt_debris"
+  ]
   possibleBoniModifier=[
   "stations_produces_mult", 
   "planet_jobs_produces_mult", 
@@ -111,16 +113,17 @@ def main():
   "ship_hull_mult",
   "ship_armor_mult",
   "ship_shield_mult",
+  "ship_fire_rate_mult"
   # ["ship_upkeep_mult","planet_building_upkeep_mult","country_starbase_upkeep_mult","army_upkeep_mult","pop_robot_upkeep_mult"]#,
   # ["pop_growth_speed","pop_robot_build_speed_mult"]
   ]
-  possibleBoniIcons=["£systems","£job", "£navy_size", "£ship_stats_maintenance","£ship_stats_build_cost", "£stability", "£influence","£military_power","£ship_stats_hitpoints","£ship_stats_armor","£ship_stats_shield"
+  possibleBoniIcons=["£systems","£job", "£navy_size", "£ship_stats_maintenance","£ship_stats_build_cost", "£stability", "£influence","£military_power","£ship_stats_hitpoints","£ship_stats_armor","£ship_stats_shield","£military_power"
   # ,"£ship_stats_maintenance","£pops"
   ]
-  possibleBoniColor=["E","B","G","P","Y","H","M","R","G","H","B"
+  possibleBoniColor=["E","B","G","P","Y","H","M","R","G","H","B","R"
   # ,"T","G"
   ]
-  defaultEmpireBonusMultList=[25,25,15,-10,-10,5,-15,0,0,0,0]
+  defaultEmpireBonusMultList=[25,25,15,-10,-10,5,-15,0,0,0,0,0]
   defaultEmpireBonusMult=dict()
   for i,bonus in enumerate(possibleBoniNames):
     defaultEmpireBonusMult[bonus]=defaultEmpireBonusMultList[i]
@@ -475,7 +478,7 @@ def main():
     difficultiesPresetProperties[diff]["ai"]=[defaultEmpireBonusMult[bonus]*i for bonus in possibleBoniNames]
     difficultiesPresetProperties[diff]["player"]=[0 for _ in possibleBoniNames]
     for cat in catsWithnpcBoniBoni:
-      difficultiesPresetProperties[diff][cat]=[condVal(1,s)*(npcBonusBase+i*npcBonusAdd) for s in npcBoni]
+      difficultiesPresetProperties[diff][cat]=[condVal(1,s)*(npcBonusBase+i*npcBonusAdd) for s in npcBoni[:-1]]
       if cat != "crisis":
         difficultiesPresetProperties[diff][cat]=[f/2 for f in difficultiesPresetProperties[diff][cat]]
   difficultiesPresetProperties["cadet"]=deepcopy(difficultiesPresetProperties["ensign"])
@@ -1495,6 +1498,7 @@ def globalAddLocs(locClass):
   locClass.addLoc("ship_cost", "$MOD_STARBASE_SHIPYARD_BUILD_COST_MULT$","all")
   locClass.addLoc("stability", "$PLANET_STABILITY_TITLE$","all")
   locClass.addLoc("diplo_upkeep", "$mod_diplomacy_upkeep_mult$","all")
+  locClass.addLoc("fire_rate", "$MOD_SHIP_FIRE_RATE_MULT$","all")
   locClass.addLoc("cap", "$NAVY_SIZE_TITLE$","all")
   locClass.addLoc("hull", "$HULL$","all")
   locClass.addLoc("armor", "$ARMOR$","all")
