@@ -269,7 +269,7 @@ def main():
   localUpdateEvent.addComment("update newly created countries without having to open menu")
   localUpdateEvent.add("hide_window","yes" )
   localUpdateEvent.add("is_triggered_only", "yes")
-  localUpdateEvent.addReturn("trigger").add("NOT", TagList("has_country_flag", "custom_difficulty_mm_country_known"))
+  localUpdateEvent.addReturn("trigger").add("NOT", TagList("has_country_flag", "custom_difficulty_mm_country_known")).add("has_global_flag","custom_difficultyMM_active")
   localUpdateImmediate=localUpdateEvent.addReturn("immediate")
   localUpdateImmediate.createReturnIf(TagList("is_ai","yes")).createEvent(eventNameSpace.format(id_updateEvents))
   localUpdateImmediate.addReturn("else").createEvent(eventNameSpace.format(id_updateEvents+1))
