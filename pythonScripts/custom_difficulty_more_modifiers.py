@@ -419,7 +419,7 @@ class Modifier:
     self.modifier=modifier
     self.multiplier=1
     self.unit=""
-    self.rangeUsed=range(-2,11)
+    self.rangeUsed=range(-10,21)
     if "_cost" in modifier or "_upkeep" in modifier:
       self.multiplier*=-1
     # if "_add" in modifier:
@@ -494,7 +494,7 @@ class ModifierSubGroup(Modifier):
     self.name=name
     self.modifiers=[]
     self.modNames=[]
-    self.rangeUsed=range(-2,11)
+    self.rangeUsed=range(-10,21)
     # self.multiplier=multiplier
   def addModifier(self, modifier):
     self.modifiers.append(modifier)
