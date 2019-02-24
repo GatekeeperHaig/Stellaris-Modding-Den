@@ -1,0 +1,183 @@
+@high = 16
+@med = 8
+@low = 4
+
+@high_rare = 0.5
+@mid_rare = 0.25
+@low_rare = 0.1
+
+@blocker_high = 10
+@blocker_low = 5
+
+@planet_type_bonus = 1.5
+
+
+# Subterranean deposits
+
+d_mineral_rich_rock = {
+	is_for_colonizeable = yes
+	use_for_min_max_adjustments = no
+	
+	use_weights_for_terraforming_swap_types = no
+	should_swap_deposit_on_terraforming = no
+	
+	category = deposit_cat_minerals
+	
+	planet_modifier = { 
+		district_mining_max = 1
+	}
+	
+	potential = {
+		OR = {
+			is_planet_class_pc_underground_rocky = yes
+			is_planet_class_pc_underground_icy = yes
+		}
+	}
+	
+	drop_weight = {
+		weight = @med
+	}
+}
+
+d_geothermal_rock = {
+	is_for_colonizeable = yes
+	use_for_min_max_adjustments = no
+	
+	use_weights_for_terraforming_swap_types = no
+	should_swap_deposit_on_terraforming = no
+	
+	category = deposit_cat_energy
+	
+	planet_modifier = { 
+		district_generator_max = 1
+	}
+	
+	potential = {
+		OR = {
+			is_planet_class_pc_underground_rocky = yes
+			is_planet_class_pc_underground_icy = yes
+		}
+	}
+	
+	drop_weight = {
+		weight = @low
+	}
+}
+
+# Subterranean blockers
+
+d_rock = {	
+	time = 270
+	use_for_min_max_adjustments = no
+	is_for_colonizeable = yes
+	category = deposit_cat_blockers
+	
+	resources = {
+		category = deposit_blockers
+		cost = {
+			energy = 500
+		}
+	}
+	
+	potential = {
+		OR = {
+			is_planet_class_pc_underground_rocky = yes
+			is_planet_class_pc_underground_icy = yes
+		}
+	}
+	
+	planet_modifier = { 
+		planet_max_districts_add = -1
+	}
+	
+	on_cleared = {
+		random_list = {
+			50 = { 
+				add_deposit = d_mineral_rich_rock
+			}
+			25 = {
+				add_deposit = d_geothermal_rock
+			}
+			25 = {
+				# nothing
+			}
+		}
+		
+	}
+	
+	drop_weight = {
+		weight = @high
+		modifier = {
+			factor = 10
+			is_planet_class_pc_underground_rocky = yes
+		}
+		modifier = {
+			factor = 5
+			is_planet_class_pc_underground_icy = yes
+		}	
+	}
+	
+	ai_weight = {
+		weight = 10
+	}
+	
+	#prerequisites = { "tech_mountain_range" }
+}
+
+d_ice = {	
+	time = 270
+	use_for_min_max_adjustments = no
+	is_for_colonizeable = yes
+	category = deposit_cat_blockers
+	
+	resources = {
+		category = deposit_blockers
+		cost = {
+			energy = 500
+		}
+	}
+	
+	potential = {
+		OR = {
+			is_planet_class_pc_underground_rocky = yes
+			is_planet_class_pc_underground_icy = yes
+		}
+	}
+	
+	planet_modifier = { 
+		planet_max_districts_add = -1
+	}
+	
+	on_cleared = {
+		random_list = {
+			50 = { 
+				add_deposit = d_geothermal_rock
+			}
+			25 = {
+				add_deposit = d_mineral_rich_rock
+			}
+			25 = {
+				# nothing
+			}
+		}
+		
+	}
+	
+	drop_weight = {
+		weight = @high
+		modifier = {
+			factor = 2
+			is_planet_class_pc_underground_rocky = yes
+		}
+		modifier = {
+			factor = 13
+			is_planet_class_pc_underground_icy = yes
+		}	
+	}
+	
+	ai_weight = {
+		weight = 10
+	}
+	
+	#prerequisites = { "tech_mountain_range" }
+}
