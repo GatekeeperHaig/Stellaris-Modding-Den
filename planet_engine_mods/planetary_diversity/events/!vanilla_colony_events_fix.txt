@@ -185,6 +185,7 @@ planet_event = {
 			is_planet_class = pc_archive
 			is_planet_class = pc_superhabitable
 			is_planet_class = pc_geothermal
+			is_planet_class = pc_biolumen
 			owner = { has_country_flag = abandoned_terraforming_country }
 			owner = { has_authority = auth_machine_intelligence }
 			AND = {
@@ -282,10 +283,6 @@ planet_event = {
 			AND = {
 				owner = { ideal_planet_class = pc_mushroom }
 				is_planet_class = pc_mushroom
-			}
-			AND = {
-				owner = { ideal_planet_class = pc_biolumen }
-				is_planet_class = pc_biolumen
 			}
 			AND = {
 				owner = { ideal_planet_class = pc_antarctic }
@@ -462,6 +459,7 @@ planet_event = {
 	option = {
 		name = colony.103.b
 		trigger = {
+			AND = {
 				count_pops = {
 					limit = { is_robot_pop = no }
 					count > 8
@@ -470,6 +468,7 @@ planet_event = {
 					limit = { is_robot_pop = no }
 					count < 17
 				}
+			}
 			owner = { resource_stockpile_compare = { resource = energy value >= 375 } }
 		}
 		owner = {
@@ -532,7 +531,7 @@ planet_event = {
 					4 = { change_pc = pc_alpine }
 					4 = { change_pc = pc_savannah }	
 					4 = { change_pc = pc_mushroom }
-					4 = { change_pc = pc_biolumen }				
+							
 			}
 		}
 	}
@@ -576,7 +575,7 @@ planet_event = {
 				4 = { change_pc = pc_alpine }
 				4 = { change_pc = pc_savannah }	
 				4 = { change_pc = pc_mushroom }
-				4 = { change_pc = pc_biolumen }		
+						
 			}
 			remove_modifier = "abandoned_terraforming"
 			owner = { set_country_flag = terraforming_mutants_invade_country }
@@ -636,11 +635,28 @@ planet_event = {
 	}
 }
 
-# Special Project Completed 4 (Ammonia)
+# Special Project Completed 4 (Tomb World)
 planet_event = {
 	id = colony.107
 	title = "PROJECT_COMPLETE"
-	desc = "colony.107.desc"
+	desc = {
+		trigger = {
+			NOR = {
+				owner = { has_civic = civic_post_apocalyptic} 
+				owner.species = { has_trait = trait_pc_nuked_preference }
+			}
+		}
+		text = "colony.107.desc"
+	}
+	desc = {
+		trigger = {
+			OR = {
+				owner = { has_civic = civic_post_apocalyptic} 
+				owner.species = { has_trait = trait_pc_nuked_preference }
+			}
+		}
+		text = "colony.107.desc.nuked_pref"
+	}
 	picture = GFX_evt_dead_city
 	show_sound = event_activating_unknown_technology
 	location = ROOT
@@ -648,14 +664,56 @@ planet_event = {
 	is_triggered_only = yes
 	
 	option = {
-		name = colony.107.a
-		change_pc = pc_ammonia
-		destroy_colony = yes
-		add_modifier = {
-			modifier = "ammonia_biosphere"
-			days = -1
+		trigger = {
+			NOR = {
+				owner = { has_civic = civic_post_apocalyptic} 
+				owner.species = { has_trait = trait_pc_nuked_preference }
+			}
 		}
-		set_deposit = d_society_3
+		name = colony.107.a
+		change_pc = pc_nuked
+		if = { #Destroys colony if no planet pops can live on Tomb Worlds
+			limit = {
+				NOT = {
+					any_owned_pop = {
+						OR = {
+							has_trait = trait_pc_nuked_preference
+							has_trait = trait_mechanical
+							has_trait = trait_machine_unit
+						}
+					}
+				}
+			}
+			destroy_colony = yes
+		}
+		else = { #Kills only planet pops that cannot live on Tomb Worlds
+			hidden_effect = {
+				every_owned_pop = {
+					limit = {
+						NOR = {
+							has_trait = trait_pc_nuked_preference
+							has_trait = trait_mechanical
+							has_trait = trait_machine_unit
+						}
+					}
+					kill_pop = yes
+				}
+			}
+			custom_tooltip = colony.107.a.tooltip
+		}
+		hidden_effect = {
+			remove_modifier = "abandoned_terraforming"
+		}
+	}
+	option = {
+		trigger = {
+			OR = {
+				owner = { has_civic = civic_post_apocalyptic} 
+				owner.species = { has_trait = trait_pc_nuked_preference }
+			}
+		}
+		name = EXCELLENT
+		change_pc = pc_nuked
 		hidden_effect = {
 			remove_modifier = "abandoned_terraforming"
 		}
