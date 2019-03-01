@@ -688,3 +688,128 @@ building_eludium_plant = {
 		}
 	}
 }
+
+building_crystal_pillar = {
+	base_buildtime = 360
+
+	category = resource
+	
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		OR = {
+			NOT = { is_planet_class = pc_habitat }
+			AND = {
+				exists = owner
+				owner = { is_gestalt = yes }
+			}
+		}
+	}
+
+	base_cap_amount = 1
+	
+	planet_modifier = {
+		planet_jobs_food_produces_mult = 0.10
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_farmer_add = 4
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			job_agri_drone_add = 4
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+		modifier = {
+			district_generator_max = 2
+			planet_technician_energy_produces_mult = 0.05
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 200
+		}
+		cost = {
+			trigger = {
+				owner = { 
+					is_machine_empire = yes
+				}
+			}
+			minerals = 100
+			alloys = 100
+		}
+		upkeep = {
+			sr_acean = 1
+		}
+	}	
+	
+	prerequisites = {
+		tech_crystal_pillar
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = job_agri_drone_effect_desc
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = job_technician_effect_desc
+	}
+	
+	ai_weight = {
+		weight = 2
+		modifier = 
+		{
+			factor = 5
+			owner = { 
+				has_monthly_income = {
+					resource = sr_acean
+					value < 2
+				}
+			}
+		}
+		# No one to work it
+		modifier = {
+			factor = 0
+			count_owned_pops = { 
+				limit = { 
+					OR = { 
+						is_unemployed = yes 
+						has_job = servant 
+					}
+				}
+				count < 1
+			}
+		}
+	}
+
+	ai_resource_production = {
+		energy = 1
+		trigger = {
+			always = yes
+		}
+	}
+}
