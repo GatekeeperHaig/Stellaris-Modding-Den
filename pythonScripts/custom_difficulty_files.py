@@ -204,7 +204,7 @@ def main():
   catCountryType=[
   ["default"], 
   ["default"],
-  ["fallen_empire", "awakened_fallen_empire","ascended_empire"],
+  ["fallen_empire", "awakened_fallen_empire","ascended_empire","eternal_empire"],
   ["guardian", "guardian_dragon", "guardian_stellarite","guardian_wraith","guardian_hiver","guardian_horror","guardian_fortress","guardian_dreadnought", "guardian_sphere","guardian_scavenger_bot","guardian_elderly_tiyanki","ldragon_country","guardian_hatchling"],
   [],
   ["swarm", "extradimensional", "extradimensional_2", "extradimensional_3", "ai_empire","cybrex_empire","sentinels", "portal_holders", "feral_prethoryn","feral_prethoryn_infighting"],
