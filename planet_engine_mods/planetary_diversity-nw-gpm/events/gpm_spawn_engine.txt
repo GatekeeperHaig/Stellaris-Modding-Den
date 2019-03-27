@@ -1,0 +1,1615 @@
+# gpm_modifier_amount_low
+# gpm_modifier_amount_normal
+# gpm_modifier_amount_high
+
+namespace = gpm_spawn_engine
+
+# initialisation called from gpm_game_start or the game start menu
+# some spawn engine parts happen after 2 days to spread the workload on user's machines. This to reduce the initial "lag"
+country_event = {
+	id = gpm_spawn_engine.0
+	hide_window = yes
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		every_planet = {
+
+			# Check for Ego the living world system
+			if = { limit = { solar_system = { has_star_flag = gpm_guardians_ego_system } }
+				planet_event = { id = gpm_guardian.1 days = 1 } # spawn Ego
+			}
+
+			# special sol stuff
+			if = {
+				limit = {
+					solar_system = {
+						has_star_flag = sol_system
+						NOT = { has_star_flag = gpm_oppertunity_lives }
+					}
+				}
+				solar_system = {
+					set_star_flag = gpm_oppertunity_lives
+					random_system_planet = {
+						limit = {
+							is_capital = no
+							is_ringworld = no
+							is_asteroid = no
+							is_star = no
+							# has_modifier = terraforming_candidate 
+							is_planet_class = pc_desolate
+							is_moon = no
+						}
+						add_modifier = { modifier = gpm_oppertunity days = -1 }
+					}
+				}
+			}
+
+			# Primary check to exclude planets and/or systems entirely
+			if = {
+				limit = {
+					solar_system = { 
+						NOR = {
+							has_star_flag = gpm_guardians_ego_system
+							has_star_flag = sol_system
+							has_star_flag = sol
+							has_star_flag = primitive_sol
+						}
+					}
+				}
+
+				# Encounter fallen empire planer: spawn modifiers
+				if = {
+					limit = {
+						exists = owner
+						OR = {
+							gpm_is_planet_habitable = yes
+							gpm_is_planet_machine = yes
+							gpm_is_planet_ringworld = yes
+							gpm_is_planet_habitat = yes
+						}
+						is_fallen_empire_planet = yes
+						NOT = { has_global_flag = gpm_modifiers_fallen_empire_disabled }
+					}
+					planet_event = { id = gpm_spawn_engine.1 days = 5}	# Fallen Empire Planet Modifiers + Effects
+				}
+				
+				# Encounter regular planet: spawn modifiers
+				if = {
+					limit = {
+						NOR = {
+							gpm_is_planet_star = yes 
+							gpm_is_planet_asteroid = yes
+							gpm_is_planet_ringworld = yes
+							AND = {
+								is_capital = yes
+								owner = { NOT = { is_country_type = primitive } }
+							}
+							AND = {
+								exists = owner
+								is_fallen_empire_planet = yes
+								OR = {
+									is_colony = yes
+									is_capital = yes
+								}
+							}
+						}
+					}
+
+					# first we roll for a planetary ring. Low low chance. This is done here to keep the average rings the same regardless of nr of modifiers spawned.
+					# compatibility with other planetary rings in mods will be added here
+	
+					planet_event = { id = gpm_spawn_engine.2 days = 2 }	# Standard Planet Modifiers + Effects
+				}
+				
+				# Encounter asteroid: spawn modifiers
+				if = {
+					limit = {
+						gpm_is_planet_asteroid = yes
+					}
+					planet_event = { id = gpm_spawn_engine.3 days = 3 }	# Asteroid Modifiers + Effects
+				}
+				
+				# Encounter star: spawn modifiers
+				if = {
+					limit = {
+						gpm_is_planet_star = yes
+					}
+					planet_event = { id = gpm_spawn_engine.4 days = 3 }	# Star Modifiers + Effects
+				}
+
+				# Encounter ringworld: spawn modifiers
+				if = {
+					limit = {
+						gpm_is_planet_ringworld = yes
+						solar_system = {
+							NOT = { exists = space_owner }
+						}
+						NOT = { has_global_flag = gpm_modifiers_ringworlds_disabled }
+					}
+					planet_event = { id = gpm_spawn_engine.6 days = 4 }	# Ringworld Modifiers + Effects
+				}
+
+				# check to see and remove modifiers if these mods are present; Can be done cleaner but for now this stays
+				# Further mod compatibility will be done later
+				# if = {
+				# 	limit = {
+				# 		OR = {
+				# 			STNH_enabled = yes
+				# 			new_worlds_enabled = yes
+				# 		}
+				# 	}
+				# 	planet_event = { id = gpm_spawn_engine.7 days = 1 } # Cleanup Planet Modifiers
+				# }
+				
+				# Remove x% of uncontrolled space mineral and energy deposits from specific planets to balance out increased deposit spawns.
+				if = {
+					limit = {
+						solar_system = {
+							NOT = { exists = space_owner }
+						}
+						NOT = { has_global_flag = gpm_planetary_rings_disabled }
+					}
+					gpm_deposit_reduction_generator = yes
+				}
+			}
+		}
+		# Spawn Planet Wonders
+		if = {
+			limit = {
+				NOT = { has_global_flag = gpm_planet_wonders_disabled }
+			}
+			country_event = { id = gpm_spawn_engine.5 }	# Spawn Natural Planet Wonders vanilla worlds
+		}
+	}
+}
+
+# Fallen Empire Planet Modifiers + Effects
+planet_event = {
+	id = gpm_spawn_engine.1
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				has_global_flag = gpm_modifier_amount_low
+			}
+			if = {
+				limit = {
+					is_capital = yes
+				}
+				# Remove all bad planet modifiers
+				gpm_remove_negative_modifiers = yes
+				# Spawn two guaranteed fallen empire modifier for capital worlds
+				gpm_spawn_fallen_empire_modifier = yes
+				gpm_spawn_fallen_empire_modifier = yes
+				# Chance to spawn one fallen empire modifier
+				random_list = {
+					50 = {}
+					50 = { gpm_spawn_fallen_empire_modifier = yes }
+				}
+			}
+			if = {
+				limit = {
+					NOT = { is_capital = yes }
+					is_colony = yes
+				}
+				# Remove all bad planet modifiers
+				gpm_remove_negative_modifiers = yes
+				# Spawn one guaranteed fallen empire modifier for colonies
+				gpm_spawn_fallen_empire_modifier = yes
+				random_list = {
+					50 = {}
+					50 = { gpm_spawn_fallen_empire_modifier = yes }
+				}
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					has_global_flag = gpm_modifier_amount_normal
+					has_global_flag = gpm_modifier_amount_high
+				}
+			}
+			if = {
+				limit = {
+					is_capital = yes
+				}
+				# Remove all bad planet modifiers
+				gpm_remove_negative_modifiers = yes
+				# Spawn two guaranteed fallen empire modifier for capital worlds
+				gpm_spawn_fallen_empire_modifier = yes
+				gpm_spawn_fallen_empire_modifier = yes
+				# Chance to spawn one fallen empire modifier
+				random_list = {
+					50 = {}
+					50 = { gpm_spawn_fallen_empire_modifier = yes }
+				}
+			}
+			if = {
+				limit = {
+					NOT = { is_capital = yes }
+					is_colony = yes
+				}
+				# Remove all bad planet modifiers
+				gpm_remove_negative_modifiers = yes
+				# Spawn one guaranteed fallen empire modifier for colonies
+				gpm_spawn_fallen_empire_modifier = yes
+				random_list = {
+					50 = {}
+					50 = { gpm_spawn_fallen_empire_modifier = yes }
+				}
+				# Chance to spawn one fallen empire modifier
+				random_list = {
+					50 = {}
+					50 = { gpm_spawn_fallen_empire_modifier = yes }
+				}
+			}
+		}
+	}
+}
+# Standard Planet Modifiers + Effects
+planet_event = {
+	id = gpm_spawn_engine.2
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		random_list = {
+			10 = { gpm_spawn_planetary_rings_modifier = yes	}
+			90 = { }
+		}
+		# Low amount of modifiers:  0 to 2 with a lower chance
+		if = {
+			limit = {
+				has_global_flag = gpm_modifier_amount_low
+			}
+			# New chance system - start
+			# roll precursor modifier first
+			###################################
+			# FIRST PRECURSOR MODIFIER CHANCE #
+			###################################
+			if = { limit = { num_modifiers < 2 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						96 = { }	# spawn nothing
+						4 = { # roll precursor modifier	- this is the only way it spawns! Other sections of the engine can only spawn extra
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 15 gpm_is_planet_tomb = yes } # more likely on tombworlds
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						}
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						996 = { }	# spawn nothing
+						4 = { # roll precursor modifier	- this is the only way it spawns! Other sections of the engine can only spawn extra
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						}
+					}
+				}
+			}
+			####################################
+			# SECOND PRECURSOR MODIFIER CHANCE #
+			####################################
+			if = { limit = { num_modifiers < 2 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						66 = { }	# spawn nothing
+						33 = { # roll precursor modifier
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 gpm_has_precursor_modifiers = no } # only roll if there is a precursor modifier already
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 1 gpm_is_planet_tomb = yes gpm_has_precursor_modifiers = yes } # more likely on tombworlds
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						80 = { }	# spawn nothing
+						20 = { # roll precursor modifier
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 gpm_has_precursor_modifiers = no } # only roll if there is a precursor modifier already
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						} 
+					}
+				}
+			}
+			###################################
+			# THIRD PRECURSOR MODIFIER CHANCE #
+			###################################
+			if = { limit = { num_modifiers < 2 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						66 = { }	# spawn nothing
+						0 = { # roll precursor modifier
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 gpm_has_precursor_modifiers = no } # only roll if there is a precursor modifier already
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 1 gpm_is_planet_tomb = yes gpm_has_precursor_modifiers = yes } # more likely on tombworlds
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						95 = { }	# spawn nothing
+						0 = { # roll precursor modifier
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 gpm_has_precursor_modifiers = no } # only roll if there is a precursor modifier already
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						} 
+					}
+				}
+			}
+
+			# Roll normal modifiers 
+			#########################
+			# FIRST MODIFIER CHANCE #
+			#########################
+			if = { limit = { num_modifiers < 2 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						35 = { }	# spawn nothing
+						65 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						75 = { }	# spawn nothing
+						25 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+			}
+			##########################
+			# SECOND MODIFIER CHANCE #
+			##########################
+			if = { limit = { num_modifiers < 2 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						75 = { }	# spawn nothing
+						25 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						90 = { }	# spawn nothing
+						10 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+			}
+			#########################
+			# THIRD MODIFIER CHANCE #
+			#########################
+			if = { limit = { num_modifiers < 2 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						75 = { }	# spawn nothing
+						0 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						90 = { }	# spawn nothing
+						0 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+			}
+			# if = { limit = { num_modifiers < 3}
+			# 	random_list = {
+			# 		900 = {
+			# 			#this ensures dead worlds arent so boring without affecting habitable worlds
+			# 			modifier = { factor = 0.80
+			# 				gpm_is_planet_uninhabitable = yes
+			# 				gpm_is_planet_gas_giant = yes
+			# 			}
+			# 		}
+			# 		98 = {
+			# 			gpm_spawn_planet_modifier = yes
+			# 			modifier = { factor = 1.3 gpm_is_planet_habitable = yes }
+			# 			modifier = { factor = 1.5 gpm_is_planet_tomb = yes }
+			# 		}
+			# 		2 = {
+			# 			gpm_spawn_precursor_modifier = yes
+			# 			modifier = { factor = 50 gpm_is_planet_tomb = yes }
+			# 			modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+			# 			modifier = { factor = 4 gpm_is_planet_habitable = yes } # Higher chance of habitable
+			# 			modifier = { factor = 0.25 gpm_is_planet_uninhabitable = yes gpm_is_planet_tomb = no  }
+			# 			modifier = { factor = 0
+			# 					exists = space_owner
+			# 				# solar_system = {
+			# 				# 	any_system_planet = {
+			# 				# 		is_capital = yes
+			# 				# 	}
+			# 				# }
+			# 			}
+			# 			modifier = { factor = 0	solar_system = { has_star_flag = sol_system } }
+			# 		}
+			# 	}
+			# }
+			# if = { limit = { num_modifiers < 3}
+			# 	random_list = {
+			# 		975 = {}
+			# 		23 = {
+			# 			gpm_spawn_planet_modifier = yes
+			# 			modifier = { factor = 1.3 gpm_is_planet_habitable = yes }
+			# 			modifier = { factor = 1.5 gpm_is_planet_tomb = yes }
+			# 			}
+			# 		2 = {
+			# 			gpm_spawn_precursor_modifier = yes
+			# 			modifier = { factor = 50 gpm_is_planet_tomb = yes }
+			# 			modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+			# 			modifier = { factor = 4 gpm_is_planet_habitable = yes } # Higher chance of habitable
+			# 			modifier = { factor = 0.25 gpm_is_planet_uninhabitable = yes gpm_is_planet_tomb = no  }
+			# 			modifier = { factor = 10 gpm_has_precursor_modifiers = yes } # Higher chance if there are already precursor modifiers
+			# 			modifier = { factor = 0
+			# 					exists = space_owner
+			# 				# solar_system = {
+			# 				# 	any_system_planet = {
+			# 				# 		is_capital = yes
+			# 				# 	}
+			# 				# }
+			# 			}
+			# 			modifier = { factor = 0	solar_system = { has_star_flag = sol_system } }
+			# 		}
+			# 	}
+			# }
+		}
+		# Normal amount of modifiers:  0 to 3 with a normal chance
+		if = {
+			limit = {
+				has_global_flag = gpm_modifier_amount_normal
+			}
+			# New chance system - start
+			# roll precursor modifier first
+			###################################
+			# FIRST PRECURSOR MODIFIER CHANCE #
+			###################################
+			if = { limit = { num_modifiers < 3 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						95 = { }	# spawn nothing
+						5 = { # roll precursor modifier	- this is the only way it spawns! Other sections of the engine can only spawn extra
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 15 gpm_is_planet_tomb = yes } # more likely on tombworlds
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						}
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						994 = { }	# spawn nothing
+						4 = { # roll precursor modifier	- this is the only way it spawns! Other sections of the engine can only spawn extra
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						}
+					}
+				}
+			}
+			####################################
+			# SECOND PRECURSOR MODIFIER CHANCE #
+			####################################
+			if = { limit = { num_modifiers < 3 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						66 = { }	# spawn nothing
+						33 = { # roll precursor modifier
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 gpm_has_precursor_modifiers = no } # only roll if there is a precursor modifier already
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 1 gpm_is_planet_tomb = yes gpm_has_precursor_modifiers = yes } # more likely on tombworlds
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						80 = { }	# spawn nothing
+						20 = { # roll precursor modifier
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 gpm_has_precursor_modifiers = no } # only roll if there is a precursor modifier already
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						} 
+					}
+				}
+			}
+			###################################
+			# THIRD PRECURSOR MODIFIER CHANCE #
+			###################################
+			if = { limit = { num_modifiers < 3 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						66 = { }	# spawn nothing
+						33 = { # roll precursor modifier
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 gpm_has_precursor_modifiers = no } # only roll if there is a precursor modifier already
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 1 gpm_is_planet_tomb = yes gpm_has_precursor_modifiers = yes } # more likely on tombworlds
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						95 = { }	# spawn nothing
+						5 = { # roll precursor modifier
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 gpm_has_precursor_modifiers = no } # only roll if there is a precursor modifier already
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						} 
+					}
+				}
+			}
+
+			# Roll normal modifiers 
+			#########################
+			# FIRST MODIFIER CHANCE #
+			#########################
+			if = { limit = { num_modifiers < 3 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						15 = { }	# spawn nothing
+						85 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						50 = { }	# spawn nothing
+						50 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+			}
+			##########################
+			# SECOND MODIFIER CHANCE #
+			##########################
+			if = { limit = { num_modifiers < 3 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						50 = { }	# spawn nothing
+						50 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						75 = { }	# spawn nothing
+						25 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+			}
+			#########################
+			# THIRD MODIFIER CHANCE #
+			#########################
+			if = { limit = { num_modifiers < 3 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						75 = { }	# spawn nothing
+						25 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						90 = { }	# spawn nothing
+						10 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+			}
+		}
+
+
+				
+			# New chance system - end
+			# 	random_list = {
+			# 		402 = {
+			# 			#this ensures dead worlds arent so boring without affecting habitable worlds
+			# 			modifier = { factor = 0.45
+			# 					gpm_is_planet_uninhabitable = yes
+			# 					gpm_is_planet_gas_giant = yes
+			# 				}
+			# 			}
+			# 		491 = {
+			# 			gpm_spawn_planet_modifier = yes
+			# 			modifier = { factor = 1.3 gpm_is_planet_habitable = yes }
+			# 			modifier = { factor = 1.5 gpm_is_planet_tomb = yes }
+			# 			}
+			# 		7 = {
+			# 			gpm_spawn_precursor_modifier = yes
+			# 			modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+			# 			modifier = { factor = 3 gpm_is_planet_habitable = yes } # Higher chance of habitable
+			# 			modifier = { factor = 0.2 gpm_is_planet_uninhabitable = yes gpm_is_planet_tomb = no  }
+			# 			modifier = { factor = 0.5 gpm_is_planet_toxic = yes }
+			# 			modifier = { factor = 40 gpm_is_planet_tomb = yes }
+			# 			modifier = { factor = 0
+			# 					exists = space_owner
+			# 				# solar_system = {
+			# 				# 	any_system_planet = {
+			# 				# 		is_capital = yes
+			# 				# 	}
+			# 				# }
+			# 			}
+			# 			modifier = { factor = 0	solar_system = { has_star_flag = sol_system } }
+			# 		}
+			# 	}
+			# }
+			# if = { limit = { num_modifiers < 3}
+			# 	random_list = {
+			# 		650 = {}
+			# 		343 = {
+			# 			gpm_spawn_planet_modifier = yes
+			# 			modifier = { factor = 1.3 gpm_is_planet_habitable = yes }
+			# 			modifier = { factor = 1.5 gpm_is_planet_tomb = yes }
+			# 			}
+			# 		7 = { 
+			# 			gpm_spawn_precursor_modifier = yes
+			# 			modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+			# 			modifier = { factor = 3 gpm_is_planet_habitable = yes } # Higher chance of habitable
+			# 			modifier = { factor = 0.2 gpm_is_planet_uninhabitable = yes gpm_is_planet_tomb = no  }
+			# 			modifier = { factor = 30 gpm_has_precursor_modifiers = yes } # Higher chance if there are alreadyalready precursor modifiers
+			# 			modifier = { factor = 0.5 gpm_is_planet_toxic = yes }
+			# 			modifier = { factor = 20 gpm_is_planet_tomb = yes }
+			# 			modifier = { factor = 0
+			# 					exists = space_owner
+			# 				# solar_system = {
+			# 				# 	any_system_planet = {
+			# 				# 		is_capital = yes
+			# 				# 	}
+			# 				# }
+			# 			}
+			# 			modifier = { factor = 0	solar_system = { has_star_flag = sol_system } }
+			# 		}
+			# 	}
+			# }
+			# if = { limit = { num_modifiers < 3}
+			# 	random_list = {
+			# 		800 = {}
+			# 		193 = {
+			# 			gpm_spawn_planet_modifier = yes
+			# 			modifier = { factor = 1.3 gpm_is_planet_habitable = yes }
+			# 			modifier = { factor = 1.5 gpm_is_planet_tomb = yes }
+			# 			}
+			# 		7 = { 
+			# 			gpm_spawn_precursor_modifier = yes
+			# 			modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+			# 			modifier = { factor = 3 gpm_is_planet_habitable = yes } # Higher chance of habitable
+			# 			modifier = { factor = 0.2 gpm_is_planet_uninhabitable = yes gpm_is_planet_tomb = no  }
+			# 			modifier = { factor = 30 gpm_has_precursor_modifiers = yes } # Higher chance if there are alreadyalready precursor modifiers
+			# 			modifier = { factor = 0.5 gpm_is_planet_toxic = yes }
+			# 			modifier = { factor = 20 gpm_is_planet_tomb = yes }
+			# 			modifier = { factor = 0
+			# 					exists = space_owner
+			# 				# solar_system = {
+			# 				# 	any_system_planet = {
+			# 				# 		is_capital = yes
+			# 				# 	}
+			# 				# }
+			# 			}
+			# 			modifier = { factor = 0	solar_system = { has_star_flag = sol_system } }
+			# 		}
+			# 	}
+			# }
+		# High amount of modifiers:  1 to 3 with a slightly higher chance
+		if = {
+			limit = {
+				has_global_flag = gpm_modifier_amount_high
+			}
+			# New chance system - start
+			# roll precursor modifier first
+			###################################
+			# FIRST PRECURSOR MODIFIER CHANCE #
+			###################################
+			if = { limit = { num_modifiers < 3 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						95 = { }	# spawn nothing
+						5 = { # roll precursor modifier	- this is the only way it spawns! Other sections of the engine can only spawn extra
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 15 gpm_is_planet_tomb = yes } # more likely on tombworlds
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						}
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						996 = { }	# spawn nothing
+						4 = { # roll precursor modifier	- this is the only way it spawns! Other sections of the engine can only spawn extra
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						}
+					}
+				}
+			}
+			####################################
+			# SECOND PRECURSOR MODIFIER CHANCE #
+			####################################
+			if = { limit = { num_modifiers < 3 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						66 = { }	# spawn nothing
+						33 = { # roll precursor modifier
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 gpm_has_precursor_modifiers = no } # only roll if there is a precursor modifier already
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 1 gpm_is_planet_tomb = yes gpm_has_precursor_modifiers = yes } # more likely on tombworlds
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						80 = { }	# spawn nothing
+						20 = { # roll precursor modifier
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 gpm_has_precursor_modifiers = no } # only roll if there is a precursor modifier already
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						} 
+					}
+				}
+			}
+			###################################
+			# THIRD PRECURSOR MODIFIER CHANCE #
+			###################################
+			if = { limit = { num_modifiers < 3 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						66 = { }	# spawn nothing
+						33 = { # roll precursor modifier
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 gpm_has_precursor_modifiers = no } # only roll if there is a precursor modifier already
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 1 gpm_is_planet_tomb = yes gpm_has_precursor_modifiers = yes } # more likely on tombworlds
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						95 = { }	# spawn nothing
+						5 = { # roll precursor modifier
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 gpm_has_precursor_modifiers = no } # only roll if there is a precursor modifier already
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+						} 
+					}
+				}
+			}
+
+			# Roll normal modifiers 
+			#########################
+			# FIRST MODIFIER CHANCE #
+			#########################
+			if = { limit = { num_modifiers < 3 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						0 = { }	# spawn nothing
+						100 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						0 = { }	# spawn nothing
+						100 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+			}
+			##########################
+			# SECOND MODIFIER CHANCE #
+			##########################
+			if = { limit = { num_modifiers < 3 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						50 = { }	# spawn nothing
+						50 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						50 = { }	# spawn nothing
+						50 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+			}
+			#########################
+			# THIRD MODIFIER CHANCE #
+			#########################
+			if = { limit = { num_modifiers < 3 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						75 = { }	# spawn nothing
+						25 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						75 = { }	# spawn nothing
+						25 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+			}
+			# if = { limit = { num_modifiers < 3}
+			# 	random_list = {
+			# 		990 = { gpm_spawn_planet_modifier = yes }
+			# 		10 = { 
+			# 			gpm_spawn_precursor_modifier = yes
+			# 			modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+			# 			modifier = { factor = 3 gpm_is_planet_habitable = yes } # Higher chance of habitable
+			# 			modifier = { factor = 0.3 gpm_is_planet_uninhabitable = yes gpm_is_planet_tomb = no  }
+			# 			modifier = { factor = 0.2 gpm_is_planet_toxic = yes }
+			# 			modifier = { factor = 20 gpm_is_planet_tomb = yes }
+			# 			modifier = { factor = 0
+			# 					exists = space_owner
+			# 				# solar_system = {
+			# 				# 	any_system_planet = {
+			# 				# 		is_capital = yes
+			# 				# 	}
+			# 				# }
+			# 			}
+			# 			modifier = { factor = 0	solar_system = { has_star_flag = sol_system } }
+			# 		}
+			# 	}
+			# }
+			# if = { limit = { num_modifiers < 3}
+			# 	random_list = {
+			# 		800 = {} # higher because we already guarantee 1 modifier
+			# 		190 = { gpm_spawn_planet_modifier = yes }
+			# 		10 = { 
+			# 			gpm_spawn_precursor_modifier = yes
+			# 			modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+			# 			modifier = { factor = 3 gpm_is_planet_habitable = yes } # Higher chance of habitable
+			# 			modifier = { factor = 0.3 gpm_is_planet_uninhabitable = yes gpm_is_planet_tomb = no  }
+			# 			modifier = { factor = 30 gpm_has_precursor_modifiers = yes } # Higher chance if there are alreadyalready precursor modifiers
+			# 			modifier = { factor = 0.2 gpm_is_planet_toxic = yes }
+			# 			modifier = { factor = 15 gpm_is_planet_tomb = yes }
+			# 			modifier = { factor = 0
+			# 					exists = space_owner
+			# 				# solar_system = {
+			# 				# 	any_system_planet = {
+			# 				# 		is_capital = yes
+			# 				# 	}
+			# 				# }
+			# 			}
+			# 			modifier = { factor = 0	solar_system = { has_star_flag = sol_system } }
+			# 		}
+			# 	}
+			# }
+			# if = { limit = { num_modifiers < 3}
+			# 	random_list = {
+			# 		900 = {} # higher because we already guarantee 1 modifier
+			# 		90 = { gpm_spawn_planet_modifier = yes }
+			# 		10 = { 
+			# 			gpm_spawn_precursor_modifier = yes
+			# 			modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+			# 			modifier = { factor = 4 gpm_is_planet_habitable = yes } # Higher chance of habitable
+			# 			modifier = { factor = 0.3 gpm_is_planet_uninhabitable = yes gpm_is_planet_tomb = no  }
+			# 			modifier = { factor = 30 gpm_has_precursor_modifiers = yes } # Higher chance if there are already already precursor modifiers
+			# 			modifier = { factor = 0.2 gpm_is_planet_toxic = yes }
+			# 			modifier = { factor = 10 gpm_is_planet_tomb = yes }
+			# 			modifier = { factor = 0
+			# 					exists = space_owner
+			# 				# solar_system = {
+			# 				# 	any_system_planet = {
+			# 				# 		is_capital = yes
+			# 				# 	}
+			# 				# }
+			# 			}
+			# 			modifier = { factor = 0	solar_system = { has_star_flag = sol_system } }
+			# 		}
+			# 	}
+			# }
+		}
+		# Spawn a terraforming candidate if specific modifiers are present
+		if = {
+			limit = {
+				OR = {
+					gpm_is_planet_barren = yes
+					gpm_is_planet_frozen = yes
+					gpm_is_planet_molten = yes
+					gpm_is_planet_toxic = yes
+				}
+				OR = {
+					gpm_has_precursor_modifiers = yes
+					has_modifier = Unnatural_World
+					has_modifier = ultra_rich_2
+					has_modifier = Spaceship_Graveyard
+					has_modifier = Old_World
+					has_modifier = Artificial_Core
+				}
+				NOR = {
+					has_modifier = terraforming_candidate 
+					has_modifier = terraforming_candidate_precursor
+				}
+			}
+			add_modifier = { modifier = terraforming_candidate_precursor days = -1 }
+			set_planet_flag = terraforming_candidate_precursor
+		}
+		# Apply planet features
+		if = {
+			limit = { gpm_is_planet_habitable = yes }
+			gpm_spawn_planetary_feature = yes 			# -guilli up to X times planetary feature 
+		}
+		
+
+		# Spawn ring sites
+		if = {
+			limit = {
+				solar_system = {
+					NOT = { exists = space_owner }
+				}
+			}
+			gpm_spawn_large_huge_RES = yes
+			gpm_spawn_medium_RES = yes
+			gpm_spawn_small_RES = yes
+		}		
+
+		# spawn a random precursor ruin if there is a precursor planet modifier
+		if = {
+			limit = { 
+				gpm_has_precursor_modifiers = yes
+				NOT = { has_planet_flag = gpm_has_precursor_ruins_feature }
+				NOT = { has_global_flag = gpm_arcane_technology_disabled }		 # dont spawn crystals if arcane tech is disabled
+			}
+			gpm_spawn_precursor_feature = yes
+			set_planet_flag = gpm_has_precursor_ruins_feature
+		}
+
+
+		# wipe deposits from uninhabitable precursor worlds and give them an Precursor Archeotech deposit
+		if = {
+			limit = { 
+				gpm_is_planet_uninhabitable = yes
+				gpm_has_precursor_modifiers = yes
+				NOT = { has_global_flag = gpm_arcane_technology_disabled }		 # dont spawn crystals if arcane tech is disabled
+			}
+			every_deposit = {
+				remove_deposit = yes
+			}
+			add_deposit = gpm_arcane_technology_deposit
+		}
+
+			
+		# # Almost Empty planets we force spawn some:
+		# if = {
+		# 	limit = {
+		# 		count_tile = {
+		# 			limit = { has_blocker = yes }
+		# 			count < 5
+		# 		}	
+		# 	}
+		# 	if = { limit = { planet_size >= 20 }
+		# 		while = {
+		# 			count = 10
+		# 			random_list = {
+		# 				25 = { }
+		# 				75 = { gpm_spawn_vanilla_tileblockers = yes }
+		# 			}
+		# 		}
+		# 	}
+		# 	if = { limit = { planet_size >= 15 planet_size < 20 }
+		# 		while = {
+		# 			count = 7
+		# 			random_list = {
+		# 				25 = { }
+		# 				75 = { gpm_spawn_vanilla_tileblockers = yes }
+		# 			}
+		# 		}
+		# 	}
+		# 	if = { limit = { planet_size < 15 }
+		# 		while = {
+		# 			count = 5
+		# 			random_list = {
+		# 				25 = { }
+		# 				75 = { gpm_spawn_vanilla_tileblockers = yes }
+		# 			}
+		# 		}
+		# 	}
+		# }
+		# planet_event = { id = gpm_spawn_engine.9999 days = 3 }	# Cleanup some tileblockers if the planet is full
+		
+	}
+}
+
+# tileblocker cleanup event, as seperate event to delay by a few days for compatibility
+# planet_event = {
+# 	id = gpm_spawn_engine.9999
+# 	hide_window = yes
+# 	is_triggered_only = yes
+	
+# 	immediate = {
+# 		# Cleanup some tileblockers if the planet is full
+# 		gpm_cleanup_tileblockers = yes
+# 	}
+# }
+
+# Asteroid Modifiers + Effects
+planet_event = {
+	id = gpm_spawn_engine.3
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		random_list = {
+			750 = {}
+			250 = { gpm_spawn_asteroid_modifier = yes }
+		}
+		random_list = {
+			850 = {}
+			150 = { gpm_spawn_asteroid_modifier = yes }
+		}
+	}
+}
+# Star Modifiers + Effects
+planet_event = {
+	id = gpm_spawn_engine.4
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		random_list = {
+			750 = {}
+			240 = { gpm_spawn_star_modifier = yes }
+		}
+		random_list = {
+			900 = {}
+			100 = { gpm_spawn_star_modifier = yes }
+		}
+	}
+}
+# Wondrous Planets + Effects
+country_event = {
+	id = gpm_spawn_engine.5
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		# NOR = {
+		# 	STNH_enabled = yes
+		# 	new_worlds_enabled = yes
+		# }
+	}
+	
+	immediate = {
+		log = "---- Fired Event gpm_spawn_engine.5 ----"
+		log = "---- spawning planet wonders on vanilla planets ----"
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							is_planet_class = pc_desert
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_desert = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							is_planet_class = pc_arid
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_arid = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							is_planet_class = pc_tropical
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_tropical = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							is_planet_class = pc_continental
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_continental = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							is_planet_class = pc_ocean
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_ocean = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							is_planet_class = pc_arctic
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_arctic = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							is_planet_class = pc_alpine
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_alpine = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							is_planet_class = pc_tundra
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_tundra = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							is_planet_class = pc_gaia
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_gaia = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							is_planet_class = pc_nuked
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_nuked = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+		log = "---- spawning planet wonders on vanilla + mod planets at random ----"
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							gpm_is_planet_dry_hot = yes
+							NOR = { 
+								is_planet_class = pc_toxic
+								is_planet_class = pc_desert
+								is_planet_class = pc_arid
+								is_planet_class = pc_savannah
+								is_planet_class = pc_tropical
+								is_planet_class = pc_continental
+								is_planet_class = pc_ocean
+								is_planet_class = pc_arctic
+								is_planet_class = pc_alpine
+								is_planet_class = pc_tundra
+								is_planet_class = pc_nuked
+								is_planet_class = pc_machine
+								is_planet_class = pc_archive
+								is_planet_class = pc_ecocity
+								is_planet_class = pc_primordial
+								is_planet_class = pc_irradiated_marginal
+								is_planet_class = pc_marginal_cold
+								is_planet_class = pc_desolate
+								is_planet_class = pc_marginal_warm
+							}
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_any = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							gpm_is_planet_dry_cold = yes
+							NOR = { 
+								is_planet_class = pc_toxic
+								is_planet_class = pc_desert
+								is_planet_class = pc_arid
+								is_planet_class = pc_savannah
+								is_planet_class = pc_tropical
+								is_planet_class = pc_continental
+								is_planet_class = pc_ocean
+								is_planet_class = pc_arctic
+								is_planet_class = pc_alpine
+								is_planet_class = pc_tundra
+								is_planet_class = pc_nuked
+								is_planet_class = pc_machine
+								is_planet_class = pc_archive
+								is_planet_class = pc_ecocity
+								is_planet_class = pc_primordial
+								is_planet_class = pc_irradiated_marginal
+								is_planet_class = pc_marginal_cold
+								is_planet_class = pc_desolate
+								is_planet_class = pc_marginal_warm
+							}
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_any = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							gpm_is_planet_wet_hot = yes
+							NOR = { 
+								is_planet_class = pc_toxic
+								is_planet_class = pc_desert
+								is_planet_class = pc_arid
+								is_planet_class = pc_savannah
+								is_planet_class = pc_tropical
+								is_planet_class = pc_continental
+								is_planet_class = pc_ocean
+								is_planet_class = pc_arctic
+								is_planet_class = pc_alpine
+								is_planet_class = pc_tundra
+								is_planet_class = pc_nuked
+								is_planet_class = pc_machine
+								is_planet_class = pc_archive
+								is_planet_class = pc_ecocity
+								is_planet_class = pc_primordial
+								is_planet_class = pc_irradiated_marginal
+								is_planet_class = pc_marginal_cold
+								is_planet_class = pc_desolate
+								is_planet_class = pc_marginal_warm
+							}
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_any = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+		random_list = {
+			75 = {}
+			50 ={
+				random_planet = {
+					limit = {
+						AND = {
+							gpm_is_planet_wet_cold = yes
+							NOR = { 
+								is_planet_class = pc_toxic
+								is_planet_class = pc_desert
+								is_planet_class = pc_arid
+								is_planet_class = pc_savannah
+								is_planet_class = pc_tropical
+								is_planet_class = pc_continental
+								is_planet_class = pc_ocean
+								is_planet_class = pc_arctic
+								is_planet_class = pc_alpine
+								is_planet_class = pc_tundra
+								is_planet_class = pc_nuked
+								is_planet_class = pc_machine
+								is_planet_class = pc_archive
+								is_planet_class = pc_ecocity
+								is_planet_class = pc_primordial
+								is_planet_class = pc_irradiated_marginal
+								is_planet_class = pc_marginal_cold
+								is_planet_class = pc_desolate
+								is_planet_class = pc_marginal_warm
+							}
+							is_colony = no
+							is_capital = no
+							NOT = { num_pops > 0 }
+							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
+							NOT = {	gpm_has_precursor_modifiers = yes	}
+						}
+					}
+					set_planet_flag = "gpm_is_wondrous_planet"
+					gpm_spawn_planet_wonders_any = yes
+					add_modifier = { modifier = "Planet_Wonder_Discovered" days = -1 }
+				}
+			}
+		}
+	}
+}
+# Ringworld Modifiers + Effects
+planet_event = {
+	id = gpm_spawn_engine.6
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		random_list = {
+			90 = {}
+			10 = { gpm_random_precursor_modifier = yes }
+		}
+		random_list = {
+			90 = {}
+			10 = { gpm_random_precursor_modifier = yes }
+		}
+	}
+}
+# Cleanup Planet Modifiers
+planet_event = {
+	id = gpm_spawn_engine.7
+	hide_window = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		remove_modifier = "Precursor_Remnants"
+		remove_modifier = "Precursor_Energy_Grid"
+		remove_modifier = "Precursor_Satalite_Grid"
+		remove_modifier = "Precursor_City"
+		remove_modifier = "Precursor_Shipyards"
+		remove_modifier = "Precursor_Planetary_Gun"
+		remove_modifier = "Precursor_Bunker_Grid"
+		remove_modifier = "Precursor_Mechs"
+		remove_modifier = "Precursor_Planetary_Shield"
+		remove_modifier = "Precursor_Floating_City"
+		remove_modifier = "Precursor_Capital_Complex"
+		remove_modifier = "Precursor_Communication_Hub"
+		remove_modifier = "Precursor_Singularity_Drive"
+		remove_modifier = "Strange_Alien_Eggs"
+		remove_modifier = "Ghost_Ships"
+		remove_modifier = "Surface_Of_Bones"
+		remove_modifier = "Arachnophobia"
+		remove_modifier = "Giant_Worm"
+		remove_modifier = "Temple_of_the_Ancient_One"
+		remove_modifier = "Strange_Voices"
+		remove_modifier = "Protomolecule_Infected_Station"
+		remove_modifier = "Crystal_Moon_Palace"
+		remove_modifier = "Cities_in_the_sky"
+		remove_modifier = "Ancient_Temple"
+		remove_modifier = "Android_Pleasure_Palace"
+		remove_modifier = "Ruined_Battlefield"
+		remove_modifier = "Spaceship_Graveyard"
+		remove_modifier = "Artificial_Core"
+		remove_modifier = "Planet_Wonder_Discovered"
+	}
+}
