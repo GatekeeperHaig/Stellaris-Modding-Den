@@ -85,7 +85,7 @@ event = {
 				planet_event = { id = nwengine.01 days = 1 }
 				planet_event = { id = nwengine.02 days = 1 }				
 				planet_event = { id = nwengine.03 days = 2 }
-				planet_event = { id = nwengine.04 days = 2 }				
+				planet_event = { id = nwengine.04 days = 2 }
 			}
 		}
 	}
@@ -143,6 +143,9 @@ planet_event = {
 				limit = { is_gas_giant = yes }		
 				gas_giant_tweak_spawn_table = yes
 			}
+			planet_event = { id = nwengine.05 days = 3 }
+			planet_event = { id = nwengine.06 days = 3 }
+			planet_event = { id = nwengine.07 days = 3 }
 	}
 }
 
@@ -241,6 +244,102 @@ event = {
 				
 			}
 		}
+}
+
+planet_event = {
+	id = nwengine.05 # SPAWN TERRAFORMING CANDIDATE MODIFIER
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	#Terraforming Candidate
+	immediate = {
+		every_planet = { 
+			limit = {  
+				OR = {
+					is_planet_class = pc_barren
+					is_planet_class = pc_hot_reducing
+					is_planet_class = pc_cold_reducing
+				}
+				not = { has_modifier = terraforming_candidate }	
+				planet_size > 9
+				planet_size < 26	
+				solar_system = {
+					NOR = {
+						is_star_class = sc_black_hole
+						is_star_class = sc_neutron_star
+						is_star_class = sc_pulsar
+					}
+				}
+			}	
+			random_list = {
+				5 = {
+					modifier = { factor = 1.50 has_moon = yes }
+					modifier = { factor = 1.25 is_gas_giant_moon = yes }
+					modifier = { factor = 0 is_moon = yes NOT = { is_gas_giant_moon = yes } }
+					modifier = { factor = 0 orbits_hot_star = yes }
+					add_modifier = { modifier = terraforming_candidate days = -1 }
+				}
+				95 = { }	
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = nwengine.06 # SPAWN ROCKY SUBTERRANEAN CANDIDATE MODIFIER
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	#Rocky Subterranean Candidate
+	immediate = {
+		every_planet = { 
+			limit = {  
+				is_planet_class = pc_barren_cold
+				not = { has_modifier = subterranean_rocky_candidate }	
+				planet_size > 6
+				planet_size < 16	
+			}	
+			random_list = {
+				10 = {
+					modifier = { factor = 1.50 is_moon = yes NOT = { is_gas_giant_moon = yes } }
+					modifier = { factor = 0.50 is_gas_giant_moon = yes }
+					modifier = {
+						factor = 0.25 solar_system = { any_system_planet = { habitable_planet = yes } }
+					}
+					add_modifier = { modifier = subterranean_rocky_candidate days = -1 }
+				}
+				90 = { }	
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = nwengine.07 # SPAWN ICY SUBTERRANEAN CANDIDATE MODIFIER
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	#Icy Subterranean Candidate
+	immediate = {
+		every_planet = { 
+			limit = {  
+				is_planet_class = pc_frozen
+				not = { has_modifier = subterranean_icy_candidate }	
+				planet_size > 6
+				planet_size < 16	
+			}	
+			random_list = {
+				10 = {
+					modifier = { factor = 2 is_gas_giant_moon = yes }
+					modifier = {
+						factor = 0.25 solar_system = { any_system_planet = { habitable_planet = yes } }
+					}
+					add_modifier = { modifier = subterranean_icy_candidate days = -1 }
+				}
+				90 = { }	
+			}
+		}
+	}
 }
 
 country_event = {
