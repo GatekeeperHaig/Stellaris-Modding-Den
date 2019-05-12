@@ -265,7 +265,10 @@ planet_event = {
 				4 = { change_pc = pc_arctic }
 				4 = { change_pc = pc_alpine }
 				4 = { change_pc = pc_savannah }	
-				4 = { change_pc = pc_mushroom }				
+				4 = { change_pc = pc_mushroom }
+				4 = { change_pc = pc_antarctic  }
+				4 = { change_pc = pc_retinal  }
+				4 = { change_pc = pc_prairie }
 			}
 			if = {									# -guilli
 				limit = {
@@ -320,7 +323,10 @@ planet_event = {
 				4 = { change_pc = pc_arctic }
 				4 = { change_pc = pc_alpine }
 				4 = { change_pc = pc_savannah }	
-				4 = { change_pc = pc_mushroom }			
+				4 = { change_pc = pc_mushroom }
+				4 = { change_pc = pc_antarctic  }
+				4 = { change_pc = pc_retinal  }
+				4 = { change_pc = pc_prairie }
 			}
 			remove_modifier = "abandoned_terraforming"
 			owner = { set_country_flag = terraforming_mutants_invade_country }
@@ -404,7 +410,7 @@ planet_event = {
 	}
 }
 
-# Special Project Completed 4 (Tomb World)
+# Special Project Completed 4 (Tomb World)	-- overwriting to apply correct planet modifiers
 planet_event = {
 	id = colony.107
 	title = "PROJECT_COMPLETE"
@@ -506,6 +512,27 @@ planet_event = {
 		change_pc = pc_nuked
 		hidden_effect = {
 			remove_modifier = "abandoned_terraforming"
+			if = {									# -guilli
+				limit = {
+					NOT = {
+						gpm_has_precursor_modifiers = yes
+					}
+				}
+				reroll_planet_modifiers = yes		# -guilli
+				gpm_remove_precursor_modifiers = yes 	# -guilli
+			}
+			if = {
+				limit = { has_planet_flag = gpm_is_wondrous_planet }
+				remove_planet_flag = gpm_is_wondrous_world
+				remove_planet_flag = gpm_is_wondrous_world_colour
+				remove_modifier = Planet_Wonder_Discovered
+				set_name = color_default_white
+			}
+			if = {
+				limit = { has_planet_flag = gpm_is_precursor_world }
+				add_modifier = { modifier = terraforming_candidate_precursor days = -1 } 
+				set_name = color_precursor_col
+			}
 		}
 	}
 }
