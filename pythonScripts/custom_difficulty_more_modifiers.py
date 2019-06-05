@@ -107,7 +107,7 @@ def main():
   updateEvent.add("hide_window","yes" )
   updateEvent.add("is_triggered_only", "yes")
   updateImmediate=updateEvent.addReturn("immediate")
-  isPlayable=updateImmediate.addReturn("every_country").add("limit",TagList("OR", TagList("is_country_type","default").add("is_country_type","fallen_empire" ).add("is_country_type","awakened_fallen_empire" ).add("is_country_type","ascended_empire" )))
+  isPlayable=updateImmediate.addReturn("every_country").add("limit",TagList("OR", TagList("is_country_type","default").add("is_country_type","fallen_empire" ).add("is_country_type","awakened_fallen_empire" ).add("is_country_type","ascended_empire" ).add("is_country_type","eternal_empire" )))
   isPlayable.createReturnIf(TagList("is_ai", "yes")).createEvent(eventNameSpace.format(id_updateEvents))
   isPlayable.addReturn("else").createEvent(eventNameSpace.format(id_updateEvents+1))
 
@@ -419,7 +419,7 @@ class Modifier:
     self.modifier=modifier
     self.multiplier=1
     self.unit=""
-    self.rangeUsed=range(-2,11)
+    self.rangeUsed=range(-10,21)
     if "_cost" in modifier or "_upkeep" in modifier:
       self.multiplier*=-1
     # if "_add" in modifier:
@@ -494,7 +494,7 @@ class ModifierSubGroup(Modifier):
     self.name=name
     self.modifiers=[]
     self.modNames=[]
-    self.rangeUsed=range(-2,11)
+    self.rangeUsed=range(-10,21)
     # self.multiplier=multiplier
   def addModifier(self, modifier):
     self.modifiers.append(modifier)
