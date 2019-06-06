@@ -81,18 +81,21 @@ planet_event = {
 	location = ROOT
 	trackable = yes
 	
-	trigger = {
+	pre_triggers = {
 		has_owner = yes
-		original_owner = yes
 		is_homeworld = no
+		original_owner = yes
+		is_ai = no
+		has_ground_combat = no
+		is_capital = no
+		is_occupied_flag = no
+	}
+
+	trigger = {
 		owner = { 
-			is_ai = no
 			NOT = { has_authority = auth_machine_intelligence }
 		}
-		has_ground_combat = no
-		is_occupied_flag = no
 		num_pops > 0
-		is_capital = no
 		OR = {
 			is_planet_class = pc_continental
 			is_planet_class = pc_tropical
@@ -158,15 +161,18 @@ planet_event = {
 	location = ROOT
 	trackable = yes
 	
-	trigger = {
+	pre_triggers = {
 		has_owner = yes
-		original_owner = yes
 		is_homeworld = no
-		owner = { is_ai = no }
+		original_owner = yes
+		is_ai = no
 		has_ground_combat = no
-		is_occupied_flag = no
-		num_pops > 0
 		is_capital = no
+		is_occupied_flag = no
+	}
+	
+	trigger = {
+		num_pops > 0
 		NOR = {
 			has_planet_flag = abandoned_terraforming_planet
 			has_planet_flag = colony_event
@@ -175,6 +181,7 @@ planet_event = {
 			is_planet_class = pc_ringworld_habitable
 			is_planet_class = pc_habitat
 			is_planet_class = pc_city
+			is_planet_class = pc_relic
 			is_planet_class = pc_floating
 			is_planet_class = pc_crystal
 			is_planet_class = pc_graveyard
@@ -385,13 +392,16 @@ planet_event = {
 	show_sound = event_air_raid_siren
 	location = ROOT
 	
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		has_ground_combat = no
+	}
+	
 	trigger = {
 		has_planet_flag = did_not_terraform
 		NOT = { has_planet_flag = terraforming_unstable_weather }
-		has_owner = yes
-		original_owner = yes
-		is_homeworld = no
-		has_ground_combat = no
 		num_pops > 0
 	}
 	
@@ -421,13 +431,16 @@ planet_event = {
 	show_sound = event_planetary_riot
 	location = ROOT
 	
+	pre_triggers = {
+		has_owner = yes
+		is_homeworld = no
+		original_owner = yes
+		has_ground_combat = no
+	}
+	
 	trigger = {
 		has_planet_flag = did_not_terraform
 		NOT = { has_planet_flag = terraforming_drought }
-		has_owner = yes
-		original_owner = yes
-		is_homeworld = no
-		has_ground_combat = no
 		num_pops > 0
 	}
 	
@@ -464,6 +477,7 @@ planet_event = {
 	option = {
 		name = colony.103.b
 		trigger = {
+			AND = {
 				count_pops = {
 					limit = { is_robot_pop = no }
 					count > 8
@@ -472,6 +486,7 @@ planet_event = {
 					limit = { is_robot_pop = no }
 					count < 17
 				}
+			}
 			owner = { resource_stockpile_compare = { resource = energy value >= 375 } }
 		}
 		owner = {
