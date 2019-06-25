@@ -8,6 +8,8 @@
 @terraforming_duration_level_3 = 5400 #<-- opposite category terraforming and uninhabitable to inhabitable terraforming
 @terraforming_duration_level_4 = 7200 #<-- special terraforming, e.g. to gaia, machine world etc.
 @terraforming_duration_gaia = 3600
+@machineCost = 10000
+@machineTime = 7200
 #Geotheraml
 terraform_link = {
 	from = pc_geothermal
@@ -15,7 +17,7 @@ terraform_link = {
 	energy = @terraforming_cost_gaia
 	duration = @terraforming_duration_gaia
 	condition = { has_ascension_perk = ap_world_shaper }
-	ai_weight = { weight = 0 }
+	ai_weight = { weight = 1 modifier = { factor = 0 resource_stockpile_compare = { resource = energy value < 40000 } } modifier = { factor = 0	OR = { is_mechanical_empire = yes is_cyborg_empire = yes has_authority = auth_machine_intelligence } } }
 }
 terraform_link = {
 	from = pc_geothermal
@@ -74,7 +76,7 @@ terraform_link = {
 	energy = @terraforming_cost_gaia
 	duration = @terraforming_duration_gaia
 	condition = { has_ascension_perk = ap_world_shaper }
-	ai_weight = { weight = 0 }
+	ai_weight = { weight = 1 modifier = { factor = 0 resource_stockpile_compare = { resource = energy value < 40000 } } modifier = { factor = 0	OR = { is_mechanical_empire = yes is_cyborg_empire = yes has_authority = auth_machine_intelligence } } }
 }
 terraform_link = {
 	from = pc_superhabitable
@@ -133,7 +135,7 @@ terraform_link = {
 	energy = @terraforming_cost_gaia
 	duration = @terraforming_duration_gaia
 	condition = { has_ascension_perk = ap_world_shaper }
-	ai_weight = { weight = 0 }
+	ai_weight = { weight = 1 modifier = { factor = 0 resource_stockpile_compare = { resource = energy value < 40000 } } modifier = { factor = 0	OR = { is_mechanical_empire = yes is_cyborg_empire = yes has_authority = auth_machine_intelligence } } }
 }
 terraform_link = {
 	from = pc_tidallylocked
@@ -190,7 +192,7 @@ terraform_link = {
 	energy = @terraforming_cost_gaia
 	duration = @terraforming_duration_gaia
 	condition = { has_ascension_perk = ap_world_shaper }
-	ai_weight = { weight = 0 }
+	ai_weight = { weight = 1 modifier = { factor = 0 resource_stockpile_compare = { resource = energy value < 40000 } } modifier = { factor = 0	OR = { is_mechanical_empire = yes is_cyborg_empire = yes has_authority = auth_machine_intelligence } } }
 }
 terraform_link = {
 	from = pc_biolumen
@@ -231,9 +233,7 @@ terraform_link = {
 	to = pc_irradiated
 	energy = @terraforming_cost_gaia
 	duration = @terraforming_duration_gaia
-	condition = { 
-		has_ascension_perk = ap_world_shaper 
-		from = { is_moon = no } }
+	condition = { has_ascension_perk = ap_world_shaper }
 	ai_weight = { weight = 0 }
 }
 terraform_link = {
@@ -241,9 +241,7 @@ terraform_link = {
 	to = pc_karst
 	energy = @terraforming_cost_gaia
 	duration = @terraforming_duration_gaia
-	condition = { 
-		has_ascension_perk = ap_world_shaper 
-		from = { is_moon = no } }
+	condition = { has_ascension_perk = ap_world_shaper }
 	ai_weight = { weight = 0 }
 }
 #Biolumen
@@ -253,7 +251,7 @@ terraform_link = {
 	energy = @terraforming_cost_gaia
 	duration = @terraforming_duration_gaia
 	condition = { has_ascension_perk = ap_world_shaper }
-	ai_weight = { weight = 0 }
+	ai_weight = { weight = 1 modifier = { factor = 0 resource_stockpile_compare = { resource = energy value < 40000 } } modifier = { factor = 0	OR = { is_mechanical_empire = yes is_cyborg_empire = yes has_authority = auth_machine_intelligence } } }
 }
 terraform_link = {
 	from = pc_karst
@@ -294,9 +292,7 @@ terraform_link = {
 	to = pc_irradiated
 	energy = @terraforming_cost_gaia
 	duration = @terraforming_duration_gaia
-	condition = { 
-		has_ascension_perk = ap_world_shaper 
-		from = { is_moon = no } }
+	condition = { has_ascension_perk = ap_world_shaper }
 	ai_weight = { weight = 0 }
 }
 terraform_link = {
@@ -304,8 +300,17 @@ terraform_link = {
 	to = pc_biolumen
 	energy = @terraforming_cost_gaia
 	duration = @terraforming_duration_gaia
-	condition = { 
-		has_ascension_perk = ap_world_shaper 
-		from = { is_moon = no } }
+	condition = { has_ascension_perk = ap_world_shaper }
 	ai_weight = { weight = 0 }
+}
+
+terraform_link = {
+	to = "pc_machine"
+	from = "pc_gaia"
+	energy = @machineCost
+	duration = @machineTime
+	potential = { has_ascension_perk = ap_machine_worlds }
+	condition = { from = { OR = { is_owned_by = root NOT = { has_modifier = "holy_planet" }	} } }
+	ai_weight = { weight = 10 modifier = { factor = 0 from = { any_owned_pop = { NOR = { has_trait = trait_machine_unit	has_trait = trait_mechanical } } } }
+		modifier = { factor = 0	from = { is_colony = no } } }
 }
