@@ -6,4 +6,4 @@ tags={
 }
 picture="pd-new_worlds.png"
 remote_file_id="1616934635"
-supported_version="2.2.4"
+supported_version="2.3.*"

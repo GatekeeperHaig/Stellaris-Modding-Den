@@ -38,6 +38,7 @@ name_rootUpdateEvent="custom_difficulty.40"
 # name_rootUpdateEventSimple="custom_difficulty.41"
 name_countryUpdateEvent="custom_difficulty.50"
 name_countryUpdateEventSimple="custom_difficulty.51"
+name_countryUpdateOneDayDelayEvent="custom_difficulty.52" #used for crisis/emerging countries immediate modifier application
 name_lockEvent="custom_difficulty.60"
 id_removeModifiers=70  #reserved range up to 72
 id_removeGroupModifiers=73  #reserved range up to 75
@@ -894,6 +895,7 @@ def main():
   onActions.add("on_yearly_pulse", TagList("events",TagList().add(name_rootYearlyEvent,""," #rootYearly").add(name_rootUpdateEvent,""," #rootUpdate")))
   onActions.add("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
   # onActions.add("on_game_start", TagList("events",TagList().add(name_rootUpdateEvent))) #is called by "fire only once"
+  onActions.add("on_ruler_set", TagList("events",TagList().add(name_countryUpdateOneDayDelayEvent), "#new country update"))
   outputToFolderAndFile(onActions, "common/on_actions", "custom_difficulty_on_action.txt")
 
   scriptedEffects=TagList("guardian_difficulty",TagList()," #I commented out the effect of the stuff applied here, but it was not up to date. Once they update it, that will be active again. Thus I kill this function as well to make sure it won't become active!")
@@ -1082,6 +1084,18 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
     immediate.add("if", ifSimple)
     immediate.add("else", TagList("if",ifDelay(name_countryUpdateEvent)).add("else", TagList("every_country", TagList("country_event", TagList("id", name_countryUpdateEvent))))) #fixed 2.1
 
+
+  newCountryUpdateEvent=TagList("id",name_countryUpdateOneDayDelayEvent)
+  mainFileContent.addComment("newCountryUpdateEvent")
+  mainFileContent.add("country_event", newCountryUpdateEvent)
+  newCountryUpdateEvent.add("is_triggered_only", yes)
+  newCountryUpdateEvent.add("hide_window", yes)
+  immediate=TagList()
+  newCountryUpdateEvent.add("immediate",immediate)
+  ifSimple=TagList("limit",TagList("has_global_flag", "custom_difficulty_activate_simple_mode"))
+  ifSimple.add("country_event", TagList("id", name_countryUpdateEventSimple).add("days","1"))
+  immediate.add("if", ifSimple)
+  immediate.add("else", TagList("country_event", TagList("id", name_countryUpdateEvent).add("days","1")))
 
 
   if not reducedMenu:
