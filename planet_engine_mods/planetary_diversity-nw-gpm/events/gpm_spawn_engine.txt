@@ -129,7 +129,7 @@ country_event = {
 					}
 					planet_event = { id = gpm_spawn_engine.6 days = 4 }	# Ringworld Modifiers + Effects
 				}
-				
+			
 				# Remove x% of uncontrolled space mineral and energy deposits from specific planets to balance out increased deposit spawns.
 				if = {
 					limit = {
@@ -159,6 +159,33 @@ planet_event = {
 	is_triggered_only = yes
 
 	immediate = {
+		if = {
+			limit = {
+				has_global_flag = gpm_modifier_amount_max_one
+			}
+			if = {
+				limit = {
+					is_capital = yes
+				}
+				# Remove all bad planet modifiers
+				gpm_remove_negative_modifiers = yes
+				# Spawn two guaranteed fallen empire modifier for capital worlds
+				gpm_spawn_fallen_empire_modifier = yes
+			}
+			if = {
+				limit = {
+					NOT = { is_capital = yes }
+					is_colony = yes
+				}
+				# Remove all bad planet modifiers
+				gpm_remove_negative_modifiers = yes
+				# Spawn one guaranteed fallen empire modifier for colonies
+				random_list = {
+					15 = {}
+					85 = { gpm_spawn_fallen_empire_modifier = yes }
+				}
+			}
+		}
 		if = {
 			limit = {
 				has_global_flag = gpm_modifier_amount_low
@@ -248,6 +275,73 @@ planet_event = {
 			10 = { gpm_spawn_planetary_rings_modifier = yes	}
 			90 = { }
 		}
+		# Max 1 modifier
+		if = {
+			limit = {
+				has_global_flag = gpm_modifier_amount_max_one
+			}
+			# New chance system - start
+			# roll precursor modifier first
+			###################################
+			# FIRST PRECURSOR MODIFIER CHANCE #
+			###################################
+			if = { limit = { num_modifiers = 0 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						96 = { }	# spawn nothing
+						4 = { # roll precursor modifier	- this is the only way it spawns! Other sections of the engine can only spawn extra
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 15 gpm_is_planet_tomb = yes } # more likely on tombworlds
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+							modifier = { factor = 0 gpm_is_planet_excluded = yes }
+						}
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						996 = { }	# spawn nothing
+						4 = { # roll precursor modifier	- this is the only way it spawns! Other sections of the engine can only spawn extra
+							gpm_spawn_precursor_modifier = yes
+							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
+							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
+							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+							modifier = { factor = 0 gpm_is_planet_excluded = yes }
+						}
+					}
+				}
+			}
+
+			# Roll normal modifiers 
+			#########################
+			# FIRST MODIFIER CHANCE #
+			#########################
+			if = { limit = { num_modifiers = 0 }
+				if = {
+					limit = { OR = { gpm_is_planet_habitable = yes gpm_is_planet_tomb = yes } }			# habitable planets
+					random_list = {
+						15 = { }	# spawn nothing
+						85 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+				if = {
+					limit = { gpm_is_planet_habitable = no }		# uninhabitle planets
+					random_list = {
+						50 = { }	# spawn nothing
+						50 = { # roll normal modifier
+							gpm_spawn_planet_modifier = yes
+
+						} 
+					}
+				}
+			}
+		}
 		# Low amount of modifiers:  0 to 2 with a lower chance
 		if = {
 			limit = {
@@ -269,6 +363,7 @@ planet_event = {
 							modifier = { factor = 15 gpm_is_planet_tomb = yes } # more likely on tombworlds
 							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
 							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+							modifier = { factor = 0 gpm_is_planet_excluded = yes }
 						}
 					}
 				}
@@ -281,6 +376,7 @@ planet_event = {
 							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
 							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
 							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+							modifier = { factor = 0 gpm_is_planet_excluded = yes }
 						}
 					}
 				}
@@ -426,7 +522,6 @@ planet_event = {
 					}
 				}
 			}
-			
 		}
 		# Normal amount of modifiers:  0 to 3 with a normal chance
 		if = {
@@ -449,6 +544,7 @@ planet_event = {
 							modifier = { factor = 15 gpm_is_planet_tomb = yes } # more likely on tombworlds
 							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
 							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+							modifier = { factor = 0 gpm_is_planet_excluded = yes }
 						}
 					}
 				}
@@ -461,6 +557,7 @@ planet_event = {
 							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
 							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
 							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+							modifier = { factor = 0 gpm_is_planet_excluded = yes }
 						}
 					}
 				}
@@ -628,6 +725,7 @@ planet_event = {
 							modifier = { factor = 15 gpm_is_planet_tomb = yes } # more likely on tombworlds
 							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
 							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+							modifier = { factor = 0 gpm_is_planet_excluded = yes }
 						}
 					}
 				}
@@ -640,6 +738,7 @@ planet_event = {
 							modifier = { factor = 0 has_global_flag = gpm_modifiers_precursor_disabled }
 							modifier = { factor = 0 exists = space_owner } # dont allow if the planet is owned by anyone
 							modifier = { factor = 0	solar_system = { has_star_flag = sol_system } } # dont allow on sol system
+							modifier = { factor = 0 gpm_is_planet_excluded = yes }
 						}
 					}
 				}
@@ -842,7 +941,7 @@ planet_event = {
 		}
 
 
-		# wipe deposits from uninhabitable precursor worlds and give them an Precursor Archeotech deposit
+		# wipe deposits from uninhabitable precursor worlds and give them a unity deposit
 		if = {
 			limit = { 
 				gpm_is_planet_uninhabitable = yes
@@ -852,7 +951,7 @@ planet_event = {
 				remove_deposit = yes
 			}
 			add_deposit = gpm_precursor_unity_deposit
-		}		
+		}
 	}
 }
 
@@ -904,8 +1003,6 @@ country_event = {
 	}
 	
 	immediate = {
-		log = "---- Fired Event gpm_spawn_engine.5 ----"
-		log = "---- spawning planet wonders on vanilla planets ----"
 		random_list = {
 			75 = {}
 			50 ={
@@ -918,6 +1015,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -938,6 +1037,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -958,6 +1059,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -978,6 +1081,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -998,6 +1103,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -1018,6 +1125,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -1038,6 +1147,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -1058,6 +1169,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -1078,6 +1191,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -1098,6 +1213,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -1122,8 +1239,6 @@ country_event = {
 								is_planet_class = pc_tropical
 								is_planet_class = pc_continental
 								is_planet_class = pc_ocean
-								is_planet_class = pc_arctic
-								is_planet_class = pc_alpine
 								is_planet_class = pc_tundra
 								is_planet_class = pc_nuked
 								is_planet_class = pc_machine
@@ -1143,6 +1258,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -1158,7 +1275,7 @@ country_event = {
 					limit = {
 						AND = {
 							gpm_is_planet_dry_cold = yes
-							NOR = { 
+							NOR = {
 								is_planet_class = pc_toxic
 								is_planet_class = pc_desert
 								is_planet_class = pc_arid
@@ -1166,8 +1283,6 @@ country_event = {
 								is_planet_class = pc_tropical
 								is_planet_class = pc_continental
 								is_planet_class = pc_ocean
-								is_planet_class = pc_arctic
-								is_planet_class = pc_alpine
 								is_planet_class = pc_tundra
 								is_planet_class = pc_nuked
 								is_planet_class = pc_machine
@@ -1187,6 +1302,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -1210,8 +1327,6 @@ country_event = {
 								is_planet_class = pc_tropical
 								is_planet_class = pc_continental
 								is_planet_class = pc_ocean
-								is_planet_class = pc_arctic
-								is_planet_class = pc_alpine
 								is_planet_class = pc_tundra
 								is_planet_class = pc_nuked
 								is_planet_class = pc_machine
@@ -1231,6 +1346,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -1254,8 +1371,6 @@ country_event = {
 								is_planet_class = pc_tropical
 								is_planet_class = pc_continental
 								is_planet_class = pc_ocean
-								is_planet_class = pc_arctic
-								is_planet_class = pc_alpine
 								is_planet_class = pc_tundra
 								is_planet_class = pc_nuked
 								is_planet_class = pc_machine
@@ -1275,6 +1390,8 @@ country_event = {
 							NOT = { num_pops > 0 }
 							NOT = { has_planet_flag = "gpm_is_wondrous_planet" }
 							NOT = {	gpm_has_precursor_modifiers = yes	}
+							NAND = { has_global_flag = gpm_modifier_amount_max_one num_modifiers > 0 }
+							NOT = { gpm_is_planet_excluded = yes }
 						}
 					}
 					set_planet_flag = "gpm_is_wondrous_planet"
@@ -1322,6 +1439,17 @@ planet_event = {
 		remove_modifier = "Precursor_Capital_Complex"
 		remove_modifier = "Precursor_Communication_Hub"
 		remove_modifier = "Precursor_Singularity_Drive"
+		remove_modifier = "Precursor_Eternal_Fortress"
+		remove_modifier = "Precursor_Prison_Planet"
+		remove_modifier = "Precursor_Mines"
+		remove_modifier = "Precursor_Manufactorium"
+		remove_modifier = "Precursor_Vaults"
+		remove_modifier = "Precursor_Crashed_Spacestation"
+		remove_modifier = "Precursor_Battleground_Ruins"
+		remove_modifier = "Precursor_Outpost_Ruins"
+		remove_modifier = "Precursor_Harbor_Ruins"
+		remove_modifier = "Precursor_Ruins"
+		remove_modifier = "Precursor_Obelisks"
 		remove_modifier = "Strange_Alien_Eggs"
 		remove_modifier = "Ghost_Ships"
 		remove_modifier = "Surface_Of_Bones"
