@@ -19,35 +19,32 @@ event = {
 		if = {
 			limit = {
 				any_country = { has_country_flag = human_2 }
-				#NOT = { any_country = { has_country_flag = human_1 } }
-				# Replaced UN check with generic Sol check
 				NOT = { any_system = { has_star_flag = sol } }
 			}
 			random_system = {
-				spawn_system = { initializer = "com_sol_system" }
+				limit = { has_star_flag = aldebaran_system }
+				spawn_system = {
+					initializer = "com_sol_system"
+					min_distance = 80
+					max_distance = 150
+				}
+				
 			}
 		}
-		else_if = {
-			# If there are no Sols - DISABLED
+		# If the opposite, any Empire is UN and Commonwealth is unplayed
+		else_if = {			
 			limit = {
-				NOT = {
-					any_system = {
-						has_star_flag = sol
-					}
-				}
+				any_country = { has_country_flag = human_1 }
+				NOT = { any_system = { has_star_flag = aldebaran_system } }
 			}
-			random_list = {
-				50 = { }
-				0 = {
-					random_system = {
-						#spawn_system = { initializer = "special_init_03" }
-					}
+			random_system = {
+				limit = { has_star_flag = sol }
+				spawn_system = {
+					initializer = "une_aldebaran_system"
+					min_distance = 80
+					max_distance = 150
 				}
-				0 = {
-					random_system = {
-						#spawn_system = { initializer = "special_init_04" }
-					}
-				}
+				
 			}
 		}
 
@@ -140,5 +137,54 @@ event = {
 				}
 			}
 		}		
+	}
+}
+
+### Country-scope start event for advanced empires
+country_event = {
+	id = game_start.6
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		give_technology = { tech = "tech_society_1" message = no }
+		give_technology = { tech = "tech_engineering_1" message = no }
+		give_technology = { tech = "tech_physics_1" message = no }
+		give_technology = { tech = "tech_planetary_unification" message = no }
+		
+		add_resource = { energy = 1000	}
+		add_resource = { minerals = 1000 }
+		add_resource = { alloys = 500	}
+		add_resource = { influence = 200 }		
+		if = {
+			limit = { is_machine_empire = no }
+			add_resource = { food = 1000 }		
+		}
+		if = {
+			limit = { is_gestalt = no }
+			add_resource = { consumer_goods = 500 }		
+		}
+		
+		every_planet_within_border = {
+			limit = { 
+				has_deposit_for = shipclass_mining_station
+				has_mining_station = no
+			}
+			create_mining_station = {
+				owner = ROOT
+			}
+		}
+		every_planet_within_border = {
+			limit = { 
+				has_deposit_for = shipclass_research_station 
+				has_research_station = no
+			}
+			create_research_station = {
+				owner = ROOT
+			}
+		}		
+		every_system_within_border = {
+			set_star_flag = advanced_empire_space
+		}
 	}
 }

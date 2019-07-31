@@ -8,6 +8,18 @@ event = {
 	immediate = { 
 		set_global_flag = milkomeda-project
 		set_global_flag = gpm_planetary_rings_disabled # Guilli's planetary rings dont play nice with this mod's rescale
+		every_country = {
+			limit = { 
+				OR = {
+					is_country_type = dormant_marauders
+					is_country_type = fallen_empire 
+					is_country_type = enclave
+				}			
+			}
+			every_system_within_border = {
+				set_star_flag = special_empire_space
+			}
+		}
 		every_planet = {
 			if = {
 				limit = {
@@ -142,5 +154,69 @@ planet_event = {
 			}
 			mp_habitable_spawn = yes
 		}
+	}
+}
+
+event = {
+	id = mpengine.03 # Convert Unity to Primordial class, setup initial wormhole link between Sol to Aldebaran and set wormholes as "seen" by the human empires
+	hide_window = yes
+	is_triggered_only = yes
+	#fire_only_once = yes
+	
+	## NOTE: The secondary Sol or Aldaberan initializer for when you play as the opposite empire is setup in the !game_start_fix.txt
+	immediate = {
+		# Change Unity to Primordial class with the Adapted Environment modifier
+		every_planet = {
+			limit = {
+				solar_system = { has_star_flag = aldebaran_system }
+				has_planet_flag = unity
+			}
+			change_pc = pc_primordial
+			set_entity_primordial = yes
+			reroll_deposits = yes
+			add_modifier = {
+				modifier = "adapted_environ"
+				days = -1
+			}
+			add_building = building_aeroponic_complex
+			remove_district = district_farming
+			remove_district = district_farming
+			remove_district = district_farming
+		}
+		# Spawn wormhole
+		random_system = {
+			limit = { has_star_flag = aldebaran_system }
+			random_system = {
+				limit = { has_star_flag = sol }
+				prev = { # done this way to ensure we don't spawn "orphan" wormholes (wormholes that aren't linked to anything)
+						spawn_natural_wormhole = {
+						bypass_type = wormhole
+						random_pos = yes
+						orbit_angle = 360
+					}
+				}
+				spawn_natural_wormhole = {
+					bypass_type = wormhole
+					random_pos = yes
+					orbit_angle = 360
+				}
+				link_wormholes = prev
+			}
+			
+		}
+		# Set wormholes as "seen"
+		random_country = {
+			limit = { has_country_flag = human_1 }
+			set_country_flag = encountered_first_wormhole
+			add_seen_bypass_type = wormhole
+			add_research_option = tech_wormhole_stabilization
+		}
+		random_country = {
+			limit = { has_country_flag = human_2 }
+			set_country_flag = encountered_first_wormhole
+			add_seen_bypass_type = wormhole
+			add_research_option = tech_wormhole_stabilization
+		}
+		
 	}
 }

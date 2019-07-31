@@ -5,12 +5,14 @@ decision_star_chart = {
 	icon = decision_star_chart
 	owned_planets_only = yes
 
-	enactment_time = 720
+	#enactment_time = 720
+	enactment_time = 10
 	resources = {	
 		category = decisions
 		cost = {
 			influence = 50
-			energy = 720
+			#energy = 720
+			energy = 10
 		}
 	}
 	potential = {
@@ -38,6 +40,10 @@ decision_star_chart = {
 			if = {
 				limit = {
 					NOT = { has_star_flag = star_system_charted }
+					NOR = {
+						has_star_flag = sol
+						has_star_flag = alpha_centauri
+					}
 					OR = { 
 							lane_attraction_level_1 = yes # Single yellow star systems, or some binaries which include low-mass dwarf stars will only spawn 1 new star
 							lane_attraction_level_2 = yes # Higher mass single star systems (like White stars), or binaries and trinaries of suficient combined mass will attract up to 2 new stars
@@ -264,6 +270,36 @@ decision_star_chart = {
 				}
 				
 				set_star_flag = star_system_charted # So it cant be charted again in case there are two or more colonies in the system
+				break = yes
+			}
+			
+			if = {
+				limit = {
+					has_star_flag = sol
+					NOT = { has_star_flag = star_system_charted }
+				}
+				spawn_system = {
+					min_distance = 10
+					max_distance = 10
+					max_jumps = 0
+					initializer = "mp_barnards_star"
+				}
+				set_star_flag = star_system_charted # So it cant be charted again in case there are two or more colonies in the system
+				break = yes
+			}
+			if = {
+				limit = {
+					has_star_flag = alpha_centauri
+					NOT = { has_star_flag = star_system_charted }
+				}
+				spawn_system = {
+					min_distance = 10
+					max_distance = 10
+					max_jumps = 0
+					initializer = "mp_proxima_centauri"
+				}
+				set_star_flag = star_system_charted # So it cant be charted again in case there are two or more colonies in the system
+				break = yes
 			}
 		}
 	  }

@@ -18,7 +18,9 @@ event = {
 						#	has_star_flag = "giant_mass"
 						#}
 						NOR = {
-							has_star_flag = "empire_home_system"
+							#has_star_flag = "empire_home_system"
+							has_star_flag = "advanced_empire_space"
+							has_star_flag = "special_empire_space"
 							has_star_flag = "marauder_system"
 							has_star_flag = "fallen_shrouded"
 							has_star_flag = "fallen_shielded_1"
@@ -29,7 +31,6 @@ event = {
 							has_star_flag = "holy_system_3"
 							has_star_flag = "holy_system_4"
 							has_star_flag = "fe_xeno_zoo"
-							any_system_planet = { has_planet_flag = "fallen_empire_world" }
 						}
 					}
 				}			
@@ -44,7 +45,7 @@ event = {
 	
 }
 
-event = {	## GENERATE NEW GALAXY HYPERLANE NETWORK - if triggered in mp_on_actions.txt
+event = {	## GENERATE NEW GALAXY HYPERLANE NETWORK - if triggered in mp_on_actions.txt, currently not used
 	id = mp_hyperlanes.01
 	hide_window = yes
 	is_triggered_only = yes
@@ -141,9 +142,10 @@ event = {	## GENERATE HYPERLANES IN HOME SYSTEM - triggered on_press_begin
 				limit = {
 					solar_system = {
 						has_star_flag = "empire_home_system"
-					}
-					solar_system = {
-						NOT = { has_star_flag = "spawned_hyperlanes" }
+						NOR = {
+							has_star_flag = "spawned_hyperlanes"
+							has_star_flag = "sol"
+						}
 					}
 				}
 				
@@ -153,6 +155,38 @@ event = {	## GENERATE HYPERLANES IN HOME SYSTEM - triggered on_press_begin
 						mp_create_hyperlane = yes
 					}
 					set_star_flag = "spawned_hyperlanes"
+				}
+			}
+			
+			if = {
+				limit = { solar_system = { has_star_flag = "sol" } }
+				solar_system = {
+					random_neighbor_system = {
+						ignore_hyperlanes = yes
+						limit = {
+							has_star_flag = alpha_centauri
+							NOT = {	has_hyperlane_to = PREV	}
+						}
+						
+						add_hyperlane = { 
+							from = PREV
+							to = THIS 
+						}
+					}
+				}
+				solar_system = {
+					random_neighbor_system = {
+						ignore_hyperlanes = yes
+						limit = {
+							has_star_flag = sirius
+							NOT = {	has_hyperlane_to = PREV	}
+						}
+						
+						add_hyperlane = { 
+							from = PREV
+							to = THIS 
+						}
+					}
 				}
 			}
 			
@@ -313,6 +347,28 @@ ship_event = {	## GENERATE HYPERLANES IN SURVEYED SYSTEM - triggered on_survey
 			}			
 		}
 		from = { set_planet_flag = "star_surveyed" }
+	}
+	
+}
+
+ship_event = {	## RESPAWNS ORBITAL DEPOSITS ON SYSTEMS GENERATED FROM THE STAR CHART DECISION - triggered on_survey, replaces vanilla deposits with this mod's engine's
+	id = mp_hyperlanes.04
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			solar_system = {
+				has_star_flag = spawned_system
+			}
+		}
+	}
+	
+	immediate = {
+		solar_system = {
+			reroll_system_deposits = yes
+			remove_star_flag = spawned_system
+		}
 	}
 	
 }
