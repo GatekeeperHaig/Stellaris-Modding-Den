@@ -110,7 +110,7 @@ def main():
   "starbase_shipyard_build_cost_mult",
   "planet_stability_add",
   "diplomacy_upkeep_mult",
-  "ship_weapon_damage",
+  ["weapon_type_strike_craft_weapon_fire_rate_mult","ship_weapon_damage"],
   "ship_hull_mult",
   "ship_armor_mult",
   "ship_shield_mult",
