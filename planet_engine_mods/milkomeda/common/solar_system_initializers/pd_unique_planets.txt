@@ -1,0 +1,1483 @@
+@base_moon_distance = 1
+@giant_moon_distance = 6
+
+#Crystal Planet
+pd_init_crystal = {
+	class = "sc_b"
+	usage = misc_system_init
+	
+	max_instances = 1
+	scaled_spawn_chance = 14
+	spawn_chance = 100	
+	usage_odds = 100	
+	flags = { pdcrystal_system giant_mass }		
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 110
+	}
+	
+	planet = {
+		count = 1
+		class = star
+		orbit_distance = 0
+		orbit_angle = 1
+		size = { min = 30 max = 35 }
+		has_ring = no
+	}
+	
+	change_orbit = 110
+	
+	planet = {
+		count = { min = 2 max = 4 }
+		orbit_distance = 0
+		orbit_angle = { min = 90 max = 270 }
+		class = "pc_asteroid"
+	}
+	
+	change_orbit = -110
+	
+	# Inner Zone
+	change_orbit = 50
+	planet = {
+		count = { min = 0 max = 1 }
+		orbit_distance = 0
+		class = "pc_radiated"
+		orbit_angle = { min = 90 max = 270 }
+		
+	}
+	change_orbit = 20
+	planet = {
+		count = { min = 0 max = 1 }
+		orbit_distance = 0
+		class = "pc_volcanic"
+		orbit_angle = { min = 90 max = 270 }
+		
+	}
+	change_orbit = 15
+	planet = {
+		count = 1
+		orbit_distance = 0
+		class = "pc_molten"
+		orbit_angle = { min = 90 max = 270 }
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = { min = 1 max = 2 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1 max = 2 }
+			class = rl_inner_hot_moon
+		}
+	}
+	change_orbit = 80
+	
+	# Eco Zone
+	planet = {
+		count = 1
+		orbit_distance = { min = 5 max = 20 }
+		class = "pc_gas_giant"
+		orbit_angle = { min = 90 max = 270 }
+		
+		change_orbit = @giant_moon_distance
+		
+		moon = {
+			count = { min = 1 max = 2 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1.5 max = 2.5 }
+			class = rl_gasgiant_moon
+		}
+		moon = {
+			count = 1
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1.5 max = 2.5 }
+			class = pc_crystal
+			size = { min = 20 max = 25 }
+			has_ring = no
+			modifiers = none
+			
+			init_effect = {
+				set_planet_flag = crystal_planet 
+				set_planet_flag = colony_event
+				prevent_anomaly = yes
+				save_event_target_as = crystal_planet
+				add_modifier = {
+					modifier = crystal
+					days = -1
+				}
+				add_deposit = d_crystal_guild
+				create_country = {
+					name = "Crystal Swarm"
+					type = faction
+				}
+				last_created_country = {
+					set_country_flag = crystal_country
+					create_fleet = {
+						name = "Crystal Swarm"
+						settings = { spawn_debris = no }
+						effect = {
+							set_owner = PREV
+							set_fleet_flag = crystal_fleet
+							create_ship_design = {
+								design = "NAME_Small_Crystal_Entity_Blue_Elite"
+							}
+							while = {
+								count = 6
+								create_ship = {
+									name = random
+									design = last_created_design
+								}
+							}
+							create_ship_design = {
+									design = "NAME_Medium_Crystal_Entity_Blue_Elite"
+							}
+							while = {
+								count = 6
+								create_ship = {
+									name = random
+									design = last_created_design
+								}
+							}
+							create_ship_design = {
+								design = "NAME_Medium_Crystal_Entity_Blue_Elite"
+							}
+							while = {
+								count = 12
+								create_ship = {
+									name = random
+									design = last_created_design
+								}
+							}
+							set_aggro_range = 200
+							set_location = event_target:crystal_planet
+							add_modifier = {
+								modifier = sanctuary_power
+								days = -1														
+							}
+						}
+					}
+				}		
+			}
+		}
+	}
+	
+	# Outer Zone
+	planet = {
+		count = 1
+		orbit_distance = { min = 50 max = 65 }
+		class = "pc_gas_giant"
+		orbit_angle = { min = 90 max = 270 }
+		
+		change_orbit = @giant_moon_distance
+		
+		moon = {
+			count = { min = 1 max = 3 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1.5 max = 2.5 }
+			class = rl_gasgiant_moon
+		}
+	}
+	change_orbit = 75
+	planet = {
+		count = { min = 1 max = 3 }
+		orbit_distance = { min = 20 max = 40 }
+		class = "rl_outer_cold_planet"
+		orbit_angle = { min = 90 max = 270 }
+	}
+	
+}
+
+#Floating Planet
+pd_init_floating = {
+	class = "sc_a"
+	usage = misc_system_init
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 110
+	}
+	max_instances = 1
+	scaled_spawn_chance = 14
+	spawn_chance = 100	
+	usage_odds = 100	
+	flags = { floating_system med_mass }		
+	
+	planet = {
+		count = 1
+		class = star
+		orbit_distance = 0
+		orbit_angle = 1
+		size = { min = 25 max = 30 }
+		has_ring = no
+	}
+	
+	change_orbit = 110
+	
+	planet = {
+		count = { min = 2 max = 4 }
+		orbit_distance = 0
+		orbit_angle = { min = 90 max = 270 }
+		class = "pc_asteroid"
+	}
+	
+	change_orbit = -110
+	
+	# Inner Zone
+	change_orbit = 40
+	planet = {
+		count = { min = 0 max = 1 }
+		orbit_distance = 0
+		class = "pc_hot_giant"
+		orbit_angle = { min = 90 max = 270 }
+		
+	}
+	change_orbit = 20
+	planet = {
+		count = { min = 2 max = 3 }
+		orbit_distance = { min = 8 max = 12 }
+		orbit_angle = { min = 90 max = 270 }
+		class = rl_inner_hot_planet
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = { min = 0 max = 1 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1 max = 2 }
+			class = rl_inner_hot_moon
+		}
+	}
+	change_orbit = 10
+	
+	# Eco Zone
+	planet = {
+		count = 1
+		orbit_distance = { min = 50 max = 75 }
+		class = "pc_gas_giant"
+		orbit_angle = { min = 90 max = 270 }
+		
+		change_orbit = @giant_moon_distance
+		
+		moon = {
+			count = { min = 1 max = 2 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1.5 max = 2.5 }
+			class = rl_gasgiant_moon
+		}
+		moon = {
+			count = 1
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1.5 max = 2.5 }
+			class = pc_floating
+			size = { min = 20 max = 25 }
+			modifiers = none
+			init_effect = {
+				set_planet_flag = floating_planet
+				set_planet_flag = colony_event
+				prevent_anomaly = yes
+				save_event_target_as = floating_planet
+				add_modifier = {
+					modifier = floating
+					days = -1
+				}
+				add_deposit = d_eludium_centre
+				create_country = {
+					name = "Void Cumulonimbus"
+					type = faction
+				}
+				last_created_country = {
+					set_country_flag = floating_country
+					create_fleet = {
+						name = "Void Cumulonimbus"
+						settings = { spawn_debris = no }						
+						effect = {
+							set_owner = PREV
+							set_fleet_flag = floating_fleet						
+							create_ship = {
+								design = "NAME_Cloud_Entity"
+							}						
+							create_ship = {
+								design = "NAME_Cloud_Entity"
+							}						
+							create_ship = {
+								design = "NAME_Cloud_Entity"
+							}						
+							create_ship = {
+								design = "NAME_Cloud_Entity"
+							}						
+							create_ship = {
+								design = "NAME_Cloud_Entity"
+							}						
+							create_ship = {
+								design = "NAME_Cloud_Entity"
+							}	
+							set_aggro_range = 200
+							set_location = event_target:floating_planet
+							add_modifier = {
+								modifier = sanctuary_power
+								days = -1														
+							}
+						}
+					}
+				}	
+			}
+		}
+	}
+	
+	# Outer Zone
+	planet = {
+		count = 1
+		orbit_distance = { min = 100 max = 120 }
+		class = "pc_gas_giant"
+		orbit_angle = { min = 90 max = 270 }
+		
+		change_orbit = @giant_moon_distance
+		
+		moon = {
+			count = { min = 2 max = 3 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1.5 max = 2.5 }
+			class = rl_gasgiant_moon
+		}
+	}
+	change_orbit = 80
+	planet = {
+		count = { min = 1 max = 3 }
+		orbit_distance = { min = 20 max = 40 }
+		class = "rl_ice_planets"
+		orbit_angle = { min = 90 max = 270 }
+		
+		change_orbit = @giant_moon_distance
+		
+		moon = {
+			count = { min = 0 max = 2 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1.5 max = 2.5 }
+			class = rl_outer_cold_moon
+		}
+	}
+	
+}
+
+#Tinyanki Graveyard
+pd_init_graveyard = {
+	class = "sc_k"
+	usage = misc_system_init
+	max_instances = 1
+	scaled_spawn_chance = 14
+	spawn_chance = 100	
+	usage_odds = 100
+	flags = { graveyard_system high_mass }
+	
+	planet = {
+		count = 1
+		class = star
+		orbit_distance = 0
+		orbit_angle = 1
+		size = { min = 30 max = 35 }
+		has_ring = no
+	}
+	
+	change_orbit = 20
+	
+	# Inner Zone
+	planet = {
+		count = { min = 0 max = 2 }
+		orbit_distance = { min = 40 max = 50 }
+		class = "pc_hot_giant"
+		orbit_angle = { min = 90 max = 270 }
+		
+		change_orbit = @giant_moon_distance
+		
+		moon = {
+			count = { min = 0 max = 1 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1.5 max = 2.5 }
+			class = "rl_inner_hot_moon"
+		}
+	}
+	
+	change_orbit = 20
+	
+	planet = {
+		count = { min = 1 max = 2 }
+		orbit_distance = { min = 18 max = 24 }
+		orbit_angle = { min = 90 max = 270 }
+		class = rl_inner_hot_planet
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = { min = 0 max = 2 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1 max = 2 }
+			class = rl_inner_hot_moon
+		}
+	}
+	
+	# Eco Zone
+	planet = {
+		count = 1
+		orbit_distance = { min = 18 max = 24 }
+		orbit_angle = { min = 90 max = 270 }
+		class = rl_eco_hot_planet
+		#flags = { eco_hot_planet }
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = 1
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1 max = 2 }
+			class = pc_graveyard
+			size = { min = 20 max = 25 }
+			modifiers = none
+			has_ring = no
+			init_effect = {
+				prevent_anomaly = yes
+				set_planet_flag = graveyard_planet
+				set_planet_flag = colony_event
+				save_event_target_as = graveyard_planet
+				add_modifier = {
+					modifier = graveyard
+					days = -1
+				}
+				add_deposit = d_graveyard_well
+				create_country = {
+					name = "Tiyanki Matriarchs"
+					type = faction
+				}
+				last_created_country = {
+					set_country_flag = tiyanki_country
+					create_fleet = {
+						name = "Tiyanki Matriarchs"
+						settings = { spawn_debris = no }
+						effect = {
+							set_owner = PREV
+							set_fleet_flag = tiyanki_fleet						
+							create_ship = {
+								design = "NAME_The_Matriarch"
+							}	
+							while = {
+								count = 8
+								create_ship = {
+									name = random
+									design = last_created_design
+								}
+							}	
+							set_aggro_range = 50			
+							set_location = event_target:graveyard_planet
+							add_modifier = {
+								modifier = sanctuary_power
+								days = -1														
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	planet = {
+		count = { min = 0 max = 1 }
+		orbit_distance = { min = 40 max = 55 }
+		class = "pc_gas_giant"
+		orbit_angle = { min = 90 max = 270 }
+		
+		change_orbit = @giant_moon_distance
+		
+		moon = {
+			count = { min = 1 max = 2 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1.5 max = 2.5 }
+			class = rl_gasgiant_moon
+		}
+		moon = {
+			count = 1
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1.5 max = 2.5 }
+			class = rl_eco_temp_planet
+			flags = { eco_temp_planet }
+		}
+	}
+	
+	change_orbit = 40
+	
+	# Outer Zone
+	planet = {
+		count = { min = 1 max = 2 }
+		orbit_distance = { min = 60 max = 85 }
+		class = "pc_gas_giant"
+		orbit_angle = { min = 90 max = 270 }
+		
+		change_orbit = @giant_moon_distance
+		
+		moon = {
+			count = { min = 1 max = 3 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1.5 max = 2.5 }
+			class = rl_gasgiant_moon
+		}
+	}
+	init_effect = {
+		create_tiyanki_country = yes
+		random_system_planet = {
+			limit = { is_planet_class = pc_gas_giant }
+			save_event_target_as = giant
+			event_target:tiyanki_country = {
+				save_event_target_as = tiyanki_country2
+				create_fleet = {
+					name = "NAME_Tiyanki_Space_Whale"
+					effect = {
+						set_owner = event_target:tiyanki_country
+						create_ship = {
+							name = "NAME_Cow"
+							design = "NAME_Tiyanki_Cow"
+						}
+						create_ship = {
+							name = "NAME_Bull"
+							design = "NAME_Tiyanki_Bull"
+						}
+						create_ship = {
+							name = "NAME_Calf"
+							design = "NAME_Tiyanki_Calf"
+						}
+						set_location = event_target:giant
+						set_fleet_stance = passive
+						set_aggro_range_measure_from = return_point
+						set_aggro_range = 0
+						queue_actions = {
+							wait = { # Cooldown until they start moving
+								duration = 320
+								random = 80
+							}
+						}
+					}
+				}
+			}
+		}
+		create_tiyanki_country = yes
+		random_system_planet = {
+			limit = { is_planet_class = pc_gas_giant }
+			save_event_target_as = giant
+			event_target:tiyanki_country = {
+				save_event_target_as = tiyanki_country2
+				create_fleet = {
+					name = "NAME_Tiyanki_Space_Whale"
+					effect = {
+						set_owner = event_target:tiyanki_country
+						create_ship = {
+							name = "NAME_Cow"
+							design = "NAME_Tiyanki_Cow"
+						}
+						create_ship = {
+							name = "NAME_Bull"
+							design = "NAME_Tiyanki_Bull"
+						}
+						create_ship = {
+							name = "NAME_Calf"
+							design = "NAME_Tiyanki_Calf"
+						}
+						set_location = event_target:giant
+						set_fleet_stance = passive
+						set_aggro_range_measure_from = return_point
+						set_aggro_range = 0
+						queue_actions = {
+							wait = { # Cooldown until they start moving
+								duration = 320
+								random = 80
+							}
+						}
+					}
+				}
+			}
+		}
+		create_tiyanki_country = yes
+		random_system_planet = {
+			limit = { is_planet_class = pc_gas_giant }
+			save_event_target_as = giant
+			event_target:tiyanki_country = {
+				save_event_target_as = tiyanki_country2
+				create_fleet = {
+					name = "NAME_Tiyanki_Space_Whale"
+					effect = {
+						set_owner = event_target:tiyanki_country
+						create_ship = {
+							name = "NAME_Cow"
+							design = "NAME_Tiyanki_Cow"
+						}
+						create_ship = {
+							name = "NAME_Bull"
+							design = "NAME_Tiyanki_Bull"
+						}
+						create_ship = {
+							name = "NAME_Calf"
+							design = "NAME_Tiyanki_Calf"
+						}
+						set_location = event_target:giant
+						set_fleet_stance = passive
+						set_aggro_range_measure_from = return_point
+						set_aggro_range = 0
+						queue_actions = {
+							wait = { # Cooldown until they start moving
+								duration = 320
+								random = 80
+							}
+						}
+					}
+				}
+			}
+		}
+		create_tiyanki_country = yes
+		random_system_planet = {
+			limit = { is_planet_class = pc_gas_giant }
+			save_event_target_as = giant
+			event_target:tiyanki_country = {
+				save_event_target_as = tiyanki_country2
+				create_fleet = {
+					name = "NAME_Tiyanki_Space_Whale"
+					effect = {
+						set_owner = event_target:tiyanki_country
+						create_ship = {
+							name = "NAME_Cow"
+							design = "NAME_Tiyanki_Cow"
+						}
+						create_ship = {
+							name = "NAME_Bull"
+							design = "NAME_Tiyanki_Bull"
+						}
+						create_ship = {
+							name = "NAME_Calf"
+							design = "NAME_Tiyanki_Calf"
+						}
+						set_location = event_target:giant
+						set_fleet_stance = passive
+						set_aggro_range_measure_from = return_point
+						set_aggro_range = 0
+						queue_actions = {
+							wait = { # Cooldown until they start moving
+								duration = 320
+								random = 80
+							}
+						}
+					}
+				}
+			}
+		}
+		create_tiyanki_country = yes
+		random_system_planet = {
+			limit = { is_planet_class = pc_gas_giant }
+			save_event_target_as = giant
+			event_target:tiyanki_country = {
+				save_event_target_as = tiyanki_country2
+				create_fleet = {
+					name = "NAME_Tiyanki_Space_Whale"
+					effect = {
+						set_owner = event_target:tiyanki_country
+						create_ship = {
+							name = "NAME_Cow"
+							design = "NAME_Tiyanki_Cow"
+						}
+						create_ship = {
+							name = "NAME_Bull"
+							design = "NAME_Tiyanki_Bull"
+						}
+						create_ship = {
+							name = "NAME_Calf"
+							design = "NAME_Tiyanki_Calf"
+						}
+						set_location = event_target:giant
+						set_fleet_stance = passive
+						set_aggro_range_measure_from = return_point
+						set_aggro_range = 0
+						queue_actions = {
+							wait = { # Cooldown until they start moving
+								duration = 320
+								random = 80
+							}
+						}
+					}
+				}
+			}
+		}
+		create_tiyanki_country = yes
+		random_system_planet = {
+			limit = { is_planet_class = pc_gas_giant }
+			save_event_target_as = giant
+			event_target:tiyanki_country = {
+				save_event_target_as = tiyanki_country2
+				create_fleet = {
+					name = "NAME_Tiyanki_Space_Whale"
+					effect = {
+						set_owner = event_target:tiyanki_country
+						create_ship = {
+							name = "NAME_Cow"
+							design = "NAME_Tiyanki_Cow"
+						}
+						create_ship = {
+							name = "NAME_Bull"
+							design = "NAME_Tiyanki_Bull"
+						}
+						create_ship = {
+							name = "NAME_Calf"
+							design = "NAME_Tiyanki_Calf"
+						}
+						set_location = event_target:giant
+						set_fleet_stance = passive
+						set_aggro_range_measure_from = return_point
+						set_aggro_range = 0
+						queue_actions = {
+							wait = { # Cooldown until they start moving
+								duration = 320
+								random = 80
+							}
+						}
+					}
+				}
+			}
+		}
+		create_tiyanki_country = yes
+		random_system_planet = {
+			limit = { is_planet_class = pc_gas_giant }
+			save_event_target_as = giant
+			event_target:tiyanki_country = {
+				save_event_target_as = tiyanki_country2
+				create_fleet = {
+					name = "NAME_Tiyanki_Space_Whale"
+					effect = {
+						set_owner = event_target:tiyanki_country
+						create_ship = {
+							name = "NAME_Cow"
+							design = "NAME_Tiyanki_Cow"
+						}
+						create_ship = {
+							name = "NAME_Bull"
+							design = "NAME_Tiyanki_Bull"
+						}
+						create_ship = {
+							name = "NAME_Calf"
+							design = "NAME_Tiyanki_Calf"
+						}
+						set_location = event_target:giant
+						set_fleet_stance = passive
+						set_aggro_range_measure_from = return_point
+						set_aggro_range = 0
+						queue_actions = {
+							wait = { # Cooldown until they start moving
+								duration = 320
+								random = 80
+							}
+						}
+					}
+				}
+			}
+		}
+		create_tiyanki_country = yes
+		random_system_planet = {
+			limit = { is_planet_class = pc_gas_giant }
+			save_event_target_as = giant
+			event_target:tiyanki_country = {
+				save_event_target_as = tiyanki_country2
+				create_fleet = {
+					name = "NAME_Tiyanki_Space_Whale"
+					effect = {
+						set_owner = event_target:tiyanki_country
+						create_ship = {
+							name = "NAME_Cow"
+							design = "NAME_Tiyanki_Cow"
+						}
+						create_ship = {
+							name = "NAME_Bull"
+							design = "NAME_Tiyanki_Bull"
+						}
+						create_ship = {
+							name = "NAME_Calf"
+							design = "NAME_Tiyanki_Calf"
+						}
+						set_location = event_target:giant
+						set_fleet_stance = passive
+						set_aggro_range_measure_from = return_point
+						set_aggro_range = 0
+						queue_actions = {
+							wait = { # Cooldown until they start moving
+								duration = 320
+								random = 80
+							}
+						}
+					}
+				}
+			}
+		}
+		create_tiyanki_country = yes
+		random_system_planet = {
+			limit = { is_planet_class = pc_gas_giant }
+			save_event_target_as = giant
+			event_target:tiyanki_country = {
+				save_event_target_as = tiyanki_country2
+				create_fleet = {
+					name = "NAME_Tiyanki_Space_Whale"
+					effect = {
+						set_owner = event_target:tiyanki_country
+						create_ship = {
+							name = "NAME_Cow"
+							design = "NAME_Tiyanki_Cow"
+						}
+						create_ship = {
+							name = "NAME_Bull"
+							design = "NAME_Tiyanki_Bull"
+						}
+						create_ship = {
+							name = "NAME_Calf"
+							design = "NAME_Tiyanki_Calf"
+						}
+						set_location = event_target:giant
+						set_fleet_stance = passive
+						set_aggro_range_measure_from = return_point
+						set_aggro_range = 0
+						queue_actions = {
+							wait = { # Cooldown until they start moving
+								duration = 320
+								random = 80
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+}
+
+#Mushroom Planet
+pd_init_mushroom = {
+	class = "sc_g"
+	usage = misc_system_init
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 160
+	}
+	max_instances = 1
+	scaled_spawn_chance = 14
+	spawn_chance = 100	
+	usage_odds = 100
+	flags = { mushroom_system med_mass }
+		
+	planet = {
+		count = 1
+		class = "pc_g_star"
+		orbit_distance = 0
+		orbit_angle = 1
+		size = 30
+		has_ring = no
+	}
+		
+	planet = {
+		count = { min = 1 max = 1 }
+		class = pc_radiated
+		orbit_distance = 25
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {			
+			count = { min = 0 max = 0 }
+			orbit_distance = 5
+		}
+	}
+		
+	planet = {
+		count = { min = 1 max = 1 }
+		class = pc_molten
+		orbit_distance = 10
+		
+		change_orbit = @base_moon_distance
+	}
+		
+	planet = {
+		count = { min = 1 max = 1 }
+		class = pc_hot_reducing
+		orbit_distance = 20
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {			
+			count = { min = 1 max = 1 }
+			orbit_distance = 5
+			class = "pc_barren_cold"
+		}
+	}
+		
+	planet = {
+		count = { min = 1 max = 1 }
+		class = pc_toxic
+		orbit_distance = 5
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {			
+			count = { min = 1 max = 1 }
+			orbit_distance = 5
+			class = "pc_barren_cold"
+		}
+	}
+	
+	planet = {
+		class = "pc_mushroom"
+		orbit_distance = 15
+		orbit_angle = 85
+		size = { min = 20 max = 25 }
+		modifiers = none
+		has_ring = no
+		
+		init_effect = {
+			prevent_anomaly = yes		
+			set_planet_flag = mushroom_planet
+			save_event_target_as = mushroom_planet
+			set_planet_flag = colony_event
+		}
+		
+		moon = {			
+			count = { min = 1 max = 1 }
+			orbit_distance = 10
+			class = "pc_barren"
+		}
+	}
+	
+	planet = {
+		count = 1
+		class = random_asteroid
+		orbit_distance = 85
+		orbit_angle = { min = 90 max = 270 }
+	}
+	
+	planet = {
+		count = 5
+		class = random_asteroid
+		orbit_distance = 0
+		orbit_angle = { min = 90 max = 270 }
+	}
+
+	
+	planet = {
+		class = pc_gas_giant
+		orbit_distance = 50
+		size = 30
+		
+		change_orbit = @giant_moon_distance
+		
+		moon = {
+				count = { min = 2 max = 4 }
+				orbit_angle = { min = 90 max = 270 }
+				orbit_distance = { min = 1.5 max = 2.5 }
+				class = rl_gasgiant_moon
+		}
+	}
+		
+	planet = {
+		count = { min = 1 max = 1 }
+		class = rl_outer_cold_planet
+		orbit_distance = 25
+		size = 27
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {
+				count = { min = 1 max = 2 }
+				orbit_angle = { min = 90 max = 270 }
+				orbit_distance = { min = 1.5 max = 2.0 }
+				class = rl_outer_cold_moon
+		}
+	}
+	
+	planet = {
+		class = pc_frozen
+		orbit_distance = 15
+		size = 12
+	}	
+}
+
+
+#Biolumen World
+pd_init_biolumen = {
+	class = "sc_trinary_orphan_twins_1"
+	usage = misc_system_init
+	max_instances = 1
+	scaled_spawn_chance = 14
+	spawn_chance = 100	
+	usage_odds = 100
+	
+	flags = { biolumen_system med_mass }
+	
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 100
+	}
+
+	planet = {
+		count = 1
+		class = star
+		orbit_distance = 15
+		orbit_angle = { min = 90 max = 270 }
+		size = { min = 26 max = 30 }
+		has_ring = no
+	}
+	planet = {
+		count = 1
+		class = star
+		orbit_distance = 30
+		orbit_angle = 180
+		size = { min = 20 max = 25 }
+		has_ring = no
+    }
+
+	change_orbit = 55
+	planet = {
+		count = { min = 1 max = 3 }
+		orbit_distance = 0
+		orbit_angle = { min = 90 max = 270 }
+		class = "pc_asteroid"
+	}	
+	change_orbit = -55
+	
+    change_orbit = 15
+	
+	#Inner Zone
+	planet = {
+		count = 2
+		orbit_distance = { min = 8 max = 10 }
+		orbit_angle = { min = 90 max = 270 }
+		class = "rl_inner_hot_planet"
+	}
+	# Asteroids
+	change_orbit = 30
+	#Eco Zone
+	planet = {
+		count = 1
+		orbit_distance = { min = 8 max = 10 }
+		orbit_angle = { min = 90 max = 270 }
+		class = rl_eco_hot_planet
+		flags = { eco_hot_planet }
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = { min = 0 max = 1 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1 max = 2 }
+			class = rl_eco_hot_moon
+		}
+	}
+	planet = {
+		count = { min = 0 max = 1 }
+		orbit_distance = 12
+		orbit_angle = { min = 90 max = 270 }
+		class = rl_eco_temp_planet
+		flags = { eco_temp_planet }
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = 1
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1 max = 2 }
+			class = rl_eco_hot_moon
+		}
+	}
+	change_orbit = 30
+	
+	# Outer Zone
+	planet = {
+		count = 1
+		orbit_distance = { min = 8 max = 10 }
+		orbit_angle = { min = 90 max = 270 }
+		class = rl_outer_cold_planet
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = { min = 0 max = 1 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1 max = 2 }
+			class = rl_outer_cold_moon
+		}
+	}
+	
+	
+	
+	
+	planet = {
+		count = 1
+		class = star
+		orbit_distance = 150
+		orbit_angle = { min = 90 max = 270 }
+		size = { min = 20 max = 25 }
+		has_ring = no
+		satellite_naming_policy = upper_case_roman_numerals
+		
+		#Inner Zone
+		change_orbit = 15
+		planet = {
+			class = "pc_biolumen"
+			orbit_distance = 5
+			orbit_angle = 85
+			size = { min = 20 max = 25 }
+			modifiers = none
+			has_ring = yes
+			
+			init_effect = {
+				set_planet_flag = biolumen_planet
+				prevent_anomaly = yes
+				save_event_target_as = biolumen_planet	
+				set_planet_flag = colony_event
+				add_modifier = {
+					modifier = biolumen
+					days = -1
+				}
+			}		
+		}
+		planet = {
+			count = { min = 1 max = 2 }
+			orbit_distance = { min = 8 max = 12 }
+			orbit_angle = { min = 90 max = 270 }
+			class = rl_airless_planets		
+		}
+		# Outer Zone
+		planet = {
+			count = 1
+			orbit_distance = { min = 40 max = 50 }
+			class = "pc_gas_giant"
+			orbit_angle = { min = 90 max = 270 }
+		
+		}
+    }
+	
+}
+
+pd_init_technoorganic = {
+	class = "sc_brown_companion_1"
+	usage = misc_system_init
+	max_instances = 1
+	scaled_spawn_chance = 14
+	spawn_chance = 100	
+	usage_odds = 100
+	
+	flags = { technoorganic_system low_mass }
+
+	planet = {
+		count = 1
+		class = star
+		orbit_distance = 0
+		orbit_angle = 1
+		size = { min = 25 max = 30 }
+		has_ring = no
+	}
+	
+	change_orbit = 10
+	
+	# Inner Zone
+	planet = {
+		count = 1
+		orbit_distance = { min = 10 max = 15 }
+		orbit_angle = { min = 90 max = 270 }
+		class = rl_inner_hot_planet
+	}
+	
+	# Eco Zone
+	change_orbit = 15
+	planet = {
+		count = { min = 0 max = 1 }
+		orbit_distance = { min = 0 max = 5 }
+		orbit_angle = { min = 90 max = 270 }
+		class = rl_eco_hot_planet
+		flags = { eco_hot_planet }
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = { min = 0 max = 1 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1 max = 2 }
+			class = "rl_eco_hot_moon"
+		}
+	}
+	planet = {
+		count = 1
+		orbit_distance = 15
+		orbit_angle = { min = 90 max = 270 }
+		class = "pc_technoorganic"
+		size = { min = 20 max = 25 }
+		modifiers = none
+		deposit_blockers = none
+		
+		init_effect = {
+			set_planet_flag = technoorganic_planet
+			set_planet_flag = colony_event
+			prevent_anomaly = yes
+			save_event_target_as = technoorganic_planet
+			add_modifier = {
+				modifier = technoorganic
+				days = -1
+			}
+			create_country = {
+				name = "Defenders"
+				type = faction
+			}
+			last_created_country = {
+				set_country_flag = technoorganic_country
+				create_fleet = {
+					name = "Mining Drones"
+					settings = { spawn_debris = no }
+					effect = {
+								set_owner = PREV
+								create_ship_design = {
+									design = "NAME_Ancient_Destroyer"
+								}
+								while = {
+									count = 20
+									create_ship = {
+										name = random
+										design = last_created_design
+									}
+								}
+								create_ship_design = {
+									design = "NAME_Ancient_Combat_Drone"
+								}
+								while = {
+									count = 10
+									create_ship = {
+										name = random
+										design = last_created_design
+									}
+								}
+								set_fleet_stance = aggressive
+								set_aggro_range_measure_from = self
+								set_aggro_range = 200			
+						set_location = event_target:technoorganic_planet
+						add_modifier = {
+							modifier = sanctuary_power
+							days = -1														
+						}
+					}
+				}
+			}
+		}
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = 1
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1 max = 2 }
+			class = "rl_eco_cold_moon"
+		}
+	}
+	
+	# Outer Zone
+	planet = {
+		count = 2
+		orbit_distance = { min = 17 max = 28 }
+		orbit_angle = { min = 90 max = 270 }
+		class = rl_outer_cold_planet
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = { min = 0 max = 1 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1 max = 2 }
+			class = "rl_outer_cold_moon"
+		}
+	}
+	
+	change_orbit = 200
+	
+	planet = {
+        count = 1
+        class = star
+        orbit_distance = 0
+        #size = { min = 15 max = 25 }
+        has_ring = no
+        #satellite_naming_policy = upper_case_latin_letters
+		satellite_naming_policy = upper_case_roman_numerals
+		change_orbit = 8
+		
+		planet = {
+            count = { min = 3 max = 5 }
+            class = rl_gasgiant_moon
+            size = { min = 14 max = 20 }
+            orbit_angle = { min = 90 max = 270 }
+            orbit_distance = { min = 4 max = 8 }
+            #satellite_naming_policy = lower_case_latin_letters
+
+            change_orbit = @base_moon_distance
+
+            moon = {
+        	    count = { min = 0 max = 1 }
+        	    orbit_angle = { min = 90 max = 270 }
+        	    orbit_distance = { min = 1 max = 2 }
+				class = rl_outer_cold_moon
+        	}
+        }
+    }
+	
+}
+#Archive World
+pd_init_archive = {
+	class = "rl_binary_yellow_with_white"
+	usage = misc_system_init
+	max_instances = 1
+	scaled_spawn_chance = 14
+	spawn_chance = 100	
+	usage_odds = 100
+	
+	flags = { archive_system med_mass }
+	
+	planet = {
+    count = 1
+    class = star
+    orbit_distance = 100
+    orbit_angle = 180
+    size = { min = 30 max = 35 }
+    has_ring = no
+	satellite_naming_policy = upper_case_roman_numerals
+	
+	change_orbit = 10
+	
+	# Inner Zone
+	planet = {
+		count = 2
+		orbit_distance = { min = 10 max = 15 }
+		class = rl_inner_hot_planet
+		orbit_angle = { min = 90 max = 270 }
+	}
+	
+	# Eco Zone
+	planet = {
+		count = 1
+		orbit_distance = { min = 20 max = 25 }
+		orbit_angle = { min = 90 max = 270 }
+		class = "pc_broken"
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = 1
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1 max = 2 }
+			class = "pc_archive"
+			size = 10
+			modifiers = none
+			has_ring = no
+			deposit_blockers = none
+			
+			init_effect = {
+				add_deposit = d_archive_dataports
+				set_planet_flag = colony_event
+				set_planet_flag = archive_planet
+				
+				prevent_anomaly = yes
+				save_event_target_as = archive_planet
+				create_country = {
+					name = "Archive Support"
+					type = faction
+				}
+				last_created_country = {
+					set_country_flag = archive_country
+					create_fleet = {
+						name = "Archive Support Fleet"
+						settings = { spawn_debris = no }
+						effect = {
+							set_owner = PREV
+							set_fleet_flag = archive_fleet
+							create_ship_design = {
+								design = "NAME_Ancient_Destroyer"
+							}	
+							while = {
+								count = 20
+								create_ship = {
+									name = random
+									design = last_created_design
+								}	
+							}	
+							create_ship_design = {
+								design = "NAME_Ancient_Combat_Drone"
+							}
+							while = {
+								count = 10
+								create_ship = {
+									name = random
+									design = last_created_design
+								}
+							}	
+							set_aggro_range = 200						
+							set_location = event_target:archive_planet
+							add_modifier = {
+							modifier = sanctuary_power
+								days = -1														
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	# Outer Zone
+	planet = {
+		count = { min = 2 max = 3 }
+		orbit_distance = { min = 15 max = 30 }
+		class = rl_outer_cold_planet
+		orbit_angle = { min = 90 max = 270 }
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = { min = 0 max = 2 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1 max = 2 }
+			class = rl_outer_cold_moon
+		}
+	}
+	
+	planet = {
+		count = { min = 0 max = 1 }
+		orbit_distance = { min = 120 max = 160 }
+		class = "pc_ice_giant"
+		orbit_angle = { min = 90 max = 270 }
+		
+		change_orbit = @giant_moon_distance
+		
+		moon = {
+			count = { min = 0 max = 2 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1.5 max = 2.5 }
+			class = rl_outer_cold_moon
+		}
+	}
+	
+  }
+
+  planet = {
+    count = 1
+    class = star
+    orbit_distance = 300
+	orbit_angle = 180
+    size = { min = 20 max = 25 }
+    has_ring = no
+	satellite_naming_policy = upper_case_roman_numerals
+	
+	# Inner Zone
+		
+	change_orbit = 5
+	
+	# Outer Zone
+	planet = {
+		count = { min = 1 max = 3 }
+		orbit_distance = { min = 8 max = 10 }
+		orbit_angle = { min = 90 max = 270 }
+		class = rl_outer_cold_planet
+		change_orbit = @base_moon_distance
+		moon = {
+			count = { min = 0 max = 1 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = { min = 1 max = 2 }
+			class = rl_outer_cold_moon
+		}
+	}
+  }
+  
+}
