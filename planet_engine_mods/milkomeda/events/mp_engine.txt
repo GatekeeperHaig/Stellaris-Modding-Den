@@ -55,8 +55,7 @@ event = {
 		name = mpengine.01.x
         custom_tooltip = mpengine.01.x.tooltip
 		hidden_effect = { # DO NOTHING - default option uses my own average balance
-			#set_global_flag = habitable_very_high_expectations
-			#planet_event = { id = mpengine.02 days = 1 }
+			set_global_flag = habitable_average_expectations
 		}
 		
 		
@@ -67,7 +66,6 @@ event = {
         custom_tooltip = mpengine.01.a.tooltip
 		hidden_effect = {
 			set_global_flag = habitable_very_high_expectations
-			#planet_event = { id = mpengine.02 days = 1 }
 		}
 		
 		
@@ -78,7 +76,6 @@ event = {
         custom_tooltip = mpengine.01.b.tooltip
 		hidden_effect = {
 			set_global_flag = habitable_high_expectations
-			#planet_event = { id = mpengine.02 days = 1 }
 		}
 	}
 	
@@ -87,7 +84,6 @@ event = {
         custom_tooltip = mpengine.01.c.tooltip
 		hidden_effect = {
 			set_global_flag = habitable_low_expectations
-			#planet_event = { id = mpengine.02 days = 1 }
 		}
 	}
 	
@@ -96,7 +92,6 @@ event = {
         custom_tooltip = mpengine.01.d.tooltip
 		hidden_effect = {
 			set_global_flag = habitable_very_low_expectations
-			#planet_event = { id = mpengine.02 days = 1 }
 		}
 	}
 
@@ -158,7 +153,7 @@ planet_event = {
 }
 
 event = {
-	id = mpengine.03 # Convert Unity to Primordial class, setup initial wormhole link between Sol to Aldebaran and set wormholes as "seen" by the human empires
+	id = mpengine.03 # Convert Unity to Primal class, setup initial wormhole link between Sirius to Aldebaran and set wormholes as "seen" by the human empires
 	hide_window = yes
 	is_triggered_only = yes
 	#fire_only_once = yes
@@ -171,23 +166,31 @@ event = {
 				solar_system = { has_star_flag = aldebaran_system }
 				has_planet_flag = unity
 			}
-			change_pc = pc_primordial
-			set_entity_primordial = yes
+			change_pc = pc_primal
+			#set_entity_primordial = yes
 			reroll_deposits = yes
 			add_modifier = {
 				modifier = "adapted_environ"
 				days = -1
 			}
-			add_building = building_aeroponic_complex
-			remove_district = district_farming
-			remove_district = district_farming
-			remove_district = district_farming
+			
+			
+			add_modifier = {
+				modifier = primal
+				days = -1
+			}
+			add_deposit = d_lava_lakes
+        
+			#add_building = building_aeroponic_complex
+			#remove_district = district_farming
+			#remove_district = district_farming
+			#remove_district = district_farming
 		}
 		# Spawn wormhole
 		random_system = {
 			limit = { has_star_flag = aldebaran_system }
 			random_system = {
-				limit = { has_star_flag = sol }
+				limit = { has_star_flag = sirius }
 				prev = { # done this way to ensure we don't spawn "orphan" wormholes (wormholes that aren't linked to anything)
 						spawn_natural_wormhole = {
 						bypass_type = wormhole
@@ -219,4 +222,47 @@ event = {
 		}
 		
 	}
+}
+
+event = {
+		id = mpengine.04 # SPAWN GPM modifiers on Aldebaran planets
+		hide_window = yes
+		is_triggered_only = yes
+		fire_only_once = yes
+		immediate = {
+			
+			# Desolate Ki
+			every_planet = {
+				limit = { 
+					has_global_flag = has_guillis_planet_modifiers_mod
+					solar_system = { has_star_flag = aldebaran_system }
+					is_planet_class = pc_desolate
+				}
+				add_modifier = {
+					modifier = "weak_magnetic_field_2"
+					days = -1
+				}
+				add_modifier = {
+					modifier = "Water_Pockets"
+					days = -1
+				}
+			}
+			# Helios
+			every_planet = {
+				limit = { 
+					has_global_flag = has_guillis_planet_modifiers_mod
+					solar_system = { has_star_flag = aldebaran_system }
+					is_planet_class = pc_frozen
+					has_planet_flag = aldebaran_helios
+				}
+				add_modifier = {
+					modifier = "Cryogeysers"
+					days = -1
+				}
+				add_modifier = {
+					modifier = "Deep_Aquifer"
+					days = -1
+				}
+			}
+		}
 }
