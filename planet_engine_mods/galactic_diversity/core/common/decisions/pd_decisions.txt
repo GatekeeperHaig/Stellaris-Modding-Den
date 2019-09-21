@@ -1,0 +1,185 @@
+##########################################################################
+# Decisions
+##########################################################################
+
+# Adapted Environment
+decision_engineered_environment = {
+	icon = decision_engineered_environment
+	owned_planets_only = yes
+	
+	prerequisites = {
+		"tech_terrestrial_sculpting"		
+	}
+
+	enactment_time = 1800
+	resources = {
+		category = decisions
+		cost = {
+			influence = 50
+			energy = 2500
+		}
+	}
+	
+	potential = {
+		habitable_structure = no
+		NOT = { is_planet_class = pc_gaia }
+		NOT = { is_planet_class = pc_city }
+		NOT = { is_planet_class = pc_ecocity }
+		NOT = { is_planet_class = pc_relic }
+		NOT = { is_planet_class = pc_crystal }
+		NOT = { is_planet_class = pc_graveyard }
+		NOT = { is_planet_class = pc_floating }
+		NOT = { is_planet_class = pc_archive }
+		NOT = { is_planet_class = pc_technoorganic }
+		NOT = { has_modifier = engineered_environment }
+		NOT = { has_modifier = engineered_environment_gaia }
+	}
+
+	effect = {
+		add_modifier = {
+			modifier = engineered_environment
+			days = -1
+		}
+		if = {
+			limit = { has_modifier = bleak_planet }
+			remove_modifier = bleak_planet
+		}
+		if = {
+			limit = { has_modifier = high_gravity }
+			remove_modifier = high_gravity
+		}
+		if = {
+			limit = { has_modifier = irradiated_planet }
+			remove_modifier = irradiated_planet
+		}
+		if = {
+			limit = { has_modifier = mineral_poor }
+			remove_modifier = mineral_poor
+		}
+		if = {
+			limit = { has_modifier = unstable_tectonics }
+			remove_modifier = unstable_tectonics
+		}
+		if = {
+			limit = { has_modifier = weak_magnetic_field }
+			remove_modifier = weak_magnetic_field
+		}
+		if = {
+			limit = { has_modifier = exofungus }
+			remove_modifier = exofungus
+		}
+	}    
+	
+	ai_weight = {
+        weight = 1
+        modifier = {
+            factor = 0
+            or = {
+                free_building_slots > 0
+                owner = {
+                    or = {
+                        resource_income_stockpile = { resource = energy value < 6000 } 
+                        resource_income_stockpile = { resource = influence value < 150 }
+                     } }
+            }
+        }
+    }
+}
+
+# Adapted Environment Gaia
+decision_engineered_environment_gaia = {
+	icon = decision_engineered_environment_gaia
+	owned_planets_only = yes
+
+	enactment_time = 1800
+	resources = {
+		category = decisions
+		cost = {
+			influence = 50
+			energy = 5000
+		}
+	}
+	
+	potential = {
+		habitable_structure = no
+		NOT = { is_planet_class = pc_gaia }
+		NOT = { is_planet_class = pc_city }
+		NOT = { is_planet_class = pc_ecocity }
+		NOT = { is_planet_class = pc_relic }
+		NOT = { is_planet_class = pc_crystal }
+		NOT = { is_planet_class = pc_graveyard }
+		NOT = { is_planet_class = pc_floating }
+		NOT = { is_planet_class = pc_archive }
+		NOT = { is_planet_class = pc_technoorganic }
+		has_modifier = engineered_environment
+		owner = { has_ascension_perk = ap_world_shaper }
+	}
+
+	effect = {
+		add_modifier = {
+			modifier = engineered_environment_gaia
+			days = -1
+		}
+		hidden_effect = {
+			remove_modifier = engineered_environment
+		}
+	}   
+	
+	ai_weight = {
+        weight = 1
+        modifier = {
+            factor = 0
+            or = {
+                free_building_slots > 0
+                owner = {
+                    or = {
+                        resource_income_stockpile = { resource = energy value < 6000 } 
+                        resource_income_stockpile = { resource = influence value < 150 }
+                     } }
+            }
+        }
+    }
+}
+
+# Nuked to Radiotrophic
+decision_radiotrophic = {
+	icon = decision_radiotrophic
+	owned_planets_only = yes
+
+	enactment_time = 360
+	resources = {
+		category = decisions
+		cost = {
+			energy = 500
+			sr_rad_bloom = 50
+		}
+	}
+	
+	potential = {
+		habitable_structure = no
+		is_planet_class = pc_nuked	
+		owner = { 
+			any_owned_planet = { is_planet_class = pc_irradiated }
+		}
+	}
+
+	effect = {
+		change_pc = pc_irradiated
+		
+		hidden_effect = {
+			remove_modifier = radiotrophic
+			add_modifier = {
+				modifier = radiotrophic
+				days = -1
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+		}
+	}
+}
+
