@@ -1,0 +1,168 @@
+@base_moon_distance = 1
+@giant_moon_distance = 6
+
+#ecoCity Planet
+pd_init_ecocity = {
+	class = "sc_g"
+	usage = misc_system_init
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 250
+	}
+	max_instances = 1
+	scaled_spawn_chance = 14
+	spawn_chance = 100	
+	usage_odds = 100
+	
+	flags = { ecocity_system low_mass }
+		
+	planet = {
+		count = 1
+		class = "pc_g_star"
+		orbit_distance = 0
+		orbit_angle = 1
+		size = 27
+		has_ring = no
+		}
+	
+	planet = {
+		count = { min = 1 max = 1 }
+		class = pc_radiated
+		orbit_distance = 30
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {			
+			count = { min = 0 max = 0 }
+			orbit_distance = 5
+		}
+	}
+		
+	planet = {
+		count = { min = 2 max = 2 }
+		class = rl_inner_hot_planet
+		orbit_distance = 25
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {			
+			count = { min = 0 max = 0 }
+			orbit_distance = 5
+		}
+	}
+	
+	planet = {
+		class = "pc_ecocity"
+		orbit_distance = 35
+		orbit_angle = 85
+		size = 25
+		has_ring = no
+		
+		init_effect = {
+			set_planet_flag = ecocity_planet
+			prevent_anomaly = yes
+			save_event_target_as = ecocity_planet
+			clear_deposits = yes
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+			add_deposit = d_ruined_arcology
+			create_country = {
+				name = "Spaceport Control"
+				type = faction
+			}
+			last_created_country = {
+				set_country_flag = ecocity_country
+				create_fleet = {
+					name = "Low Orbit Junk Removal"
+					settings = { spawn_debris = no }
+					effect = {
+						set_owner = PREV
+						set_fleet_flag = ecocity_fleet
+						create_ship_design = {
+							design = "NAME_Ancient_Combat_Drone"
+						}
+						while = {
+							count = 15
+							create_ship = {
+								name = random
+								design = last_created_design
+							}
+						}
+						create_ship_design = {
+							design = "NAME_Ancient_Destroyer"
+						}
+						while = {
+							count = 15
+							create_ship = {
+								name = random
+								design = last_created_design
+							}
+						}	
+						set_aggro_range = 100			
+						set_location = event_target:ecocity_planet
+						add_modifier = {
+							modifier = sanctuary_power
+							days = -1														
+						}
+					}
+				}
+			}
+		}
+		
+		change_orbit = @base_moon_distance
+		moon = {			
+			count = { min = 2 max = 3 }
+			orbit_distance = { min = 1 max = 2 }
+			class = random_non_colonizable
+		}
+	}
+		
+	planet = {
+		count = { min = 2 max = 2 }
+		class = pc_gas_giant
+		orbit_distance = { min = 45 max = 45 }
+		
+		change_orbit = @giant_moon_distance
+		
+		moon = {			
+			count = { min = 3 max = 3 }
+			orbit_distance = { min = 1.5 max = 2.5 }
+			class = rl_gasgiant_moon
+		}
+	}	
+	
+	planet = {
+		count = 1
+		class = random_asteroid
+		orbit_distance = 45
+		orbit_angle = { min = 90 max = 270 }
+	}
+	
+	planet = {
+		count = 5
+		class = random_asteroid
+		orbit_distance = 0
+		orbit_angle = { min = 90 max = 270 }
+	}
+	
+	planet = {
+		count = { min = 2 max = 2 }
+		class = rl_outer_cold_planet
+		orbit_distance = 25
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {			
+			count = { min = 0 max = 1 }
+			orbit_distance = { min = 1 max = 2 }
+			class = rl_outer_cold_moon
+		}
+	}
+}
