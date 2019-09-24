@@ -1,0 +1,441 @@
+#############
+# Resource buildings Replacer
+#############
+
+building_food_processing_center = {
+	base_buildtime = 480
+	can_build = no
+	category = resource
+		
+	planet_modifier = {
+		planet_farmers_food_produces_mult = 0.25
+	}
+	
+	allow = {
+		exists = owner
+		has_upgraded_capital = yes
+	}
+	
+	destroy_trigger = {
+		owner = { is_ai = yes }
+		OR = {
+			is_planet_class = pc_machine
+			has_modifier = resort_colony
+		}
+		OR = {
+			num_districts = { type = district_farming value < 6 }
+			num_districts = { type = district_farming_uncapped value < 6 }
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_farmer_add = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			job_agri_drone_add = 2
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 500
+			volatile_motes = 50
+		}
+		upkeep = {
+			energy = 1
+			volatile_motes = 1
+		}
+	}	
+	
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = job_agri_drone_effect_desc
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = job_farmer_effect_desc
+	}
+	
+	upgrades = {
+		building_crystal_pillar
+	}
+	
+	prerequisites = {
+		"tech_food_processing_2"
+	}	
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			buildings_has_motes = no
+		}
+		modifier = {
+			factor = 0
+			owner = { has_country_flag = buildings_new_mote_building }
+		}
+	}
+
+	ai_resource_production = {
+		food = 1
+		trigger = {
+			always = yes
+		}
+	}
+	
+	on_built = {
+		planet = { 
+			owner = { set_timed_country_flag = { flag = buildings_new_mote_building days = 480 } }
+		}
+	}
+}
+
+building_crystal_pillar = {
+	base_buildtime = 480
+	can_build = no
+	category = resource
+		
+	planet_modifier = {
+		planet_farmers_food_produces_mult = 0.35
+	}
+	
+	allow = {
+		exists = owner
+		has_upgraded_capital = yes
+	}
+	
+	destroy_trigger = {
+		owner = { is_ai = yes }
+		OR = {
+			is_planet_class = pc_machine
+			has_modifier = resort_colony
+		}
+		OR = {
+			num_districts = { type = district_farming value < 6 }
+			num_districts = { type = district_farming_uncapped value < 6 }
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_farmer_add = 4
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			job_agri_drone_add = 4
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 500
+			sr_acean = 250
+		}
+		upkeep = {
+			energy = 1
+			volatile_motes = 1
+		}
+	}	
+	
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = job_agri_drone_effect_desc
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = job_farmer_effect_desc
+	}
+	
+	prerequisites = {
+		"tech_crystal_pillar"
+	}	
+	
+	ai_weight = {
+		weight = 1
+	}
+
+	ai_resource_production = {
+		food = 1
+		trigger = {
+			always = yes
+		}
+	}
+}
+
+building_energy_nexus = {
+	base_buildtime = 480
+	can_build = no
+	category = resource
+	
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	planet_modifier = {
+		planet_technician_energy_produces_mult = 0.25
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_technician_add = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			job_technician_drone_add = 2
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { 
+				is_robot_empire = yes
+			}
+		}
+		modifier = {
+			planet_technician_energy_produces_mult = 0.05
+		}
+	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { 
+				is_robot_empire = yes
+			}
+			NOR  = {
+				is_planet_class = pc_habitat
+				is_planet_class = pc_machine
+				is_planet_class = pc_hive
+				is_planet_class = pc_city
+			}
+		}
+		modifier = {
+			district_generator_max = 4
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 500
+			exotic_gases = 50
+		}
+		cost = {
+			trigger = {
+				owner = { 
+					is_robot_empire = yes
+				}
+			}
+			minerals = 300
+			alloys = 150
+		}
+		upkeep = {
+			energy = 1
+			exotic_gases = 1
+		}
+	}	
+	
+	prerequisites = {
+		tech_power_hub_2
+	}
+	
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = job_technician_drone_effect_desc
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = job_technician_effect_desc
+	}
+	
+	upgrades = {
+		building_eludium_plant
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			owner = { has_country_flag = buildings_new_gas_building }
+		}
+	}
+
+	ai_resource_production = {
+		energy = 1
+		trigger = {
+			always = yes
+		}
+	}
+	
+	on_built = {
+		planet = { 
+			owner = { set_timed_country_flag = { flag = buildings_new_gas_building days = 480 } }
+		}
+	}
+}
+
+building_eludium_plant = {
+	base_buildtime = 480
+	can_build = no
+	category = resource
+	
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	planet_modifier = {
+		planet_technician_energy_produces_mult = 0.35
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_technician_add = 4
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			job_technician_drone_add = 4
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { 
+				is_robot_empire = yes
+			}
+		}
+		modifier = {
+			planet_technician_energy_produces_mult = 0.10
+		}
+	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { 
+				is_robot_empire = yes
+			}
+			NOR  = {
+				is_planet_class = pc_habitat
+				is_planet_class = pc_machine
+				is_planet_class = pc_hive
+				is_planet_class = pc_city
+			}
+		}
+		modifier = {
+			district_generator_max = 8
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 500
+			sr_eludium = 250
+		}
+		cost = {
+			trigger = {
+				owner = { 
+					is_robot_empire = yes
+				}
+			}
+			minerals = 300
+			alloys = 150
+		}
+		upkeep = {
+			energy = 1
+			exotic_gases = 1
+		}
+	}	
+	
+	prerequisites = {
+		tech_eludium_plant
+	}
+	
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = job_technician_drone_effect_desc
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = job_technician_effect_desc
+	}
+	
+	ai_weight = {
+		weight = 1
+	}
+
+	ai_resource_production = {
+		energy = 1
+		trigger = {
+			always = yes
+		}
+	}
+}

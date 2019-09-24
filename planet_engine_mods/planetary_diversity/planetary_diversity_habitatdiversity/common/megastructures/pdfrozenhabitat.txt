@@ -1,0 +1,344 @@
+# see README.txt for example
+
+pdfhab_0 = {
+	entity = ""
+	construction_entity = ""
+	portrait = "GFX_megastructure_construction_background"
+	place_entity_on_planet_plane = yes
+	build_time = 1000
+
+	resources = {
+		category = megastructures
+		cost = {
+			alloys = 2000
+			influence = 100
+		}
+	}
+	construction_blocks_others = no
+	construction_blocked_by_others = no
+
+	potential = { has_technology = tech_pdhabitat_2 }
+
+	possible = {
+		exists = starbase
+		custom_tooltip = {
+			fail_text = "requires_inside_border"
+			is_inside_border = from
+		}
+	}
+
+	placement_rules = {
+		planet_possible = {
+			custom_tooltip = {
+				fail_text = "requires_surveyed_planet"
+				is_surveyed = {			# prevent leaking habitability information
+					who = prev.from
+					status = yes
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_anomaly"
+				NOT = { has_anomaly = yes }
+			}
+			custom_tooltip = {
+				fail_text = "requires_no_existing_megastructure"
+				#can_build_megastructure_on_planet = yes
+				NOR = {
+					has_planet_flag = megastructure
+					has_planet_flag = has_megastructure
+					solar_system = {
+						has_star_flag = ring_world_built
+					}
+					is_planet_class = pc_ringworld_habitable
+					is_planet_class = pc_ringworld_habitable_damaged
+					is_planet_class = pc_ringworld_tech
+					is_planet_class = pc_ringworld_tech_damaged
+					is_planet_class = pc_ringworld_seam
+					is_planet_class = pc_ringworld_seam_damaged
+					is_planet_class = pc_habitat
+				}
+			}
+
+ 			# balance for habitats
+			custom_tooltip = {
+				fail_text = "requires_not_minor_planetary_body"
+				NOT = {
+					is_asteroid = yes
+				}
+			}
+			custom_tooltip = {
+				fail_text = "requires_not_star"
+				is_star = no
+			}
+			custom_tooltip = {
+				fail_text = "is_barrenorcold"
+				is_planet_class = pc_frozen
+			}
+		} 
+	}
+
+	# root = system
+	# from = country	
+	ai_weight = {
+		factor = 1
+	
+		modifier = {
+			factor = 0
+			starbase = { NOT = { has_starbase_size >= starbase_starport } }
+		}
+
+		modifier = {
+			factor = 0.1
+			any_neighbor_system = {
+				exists = owner
+				owner = { NOT = { is_same_value = from } }
+			}
+		}
+	}
+	
+	on_build_start = {}
+	on_build_cancel = {}
+	
+	on_build_complete = {
+		fromfrom.planet = {
+			set_planet_flag = has_megastructure
+			change_pc = pc_fhab
+			IF = {
+				limit = {
+					from = { has_ascension_perk = ap_voidborn }
+					NOT = { has_modifier = master_builders_habitats }
+				}
+				add_modifier = {
+					modifier = master_builders_habitats
+					days = -1
+				}
+			}
+			IF = {
+				limit = {
+					has_deposit = d_rare_crystals_1
+				}
+				remove_deposit = d_rare_crystals_1
+				add_deposit = d_hab_crystal_1
+			}
+			IF = {
+				limit = {
+					has_deposit = d_rare_crystals_2
+				}
+				remove_deposit = d_rare_crystals_2
+				add_deposit = d_hab_crystal_2
+			}
+			IF = {
+				limit = {
+					has_deposit = d_rare_crystals_3
+				}
+				remove_deposit = d_rare_crystals_3
+				add_deposit = d_hab_crystal_3
+			}
+			IF = {
+				limit = {
+					has_deposit = d_rare_crystals_4
+				}
+				remove_deposit = d_rare_crystals_4
+				add_deposit = d_hab_crystal_4
+			}
+			IF = {
+				limit = {
+					has_deposit = d_rare_crystals_5
+				}
+				remove_deposit = d_rare_crystals_5
+				add_deposit = d_hab_crystal_5
+			}
+			IF = {
+				limit = {
+					has_deposit = d_zro_deposit_1
+				}
+				remove_deposit = d_zro_deposit_1
+				add_deposit = d_hab_zro_1
+			}
+			IF = {
+				limit = {
+					has_deposit = d_zro_deposit_2
+				}
+				remove_deposit = d_zro_deposit_2
+				add_deposit = d_hab_zro_2
+			}
+			IF = {
+				limit = {
+					has_deposit = d_zro_deposit_3
+				}
+				remove_deposit = d_zro_deposit_3
+				add_deposit = d_hab_zro_3
+			}
+			IF = {
+				limit = {
+					has_deposit = d_dark_matter_deposit_1
+				}
+				remove_deposit = d_dark_matter_deposit_1
+				add_deposit = d_hab_dark_matter_1
+			}
+			IF = {
+				limit = {
+					has_deposit = d_dark_matter_deposit_2
+				}
+				remove_deposit = d_dark_matter_deposit_2
+				add_deposit = d_hab_dark_matter_2
+			}
+			IF = {
+				limit = {
+					has_deposit = d_dark_matter_deposit_3
+				}
+				remove_deposit = d_dark_matter_deposit_3
+				add_deposit = d_hab_dark_matter_3
+			}
+			IF = {
+				limit = {
+					has_deposit = d_living_metal_deposit
+				}
+				remove_deposit = d_living_metal_deposit
+				add_deposit = d_hab_living_metal_1
+			}
+			IF = {
+				limit = {
+					is_moon = yes
+				}
+				set_planet_entity = {
+                    entity = "fhab_moon_01_entity"
+                }
+			}
+			IF = {
+				limit = {
+					planet_size = 25
+				}
+				add_deposit = d_fblock15
+				add_deposit = d_fblock2
+			}
+			IF = {
+				limit = {
+					planet_size = 24
+				}
+				add_deposit = d_fblock15
+				add_deposit = d_fblock1
+			}
+			IF = {
+				limit = {
+					planet_size = 23
+				}
+				add_deposit = d_fblock15
+			}
+			IF = {
+				limit = {
+					planet_size = 22
+				}
+				add_deposit = d_fblock10
+				add_deposit = d_fblock4
+			}
+			IF = {
+				limit = {
+					planet_size = 21
+				}
+				add_deposit = d_fblock10
+				add_deposit = d_fblock4
+			}
+			IF = {
+				limit = {
+					planet_size = 20
+				}
+				add_deposit = d_fblock10
+				add_deposit = d_fblock3
+			}
+			IF = {
+				limit = {
+					planet_size = 19
+				}
+				add_deposit = d_fblock10
+				add_deposit = d_fblock2
+			}
+			IF = {
+				limit = {
+					planet_size = 18
+				}
+				add_deposit = d_fblock10
+				add_deposit = d_fblock1
+			}
+			IF = {
+				limit = {
+					planet_size = 17
+				}
+				add_deposit = d_fblock10
+				add_deposit = d_fblock1
+			}
+			IF = {
+				limit = {
+					planet_size = 16
+				}
+				add_deposit = d_fblock10
+			}
+			IF = {
+				limit = {
+					planet_size = 15
+				}
+				add_deposit = d_fblock5
+				add_deposit = d_fblock4
+			}
+			IF = {
+				limit = {
+					planet_size = 14
+				}
+				add_deposit = d_fblock5
+				add_deposit = d_fblock3
+			}
+			IF = {
+				limit = {
+					planet_size = 13
+				}
+				add_deposit = d_fblock5
+				add_deposit = d_fblock3
+			}
+			IF = {
+				limit = {
+					planet_size = 12
+				}
+				add_deposit = d_fblock5
+				add_deposit = d_fblock2
+			}
+			IF = {
+				limit = {
+					planet_size = 11
+				}
+				add_deposit = d_fblock5
+				add_deposit = d_fblock1
+			}
+			IF = {
+				limit = {
+					planet_size = 10
+				}
+				add_deposit = d_fblock5
+			}
+			IF = {
+				limit = {
+					planet_size = 9
+				}
+				add_deposit = d_fblock4
+			}
+			IF = {
+				limit = {
+					planet_size = 8
+				}
+				add_deposit = d_fblock3
+			}
+			IF = {
+				limit = {
+					planet_size = 7
+				}
+				add_deposit = d_fblock2
+			}
+			IF = {
+				limit = {
+					planet_size = 6
+				}
+				add_deposit = d_fblock1
+			}
+		}
+		remove_megastructure = fromfrom
+}
+
