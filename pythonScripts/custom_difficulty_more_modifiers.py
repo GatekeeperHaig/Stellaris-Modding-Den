@@ -304,6 +304,9 @@ def addChangeOption(event, modifier, modifierName, amount, category, locList):
   name="custom_difficulty_change_{}_{!s}_{}".format(modifierName,amount, category)
   option.add("name",name)
   val=amount*modifier.multiplier
+  # print(f"name:{name}")
+  # print(f"modifier.multiplier:{modifier.multiplier}")
+  # print(f"modifier:{modifier}")
   forWhom="@for"
   if category=="Both":
     forWhom+="AI + @Player"
@@ -315,10 +318,14 @@ def addChangeOption(event, modifier, modifierName, amount, category, locList):
     color="R"
   else:
     color="G"
-  if val<0:
-    locList.append(name,"§{}@decrease ${}$ @by {:g}{} {}§!".format(color,modifierName,-val, modifier.unit, forWhom) )
+  # if type(modifier) is ModifierSubGroup:
+  #   textVal=val*modifier.textMultiplier
+  # else:
+  textVal=val
+  if textVal<0:
+    locList.append(name,"§{}@decrease ${}$ @by {:g}{} {}§!".format(color,modifierName,-textVal, modifier.unit, forWhom) )
   else:
-    locList.append(name,"§{}@increase ${}$ @by {:g}{} {}§!".format(color,modifierName,val, modifier.unit, forWhom) )
+    locList.append(name,"§{}@increase ${}$ @by {:g}{} {}§!".format(color,modifierName,textVal, modifier.unit, forWhom) )
 
   trigger=option.addReturn("trigger").addReturn(ETMM)
   effect=option.addReturn("hidden_effect")
@@ -370,6 +377,8 @@ def loadFile(locList):
         currentSubGroup=ModifierSubGroup(lineSplit[0].strip('"'))
         currentGroup.add(currentSubGroup)
         inSubGroup=int(lineSplit[1])
+        if len(lineSplit)>2:
+          currentSubGroup.multiplier=int(lineSplit[2].strip())
         continue
       currentModifier=Modifier(lineSplit[0])
       if inSubGroup:
@@ -495,10 +504,12 @@ class ModifierSubGroup(Modifier):
     self.modifiers=[]
     self.modNames=[]
     self.rangeUsed=range(-10,21)
-    # self.multiplier=multiplier
+    self.textMultiplier=1
+    self.multiplier=1
   def addModifier(self, modifier):
     self.modifiers.append(modifier)
-    self.multiplier=modifier.multiplier
+    if self.multiplier==1:
+      self.multiplier=modifier.multiplier
     self.unit=modifier.unit
     # self.values=modifier.values
   def __str__(self):
