@@ -61,7 +61,7 @@ pdmmhab_0 = {
  			# balance for habitats
 			custom_tooltip = {
 				fail_text = "is_moon_text"
-				is_moon = yes
+				has_planet_flag = "moon_habitat"
 			}
 			custom_tooltip = {
 				fail_text = "requires_not_star"
@@ -72,14 +72,6 @@ pdmmhab_0 = {
 				OR = {
 					is_planet_class = pc_barren
 					is_planet_class = pc_barren_cold
-				}
-			}
-			custom_tooltip = {
-				fail_text = "has_moonbase"
-					NOT = {
-					solar_system = {
-						has_star_flag = mmoonbase
-					}
 				}
 			}
 		} 
@@ -102,6 +94,21 @@ pdmmhab_0 = {
 				owner = { NOT = { is_same_value = from } }
 			}
 		}
+
+        modifier = {
+            factor = 0
+                owner = {
+                    or = {
+                        resource_stockpile_compare = { resource = alloys value < 5000 } 
+                } 
+            }
+        }
+
+        modifier = {
+            factor = 0
+			solar_system = { any_system_planet = { has_planet_flag = pdmmhab } 
+            }
+        }
 	}
 	
 	on_build_start = {}
@@ -109,9 +116,9 @@ pdmmhab_0 = {
 	
 	on_build_complete = {
 		fromfrom.planet = {
-			set_planet_flag = has_megastructure
-			ROOT = { set_star_flag = mmoonbase }
+			set_planet_flag = pdmmhab
 			clear_deposits = yes
+			ROOT = { set_star_flag = pdmmhab }
 			IF = {
 				limit = {
 					fromfrom.space_owner = { has_ascension_perk = ap_voidborn }

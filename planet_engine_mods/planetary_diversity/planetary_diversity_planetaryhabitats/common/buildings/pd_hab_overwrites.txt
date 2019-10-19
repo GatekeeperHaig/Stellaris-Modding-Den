@@ -23,9 +23,6 @@ building_luxury_residence = {
 		}
 	}
 
-	allow = {
-		buildings_simple_allow = yes
-	}
 	
 	destroy_trigger = {
 		exists = owner
@@ -129,9 +126,6 @@ building_communal_housing = {
 		}
 	}
 
-	allow = {
-		buildings_simple_allow = yes
-	}
 	
 	destroy_trigger = {
 		exists = owner
@@ -302,19 +296,35 @@ building_communal_housing_large = {
 	}
 	
 	ai_weight = {
-		weight = 1#Needs to be higher than base building to gurantee the AI upgrades before it builds a new regular housing building
+		weight = 0
 		modifier = {
-			factor = 0
-			owner = { has_country_flag = buildings_new_crystal_building }
+			weight = 1
+			buildings_has_crystals = yes
 		}
-	}#Should always upgrade
-	on_built = {
-		planet = { 
-			owner = { set_timed_country_flag = { flag = buildings_new_crystal_building days = 480 } }
+	}
+
+	on_queued = {
+		IF = {
+			limit = {
+				owner = { has_technology = tech_construction_templates }
+			}
+			owner = { set_timed_country_flag = { flag = buildings_new_crystal_building days = 270 } }
+		}
+		ELSE_IF = {
+			limit = {
+				owner = { has_technology = tech_assembly_pattern }
+			}
+			owner = { set_timed_country_flag = { flag = buildings_new_crystal_building days = 390 } }
+		}
+		else = {
+			planet = { 
+				owner = { set_timed_country_flag = { flag = buildings_new_crystal_building days = 510 } }
+			}
 		}
 	}
 }
 
+#Machine housing
 building_drone_storage = {
 	base_buildtime = 360
 
@@ -335,9 +345,6 @@ building_drone_storage = {
 		owner = { is_machine_empire = yes }
 	}
 
-	allow = {
-		buildings_simple_allow = yes
-	}
 	
 	destroy_trigger = {
 		exists = owner
@@ -433,9 +440,6 @@ building_hive_warren = {
 		owner = { is_hive_empire = yes }
 	}
 
-	allow = {
-		buildings_simple_allow = yes
-	}
 	
 	destroy_trigger = {
 		exists = owner

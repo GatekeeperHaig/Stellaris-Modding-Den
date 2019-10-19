@@ -84,7 +84,7 @@ pdmhab_0 = {
 	
 		modifier = {
 			factor = 0
-			starbase = { NOT = { has_starbase_size >= starbase_starport } }
+			starbase = { NOT = { has_starbase_size >= starbase_starhold } }
 		}
 
 		modifier = {
@@ -94,6 +94,21 @@ pdmhab_0 = {
 				owner = { NOT = { is_same_value = from } }
 			}
 		}
+
+        modifier = {
+            factor = 0
+                owner = {
+                    or = {
+                        resource_stockpile_compare = { resource = alloys value < 5000 } 
+                } 
+            }
+        }
+
+        modifier = {
+            factor = 0
+			solar_system = { any_system_planet = { has_planet_flag = pdmhab }
+            }
+        }
 	}
 	
 	on_build_start = {}
@@ -101,8 +116,9 @@ pdmhab_0 = {
 	
 	on_build_complete = {
 		fromfrom.planet = {
-			set_planet_flag = has_megastructure
+			set_planet_flag = pdmhab
 			change_pc = pc_mhab
+			ROOT = { set_star_flag = pdmhab }
 			IF = {
 				limit = {
 					fromfrom.space_owner = { has_ascension_perk = ap_voidborn }
