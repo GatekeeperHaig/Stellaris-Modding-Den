@@ -20,19 +20,19 @@ event = {
 				set_star_flag = special_empire_space
 			}
 		}
-		every_planet = {
-			if = {
-				limit = {
-					OR = {
-						has_planet_flag = eco_hot_planet
-						has_planet_flag = eco_temp_planet
-						has_planet_flag = eco_cold_planet
-					}
-				}
-				planet_event = { id = mpengine.02 days = 1 }
-				
-			}
-		}		
+		#every_planet = {
+		#	if = {
+		#		limit = {
+		#			OR = {
+		#				has_planet_flag = eco_hot_planet
+		#				has_planet_flag = eco_temp_planet
+		#				has_planet_flag = eco_cold_planet
+		#			}
+		#		}
+		#		planet_event = { id = mpengine.02 days = 1 }
+		#		
+		#	}
+		#}		
 		
 	}
 }
@@ -51,15 +51,15 @@ event = {
 		owner = { is_ai = no }
 	}
 
-	option = {
-		name = mpengine.01.x
-        custom_tooltip = mpengine.01.x.tooltip
-		hidden_effect = { # DO NOTHING - default option uses my own average balance
-			set_global_flag = habitable_average_expectations
-		}
-		
-		
-	}
+	#option = {
+	#	name = mpengine.01.x
+    #    custom_tooltip = mpengine.01.x.tooltip
+	#	hidden_effect = { # DO NOTHING - default option uses my own average balance
+	#		set_global_flag = habitable_average_expectations
+	#	}
+	#	
+	#	
+	#}
 	
 	option = {
 		name = mpengine.01.a
@@ -265,4 +265,35 @@ event = {
 				}
 			}
 		}
+}
+
+ship_event = {
+	id = mpengine.05 # SPAWN MODIFIERS ON POTENTIALLY HABITABLE WORLDS - triggered on_survey
+	hide_window = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		from = {
+			OR = { 
+				has_planet_flag = eco_hot_planet
+				has_planet_flag = eco_temp_planet
+				has_planet_flag = eco_cold_planet
+			}
+			NOT = { has_planet_flag = "planet_surveyed" }
+		}
+	}
+	
+	immediate = { 
+		
+		from = {
+			spawn_temperature_modifier = yes
+			spawn_gravity_modifier = yes
+			spawn_water_modifier = yes
+			spawn_atmosphere_modifier = yes
+			spawn_vegetation_modifier = yes
+			spawn_resource_modifier = yes
+			set_planet_flag = "planet_surveyed"
+		}		
+		
+	}
 }

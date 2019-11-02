@@ -84,8 +84,9 @@ event = {
 				# these events occur one after the other.
 				planet_event = { id = gdengine.01 days = 1 } # REMOVE VANILLA MODIFIERS
 				planet_event = { id = gdengine.02 days = 1 } # UNINHABITABLE SPAWNER / SIZE ADJUSTMENT
-				planet_event = { id = gdengine.03 days = 2 } # ORBITAL RESOURCE SPAWNER
-				planet_event = { id = gdengine.04 days = 2 } # SPAWN GPM modifiers on Sol planets
+				planet_event = { id = gdengine.03 days = 2 } # SPAWN HABITABLE WORLDS
+				planet_event = { id = gdengine.04 days = 3 } # ORBITAL RESOURCE SPAWNER
+				
 			}
 		}
 	}
@@ -97,10 +98,24 @@ planet_event = {
 	is_triggered_only = yes
 	fire_only_once = yes
 	
-	#Remove Vanilla Tidally Locked Modifier
 	immediate = {
-		every_planet = { 
-			remove_modifier = "tidal_locked"	
+		if = {
+			limit = {
+				OR = {
+					has_modifier = "tidal_locked"
+					has_modifier = "low_gravity"
+					has_modifier = "high_gravity"
+					has_modifier = "mineral_rich"
+					has_modifier = "ultra_rich"
+					has_modifier = "mineral_poor"
+				}
+			}
+			remove_modifier = "tidal_locked"
+			remove_modifier = "low_gravity"
+			remove_modifier = "high_gravity"
+			remove_modifier = "mineral_rich"
+			remove_modifier = "ultra_rich"
+			remove_modifier = "mineral_poor"
 		}
 	}
 }
@@ -132,7 +147,66 @@ planet_event = {
 }
 
 planet_event = {
-	id = gdengine.03 # ORBITAL RESOURCE SPAWNER
+	id = gdengine.03 # SPAWN POTENTIALLY HABITABLE WORLDS
+	hide_window = yes
+	is_triggered_only = yes
+	#fire_only_once = yes
+	
+	immediate = {
+		if = {
+			limit = {
+				OR = {
+					has_planet_flag = eco_hot_planet
+					has_planet_flag = eco_temp_planet
+					has_planet_flag = eco_cold_planet
+				}
+			}
+			random_list = {
+			
+				0 = {
+					remove_vanilla_planet_modifiers = yes
+					spawn_super_terrestrial = yes
+					modifier = { factor = 0.05 solar_system = { any_system_planet = { filtered_habitable_planet = yes } } } 
+					modifier = { factor = 0.00 OR = { planet_size < 15 planet_size > 22 } }
+				}
+				10 = {
+					remove_vanilla_planet_modifiers = yes
+					spawn_terrestrial = yes
+					modifier = { factor = 0.33 solar_system = { any_system_planet = { filtered_habitable_planet = yes } } } 
+					modifier = { factor = 0.00 OR = { planet_size < 15 planet_size > 22 } }
+				}
+				0 = {
+					remove_vanilla_planet_modifiers = yes
+					spawn_oceanic = yes
+					modifier = { factor = 0.33 solar_system = { any_system_planet = { filtered_habitable_planet = yes } } } 
+					modifier = { factor = 0.00 OR = { planet_size < 15 planet_size > 22 } }
+				}
+				0 = {
+					remove_vanilla_planet_modifiers = yes
+					spawn_marginal = yes
+					modifier = { factor = 0.66 solar_system = { any_system_planet = { filtered_habitable_planet = yes } } } 
+					modifier = { factor = 0.00 OR = { planet_size < 15 planet_size > 22 } }
+				}
+				0 = {
+					remove_vanilla_planet_modifiers = yes
+					spawn_sub_marginal = yes
+					modifier = { factor = 0.95 solar_system = { any_system_planet = { filtered_habitable_planet = yes } } } 
+					modifier = { factor = 0.00 OR = { planet_size < 15 planet_size > 22 } }
+				}
+				0 = {
+					#Do nothing / remain uninhabitable
+					modifier = { factor = 0.33 has_global_flag = habitable_very_high_expectations }
+					modifier = { factor = 0.66 has_global_flag = habitable_high_expectations }
+					modifier = { factor = 1.50 has_global_flag = habitable_low_expectations }
+					modifier = { factor = 2.00 has_global_flag = habitable_very_low_expectations }
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = gdengine.04 # ORBITAL RESOURCE SPAWNER
 	hide_window = yes
 	is_triggered_only = yes
 	#fire_only_once = yes
@@ -194,69 +268,6 @@ planet_event = {
 				nw_orbital_resource_spawn_table = yes
 			}
 	}
-}
-
-event = {
-		id = gdengine.04 # SPAWN GPM modifiers on Sol planets
-		hide_window = yes
-		is_triggered_only = yes
-		fire_only_once = yes
-		immediate = {
-			# VENUS
-			every_planet = {
-				limit = { 
-					has_global_flag = has_guillis_planet_modifiers_mod
-					solar_system = { has_star_flag = sol }
-					is_planet_class = pc_hot_reducing
-				}
-				add_modifier = {
-					modifier = "Dense_Atmospheres"
-					days = -1
-				}
-			}
-			# MARS
-			every_planet = {
-				limit = { 
-					has_global_flag = has_guillis_planet_modifiers_mod
-					solar_system = { has_star_flag = sol }
-					is_planet_class = pc_desolate
-				}
-				add_modifier = {
-					modifier = "weak_magnetic_field_2"
-					days = -1
-				}
-				add_modifier = {
-					modifier = "Water_Pockets"
-					days = -1
-				}
-			}
-			# EUROPA
-			every_planet = {
-				limit = { 
-					has_global_flag = has_guillis_planet_modifiers_mod
-					solar_system = { has_star_flag = sol }
-					is_planet_class = pc_frozen
-					has_planet_flag = sol_europa
-				}
-				add_modifier = {
-					modifier = "Cryogeysers"
-					days = -1
-				}
-				add_modifier = {
-					modifier = "Deep_Aquifer"
-					days = -1
-				}
-			}
-			# LUNA
-			every_planet = {
-				limit = { 
-					has_global_flag = has_guillis_planet_modifiers_mod
-					solar_system = { has_star_flag = sol }
-					is_planet_class = pc_underground_rocky
-				}
-				
-			}
-		}
 }
 
 planet_event = {
@@ -531,4 +542,67 @@ country_event = {
 			}
 		}	
 	}		
+}
+
+event = {
+		id = gdengine.14 # SPAWN GPM modifiers on Sol planets
+		hide_window = yes
+		is_triggered_only = yes
+		fire_only_once = yes
+		immediate = {
+			# VENUS
+			every_planet = {
+				limit = { 
+					has_global_flag = has_guillis_planet_modifiers_mod
+					solar_system = { has_star_flag = sol }
+					is_planet_class = pc_hot_reducing
+				}
+				add_modifier = {
+					modifier = "Dense_Atmospheres"
+					days = -1
+				}
+			}
+			# MARS
+			every_planet = {
+				limit = { 
+					has_global_flag = has_guillis_planet_modifiers_mod
+					solar_system = { has_star_flag = sol }
+					is_planet_class = pc_desolate
+				}
+				add_modifier = {
+					modifier = "weak_magnetic_field_2"
+					days = -1
+				}
+				add_modifier = {
+					modifier = "Water_Pockets"
+					days = -1
+				}
+			}
+			# EUROPA
+			every_planet = {
+				limit = { 
+					has_global_flag = has_guillis_planet_modifiers_mod
+					solar_system = { has_star_flag = sol }
+					is_planet_class = pc_frozen
+					has_planet_flag = sol_europa
+				}
+				add_modifier = {
+					modifier = "Cryogeysers"
+					days = -1
+				}
+				add_modifier = {
+					modifier = "Deep_Aquifer"
+					days = -1
+				}
+			}
+			# LUNA
+			every_planet = {
+				limit = { 
+					has_global_flag = has_guillis_planet_modifiers_mod
+					solar_system = { has_star_flag = sol }
+					is_planet_class = pc_underground_rocky
+				}
+				
+			}
+		}
 }
