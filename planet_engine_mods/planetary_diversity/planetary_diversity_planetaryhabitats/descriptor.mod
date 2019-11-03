@@ -1,4 +1,3 @@
-version="2.4.*"
 tags={
 	"Balance"
 	"Buildings"
@@ -7,4 +6,5 @@ tags={
 }
 name="Planetary Diveristy - Planetary Habitats"
 picture="thumbnail.png"
+supported_version="2.5.*"
 remote_file_id="1878751971"

@@ -17,7 +17,9 @@ pdmhab_0 = {
 	construction_blocks_others = no
 	construction_blocked_by_others = no
 
-	potential = { has_technology = tech_pdhabitat_2 }
+	potential = { 
+		has_technology = tech_pdhabitat_2
+	}
 
 	possible = {
 		exists = starbase
@@ -28,54 +30,61 @@ pdmhab_0 = {
 	}
 
 	placement_rules = {
-		planet_possible = {
-			custom_tooltip = {
-				fail_text = "requires_surveyed_planet"
-				is_surveyed = {			# prevent leaking habitability information
-					who = prev.from
-					status = yes
-				}
+        planet_possible = {
+            #AND = { 
+             #   from = { is_ai = yes }
+             # }
+            custom_tooltip = {
+                fail_text = "requires_surveyed_planet"
+                is_surveyed = {            # prevent leaking habitability information
+                    who = prev.from
+                    status = yes
+                }
+            }
+            custom_tooltip = {
+                fail_text = "requires_no_anomaly"
+                NOT = { has_anomaly = yes }
 			}
+			
 			custom_tooltip = {
-				fail_text = "requires_no_anomaly"
-				NOT = { has_anomaly = yes }
-			}
-			custom_tooltip = {
-				fail_text = "requires_no_existing_megastructure"
-				#can_build_megastructure_on_planet = yes
-				NOR = {
-					has_planet_flag = megastructure
-					has_planet_flag = has_megastructure
-					solar_system = {
-						has_star_flag = ring_world_built
-					}
-					is_planet_class = pc_ringworld_habitable
-					is_planet_class = pc_ringworld_habitable_damaged
-					is_planet_class = pc_ringworld_tech
-					is_planet_class = pc_ringworld_tech_damaged
-					is_planet_class = pc_ringworld_seam
-					is_planet_class = pc_ringworld_seam_damaged
-					is_planet_class = pc_habitat
-				}
-			}
- 			# balance for habitats
-			custom_tooltip = {
-				fail_text = "requires_not_minor_planetary_body"
-				NOT = {
-					is_asteroid = yes
-					is_moon = yes
-				}
-			}
-			custom_tooltip = {
-				planet_size < 25
-				planet_size > 12
-			}
-			custom_tooltip = {
-				fail_text = "is_not_molten"
-				is_planet_class = pc_molten
-			}
-		} 
-	}
+                fail_text = "requires_no_existing_megastructure"
+                #can_build_megastructure_on_planet = yes
+                NOR = {
+                    has_planet_flag = megastructure
+                    has_planet_flag = has_megastructure
+                    solar_system = {
+                        has_star_flag = ring_world_built
+                    }
+                    is_planet_class = pc_ringworld_habitable
+                    is_planet_class = pc_ringworld_habitable_damaged
+                    is_planet_class = pc_ringworld_tech
+                    is_planet_class = pc_ringworld_tech_damaged
+                    is_planet_class = pc_ringworld_seam
+                    is_planet_class = pc_ringworld_seam_damaged
+                    is_planet_class = pc_habitat
+                }
+            }
+
+             # balance for habitats
+            custom_tooltip = {
+                fail_text = "requires_not_minor_planetary_body"
+                NOR = {
+                    is_asteroid = yes
+                    is_moon = yes
+                }
+            }
+            custom_tooltip = {
+                planet_size < 25
+                planet_size > 12
+            }
+            custom_tooltip = {
+                fail_text = "is_barrenorcold"
+                OR = {
+                    is_planet_class = pc_molten
+                }
+            }
+        } 
+    }
 
 	# root = system
 	# from = country	
@@ -106,7 +115,7 @@ pdmhab_0 = {
 
         modifier = {
             factor = 0
-			solar_system = { any_system_planet = { has_planet_flag = pdmhab }
+			root = { any_system_planet = { has_planet_flag = pdhab }
             }
         }
 	}
@@ -116,7 +125,7 @@ pdmhab_0 = {
 	
 	on_build_complete = {
 		fromfrom.planet = {
-			set_planet_flag = pdmhab
+			set_planet_flag = pdhab
 			change_pc = pc_mhab
 			ROOT = { set_star_flag = pdmhab }
 			IF = {
