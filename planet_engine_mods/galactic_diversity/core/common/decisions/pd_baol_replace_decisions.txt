@@ -1,0 +1,87 @@
+##########################################################################
+# Ancient Relics Decisions
+##########################################################################
+@minor_artifact_decision_cost = 2
+@minor_artifact_decision_duration = 3600
+
+# Baol Organism Lifeseed
+decision_baol_life_seed = {
+	owned_planets_only = yes
+	sound = event_laboratory_sound
+	icon = decision_resort_colony
+
+	#enactment_time = 20
+	
+	potential = {
+		NOT = {
+			is_planet_class = pc_city
+			is_planet_class = pc_machine
+			is_planet_class = pc_relic
+			is_planet_class = pc_hive
+			is_planet_class = pc_tmhab
+			is_planet_class = pc_tmhab2
+			is_planet_class = pc_mmhab
+			is_planet_class = pc_mmhab2
+			is_planet_class = pc_bhab
+			is_planet_class = pc_bchab
+			is_planet_class = pc_gghab
+			is_planet_class = pc_mhab
+			is_planet_class = pc_fhab
+		}
+		habitable_structure = no
+		exists = owner
+		owner = { has_country_flag = relic_last_baol_activated }
+	}
+	
+	allow = { }
+	
+	effect = {
+		# Convert to Gaia world, spawn Nu-Baol pops
+		custom_tooltip = decision_baol_life_seed_effects
+		hidden_effect = {
+			owner = { remove_country_flag = relic_last_baol_activated }
+			if = { #Special case since Grunur Prime has mostly non-convertable deposits
+				limit = { has_planet_flag = grunur_prime }
+				reroll_deposits = yes
+			}
+			change_pc = pc_gaia
+			if = {
+				limit = { NOT = { exists = event_target:nu_baol_species } }
+				create_species = {
+					name = "NAME_Nu_Baol"
+					plural = "NAME_Nu_Baol"
+					class = "PLANT"
+					portrait = pla16_baol
+					name_list = "PLANT2"
+					extra_trait_points = 3
+					traits = {
+						trait = "trait_agrarian"
+						trait = "trait_communal"
+						trait = "trait_venerable"
+						trait = "trait_delicious"
+						trait = "trait_slow_breeders"
+						trait = "trait_pc_gaia_preference"
+					}
+					effect = {
+						save_global_event_target_as = nu_baol_species
+					}
+				}
+			}
+			while = {
+				count = 4
+				create_pop = {
+					species = event_target:nu_baol_species
+					ethos = {
+						ethic = "ethic_fanatic_pacifist"
+					}
+				}
+			}
+			planet_event = { id = ancrel.2025 } #Notification event
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}
+

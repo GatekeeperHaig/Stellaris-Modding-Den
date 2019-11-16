@@ -9,6 +9,14 @@ building_eludium_mines = {
 	potential = {
 		NOT = { has_modifier = resort_colony }
 	}
+	
+	prerequisites = {
+		"tech_mine_volatile_motes"
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
 
 	triggered_planet_modifier = {
 		potential = {
@@ -16,7 +24,9 @@ building_eludium_mines = {
 			owner = { is_regular_empire = yes }
 		}
 		modifier = {
-            job_eludium_expert_add = 1
+			job_eludium_expert_add = 3
+			job_mote_harvester_add = 2
+			job_researcher_add = 2
 		}
 	}
 
@@ -26,7 +36,9 @@ building_eludium_mines = {
 			owner = { is_hive_empire = yes }
 		}
 		modifier = {
-			job_eludium_hive_add = 1
+			job_eludium_hive_add = 3
+			job_mote_harvesting_drone_add = 2
+			job_brain_drone_add = 2
 		}
 	}
 
@@ -36,7 +48,10 @@ building_eludium_mines = {
 			owner = { is_machine_empire = yes }
 		}
 		modifier = {
-			job_eludium_robot_add = 1
+			job_eludium_robot_add = 3
+			job_mote_harvesting_drone_add = 2
+			job_calculator_add = 2
+			
 		}
 	}
 	
@@ -65,6 +80,15 @@ building_graveyard_recycler = {
 	potential = {
 		NOT = { has_modifier = resort_colony }
 	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	prerequisites = {
+		"tech_mine_volatile_motes"
+	}
+	
 
 	triggered_planet_modifier = {
 		potential = {
@@ -478,138 +502,35 @@ building_archive_major_capital = {
 	}
 }
 
-building_eludium_plant = {
-	base_buildtime = 360
-
-	category = resource
-	
-	potential = {
-		NOT = { has_modifier = resort_colony }
-		OR = {
-			NOT = { OR = { is_planet_class = pc_habitat is_planet_class = pc_floating } }
-				exists = owner
-			}
-	}
-
-	base_cap_amount = 1
-	
-	planet_modifier = {
-		planet_technician_energy_produces_mult = 0.10
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		modifier = {
-			job_technician_add = 4
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_gestalt = yes }
-		}
-		modifier = {
-			job_technician_drone_add = 4
-		}
-	}
-	
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
-		modifier = {
-			district_generator_max = 2
-			planet_technician_energy_produces_mult = 0.05
-		}
-	}
-	
-	resources = {
-		category = planet_buildings
-		cost = {
-			minerals = 200
-		}
-		cost = {
-			trigger = {
-				owner = { 
-					is_machine_empire = yes
-				}
-			}
-			minerals = 100
-			alloys = 100
-		}
-		upkeep = {
-			sr_eludium = 1
-		}
-	}	
-	
-	prerequisites = {
-		tech_eludium_plant
-	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_gestalt = yes }
-		}
-		text = job_technician_drone_effect_desc
-	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_gestalt = no }
-		}
-		text = job_technician_effect_desc
-	}
-	
-	ai_weight = {
-		weight = 2
-		modifier = 
-		{
-			factor = 5
-			owner = { 
-				has_monthly_income = {
-					resource = sr_eludium
-					value < 2
-				}
-			}
-		}
-		# No one to work it
-		modifier = {
-			factor = 0
-			count_owned_pops = { 
-				limit = { 
-					OR = { 
-						is_unemployed = yes 
-						has_job = servant 
-					}
-				}
-				count < 1
-			}
-		}
-	}
-
-	ai_resource_production = {
-		energy = 1
-		trigger = {
-			always = yes
-		}
-	}
-}
-
 building_nature_preserve = {
 	base_buildtime = 360
 
 	is_capped_by_modifier = yes
+	
+	convert_to = {
+		building_volatiles_mine
+		building_geothermal_slurry_site
+		building_ammonia_electrodeposition
+		building_frozen_gas_mine
+		building_lava_mine
+		building_karst_mine
+		#building_nature_preserve
+		building_nightside_mining
+		building_sugarbush
+		building_undersea_gasmine
+	}
 
 	category = resource
 	
 	potential = {
 		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_biolumen
 	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
 
 	triggered_planet_modifier = {
 		potential = {
@@ -670,13 +591,20 @@ building_subsurface_assembly = {
 		NOT = { has_modifier = resort_colony }
 	}
 
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
 			owner = { is_regular_empire = yes }
 		}
 		modifier = {
-			job_synth_assembler_add = 1
+			job_roboticist_add = 2
+			job_researcher_add = 2
+			job_foundry_add = 2
 		}
 	}
 	
@@ -686,8 +614,8 @@ building_subsurface_assembly = {
 			owner = { is_hive_empire = yes }
 		}
 		modifier = {
-			job_alloy_drone_add = 1
-			job_brain_drone_add = 1
+			job_alloy_drone_add = 3
+			job_brain_drone_add = 3
 		}
 	}
 	
@@ -697,8 +625,9 @@ building_subsurface_assembly = {
 			owner = { is_machine_empire = yes }
 		}
 		modifier = {	
-			job_calculator_add = 1
-			job_replicator_add = 1
+			job_replicator_add = 2
+			job_calculator_add = 2
+			job_fabricator_add = 2
 		}
 	}
 	
@@ -727,6 +656,15 @@ building_crystal_carver = {
 	potential = {
 		NOT = { has_modifier = resort_colony }
 	}
+	
+	prerequisites = {
+		"tech_mine_rare_crystals"
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
 
 	triggered_planet_modifier = {
 		potential = {
@@ -734,7 +672,10 @@ building_crystal_carver = {
 			owner = { is_regular_empire = yes }
 		}
 		modifier = {
-			job_crystal_carver_add = 1
+			job_crystal_carver_add = 3
+			job_crystal_miner_add = 2
+			job_merchant_add = 1
+			job_clerk_add = 2
 		}
 	}
 	
@@ -744,7 +685,9 @@ building_crystal_carver = {
 			owner = { is_hive_empire = yes }
 		}
 		modifier = {
-			job_crystal_hive_add = 1
+			job_crystal_hive_add = 3
+			job_crystal_mining_drone_add = 2
+			job_agri_drone_add = 4
 		}
 	}
 	
@@ -755,6 +698,8 @@ building_crystal_carver = {
 		}
 		modifier = {	
 			job_crystal_robot_add = 1
+			job_crystal_mining_drone_add = 2
+			job_technician_add = 4
 		}
 	}
 	
@@ -777,12 +722,35 @@ building_nightside_mining = {
 	base_buildtime = 360
 
 	is_capped_by_modifier = yes
+	
+	convert_to = {
+		building_volatiles_mine
+		building_geothermal_slurry_site
+		building_ammonia_electrodeposition
+		building_frozen_gas_mine
+		building_lava_mine
+		building_karst_mine
+		building_nature_preserve
+		#building_nightside_mining
+		building_sugarbush
+		building_undersea_gasmine
+	}
 
 	category = resource
 	
 	potential = {
 		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_tidallylocked
 	}
+	
+	prerequisites = {
+		"tech_mine_rare_crystals"
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
 
 	triggered_planet_modifier = {
 		potential = {
@@ -843,13 +811,26 @@ building_graveyard_well = {
 		NOT = { has_modifier = resort_colony }
 	}
 
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	prerequisites = {
+		"tech_mine_volatile_motes"
+		"tech_mine_exotic_gases"
+		"tech_mine_rare_crystals"
+	}
+	
+
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
 			owner = { is_regular_empire = yes }
 		}
 		modifier = {
-			job_tiyanki_roughneck_add = 1
+			job_gas_extractor_add = 2
+			job_crystal_miner_add = 2
+			job_mote_harvester_add = 2
 		}
 	}
 	
@@ -859,7 +840,9 @@ building_graveyard_well = {
 			owner = { is_hive_empire = yes }
 		}
 		modifier = {
-			job_tiyanki_hive_add = 1
+			job_gas_extraction_drone_add = 2
+			job_mote_harvesting_drone_add = 2
+			job_crystal_mining_drone_add = 2
 		}
 	}
 	
@@ -869,7 +852,9 @@ building_graveyard_well = {
 			owner = { is_machine_empire = yes }
 		}
 		modifier = {	
-			job_tiyanki_robot_add = 1
+			job_gas_extraction_drone_add = 2
+			job_mote_harvesting_drone_add = 2
+			job_crystal_mining_drone_add = 2
 		}
 	}
 	
@@ -895,9 +880,32 @@ building_volatiles_mine = {
 
 	category = resource
 	
+	convert_to = {
+		#building_volatiles_mine
+		building_geothermal_slurry_site
+		building_ammonia_electrodeposition
+		building_frozen_gas_mine
+		building_lava_mine
+		building_karst_mine
+		building_nature_preserve
+		building_nightside_mining
+		building_sugarbush
+		building_undersea_gasmine
+	}
+	
 	potential = {
 		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_superhabitable
 	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	prerequisites = {
+		"tech_mine_volatile_motes"
+	}
+	
 
 	triggered_planet_modifier = {
 		potential = {
@@ -954,9 +962,32 @@ building_geothermal_slurry_site = {
 
 	category = resource
 	
+	convert_to = {
+		building_volatiles_mine
+		#building_geothermal_slurry_site
+		building_ammonia_electrodeposition
+		building_frozen_gas_mine
+		building_lava_mine
+		building_karst_mine
+		building_nature_preserve
+		building_nightside_mining
+		building_sugarbush
+		building_undersea_gasmine
+	}
+	
 	potential = {
 		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_geothermal
 	}
+	
+	prerequisites = {
+		"tech_mine_exotic_gases"
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
 
 	triggered_planet_modifier = {
 		potential = {
@@ -1006,138 +1037,40 @@ building_geothermal_slurry_site = {
 	}
 }
 
-building_crystal_pillar = {
-	base_buildtime = 360
-
-	category = resource
-	
-	potential = {
-		NOT = { has_modifier = resort_colony }
-		OR = {
-			NOT = { OR = { is_planet_class = pc_habitat is_planet_class = pc_crystal } }
-				exists = owner
-			}
-	}
-
-	base_cap_amount = 1
-	
-	planet_modifier = {
-		planet_jobs_food_produces_mult = 0.10
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		modifier = {
-			job_farmer_add = 4
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_gestalt = yes }
-		}
-		modifier = {
-			job_agri_drone_add = 4
-		}
-	}
-	
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-		}
-		modifier = {
-			job_technician_drone_add = 4
-		}
-	}
-	
-	resources = {
-		category = planet_buildings
-		cost = {
-			minerals = 200
-		}
-		cost = {
-			trigger = {
-				owner = { 
-					is_machine_empire = yes
-				}
-			}
-			minerals = 100
-			alloys = 100
-		}
-		upkeep = {
-			sr_acean = 1
-		}
-	}	
-	
-	prerequisites = {
-		tech_crystal_pillar
-	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_gestalt = yes }
-		}
-		text = job_agri_drone_effect_desc
-	}
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_gestalt = no }
-		}
-		text = job_technician_effect_desc
-	}
-	
-	ai_weight = {
-		weight = 2
-		modifier = 
-		{
-			factor = 5
-			owner = { 
-				has_monthly_income = {
-					resource = sr_acean
-					value < 2
-				}
-			}
-		}
-		# No one to work it
-		modifier = {
-			factor = 0
-			count_owned_pops = { 
-				limit = { 
-					OR = { 
-						is_unemployed = yes 
-						has_job = servant 
-					}
-				}
-				count < 1
-			}
-		}
-	}
-
-	ai_resource_production = {
-		energy = 1
-		trigger = {
-			always = yes
-		}
-	}
-}
-
-#Ammonia
+#Methane
 building_frozen_gas_mine = {
 	base_buildtime = 360
 
 	is_capped_by_modifier = yes
+	
+	convert_to = {
+		building_volatiles_mine
+		building_geothermal_slurry_site
+		building_ammonia_electrodeposition
+		#building_frozen_gas_mine
+		building_lava_mine
+		building_karst_mine
+		building_nature_preserve
+		building_nightside_mining
+		building_sugarbush
+		building_undersea_gasmine
+	}
 
 	category = resource
 	
 	potential = {
 		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_methane
 	}
+	
+	prerequisites = {
+		"tech_mine_exotic_gases"
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
 
 	triggered_planet_modifier = {
 		potential = {
@@ -1145,7 +1078,8 @@ building_frozen_gas_mine = {
 			owner = { is_regular_empire = yes }
 		}
 		modifier = {
-			job_frozen_gas_miner_add = 1
+			job_gas_extractor_add = 2
+			job_miner_add = 4
 		}
 	}
 	
@@ -1155,8 +1089,8 @@ building_frozen_gas_mine = {
 			owner = { is_hive_empire = yes }
 		}
 		modifier = {
-			job_mining_drone_add = 2
-			job_gas_extraction_drone_add = 1
+			job_mining_drone_add = 4
+			job_gas_extraction_drone_add = 2
 		}
 	}
 	
@@ -1166,8 +1100,8 @@ building_frozen_gas_mine = {
 			owner = { is_machine_empire = yes }
 		}
 		modifier = {	
-			job_mining_drone_add = 2
-			job_gas_extraction_drone_add = 1
+			job_mining_drone_add = 4
+			job_gas_extraction_drone_add = 2
 		}
 	}
 	
@@ -1193,9 +1127,32 @@ building_ammonia_electrodeposition = {
 
 	category = resource
 	
+	convert_to = {
+		building_volatiles_mine
+		building_geothermal_slurry_site
+		#building_ammonia_electrodeposition
+		building_frozen_gas_mine
+		building_lava_mine
+		building_karst_mine
+		building_nature_preserve
+		building_nightside_mining
+		building_sugarbush
+		building_undersea_gasmine
+	}
+	
 	potential = {
 		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_ammonia
 	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	prerequisites = {
+		"tech_mine_volatile_motes"
+	}
+	
 
 	triggered_planet_modifier = {
 		potential = {
@@ -1203,7 +1160,8 @@ building_ammonia_electrodeposition = {
 			owner = { is_regular_empire = yes }
 		}
 		modifier = {
-			job_electrodepositionist_add = 1
+			job_electrodepositionist_add = 2
+			job_mote_harvester_add = 2
 		}
 	}
 	
@@ -1213,8 +1171,8 @@ building_ammonia_electrodeposition = {
 			owner = { is_hive_empire = yes }
 		}
 		modifier = {
-			job_alloy_drone_add = 1
-			job_mote_harvesting_drone_add = 1
+			job_alloy_drone_add = 2
+			job_mote_harvesting_drone_add = 2
 		}
 	}
 	
@@ -1224,8 +1182,8 @@ building_ammonia_electrodeposition = {
 			owner = { is_machine_empire = yes }
 		}
 		modifier = {	
-			job_fabricator_add = 1
-			job_mote_harvesting_drone_add = 1
+			job_fabricator_add = 2
+			job_mote_harvesting_drone_add = 2
 		}
 	}
 	
@@ -1244,7 +1202,7 @@ building_ammonia_electrodeposition = {
 	}
 }
 
-building_zro_harvester = {
+building_pdzro_harvester = {
 	base_buildtime = 360
 
 	is_capped_by_modifier = yes
@@ -1304,12 +1262,31 @@ building_sugarbush = {
 	base_buildtime = 360
 
 	is_capped_by_modifier = yes
+	
+	convert_to = {
+		building_volatiles_mine
+		building_geothermal_slurry_site
+		building_ammonia_electrodeposition
+		building_frozen_gas_mine
+		building_lava_mine
+		building_karst_mine
+		building_nature_preserve
+		building_nightside_mining
+		#building_sugarbush
+		building_undersea_gasmine
+	}
 
 	category = resource
 	
 	potential = {
 		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_irradiated
 	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
 
 	triggered_planet_modifier = {
 		potential = {
@@ -1363,12 +1340,35 @@ building_karst_mine = {
 	base_buildtime = 360
 
 	is_capped_by_modifier = yes
+	
+	convert_to = {
+		building_volatiles_mine
+		building_geothermal_slurry_site
+		building_ammonia_electrodeposition
+		building_frozen_gas_mine
+		building_lava_mine
+		#building_karst_mine
+		building_nature_preserve
+		building_nightside_mining
+		building_sugarbush
+		building_undersea_gasmine
+	}
 
 	category = resource
 	
 	potential = {
 		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_karst
 	}
+	
+	prerequisites = {
+		"tech_mine_rare_crystals"
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
 
 	triggered_planet_modifier = {
 		potential = {
@@ -1422,12 +1422,38 @@ building_lava_mine = {
 	base_buildtime = 360
 
 	is_capped_by_modifier = yes
+	
+	convert_to = {
+		building_volatiles_mine
+		building_geothermal_slurry_site
+		building_ammonia_electrodeposition
+		building_frozen_gas_mine
+		#building_lava_mine
+		building_karst_mine
+		building_nature_preserve
+		building_nightside_mining
+		building_sugarbush
+		building_undersea_gasmine
+	}
 
 	category = resource
 	
 	potential = {
 		NOT = { has_modifier = resort_colony }
+		OR = {
+		is_planet_class = pc_primal
+		is_planet_class = pc_ash
+		}
 	}
+	
+	prerequisites = {
+		"tech_mine_rare_crystals"
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
 
 	triggered_planet_modifier = {
 		potential = {
@@ -1459,6 +1485,88 @@ building_lava_mine = {
 		modifier = {	
 			job_fabricator_add = 2
 			job_crystal_mining_drone_add = 2
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 400
+		}
+		upkeep = {
+			energy = 1
+		}
+	}	
+	
+	ai_weight = {
+		weight = 10	
+	}
+}
+
+building_undersea_gasmine = {
+	base_buildtime = 360
+
+	is_capped_by_modifier = yes
+	
+	convert_to = {
+		building_volatiles_mine
+		building_geothermal_slurry_site
+		building_ammonia_electrodeposition
+		building_frozen_gas_mine
+		building_lava_mine
+		building_karst_mine
+		building_nature_preserve
+		building_nightside_mining
+		building_sugarbush
+		#building_undersea_gasmine
+	}
+
+	category = resource
+	
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_aquatic
+	}
+	
+	prerequisites = {
+		"tech_mine_exotic_gases"
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_gas_extractor_add = 2
+			job_technician_add = 4
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_hive_empire = yes }
+		}
+		modifier = {
+			job_gas_extraction_drone_add = 2
+			job_technician_drone_add = 4
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+		modifier = {	
+			job_gas_extraction_drone_add = 2
+			job_technician_drone_add = 4
 		}
 	}
 	
