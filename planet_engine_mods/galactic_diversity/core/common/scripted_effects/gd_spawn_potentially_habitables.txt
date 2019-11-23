@@ -537,7 +537,251 @@ spawn_terrestrial = {
 }
 
 spawn_oceanic = {
-
+	# We can use the same code for the 3 different flags
+	if = {
+		limit = {
+			OR = {
+				has_planet_flag = "eco_hot_planet"
+				has_planet_flag = "eco_temp_planet"
+				has_planet_flag = "eco_cold_planet"
+			}
+		}
+		# Spawn Temperature Modifier
+		random_list = {
+			25 = {
+				add_modifier = {
+					modifier = "temperature-hot"
+					days = -1
+				}
+				modifier = { factor = 2.00 has_planet_flag = "eco_hot_planet" }
+				modifier = { factor = 1.00 has_planet_flag = "eco_temp_planet" }
+				modifier = { factor = 0.00 has_planet_flag = "eco_cold_planet" }
+			}
+			25 = {
+				add_modifier = {
+					modifier = "temperature-temperate"
+					days = -1
+				}
+				modifier = { factor = 1.00 has_planet_flag = "eco_hot_planet" }
+				modifier = { factor = 2.50 has_planet_flag = "eco_temp_planet" }
+				modifier = { factor = 1.00 has_planet_flag = "eco_cold_planet" }
+			}
+			25 = {
+				add_modifier = {
+					modifier = "temperature-cold"
+					days = -1
+				}
+				modifier = { factor = 0.00 has_planet_flag = "eco_hot_planet" }
+				modifier = { factor = 1.00 has_planet_flag = "eco_temp_planet" }
+				modifier = { factor = 2.00 has_planet_flag = "eco_cold_planet" }
+			}
+			25 = {
+				add_modifier = {
+					modifier = "temperature-freezing"
+					days = -1
+				}
+				modifier = { factor = 0.00 has_planet_flag = "eco_hot_planet" }
+				modifier = { factor = 0.25 has_planet_flag = "eco_temp_planet" }
+				modifier = { factor = 0.50 has_planet_flag = "eco_cold_planet" }
+			}
+		}
+		# Spawn Water Modifier - Oceanics require the Oceanic modifier and will spawn no others
+		add_modifier = {
+				modifier = "water-oceanic"
+				days = -1
+		}
+		# Spawn Atmosphere Modifier - Oceanics can have all types of atmospheres, but only optimal and marginal will result in a habitable planet
+		random_list = {
+			20 = {
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				modifier = { factor = 0.80 has_modifier = "temperature-hot" }
+				modifier = { factor = 1.50 has_modifier = "temperature-temperate" }
+				modifier = { factor = 0.30 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.10 has_modifier = "temperature-freezing" }
+			}
+			30 = {
+				add_modifier = {
+					modifier = "atmosphere-marginal"
+					days = -1
+				}
+				modifier = { factor = 1.00 has_modifier = "temperature-hot" }
+				modifier = { factor = 1.00 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.00 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.50 has_modifier = "temperature-freezing" }
+			}
+			50 = {
+				add_modifier = {
+					modifier = "atmosphere-toxic"
+					days = -1
+				}
+				modifier = { factor = 1.20 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.50 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.20 has_modifier = "temperature-cold" }
+				modifier = { factor = 2.00 has_modifier = "temperature-freezing" }
+			}
+		
+		}
+		# Convert the planet to a habitable or uninhabitable Oceanic class factoring the modifiers spawned above
+		random_list = {
+			0 = {
+				change_pc = pc_savannah # Pangaian Class
+				modifier = { add = 40 has_modifier = "temperature-hot" }
+				modifier = { add = 20 has_modifier = "temperature-temperate" }
+				modifier = { add = 00 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.25 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.75 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-toxic" }
+			}
+			0 = {
+				change_pc = pc_ocean # Archipelagic Class
+				modifier = { add = 20 has_modifier = "temperature-hot" }
+				modifier = { add = 30 has_modifier = "temperature-temperate" }
+				modifier = { add = 10 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.00 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 1.00 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-toxic" }
+			}
+			0 = {
+				change_pc = pc_alpine # Panthalassic Class
+				modifier = { add = 20 has_modifier = "temperature-hot" }
+				modifier = { add = 20 has_modifier = "temperature-temperate" }
+				modifier = { add = 20 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.75 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 1.25 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-toxic" }
+			}
+			0 = {
+				change_pc = pc_cryothalassic # Cryothalassic Class
+				modifier = { add = 00 has_modifier = "temperature-hot" }
+				modifier = { add = 00 has_modifier = "temperature-temperate" }
+				modifier = { add = 25 has_modifier = "temperature-cold" }
+				modifier = { add = 50 has_modifier = "temperature-freezing" }
+				modifier = { factor = 0.50 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 1.00 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 1.50 has_modifier = "atmosphere-toxic" }
+			}
+			0 = {
+				change_pc = pc_waterworld # Water World
+				modifier = { add = 10 has_modifier = "temperature-hot" }
+				modifier = { add = 40 has_modifier = "temperature-temperate" }
+				modifier = { add = 10 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.50 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 2.50 has_modifier = "atmosphere-toxic" }
+			}
+			0 = {
+				change_pc = pc_ethaneworld # Ethane World
+				modifier = { add = 00 has_modifier = "temperature-hot" }
+				modifier = { add = 10 has_modifier = "temperature-temperate" }
+				modifier = { add = 50 has_modifier = "temperature-cold" }
+				modifier = { add = 50 has_modifier = "temperature-freezing" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 2.50 has_modifier = "atmosphere-toxic" }
+			}
+		}
+		# Spawn Gravity Modifier
+		spawn_gravity_modifier = yes
+		# Spawn Resource Modifier
+		spawn_resource_modifier = yes
+		# Spawn Vegetation modifier depending on planet class and some modifiers spawned above
+		random_list = {
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-lush"
+					days = -1
+				}
+				modifier = { add = 50 is_planet_class = "pc_savannah" }
+				modifier = { add = 50 is_planet_class = "pc_ocean" }
+				modifier = { add = 00 is_planet_class = "pc_alpine" }
+				modifier = { add = 00 is_planet_class = "pc_cryothalassic" }
+				modifier = { factor = 2.00 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.50 has_modifier = "temperature-temperate" }
+				modifier = { factor = 0.00 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.00 has_modifier = "temperature-freezing" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-mixed"
+					days = -1
+				}
+				modifier = { add = 50 is_planet_class = "pc_savannah" }
+				modifier = { add = 50 is_planet_class = "pc_ocean" }
+				modifier = { add = 25 is_planet_class = "pc_alpine" }
+				modifier = { add = 00 is_planet_class = "pc_cryothalassic" }
+				modifier = { factor = 0.00 has_modifier = "temperature-hot" }
+				modifier = { factor = 1.00 has_modifier = "temperature-temperate" }
+				modifier = { factor = 2.00 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.00 has_modifier = "temperature-freezing" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-sparse"
+					days = -1
+				}
+				modifier = { add = 50 is_planet_class = "pc_savannah" }
+				modifier = { add = 00 is_planet_class = "pc_ocean" }
+				modifier = { add = 25 is_planet_class = "pc_alpine" }
+				modifier = { factor = 1.00 has_modifier = "temperature-hot" }
+				modifier = { factor = 1.00 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.00 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.00 has_modifier = "temperature-freezing" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-barren"
+					days = -1
+				}
+				modifier = { add = 50 is_planet_class = "pc_cryothalassic" }
+				modifier = { add = 50 is_planet_class = "pc_waterworld" }
+				modifier = { add = 50 is_planet_class = "pc_ethaneworld" }
+			}
+		}
+		# Convert biome art based on planet class and vegetation modifier spawned above
+		if = {
+			limit = { is_planet_class = "pc_savannah" has_modifier = "vegetation-lush" }
+			set_planet_entity = { picture = pc_mangrove entity = pangaian_planet_lush_01_entity }
+		}
+		if = {
+			limit = { is_planet_class = "pc_savannah" has_modifier = "vegetation-mixed" }
+			set_planet_entity = { picture = pc_cascadian entity = pangaian_planet_mixed_01_entity }
+		}
+		if = {
+			limit = { is_planet_class = "pc_savannah" has_modifier = "vegetation-sparse" }
+			set_planet_entity = { picture = pc_arid entity = pangaian_planet_barren_01_entity }
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_ocean" has_modifier = "vegetation-lush" }
+			set_planet_entity = { picture = pc_ocean entity = ocean_planet_02_entity }
+		}
+		if = {
+			limit = { is_planet_class = "pc_ocean" has_modifier = "vegetation-mixed" }
+			set_planet_entity = { picture = pc_subarctic entity = ocean_planet_02_entity }
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_alpine" has_modifier = "temperature-temperate" }
+			set_planet_entity = { picture = pc_aquatic entity = aquatic_planet_01_entity }
+		}
+		if = {
+			limit = { is_planet_class = "pc_alpine" has_modifier = "temperature-hot" }
+			set_planet_entity = { picture = pc_aquatichot entity = aquatichot_planet_01_entity }
+		}
+		if = {
+			limit = { is_planet_class = "pc_alpine" has_modifier = "temperature-cold" }
+			set_planet_entity = { picture = pc_aquaticcold entity = aquaticcold_planet_01_entity }
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_cryothalassic" }
+			set_planet_entity = { picture = pc_glacial entity = glacial_planet_01_entity }
+		}
+		
+	}
 }
 
 spawn_marginal = {
