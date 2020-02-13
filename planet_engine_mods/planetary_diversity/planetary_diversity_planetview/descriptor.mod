@@ -5,3 +5,4 @@ tags={
 name="Planetary Diversity - Planet View"
 picture="thumbnail.png"
 remote_file_id="1866576239"
+dependencies={"Planetary Diversity"}

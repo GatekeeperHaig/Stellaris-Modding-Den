@@ -21,12 +21,13 @@ country_event = {
 			limit = { 
 				is_planet_class = pc_continental 
 				is_homeworld = no 
-				not = {
-					or = {
+				NOR = {
 					has_planet_flag = prescripted_ideal 
 					has_planet_flag = planet_earth
 					solar_system = { has_star_flag = empire_cluster }
-					}
+					solar_system = { has_star_flag = empire_home_system }
+					solar_system = { has_star_flag = sol_system }
+					solar_system = { has_star_flag = sol }
 				} 
 			}
 			random_list = {
@@ -45,12 +46,10 @@ country_event = {
 		every_planet = { 				
 			limit = { 
 				is_planet_class = pc_ocean is_homeworld = no  
-				not = { 
-					or = {
+				NOR = {
 					has_planet_flag = prescripted_ideal
 				    has_planet_flag = living_planet
 					solar_system = { has_star_flag = empire_cluster }
-					}
 				}
 			}
 			random_list = {
@@ -286,6 +285,8 @@ country_event = {
 		every_planet = { limit = { is_planet_class = pc_primal is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Aquatic
 		every_planet = { limit = { is_planet_class = pc_aquatic is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
+		#Salt
+		every_planet = { limit = { is_planet_class = pc_salt is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Gaia
 		every_planet = { limit = { is_planet_class = pc_gaia } add_deposit = d_pdgaia }
 	}
@@ -570,6 +571,22 @@ country_event = {
 				10 = { change_pc = pc_steppe reroll_planet = yes }		
 				10 = { change_pc = pc_med reroll_planet = yes }			
 				10 = { change_pc = pc_prairie reroll_planet = yes }			
+			}
+		}
+		#Salt Start
+		every_planet = { 				
+			limit = { is_planet_class = pc_salt is_homeworld = no has_planet_flag = prescripted_ideal }
+			random_list = {
+				10 = { change_pc = pc_desert reroll_planet = yes }
+				10 = { change_pc = pc_sandsea reroll_planet = yes }	
+				10 = { change_pc = pc_oasis reroll_planet = yes }	
+				10 = { change_pc = pc_arid reroll_planet = yes }	
+				10 = { change_pc = pc_mesa reroll_planet = yes }
+				10 = { change_pc = pc_savannah reroll_planet = yes }		
+				10 = { change_pc = pc_steppe reroll_planet = yes }		
+				10 = { change_pc = pc_med reroll_planet = yes }			
+				10 = { change_pc = pc_prairie reroll_planet = yes }		
+				10 = { change_pc = pc_hadesert reroll_planet = yes }			
 			}
 		}
 		#Aquatic Start
@@ -1181,8 +1198,8 @@ country_event = {
 				}
 			}	
 			random_list = {
-				5 = { add_modifier = {	modifier = terraforming_candidate days = -1	} }
-				95 = { }	
+				4 = { add_modifier = {	modifier = terraforming_candidate days = -1	} }
+				96 = { }	
 			}
 		}
 	}
@@ -1247,6 +1264,11 @@ planet_event = {
 		limit = { is_planet_class = pc_primal not = { has_deposit = d_lava_lakes }}
 		add_deposit = d_lava_lakes
 		add_modifier = { modifier = "primal" days = -1 }
+		}
+		if = { 
+		limit = { is_planet_class = pc_salt not = { has_deposit = d_salt_caves }}
+		add_deposit = d_salt_cave
+		add_modifier = { modifier = "pdsalt" days = -1 }
 		}
 		if = { 
 		limit = { is_planet_class = pc_ash not = { has_deposit = d_lava_lakes }}
