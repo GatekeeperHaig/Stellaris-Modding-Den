@@ -9,7 +9,7 @@ generate_pd_start_deposits_and_blockers = {
 	if = {
 		limit = {
 			owner = {		
-				has_civic = civic_post_apocalyptic 
+				has_origin = origin_post_apocalyptic
 			}
 		}
 		add_deposit = d_tomb_world_ruins
@@ -19,6 +19,7 @@ generate_pd_start_deposits_and_blockers = {
 		limit = {
 			owner = {		
 				has_civic = civic_machine_terminator
+				NOT = { has_origin = origin_machine }
 			}
 		}
 	
@@ -39,6 +40,7 @@ generate_pd_start_deposits_and_blockers = {
 		limit = {
 			owner = {		
 				has_civic = civic_machine_assimilator
+				NOT = { has_origin = origin_machine }
 			}
 		}
 	
@@ -49,6 +51,7 @@ generate_pd_start_deposits_and_blockers = {
 		limit = {
 			owner = {		
 				has_authority = auth_machine_intelligence
+				NOT = { has_origin = origin_machine }
 			}
 		}
 	
@@ -65,8 +68,13 @@ generate_pd_start_deposits_and_blockers = {
 		add_deposit = d_collapsed_burrows
 		add_deposit = d_failing_infrastructure
 		add_deposit = d_failing_infrastructure
-	}		
-	else = {
+	}	
+	else_if = {
+		limit = {
+			owner = {
+				NOT = { has_origin = origin_machine }
+			}
+		}
 		add_deposit = d_decrepit_dwellings
 		add_deposit = d_failing_infrastructure
 		add_deposit = d_failing_infrastructure
@@ -76,7 +84,10 @@ generate_pd_start_deposits_and_blockers = {
 		limit = {
 			owner = {
 				is_lithoid_empire = yes
-				NOT = { has_valid_civic = civic_hive_devouring_swarm }
+				NOR = {
+					has_valid_civic = civic_hive_devouring_swarm
+					has_origin = origin_lithoid
+				}
 			}
 		}
 		while = {
@@ -127,8 +138,15 @@ generate_pd_start_deposits_and_blockers = {
 		if = {
 			limit = { owner = { is_machine_empire = no } }
 			add_deposit = d_rugged_woods
-			add_deposit = d_black_soil	
-		}			
+
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			else = {
+				add_deposit = d_black_soil
+			}
+		}		
 	}
 	
 	if = {
@@ -156,15 +174,21 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_green_hills	
-		add_deposit = d_lush_jungle			
+		add_deposit = d_lush_jungle	
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_lush_jungle
 			add_deposit = d_tropical_island
-		}
 
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_submerged_ore_veins
+			}
+			else = {
+				add_deposit = d_tropical_island
+			}
+		}
 		add_deposit = d_biolumen_nature_preserve
-		add_modifier = { modifier = "biolumen" days = -1 }
+		if = { limit = { not = { has_modifier = biolumen } } add_modifier = { modifier = biolumen days = -1 } }
 	}
 	
 	if = {
@@ -192,12 +216,17 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_green_hills	
-		add_deposit = d_lush_jungle			
+		add_deposit = d_lush_jungle	
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_green_hills
-			add_deposit = d_tropical_island
-		}
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			else = {
+				add_deposit = d_tropical_island
+			}
+		}		
 	}
 	
 	if = {
@@ -225,12 +254,17 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_green_hills	
-		add_deposit = d_lush_jungle			
+		add_deposit = d_lush_jungle	
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_green_hills
-			add_deposit = d_tropical_island
-		}
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_submerged_ore_veins
+			}
+			else = {
+				add_deposit = d_tropical_island
+			}
+		}	
 	}
 	
 	if = {
@@ -258,11 +292,16 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_boggy_fens
-		add_deposit = d_fungal_caves				
+		add_deposit = d_fungal_caves
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_boggy_fens
-			add_deposit = d_teeming_reef	
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_submerged_ore_veins
+			}
+			else = {
+				add_deposit = d_teeming_reef
+			}
 		}	
 	}
 	
@@ -291,12 +330,17 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_green_hills
-		add_deposit = d_lush_jungle				
+		add_deposit = d_lush_jungle	
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_tropical_island
-			add_deposit = d_teeming_reef	
-		}	
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_submerged_ore_veins
+			}
+			else = {
+				add_deposit = d_teeming_reef
+			}
+		}		
 	}
 	
 	if = {
@@ -328,7 +372,14 @@ generate_pd_start_deposits_and_blockers = {
 		if = {
 			limit = { owner = { is_machine_empire = no } }
 			add_deposit = d_rugged_woods
+
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			else = {
 			add_deposit = d_black_soil	
+			}
 		}			
 	}
 	
@@ -360,7 +411,10 @@ generate_pd_start_deposits_and_blockers = {
 		add_deposit = d_fertile_lands
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_rugged_woods
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
 			add_deposit = d_black_soil	
 		}			
 	}
@@ -393,8 +447,11 @@ generate_pd_start_deposits_and_blockers = {
 		add_deposit = d_fungal_caves
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_lichen_fields	
-			add_deposit = d_fungal_forest		
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			add_deposit = d_fungal_forest	
 		}	
 	}
 	
@@ -426,8 +483,11 @@ generate_pd_start_deposits_and_blockers = {
 		add_deposit = d_fungal_caves
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_lichen_fields	
-			add_deposit = d_fungal_forest		
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			add_deposit = d_fungal_forest	
 		}	
 	}
 	
@@ -459,9 +519,12 @@ generate_pd_start_deposits_and_blockers = {
 		add_deposit = d_fungal_caves
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_lichen_fields	
-			add_deposit = d_fungal_forest		
-		}	
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_submerged_ore_veins
+			}
+			add_deposit = d_fungal_forest	
+		}		
 	}
 	
 	if = {
@@ -489,11 +552,14 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_boggy_fens
-		add_deposit = d_fungal_caves		
+		add_deposit = d_fungal_caves
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_boggy_fens	
-			add_deposit = d_fungal_forest		
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			add_deposit = d_fungal_forest	
 		}	
 	}
 	
@@ -522,12 +588,15 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_fungal_caves
-		add_deposit = d_fungal_caves		
+		add_deposit = d_fungal_caves
 		if = {
 			limit = { owner = { is_machine_empire = no } }
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
 			add_deposit = d_fungal_forest	
-			add_deposit = d_fungal_forest		
-		}	
+		}		
 	}
 	
 	if = {
@@ -558,9 +627,12 @@ generate_pd_start_deposits_and_blockers = {
 		add_deposit = d_fungal_caves
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_forgiving_tundra	
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
 			add_deposit = d_fungal_forest	
-		}		
+		}			
 	}
 	
 	if = {
@@ -591,9 +663,12 @@ generate_pd_start_deposits_and_blockers = {
 		add_deposit = d_fertile_lands
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_forgiving_tundra	
-			add_deposit = d_black_soil	
-		}		
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			add_deposit = d_fertile_lands	
+		}			
 	}
 	
 	if = {
@@ -624,7 +699,10 @@ generate_pd_start_deposits_and_blockers = {
 		add_deposit = d_fertile_lands
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_forgiving_tundra	
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
 			add_deposit = d_black_soil	
 		}		
 	}
@@ -657,9 +735,12 @@ generate_pd_start_deposits_and_blockers = {
 		add_deposit = d_great_river
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_nutritious_mudland	
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
 			add_deposit = d_marvelous_oasis	
-		}		
+		}			
 	}	
 		
 	if = {
@@ -690,7 +771,10 @@ generate_pd_start_deposits_and_blockers = {
 		add_deposit = d_great_river
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_nutritious_mudland	
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
 			add_deposit = d_marvelous_oasis	
 		}		
 	}			
@@ -720,11 +804,14 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_bountiful_plains	
-		add_deposit = d_great_river			
+		add_deposit = d_great_river	
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_bountiful_plains 
-			add_deposit = d_marvelous_oasis
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			add_deposit = d_marvelous_oasis	
 		}		
 	}
 	
@@ -753,11 +840,14 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_bountiful_plains	
-		add_deposit = d_fertile_lands			
+		add_deposit = d_fertile_lands	
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_bountiful_plains 
-			add_deposit = d_black_soil
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			add_deposit = d_black_soil	
 		}	
 	}
 	
@@ -786,11 +876,14 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_bountiful_plains	
-		add_deposit = d_fertile_lands			
+		add_deposit = d_fertile_lands	
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_bountiful_plains 
-			add_deposit = d_black_soil
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_submerged_ore_veins
+			}
+			add_deposit = d_black_soil	
 		}	
 	}			
 	
@@ -819,12 +912,15 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_bountiful_plains	
-		add_deposit = d_great_river			
+		add_deposit = d_great_river		
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_bountiful_plains 
-			add_deposit = d_marvelous_oasis
-		}		
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			add_deposit = d_marvelous_oasis	
+		}			
 	}
 	
 	if = {
@@ -852,14 +948,17 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_nutritious_mudland	
-		add_deposit = d_fertile_lands			
+		add_deposit = d_fertile_lands		
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_nutritious_mudland 
-			add_deposit = d_black_soil
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			add_deposit = d_black_soil	
 		}	
 		add_deposit = d_ammonia_sea
-		add_modifier = { modifier = "ammonia" days = -1 }
+		if = { limit = { not = { has_modifier = ammonia } } add_modifier = { modifier = ammonia days = -1 } }
 	}
 
 	if = {
@@ -887,14 +986,17 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_nutritious_mudland	
-		add_deposit = d_fertile_lands			
+		add_deposit = d_fertile_lands		
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_nutritious_mudland 
-			add_deposit = d_black_soil
-		}	
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			add_deposit = d_black_soil	
+		}			
 		add_deposit = d_frozen_gas_mountain
-		add_modifier = { modifier = "methane" days = -1 }
+		if = { limit = { not = { has_modifier = methane } } add_modifier = { modifier = methane days = -1 } }
 	}
 	
 	if = {
@@ -922,14 +1024,17 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_lichen_fields	
-		add_deposit = d_fungal_caves			
+		add_deposit = d_fungal_caves		
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_lichen_fields 
-			add_deposit = d_black_soil
-		}	
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			add_deposit = d_black_soil	
+		}		
 		add_deposit = d_lava_lakes
-		add_modifier = { modifier = "ash" days = -1 }
+		if = { limit = { not = { has_modifier = ash } } add_modifier = { modifier = ash days = -1 } }
 	}
 	
 	if = {
@@ -960,11 +1065,14 @@ generate_pd_start_deposits_and_blockers = {
 		add_deposit = d_lush_jungle			
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_nutritious_mudland 
-			add_deposit = d_black_soil
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			add_deposit = d_black_soil	
 		}	
 		add_deposit = d_lava_lakes
-		add_modifier = { modifier = "primal" days = -1 }
+		if = { limit = { not = { has_modifier = primal } } add_modifier = { modifier = primal days = -1 } }
 	}
 
 	if = {
@@ -992,7 +1100,7 @@ generate_pd_start_deposits_and_blockers = {
 
 		# 4 + 3 farming (lithoids swap 3 for minerals)
 		add_deposit = d_nutritious_mudland
-		add_deposit = d_great_river
+		add_deposit = d_great_river		
 		if = {
 			limit = { owner = { is_machine_empire = no } }
 			add_deposit = d_nutritious_mudland
@@ -1006,7 +1114,7 @@ generate_pd_start_deposits_and_blockers = {
 			}
 		}
 		add_deposit = d_salt_caves
-		add_modifier = { modifier = "pdsalt" days = -1 }
+		if = { limit = { not = { has_modifier = pdsalt } } add_modifier = { modifier = pdsalt days = -1 } }
 	}
 
 	if = {
@@ -1034,14 +1142,21 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_green_hills	
-		add_deposit = d_lush_jungle			
+		add_deposit = d_lush_jungle		
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_green_hills 
-			add_deposit = d_black_soil
-		}
+			add_deposit = d_green_hills
+
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+			}
+			else = {
+				add_deposit = d_black_soil
+			}
+		}	
 		add_deposit = d_geothermal_slurry_site
-		add_modifier = { modifier = "geothermal" days = -1 }
+		if = { limit = { not = { has_modifier = geothermal } } add_modifier = { modifier = geothermal days = -1 } }
 	}
 
 	if = {
@@ -1069,15 +1184,21 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_rugged_woods	
-		add_deposit = d_lush_jungle			
+		add_deposit = d_lush_jungle		
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_rugged_woods 
-			add_deposit = d_teeming_reef
-		}	
+			add_deposit = d_rugged_woods
 
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_submerged_ore_veins
+			}
+			else = {
+				add_deposit = d_teeming_reef
+			}
+		}		
 		add_deposit = d_ancient_motes
-		add_modifier = { modifier = "superhabitable" days = -1 }
+		if = { limit = { not = { has_modifier = superhabitable } } add_modifier = { modifier = superhabitable days = -1 } }
 	}
 
 	if = {
@@ -1105,18 +1226,21 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_lichen_fields	
-		add_deposit = d_fungal_caves			
+		add_deposit = d_fungal_caves	
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_lichen_fields 
-			add_deposit = d_great_river
-		}	
+			add_deposit = d_lichen_fields
 
-		add_deposit = d_karst_cave
-		add_modifier = {
-			modifier = "karst"
-			days = -1
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_submerged_ore_veins
+			}
+			else = {
+				add_deposit = d_fungal_caves
+			}
 		}
+		add_deposit = d_karst_cave
+		if = { limit = { not = { has_modifier = karst } } add_modifier = { modifier = karst days = -1 } }
 	}
 	
 	if = {
@@ -1144,14 +1268,21 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_sea_grass
-		add_deposit = d_kelp_forests				
+		add_deposit = d_kelp_forests
 		if = {
 			limit = { owner = { is_machine_empire = no } }
 			add_deposit = d_kelp_forests
-			add_deposit = d_teeming_reef	
+
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_submerged_ore_veins
+			}
+			else = {
+				add_deposit = d_teeming_reef
+			}
 		}	
 		add_deposit = d_aquatic_trench
-		add_modifier = { modifier = "aquatic" days = -1 }
+		if = { limit = { not = { has_modifier = aquatic } } add_modifier = { modifier = aquatic days = -1 } }
 	}
 
 	if = {
@@ -1180,13 +1311,20 @@ generate_pd_start_deposits_and_blockers = {
 		# 3 + 2 farming
 		add_deposit = d_lichen_fields	
 		add_deposit = d_fungal_caves 	
-		add_deposit = d_fungal_forest	
+		if = {
+			limit = { owner = { is_machine_empire = no } }
+			add_deposit = d_fungal_caves
 
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_submerged_ore_veins
+			}
+			else = {
+				add_deposit = d_fungal_forest
+			}
+		}	
 		add_deposit = d_rad_blooms
-		add_modifier = {
-			modifier = "radiotrophic"
-			days = -1
-		}
+		if = { limit = { not = { has_modifier = radiotrophic } } add_modifier = { modifier = radiotrophic days = -1 } }
 	}
 
 	if = {
@@ -1214,15 +1352,23 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_rugged_woods	
-		add_deposit = d_fertile_lands			
+		add_deposit = d_fertile_lands
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_rugged_woods 
-			add_deposit = d_black_soil
+			add_deposit = d_rugged_woods
+
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
+		
+			}
+			else = {
+				add_deposit = d_black_soil
+			}
 		}	
 
 		add_deposit = d_nightside_mining_operations
-		add_modifier = { modifier = "tidal_locked2" days = -1 }
+		if = { limit = { not = { has_modifier = tidal_locked2 } } add_modifier = { modifier = tidal_locked2 days = -1 } }
 	}
 
 	if = {
@@ -1250,20 +1396,23 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_rugged_woods	
-		add_deposit = d_fertile_lands			
+		add_deposit = d_fertile_lands	
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_rugged_woods 
-			add_deposit = d_black_soil
-		}
+			add_deposit = d_rugged_woods
+
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
 		
+			}
+			else = {
+				add_deposit = d_black_soil
+			}
+		}			
 		add_deposit = d_crystal_guild
-		
 		change_planet_size = +4
-		add_modifier = {
-			modifier = "crystal"
-			days = -1
-		}
+		if = { limit = { not = { has_modifier = crystal } } add_modifier = { modifier = crystal days = -1 } }
 	}
 
 	if = {
@@ -1291,20 +1440,23 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_green_hills	
-		add_deposit = d_fertile_lands			
+		add_deposit = d_fertile_lands
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_green_hills 
-			add_deposit = d_black_soil
-		}
+			add_deposit = d_rugged_woods
 
-		add_deposit = d_eludium_centre
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
 		
+			}
+			else = {
+				add_deposit = d_black_soil
+			}
+		}	
+		add_deposit = d_eludium_centre
 		change_planet_size = +4
-		add_modifier = {
-			modifier = "floating"
-			days = -1
-		}
+		if = { limit = { not = { has_modifier = floating } } add_modifier = { modifier = floating days = -1 } }
 	}
 
 	if = {
@@ -1332,20 +1484,23 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_green_hills	
-		add_deposit = d_fertile_lands			
+		add_deposit = d_fertile_lands	
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_green_hills 
-			add_deposit = d_black_soil
-		}
+			add_deposit = d_rugged_woods
+
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
 		
+			}
+			else = {
+				add_deposit = d_black_soil
+			}
+		}		
 		add_deposit = d_subsurface_assembly
-		
 		change_planet_size = +4
-		add_modifier = {
-			modifier = "technoorganic"
-			days = -1
-		}
+		if = { limit = { not = { has_modifier = technoorganic } } add_modifier = { modifier = technoorganic days = -1 } }
 	}
 
 	if = {
@@ -1373,20 +1528,23 @@ generate_pd_start_deposits_and_blockers = {
 		
 		# 4 + 3 farming
 		add_deposit = d_bountiful_plains	
-		add_deposit = d_great_river			
+		add_deposit = d_great_river	
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_bountiful_plains 
-			add_deposit = d_black_soil
-		}
+			add_deposit = d_bountiful_plains
 
-		add_deposit = d_graveyard_well
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_rich_mountain
 		
+			}
+			else = {
+				add_deposit = d_black_soil
+			}
+		}	
+		add_deposit = d_graveyard_well
 		change_planet_size = +4
-		add_modifier = {
-			modifier = "graveyard"
-			days = -1
-		}
+		if = { limit = { not = { has_modifier = graveyard } } add_modifier = { modifier = graveyard days = -1 } }
 	}
 
 	if = {
@@ -1394,7 +1552,7 @@ generate_pd_start_deposits_and_blockers = {
 			is_planet_class = pc_nuked
 			owner = {	
 				or = {	
-				not = { has_civic = civic_post_apocalyptic }		
+				not = { has_origin = origin_post_apocalyptic }		
 				not = { has_civic = civic_machine_terminator }		
 				not = { has_civic = civic_machine_assimilator }		
 				not = { has_authority = auth_machine_intelligence }
@@ -1423,13 +1581,20 @@ generate_pd_start_deposits_and_blockers = {
 		# 4 + 3 farming
 		add_deposit = d_lichen_fields	
 		add_deposit = d_fungal_caves 	
-		add_deposit = d_fungal_forest			
+		add_deposit = d_fungal_forest	
 		if = {
 			limit = { owner = { is_machine_empire = no } }
-			add_deposit = d_lichen_fields 
 			add_deposit = d_lichen_fields
-		}
+
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_submerged_ore_veins
 		
+			}
+			else = {
+				add_deposit = d_lichen_fields
+			}
+		}			
 		add_deposit = d_tomb_world_ruins
 		add_deposit = d_tomb_world_wasteland
 	}
@@ -1457,61 +1622,38 @@ generate_pd_start_deposits_and_blockers = {
 		add_district = district_archive_energy
 		add_district = district_archive_energy
 		add_district = district_archive_energy
-
 		add_modifier = {
 			modifier = "dying_solar_collectors"
 			days = 3600
 		}
 		change_planet_size = -4
 	}
-
 	if = {
 		limit = {
-			is_planet_class = pc_machine
-			owner = { has_authority = auth_machine_intelligence	}
+			owner = {
+				has_origin = origin_tree_of_life
+			}
 		}
-
-		remove_district = district_generator
-		remove_district = district_generator
-		remove_district = district_generator
-		remove_district = district_generator
-		remove_district = district_mining
-		remove_district = district_mining
-		remove_district = district_farming
-		remove_district = district_farming
-		add_district = district_generator_uncapped
-		add_district = district_generator_uncapped
-		add_district = district_generator_uncapped
-		add_district = district_generator_uncapped
-		add_district = district_mining_uncapped
-		add_district = district_mining_uncapped
-
-		remove_deposit = d_machine_empire_ruins
-		remove_deposit = d_strip_mine
+		owner = {
+			capital_scope = {
+				add_deposit = d_tree_of_life_home
+			}
+		}
 	}
-
 	if = {
 		limit = {
-			is_planet_class = pc_hive
-			owner = { has_authority = auth_hive_mind }
+			owner = {
+				has_origin = origin_lithoid
+			}
 		}
-
-		remove_district = district_generator
-		remove_district = district_generator
-		remove_district = district_generator
-		remove_district = district_generator
-		remove_district = district_mining
-		remove_district = district_mining
-		remove_district = district_farming
-		remove_district = district_farming
-		add_district = district_generator_uncapped
-		add_district = district_generator_uncapped
-		add_district = district_mining_uncapped
-		add_district = district_mining_uncapped
-		add_district = district_farming_uncapped
-		add_district = district_farming_uncapped
-
-		#remove_deposit = d_machine_empire_ruins
-		#remove_deposit = d_strip_mine
+		owner = {
+			capital_scope = {
+				add_deposit = d_lithoid_crater
+				add_deposit = d_buried_lithoids
+				add_deposit = d_buried_lithoids
+				add_deposit = d_buried_lithoids
+				add_deposit = d_buried_lithoids
+			}
+		}
 	}
 }

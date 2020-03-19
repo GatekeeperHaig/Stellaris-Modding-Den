@@ -4,6 +4,8 @@ tags={
 }
 name="Planetary Diversity - Reworked Habitability"
 picture="thumbnail.png"
-supported_version="2.5.*"
+dependencies={
+	"Planetary Diversity"
+}
+supported_version="2.6.*"
 remote_file_id="1807850864"
-dependencies={"Planetary Diversity"}

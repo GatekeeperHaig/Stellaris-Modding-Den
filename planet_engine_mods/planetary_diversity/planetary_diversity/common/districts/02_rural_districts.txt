@@ -55,40 +55,6 @@ district_generator = {
 	
 	allow = {
 		NOT = { has_modifier = resort_colony }
-		OR = {
-			free_jobs < 2
-			controller = { is_ai = no }
-			owner = { is_ai = no }
-			AND = {
-				free_jobs < 3
-				exists = owner
-				owner = {
-					has_monthly_income = {
-						resource = energy
-						value < 20
-					}
-				}
-			}
-			districts_good_energy = yes
-			num_free_districts = { type = district_generator value = 0 }
-			free_district_slots = 0
-			AND = {
-				num_free_districts = { type = district_farming value = 0 }
-				num_free_districts = { type = district_mining value = 0 }
-			}
-			any_owned_pop = {
-				is_unemployed = yes
-				NOT = { has_citizenship_type = { type = citizenship_organic_trophy } }
-				NOR = {
-					is_pop_category = specialist
-					is_pop_category = ruler
-					AND = {
-						has_trait = trait_mechanical
-						NOT = { owner = { has_technology = tech_droid_workers } }
-					}
-				}
-			}
-		}
 	}
 	
 	conversion_ratio = 1
@@ -139,6 +105,7 @@ district_generator = {
 		}
 		modifier = {
 			job_technician_drone_add = 2
+			planet_housing_add = 1
 		}
 	}	
 		
@@ -225,7 +192,18 @@ district_generator = {
 			}
 		}
 		modifier = {
-			weight = 1200
+			weight = 3
+			free_jobs < 2
+			num_free_districts = { type = district_mining value = 0 }
+			owner = {
+				has_monthly_income = {
+					resource = energy
+					value < 250
+				}
+			}
+		}
+		modifier = {
+			weight = 250
 			years_passed > 4
 			OR = {
 				free_jobs < 3
@@ -239,6 +217,7 @@ district_generator = {
 				}
 			}
 			OR = {
+				owner = { country_uses_food = no }
 				owner = {
 					has_monthly_income = {
 						resource = food
@@ -264,16 +243,20 @@ district_generator = {
 			}
 		}
 		modifier = {
-			weight = 3
-			free_jobs < 2
-			num_free_districts = { type = district_mining value = 0 }
+			factor = 3
 			owner = {
 				has_monthly_income = {
 					resource = energy
-					value < 250
+					value < 0
 				}
 			}
-		}#Above 300 the AI will scrap energy districts.
+		}
+		modifier = {
+			factor = 10
+			owner = {
+				has_deficit = energy
+			}
+		}
 	}
 
 	ai_resource_production = {
@@ -283,7 +266,6 @@ district_generator = {
 		}
 	}
 }
-
 district_mining = {
 	base_buildtime = 240
 	
@@ -338,36 +320,6 @@ district_mining = {
 	
 	allow = {
 		NOT = { has_modifier = resort_colony }
-		OR = {
-			districts_good_minerals = yes
-			num_free_districts = { type = district_mining value = 0 }
-			free_district_slots = 0
-			free_jobs < 2
-			controller = { is_ai = no }
-			owner = { is_ai = no }
-			AND = {
-				free_jobs < 3
-				exists = owner
-				owner = {
-					has_monthly_income = {
-						resource = minerals
-						value < 40
-					}
-				}
-			}
-			any_owned_pop = {
-				is_unemployed = yes
-				NOT = { has_citizenship_type = { type = citizenship_organic_trophy } }
-				NOR = {
-					is_pop_category = specialist
-					is_pop_category = ruler
-				}
-			}
-			AND = {
-				num_free_districts = { type = district_farming value = 0 }
-				num_free_districts = { type = district_generator value = 0 }
-			}
-		}
 	}
 	
 	conversion_ratio = 1
@@ -389,8 +341,6 @@ district_mining = {
 		planet_housing_add = 2
 	}
 
-	#Vanilla
-	
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
@@ -420,6 +370,7 @@ district_mining = {
 		}
 		modifier = {
 			job_mining_drone_add = 2
+			planet_housing_add = 1
 		}
 	}	
 		
@@ -497,7 +448,7 @@ district_mining = {
 			}
 		}
 		modifier = {
-			weight = 1100
+			weight = 300
 			OR = {
 				AND = {
 					years_passed > 4
@@ -541,6 +492,19 @@ district_mining = {
 						}#Alloy production has shut down which means the current mineral income can't be trusted
 					}
 				}
+			}
+		}
+		modifier = {
+			factor = 1.25
+			exists = owner
+			owner = {
+				is_lithoid_empire = yes
+			}
+		}
+		modifier = {
+			factor = 10
+			owner = {
+				has_deficit = minerals
 			}
 		}
 	}
@@ -607,35 +571,6 @@ district_farming = {
 	
 	allow = {
 		NOT = { has_modifier = resort_colony }
-		OR = {
-			free_jobs < 2
-			controller = { is_ai = no }
-			owner = { is_ai = no }
-			districts_good_food = yes
-			free_district_slots = 0
-			num_free_districts = { type = district_farming value = 0 }
-			any_owned_pop = {
-				is_unemployed = yes
-				NOT = { has_citizenship_type = { type = citizenship_organic_trophy } }
-				NOR = {
-					is_pop_category = specialist
-					is_pop_category = ruler
-				}
-			}
-			AND = {
-				free_jobs < 3
-				owner = { 
-					has_monthly_income = {
-						resource = food
-						value < 0
-					}
-				}
-			}
-			AND = {
-				num_free_districts = { type = district_mining value = 0 }
-				num_free_districts = { type = district_generator value = 0 }
-			}
-		}
 	}
 	
 	conversion_ratio = 1
@@ -699,6 +634,7 @@ district_farming = {
 		}
 		modifier = {
 			job_agri_drone_add = 2
+			planet_housing_add = 1
 		}
 	}
 		
@@ -774,7 +710,7 @@ district_farming = {
 			}
 		}
 		modifier = {
-			weight = 1000
+			weight = 250
 			years_passed > 4
 			OR = {
 				free_jobs < 3
@@ -817,7 +753,14 @@ district_farming = {
 					value < 0
 				}
 			}
-		}#Recover from food shortage
+		}
+
+		modifier = {
+			factor = 10
+			owner = {
+				has_deficit = food
+			}
+		}
 	}
 
 	ai_resource_production = {
@@ -899,6 +842,7 @@ district_generator_uncapped = {
 		}
 		modifier = {
 			job_technician_drone_add = 2
+			planet_housing_add = 1
 		}
 	}	
 		
@@ -953,7 +897,7 @@ district_generator_uncapped = {
 	ai_weight = {
 		weight = 0
 		modifier = {
-			weight = 9000
+			weight = 250
 			districts_build_district = yes
 			OR = {
 			owner = { 
@@ -963,6 +907,21 @@ district_generator_uncapped = {
 				}
 			}
 				num_free_districts = { type = district_mining_uncapped value = 0 } #ring worlds
+			}
+		}
+		modifier = {
+			factor = 3
+			owner = {
+				has_monthly_income = {
+					resource = energy
+						value < 0
+				}
+			}
+		}
+		modifier = {
+			factor = 10
+			owner = {
+				has_deficit = energy
 			}
 		}
 	}
@@ -1046,6 +1005,7 @@ district_mining_uncapped = {
 		}
 		modifier = {
 			job_mining_drone_add = 2
+			planet_housing_add = 1
 		}
 	}	
 		
@@ -1104,7 +1064,7 @@ district_mining_uncapped = {
 	ai_weight = {
 		weight = 0
 		modifier = {
-			weight = 8900
+			weight = 300
 			districts_build_district = yes
 			owner = { 
 				has_monthly_income = {
@@ -1118,10 +1078,23 @@ district_mining_uncapped = {
 			}
 		}
 		modifier = {
-			weight = 8500
+			weight = 250
 				any_owned_pop = { 
 						is_unemployed = yes 
 				NOT = { has_citizenship_type = { type = citizenship_organic_trophy } }
+			}
+		}
+		modifier = {
+			factor = 1.25
+			exists = owner
+			owner = {
+				is_lithoid_empire = yes
+			}
+		}
+		modifier = {
+			factor = 10
+			owner = {
+				has_deficit = minerals
 			}
 		}
 	}
@@ -1208,6 +1181,7 @@ district_farming_uncapped = {
 		}
 		modifier = {
 			job_agri_drone_add = 2
+			planet_housing_add = 1
 		}
 	}
 		
@@ -1262,7 +1236,7 @@ district_farming_uncapped = {
 	ai_weight = {
 		weight = 0
 		modifier = {
-			weight = 9500
+			weight = 250
 			districts_build_district = yes
 			owner = { 
 				has_monthly_income = {
@@ -1272,7 +1246,7 @@ district_farming_uncapped = {
 			}
 		}
 		modifier = {
-			weight = 9500
+			weight = 250
 			any_owned_pop = { 
 				is_unemployed = yes
 				NOT = { has_citizenship_type = { type = citizenship_organic_trophy } }
@@ -1292,6 +1266,21 @@ district_farming_uncapped = {
 					resource = food
 					value > 80
 				}
+			}
+		}
+
+		modifier = {
+			factor = 0
+			owner = {
+				country_uses_food = no
+				NOT = { has_deficit = food }
+			}
+		}
+
+		modifier = {
+			factor = 10
+			owner = {
+				has_deficit = food
 			}
 		}
 	}
