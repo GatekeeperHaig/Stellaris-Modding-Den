@@ -8,8 +8,8 @@ from functools import reduce
 
 class LocList:
   def __init__(self, translateRest=0):
-    self.languages=["braz_por","english","french","german","polish","russian","spanish","simp_chinese"]
-    self.languageCodes=["pt","en","fr", "de","pl","ru", "es","zh"]
+    self.languages=["braz_por","english","french","german","polish","russian","spanish"]#,"simp_chinese"]
+    self.languageCodes=["pt","en","fr", "de","pl","ru", "es"]#,"zh"] chinese seems not to work according to chinese translators and blocks their translation
     # self.entries=[]
     self.entries=dict()
     self.dicts=dict()
