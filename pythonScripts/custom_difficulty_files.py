@@ -414,7 +414,10 @@ def main():
 
           hidden_effect=TagList()
           if bonusIndex>len(bonusesListNames):
-            hidden_effect.add(ET,TagList().add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value",str(changeStep*boniFactor[bonus]))))
+            valueToBeChanged=changeStep*boniFactor[bonus]
+            if cat=="ai_yearly":
+              valueToBeChanged=changeStep*(1 if boniFactor[bonus] > 0 else -1)
+            hidden_effect.add(ET,TagList().add("change_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,bonus)).add("value",str(valueToBeChanged))))
           else:
             et=TagList()
             hidden_effect.add(ET,et)
@@ -873,7 +876,7 @@ def main():
     ifPos.add("if",ifTagList)
     ifTagList.add("limit", TagList().add("not",TagList().add("check_variable", TagList().add("which", yearCountVar).add("value",yearLimitVar,"","<"))))
     ifTagList.add("set_variable", TagList().add("which", yearCountVar).add("value", "0"))
-    ifTagList.add("change_variable", TagList().add("which", bonusVar).add("value", "1"))
+    ifTagList.add("change_variable", TagList().add("which", bonusVar).add("value", f"{abs(boniFactor[bonus])}"))
 
     ifTagList=TagList()
     ifNeg.add("multiply_variable", TagList().add("which", yearLimitVar).add("value","-1"))
@@ -881,7 +884,7 @@ def main():
     ifNeg.add("multiply_variable", TagList().add("which", yearLimitVar).add("value","-1"))
     ifTagList.add("limit", TagList().add("not",TagList().add("check_variable", TagList().add("which", yearCountVar).add("value",yearLimitVar,"","<"))))
     ifTagList.add("set_variable", TagList().add("which", yearCountVar).add("value", "0"))
-    ifTagList.add("change_variable", TagList().add("which", bonusVar).add("value", "-1"))
+    ifTagList.add("change_variable", TagList().add("which", bonusVar).add("value", f"-{abs(boniFactor[bonus])}"))
 
   with open(outFolder+"/"+"custom_difficulty_yealy_event.txt",'w') as file:
     yearlyFile.writeAll(file, args())

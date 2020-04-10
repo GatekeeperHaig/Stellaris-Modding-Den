@@ -5,4 +5,4 @@ tags={
 }
 picture="pyraSquare.png"
 remote_file_id="1613880809"
-supported_version="2.5.*"
+supported_version="2.6.*"
