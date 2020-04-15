@@ -440,63 +440,173 @@ building_eludium_plant = {
 	}
 }
 
-building_dimensional_fabricator = {
-	can_build = yes
-	can_demolish = yes
-	icon = building_nanite_transmuter
+building_robot_assembly_plant = {
+	base_buildtime = @b1_time
+	base_cap_amount = 1
+
+	category = pop_assembly
 	
 	potential = {
-		custom_tooltip = {
-			exists = owner
-			OR = {
-				owner = { is_fallen_empire = yes }
-				owner = {
-					check_variable = { which = dimensional_fabricator_build_count value >= 1 }
+		exists = owner
+		OR = {
+			owner = { is_ai = no }
+			free_building_slots > 0
+		}
+		owner = { 
+			is_regular_empire = yes 
+			NOT = { has_policy_flag = robots_outlawed }
+		}
+		NOT = { has_modifier = slave_colony }
+	}
+	
+	convert_to = {
+		building_machine_assembly_plant
+	}
+	
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				OR = {
+					is_regular_empire = no 
+					has_policy_flag = robots_outlawed
 				}
 			}
-			fail_text = "ancrel.10004.failtext"
+			has_modifier = slave_colony
+			AND = {
+				owner = { is_ai = yes }
+				free_jobs < 1
+				OR = {
+					num_buildings = {
+						type = any
+						value = 16
+					}
+					is_planet_class = pc_habitat
+				}
+			}
 		}
 	}
 	
 	planet_modifier = {
+		job_roboticist_add = 1
 	}
-
+	
 	resources = {
 		category = planet_buildings
-		produces = {
-			minerals = 100
-			rare_crystals = 2
-			exotic_gases = 2
-			volatile_motes = 2			
+		cost = {
+			minerals = @b2_minerals
 		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = { is_fallen_empire = yes }
-			}
-			sr_zro = 2
-			sr_dark_matter = 2
-			sr_living_metal = 2
-			sr_eludium = 2
-			sr_acean = 2
-		}#Fixed fallen empire being unable to build new ships.
 		upkeep = {
-			energy = 20
+			energy = @b2_upkeep
 		}
 	}
-
-	on_queued = {
-		owner = {
-			subtract_variable = { which = dimensional_fabricator_build_count value = 1 }
-		}
+	
+	triggered_desc = {
+		text = job_roboticist_effect_desc
+	}	
+	
+	prerequisites = {
+		"tech_robotic_workers"
 	}
-
-	on_unqueued = {
-		owner = {
-			change_variable = { which = dimensional_fabricator_build_count value = 1 }
-		}
-	}
-		
+	
 	upgrades = {
+		building_robot_techno_plant
+	}
+	
+	ai_weight = {
+		weight = 50000
+		modifier = {
+			factor = 0
+			OR = {
+				is_planet_class = pc_habitat
+				is_planet_class = pc_city
+				num_buildings = { type = any value >= 14 }
+				owner = { 
+					has_monthly_income = {
+						resource = energy
+						value < 5
+					}
+				}
+			}
+		}
+	}
+}
+
+building_robot_techno_plant = {
+	base_buildtime = @b1_time
+	can_build = no
+
+	category = pop_assembly
+	
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	convert_to = {
+		building_machine_assembly_plant
+	}
+	
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = {
+				OR = {
+					is_regular_empire = no 
+					has_policy_flag = robots_outlawed
+				}
+			}
+			has_modifier = slave_colony
+			AND = {
+				owner = { is_ai = yes }
+				free_jobs < 1
+				OR = {
+					num_buildings = {
+						type = any
+						value = 16
+					}
+					is_planet_class = pc_habitat
+				}
+			}
+		}
+	}
+	
+	planet_modifier = {
+		job_roboticist_add = 2
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b4_minerals
+		}
+		upkeep = {
+			energy = @b4_upkeep
+		}
+	}
+	
+	triggered_desc = {
+		text = job_roboticist_effect_desc
+	}	
+	
+	prerequisites = {
+		tech_techno_robot_factory
+	}
+	
+	ai_weight = {
+		weight = 50000
+		modifier = {
+			factor = 0
+			OR = {
+				is_planet_class = pc_habitat
+				is_planet_class = pc_city
+				num_buildings = { type = any value >= 14 }
+				owner = { 
+					has_monthly_income = {
+						resource = energy
+						value < 5
+					}
+				}
+			}
+		}
 	}
 }

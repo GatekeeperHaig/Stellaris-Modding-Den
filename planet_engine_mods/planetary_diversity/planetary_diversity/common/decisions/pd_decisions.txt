@@ -200,6 +200,7 @@ decision_radiotrophic = {
 		owner = { 
 			any_owned_planet = { is_planet_class = pc_irradiated }
 		}
+		NOT = { is_planet_class = pc_irradiated }
 	}
 
 	effect = {
@@ -269,6 +270,7 @@ decision_removeocean = {
 			IF = { limit = { is_planet_class = pc_desertislands } set_planet_entity = { picture = pc_desertislands } }
 			IF = { limit = { is_planet_class = pc_subarctic } set_planet_entity = { picture = pc_subarctic } }
 			IF = { limit = { is_planet_class = pc_mangrove } set_planet_entity = { picture = pc_mangrove } }
+			IF = { limit = { is_planet_class = pc_wetswamp } set_planet_entity = { picture = pc_wetswamp } }
 			IF = { limit = { is_planet_class = pc_hajungle } set_planet_entity = { picture = pc_hajungle } }
 			IF = { limit = { is_planet_class = pc_gaia } set_planet_entity = { picture = pc_gaia } }
 			IF = { limit = { is_planet_class = pc_prairie } set_planet_entity = { picture = pc_prairie } }
@@ -331,6 +333,17 @@ decision_oceancapital = {
 		NOT = { is_planet_class = pc_fhab }
 		NOT = { is_planet_class = pc_fmhab }
 		NOT = { is_planet_class = pc_mehab }
+		NOT = { is_planet_class = pc_hadesert }
+		NOT = { is_planet_class = pc_antarctic }
+		NOT = { is_planet_class = pc_snow }
+		NOT = { is_planet_class = pc_highland }
+		NOT = { is_planet_class = pc_tundra }
+		NOT = { is_planet_class = pc_frozen_desert }
+		NOT = { is_planet_class = pc_mesa }
+		NOT = { is_planet_class = pc_outback }
+		NOT = { is_planet_class = pc_desert }
+		NOT = { is_planet_class = pc_arid }
+		NOT = { is_planet_class = pc_sandsea }
 	}
 
 	effect = {
@@ -357,12 +370,14 @@ decision_oceancapital = {
 			IF = { limit = { is_planet_class = pc_mushroom } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_antarctic } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_snow } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
+			#IF = { limit = { is_planet_class = pc_highland } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_tundra } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_frozen_desert } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			#Tropical
 			IF = { limit = { is_planet_class = pc_desertislands } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_tropical } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_mangrove } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_wetswamp } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_hajungle } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_oasis } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_med } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
@@ -370,6 +385,7 @@ decision_oceancapital = {
 			IF = { limit = { is_planet_class = pc_gaia } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_ringworld_habitable } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_mesa } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
+			#IF = { limit = { is_planet_class = pc_outback } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_desert } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_arid } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_sandsea } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
@@ -407,11 +423,121 @@ decision_pdcrystalpatch = {
 	
 	potential = {
 		NOT = { is_planet_class = pc_crystal }
+		NOT = { has_planet_flag = pdcrystalpatch }
+		NOT = { is_planet_class = pc_city }
+		NOT = { is_planet_class = pc_ecocity }
+		NOT = { is_planet_class = pc_hive }
+		NOT = { is_planet_class = pc_bioforge }
+		NOT = { is_planet_class = pc_machine }
+		NOT = { is_planet_class = pc_machine_factory }
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = penal_colony }
+		NOT = { has_modifier = slave_colony }
 		habitable_structure = no
 	}
 
 	effect = {
 		add_deposit = d_pdcrystalpatch
+		hidden_effect = { set_planet_flag = pdcrystalpatch }
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+		}
+	}
+}
+
+# Tiyanki Prospecting
+decision_tiyanki_prospecting = {
+	icon = decision_tiyanki_prospecting
+	owned_planets_only = yes
+
+	enactment_time = 500
+	resources = {
+		category = decisions
+		cost = {
+			energy = 1000
+		}
+	}
+		
+	prerequisites = {
+		"tech_tiyanki_prospecting"		
+	}
+	
+	potential = {
+		NOT = { is_planet_class = pc_graveyard }
+		NOT = { has_planet_flag = tiyanki_prospected }
+		NOT = { is_planet_class = pc_city }
+		NOT = { is_planet_class = pc_ecocity }
+		NOT = { is_planet_class = pc_hive }
+		NOT = { is_planet_class = pc_bioforge }
+		NOT = { is_planet_class = pc_machine }
+		NOT = { is_planet_class = pc_machine_factory }
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = penal_colony }
+		NOT = { has_modifier = slave_colony }
+		habitable_structure = no
+	}
+
+	effect = {
+		custom_tooltip = decision_tiyanki_prospect_effects_short
+		hidden_effect = {
+			set_planet_flag = tiyanki_prospected
+			random_list = {
+				40 = { add_deposit = d_tiyanki_small }
+				30 = { add_deposit = d_bubbling_swamp }
+				20 = { add_deposit = d_fuming_bog }
+				10 = { add_deposit = d_tiyanki_large }
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+		}
+	}
+}
+
+# Techno Canal
+decision_techno_canal = {
+	icon = decision_techno_canal
+	owned_planets_only = yes
+
+	enactment_time = 900
+	resources = {
+		category = decisions
+		cost = {
+			energy = 1000
+			minerals = 1000
+		}
+	}
+		
+	prerequisites = {
+		"tech_techno_canal"		
+	}
+	
+	potential = {
+		NOT = { is_planet_class = pc_technoorganic }
+		NOT = { has_planet_flag = pdtechnocanal }
+		NOT = { is_planet_class = pc_city }
+		NOT = { is_planet_class = pc_ecocity }
+		NOT = { is_planet_class = pc_hive }
+		NOT = { is_planet_class = pc_bioforge }
+		NOT = { is_planet_class = pc_machine }
+		NOT = { is_planet_class = pc_machine_factory }
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = penal_colony }
+		NOT = { has_modifier = slave_colony }
+		habitable_structure = no
+	}
+
+	effect = {
+		add_deposit = d_technocanal
+		hidden_effect = { set_planet_flag = pdtechnocanal }
 	}
 	
 	ai_weight = {

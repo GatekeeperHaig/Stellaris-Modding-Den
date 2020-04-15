@@ -81,24 +81,34 @@ ship_event = {
 planet_event = {
 	id = pdtechnoorganic.30
 	title = pdtechnoorganic.30.name
-	desc = pdtechnoorganic.30.desc
 	picture = GFX_evt_technoorganic2
 	show_sound = event_alien_nature
 	location = root
+	desc = {
+		text = pdtechnoorganic.30.desc
+		trigger = { NOT = { owner = { is_hive_empire = yes } } }
+	}
+	desc = {
+		text = pdtechnoorganic.30.hive.desc
+		trigger = { owner = { is_hive_empire = yes } }
+	}
+
 
 	is_triggered_only = yes
 
-	trigger = {
-		has_planet_flag = technoorganic_planet
+	pre_triggers = {
 		has_owner = yes
-		is_homeworld = no		
+		is_homeworld = no
+		has_ground_combat = no
+		is_occupied_flag = no
+	}
+	trigger = {
+		has_planet_flag = technoorganic_planet				
 		owner = {
 			NOT = {
 				has_authority = auth_machine_intelligence
 			}
 		}
-		has_ground_combat = no
-		is_occupied_flag = no
 	}
 
 	immediate = {
@@ -109,6 +119,7 @@ planet_event = {
 
 	option = {
 		name = pdtechnoorganic.30.a
+		trigger = {	owner = { NOT = { has_authority = auth_hive_mind } } }
 		hidden_effect = {
 			planet_event = { id = pdtechnoorganic.31 days = 180 random = 180 }
 		}
@@ -119,9 +130,9 @@ planet_event = {
 		custom_tooltip = pdtechnoorganic.30.b.tooltip
 			trigger = {
 				owner = { 
-				OR = { 
-					has_ethic = ethic_materialist
-					has_ethic = ethic_fanatic_materialist
+					OR = { 
+						has_ethic = ethic_materialist
+						has_ethic = ethic_fanatic_materialist
 					}
 				}
 			}
@@ -138,10 +149,10 @@ planet_event = {
 		name = pdtechnoorganic.30.c
 		custom_tooltip = pdtechnoorganic.30.c.tooltip	
 			trigger = {
-				owner = { 
-				OR = { 
-					has_ethic = ethic_spiritualist
-					has_ethic = ethic_fanatic_spiritualist
+				owner = {
+					OR = { 
+						has_ethic = ethic_spiritualist
+						has_ethic = ethic_fanatic_spiritualist
 					}
 				}
 			}
@@ -149,6 +160,19 @@ planet_event = {
 			planet_event = { id = pdtechnoorganic.31 days = 180 random = 180 }
 			add_modifier = {
 				modifier = "technoshame"
+				days = -1
+			}
+		}
+	}
+
+	option = {
+		name = pdtechnoorganic.30.d
+		custom_tooltip = pdtechnoorganic.30.d.tooltip	
+			trigger = {	owner = { has_authority = auth_hive_mind } }
+		hidden_effect = {
+			planet_event = { id = pdtechnoorganic.31 days = 180 random = 180 }
+			add_modifier = {
+				modifier = "technohive"
 				days = -1
 			}
 		}
@@ -250,6 +274,7 @@ planet_event = {
 	option = {
 		name = pdtechnoorganic.40.a
 		custom_tooltip = pdtechnoorganic.40.a.tooltip	
+		trigger = {	owner = { NOT = { has_authority = auth_hive_mind } } }
 		hidden_effect = {
 			owner = { country_event = { id = pdtechnoorganic.41 days = 360 } }
 		}
@@ -260,6 +285,14 @@ planet_event = {
 		custom_tooltip = pdtechnoorganic.40.b.tooltip		
 		hidden_effect = {
 			owner = { country_event = { id = pdtechnoorganic.42 days = 360 } }
+		}
+	}
+	
+	option = {
+		name = pdtechnoorganic.40.g
+		custom_tooltip = pdtechnoorganic.40.g.tooltip		
+		hidden_effect = {
+			owner = { country_event = { id = pdtechnoorganic.47 days = 360 } }
 		}
 	}
 	
@@ -307,7 +340,7 @@ planet_event = {
 			}
 		}
 		hidden_effect = {
-			root = { planet_event = { id = pdtechnoorganic.45 days = 360 } }
+			owner = { country_event = { id = pdtechnoorganic.45 days = 360 } }
 		}
 	}
 	
@@ -326,6 +359,15 @@ planet_event = {
 			root = { planet_event = { id = pdtechnoorganic.46 days = 360 } }
 		}
 	}
+
+	option = {
+		name = pdtechnoorganic.40.h
+		custom_tooltip = pdtechnoorganic.40.h.tooltip	
+			trigger = {	owner = { has_authority = auth_hive_mind } }
+		hidden_effect = {
+			owner = { country_event = { id = pdtechnoorganic.48 days = 360 } }
+		}
+	}
 }
 
 #General Yes
@@ -338,10 +380,20 @@ country_event = {
 	location = root
 		
 	is_triggered_only = yes
+
+	immediate = {
+		FROM = { add_deposit = d_unit04 }
+	}
 	
 	option = {
 		name = pdtechnoorganic.41.a
-		root = { give_technology = { tech = tech_syntheticlifeforms } }	
+		root = {
+		if = {
+			limit = { NOT = { has_technology = tech_robotic_workers }
+			}
+			give_technology = { tech = tech_robotic_workers } }	
+		}
+		give_technology = { tech = tech_syntheticlifeforms }	
 	}
 }
 
@@ -356,11 +408,15 @@ country_event = {
 		
 	is_triggered_only = yes
 	
+	immediate = {
+		FROM = { add_deposit = d_dead04 }
+	}
+	
 	option = {
 		name = pdtechnoorganic.42.a		
 		owner = {
 			add_monthly_resource_mult = {
-				resource = physics_research
+				resource = engineering_research
 				value = 48
 				min = 500
 				max = 3000
@@ -386,9 +442,19 @@ country_event = {
 		
 	is_triggered_only = yes
 	
+	immediate = {
+		FROM = { add_deposit = d_unit04 }
+	}
+	
 	option = {
 		name = pdtechnoorganic.43.a	
-		root = { give_technology = { tech = tech_synthwarform } }	
+		root = { 
+			if = {
+				limit = { NOT = { has_technology = tech_robotic_workers }
+				}
+				give_technology = { tech = tech_robotic_workers } }	
+			}
+			give_technology = { tech = tech_synthwarform }	
 	}
 }
 
@@ -403,14 +469,24 @@ planet_event = {
 		
 	is_triggered_only = yes
 	
+	immediate = {
+		add_deposit = d_unit04
+	}
+	
 	option = {
 		name = pdtechnoorganic.44.a	
 		add_deposit = d_peace_museum
+		FROMFROM = { 
+			if = {
+				limit = { NOT = { has_technology = tech_robotic_workers }
+			}
+			give_technology = { tech = tech_robotic_workers } }	
 		}
+	}
 }
 
 #Materialist Option
-planet_event = {
+country_event = {
 	id = pdtechnoorganic.45
 	title = pdtechnoorganic.45.name
 	desc = pdtechnoorganic.45.desc
@@ -420,29 +496,29 @@ planet_event = {
 		
 	is_triggered_only = yes
 	
+	immediate = {
+		FROM = { add_deposit = d_unit04 }
+	}
+	
 	option = {
 		name = pdtechnoorganic.45.a	
-		hidden_effect = {
-			root = {
-				create_species = {
-				name = "Four's Children"
-					class = MACHINE
-					portrait = default_robot
-					immortal = yes
-					traits = {
-						trait = "trait_mechanical"
-						trait = "trait_robot_fourschildren"
-					}
-					homeworld = FROM
-			}	
-			while = { 
-				count = 3
-				create_pop = {
-					species = last_created
-					}
+		ROOT = { 
+			give_technology = { tech = tech_fourschildren }
+			if = {
+				limit = { 
+					NOT = { has_technology = tech_sapient_ai }
+					NOT = { is_gestalt = YES }
 				}
-			}
-		}
+				give_technology = { tech = tech_sapient_ai }
+			} 
+			if = {
+				limit = { 
+					NOT = { has_technology = tech_positronic_implants }
+					is_gestalt = YES
+				}
+				give_technology = { tech = tech_positronic_implants }
+			} 
+		} 
 	}
 }
 
@@ -457,7 +533,7 @@ planet_event = {
 	location = root
 		
 	is_triggered_only = yes
-	
+		
 	option = {
 		name = pdtechnoorganic.46.a	
 		hidden_effect = {
@@ -467,6 +543,90 @@ planet_event = {
 		}
 		hidden_effect = {
 			remove_modifier = "technoshame"
+			remove_modifier = "technoorganic"
+			remove_deposit = d_subsurface_assembly
+			add_deposit = d_pdgaia
 		}
+	}
+}
+
+#Kill Them All
+country_event = {
+	id = pdtechnoorganic.47
+	title = pdtechnoorganic.47.name
+	picture = GFX_evt_technoorganic2
+	show_sound = event_mystic_reveal
+	location = root
+
+	desc = {
+		text = pdtechnoorganic.47.desc
+		trigger = { NOT = { owner = { is_hive_empire = yes } } }
+	}
+	desc = {
+		text = pdtechnoorganic.47.hive.desc
+		trigger = { owner = { is_hive_empire = yes } }
+	}
+		
+	is_triggered_only = yes
+	
+	immediate = {
+		FROM = { 
+			add_deposit = d_dead04 
+			remove_modifier = technobliss
+			remove_modifier = technoorganic
+			remove_modifier = technohive
+			add_modifier = {
+				modifier = "technoorganic2"
+				days = -1
+			}
+
+		}
+	}
+	
+	option = {
+		name = pdtechnoorganic.42.a		
+		owner = {
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = 48
+				min = 500
+				max = 3000
+			}
+			add_monthly_resource_mult = {
+				resource = alloys
+				value = 36
+				min = 500
+				max = 3000
+			}
+		}
+	}
+}
+
+#Hive Yes
+country_event = {
+	id = pdtechnoorganic.48
+	title = pdtechnoorganic.48.name
+	desc = pdtechnoorganic.48.desc
+	picture = GFX_evt_animal_wildlife
+	show_sound = event_mystic_reveal
+	location = root
+		
+	is_triggered_only = yes
+
+	immediate = {
+		FROM = { add_deposit = d_unit04 }
+	}
+	
+	option = {
+		name = pdtechnoorganic.48.a
+		ROOT = { 
+			give_technology = { tech = tech_biosynths }
+			if = {
+				limit = { 
+					NOT = { has_technology = tech_positronic_implants }
+				}
+				give_technology = { tech = tech_positronic_implants }
+			} 
+		} 
 	}
 }
