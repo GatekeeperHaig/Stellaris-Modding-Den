@@ -337,11 +337,24 @@ def addChangeOption(event, modifier, modifierName, amount, category, locList):
       # trigger.variableOp("check", modifierName+"_"+category, modifier.rangeUsed[-1]-amount+1, "<")
     else:
       limit=modifier.rangeUsed[0]
+      if limit>0:
+        limit=-0.1 #the used formula only works for negative at the lower end...
     if val<0:
       comp=">"
     else:
       comp="<"
     # trigger.variableOp("check", modifierName+"_"+category, modifier.rangeUsed[0]-amount-1, ">")
+    # print(modifier)
+    try:
+      # print(f'modifier.modifier = "{modifier.modifier}"')
+      if modifier.modifier=="colony_start_num_pops_add":
+        print(f'limit = "{limit}"')
+        print(f'val = "{val}"')
+        print(f'comp = "{comp}"')
+        print("{:.3f}".format((limit*modifier.multiplier-val)*1.01))
+    except:
+      pass
+
     trigger.variableOp("check", modifierName+"_"+category, "{:.3f}".format((limit*modifier.multiplier-val)*1.01), comp)
 
 

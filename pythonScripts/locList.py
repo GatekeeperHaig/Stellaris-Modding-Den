@@ -7,13 +7,14 @@ from functools import reduce
 
 
 class LocList:
-  def __init__(self, translateRest=0):
+  def __init__(self, translateRest=0, useReplaceFolder=False):
     self.languages=["braz_por","english","french","german","polish","russian","spanish"]#,"simp_chinese"]
     self.languageCodes=["pt","en","fr", "de","pl","ru", "es"]#,"zh"] chinese seems not to work according to chinese translators and blocks their translation
     # self.entries=[]
     self.entries=dict()
     self.dicts=dict()
     self.translateRest=translateRest
+    self.useReplaceFolder=useReplaceFolder
     for languageCode in self.languageCodes:
       self.dicts[languageCode]=dict()
 
@@ -112,7 +113,10 @@ class LocList:
         file.write("\n")
   def writeToMod(self,path,fileNameBase):
     for language in self.languages:
-      outFolderLoc=path+"/localisation/"+language
+      outFolderLoc=path+"/localisation/"
+      outFolderLoc+=language
+      if self.useReplaceFolder:
+        outFolderLoc+="/replace"
       if not os.path.exists(outFolderLoc):
         os.makedirs(outFolderLoc)
       self.write(outFolderLoc+"/"+fileNameBase+"_l_"+language+".yml",language)

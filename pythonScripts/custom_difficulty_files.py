@@ -51,6 +51,9 @@ id_defaultEvents=100 #reserved range up to 199
 id_ChangeEvents=1000 #reserved range up to 9999
 id_subChangeEvents=10
 
+dmmId=4
+dmmType="utilities"
+
 # t_notLockedTrigger=TagList("not", TagList("has_global_flag", "custom_difficulty_locked"))
 t_notLockedTrigger=TagList("custom_difficulty_allow_changes", "yes")
 t_mainMenuEvent=TagList("id",name_mainMenuEvent)
@@ -231,6 +234,7 @@ def main():
   doTranslation=False
   # doTranslation=False
   locClass=LocList(doTranslation)
+  locClassReplace=LocList(doTranslation, useReplaceFolder=True)
   
   globalAddLocs(locClass)
 
@@ -939,12 +943,20 @@ def main():
 
   createTriggerFile()
 
-  locClassCopy=deepcopy(locClass)
-  for language in locClass.languages:
-    outFolderLoc="../gratak_mods/custom_difficulty/localisation/"+language
-    if not os.path.exists(outFolderLoc):
-      os.makedirs(outFolderLoc)
-    locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
+  locClass.writeToMod("../gratak_mods/custom_difficulty","custom_difficulty")
+  locClassReplace.addLoc("modName", "Dynamic Difficulty", "all")
+  locClassReplace.addLoc("menuDesc", "Triggers an event to let you customize the difficulty of your current game")
+  locClassReplace.addEntry(f"dmm_mod_{dmmType}_{dmmId}", "@modName")
+  locClassReplace.addEntry(f"dmm_mod_{dmmType}_{dmmId}.title", "@modName")
+  locClassReplace.addEntry(f"dmm_mod_{dmmType}_{dmmId}.desc", "@menuDesc")
+  locClassReplace.writeToMod("../gratak_mods/custom_difficulty","custom_difficulty_dmm")
+
+  # locClassCopy=deepcopy(locClass)
+  # for language in locClass.languages:
+  #   outFolderLoc="../gratak_mods/custom_difficulty/localisation/"+language
+  #   if not os.path.exists(outFolderLoc):
+  #     os.makedirs(outFolderLoc)
+  #   locClass.write(outFolderLoc+"/custom_difficulty_l_"+language+".yml",language)
 
 def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, modFolder="../gratak_mods/custom_difficulty", reducedMenu=False, gameStartAfter=None):
 
@@ -1139,6 +1151,7 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
     gameStartAfter=TagList()
     gameStartInitEvent.add("after",TagList("hidden_effect", gameStartAfter))
     gameStartAfter.add("set_global_flag", "custom_difficulty_active")
+    gameStartAfter.add("set_global_flag", f"dmm_mod_{dmmType}_{dmmId}")
     gameStartAfter.add("set_global_flag","custom_difficulty_no_player_bonus")
     gameStartAfter.add("set_global_flag","custom_difficulty_no_scaling")
 
@@ -1347,6 +1360,7 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
     # add_event(effect, "name_resetEvent")
     add_event(effect, "name_removeAllModifiers")
     effect.add("remove_global_flag", "custom_difficulty_active")
+    effect.add("remove_global_flag", f"dmm_mod_{dmmType}_{dmmId}")
     removeConfirmation.add("option", TagList("name", "OK").add("hidden_effect", effect))
     removeConfirmation.add("option", TagList("name", "custom_difficulty_cancel").add("hidden_effect", TagList("country_event", TagList("id", name_optionsEvent))))
 
@@ -1391,6 +1405,16 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
 
 
   outputToFolderAndFile(mainFileContent , "events", "custom_difficulty_main.txt",1, modFolder )
+
+  dmmFileContent= TagList()
+  dmmFileContent.add("namespace",f"dmm_mod_{dmmType}")
+  dmmEvent=dmmFileContent.addReturn("country_event")
+  dmmEvent.add("id",f"dmm_mod_{dmmType}.{dmmId}")
+  triggeredHidden(dmmEvent)
+  dmmImm=dmmEvent.addReturn("immediate")
+  add_event(dmmImm, "name_mainMenuEvent")
+  dmmImm.add("remove_global_flag",f"dmm_mod_{dmmType}_{dmmId}_opened")
+  outputToFolderAndFile(dmmFileContent , "events", "000_custom_difficulty_dmm.txt",1, modFolder )
 
 def createTriggerFile(modFolder="../gratak_mods/custom_difficulty"):
   scriptedTriggers=TagList()
@@ -1622,7 +1646,8 @@ def globalAddLocs(locClass):
   locClass.addLoc("initDesc", "Thank you for using Dynamic Difficulty. Start the event menu via 'ModMenu' or edict.")
   locClass.addLoc("crisisInit","Since it seems to be impossible to read crisis strength in a mod, you'll have to enter it here."+
     " The option chosen during game start will not have an effect anymore."+
-    " The value chosen below is translated into a bonus using the same formula as Vanilla Stellaris and can be customized at any time.")
+    " The value chosen below is translated into a bonus using the same formula as Vanilla Stellaris and can be customized at any time."+
+    " This later custumization also allows values beyond the maximum offered in Vanilla.")
   locClass.addLoc("noCrisisInit","This game has crisis disabled via the game start options. Crisis options are thus also disabled in this mod. You can activate crisis only with a new game or a save-game edit.")
   locClass.addLoc("crisisStrength","Crisis Strength")
   locClass.addLoc("current_options", "Currently active options")
