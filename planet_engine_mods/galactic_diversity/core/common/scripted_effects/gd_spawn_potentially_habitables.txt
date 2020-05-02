@@ -1,0 +1,2284 @@
+spawn_super_terrestrial = {
+
+}
+
+spawn_terrestrial = {
+	# Planets flagged as being in the system's Hot Zone by the galaxy generator
+	if = {
+		limit = { has_planet_flag = "eco_hot_planet" }
+		# Spawn Temperature Modifier - Hot zone Terrestrials restricted to Hot or Temperate
+		random_list = {
+			66 = {
+				add_modifier = {
+					modifier = "temperature-hot"
+					days = -1
+				}
+				#modifier = { factor = 2.00 orbits_hot_star = yes }
+			}
+			33 = {
+				add_modifier = {
+					modifier = "temperature-temperate"
+					days = -1
+				}
+				modifier = { factor = 0.50 orbits_hot_star = yes }
+			}
+		}
+		# Spawn Atmosphere Modifier - Terrestrials restricted to Optimal or Marginal
+		random_list = {
+			50 = {
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				modifier = { factor = 0.80 has_modifier = "temperature-hot" }
+				modifier = { factor = 1.20 has_modifier = "temperature-temperate" }
+			}
+			50 = {
+				add_modifier = {
+					modifier = "atmosphere-marginal"
+					days = -1
+				}
+				modifier = { factor = 1.20 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.80 has_modifier = "temperature-temperate" }
+			}
+		
+		}
+		# Spawn Water Modifier - Terrestrials require the Continental modifier and will spawn no others
+		add_modifier = {
+				modifier = "water-continental"
+				days = -1
+		}
+		# Convert the planet to a habitable Terrestrial class factoring the modifiers spawned above
+		random_list = {
+			0 = {
+				change_pc = pc_xerosgenian # Xerosgenian Class
+				modifier = { add = 50 has_modifier = "temperature-hot" }
+				modifier = { add = 20 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.50 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.50 has_modifier = "atmosphere-marginal" }
+			}
+			0 = {
+				change_pc = pc_chlorogenian # Chlorogenian Class
+				modifier = { add = 10 has_modifier = "temperature-hot" }
+				modifier = { add = 50 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.50 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.25 has_modifier = "atmosphere-marginal" }
+			}
+		}
+		# Spawn Gravity Modifier
+		spawn_gravity_modifier = yes
+		# Spawn Resource Modifier
+		#spawn_resource_modifier = yes
+		# Spawn Vegetation modifier depending on planet class and some modifiers spawned above
+		random_list = {
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-lush"
+					days = -1
+				}
+				modifier = { add = 00 has_modifier = "temperature-scorching" }
+				modifier = { add = 25 has_modifier = "temperature-hot" }
+				modifier = { add = 40 has_modifier = "temperature-temperate" }
+				modifier = { add = 10 has_modifier = "temperature-cold" }
+				modifier = { add = 00 has_modifier = "temperature-freezing" }
+				modifier = { factor = 0.00 is_planet_class = "pc_xerosgenian" }
+				modifier = { factor = 0.50 is_planet_class = "pc_chlorogenian" }
+				modifier = { factor = 0.40 is_planet_class = "pc_retinalgenian" }
+				modifier = { factor = 0.00 is_planet_class = "pc_cryogenian" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-mixed"
+					days = -1
+				}
+				modifier = { add = 00 has_modifier = "temperature-scorching" }
+				modifier = { add = 20 has_modifier = "temperature-hot" }
+				modifier = { add = 55 has_modifier = "temperature-temperate" }
+				modifier = { add = 25 has_modifier = "temperature-cold" }
+				modifier = { add = 00 has_modifier = "temperature-freezing" }
+				modifier = { factor = 0.50 is_planet_class = "pc_xerosgenian" }
+				modifier = { factor = 1.50 is_planet_class = "pc_chlorogenian" }
+				modifier = { factor = 1.00 is_planet_class = "pc_retinalgenian" }
+				modifier = { factor = 0.50 is_planet_class = "pc_cryogenian" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-sparse"
+					days = -1
+				}
+				modifier = { add = 00 has_modifier = "temperature-scorching" }
+				modifier = { add = 35 has_modifier = "temperature-hot" }
+				modifier = { add = 20 has_modifier = "temperature-temperate" }
+				modifier = { add = 40 has_modifier = "temperature-cold" }
+				modifier = { add = 00 has_modifier = "temperature-freezing" }
+				modifier = { factor = 1.50 is_planet_class = "pc_xerosgenian" }
+				modifier = { factor = 0.33 is_planet_class = "pc_chlorogenian" }
+				modifier = { factor = 0.00 is_planet_class = "pc_retinalgenian" }
+				modifier = { factor = 1.50 is_planet_class = "pc_cryogenian" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-barren"
+					days = -1
+				}
+				modifier = { add = 75 has_modifier = "temperature-scorching" }
+				modifier = { add = 45 has_modifier = "temperature-hot" }
+				modifier = { add = 00 has_modifier = "temperature-temperate" }
+				modifier = { add = 30 has_modifier = "temperature-cold" }
+				modifier = { add = 50 has_modifier = "temperature-freezing" }
+				modifier = { factor = 1.00 is_planet_class = "pc_xerosgenian" }
+				modifier = { factor = 0.00 is_planet_class = "pc_chlorogenian" }
+				modifier = { factor = 0.00 is_planet_class = "pc_retinalgenian" }
+				modifier = { factor = 1.00 is_planet_class = "pc_cryogenian" }
+			}
+		}
+		# Convert biome art based on planet class and vegetation modifier spawned above, and add variable gas modifier
+		if = {
+			limit = { is_planet_class = "pc_xerosgenian" has_modifier = "vegetation-mixed" }
+			set_planet_entity = { picture = biome_xerosgenian_mixed entity = gd_xerosgenian_planet_mixed_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_xerosgenian" has_modifier = "vegetation-sparse" }
+			set_planet_entity = { picture = biome_xerosgenian_sparse entity = gd_xerosgenian_planet_barren_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_xerosgenian" has_modifier = "vegetation-barren" }
+			set_planet_entity = { picture = biome_xerosgenian_barren entity = gd_xerosgenian_planet_barren_01_entity }
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_chlorogenian" has_modifier = "vegetation-lush" }
+			set_planet_entity = { picture = biome_chlorogenian_lush entity = gd_chlorogenian_planet_lush_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_chlorogenian" has_modifier = "vegetation-mixed" }
+			set_planet_entity = { picture = biome_chlorogenian_mixed entity = gd_chlorogenian_planet_mixed_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_chlorogenian" has_modifier = "vegetation-sparse" }
+			set_planet_entity = { picture = biome_chlorogenian_sparse entity = gd_chlorogenian_planet_mixed_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+	}
+	# Planets flagged as being in the system's Temperate Zone by the galaxy generator
+	if = {
+		limit = { has_planet_flag = "eco_temp_planet" }
+		# Spawn Temperature Modifier - Temp zone Terrestrials restricted to Hot, Temperate or Cold
+		random_list = {
+			25 = {
+				add_modifier = {
+					modifier = "temperature-hot"
+					days = -1
+				}
+				modifier = { factor = 1.50 orbits_hot_star = yes }
+			}
+			50 = {
+				add_modifier = {
+					modifier = "temperature-temperate"
+					days = -1
+				}
+				modifier = { factor = 1.25 orbits_ideal_star = yes }
+			}
+			25 = {
+				add_modifier = {
+					modifier = "temperature-cold"
+					days = -1
+				}
+				modifier = { factor = 1.50 orbits_cold_star = yes }
+			}
+		}
+		# Spawn Atmosphere Modifier - Terrestrials restricted to Optimal or Marginal
+		random_list = {
+			50 = {
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				modifier = { factor = 0.80 has_modifier = "temperature-hot" }
+				modifier = { factor = 1.20 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.00 has_modifier = "temperature-cold" }
+			}
+			50 = {
+				add_modifier = {
+					modifier = "atmosphere-marginal"
+					days = -1
+				}
+				modifier = { factor = 1.20 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.80 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.00 has_modifier = "temperature-cold" }
+			}
+		
+		}
+		# Spawn Water Modifier - Terrestrials require the Continental modifier and will spawn no others
+		add_modifier = {
+				modifier = "water-continental"
+				days = -1
+		}
+		# Convert the planet to a habitable Terrestrial class factoring the modifiers spawned above
+		random_list = {
+			0 = {
+				change_pc = pc_xerosgenian # Xerosgenian Class
+				modifier = { add = 50 has_modifier = "temperature-hot" }
+				modifier = { add = 20 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.50 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.50 has_modifier = "atmosphere-marginal" }
+			}
+			0 = {
+				change_pc = pc_chlorogenian # Chlorogenian Class
+				modifier = { add = 20 has_modifier = "temperature-hot" }
+				modifier = { add = 60 has_modifier = "temperature-temperate" }
+				modifier = { add = 10 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.50 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.25 has_modifier = "atmosphere-marginal" }
+			}
+			0 = {
+				change_pc = pc_retinalgenian # Retinalgenian Class
+				modifier = { add = 10 has_modifier = "temperature-hot" }
+				modifier = { add = 40 has_modifier = "temperature-temperate" }
+				modifier = { add = 30 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.50 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.25 has_modifier = "atmosphere-marginal" }
+			}
+			0 = {
+				change_pc = pc_cryogenian # Cryogenian Class
+				modifier = { add = 20 has_modifier = "temperature-temperate" }
+				modifier = { add = 50 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.50 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.50 has_modifier = "atmosphere-marginal" }
+			}
+		}
+		# Spawn Gravity Modifier
+		spawn_gravity_modifier = yes
+		# Spawn Resource Modifier
+		#spawn_resource_modifier = yes
+		# Spawn Vegetation modifier depending on planet class and some modifiers spawned above
+		random_list = {
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-lush"
+					days = -1
+				}
+				modifier = { add = 00 has_modifier = "temperature-scorching" }
+				modifier = { add = 25 has_modifier = "temperature-hot" }
+				modifier = { add = 40 has_modifier = "temperature-temperate" }
+				modifier = { add = 10 has_modifier = "temperature-cold" }
+				modifier = { add = 00 has_modifier = "temperature-freezing" }
+				modifier = { factor = 0.00 is_planet_class = "pc_xerosgenian" }
+				modifier = { factor = 0.50 is_planet_class = "pc_chlorogenian" }
+				modifier = { factor = 0.40 is_planet_class = "pc_retinalgenian" }
+				modifier = { factor = 0.00 is_planet_class = "pc_cryogenian" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-mixed"
+					days = -1
+				}
+				modifier = { add = 00 has_modifier = "temperature-scorching" }
+				modifier = { add = 20 has_modifier = "temperature-hot" }
+				modifier = { add = 55 has_modifier = "temperature-temperate" }
+				modifier = { add = 25 has_modifier = "temperature-cold" }
+				modifier = { add = 00 has_modifier = "temperature-freezing" }
+				modifier = { factor = 0.50 is_planet_class = "pc_xerosgenian" }
+				modifier = { factor = 1.50 is_planet_class = "pc_chlorogenian" }
+				modifier = { factor = 1.00 is_planet_class = "pc_retinalgenian" }
+				modifier = { factor = 0.50 is_planet_class = "pc_cryogenian" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-sparse"
+					days = -1
+				}
+				modifier = { add = 00 has_modifier = "temperature-scorching" }
+				modifier = { add = 35 has_modifier = "temperature-hot" }
+				modifier = { add = 20 has_modifier = "temperature-temperate" }
+				modifier = { add = 40 has_modifier = "temperature-cold" }
+				modifier = { add = 00 has_modifier = "temperature-freezing" }
+				modifier = { factor = 1.50 is_planet_class = "pc_xerosgenian" }
+				modifier = { factor = 0.33 is_planet_class = "pc_chlorogenian" }
+				modifier = { factor = 1.00 is_planet_class = "pc_retinalgenian" }
+				modifier = { factor = 1.50 is_planet_class = "pc_cryogenian" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-barren"
+					days = -1
+				}
+				modifier = { add = 75 has_modifier = "temperature-scorching" }
+				modifier = { add = 45 has_modifier = "temperature-hot" }
+				modifier = { add = 00 has_modifier = "temperature-temperate" }
+				modifier = { add = 30 has_modifier = "temperature-cold" }
+				modifier = { add = 50 has_modifier = "temperature-freezing" }
+				modifier = { factor = 1.00 is_planet_class = "pc_xerosgenian" }
+				modifier = { factor = 0.00 is_planet_class = "pc_chlorogenian" }
+				modifier = { factor = 0.00 is_planet_class = "pc_retinalgenian" }
+				modifier = { factor = 1.00 is_planet_class = "pc_cryogenian" }
+			}
+		}
+		# Convert biome art based on planet class and vegetation modifier spawned above, and add variable gas modifier
+		if = {
+			limit = { is_planet_class = "pc_xerosgenian" has_modifier = "vegetation-mixed" }
+			set_planet_entity = { picture = biome_xerosgenian_mixed entity = gd_xerosgenian_planet_mixed_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_xerosgenian" has_modifier = "vegetation-sparse" }
+			set_planet_entity = { picture = biome_xerosgenian_sparse entity = gd_xerosgenian_planet_barren_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_xerosgenian" has_modifier = "vegetation-barren" }
+			set_planet_entity = { picture = biome_xerosgenian_barren entity = gd_xerosgenian_planet_barren_01_entity }
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_chlorogenian" has_modifier = "vegetation-lush" }
+			set_planet_entity = { picture = biome_chlorogenian_lush entity = gd_chlorogenian_planet_lush_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_chlorogenian" has_modifier = "vegetation-mixed" }
+			set_planet_entity = { picture = biome_chlorogenian_mixed entity = gd_chlorogenian_planet_mixed_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_chlorogenian" has_modifier = "vegetation-sparse" }
+			set_planet_entity = { picture = biome_chlorogenian_sparse entity = gd_chlorogenian_planet_mixed_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_retinalgenian" has_modifier = "vegetation-lush" }
+			set_planet_entity = { picture = biome_retinalgenian_lush entity = gd_retinalgenian_planet_lush_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_retinalgenian" has_modifier = "vegetation-mixed" }
+			set_planet_entity = { picture = biome_retinalgenian_mixed entity = gd_retinalgenian_planet_mixed_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_retinalgenian" has_modifier = "vegetation-sparse" }
+			set_planet_entity = { picture = biome_retinalgenian_sparse entity = gd_retinalgenian_planet_glaciated_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_cryogenian" has_modifier = "vegetation-mixed" }
+			set_planet_entity = { picture = biome_cryogenian_mixed entity = gd_cryogenian_planet_mixed_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_cryogenian" has_modifier = "vegetation-sparse" }
+			set_planet_entity = { picture = biome_cryogenian_sparse entity = gd_cryogenian_planet_barren_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_cryogenian" has_modifier = "vegetation-barren" }
+			set_planet_entity = { picture = biome_cryogenian_barren entity = gd_cryogenian_planet_barren_01_entity }
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+	}
+	# Planets flagged as being in the system's Cold Zone by the galaxy generator
+	if = {
+		limit = { has_planet_flag = "eco_cold_planet" }
+		# Spawn Temperature Modifier - Cold zone Terrestrials restricted to Temperate or Cold
+		random_list = {
+			33 = {
+				add_modifier = {
+					modifier = "temperature-temperate"
+					days = -1
+				}
+				modifier = { factor = 0.5 orbits_cold_star = yes }
+			}
+			66 = {
+				add_modifier = {
+					modifier = "temperature-cold"
+					days = -1
+				}
+				#modifier = { factor = 1.50 orbits_cold_star = yes }
+			}
+		}
+		# Spawn Atmosphere Modifier - Terrestrials restricted to Optimal or Marginal
+		random_list = {
+			50 = {
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				modifier = { factor = 1.20 has_modifier = "temperature-temperate" }
+				modifier = { factor = 0.80 has_modifier = "temperature-cold" }
+			}
+			50 = {
+				add_modifier = {
+					modifier = "atmosphere-marginal"
+					days = -1
+				}
+				modifier = { factor = 0.80 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.20 has_modifier = "temperature-cold" }
+			}
+		
+		}
+		# Spawn Water Modifier - Terrestrials require the Continental modifier and will spawn no others
+		add_modifier = {
+				modifier = "water-continental"
+				days = -1
+		}
+		# Convert the planet to a habitable Terrestrial class factoring the modifiers spawned above
+		random_list = {
+			0 = {
+				change_pc = pc_chlorogenian # Chlorogenian Class
+				modifier = { add = 50 has_modifier = "temperature-temperate" }
+				modifier = { add = 10 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.50 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.25 has_modifier = "atmosphere-marginal" }
+			}
+			0 = {
+				change_pc = pc_retinalgenian # Retinalgenian Class
+				modifier = { add = 60 has_modifier = "temperature-temperate" }
+				modifier = { add = 20 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.50 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.25 has_modifier = "atmosphere-marginal" }
+			}
+			0 = {
+				change_pc = pc_cryogenian # Cryogenian Class
+				modifier = { add = 10 has_modifier = "temperature-temperate" }
+				modifier = { add = 50 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.75 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.40 has_modifier = "atmosphere-marginal" }
+			}
+		}
+		# Spawn Gravity Modifier
+		spawn_gravity_modifier = yes
+		# Spawn Resource Modifier
+		#spawn_resource_modifier = yes
+		# Spawn Vegetation modifier depending on planet class and some modifiers spawned above
+		random_list = {
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-lush"
+					days = -1
+				}
+				modifier = { add = 00 has_modifier = "temperature-scorching" }
+				modifier = { add = 25 has_modifier = "temperature-hot" }
+				modifier = { add = 40 has_modifier = "temperature-temperate" }
+				modifier = { add = 10 has_modifier = "temperature-cold" }
+				modifier = { add = 00 has_modifier = "temperature-freezing" }
+				modifier = { factor = 0.00 is_planet_class = "pc_xerosgenian" }
+				modifier = { factor = 0.50 is_planet_class = "pc_chlorogenian" }
+				modifier = { factor = 0.40 is_planet_class = "pc_retinalgenian" }
+				modifier = { factor = 0.00 is_planet_class = "pc_cryogenian" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-mixed"
+					days = -1
+				}
+				modifier = { add = 00 has_modifier = "temperature-scorching" }
+				modifier = { add = 20 has_modifier = "temperature-hot" }
+				modifier = { add = 55 has_modifier = "temperature-temperate" }
+				modifier = { add = 25 has_modifier = "temperature-cold" }
+				modifier = { add = 00 has_modifier = "temperature-freezing" }
+				modifier = { factor = 0.50 is_planet_class = "pc_xerosgenian" }
+				modifier = { factor = 1.50 is_planet_class = "pc_chlorogenian" }
+				modifier = { factor = 1.00 is_planet_class = "pc_retinalgenian" }
+				modifier = { factor = 0.50 is_planet_class = "pc_cryogenian" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-sparse"
+					days = -1
+				}
+				modifier = { add = 00 has_modifier = "temperature-scorching" }
+				modifier = { add = 35 has_modifier = "temperature-hot" }
+				modifier = { add = 20 has_modifier = "temperature-temperate" }
+				modifier = { add = 40 has_modifier = "temperature-cold" }
+				modifier = { add = 00 has_modifier = "temperature-freezing" }
+				modifier = { factor = 1.50 is_planet_class = "pc_xerosgenian" }
+				modifier = { factor = 0.33 is_planet_class = "pc_chlorogenian" }
+				modifier = { factor = 1.00 is_planet_class = "pc_retinalgenian" }
+				modifier = { factor = 1.50 is_planet_class = "pc_cryogenian" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-barren"
+					days = -1
+				}
+				modifier = { add = 75 has_modifier = "temperature-scorching" }
+				modifier = { add = 45 has_modifier = "temperature-hot" }
+				modifier = { add = 00 has_modifier = "temperature-temperate" }
+				modifier = { add = 30 has_modifier = "temperature-cold" }
+				modifier = { add = 50 has_modifier = "temperature-freezing" }
+				modifier = { factor = 1.00 is_planet_class = "pc_xerosgenian" }
+				modifier = { factor = 0.00 is_planet_class = "pc_chlorogenian" }
+				modifier = { factor = 0.00 is_planet_class = "pc_retinalgenian" }
+				modifier = { factor = 1.00 is_planet_class = "pc_cryogenian" }
+			}
+		}
+		# Convert biome art based on planet class and vegetation modifier spawned above, and add variable gas modifier
+		if = {
+			limit = { is_planet_class = "pc_chlorogenian" has_modifier = "vegetation-lush" }
+			set_planet_entity = { picture = biome_chlorogenian_lush entity = gd_chlorogenian_planet_lush_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_chlorogenian" has_modifier = "vegetation-mixed" }
+			set_planet_entity = { picture = biome_chlorogenian_mixed entity = gd_chlorogenian_planet_mixed_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_chlorogenian" has_modifier = "vegetation-sparse" }
+			set_planet_entity = { picture = biome_chlorogenian_sparse entity = gd_chlorogenian_planet_mixed_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_retinalgenian" has_modifier = "vegetation-lush" }
+			set_planet_entity = { picture = biome_retinalgenian_lush entity = gd_retinalgenian_planet_lush_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_retinalgenian" has_modifier = "vegetation-mixed" }
+			set_planet_entity = { picture = biome_retinalgenian_mixed entity = gd_retinalgenian_planet_mixed_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_retinalgenian" has_modifier = "vegetation-sparse" }
+			set_planet_entity = { picture = biome_retinalgenian_sparse entity = gd_retinalgenian_planet_glaciated_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_cryogenian" has_modifier = "vegetation-mixed" }
+			set_planet_entity = { picture = biome_cryogenian_mixed entity = gd_cryogenian_planet_mixed_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_cryogenian" has_modifier = "vegetation-sparse" }
+			set_planet_entity = { picture = biome_cryogenian_sparse entity = gd_cryogenian_planet_barren_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_cryogenian" has_modifier = "vegetation-barren" }
+			set_planet_entity = { picture = biome_cryogenian_barren entity = gd_cryogenian_planet_barren_01_entity }
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+	}
+}
+
+spawn_oceanic = {
+	# We can use the same code for the 3 different flags
+	if = {
+		limit = {
+			OR = {
+				has_planet_flag = "eco_hot_planet"
+				has_planet_flag = "eco_temp_planet"
+				has_planet_flag = "eco_cold_planet"
+			}
+		}
+		# Spawn Temperature Modifier
+		random_list = {
+			25 = {
+				add_modifier = {
+					modifier = "temperature-hot"
+					days = -1
+				}
+				modifier = { factor = 2.00 has_planet_flag = "eco_hot_planet" }
+				modifier = { factor = 1.00 has_planet_flag = "eco_temp_planet" }
+				modifier = { factor = 0.00 has_planet_flag = "eco_cold_planet" }
+			}
+			25 = {
+				add_modifier = {
+					modifier = "temperature-temperate"
+					days = -1
+				}
+				modifier = { factor = 1.00 has_planet_flag = "eco_hot_planet" }
+				modifier = { factor = 2.50 has_planet_flag = "eco_temp_planet" }
+				modifier = { factor = 1.00 has_planet_flag = "eco_cold_planet" }
+			}
+			25 = {
+				add_modifier = {
+					modifier = "temperature-cold"
+					days = -1
+				}
+				modifier = { factor = 0.00 has_planet_flag = "eco_hot_planet" }
+				modifier = { factor = 1.00 has_planet_flag = "eco_temp_planet" }
+				modifier = { factor = 2.00 has_planet_flag = "eco_cold_planet" }
+			}
+			25 = {
+				add_modifier = {
+					modifier = "temperature-freezing"
+					days = -1
+				}
+				modifier = { factor = 0.00 has_planet_flag = "eco_hot_planet" }
+				modifier = { factor = 0.25 has_planet_flag = "eco_temp_planet" }
+				modifier = { factor = 0.50 has_planet_flag = "eco_cold_planet" }
+			}
+		}
+		# Spawn Atmosphere Modifier - Oceanics can have all types of atmospheres, but only optimal and marginal will result in a habitable planet
+		random_list = {
+			20 = {
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				modifier = { factor = 0.90 has_modifier = "temperature-hot" }
+				modifier = { factor = 1.50 has_modifier = "temperature-temperate" }
+				modifier = { factor = 0.60 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.10 has_modifier = "temperature-freezing" }
+			}
+			30 = {
+				add_modifier = {
+					modifier = "atmosphere-marginal"
+					days = -1
+				}
+				modifier = { factor = 1.00 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.80 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.00 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.50 has_modifier = "temperature-freezing" }
+			}
+			50 = {
+				add_modifier = {
+					modifier = "atmosphere-toxic"
+					days = -1
+				}
+				modifier = { factor = 1.20 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.50 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.20 has_modifier = "temperature-cold" }
+				modifier = { factor = 2.00 has_modifier = "temperature-freezing" }
+			}
+		
+		}
+		# Convert the planet to a habitable or uninhabitable Oceanic class factoring the modifiers spawned above
+		random_list = {
+			0 = {
+				change_pc = pc_pangaian # Pangaian Class
+				# Spawn Water Modifier - Oceanics require the Oceanic modifier and will spawn no others
+				add_modifier = {
+					modifier = "water-continental"
+					days = -1
+				}
+				modifier = { add = 15 has_modifier = "temperature-hot" }
+				modifier = { add = 30 has_modifier = "temperature-temperate" }
+				modifier = { add = 15 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.25 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.75 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-toxic" }
+			}
+			0 = {
+				change_pc = pc_archipelagic # Archipelagic Class
+				# Spawn Water Modifier - Oceanics require the Oceanic modifier and will spawn no others
+				add_modifier = {
+					modifier = "water-oceanic"
+					days = -1
+				}
+				modifier = { add = 25 has_modifier = "temperature-hot" }
+				modifier = { add = 35 has_modifier = "temperature-temperate" }
+				modifier = { add = 00 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.00 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 1.00 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-toxic" }
+			}
+			0 = {
+				change_pc = pc_erimospelagic # Erimospelagic Class
+				# Spawn Water Modifier - Oceanics require the Oceanic modifier and will spawn no others
+				add_modifier = {
+					modifier = "water-oceanic"
+					days = -1
+				}
+				modifier = { add = 50 has_modifier = "temperature-hot" }
+				modifier = { add = 10 has_modifier = "temperature-temperate" }
+				modifier = { add = 0 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.75 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 1.25 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-toxic" }
+			}
+			0 = {
+				change_pc = pc_panthalassic # Panthalassic Class
+				# Spawn Water Modifier - Oceanics require the Oceanic modifier and will spawn no others
+				add_modifier = {
+					modifier = "water-oceanic"
+					days = -1
+				}
+				modifier = { add = 20 has_modifier = "temperature-hot" }
+				modifier = { add = 20 has_modifier = "temperature-temperate" }
+				modifier = { add = 20 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.75 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 1.25 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-toxic" }
+			}
+			0 = {
+				change_pc = pc_cryothalassic # Cryothalassic Class
+				# Spawn Water Modifier - Oceanics require the Oceanic modifier and will spawn no others
+				add_modifier = {
+					modifier = "water-oceanic"
+					days = -1
+				}
+				modifier = { add = 00 has_modifier = "temperature-hot" }
+				modifier = { add = 00 has_modifier = "temperature-temperate" }
+				modifier = { add = 10 has_modifier = "temperature-cold" }
+				modifier = { add = 50 has_modifier = "temperature-freezing" }
+				modifier = { factor = 0.50 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 1.00 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 1.50 has_modifier = "atmosphere-toxic" }
+			}
+			0 = {
+				change_pc = pc_panammoniac # Panammoniac Class
+				# Spawn Water Modifier - Oceanics require the Oceanic modifier and will spawn no others
+				add_modifier = {
+					modifier = "water-oceanic"
+					days = -1
+				}
+				modifier = { add = 00 has_modifier = "temperature-hot" }
+				modifier = { add = 00 has_modifier = "temperature-temperate" }
+				modifier = { add = 45 has_modifier = "temperature-cold" }
+				modifier = { add = 15 has_modifier = "temperature-freezing" }
+				modifier = { factor = 0.75 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 1.25 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-toxic" }
+			}
+			0 = {
+				change_pc = pc_waterworld # Water World
+				# Spawn Water Modifier - Oceanics require the Oceanic modifier and will spawn no others
+				add_modifier = {
+					modifier = "water-oceanic"
+					days = -1
+				}
+				modifier = { add = 10 has_modifier = "temperature-hot" }
+				modifier = { add = 40 has_modifier = "temperature-temperate" }
+				modifier = { add = 10 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.50 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 2.50 has_modifier = "atmosphere-toxic" }
+			}
+			0 = {
+				change_pc = pc_ethaneworld # Ethane World
+				# Spawn Water Modifier - Oceanics require the Oceanic modifier and will spawn no others
+				add_modifier = {
+					modifier = "water-oceanic"
+					days = -1
+				}
+				modifier = { add = 00 has_modifier = "temperature-hot" }
+				modifier = { add = 00 has_modifier = "temperature-temperate" }
+				modifier = { add = 10 has_modifier = "temperature-cold" }
+				modifier = { add = 50 has_modifier = "temperature-freezing" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-optimal" }
+				modifier = { factor = 0.00 has_modifier = "atmosphere-marginal" }
+				modifier = { factor = 2.50 has_modifier = "atmosphere-toxic" }
+			}
+		}
+		# Spawn Gravity Modifier
+		spawn_gravity_modifier = yes
+		# Spawn Resource Modifier
+		#spawn_resource_modifier = yes
+		# Spawn Vegetation modifier depending on planet class and some modifiers spawned above
+		random_list = {
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-lush"
+					days = -1
+				}
+				modifier = { add = 50 is_planet_class = "pc_pangaian" }
+				modifier = { add = 00 is_planet_class = "pc_erimospelagic" }
+				modifier = { add = 50 is_planet_class = "pc_archipelagic" }
+				modifier = { add = 00 is_planet_class = "pc_panthalassic" }
+				modifier = { add = 00 is_planet_class = "pc_cryothalassic" }
+				modifier = { add = 00 is_planet_class = "pc_panammoniac" }
+				modifier = { factor = 2.00 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.50 has_modifier = "temperature-temperate" }
+				modifier = { factor = 0.00 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.00 has_modifier = "temperature-freezing" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-mixed"
+					days = -1
+				}
+				modifier = { add = 50 is_planet_class = "pc_pangaian" }
+				modifier = { add = 00 is_planet_class = "pc_erimospelagic" }
+				modifier = { add = 00 is_planet_class = "pc_archipelagic" }
+				modifier = { add = 25 is_planet_class = "pc_panthalassic" }
+				modifier = { add = 00 is_planet_class = "pc_cryothalassic" }
+				modifier = { add = 00 is_planet_class = "pc_panammoniac" }
+				modifier = { factor = 0.00 has_modifier = "temperature-hot" }
+				modifier = { factor = 1.00 has_modifier = "temperature-temperate" }
+				modifier = { factor = 2.00 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.00 has_modifier = "temperature-freezing" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-sparse"
+					days = -1
+				}
+				modifier = { add = 50 is_planet_class = "pc_pangaian" }
+				modifier = { add = 50 is_planet_class = "pc_erimospelagic" }
+				modifier = { add = 00 is_planet_class = "pc_archipelagic" }
+				modifier = { add = 25 is_planet_class = "pc_panthalassic" }
+				modifier = { add = 50 is_planet_class = "pc_panammoniac" }
+				modifier = { factor = 1.00 has_modifier = "temperature-hot" }
+				modifier = { factor = 1.00 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.00 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.00 has_modifier = "temperature-freezing" }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "vegetation-barren"
+					days = -1
+				}
+				modifier = { add = 50 is_planet_class = "pc_cryothalassic" }
+				modifier = { add = 50 is_planet_class = "pc_waterworld" }
+				modifier = { add = 50 is_planet_class = "pc_ethaneworld" }
+			}
+		}
+		# Convert biome art based on planet class and vegetation modifier spawned above, and add variable gas modifier
+		if = {
+			limit = { is_planet_class = "pc_pangaian" has_modifier = "vegetation-lush" }
+			set_planet_entity = { picture = biome_pangaian_lush entity = gd_pangaian_planet_lush_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_pangaian" has_modifier = "vegetation-mixed" }
+			set_planet_entity = { picture = biome_pangaian_mixed entity = gd_pangaian_planet_mixed_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_pangaian" has_modifier = "vegetation-sparse" }
+			set_planet_entity = { picture = biome_pangaian_sparse entity = gd_pangaian_planet_barren_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_erimospelagic" has_modifier = "vegetation-sparse" }
+			set_planet_entity = { picture = biome_erimospelagic entity = oasis_planet_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_archipelagic" has_modifier = "vegetation-lush" }
+			set_planet_entity = { picture = biome_archipelagic_lush entity = ocean_planet_02_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_panthalassic" has_modifier = "temperature-temperate" }
+			set_planet_entity = { picture = biome_aquatic_temperate entity = aquatic_planet_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_panthalassic" has_modifier = "temperature-hot" }
+			set_planet_entity = { picture = biome_aquatic_hot entity = aquatichot_planet_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		if = {
+			limit = { is_planet_class = "pc_panthalassic" has_modifier = "temperature-cold" }
+			set_planet_entity = { picture = biome_aquatic_cold entity = aquaticcold_planet_01_entity }
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_cryothalassic" }
+			set_planet_entity = { picture = biome_cryothalassic entity = glacial_planet_01_entity }
+			add_modifier = {
+				modifier = "gas-helium"
+				days = -1
+			}
+		}
+		
+		if = {
+			limit = { is_planet_class = "pc_panammoniac" }
+			set_planet_entity = { picture = biome_panammoniac entity = panammoniac_planet_01_entity }
+			add_modifier = {
+				modifier = "gas-ammonia"
+				days = -1
+			}
+		}
+		
+	}
+}
+
+spawn_marginal = { # Includes Sub-Terrestrials and Primordials
+	# We can use the same code for the 3 different flags
+	if = {
+		limit = {
+			OR = {
+				has_planet_flag = "eco_hot_planet"
+				has_planet_flag = "eco_temp_planet"
+				has_planet_flag = "eco_cold_planet"
+			}
+		}
+		# Spawn Temperature Modifier
+		random_list = {
+			20 = {
+				add_modifier = {
+					modifier = "temperature-scorching"
+					days = -1
+				}
+				modifier = { factor = 0.50 has_planet_flag = "eco_hot_planet" }
+				modifier = { factor = 0.00 has_planet_flag = "eco_temp_planet" }
+				modifier = { factor = 0.00 has_planet_flag = "eco_cold_planet" }
+			}
+			20 = {
+				add_modifier = {
+					modifier = "temperature-hot"
+					days = -1
+				}
+				modifier = { factor = 2.00 has_planet_flag = "eco_hot_planet" }
+				modifier = { factor = 1.00 has_planet_flag = "eco_temp_planet" }
+				modifier = { factor = 0.00 has_planet_flag = "eco_cold_planet" }
+			}
+			20 = {
+				add_modifier = {
+					modifier = "temperature-temperate"
+					days = -1
+				}
+				modifier = { factor = 1.00 has_planet_flag = "eco_hot_planet" }
+				modifier = { factor = 2.50 has_planet_flag = "eco_temp_planet" }
+				modifier = { factor = 1.00 has_planet_flag = "eco_cold_planet" }
+			}
+			20 = {
+				add_modifier = {
+					modifier = "temperature-cold"
+					days = -1
+				}
+				modifier = { factor = 0.00 has_planet_flag = "eco_hot_planet" }
+				modifier = { factor = 1.00 has_planet_flag = "eco_temp_planet" }
+				modifier = { factor = 2.00 has_planet_flag = "eco_cold_planet" }
+			}
+			20 = {
+				add_modifier = {
+					modifier = "temperature-freezing"
+					days = -1
+				}
+				modifier = { factor = 0.00 has_planet_flag = "eco_hot_planet" }
+				modifier = { factor = 0.25 has_planet_flag = "eco_temp_planet" }
+				modifier = { factor = 0.50 has_planet_flag = "eco_cold_planet" }
+			}
+		}
+		# Spawn Atmosphere Modifier - We need to split planet classes based on atmosphere, as sub-terrestrials will only spawn with Optimal atmosphere
+		random_list = {
+			15 = {
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				#modifier = { add = 10 is_moon = yes }
+				modifier = { add = 10 has_global_flag = habitable_very_high_expectations }
+				modifier = { add = 5 has_global_flag = habitable_high_expectations }
+				modifier = { factor = 0.00 has_modifier = "temperature-scorching" }
+				modifier = { factor = 0.75 has_modifier = "temperature-hot" }
+				modifier = { factor = 1.25 has_modifier = "temperature-temperate" }
+				modifier = { factor = 0.75 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.00 has_modifier = "temperature-freezing" }
+				modifier = { factor = 0.50 orbits_cold_star = yes }
+				modifier = { factor = 1.50 orbits_ideal_star = yes }
+				modifier = { factor = 0.50 orbits_hot_star = yes }
+				modifier = { factor = 0.00 planet_size < 15 }
+				modifier = { factor = 0.50 planet_size > 18 }
+				modifier = { factor = 0.00 planet_size > 22 }
+			}
+			30 = {
+				add_modifier = {
+					modifier = "atmosphere-marginal"
+					days = -1
+				}
+				modifier = { factor = 0.00 has_modifier = "temperature-scorching" }
+				modifier = { factor = 1.50 has_modifier = "temperature-hot" }
+				modifier = { factor = 1.00 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.50 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.00 has_modifier = "temperature-freezing" }
+				modifier = { factor = 1.00 orbits_cold_star = yes }
+				modifier = { factor = 1.00 orbits_ideal_star = yes }
+				modifier = { factor = 1.00 orbits_hot_star = yes }
+				modifier = { factor = 0.00 planet_size < 13 }
+				modifier = { factor = 0.00 planet_size > 23 }
+			}
+			45 = {
+				add_modifier = {
+					modifier = "atmosphere-toxic"
+					days = -1
+				}
+				modifier = { add = 30 has_global_flag = habitable_very_low_expectations }
+				modifier = { add = 15 has_global_flag = habitable_low_expectations }
+				modifier = { factor = 2.00 has_modifier = "temperature-scorching" }
+				modifier = { factor = 1.00 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.50 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.00 has_modifier = "temperature-cold" }
+				modifier = { factor = 2.00 has_modifier = "temperature-freezing" }
+				modifier = { factor = 1.25 orbits_cold_star = yes }
+				modifier = { factor = 0.75 orbits_ideal_star = yes }
+				modifier = { factor = 1.25 orbits_hot_star = yes }
+			}
+		}
+		# Split planet groups based on atmosphere modifier
+		if = {
+			limit = { has_modifier = "atmosphere-optimal" }
+			# Roll a Sub-Terrestrial world
+			if = {
+				limit = { has_modifier = "temperature-cold" }
+
+				random_list = {
+					10 = {
+						roll_geothermal = yes
+						modifier = { factor = 1.50 is_moon = yes }
+					}
+					10 = {
+						roll_ammonia = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					5 = {
+						roll_geotidal = yes
+						modifier = { factor = 0.00 is_moon = yes }
+						modifier = { factor = 3.00 orbits_cold_star = yes }
+					}
+				}
+			}
+			if = {
+				limit = { has_modifier = "temperature-temperate" }
+				
+				random_list = {
+					5 = {
+						roll_biolumenal = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+						modifier = { factor = 4.00 is_gas_giant_moon = yes }
+					}
+					5 = {
+						roll_geotidal = yes
+						modifier = { factor = 0.00 is_moon = yes }
+						modifier = { factor = 3.00 orbits_cold_star = yes }
+					}
+					10 = {
+						roll_megafloral = yes
+						modifier = { factor = 0.50 planet_size > 18 }
+						modifier = { factor = 2 planet_size < 14 }
+					}
+					10 = {
+						roll_mycellial = yes
+						#modifier = { factor = 2.00 planet_size < 18 }
+					}
+					5 = {
+						roll_geocrystallic = yes
+						modifier = { factor = 2.00 orbits_ideal_star = yes }
+						modifier = { factor = 0.50 is_moon = yes }
+						modifier = { factor = 1.50 has_moon = yes }
+					}
+				}
+			}
+			if = {
+				limit = { has_modifier = "temperature-hot" }
+				
+				random_list = {
+					5 = {
+						roll_geotidal = yes
+						modifier = { factor = 0.00 is_moon = yes }
+						modifier = { factor = 2.00 orbits_cold_star = yes }
+					}
+					10 = {
+						roll_geocoral = yes
+						modifier = { factor = 2.00 orbits_hot_star = yes }
+					}
+				}
+			}
+			
+		}
+		if = {
+			limit = { has_modifier = "atmosphere-marginal" }
+			# Roll a late Primordial or Marginal world
+			if = {
+				limit = { has_modifier = "temperature-cold" NOT = { has_planet_flag = "planet_converted" } }
+				
+				random_list = {
+					10 = {
+						roll_wetland_cold = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					10 = {
+						roll_steppeland_cold = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					10 = {
+						roll_highland_cold = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					10 = {
+						roll_desolate_cold = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					10 = {
+						roll_karstic = yes
+						modifier = { factor = 2.00 planet_size < 17 }
+						modifier = { factor = 0.00 planet_size > 20 }
+					}
+					5 = {
+						roll_geometallic = yes
+						modifier = { factor = 1.00 orbits_ideal_star = yes }
+						modifier = { factor = 0.50 is_moon = yes }
+						modifier = { factor = 1.50 has_moon = yes }
+					}
+				}
+			}
+			if = {
+				limit = { has_modifier = "temperature-temperate" NOT = { has_planet_flag = "planet_converted" } }
+				
+				random_list = {
+					10 = {
+						roll_wetland_temperate = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					10 = {
+						roll_steppeland_temperate = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					10 = {
+						roll_highland_temperate = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					10 = {
+						roll_desolate_temperate = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					5 = {
+						roll_biolumenal = yes
+						modifier = { factor = 4.00 is_gas_giant_moon = yes }
+					}
+					5 = {
+						roll_geometallic = yes
+						modifier = { factor = 1.00 orbits_ideal_star = yes }
+						modifier = { factor = 0.50 is_moon = yes }
+						modifier = { factor = 1.50 has_moon = yes }
+					}
+				}
+			}
+			if = {
+				limit = { has_modifier = "temperature-hot" NOT = { has_planet_flag = "planet_converted" } }
+				
+				random_list = {
+					10 = {
+						roll_wetland_hot = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					10 = {
+						roll_steppeland_hot = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					10 = {
+						roll_highland_hot = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					10 = {
+						roll_desolate_hot = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					5 = {
+						roll_geometallic = yes
+						modifier = { factor = 1.00 orbits_ideal_star = yes }
+						modifier = { factor = 0.50 is_moon = yes }
+						modifier = { factor = 1.50 has_moon = yes }
+					}
+				}
+			}
+		}
+		if = {
+			limit = { has_modifier = "atmosphere-toxic" }
+			# Roll an early Primordial or Sub-marginal world
+			if = {
+				limit = { has_modifier = "temperature-freezing" NOT = { has_planet_flag = "planet_converted" } }
+				
+				random_list = {
+					10 = {
+						roll_methane = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					10 = {
+						roll_frigid = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					10 = {
+						# Do nothing, stay uninhabitable
+						modifier = { factor = 0.33 has_global_flag = habitable_very_high_expectations }
+						modifier = { factor = 0.66 has_global_flag = habitable_high_expectations }
+						modifier = { factor = 1.50 has_global_flag = habitable_low_expectations }
+						modifier = { factor = 2.00 has_global_flag = habitable_very_low_expectations }
+					}
+				}
+			}
+			if = {
+				limit = { has_modifier = "temperature-cold" NOT = { has_planet_flag = "planet_converted" } }
+				
+				random_list = {
+					#10 = {
+					#	roll_karstic_cold = yes
+					#	#modifier = { factor = 2.00 planet_size > 17 }
+					#}
+					1 = {
+						roll_geoplastic = yes
+						modifier = { factor = 1.00 orbits_ideal_star = yes }
+						modifier = { factor = 0.50 is_moon = yes }
+						modifier = { factor = 1.50 has_moon = yes }
+					}
+					4 = {
+						roll_carbonic = yes
+						modifier = { factor = 0.50 orbits_hot_star = yes }
+						modifier = { factor = 3.00 orbits_cold_star = yes }
+					}
+					10 = {
+						# Do nothing, stay uninhabitable
+						modifier = { factor = 0.33 has_global_flag = habitable_very_high_expectations }
+						modifier = { factor = 0.66 has_global_flag = habitable_high_expectations }
+						modifier = { factor = 1.50 has_global_flag = habitable_low_expectations }
+						modifier = { factor = 2.00 has_global_flag = habitable_very_low_expectations }
+					}
+				}
+			}
+			if = {
+				limit = { has_modifier = "temperature-temperate" NOT = { has_planet_flag = "planet_converted" } }
+				
+				random_list = {
+					
+					2 = {
+						roll_geoplastic = yes
+						modifier = { factor = 1.00 orbits_ideal_star = yes }
+						modifier = { factor = 0.50 is_moon = yes }
+						modifier = { factor = 1.50 has_moon = yes }
+					}
+					10 = {
+						# Do nothing, stay uninhabitable
+						modifier = { factor = 0.33 has_global_flag = habitable_very_high_expectations }
+						modifier = { factor = 0.66 has_global_flag = habitable_high_expectations }
+						modifier = { factor = 1.50 has_global_flag = habitable_low_expectations }
+						modifier = { factor = 2.00 has_global_flag = habitable_very_low_expectations }
+					}
+				}
+			}
+			if = {
+				limit = { has_modifier = "temperature-hot" NOT = { has_planet_flag = "planet_converted" } }
+				
+				random_list = {
+					4 = {
+						roll_irradiated = yes
+						modifier = { factor = 2.00 orbits_hot_star = yes }
+						modifier = { factor = 2.00 orbits_cold_star = yes }
+					}
+					6 = {
+						roll_hothouse = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					1 = {
+						roll_geoplastic = yes
+						modifier = { factor = 1.00 orbits_ideal_star = yes }
+						modifier = { factor = 0.50 is_moon = yes }
+						modifier = { factor = 1.50 has_moon = yes }
+					}
+					10 = {
+						# Do nothing, stay uninhabitable
+						modifier = { factor = 0.33 has_global_flag = habitable_very_high_expectations }
+						modifier = { factor = 0.66 has_global_flag = habitable_high_expectations }
+						modifier = { factor = 1.50 has_global_flag = habitable_low_expectations }
+						modifier = { factor = 2.00 has_global_flag = habitable_very_low_expectations }
+					}
+				}
+			}
+			if = {
+				limit = { has_modifier = "temperature-scorching" NOT = { has_planet_flag = "planet_converted" } }
+				
+				random_list = {
+					2 = {
+						roll_hothouse = yes
+						#modifier = { factor = 2.00 planet_size > 17 }
+					}
+					#10 = {
+					#	roll_karstic_hot = yes
+					#	#modifier = { factor = 2.00 planet_size > 17 }
+					#}
+					10 = {
+						# Do nothing, stay uninhabitable
+						modifier = { factor = 0.33 has_global_flag = habitable_very_high_expectations }
+						modifier = { factor = 0.66 has_global_flag = habitable_high_expectations }
+						modifier = { factor = 1.50 has_global_flag = habitable_low_expectations }
+						modifier = { factor = 2.00 has_global_flag = habitable_very_low_expectations }
+					}
+				}
+			}
+		}
+	}
+}
+
+roll_geoplastic = {
+	change_pc = pc_geoplastic
+	if = {
+		limit = { has_modifier = temperature-scorching }
+		remove_modifier = temperature-scorching
+	}
+	if = {
+		limit = { has_modifier = temperature-hot }
+		remove_modifier = temperature-hot
+	}
+	if = {
+		limit = { has_modifier = temperature-temperate }
+		remove_modifier = temperature-temperate
+	}
+	if = {
+		limit = { has_modifier = temperature-cold }
+		remove_modifier = temperature-cold
+	}
+	if = {
+		limit = { has_modifier = temperature-freezing }
+		remove_modifier = temperature-freezing
+	}
+	add_modifier = {
+		modifier = "temperature-scorching"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "water-trace"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-barren"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-sulfur_dioxide"
+		days = -1
+	}
+	#set_planet_entity = { picture = pc_tundra entity = gd_cryogenian_planet_barren_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_geometallic = {
+	change_pc = pc_geometallic
+	if = {
+		limit = { has_modifier = temperature-scorching }
+		remove_modifier = temperature-scorching
+	}
+	if = {
+		limit = { has_modifier = temperature-hot }
+		remove_modifier = temperature-hot
+	}
+	if = {
+		limit = { has_modifier = temperature-temperate }
+		remove_modifier = temperature-temperate
+	}
+	if = {
+		limit = { has_modifier = temperature-cold }
+		remove_modifier = temperature-cold
+	}
+	if = {
+		limit = { has_modifier = temperature-freezing }
+		remove_modifier = temperature-freezing
+	}
+	add_modifier = {
+		modifier = "temperature-hot"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "water-continental"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-barren"
+		days = -1
+	}
+	random_list = {
+		2 = { 
+			add_modifier = {
+				modifier = "gas-sulfur_dioxide"
+				days = -1
+			}
+		}
+		1 = { 
+			add_modifier = {
+				modifier = "gas-argon"
+				days = -1
+			}
+		}
+		3 = { 
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+	}
+	#set_planet_entity = { picture = pc_tundra entity = gd_cryogenian_planet_barren_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_geocrystallic = {
+	change_pc = pc_geocrystallic
+	add_modifier = {
+		modifier = "water-continental"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-mixed"
+		days = -1
+	}
+	random_list = {
+		1 = { 
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+		1 = { 
+			add_modifier = {
+				modifier = "gas-argon"
+				days = -1
+			}
+		}
+		3 = { 
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+	}
+	#set_planet_entity = { picture = pc_tundra entity = gd_cryogenian_planet_barren_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_geothermal = {
+	change_pc = pc_geothermal
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-lush"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-water_vapor"
+		days = -1
+	}
+	#set_planet_entity = { picture = pc_tundra entity = gd_cryogenian_planet_barren_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_mycellial = {
+	change_pc = pc_mycellial
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-sparse"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-water_vapor"
+		days = -1
+	}
+	#set_planet_entity = { picture = pc_tundra entity = gd_cryogenian_planet_barren_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_biolumenal = {
+	change_pc = pc_biolumenal
+	add_modifier = {
+		modifier = "water-continental"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-lush"
+		days = -1
+	}
+	if = {
+		limit = { has_modifier = atmosphere-optimal }
+		set_planet_entity = { picture = biome_biolumenal_optimal entity = gd_biolumenal_planet_01_entity }
+		add_modifier = {
+			modifier = "gas-water_vapor"
+			days = -1
+		}
+	}
+	if = {
+		limit = { has_modifier = atmosphere-marginal }
+		set_planet_entity = { picture = biome_biolumenal_marginal entity = gd_biolumenal_planet_02_entity }
+		add_modifier = {
+			modifier = "gas-argon"
+			days = -1
+		}
+	}
+	set_planet_flag = "planet_converted"
+}
+
+roll_megafloral = {
+	change_pc = pc_megafloral
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "low_gravity"
+		days = -1
+	}
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-mixed"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-water_vapor"
+		days = -1
+	}
+	#set_planet_entity = { picture = pc_tundra entity = gd_cryogenian_planet_barren_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_geotidal = {
+	change_pc = pc_geotidal
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-mixed"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-water_vapor"
+		days = -1
+	}
+	#set_planet_entity = { picture = pc_tundra entity = gd_cryogenian_planet_barren_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_geocoral = {
+	change_pc = pc_geocoral
+	add_modifier = {
+		modifier = "water-oceanic"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-lush"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-water_vapor"
+		days = -1
+	}
+	#set_planet_entity = { picture = pc_tundra entity = gd_cryogenian_planet_barren_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_wetland_cold = {
+	change_pc = pc_wetland
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-lush"
+		days = -1
+	}
+	random_list = {
+		1 = { 
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		2 = { 
+			add_modifier = {
+				modifier = "gas-argon"
+				days = -1
+			}
+		}
+		3 = { 
+			add_modifier = {
+				modifier = "gas-methane"
+				days = -1
+			}
+		}
+	}
+	set_planet_entity = { picture = biome_wetland_cold entity = wetswamp_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+roll_wetland_temperate = {
+	change_pc = pc_wetland
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-lush"
+		days = -1
+	}
+	random_list = {
+		3 = { 
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		2 = { 
+			add_modifier = {
+				modifier = "gas-argon"
+				days = -1
+			}
+		}
+		1 = { 
+			add_modifier = {
+				modifier = "gas-methane"
+				days = -1
+			}
+		}
+	}
+	set_planet_entity = { picture = biome_wetland_temperate entity = cascadian_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+roll_wetland_hot = {
+	change_pc = pc_wetland
+	add_modifier = {
+		modifier = "water-continental"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-lush"
+		days = -1
+	}
+	random_list = {
+		2 = { 
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		3 = { 
+			add_modifier = {
+				modifier = "gas-argon"
+				days = -1
+			}
+		}
+		1 = { 
+			add_modifier = {
+				modifier = "gas-methane"
+				days = -1
+			}
+		}
+	}
+	set_planet_entity = { picture = biome_wetland_hot entity = mangrove_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_steppeland_hot = {
+	change_pc = pc_steppeland
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-sparse"
+		days = -1
+	}
+	random_list = {
+		1 = { 
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		2 = { 
+			add_modifier = {
+				modifier = "gas-argon"
+				days = -1
+			}
+		}
+		3 = { 
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+	}
+	set_planet_entity = { picture = biome_steppeland_hot entity = salt_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+roll_steppeland_temperate = {
+	change_pc = pc_steppeland
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-sparse"
+		days = -1
+	}
+	random_list = {
+		3 = { 
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		2 = { 
+			add_modifier = {
+				modifier = "gas-argon"
+				days = -1
+			}
+		}
+		1 = { 
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+	}
+	set_planet_entity = { picture = biome_steppeland_temperate entity = prairie_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+roll_steppeland_cold = {
+	change_pc = pc_steppeland
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-sparse"
+		days = -1
+	}
+	random_list = {
+		1 = { 
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		3 = { 
+			add_modifier = {
+				modifier = "gas-argon"
+				days = -1
+			}
+		}
+		2 = { 
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+	}
+	set_planet_entity = { picture = biome_steppeland_cold entity = steppe_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_highland_hot = {
+	change_pc = pc_highland
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-barren"
+		days = -1
+	}
+	random_list = {
+		1 = { 
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		2 = { 
+			add_modifier = {
+				modifier = "gas-argon"
+				days = -1
+			}
+		}
+		3 = { 
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+	}
+	set_planet_entity = { picture = biome_highland_hot entity = hadesert_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+roll_highland_temperate = {
+	change_pc = pc_highland
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-mixed"
+		days = -1
+	}
+	random_list = {
+		3 = { 
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		2 = { 
+			add_modifier = {
+				modifier = "gas-argon"
+				days = -1
+			}
+		}
+		1 = { 
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+	}
+	set_planet_entity = { picture = biome_highland_temperate entity = hajungle_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+roll_highland_cold = {
+	change_pc = pc_highland
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-sparse"
+		days = -1
+	}
+	random_list = {
+		1 = { 
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+		}
+		3 = { 
+			add_modifier = {
+				modifier = "gas-argon"
+				days = -1
+			}
+		}
+		2 = { 
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+	}
+	set_planet_entity = { picture = biome_highland_cold entity = highland_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_desolate_hot = {
+	change_pc = pc_desolate
+	add_modifier = {
+		modifier = "water-trace"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-barren"
+		days = -1
+	}
+	random_list = {
+		2 = { 
+			add_modifier = {
+				modifier = "gas-argon"
+				days = -1
+			}
+		}
+		3 = { 
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+	}
+	set_planet_entity = { picture = biome_desolate_hot entity = sandsea_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+roll_desolate_temperate = {
+	change_pc = pc_desolate
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-barren"
+		days = -1
+	}
+	random_list = {
+		3 = { 
+			add_modifier = {
+				modifier = "gas-argon"
+				days = -1
+			}
+		}
+		2 = { 
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+	}
+	random_list = {
+		1 = { set_planet_entity = { picture = biome_desolate_temperate entity = desert_planet_01_entity } }
+		1 = { set_planet_entity = { picture = biome_desolate_temperate entity = desert_planet_02_entity } }
+		1 = { set_planet_entity = { picture = biome_desolate_temperate entity = desert_planet_03_entity } }
+	}
+	set_planet_flag = "planet_converted"
+}
+roll_desolate_cold = {
+	change_pc = pc_desolate
+	add_modifier = {
+		modifier = "water-trace"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-barren"
+		days = -1
+	}
+	random_list = {
+		3 = { 
+			add_modifier = {
+				modifier = "gas-carbon_monoxide"
+				days = -1
+			}
+		}
+		1 = { 
+			add_modifier = {
+				modifier = "gas-carbon_dioxide"
+				days = -1
+			}
+		}
+	}
+	random_list = {
+		1 = { set_planet_entity = { picture = biome_desolate_cold entity = desolate_planet_01_entity } }
+		1 = { set_planet_entity = { picture = biome_desolate_cold entity = desolate_planet_02_entity } }
+	}
+	set_planet_flag = "planet_converted"
+}
+
+roll_karstic = {
+	change_pc = pc_karstic
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-sparse"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-water_vapor"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "karst"
+		days = -1
+	}
+	set_planet_entity = { picture = biome_karstic_surface entity = alpine_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_methane = {
+	change_pc = pc_methane
+	add_modifier = {
+		modifier = "water-trace"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-barren"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-methane"
+		days = -1
+	}
+	#add_modifier = {
+	#	modifier = "methane"
+	#	days = -1
+	#}
+	#set_planet_entity = { picture = pc_antarctic entity = antarctic_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_frigid = {
+	change_pc = pc_frigid
+	add_modifier = {
+		modifier = "water-trace"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-barren"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-helium"
+		days = -1
+	}
+	#set_planet_entity = { picture = pc_antarctic entity = antarctic_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_ammonia = {
+	change_pc = pc_ammonia
+	add_modifier = {
+		modifier = "water-continental"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-sparse"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-ammonia"
+		days = -1
+	}
+	#add_modifier = {
+	#	modifier = "ammonia"
+	#	days = -1
+	#}
+	#set_planet_entity = { picture = pc_antarctic entity = antarctic_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_radiotrophic = {
+	change_pc = pc_radiotrophic
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-mixed"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-methane"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "radiotrophic"
+		days = -1
+	}
+	#set_planet_entity = { picture = pc_antarctic entity = antarctic_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_irradiated = {
+	change_pc = pc_irradiated
+	add_modifier = {
+		modifier = "water-seas"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-sparse"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-carbon_dioxide"
+		days = -1
+	}
+	#set_planet_entity = { picture = pc_antarctic entity = antarctic_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_hothouse = {
+	change_pc = pc_hothouse
+	add_modifier = {
+		modifier = "water-trace"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-barren"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-sulfur_dioxide"
+		days = -1
+	}
+	set_planet_entity = { picture = biome_hothouse entity = hot_reducing_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
+
+roll_carbonic = {
+	change_pc = pc_carbonic
+	add_modifier = {
+		modifier = "gas-carbon_monoxide"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "water-trace"
+		days = -1
+	}
+	spawn_gravity_modifier = yes
+	#spawn_resource_modifier = yes
+	add_modifier = {
+		modifier = "vegetation-barren"
+		days = -1
+	}
+	add_modifier = {
+		modifier = "gas-carbon_monoxide"
+		days = -1
+	}
+	#add_modifier = {
+	#	modifier = "methane"
+	#	days = -1
+	#}
+	#set_planet_entity = { picture = pc_antarctic entity = antarctic_planet_01_entity }
+	set_planet_flag = "planet_converted"
+}
