@@ -345,15 +345,6 @@ def addChangeOption(event, modifier, modifierName, amount, category, locList):
       comp="<"
     # trigger.variableOp("check", modifierName+"_"+category, modifier.rangeUsed[0]-amount-1, ">")
     # print(modifier)
-    try:
-      # print(f'modifier.modifier = "{modifier.modifier}"')
-      if modifier.modifier=="colony_start_num_pops_add":
-        print(f'limit = "{limit}"')
-        print(f'val = "{val}"')
-        print(f'comp = "{comp}"')
-        print("{:.3f}".format((limit*modifier.multiplier-val)*1.01))
-    except:
-      pass
 
     trigger.variableOp("check", modifierName+"_"+category, "{:.3f}".format((limit*modifier.multiplier-val)*1.01), comp)
 
