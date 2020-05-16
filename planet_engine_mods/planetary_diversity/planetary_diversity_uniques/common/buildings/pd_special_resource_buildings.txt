@@ -199,12 +199,19 @@ building_crystal_pillar = {
 }
 
 building_energy_nexus = {
-	base_buildtime = 480
+	base_buildtime = @b2_time
 	can_build = no
 	category = resource
 	
 	allow = {
 		has_upgraded_capital = yes
+	}
+
+	destroy_trigger = {
+		OR = {
+			has_modifier = resort_colony
+			buildings_no_exotic_gases = yes
+		}
 	}
 	
 	planet_modifier = {
@@ -250,6 +257,12 @@ building_energy_nexus = {
 			}
 			NOR  = {
 				is_planet_class = pc_habitat
+				is_planet_class = pc_pd_barren_cold_hab
+				is_planet_class = pc_pd_barren_hab
+				is_planet_class = pc_pd_frozen_hab
+				is_planet_class = pc_pd_gas_giant_hab
+				is_planet_class = pc_pd_hothouse_hab
+				is_planet_class = pc_pd_molten_hab
 				is_planet_class = pc_machine
 				is_planet_class = pc_hive
 				is_planet_class = pc_city
@@ -263,8 +276,8 @@ building_energy_nexus = {
 	resources = {
 		category = planet_buildings
 		cost = {
-			minerals = 500
-			exotic_gases = 50
+			minerals = @b2_minerals
+			exotic_gases = @b2_rare_cost
 		}
 		cost = {
 			trigger = {
@@ -276,8 +289,8 @@ building_energy_nexus = {
 			alloys = 150
 		}
 		upkeep = {
-			energy = 1
-			exotic_gases = 1
+			energy = 2
+			exotic_gases = @b2_rare_upkeep
 		}
 	}	
 	
@@ -303,12 +316,22 @@ building_energy_nexus = {
 	upgrades = {
 		building_eludium_plant
 	}
-	
+
 	ai_weight = {
-		weight = 1
+		weight = 0
 		modifier = {
-			factor = 0
-			owner = { has_country_flag = buildings_new_gas_building }
+			weight = 30
+			buildings_has_exotic_gases = yes
+		}
+		modifier = {
+			factor = 2
+			exists = owner
+			owner = {
+				has_monthly_income = {
+					resource = energy
+					value < 50
+				}
+			}
 		}
 	}
 
@@ -316,12 +339,6 @@ building_energy_nexus = {
 		energy = 1
 		trigger = {
 			always = yes
-		}
-	}
-	
-	on_built = {
-		planet = { 
-			owner = { set_timed_country_flag = { flag = buildings_new_gas_building days = 480 } }
 		}
 	}
 }

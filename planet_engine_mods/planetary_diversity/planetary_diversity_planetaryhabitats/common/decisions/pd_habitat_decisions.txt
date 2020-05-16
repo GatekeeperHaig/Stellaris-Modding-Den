@@ -2,112 +2,272 @@
 # Decisions
 ##########################################################################
 
-# Crystal/Motes/Gas for Habitats
-decision_frohabcry = {
-	icon = decision_frohabcry
+# Make Trade Moon
+decision_trademoonhab = {
+	icon = decision_trademoonhab
 	owned_planets_only = yes
 	
 	#prerequisites = {
 	#	"tech_terrestrial_sculpting"		
 	#}
 
-	enactment_time = 360
+	#enactment_time = 0
 	resources = {
 		category = decisions
 		cost = {
-			energy = 500
+			energy = 250
 		}
 	}
 	
 	potential = { 
 		OR = {
-		is_planet_class = pc_fhab
-		is_planet_class = pc_mhab
-		is_planet_class = pc_gghab
+			is_planet_class = pc_pd_barren_hab
+			is_planet_class = pc_pd_barren_cold_hab
+			is_planet_class = pc_pd_frozen_hab
+			is_planet_class = pc_pd_molten_hab
+			is_planet_class = pc_pd_hothouse_hab
+			is_planet_class = pc_pd_gas_giant_hab
 		}
-		NOT = { has_planet_flag = pdhab_prospected }
+		NOT = { has_planet_flag = pd_commercial_hab }
+		NOT = { has_planet_flag = pd_hab_d2 }
+		owner = { is_gestalt = no }
 	}
 
 	effect = {
-		custom_tooltip = decision_pdprospect_effects_short
+		custom_tooltip = decision_commercial_hab_effects_short
 		hidden_effect = {
-			set_planet_flag = pdhab_prospected
-			IF = {
-				limit = { is_planet_class = pc_fhab } 
-					random_list = {
-						50 = { planet_event = { id = moonbase.2 } }
-						30 = { add_deposit = d_hab_crystal_1 }
-						10 = { add_deposit = d_hab_crystal_2 }
-						5 = { add_deposit = d_hab_crystal_3 }
-						3 = { add_deposit = d_hab_crystal_4	}
-						2 = { add_deposit = d_hab_crystal_5	}
-				}
-			}
-			IF = {
-				limit = { is_planet_class = pc_mhab } 
-					random_list = {
-						50 = { planet_event = { id = moonbase.2 } }
-						30 = { add_deposit = d_hab_mote_1 }
-						10 = { add_deposit = d_hab_mote_2 }
-						5 = { add_deposit = d_hab_mote_3 }
-						3 = { add_deposit = d_hab_mote_4 }
-						2 = { add_deposit = d_hab_mote_5 }
-				}
-			}
-			IF = {
-				limit = { is_planet_class = pc_gghab } 
-					random_list = {
-						50 = { planet_event = { id = moonbase.2 } }
-						30 = { add_deposit = d_hab_gas_1 }
-						10 = { add_deposit = d_hab_gas_2 }
-						5 = { add_deposit = d_hab_gas_3 }
-						3 = { add_deposit = d_hab_gas_4	}
-						2 = { add_deposit = d_hab_gas_5	}
-				}
-			}
+			set_planet_flag = pd_commercial_hab
+			IF = { limit = { NOT = { has_planet_flag = pd_hab_d1 } } set_planet_flag = pd_hab_d1 }
+			ELSE_IF = { limit = { has_planet_flag = pd_hab_d1 } set_planet_flag = pd_hab_d2 }
 		}
 	}    
 	
-	ai_weight = { weight = 1 }
+	ai_weight = { 
+		weight = 1
+	}
 }
 
-# Barren World Prospecting
-decision_pdbarrenhab = {
-	icon = decision_frohabcry
+# Make Farm 2
+decision_farmhab = {
+	icon = decision_farmhab
 	owned_planets_only = yes
 	
 	#prerequisites = {
 	#	"tech_terrestrial_sculpting"		
 	#}
 
-	enactment_time = 360
+	#enactment_time = 0
 	resources = {
 		category = decisions
 		cost = {
-			energy = 500
+			energy = 250
 		}
 	}
 	
 	potential = { 
 		OR = {
-		is_planet_class = pc_bhab
-		is_planet_class = pc_bchab
+			is_planet_class = pc_pd_barren_hab
+			is_planet_class = pc_pd_barren_cold_hab
+			is_planet_class = pc_pd_frozen_hab
+			is_planet_class = pc_pd_hothouse_hab
+			is_planet_class = pc_pd_gas_giant_hab
 		}
-		NOT = { has_planet_flag = pdbhab_prospected }
-		NOT = { has_modifier = terraforming_candidate }
+		NOT = { has_planet_flag = pd_farming_hab }
+		NOT = { has_planet_flag = pd_hab_d2 }
+		OR = {
+			owner = { is_gestalt = no }
+			owner = { has_valid_civic = civic_machine_servitor }
+		}
 	}
 
 	effect = {
-		custom_tooltip = decision_pdprospectbhab_effects_short
+		custom_tooltip = decision_farm_hab_effects_short
 		hidden_effect = {
-			set_planet_flag = pdbhab_prospected
-			random_list = {
-				30 = { planet_event = { id = moonbase.31 } }
-				40 = { planet_event = { id = moonbase.32 } }
-				30 = { planet_event = { id = moonbase.33 } }
-			}
+			set_planet_flag = pd_farming_hab
+			IF = { limit = { NOT = { has_planet_flag = pd_hab_d1 } } set_planet_flag = pd_hab_d1 }
+			ELSE_IF = { limit = { has_planet_flag = pd_hab_d1 } set_planet_flag = pd_hab_d2 }
 		}
 	}    
 	
-	ai_weight = { weight = 1 }
+	ai_weight = { 
+		weight = 1
+	}
+}
+
+# Make Energy 2
+decision_energy2hab = {
+	icon = decision_energyhab
+	owned_planets_only = yes
+	
+	#prerequisites = {
+	#	"tech_terrestrial_sculpting"		
+	#}
+
+	enactment_time = 1
+	resources = {
+		category = decisions
+		cost = {
+			energy = 250
+		}
+	}
+	
+	potential = { 
+		OR = {
+			is_planet_class = pc_pd_barren_hab
+			is_planet_class = pc_pd_barren_cold_hab
+			is_planet_class = pc_pd_frozen_hab
+			is_planet_class = pc_pd_hothouse_hab
+			is_planet_class = pc_pd_gas_giant_hab
+		}
+		NOT = { has_planet_flag = pd_energy2_hab }
+		NOT = { has_planet_flag = pd_hab_d2 }
+		owner = { NOT = { has_authority = auth_hive_mind } }
+	}
+
+	effect = {
+		custom_tooltip = decision_energy2_hab_effects_short
+		hidden_effect = {
+			set_planet_flag = pd_energy2_hab
+			IF = { limit = { NOT = { has_planet_flag = pd_hab_d1 } } set_planet_flag = pd_hab_d1 }
+			ELSE_IF = { limit = { has_planet_flag = pd_hab_d1 } set_planet_flag = pd_hab_d2 }
+		}
+	}    
+	
+	ai_weight = { 
+		weight = 1
+	}
+}
+
+# Make Energy 2
+decision_mining2hab = {
+	icon = decision_mininghab
+	owned_planets_only = yes
+	
+	#prerequisites = {
+	#	"tech_terrestrial_sculpting"		
+	#}
+
+	enactment_time = 1
+	resources = {
+		category = decisions
+		cost = {
+			energy = 250
+		}
+	}
+	
+	potential = { 
+		OR = {
+			is_planet_class = pc_pd_barren_hab
+			is_planet_class = pc_pd_barren_cold_hab
+			is_planet_class = pc_pd_frozen_hab
+			is_planet_class = pc_pd_molten_hab
+		}
+		NOT = { has_planet_flag = pd_mining2_hab }
+		NOT = { has_planet_flag = pd_hab_d2 }
+		owner = { NOT = { has_authority = auth_hive_mind } }
+	}
+
+	effect = {
+		custom_tooltip = decision_mining2_hab_effects_short
+		hidden_effect = {
+			set_planet_flag = pd_mining2_hab
+			IF = { limit = { NOT = { has_planet_flag = pd_hab_d1 } } set_planet_flag = pd_hab_d1 }
+			ELSE_IF = { limit = { has_planet_flag = pd_hab_d1 } set_planet_flag = pd_hab_d2 }
+		}
+	}    
+	
+	ai_weight = { 
+		weight = 1
+	}
+}
+
+# Advanced Habitat
+decision_upgrade_pd_habitat = {
+	owned_planets_only = yes
+	icon = decision_satellite_in_orbit
+
+	enactment_time = 720
+	resources = {
+		category = decisions
+		cost = {
+			alloys = 1000
+		}
+	}
+
+	potential = {
+		OR = {
+		is_planet_class = pc_pd_barren_cold_hab
+		is_planet_class = pc_pd_barren_hab
+		is_planet_class = pc_pd_frozen_hab
+		is_planet_class = pc_pd_gas_giant_hab
+		is_planet_class = pc_pd_hothouse_hab
+		is_planet_class = pc_pd_molten_hab
+		}
+		NOT = { has_planet_flag = advanced_habitat }
+		exists = owner
+		owner = {
+			has_technology = tech_habitat_2
+		}
+	}
+
+	allow = {
+		free_district_slots = 0
+	}
+
+	effect = {
+		add_deposit = d_expanded_dome_system
+		hidden_effect = {
+			set_planet_flag = advanced_habitat
+		}
+	}
+
+	ai_weight = {
+		weight = 1
+	}
+}
+
+decision_upgrade_pd_habitat_2 = {
+	owned_planets_only = yes
+	icon = decision_satellite_in_orbit
+
+	enactment_time = 1440
+	resources = {
+		category = decisions
+		cost = {
+			alloys = 1500
+		}
+	}
+
+	potential = {
+		OR = {
+		is_planet_class = pc_pd_barren_cold_hab
+		is_planet_class = pc_pd_barren_hab
+		is_planet_class = pc_pd_frozen_hab
+		is_planet_class = pc_pd_gas_giant_hab
+		is_planet_class = pc_pd_hothouse_hab
+		is_planet_class = pc_pd_molten_hab
+		}
+		has_planet_flag = advanced_habitat
+		NOT = { has_planet_flag = advanced_habitat_2 }
+		exists = owner
+		owner = {
+			has_technology = tech_habitat_3
+		}
+	}
+
+	allow = {
+		free_district_slots = 0
+		has_major_upgraded_capital = yes
+	}
+
+	effect = {
+		add_deposit = d_expanded_dome_system
+		hidden_effect = {
+			set_planet_flag = advanced_habitat_2
+		}
+	}
+
+	ai_weight = {
+		weight = 1
+	}
 }

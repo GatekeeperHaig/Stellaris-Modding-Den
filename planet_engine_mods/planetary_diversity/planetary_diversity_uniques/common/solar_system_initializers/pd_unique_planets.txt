@@ -231,16 +231,6 @@ pd_init_floating = {
 							set_fleet_flag = floating_fleet						
 							create_ship = {
 								design = "NAME_Cloud_Entity"
-							}						
-							create_ship = {
-								design = "NAME_Cloud_Entity"
-							}						
-							create_ship = {
-								design = "NAME_Cloud_Entity"
-							}						
-							create_ship = {
-								design = "NAME_Cloud_Entity"
-							}		
 							set_aggro_range = 200
 							set_location = event_target:floating_planet
 							add_modifier = {
@@ -301,6 +291,20 @@ pd_init_graveyard = {
 		orbit_angle = 1
 		size = 30
 		has_ring = no
+
+		init_effect = {
+			create_ambient_object = {
+				type = "space_storm_2"
+				location = this
+			}
+			last_created_ambient_object = {
+				set_location = {
+					target = prev
+					distance = 0
+					angle = random
+				}
+			}
+		}
 	}
 	planet = {
 		count = { min = 1 max = 1 }
@@ -310,6 +314,11 @@ pd_init_graveyard = {
 		moon = {			
 			count = { min = 0 max = 0 }
 			orbit_distance = 5
+		}
+		flags = { tiyanki_pdgiant1 }
+		init_effect = {
+			prevent_anomaly = yes
+			save_event_target_as = pdgiant1
 		}
 	}
 	planet = {
@@ -322,6 +331,11 @@ pd_init_graveyard = {
 			count = { min = 0 max = 0 }
 			orbit_distance = 5
 		}
+		flags = { tiyanki_pdgiant2 }
+		init_effect = {
+			prevent_anomaly = yes
+			save_event_target_as = pdgiant2
+		}
 	}
 	planet = {
 		count = { min = 1 max = 1 }
@@ -331,6 +345,11 @@ pd_init_graveyard = {
 		moon = {			
 			count = { min = 1 max = 1 }
 			orbit_distance = 5
+		}
+		flags = { tiyanki_pdgiant3 }
+		init_effect = {
+			prevent_anomaly = yes
+			save_event_target_as = pdgiant3
 		}
 	}
 	planet = {
@@ -350,7 +369,12 @@ pd_init_graveyard = {
 		orbit_distance = 35
 		size = 35
 		change_orbit = 10
-	moon = {			
+		flags = { tiyanki_pdgiant4 }
+		init_effect = {
+			prevent_anomaly = yes
+			save_event_target_as = pdgiant4
+		}
+		moon = {			
 		class = "pc_graveyard"
 		orbit_distance = 10
 		orbit_angle = 85
@@ -367,37 +391,6 @@ pd_init_graveyard = {
 				days = -1
 			}
 			add_deposit = d_graveyard_well
-			create_country = {
-				name = "Tiyanki Matriarchs"
-				type = faction
-			}
-			last_created_country = {
-				set_country_flag = tiyanki_country
-				create_fleet = {
-					name = "Tiyanki Matriarchs"
-					settings = { spawn_debris = no }
-					effect = {
-						set_owner = PREV
-						set_fleet_flag = tiyanki_fleet						
-						create_ship = {
-							design = "NAME_The_Matriarch"
-						}	
-						while = {
-							count = 6
-							create_ship = {
-								name = random
-								design = last_created_design
-							}
-						}	
-						set_aggro_range = 50			
-						set_location = event_target:graveyard_planet
-						add_modifier = {
-							modifier = sanctuary_power
-							days = -1														
-						}
-					}
-				}
-				}
 			}
 		}
 		moon = {			
@@ -416,330 +409,11 @@ pd_init_graveyard = {
 		}	
 	}	
 	init_effect = {
-		create_tiyanki_country = yes
-		random_system_planet = {
-			limit = { is_planet_class = pc_gas_giant }
-			save_event_target_as = giant
-			event_target:tiyanki_country = {
-				save_event_target_as = tiyanki_country2
-				create_fleet = {
-					name = "NAME_Tiyanki_Space_Whale"
-					effect = {
-						set_owner = event_target:tiyanki_country
-						create_ship = {
-							name = "NAME_Cow"
-							design = "NAME_Tiyanki_Cow"
-						}
-						create_ship = {
-							name = "NAME_Bull"
-							design = "NAME_Tiyanki_Bull"
-						}
-						create_ship = {
-							name = "NAME_Calf"
-							design = "NAME_Tiyanki_Calf"
-						}
-						set_location = event_target:giant
-						set_fleet_stance = passive
-						set_aggro_range_measure_from = return_point
-						set_aggro_range = 0
-						queue_actions = {
-							wait = { # Cooldown until they start moving
-								duration = 320
-								random = 80
-							}
-						}
-					}
-				}
-			}
-		}
-		create_tiyanki_country = yes
-		random_system_planet = {
-			limit = { is_planet_class = pc_gas_giant }
-			save_event_target_as = giant
-			event_target:tiyanki_country = {
-				save_event_target_as = tiyanki_country2
-				create_fleet = {
-					name = "NAME_Tiyanki_Space_Whale"
-					effect = {
-						set_owner = event_target:tiyanki_country
-						create_ship = {
-							name = "NAME_Cow"
-							design = "NAME_Tiyanki_Cow"
-						}
-						create_ship = {
-							name = "NAME_Bull"
-							design = "NAME_Tiyanki_Bull"
-						}
-						create_ship = {
-							name = "NAME_Calf"
-							design = "NAME_Tiyanki_Calf"
-						}
-						set_location = event_target:giant
-						set_fleet_stance = passive
-						set_aggro_range_measure_from = return_point
-						set_aggro_range = 0
-						queue_actions = {
-							wait = { # Cooldown until they start moving
-								duration = 320
-								random = 80
-							}
-						}
-					}
-				}
-			}
-		}
-		create_tiyanki_country = yes
-		random_system_planet = {
-			limit = { is_planet_class = pc_gas_giant }
-			save_event_target_as = giant
-			event_target:tiyanki_country = {
-				save_event_target_as = tiyanki_country2
-				create_fleet = {
-					name = "NAME_Tiyanki_Space_Whale"
-					effect = {
-						set_owner = event_target:tiyanki_country
-						create_ship = {
-							name = "NAME_Cow"
-							design = "NAME_Tiyanki_Cow"
-						}
-						create_ship = {
-							name = "NAME_Bull"
-							design = "NAME_Tiyanki_Bull"
-						}
-						create_ship = {
-							name = "NAME_Calf"
-							design = "NAME_Tiyanki_Calf"
-						}
-						set_location = event_target:giant
-						set_fleet_stance = passive
-						set_aggro_range_measure_from = return_point
-						set_aggro_range = 0
-						queue_actions = {
-							wait = { # Cooldown until they start moving
-								duration = 320
-								random = 80
-							}
-						}
-					}
-				}
-			}
-		}
-		create_tiyanki_country = yes
-		random_system_planet = {
-			limit = { is_planet_class = pc_gas_giant }
-			save_event_target_as = giant
-			event_target:tiyanki_country = {
-				save_event_target_as = tiyanki_country2
-				create_fleet = {
-					name = "NAME_Tiyanki_Space_Whale"
-					effect = {
-						set_owner = event_target:tiyanki_country
-						create_ship = {
-							name = "NAME_Cow"
-							design = "NAME_Tiyanki_Cow"
-						}
-						create_ship = {
-							name = "NAME_Bull"
-							design = "NAME_Tiyanki_Bull"
-						}
-						create_ship = {
-							name = "NAME_Calf"
-							design = "NAME_Tiyanki_Calf"
-						}
-						set_location = event_target:giant
-						set_fleet_stance = passive
-						set_aggro_range_measure_from = return_point
-						set_aggro_range = 0
-						queue_actions = {
-							wait = { # Cooldown until they start moving
-								duration = 320
-								random = 80
-							}
-						}
-					}
-				}
-			}
-		}
-		create_tiyanki_country = yes
-		random_system_planet = {
-			limit = { is_planet_class = pc_gas_giant }
-			save_event_target_as = giant
-			event_target:tiyanki_country = {
-				save_event_target_as = tiyanki_country2
-				create_fleet = {
-					name = "NAME_Tiyanki_Space_Whale"
-					effect = {
-						set_owner = event_target:tiyanki_country
-						create_ship = {
-							name = "NAME_Cow"
-							design = "NAME_Tiyanki_Cow"
-						}
-						create_ship = {
-							name = "NAME_Bull"
-							design = "NAME_Tiyanki_Bull"
-						}
-						create_ship = {
-							name = "NAME_Calf"
-							design = "NAME_Tiyanki_Calf"
-						}
-						set_location = event_target:giant
-						set_fleet_stance = passive
-						set_aggro_range_measure_from = return_point
-						set_aggro_range = 0
-						queue_actions = {
-							wait = { # Cooldown until they start moving
-								duration = 320
-								random = 80
-							}
-						}
-					}
-				}
-			}
-		}
-		create_tiyanki_country = yes
-		random_system_planet = {
-			limit = { is_planet_class = pc_gas_giant }
-			save_event_target_as = giant
-			event_target:tiyanki_country = {
-				save_event_target_as = tiyanki_country2
-				create_fleet = {
-					name = "NAME_Tiyanki_Space_Whale"
-					effect = {
-						set_owner = event_target:tiyanki_country
-						create_ship = {
-							name = "NAME_Cow"
-							design = "NAME_Tiyanki_Cow"
-						}
-						create_ship = {
-							name = "NAME_Bull"
-							design = "NAME_Tiyanki_Bull"
-						}
-						create_ship = {
-							name = "NAME_Calf"
-							design = "NAME_Tiyanki_Calf"
-						}
-						set_location = event_target:giant
-						set_fleet_stance = passive
-						set_aggro_range_measure_from = return_point
-						set_aggro_range = 0
-						queue_actions = {
-							wait = { # Cooldown until they start moving
-								duration = 320
-								random = 80
-							}
-						}
-					}
-				}
-			}
-		}
-		create_tiyanki_country = yes
-		random_system_planet = {
-			limit = { is_planet_class = pc_gas_giant }
-			save_event_target_as = giant
-			event_target:tiyanki_country = {
-				save_event_target_as = tiyanki_country2
-				create_fleet = {
-					name = "NAME_Tiyanki_Space_Whale"
-					effect = {
-						set_owner = event_target:tiyanki_country
-						create_ship = {
-							name = "NAME_Cow"
-							design = "NAME_Tiyanki_Cow"
-						}
-						create_ship = {
-							name = "NAME_Bull"
-							design = "NAME_Tiyanki_Bull"
-						}
-						create_ship = {
-							name = "NAME_Calf"
-							design = "NAME_Tiyanki_Calf"
-						}
-						set_location = event_target:giant
-						set_fleet_stance = passive
-						set_aggro_range_measure_from = return_point
-						set_aggro_range = 0
-						queue_actions = {
-							wait = { # Cooldown until they start moving
-								duration = 320
-								random = 80
-							}
-						}
-					}
-				}
-			}
-		}
-		create_tiyanki_country = yes
-		random_system_planet = {
-			limit = { is_planet_class = pc_gas_giant }
-			save_event_target_as = giant
-			event_target:tiyanki_country = {
-				save_event_target_as = tiyanki_country2
-				create_fleet = {
-					name = "NAME_Tiyanki_Space_Whale"
-					effect = {
-						set_owner = event_target:tiyanki_country
-						create_ship = {
-							name = "NAME_Cow"
-							design = "NAME_Tiyanki_Cow"
-						}
-						create_ship = {
-							name = "NAME_Bull"
-							design = "NAME_Tiyanki_Bull"
-						}
-						create_ship = {
-							name = "NAME_Calf"
-							design = "NAME_Tiyanki_Calf"
-						}
-						set_location = event_target:giant
-						set_fleet_stance = passive
-						set_aggro_range_measure_from = return_point
-						set_aggro_range = 0
-						queue_actions = {
-							wait = { # Cooldown until they start moving
-								duration = 320
-								random = 80
-							}
-						}
-					}
-				}
-			}
-		}
-		create_tiyanki_country = yes
-		random_system_planet = {
-			limit = { is_planet_class = pc_gas_giant }
-			save_event_target_as = giant
-			event_target:tiyanki_country = {
-				save_event_target_as = tiyanki_country2
-				create_fleet = {
-					name = "NAME_Tiyanki_Space_Whale"
-					effect = {
-						set_owner = event_target:tiyanki_country
-						create_ship = {
-							name = "NAME_Cow"
-							design = "NAME_Tiyanki_Cow"
-						}
-						create_ship = {
-							name = "NAME_Bull"
-							design = "NAME_Tiyanki_Bull"
-						}
-						create_ship = {
-							name = "NAME_Calf"
-							design = "NAME_Tiyanki_Calf"
-						}
-						set_location = event_target:giant
-						set_fleet_stance = passive
-						set_aggro_range_measure_from = return_point
-						set_aggro_range = 0
-						queue_actions = {
-							wait = { # Cooldown until they start moving
-								duration = 320
-								random = 80
-							}
-						}
-					}
-				}
-			}
-		}
+		create_pd_tiyanki_home_fleet_1 = yes
+		create_pd_tiyanki_home_fleet_2 = yes
+		create_pd_tiyanki_home_fleet_3 = yes
+		create_pd_tiyanki_home_fleet_4 = yes
+		#create_pd_tiyanki_home_roaming_fleets = yes
 	}
 }
 
