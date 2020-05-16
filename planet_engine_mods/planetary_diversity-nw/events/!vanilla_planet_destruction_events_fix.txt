@@ -220,22 +220,18 @@ planet_event = {
 				pc_mushroom = { change_pc = pc_mushroom }
 				pc_superhabitable = { change_pc = pc_superhabitable }
 				pc_retinal = { change_pc = pc_retinal }	
+				pc_forest = { change_pc = pc_forest }		
 				pc_ecocity = { change_pc = pc_ecocity }	
 				pc_prairie = { change_pc = pc_prairie }	
+				pc_med = { change_pc = pc_med }	
 				pc_machine_factory = { change_pc = pc_machine_factory }
 				pc_bioforge = { change_pc = pc_bioforge }
 				pc_irradiated = { change_pc = pc_irradiated }
 				pc_karst = { change_pc = pc_karst }
-				pc_hothouse = { change_pc = pc_hothouse }
-				pc_desolate = { change_pc = pc_desolate }
-				pc_irradiated_marginal = { change_pc = pc_irradiated_marginal }
-				pc_marginal_warm = { change_pc = pc_marginal_warm }
-				pc_marginal_cold = { change_pc = pc_marginal_cold }
-				pc_forest = { change_pc = pc_forest }
-				pc_med = { change_pc = pc_med }
-				pc_snow = { change_pc = pc_snow }
 				pc_ash = { change_pc = pc_ash }
 				pc_primal = { change_pc = pc_primal }
+				pc_salt = { change_pc = pc_salt }
+				pc_aquatic = { change_pc = pc_aquatic }
 				pc_gghab = { change_pc = pc_gghab }
 				pc_tmhab = { change_pc = pc_tmhab }
 				pc_tmhab2 = { change_pc = pc_tmhab2 }
@@ -245,6 +241,17 @@ planet_event = {
 				pc_bchab = { change_pc = pc_bchab }
 				pc_mhab = { change_pc = pc_mhab }
 				pc_fhab = { change_pc = pc_fhab }
+				pc_fmhab = { change_pc = pc_fmhab }
+				pc_mehab = { change_pc = pc_mehab }
+				pc_pdshroud = { change_pc = pc_pdshroud }
+				pc_hothouse = { change_pc = pc_hothouse }
+				pc_desolate = { change_pc = pc_desolate }
+				pc_irradiated_marginal = { change_pc = pc_irradiated_marginal }
+				pc_marginal_warm = { change_pc = pc_marginal_warm }
+				pc_marginal_cold = { change_pc = pc_marginal_cold }
+				pc_wetswamp = { change_pc = pc_wetswamp }
+				pc_outback = { change_pc = pc_outback }
+				pc_highland = { change_pc = pc_highland }
 			}
 		}
 		# For Infested worlds
@@ -252,7 +259,7 @@ planet_event = {
 			limit = { is_planet_class = pc_infested }
 			random_list = {
 				50 = { change_pc = pc_barren }
-				0 = { change_pc = pc_barren_cold }
+				50 = { change_pc = pc_barren_cold }
 			}
 			add_modifier = { modifier = "terraforming_candidate" days = -1 }
 		}
@@ -353,6 +360,7 @@ planet_event = {
 	immediate = {
 		if = {
 			limit = {
+				NOT = { is_planet_class = pc_ai }
 				exists = owner
 				owner = { NOT = { is_same_value = from.owner } }
 			}
@@ -360,8 +368,75 @@ planet_event = {
 				country_event = { id = planet_destruction.401 }
 			}
 		}
+
+		# Contingency Machine World
 		if = {
 			limit = {
+				is_planet_class = pc_ai
+				NOT = { has_planet_flag = machine_lair }
+			}
+			set_planet_flag = destroyed_by_colossus
+			set_planet_flag = planet_godrayed
+			planet_event = { id = crisis.2040 }
+			create_ambient_object = {
+				location = this
+				type = habitat_cracker_object
+				duration = 5
+
+				use_3d_location = yes
+				base_angle_towards = star
+				entity_face_object = star
+
+				entity_offset = { min = 0 max = 0 }
+
+				entity_scale_to_size = yes
+				scale = 0.5
+			}
+		}
+
+		# Contingency Final Machine World
+		if = {
+			limit = {
+				is_planet_class = pc_ai
+				has_planet_flag = machine_lair
+			}
+			set_planet_flag = destroyed_by_colossus
+			set_planet_flag = planet_godrayed
+			from.owner = { save_event_target_as = final_machine_world_destroyer }
+			stop_crisis_sound = yes
+			planet_event = { id = crisis.2046 }
+			create_ambient_object = {
+				location = this
+				type = habitat_cracker_object
+				duration = 5
+
+				use_3d_location = yes
+				base_angle_towards = star
+				entity_face_object = star
+
+				entity_offset = { min = 0 max = 0 }
+
+				entity_scale_to_size = yes
+				scale = 0.5
+			}
+		}
+
+		if = {
+			limit = {
+				OR = {
+					is_active_resolution = "resolution_rulesofwar_independent_tribunals"
+					is_active_resolution = "resolution_rulesofwar_last_resort_doctrine"
+					is_active_resolution = "resolution_rulesofwar_demobilization_initiative"
+				}
+			}
+			from.owner = {
+				set_timed_country_flag = { flag = resolution_breached_fired_godray days = 3600 }
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { is_planet_class = pc_ai }
 				exists = owner
 				owner = {
 					NOT = { is_same_value = from.owner }
@@ -511,30 +586,26 @@ planet_event = {
 				pc_steppe = { change_pc = pc_steppe }
 				pc_frozen_desert = { change_pc = pc_frozen_desert }
 				pc_boreal = { change_pc = pc_boreal }
-				pc_retinal = { change_pc = pc_retinal }
 				pc_ammonia = { change_pc = pc_ammonia }
 				pc_methane = { change_pc = pc_methane }
 				pc_crystal = { change_pc = pc_crystal }
 				pc_floating = { change_pc = pc_floating }
 				pc_graveyard = { change_pc = pc_graveyard }
 				pc_mushroom = { change_pc = pc_mushroom }
-				pc_superhabitable = { change_pc = pc_superhabitable }	
+				pc_superhabitable = { change_pc = pc_superhabitable }
+				pc_retinal = { change_pc = pc_retinal }		
+				pc_forest = { change_pc = pc_forest }	
 				pc_ecocity = { change_pc = pc_ecocity }	
 				pc_prairie = { change_pc = pc_prairie }	
+				pc_med = { change_pc = pc_med }	
 				pc_machine_factory = { change_pc = pc_machine_factory }
 				pc_bioforge = { change_pc = pc_bioforge }
 				pc_irradiated = { change_pc = pc_irradiated }
 				pc_karst = { change_pc = pc_karst }
-				pc_hothouse = { change_pc = pc_hothouse }
-				pc_desolate = { change_pc = pc_desolate }
-				pc_irradiated_marginal = { change_pc = pc_irradiated_marginal }
-				pc_marginal_warm = { change_pc = pc_marginal_warm }
-				pc_marginal_cold = { change_pc = pc_marginal_cold }
-				pc_forest = { change_pc = pc_forest }
-				pc_med = { change_pc = pc_med }
-				pc_snow = { change_pc = pc_snow }
 				pc_ash = { change_pc = pc_ash }
 				pc_primal = { change_pc = pc_primal }
+				pc_salt = { change_pc = pc_salt }
+				pc_aquatic = { change_pc = pc_aquatic }
 				pc_gghab = { change_pc = pc_gghab }
 				pc_tmhab = { change_pc = pc_tmhab }
 				pc_tmhab2 = { change_pc = pc_tmhab2 }
@@ -544,6 +615,17 @@ planet_event = {
 				pc_bchab = { change_pc = pc_bchab }
 				pc_mhab = { change_pc = pc_mhab }
 				pc_fhab = { change_pc = pc_fhab }
+				pc_fmhab = { change_pc = pc_fmhab }
+				pc_mehab = { change_pc = pc_mehab }
+				pc_pdshroud = { change_pc = pc_pdshroud }
+				pc_hothouse = { change_pc = pc_hothouse }
+				pc_desolate = { change_pc = pc_desolate }
+				pc_irradiated_marginal = { change_pc = pc_irradiated_marginal }
+				pc_marginal_warm = { change_pc = pc_marginal_warm }
+				pc_marginal_cold = { change_pc = pc_marginal_cold }
+				pc_wetswamp = { change_pc = pc_wetswamp }
+				pc_outback = { change_pc = pc_outback }
+				pc_highland = { change_pc = pc_highland }
 			}
 		}
 		add_modifier = {
@@ -599,6 +681,20 @@ planet_event = {
 
 	immediate = { # remove hive mind?
 		from.owner = { country_event = { id = planet_destruction.501 } }
+
+		if = {
+			limit = {
+				OR = {
+					is_active_resolution = "resolution_rulesofwar_independent_tribunals"
+					is_active_resolution = "resolution_rulesofwar_last_resort_doctrine"
+					is_active_resolution = "resolution_rulesofwar_demobilization_initiative"
+				}
+			}
+			from.owner = {
+				set_timed_country_flag = { flag = resolution_breached_fired_assimilator days = 3600 }
+			}
+		}
+		
 		if = {
 			limit = {
 				exists = owner
@@ -810,30 +906,27 @@ planet_event = {
 				pc_steppe = { change_pc = pc_steppe }
 				pc_frozen_desert = { change_pc = pc_frozen_desert }
 				pc_boreal = { change_pc = pc_boreal }
-				pc_retinal = { change_pc = pc_retinal }
 				pc_ammonia = { change_pc = pc_ammonia }
 				pc_methane = { change_pc = pc_methane }
 				pc_crystal = { change_pc = pc_crystal }
 				pc_floating = { change_pc = pc_floating }
 				pc_graveyard = { change_pc = pc_graveyard }
 				pc_mushroom = { change_pc = pc_mushroom }
-				pc_superhabitable = { change_pc = pc_superhabitable }	
+				pc_superhabitable = { change_pc = pc_superhabitable }
+				pc_retinal = { change_pc = pc_retinal }	
+				pc_forest = { change_pc = pc_forest }		
 				pc_ecocity = { change_pc = pc_ecocity }	
 				pc_prairie = { change_pc = pc_prairie }	
+				pc_med = { change_pc = pc_med }	
 				pc_machine_factory = { change_pc = pc_machine_factory }
 				pc_bioforge = { change_pc = pc_bioforge }
 				pc_irradiated = { change_pc = pc_irradiated }
 				pc_karst = { change_pc = pc_karst }
-				pc_hothouse = { change_pc = pc_hothouse }
-				pc_desolate = { change_pc = pc_desolate }
-				pc_irradiated_marginal = { change_pc = pc_irradiated_marginal }
-				pc_marginal_warm = { change_pc = pc_marginal_warm }
-				pc_marginal_cold = { change_pc = pc_marginal_cold }
-				pc_forest = { change_pc = pc_forest }
-				pc_med = { change_pc = pc_med }
-				pc_snow = { change_pc = pc_snow }
 				pc_ash = { change_pc = pc_ash }
 				pc_primal = { change_pc = pc_primal }
+				pc_salt = { change_pc = pc_salt }
+				pc_aquatic = { change_pc = pc_aquatic }
+				pc_aquatic = { change_pc = pc_aquatic }
 				pc_gghab = { change_pc = pc_gghab }
 				pc_tmhab = { change_pc = pc_tmhab }
 				pc_tmhab2 = { change_pc = pc_tmhab2 }
@@ -843,6 +936,14 @@ planet_event = {
 				pc_bchab = { change_pc = pc_bchab }
 				pc_mhab = { change_pc = pc_mhab }
 				pc_fhab = { change_pc = pc_fhab }
+				pc_fmhab = { change_pc = pc_fmhab }
+				pc_mehab = { change_pc = pc_mehab }
+				pc_pdshroud = { change_pc = pc_pdshroud }
+				pc_hothouse = { change_pc = pc_hothouse }
+				pc_desolate = { change_pc = pc_desolate }
+				pc_irradiated_marginal = { change_pc = pc_irradiated_marginal }
+				pc_marginal_warm = { change_pc = pc_marginal_warm }
+				pc_marginal_cold = { change_pc = pc_marginal_cold }
 			}
 		}
 	}

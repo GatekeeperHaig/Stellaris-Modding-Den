@@ -1,0 +1,569 @@
+##
+building_regolith_refinery = {
+	base_buildtime = 360
+	base_cap_amount = 1
+
+	category = resource
+	
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		NOT = { is_planet_class = pc_habitat }
+		new_worlds_subterranean = yes
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_miner_add = 4
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			job_mining_drone_add = 4
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { 
+				is_robot_empire = yes
+			}
+		}
+		modifier = {
+			district_mining_max = 2
+			planet_miners_minerals_produces_mult = 0.05
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 400
+		}
+		cost = {
+			trigger = {
+				owner = { 
+					is_robot_empire = yes
+				}
+			}
+			minerals = 200
+			alloys = 200
+		}
+		upkeep = {
+			energy = 4
+		}
+	}
+	
+	prerequisites = {
+		tech_basic_industry
+	}
+	
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = job_mining_drone_effect_desc
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = job_miner_effect_desc
+	}
+	
+	ai_weight = {
+		weight = 2
+		modifier = {
+			factor = 5
+			owner = { 
+				has_monthly_income = {
+					resource = minerals
+					value < 5
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			owner = {
+				has_monthly_income = {
+					resource = energy
+					value < 6
+				}
+			}
+		}
+		# No one to work it
+		modifier = {
+			factor = 0
+			count_owned_pops = { 
+				limit = { 
+					OR = { 
+						is_unemployed = yes 
+						has_job = servant 
+					}
+				}
+				count < 1
+			}
+		}
+	}
+
+	ai_resource_production = {
+		minerals = 1
+		trigger = {
+			always = yes
+		}
+	}
+}
+
+##
+building_helium-3_reactor = {
+	base_buildtime = 360
+	#base_cap_amount = 1
+	
+	is_capped_by_modifier = no
+
+	category = resource
+	
+	potential = {
+		new_worlds_subterranean = yes
+	}
+	
+	allow = {
+		has_building = building_regolith_refinery
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 400
+		}
+		produces = {
+			energy = 5
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_technician_add = 3
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			job_technician_drone_add = 3
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = job_technician_drone_effect_desc
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = job_technician_effect_desc
+	}
+	
+	prerequisites = {
+		"tech_basic_industry"
+	}
+	
+	ai_weight = {
+		weight = 10	
+		modifier = {
+			factor = 0
+			count_owned_pops = { 
+				limit = { 
+					OR = { 
+						is_unemployed = yes 
+						has_job = servant 
+					}
+				}
+				count < 2
+			}
+		}
+	}
+}
+
+##
+building_precious_metal_foundry = {
+	base_buildtime = 360
+	#base_cap_amount = 1
+	category = manufacturing
+	
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		new_worlds_subterranean = yes
+	}
+
+	allow = {
+		has_building = building_regolith_refinery
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_hive_empire = yes }
+		}
+		modifier = {
+			job_alloy_drone_add = 3
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+		modifier = {
+			job_fabricator_add = 3
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_foundry_add = 3
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 400
+		}
+		upkeep = {
+			energy = 3
+		}
+	}
+	
+	prerequisites = {
+		"tech_basic_industry"
+	}
+	
+	triggered_desc = {
+		trigger = { 
+			exists = owner
+			owner = { is_regular_empire = yes } 
+		}
+		text = job_foundry_effect_desc
+	}
+	
+	triggered_desc = {
+		trigger = { 
+			exists = owner
+			owner = { is_hive_empire = yes } 
+		}
+		text = job_alloy_drone_effect_desc
+	}
+	
+	triggered_desc = {
+		trigger = { 
+			exists = owner
+			owner = { is_machine_empire = yes } 
+		}
+		text = job_fabricator_effect_desc
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 6
+			owner = { 
+				has_monthly_income = {
+					resource = alloys
+					value < 15
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			OR = {
+				AND = {
+					is_capital  = no
+					OR = {
+						num_buildings = { type = building_foundry_1 value >= 2 }
+						num_buildings = { type = building_foundry_2 value >= 1 }
+						num_buildings = { type = building_foundry_3 value >= 1 }
+					}
+				}
+				AND = {
+					is_capital  = yes
+					OR = {
+						num_buildings = { type = building_foundry_1 value >= 3 }
+						num_buildings = { type = building_foundry_2 value >= 1 }
+						num_buildings = { type = building_foundry_3 value >= 1 }
+					}
+				}
+			}
+		}
+		# There are already unworked jobs
+		# Blocks buildings unworkable by remaining pops (slaves/robots etc)
+		# Will be improved... at some point
+		modifier = {
+			factor = 0
+			free_jobs > 0 
+		}
+	}
+
+	ai_resource_production = {
+		alloys = 1
+		trigger = {
+			always = yes
+		}
+	}
+}
+
+##
+building_aeroponic_complex = {
+	base_buildtime = 280
+	base_cap_amount = 1
+	category = resource
+	
+	potential = {
+		NOR = {
+			has_modifier = resort_colony
+			#is_planet_class_pc_methane = yes
+			#is_planet_class_pc_hothouse = yes
+			#is_planet_class_pc_ammonia = yes
+		}
+		OR = {
+			has_modifier = underground_colony
+			has_modifier = adapted_environ
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_farmer_add = 5
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			job_agri_drone_add = 5
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 300
+		}
+		upkeep = {
+			energy = 3
+		}
+	}	
+	
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = job_agri_drone_effect_desc
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = no }
+		}
+		text = job_farmer_effect_desc
+	}
+	
+	prerequisites = {
+		#"tech_hydroponics"
+	}
+	
+	ai_weight = {
+		weight = 2
+		modifier = 
+		{
+			factor = 5
+			owner = { 
+				has_monthly_income = {
+					resource = food
+					value < 5
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			owner = {
+				OR = {
+					is_mechanical_empire = no
+					AND = {
+						is_mechanical_empire = yes
+						OR = {
+							has_civic = civic_machine_servitor
+							has_civic = civic_machine_assimilator
+						}
+					}
+				}
+				has_monthly_income = {
+					resource = energy
+					value < 5
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			owner = {
+				is_mechanical_empire = yes
+				NOR = {
+					has_civic = civic_machine_servitor
+					has_civic = civic_machine_assimilator
+				}
+			}
+		}
+		# No one to work it
+		modifier = {
+			factor = 0
+			count_owned_pops = { 
+				limit = { 
+					OR = { 
+						is_unemployed = yes 
+						has_job = servant 
+					}
+				}
+				count < 2
+			}
+		}
+		modifier = {
+			factor = 0
+			num_buildings = { type = building_aeroponic_complex value >= 2 }
+		}
+	}
+
+	ai_resource_production = {
+		food = 1
+		trigger = {
+			always = yes
+		}
+	}
+}
+
+##
+building_pressurized_arcology = {
+	base_buildtime = 480
+	base_cap_amount = 1
+	
+	category = government
+	
+	potential = {
+		NOR = {
+			has_modifier = slave_colony
+			#is_planet_class_pc_marginal_warm = yes
+			#is_planet_class_pc_marginal_cold = yes
+			#is_planet_class_pc_methane = yes
+			#is_planet_class_pc_hothouse = yes
+			#is_planet_class_pc_ammonia = yes
+		}
+		OR = {
+			has_modifier = underground_colony
+			has_modifier = adapted_environ
+		}
+	}
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			planet_housing_add = 10
+			job_enforcer_add = 1
+			job_clerk_add = 3
+			job_culture_worker_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			planet_housing_add = 10
+			job_patrol_drone_add = 1
+			job_maintenance_drone_add = 3
+			job_artisan_drone_add = 1
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				has_non_swapped_tradition = tr_domination_imperious_architecture
+			}					
+		}
+		modifier = {
+			planet_housing_add = 2
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 600
+		}
+		upkeep = {
+			energy = 8
+		}
+	}	
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 2
+			free_housing < -2
+		}
+
+		modifier = {
+			factor = 3
+			free_amenities < -5
+		}
+		
+		modifier = {
+			factor = 0
+			free_housing > 1
+		}
+	}
+}

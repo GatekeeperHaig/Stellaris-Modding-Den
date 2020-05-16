@@ -37,120 +37,6 @@ event = {
 	}
 }
 
-event = {
-    id = mpengine.01
-	title = mpengine.01.name
-	desc = mpengine.01.desc
-	picture = GFX_evt_star_chart
-	show_sound = event_default
-	location = root
-
-	is_triggered_only = yes
-
-	trigger = {
-		owner = { is_ai = no }
-	}
-
-	#option = {
-	#	name = mpengine.01.x
-    #    custom_tooltip = mpengine.01.x.tooltip
-	#	hidden_effect = { # DO NOTHING - default option uses my own average balance
-	#		set_global_flag = habitable_average_expectations
-	#	}
-	#	
-	#	
-	#}
-	
-	option = {
-		name = mpengine.01.a
-        custom_tooltip = mpengine.01.a.tooltip
-		hidden_effect = {
-			set_global_flag = habitable_very_high_expectations
-		}
-		
-		
-	}
-	
-	option = {
-		name = mpengine.01.b
-        custom_tooltip = mpengine.01.b.tooltip
-		hidden_effect = {
-			set_global_flag = habitable_high_expectations
-		}
-	}
-	
-	option = {
-		name = mpengine.01.c
-        custom_tooltip = mpengine.01.c.tooltip
-		hidden_effect = {
-			set_global_flag = habitable_low_expectations
-		}
-	}
-	
-	option = {
-		name = mpengine.01.d
-        custom_tooltip = mpengine.01.d.tooltip
-		hidden_effect = {
-			set_global_flag = habitable_very_low_expectations
-		}
-	}
-
-	
-}
-
-planet_event = {
-	id = mpengine.02 # HABITABLE SPAWNER
-	hide_window = yes
-	is_triggered_only = yes
-	#fire_only_once = yes
-	
-	immediate = {
-		if = {
-			limit = { 
-				solar_system = {
-					NOR = {
-						has_star_flag = sol_system
-						has_star_flag = empire_home_system
-						has_star_flag = floating_system
-						has_star_flag = pdcrystal_system
-						has_star_flag = city_system
-						has_star_flag = graveyard_system
-						has_star_flag = mushroom_system
-						has_star_flag = biolumen_system
-						has_star_flag = technoorganic_system
-						has_star_flag = archive_system
-						has_star_flag = empire_home_system
-						has_star_flag = primitive_sol
-						has_star_flag = eilistraee_system
-						has_star_flag = tulshar_system
-						has_star_flag = elven_system
-						has_star_flag = lunari_system
-						has_star_flag = elven_ring_system
-						has_star_flag = AI_hub
-						has_star_flag = AI_lair
-						has_star_flag = sentinel_system
-						has_star_flag = vechtar_zavonia_system
-						has_star_flag = toxic_moon_system
-						has_star_flag = shattered_world_system
-						has_star_flag = hostile_system
-						has_star_flag = high_energy_system
-						has_star_flag = superflare_system
-						has_star_flag = ruined_empire
-						has_star_flag = crystal_system
-						has_star_flag = sealed_system
-						has_star_flag = marauder_system
-						has_star_flag = ruined_matter_decompressor_system
-						has_star_flag = ruined_strategic_coordination_center_system
-						has_star_flag = ruined_interstellar_assembly_system
-						has_star_flag = precursor_system
-						has_star_flag = hyacinth_system	
-					}
-				}
-			}
-			mp_habitable_spawn = yes
-		}
-	}
-}
 
 event = {
 	id = mpengine.03 # Convert Unity to Primal class, setup initial wormhole link between Sirius to Aldebaran and set wormholes as "seen" by the human empires
@@ -166,20 +52,27 @@ event = {
 				solar_system = { has_star_flag = aldebaran_system }
 				has_planet_flag = unity
 			}
-			change_pc = pc_primal
-			#set_entity_primordial = yes
+			change_pc = pc_geocrystallic
 			reroll_deposits = yes
 			add_modifier = {
-				modifier = "adapted_environ"
+				modifier = "temperature-temperate"
 				days = -1
 			}
-			
-			
 			add_modifier = {
-				modifier = primal
+				modifier = "water-continental"
 				days = -1
 			}
-			add_deposit = d_lava_lakes
+			spawn_gravity_modifier = yes
+			#spawn_resource_modifier = yes
+			add_modifier = {
+				modifier = "vegetation-mixed"
+				days = -1
+			}
+			add_modifier = {
+				modifier = "gas-water_vapor"
+				days = -1
+			}
+			set_planet_flag = "planet_converted"
         
 			#add_building = building_aeroponic_complex
 			#remove_district = district_farming
@@ -220,80 +113,6 @@ event = {
 			add_seen_bypass_type = wormhole
 			add_research_option = tech_wormhole_stabilization
 		}
-		
-	}
-}
-
-event = {
-		id = mpengine.04 # SPAWN GPM modifiers on Aldebaran planets
-		hide_window = yes
-		is_triggered_only = yes
-		fire_only_once = yes
-		immediate = {
-			
-			# Desolate Ki
-			every_planet = {
-				limit = { 
-					has_global_flag = has_guillis_planet_modifiers_mod
-					solar_system = { has_star_flag = aldebaran_system }
-					is_planet_class = pc_desolate
-				}
-				add_modifier = {
-					modifier = "weak_magnetic_field_2"
-					days = -1
-				}
-				add_modifier = {
-					modifier = "Water_Pockets"
-					days = -1
-				}
-			}
-			# Helios
-			every_planet = {
-				limit = { 
-					has_global_flag = has_guillis_planet_modifiers_mod
-					solar_system = { has_star_flag = aldebaran_system }
-					is_planet_class = pc_frozen
-					has_planet_flag = aldebaran_helios
-				}
-				add_modifier = {
-					modifier = "Cryogeysers"
-					days = -1
-				}
-				add_modifier = {
-					modifier = "Deep_Aquifer"
-					days = -1
-				}
-			}
-		}
-}
-
-ship_event = {
-	id = mpengine.05 # SPAWN MODIFIERS ON POTENTIALLY HABITABLE WORLDS - triggered on_survey
-	hide_window = yes
-	is_triggered_only = yes
-	
-	trigger = {
-		from = {
-			OR = { 
-				has_planet_flag = eco_hot_planet
-				has_planet_flag = eco_temp_planet
-				has_planet_flag = eco_cold_planet
-			}
-			NOT = { has_planet_flag = "planet_surveyed" }
-		}
-	}
-	
-	immediate = { 
-		
-		from = {
-			spawn_temperature_modifier = yes
-			spawn_gravity_modifier = yes
-			spawn_water_modifier = yes
-			spawn_atmosphere_modifier = yes
-			spawn_vegetation_modifier = yes
-			spawn_resource_modifier = yes
-			set_planet_flag = "planet_surveyed"
-		}		
 		
 	}
 }
