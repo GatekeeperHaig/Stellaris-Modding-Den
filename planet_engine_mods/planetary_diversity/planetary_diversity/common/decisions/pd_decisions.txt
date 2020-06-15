@@ -39,6 +39,7 @@ decision_engineered_environment = {
 		NOT = { is_planet_class = pc_pd_molten_hab }
 		#NOT = { is_planet_class = pc_pd_toxic_hab }
 		NOT = { is_planet_class = pc_pd_hothouse_hab }
+		NOT = { is_planet_class = pc_pd_asteroid_hab }
 		NOT = { is_planet_class = pc_hive }
 		NOT = { is_planet_class = pc_pdhive1 }
 		NOT = { is_planet_class = pc_pdhive2 }
@@ -82,33 +83,52 @@ decision_engineered_environment = {
 	}    
 	
 	ai_weight = {
-        weight = 1
+        weight = 3
         modifier = {
             factor = 0
             or = {
-                free_building_slots > 0
+            		num_pops < 15
+                and = {
+                  # By late game, AI will likely keep some open building slots
+                  # This is mostly harmless if there are still jobs available
+                  # Otherwise, don't let them take this over building a building
+                  free_building_slots > 0
+                  free_jobs <= 0
+                }
+                free_building_slots > 2
                 owner = {
                     or = {
                         resource_stockpile_compare = { resource = energy value < 6000 } 
                         resource_stockpile_compare = { resource = influence value < 150 }
-					} 
-				}
+                    }
+                }
             }
         }
         modifier = {
-            factor = 0
+        	# Will still be above 1
+          factor = 0.5
+          # We want to move along to perfect world shaping for its 10% jobs bonus if we have world shaper
+          NOT = { owner = { has_ascension_perk = ap_world_shaper } }
+          NOT = { any_owned_pop = {
+            prev = {
+              habitability = { who = prev value < 1.0 }
+            }
+          } }
+        }
+        modifier = {
+          factor = 0
+				  owner = {
             or = {
-				owner = {
-					has_civic = civic_barbaric_despoilers
-					has_civic = civic_fanatic_purifiers
-					has_origin = origin_post_apocalyptic
-					has_civic = civic_hive_devouring_swarm			
-				}
+              has_civic = civic_barbaric_despoilers
+              has_civic = civic_fanatic_purifiers
+              has_origin = origin_post_apocalyptic
+              has_civic = civic_hive_devouring_swarm			
             }
+          }
         }
         modifier = {
-			factor = 0
-				owner = { is_machine_empire = yes }
+          factor = 0
+          owner = { is_machine_empire = yes }
         }
     }
 }
@@ -146,6 +166,7 @@ decision_engineered_environment_gaia = {
 		NOT = { is_planet_class = pc_pd_molten_hab }
 		#NOT = { is_planet_class = pc_pd_toxic_hab }
 		NOT = { is_planet_class = pc_pd_hothouse_hab }
+		NOT = { is_planet_class = pc_pd_asteroid_hab }
 		NOT = { is_planet_class = pc_hive }
 		NOT = { is_planet_class = pc_pdhive1 }
 		NOT = { is_planet_class = pc_pdhive2 }
@@ -164,19 +185,28 @@ decision_engineered_environment_gaia = {
 	}   
 	
 	ai_weight = {
-        weight = 1
+        weight = 3
         modifier = {
             factor = 0
             or = {
-                free_building_slots > 0
+                num_pops < 20
+                and = {
+                  # By late game, AI will likely keep some open building slots
+                  # This is mostly harmless if there are still jobs available
+                  # Otherwise, don't let them take this over building a building
+                  free_building_slots > 0
+                  free_jobs <= 0
+                }
+                free_building_slots > 2
                 owner = {
                     or = {
-                        resource_stockpile_compare = { resource = energy value < 6000 } 
+                        resource_stockpile_compare = { resource = energy value < 10000 }
                         resource_stockpile_compare = { resource = influence value < 150 }
-                     } }
+                    }
+                }
             }
         }
-    }
+  }
 }
 
 # Any Planet to Radiotrophic
@@ -246,8 +276,9 @@ decision_removeocean = {
 		NOT = { is_planet_class = pc_pd_barren_cold_hab }
 		NOT = { is_planet_class = pc_pd_frozen_hab }
 		NOT = { is_planet_class = pc_pd_molten_hab }
-		NOT = { is_planet_class = pc_pd_toxic_hab }
+		#NOT = { is_planet_class = pc_pd_toxic_hab }
 		NOT = { is_planet_class = pc_pd_hothouse_hab }
+		NOT = { is_planet_class = pc_pd_asteroid_hab }
 		has_planet_flag = pdaquapicture
 	}
 
@@ -321,8 +352,9 @@ decision_oceancapital = {
 		NOT = { is_planet_class = pc_pd_barren_cold_hab }
 		NOT = { is_planet_class = pc_pd_frozen_hab }
 		NOT = { is_planet_class = pc_pd_molten_hab }
-		NOT = { is_planet_class = pc_pd_toxic_hab }
+		#NOT = { is_planet_class = pc_pd_toxic_hab }
 		NOT = { is_planet_class = pc_pd_hothouse_hab }
+		NOT = { is_planet_class = pc_pd_asteroid_hab }
 		NOT = { is_planet_class = pc_hadesert }
 		NOT = { is_planet_class = pc_antarctic }
 		NOT = { is_planet_class = pc_snow }
@@ -433,9 +465,41 @@ decision_pdcrystalpatch = {
 	
 	ai_weight = {
 		weight = 1
-		modifier = {
-			factor = 0
-		}
+    modifier = {
+        factor = 0
+        or = {
+            num_pops < 15
+            and = {
+              # By late game, AI will likely keep some open building slots
+              # This is mostly harmless if there are still jobs available
+              # Otherwise, don't let them take this over building a building
+              free_building_slots > 0
+              free_jobs <= 0
+            }
+            free_building_slots > 2
+            owner = {
+                or = {
+                    resource_stockpile_compare = { resource = sr_acean value < 2500 }
+                    resource_income_compare = { resource = sr_acean value < 0 }
+                }
+            }
+            AND = {
+            	free_district_slots <= 0
+            	owner = { resource_income_compare = { resource = rare_crystals value > 2 } }
+          	}
+            AND = {
+		          num_free_districts = {
+		            type = district_mining
+		            value > 1
+		          }
+		          num_free_districts = {
+		            type = district_farming
+		            value > 1
+		          }
+	          }
+          	owner = { resource_income_compare = { resource = rare_crystals value > 2 } }
+        }
+    }
 	}
 }
 
@@ -483,10 +547,28 @@ decision_tiyanki_prospecting = {
 	}
 	
 	ai_weight = {
-		weight = 1
-		modifier = {
-			factor = 0
-		}
+		weight = 2
+    modifier = {
+        factor = 0
+        or = {
+            # Deliberately start not on a multiple of 5 boundary, so hopefully this
+            # will be done by the time the next building slot opens up.
+            num_pops < 13
+            and = {
+              # By late game, AI will likely keep some open building slots
+              # This is mostly harmless if there are still jobs available
+              # Otherwise, don't let them take this over building a building
+              free_building_slots > 0
+              free_jobs <= 0
+            }
+            free_building_slots > 2
+            owner = {
+                or = {
+                    resource_stockpile_compare = { resource = energy value < 8000 }
+                }
+            }
+        }
+    }
 	}
 }
 
@@ -530,9 +612,31 @@ decision_techno_canal = {
 	
 	ai_weight = {
 		weight = 1
-		modifier = {
-			factor = 0
-		}
+    modifier = {
+        factor = 0
+        or = {
+            num_pops < 15
+            and = {
+              # By late game, AI will likely keep some open building slots
+              # This is mostly harmless if there are still jobs available
+              # Otherwise, don't let them take this over building a building
+              free_building_slots > 0
+              free_jobs <= 0
+            }
+            free_building_slots > 2
+            owner = {
+                or = {
+                    resource_stockpile_compare = { resource = energy value < 8000 } 
+                    resource_stockpile_compare = { resource = minerals value < 8000 } 
+                }
+            }
+            free_district_slots <= 0
+            num_free_districts = {
+              type = district_farming
+              value > 1
+            }
+        }
+    }
 	}
 }
 
@@ -545,7 +649,7 @@ decision_pdhive_infest1 = {
 	resources = {
 		category = decisions
 		cost = {
-			energy = 2000
+			energy = 1500
 		}
 	}
 		
@@ -714,36 +818,28 @@ decision_pdhive_infest1 = {
 			
 			IF = {
 				limit = {
-					AND = {
 					planet_size <= 25
 					planet_size >= 21
-					}
 				}
 				add_deposit = d_pdhive10
 			}
 			IF = {
 				limit = {
-					AND = {
 					planet_size <= 20
 					planet_size >= 16
-					}
 				}
 				add_deposit = d_pdhive8
 			}
 			IF = {
 				limit = {
-					AND = {
 					planet_size <= 15
 					planet_size >= 11
-					}
 				}
 				add_deposit = d_pdhive6
 			}
 			IF = {
 				limit = {
-					AND = {
 					planet_size <= 10
-					}
 				}
 				add_deposit = d_pdhive4
 			}
@@ -795,7 +891,7 @@ decision_pdhive_infest2 = {
 	resources = {
 		category = decisions
 		cost = {
-			energy = 3000
+			energy = 3500
 		}
 	}
 		
@@ -824,10 +920,7 @@ decision_pdhive_infest2 = {
 	}
 	
 	ai_weight = {
-		weight = 1
-		modifier = {
-			factor = 0
-		}
+		weight = 10000
 	}
 }
 
@@ -971,6 +1064,83 @@ decision_pdhive_uninfest = {
 	
 	ai_weight = {
 		weight = 10000
+	}
+}
+
+decision_pd_transplant_tree = {
+	owned_planets_only = yes
+	sound = event_laboratory_sound
+	icon = decision_pd_transplant_tree
+
+	enactment_time = 180
+
+	resources = {
+		category = decisions
+		cost = {
+			food = 500
+		}
+	}
+
+	potential = {
+		has_modifier = no_pd_lifetree
+	}
+
+	allow = { }
+
+	effect = {
+		remove_modifier = no_pd_lifetree
+		hidden_effect = {
+		remove_deposit = d_pd_tree_of_life_dead
+		IF = {
+			limit = { 
+				NOT = { has_planet_flag = pd_tol1 }
+				NOT = { has_planet_flag = pd_tol2 }
+				NOT = { has_planet_flag = pd_tol3 }
+				NOT = { habitable_structure = yes }
+				NOT = { is_planet_class = pc_ecocity }
+				NOT = { is_planet_class = pc_relic }
+				NOT = { is_planet_class = pc_city }
+				NOT = { is_planet_class = pc_floating }
+				NOT = { is_planet_class = pc_crystal }
+				NOT = { is_planet_class = pc_technoorganic }
+				NOT = { is_planet_class = pc_graveyard }
+			 }
+			add_deposit = d_pd_tree_of_life_1
+			set_planet_flag = pd_tol1	
+			planet_event = { id = pdengine.40 days = 7200 random = 7200 } #TODO test
+		}
+		ELSE_IF = {
+			limit = { 
+				habitable_structure = yes
+				NOT = { is_planet_class = pc_ringworld_habitable }
+			 }
+		add_deposit = d_pd_tree_of_life_habitat
+		}
+		ELSE_IF = {
+			limit = { 
+				is_planet_class = pc_ringworld_habitable
+			 }
+		add_deposit = d_pd_tree_of_life_ringworld
+		}
+		ELSE_IF = {
+			limit = { 
+				OR = {
+				is_planet_class = pc_ecocity
+				is_planet_class = pc_relic
+				is_planet_class = pc_city
+				is_planet_class = pc_floating
+				is_planet_class = pc_crystal
+				is_planet_class = pc_technoorganic
+				is_planet_class = pc_graveyard
+				}
+			 }
+		add_deposit = d_pd_tree_of_life_special
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 1
 	}
 }
 

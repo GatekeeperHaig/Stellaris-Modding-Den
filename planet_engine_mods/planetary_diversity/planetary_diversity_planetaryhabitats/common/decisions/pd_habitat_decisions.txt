@@ -27,6 +27,7 @@ decision_trademoonhab = {
 			is_planet_class = pc_pd_molten_hab
 			is_planet_class = pc_pd_hothouse_hab
 			is_planet_class = pc_pd_gas_giant_hab
+			is_planet_class = pc_pd_asteroid_hab
 		}
 		NOT = { has_planet_flag = pd_commercial_hab }
 		NOT = { has_planet_flag = pd_hab_d2 }
@@ -71,6 +72,7 @@ decision_farmhab = {
 			is_planet_class = pc_pd_frozen_hab
 			is_planet_class = pc_pd_hothouse_hab
 			is_planet_class = pc_pd_gas_giant_hab
+			is_planet_class = pc_pd_asteroid_hab
 		}
 		NOT = { has_planet_flag = pd_farming_hab }
 		NOT = { has_planet_flag = pd_hab_d2 }
@@ -118,6 +120,7 @@ decision_energy2hab = {
 			is_planet_class = pc_pd_frozen_hab
 			is_planet_class = pc_pd_hothouse_hab
 			is_planet_class = pc_pd_gas_giant_hab
+			is_planet_class = pc_pd_asteroid_hab
 		}
 		NOT = { has_planet_flag = pd_energy2_hab }
 		NOT = { has_planet_flag = pd_hab_d2 }
@@ -138,7 +141,7 @@ decision_energy2hab = {
 	}
 }
 
-# Make Energy 2
+# Make Mining 2
 decision_mining2hab = {
 	icon = decision_mininghab
 	owned_planets_only = yes
@@ -161,6 +164,7 @@ decision_mining2hab = {
 			is_planet_class = pc_pd_barren_cold_hab
 			is_planet_class = pc_pd_frozen_hab
 			is_planet_class = pc_pd_molten_hab
+			is_planet_class = pc_pd_asteroid_hab
 		}
 		NOT = { has_planet_flag = pd_mining2_hab }
 		NOT = { has_planet_flag = pd_hab_d2 }
@@ -202,6 +206,7 @@ decision_upgrade_pd_habitat = {
 		is_planet_class = pc_pd_gas_giant_hab
 		is_planet_class = pc_pd_hothouse_hab
 		is_planet_class = pc_pd_molten_hab
+		is_planet_class = pc_pd_asteroid_hab
 		}
 		NOT = { has_planet_flag = advanced_habitat }
 		exists = owner
@@ -215,7 +220,15 @@ decision_upgrade_pd_habitat = {
 	}
 
 	effect = {
-		add_deposit = d_expanded_dome_system
+		if = {
+			limit = { NOT = { is_planet_class = pc_pd_asteroid_hab }
+			}
+			add_deposit = d_expanded_dome_system
+		}
+		else_if = {
+			limit = { is_planet_class = pc_pd_asteroid_hab }
+			add_deposit = d_expanded_dome_system_1
+		}
 		hidden_effect = {
 			set_planet_flag = advanced_habitat
 		}
@@ -246,6 +259,7 @@ decision_upgrade_pd_habitat_2 = {
 		is_planet_class = pc_pd_gas_giant_hab
 		is_planet_class = pc_pd_hothouse_hab
 		is_planet_class = pc_pd_molten_hab
+		is_planet_class = pc_pd_asteroid_hab
 		}
 		has_planet_flag = advanced_habitat
 		NOT = { has_planet_flag = advanced_habitat_2 }
@@ -257,11 +271,20 @@ decision_upgrade_pd_habitat_2 = {
 
 	allow = {
 		free_district_slots = 0
-		has_major_upgraded_capital = yes
+		has_building = building_hab_major_capital
+		#has_major_upgraded_capital = yes
 	}
 
 	effect = {
-		add_deposit = d_expanded_dome_system
+		if = {
+			limit = { NOT = { is_planet_class = pc_pd_asteroid_hab }
+			}
+			add_deposit = d_expanded_dome_system
+		}
+		else_if = {
+			limit = { is_planet_class = pc_pd_asteroid_hab }
+			add_deposit = d_expanded_dome_system_1
+		}
 		hidden_effect = {
 			set_planet_flag = advanced_habitat_2
 		}
