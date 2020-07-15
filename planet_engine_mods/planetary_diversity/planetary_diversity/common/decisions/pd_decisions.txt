@@ -292,6 +292,7 @@ decision_removeocean = {
 			IF = { limit = { is_planet_class = pc_cascadian } set_planet_entity = { picture = pc_cascadian } }
 			IF = { limit = { is_planet_class = pc_retinal } set_planet_entity = { picture = pc_retinal } }
 			IF = { limit = { is_planet_class = pc_forest } set_planet_entity = { picture = pc_forest } }
+			IF = { limit = { is_planet_class = pc_lake } set_planet_entity = { picture = pc_lake } }
 			IF = { limit = { is_planet_class = pc_desertislands } set_planet_entity = { picture = pc_desertislands } }
 			IF = { limit = { is_planet_class = pc_subarctic } set_planet_entity = { picture = pc_subarctic } }
 			IF = { limit = { is_planet_class = pc_mangrove } set_planet_entity = { picture = pc_mangrove } }
@@ -375,6 +376,7 @@ decision_oceancapital = {
 			IF = { limit = { is_planet_class = pc_ocean } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_continental } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_forest } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_lake } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pc_lake }
 			IF = { limit = { is_planet_class = pc_cascadian } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture } 
 			IF = { limit = { is_planet_class = pc_retinal } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_steppe } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
@@ -672,7 +674,9 @@ decision_pdhive_infest1 = {
 		NOT = { is_planet_class = pc_machine_factory }
 		NOT = { is_planet_class = pc_city }
 		NOT = { is_planet_class = pc_ecocity }
-		habitable_structure = no
+		NOT = { habitable_structure = yes }
+		NOT = { is_a_planet_megastructure = yes }
+		NOT = { has_planet_flag = pd_ignore }
 	}
 
 	effect = {
@@ -684,6 +688,7 @@ decision_pdhive_infest1 = {
 			if = { limit = { is_planet_class = pc_cascadian } set_planet_flag = pdhive_cascadian }
 			if = { limit = { is_planet_class = pc_retinal } set_planet_flag = pdhive_retinal }
 			if = { limit = { is_planet_class = pc_forest } set_planet_flag = pdhive_forest }
+			if = { limit = { is_planet_class = pc_lake } set_planet_flag = pdhive_lake }
 			if = { limit = { is_planet_class = pc_wetswamp } set_planet_flag = pdhive_wetswamp }
 			if = { limit = { is_planet_class = pc_subarctic } set_planet_flag = pdhive_subarctic }
 			if = { limit = { is_planet_class = pc_desertislands } set_planet_flag = pdhive_desertislands }
@@ -1002,6 +1007,7 @@ decision_pdhive_uninfest = {
 			if = { limit = { has_planet_flag = pdhive_cascadian } change_pc = pc_cascadian remove_planet_flag = pdhive_cascadian }
 			if = { limit = { has_planet_flag = pdhive_retinal } change_pc = pc_retinal remove_planet_flag = pdhive_retinal }
 			if = { limit = { has_planet_flag = pdhive_forest } change_pc = pc_forest remove_planet_flag = pdhive_forest }
+			if = { limit = { has_planet_flag = pdhive_lake } change_pc = pc_lake remove_planet_flag = pdhive_lake }
 			if = { limit = { has_planet_flag = pdhive_wetswamp } change_pc = pc_wetswamp remove_planet_flag = pdhive_wetswamp }
 			if = { limit = { has_planet_flag = pdhive_subarctic } change_pc = pc_subarctic remove_planet_flag = pdhive_subarctic }
 			if = { limit = { has_planet_flag = pdhive_desertislands } change_pc = pc_desertislands remove_planet_flag = pdhive_desertislands }
@@ -1083,6 +1089,13 @@ decision_pd_transplant_tree = {
 
 	potential = {
 		has_modifier = no_pd_lifetree
+		NOT = {
+			OR = {
+				has_deposit = d_pd_tree_of_life_habitat
+				has_deposit = d_pd_tree_of_life_ringworld
+				has_deposit = d_pd_tree_of_life_special
+			}
+		}
 	}
 
 	allow = { }
@@ -1107,7 +1120,14 @@ decision_pd_transplant_tree = {
 			 }
 			add_deposit = d_pd_tree_of_life_1
 			set_planet_flag = pd_tol1	
-			planet_event = { id = pdengine.40 days = 7200 random = 7200 } #TODO test
+			IF = {
+				limit = { owner = { NOT = { has_technology = tech_pdtoltech } } }
+				planet_event = { id = pdengine.40 days = 7200 random = 7200 } #TODO test
+			}
+			IF = {
+				limit = { owner = { has_technology = tech_pdtoltech } }
+				planet_event = { id = pdengine.40 days = 3600 random = 3600 } #TODO test
+			}
 		}
 		ELSE_IF = {
 			limit = { 
@@ -1190,7 +1210,19 @@ decision_ammoniahabsnocolony = {
 		hidden_effect = { 
 			remove_modifier = pdmethaneatmosphere
 			remove_modifier = pdashatmosphere
-			set_planet_entity = { picture = pc_ammoniaring }
+			if = {
+				limit = { is_planet_class = pc_ringworld_habitable }
+				set_planet_entity = { picture = pc_ammoniaring entity = ammoniaring_habitable_entity_01_entity }
+			}
+			if = {
+				limit = { 
+					OR = { 
+						is_planet_class = pc_city 
+						is_planet_class = pc_ecocity 
+					} 
+				}
+				set_planet_entity = { picture = pc_ammoniacity }
+			}
 		}
 	}
 
@@ -1243,7 +1275,14 @@ decision_ammoniahabs = {
 		hidden_effect = { 
 			remove_modifier = pdmethaneatmosphere
 			remove_modifier = pdashatmosphere
-			set_planet_entity = { picture = pc_ammoniaring }
+			if = {
+				limit = { is_planet_class = pc_ringworld_habitable }
+				set_planet_entity = { picture = pc_ammoniaring entity = ammoniaring_habitable_entity_01_entity }
+			}
+			if = {
+				limit = { OR = { is_planet_class = pc_city is_planet_class = pc_ecocity } }
+				set_planet_entity = { picture = pc_ammoniacity }
+			}
 		}
 	}
 
@@ -1297,7 +1336,14 @@ decision_methanehabsnocolony = {
 		hidden_effect = { 
 			remove_modifier = pdammoniaatmosphere
 			remove_modifier = pdashatmosphere
-			set_planet_entity = { picture = pc_methanering }
+			if = {
+				limit = { is_planet_class = pc_ringworld_habitable }
+				set_planet_entity = { picture = pc_methanering entity = methanering_habitable_entity_01_entity }
+			}
+			if = {
+				limit = { OR = { is_planet_class = pc_city is_planet_class = pc_ecocity } }
+				set_planet_entity = { picture = pc_methanecity }
+			}
 		}
 	}
 
@@ -1350,9 +1396,13 @@ decision_methanehabs = {
 		hidden_effect = { 
 			remove_modifier = pdammoniaatmosphere
 			remove_modifier = pdashatmosphere
-			IF = {
+			if = {
 				limit = { is_planet_class = pc_ringworld_habitable }
-					set_planet_entity = { picture = pc_methanering }
+				set_planet_entity = { picture = pc_methanering entity = methanering_habitable_entity_01_entity }
+			}
+			if = {
+				limit = { OR = { is_planet_class = pc_city is_planet_class = pc_ecocity } }
+				set_planet_entity = { picture = pc_methanecity }
 			}
 		}
 	}
@@ -1409,7 +1459,11 @@ decision_ashhabsnocolony = {
 			remove_modifier = pdmethaneatmosphere
 			IF = {
 				limit = { is_planet_class = pc_ringworld_habitable }
-					set_planet_entity = { picture = pc_ashring }
+				set_planet_entity = { picture = pc_ashring entity = ashring_habitable_entity_01_entity }
+			}
+			if = {
+				limit = { OR = { is_planet_class = pc_city is_planet_class = pc_ecocity } }
+				set_planet_entity = { picture = pc_ashcity }
 			}
 		}
 	}
@@ -1465,7 +1519,11 @@ decision_ashhabs = {
 			remove_modifier = pdmethaneatmosphere
 			IF = {
 				limit = { is_planet_class = pc_ringworld_habitable }
-					set_planet_entity = { picture = pc_ashring }
+				set_planet_entity = { picture = pc_ashring entity = ashring_habitable_entity_01_entity }
+			}
+			if = {
+				limit = { OR = { is_planet_class = pc_city is_planet_class = pc_ecocity } }
+				set_planet_entity = { picture = pc_ashcity }
 			}
 		}
 	}
@@ -1533,7 +1591,15 @@ decision_noexoitchabsnocolony = {
 			remove_modifier = pdashatmosphere
 			IF = {
 				limit = { is_planet_class = pc_ringworld_habitable }
-					set_planet_entity = { picture = pc_ringworld_habitable }
+				set_planet_entity = { picture = pc_ringworld_habitable }
+			}
+			IF = {
+				limit = { is_planet_class = pc_city }
+				set_planet_entity = { picture = pc_city }
+			}
+			IF = {
+				limit = { is_planet_class = pc_ecocity }
+				set_planet_entity = { picture = pc_ecocity }
 			}
 		}
 	}
@@ -1600,7 +1666,15 @@ decision_noexoitchabs = {
 			remove_modifier = pdashatmosphere
 			IF = {
 				limit = { is_planet_class = pc_ringworld_habitable }
-					set_planet_entity = { picture = pc_ringworld_habitable }
+				set_planet_entity = { picture = pc_ringworld_habitable }
+			}
+			IF = {
+				limit = { is_planet_class = pc_city }
+				set_planet_entity = { picture = pc_city }
+			}
+			IF = {
+				limit = { is_planet_class = pc_ecocity }
+				set_planet_entity = { picture = pc_ecocity }
 			}
 		}
 	}
