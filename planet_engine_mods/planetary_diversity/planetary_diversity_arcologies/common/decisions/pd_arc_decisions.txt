@@ -81,28 +81,22 @@ decision_ecoarcology_project = {
 				set_planet_flag = pdaquapicture
 			}
 			IF = {
-				limit = {
-					has_planet_flag = planet_earth
-				}
-				set_planet_entity = {
-                    entity = "ecocity_planet_02_earth_entity"
-                }
-				set_planet_flag = pdaquapicture
-			}
-			IF = {
 				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
-				add_modifier = { modifier = pdammoniaatmosphere	}
+				IF = { limit = { NOT = { has_modifier = pdammoniaatmosphere } }	add_modifier = { modifier = pdammoniaatmosphere	} }
 				remove_modifier = ammonia
+				set_planet_entity = { picture = pc_ammoniacity entity = ecocity_ammonia_planet_01_entity }
 			}
 			IF = {
 				limit = { owner = { has_trait = trait_pc_methane_preference } }
-				add_modifier = { modifier = pdmethaneatmosphere	}
+				IF = { limit = { NOT = { has_modifier = pdmethaneatmosphere } }	add_modifier = { modifier = pdmethaneatmosphere	} }
 				remove_modifier = methane
+				set_planet_entity = { picture = pc_methanecity entity = ecocity_methane_planet_01_entity }
 			}
 			IF = {
 				limit = { owner = { has_trait = trait_pc_ash_preference } }
-				add_modifier = { modifier = pdashatmosphere	}
+				IF = { limit = { NOT = { has_modifier = pdashatmosphere } }	add_modifier = { modifier = pdashatmosphere	} }
 				remove_modifier = ash
+				set_planet_entity = { picture = pc_ashcity entity = ecocity_ash_planet_01_entity }
 			}
 			owner = {
 				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
@@ -334,6 +328,57 @@ decision_ecoarcology_project_relic = {
 		}
 	}
 
+	ai_weight = {
+		weight = 0
+	}
+}
+
+# Flora-Forge Project
+decision_floraforge_project = {
+	owned_planets_only = yes
+	icon = decision_floraforge_project
+
+	enactment_time = 360
+	resources = {
+		category = decisions
+		cost = {
+			influence = 200
+			minerals = 5000
+		}
+	}
+	
+	potential = {
+		NOR = {
+			is_planet_class = pc_pdfloraforge
+		}
+		is_planet_class = pc_megafloratol
+		habitable_structure = no
+		exists = owner
+		#owner = { has_ascension_perk = ap_hive_worlds }
+	}
+	
+	allow = {
+		custom_tooltip = {
+			fail_text = decision_floraforge_requirements
+			num_districts = { type = district_farming value < 1 }
+			num_districts = { type = district_mining value < 1 }
+			num_districts = { type = district_generator value < 1 }
+		}
+		num_uncleared_blockers < 1
+	}
+	
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_floraforge_effects
+		hidden_effect = {		
+			change_pc = pc_pdfloraforge
+			owner = {
+				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
+			}
+			planet_event = { id = pdengine.11 }
+		}
+	}
+	
 	ai_weight = {
 		weight = 0
 	}
