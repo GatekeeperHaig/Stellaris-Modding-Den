@@ -253,6 +253,8 @@ country_event = {
 		every_planet = { limit = { is_planet_class = pc_coral is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Storm
 		every_planet = { limit = { is_planet_class = pc_storm is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
+		#Storm
+		every_planet = { limit = { is_planet_class = pc_rogue is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Megaflora
 		every_planet = { limit = { is_planet_class = pc_megaflora is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Gaia
@@ -503,6 +505,16 @@ country_event = {
 				25 = { change_pc = pc_antarctic reroll_planet = yes }	
 				25 = { change_pc = pc_glacial reroll_planet = yes }
 				25 = { change_pc = pc_frozen_desert reroll_planet = yes }		
+			}
+		}
+		#Rogue Start
+		every_planet = { 				
+			limit = { is_planet_class = pc_rogue is_homeworld = no has_planet_flag = prescripted_ideal }
+			random_list = {
+				25 = { change_pc = pc_tundra reroll_planet = yes }
+				25 = { change_pc = pc_mud reroll_planet = yes }	
+				25 = { change_pc = pc_mushroom reroll_planet = yes }
+				25 = { change_pc = pc_swamp reroll_planet = yes }		
 			}
 		}
 		#Megaflora Start
@@ -983,8 +995,11 @@ country_event = {
 			limit = {					
                 solar_system = { has_star_flag = sol }
 				is_planet_class = pc_barren		       
-	            planet_size = 13
+				OR = {
+				planet_size = 13
+				planet_size = 11
 					}
+				}
 			set_planet_flag = pdmars
 			set_planet_entity = {
 				picture = pc_barren_mars
@@ -1175,6 +1190,11 @@ planet_event = {
 		set_planet_flag =  pdnoseamonster
 		}
 		if = { 
+		limit = { is_planet_class = pc_rogue not = { has_deposit = d_rogue_geo }}
+		add_deposit = d_rogue_geo
+		add_modifier = { modifier = "pdrogue" days = -1 }
+		}
+		if = { 
 		limit = { is_planet_class = pc_megaflora not = { has_deposit = d_megaflora_deposit }}
 		add_deposit = d_megaflora_deposit
 		add_modifier = { modifier = "pdmegaflora" days = -1 }
@@ -1215,8 +1235,10 @@ planet_event = {
 		add_modifier = { modifier = "radiotrophic" days = -1 }
 		}
 		if = { 
-		limit = { is_planet_class = pc_gaia not = { has_deposit = d_pdgaia } }
-		add_deposit = d_pdgaia
+		limit = { is_planet_class = pc_gaia }
+		if = { limit = { not = { has_deposit = d_pdgaia } } add_deposit = d_pdgaia }
+		remove_modifier = engineered_environment
+		remove_modifier = engineered_environment_gaia
 		}
 		if = { 
 		limit = { 
@@ -1277,6 +1299,11 @@ planet_event = {
 		limit = { NOT = { is_planet_class = pc_storm } }
 		remove_deposit = d_storm_corridor
 		remove_modifier = pdstorm
+		}
+		if = { 
+		limit = { NOT = { is_planet_class = pc_rogue } }
+		remove_deposit = d_rogue_geo
+		remove_modifier = pdrogue
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_megaflora } }
@@ -1948,6 +1975,7 @@ planet_event = {
 		if = { limit = { is_planet_class = pc_salt } set_planet_flag = pdhive_salt }
 		if = { limit = { is_planet_class = pc_coral } set_planet_flag = pdhive_coral }
 		if = { limit = { is_planet_class = pc_storm } set_planet_flag = pdhive_storm }
+		if = { limit = { is_planet_class = pc_rogue } set_planet_flag = pdhive_rogue }
 		IF = { limit = { is_planet_class = pc_megaflora } set_planet_flag = pdhive_megaflora }
 		#Exotic
 		if = { limit = { is_planet_class = pc_ammonia } set_planet_flag = pdhive_ammonia }
@@ -2791,39 +2819,106 @@ country_event = {
 	hide_window = yes
 	is_triggered_only = yes
 	fire_only_once = yes
-	#Terraforming Candidate
+
 	immediate = {
 		every_planet = { 
 			limit = { 
 				is_planet_class = pc_barren_cold
 				not = { has_modifier = terraforming_candidate }	
-				solar_system = {
-					NOR = {
-						has_star_flag = empire_cluster
-						has_star_flag = empire_home_system
-					}
-				}
+				solar_system = { NOT = { has_star_flag = empire_home_system } }
 			}	
 			random_list = {
 				2 = { 
 					change_pc = pc_diamond
+					this = { clear_deposits = yes }
 					random_list = {
-						10 = { add_deposit = d_minerals_10 }
-						10 = { add_deposit = d_minerals_9 }
-						15 = { add_deposit = d_minerals_8 }
-						20 = { add_deposit = d_minerals_7 }
-						20 = { add_deposit = d_minerals_6 }
-						25 = { add_deposit = d_minerals_5 }
+						5 = { add_deposit = d_minerals_10 }
+						10 = { add_deposit = d_minerals_8 }
+						10 = { add_deposit = d_minerals_6 }
+						25 = { add_deposit = d_minerals_4 }
+						50 = { add_deposit = d_minerals_2 }
 					}
 					random_list = {
-						10 = { add_deposit = d_rare_crystals_5 }
-						15 = { add_deposit = d_rare_crystals_4 }
-						20 = { add_deposit = d_rare_crystals_3 }
-						25 = { add_deposit = d_rare_crystals_2 }
-						30 = { add_deposit = d_rare_crystals_1 }
+						10 = { add_deposit = d_rare_crystals_3 }
+						30 = { add_deposit = d_rare_crystals_2 }
+						60 = { add_deposit = d_rare_crystals_1 }
 					}
 				}
 				98 = { }	
+			}
+		}
+		every_planet = { 
+			limit = { 
+				is_planet_class = pc_barren
+				not = { 
+					OR = {
+						has_modifier = terraforming_candidate 
+						is_moon = yes
+					}
+				}	
+				solar_system = { NOT = {	has_star_flag = empire_home_system } }
+			}	
+			random_list = {
+				2 = {
+					change_pc = pc_chthonian
+					this = { clear_deposits = yes }
+					random_list = {
+						5 = { add_deposit = d_alloys_5 }
+						10 = { add_deposit = d_alloys_4 }
+						10 = { add_deposit = d_alloys_3 }
+						25 = { add_deposit = d_alloys_2 }
+						50 = { add_deposit = d_alloys_1 }
+					}
+					random_list = {
+						10 = { add_deposit = d_volatile_motes_3 }
+						30 = { add_deposit = d_volatile_motes_2 }
+						60 = { add_deposit = d_volatile_motes_1 }
+					}
+				}
+				98 = { }
+			}
+		}
+		every_planet = { 
+			limit = { 
+				is_planet_class = pc_gas_giant
+				solar_system = { NOT = { has_star_flag = empire_home_system } }
+			}	
+			random_list = {
+				2 = { 
+					change_pc = pc_hot_gas_giant
+					this = { clear_deposits = yes }
+					random_list = {
+						5 = { add_deposit = d_energy_10 }
+						10 = { add_deposit = d_energy_8 }
+						10 = { add_deposit = d_energy_6 }
+						25 = { add_deposit = d_energy_4 }
+						50 = { add_deposit = d_energy_2 }
+					}
+					random_list = {
+						10 = { add_deposit = d_exotic_gases_3 }
+						30 = { add_deposit = d_exotic_gases_2 }
+						60 = { add_deposit = d_exotic_gases_1 }
+					}
+				}
+				2 = { 
+					change_pc = pc_cold_gas_giant
+					this = { clear_deposits = yes }
+					random_list = {
+						5 = { add_deposit = d_physics_10 }
+						10 = { add_deposit = d_physics_8 }
+						10 = { add_deposit = d_physics_6 }
+						25 = { add_deposit = d_physics_4 }
+						50 = { add_deposit = d_physics_2 }
+					}
+					random_list = {
+						5 = { add_deposit = d_engineering_10 }
+						10 = { add_deposit = d_engineering_8 }
+						10 = { add_deposit = d_engineering_6 }
+						25 = { add_deposit = d_engineering_4 }
+						50 = { add_deposit = d_engineering_2 }
+					}
+				}
+				96 = { } 
 			}
 		}
 	}
@@ -2977,6 +3072,19 @@ country_event = {
 			if = {
 				limit = {
 					has_planet_flag = lost_colony_planet
+					is_planet_class = pc_rogue
+				}
+				random_list = {
+					25 = { change_pc = pc_tundra }
+					25 = { change_pc = pc_mud }
+					25 = { change_pc = pc_mushroom }
+					25 = { change_pc = pc_swamp }
+				}
+				generate_pd_start_deposits_and_blockers = yes
+			}
+			if = {
+				limit = {
+					has_planet_flag = lost_colony_planet
 					is_planet_class = pc_ammonia
 				}
 				generate_pd_start_deposits_and_blockers = yes
@@ -3018,7 +3126,7 @@ planet_event = {
 	id = pdengine.47
 	title = pdengine.47.name
 	desc = pdengine.47.desc
-	picture = GFX_evt_megaflora
+	picture = GFX_evt_baol_devolved
 	show_sound = event_alien_nature
 	location = root
 
@@ -3121,3 +3229,183 @@ planet_event = {
 		}
 	}
 }
+
+#Change Planet to Irradiated
+planet_event = {
+	id = pdengine.49
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		change_pc = pc_irradiated
+		hidden_effect = {
+			remove_modifier = radiotrophic
+			add_modifier = {
+				modifier = radiotrophic
+				days = -1
+			}
+			add_deposit = d_rad_blooms
+		}
+	}
+}
+
+#TOL Hive Can Turn Barren into Forest
+planet_event = {
+	id = pdengine.50
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		change_pc = pc_forest
+		remove_modifier = terraforming_candidate
+		remove_modifier = pdintoaforest
+		reroll_planet = yes
+		clear_blockers = yes
+	}
+}
+
+
+country_event = {
+	id = pdengine.51
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	immediate = {
+		every_planet = {
+			limit = { is_planet_class = pc_rogue  is_homeworld = yes }
+				ROOT = { set_country_flag = pdroguehomeworld }
+		}
+	}
+}
+
+country_event = {
+	id = pdengine.52
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+		
+	trigger	 = { 
+		has_country_flag = pdroguehomeworld 
+		any_owned_planet = {
+			is_planet_class = pc_rogue
+		}
+	}
+
+	immediate = {
+		every_planet_within_border = {
+			limit = { 
+				is_asteroid = yes
+			}
+			clear_deposits = yes
+			if = {
+				limit = { has_mining_station = yes }
+				random_mining_station = { dismantle = yes }
+			}
+			if = {
+				limit = { has_research_station = yes }
+				random_mining_station = { dismantle = yes }
+			}
+		}
+		random_planet_within_border = {
+			limit = {
+				is_capital = no 
+				is_star = no 
+				is_asteroid = no
+				is_moon = no
+				habitable_structure =  no 
+			}
+			clear_deposits = yes
+			change_pc = pc_asteroid
+			set_planet_size = 3
+			set_planet_flag = pdrogueresource
+			add_deposit = d_minerals_10
+			if = {
+				limit = { has_research_station = yes }
+				random_research_station = { dismantle = yes }
+			}
+			if = {
+				limit = { has_mining_station = no }
+				create_mining_station = { owner = ROOT }
+			}
+		}
+		random_planet_within_border = {
+			limit = {
+				is_capital = no 
+				is_star = no 
+				habitable_structure =  no 
+				is_asteroid = no
+				is_moon = no
+			}
+			clear_deposits = yes
+			change_pc = pc_asteroid
+			set_planet_size = 3
+			set_planet_flag = pdrogueresource
+			add_deposit = d_energy_10
+			if = {
+				limit = { has_research_station = yes }
+				random_research_station = { dismantle = yes }
+			}
+			if = {
+				limit = { has_mining_station = no }
+				create_mining_station = { owner = ROOT }
+			}
+		}
+		random_planet_within_border = {
+			limit = {
+				is_asteroid = no
+				is_moon = no
+				is_capital = no 
+				is_star = no 
+				habitable_structure =  no 
+			}
+			clear_deposits = yes
+			change_pc = pc_asteroid
+			set_planet_size = 3
+			set_planet_flag = pdrogueresource
+			random_list = {
+				33 = { add_deposit = d_physics_2 add_deposit = d_society_2 }
+				33 = { add_deposit = d_physics_2 add_deposit = d_engineering_2 }
+				33 = { add_deposit = d_engineering_2 add_deposit = d_society_2 }
+			}
+			if = {
+				limit = { has_mining_station = yes }
+				random_mining_station = { dismantle = yes }
+			}
+			if = {
+				limit = { has_research_station = no }
+				create_research_station = { owner = ROOT }
+			}
+		}
+		every_planet_within_border = {
+			limit = { 
+				is_capital = no 
+				is_star = no 
+				is_asteroid = no
+				habitable_structure =  no 
+				NOT = { has_planet_flag = pdrogueresource }
+			}
+			remove_planet = yes
+			if = {
+				limit = { has_mining_station = yes }
+				random_mining_station = { dismantle = yes }
+			}
+			if = {
+				limit = { has_research_station = yes }
+				random_mining_station = { dismantle = yes }
+			}
+		}
+		every_planet_within_border = {
+			limit = { is_star = yes }
+			change_pc = pc_black_hole
+			reset_planet = yes
+			if = {
+				limit = { has_mining_station = yes }
+				random_mining_station = { dismantle = yes }
+			}
+			if = {
+				limit = { has_research_station = yes }
+				random_mining_station = { dismantle = yes }
+			}
+		}
+	}
+} 

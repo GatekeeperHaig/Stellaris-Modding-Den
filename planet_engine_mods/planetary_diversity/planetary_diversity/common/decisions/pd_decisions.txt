@@ -52,9 +52,11 @@ decision_engineered_environment = {
 	}
 
 	effect = {
-		add_modifier = {
-			modifier = engineered_environment
-			days = -1
+		if = { limit = { NOT = { is_planet_class = pc_gaia } }
+			add_modifier = {
+				modifier = engineered_environment
+				days = -1
+			}
 		}
 		if = {
 			limit = { has_modifier = bleak_planet }
@@ -150,6 +152,10 @@ decision_engineered_environment_gaia = {
 			energy = 5000
 		}
 	}
+
+	allow = {
+		NOT = { is_planet_class = pc_gaia }
+	}
 	
 	potential = {
 		habitable_structure = no
@@ -179,9 +185,11 @@ decision_engineered_environment_gaia = {
 	}
 
 	effect = {
-		add_modifier = {
-			modifier = engineered_environment_gaia
-			days = -1
+		if = { limit = { NOT = { is_planet_class = pc_gaia } }
+			add_modifier = {
+				modifier = engineered_environment_gaia
+				days = -1
+			}
 		}
 		hidden_effect = {
 			remove_modifier = engineered_environment
@@ -229,11 +237,13 @@ decision_radiotrophic = {
 	
 	potential = {
 		habitable_structure = no
+		habitable_planet = yes
 		owner = { 
 			any_owned_planet = { is_planet_class = pc_irradiated }
 		}
 		NOT = { is_planet_class = pc_irradiated }
 		NOT = { is_planet_class = pc_nuked }
+		
 	}
 
 	effect = {
@@ -260,9 +270,7 @@ decision_radiotrophic = {
 # Any Planet to Radiotrophic Uncolonized
 decision_radiotrophic_no_colony = {
 	icon = decision_radiotrophic
-	#owned_planets_only = yes
 
-	enactment_time = 1800
 	resources = {
 		category = decisions
 		cost = {
@@ -273,23 +281,17 @@ decision_radiotrophic_no_colony = {
 	
 	potential = {
 		habitable_structure = no
+		habitable_planet = yes
 		has_owner = no
 		FROM = { owner = {  any_owned_planet = { is_planet_class = pc_irradiated } } }
 		NOT = { is_planet_class = pc_irradiated }
 		NOT = { is_planet_class = pc_nuked }
+		NOT = { has_modifier = pdintrotorads }
 	}
 
 	effect = {
-		change_pc = pc_irradiated
-		
-		hidden_effect = {
-			remove_modifier = radiotrophic
-			add_modifier = {
-				modifier = radiotrophic
-				days = -1
-			}
-			add_deposit = d_rad_blooms
-		}
+		add_modifier = { modifier = pdintrotorads days = 1800 }
+		hidden_effect = { planet_event = { id = pdengine.49 days = 1800 } }
 	}
 	
 	ai_weight = {
@@ -305,7 +307,7 @@ decision_radiotrophic_nuked = {
 	icon = decision_radiotrophic
 	owned_planets_only = yes
 
-	enactment_time = 1800
+	enactment_time = 900
 	resources = {
 		category = decisions
 		cost = {
@@ -346,9 +348,7 @@ decision_radiotrophic_nuked = {
 # Tomb to Radiotrophic No Colony
 decision_radiotrophic_nuked_no_colony = {
 	icon = decision_radiotrophic
-	#owned_planets_only = yes
 
-	enactment_time = 1800
 	resources = {
 		category = decisions
 		cost = {
@@ -362,19 +362,12 @@ decision_radiotrophic_nuked_no_colony = {
 		has_owner = no
 		is_planet_class = pc_nuked
 		FROM = { owner = {  any_owned_planet = { is_planet_class = pc_irradiated } } }
+		NOT = { has_modifier = pdintrotorads }
 	}
 
 	effect = {
-		change_pc = pc_irradiated
-		
-		hidden_effect = {
-			remove_modifier = radiotrophic
-			add_modifier = {
-				modifier = radiotrophic
-				days = -1
-			}
-			add_deposit = d_rad_blooms
-		}
+		add_modifier = { modifier = pdintrotorads days = 900 }
+		hidden_effect = { planet_event = { id = pdengine.49 days = 900 } }
 	}
 	
 	ai_weight = {
@@ -453,6 +446,7 @@ decision_removeocean = {
 			IF = { limit = { is_planet_class = pc_salt } set_planet_entity = { picture = pc_salt } }
 			IF = { limit = { is_planet_class = pc_coral } set_planet_entity = { picture = pc_coral } }
 			IF = { limit = { is_planet_class = pc_storm } set_planet_entity = { picture = pc_storm } }
+			IF = { limit = { is_planet_class = pc_rogue } set_planet_entity = { picture = pc_rogue } }
 		}
 	}
 	
@@ -859,6 +853,7 @@ decision_pdhive_uninfest = {
 			if = { limit = { has_planet_flag = pdhive_salt } change_pc = pc_salt remove_planet_flag = pdhive_salt }
 			if = { limit = { has_planet_flag = pdhive_coral } change_pc = pc_coral remove_planet_flag = pdhive_coral }
 			if = { limit = { has_planet_flag = pdhive_storm } change_pc = pc_storm remove_planet_flag = pdhive_storm }
+			if = { limit = { has_planet_flag = pdhive_rogue } change_pc = pc_rogue remove_planet_flag = pdhive_rogue }
 			#Exotic
 			if = { limit = { has_planet_flag = pdhive_ammonia } change_pc = pc_ammonia remove_planet_flag = pdhive_ammonia }
 			if = { limit = { has_planet_flag = pdhive_acid } change_pc = pc_acid remove_planet_flag = pdhive_acid }
@@ -1570,5 +1565,42 @@ decision_armbombownplanet = {
 	}
 }
 
+# TOL Can Terraform Barren
+decision_tolbarren_no_colony = {
+	icon = decision_pd_transplant_tree
+	#owned_planets_only = yes
+
+	resources = {
+		category = decisions
+		cost = {
+			energy = 10000
+		}
+	}
+	
+	potential = {
+		habitable_structure = no
+		has_owner = no
+		FROM = { owner = { has_origin = origin_pd_tree_of_life has_technology = tech_climate_restoration } }
+		OR = {
+			is_planet_class = pc_barren
+			is_planet_class = pc_barren_cold
+			is_planet_class = pc_hothouse
+		}
+		has_modifier = terraforming_candidate
+		NOT = { has_modifier = pdintoaforest }
+	}
+
+	effect = {
+		add_modifier = { modifier = pdintoaforest days = -1 }
+		hidden_effect = { planet_event = { id = pdengine.50 days = 3600 } }
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+		}
+	}
+}
 
 
