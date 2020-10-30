@@ -253,8 +253,10 @@ country_event = {
 		every_planet = { limit = { is_planet_class = pc_coral is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Storm
 		every_planet = { limit = { is_planet_class = pc_storm is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
-		#Storm
+		#Rogue
 		every_planet = { limit = { is_planet_class = pc_rogue is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
+		#Eyeball
+		every_planet = { limit = { is_planet_class = pc_eyeball is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Megaflora
 		every_planet = { limit = { is_planet_class = pc_megaflora is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Gaia
@@ -289,10 +291,10 @@ country_event = {
 		every_planet = {
 			limit = { is_planet_class = pc_tidallylocked  is_homeworld = no has_planet_flag = prescripted_ideal }
 			random_list = {
-				25 = { change_pc = pc_continental reroll_planet = yes }	
-				25 = { change_pc = pc_retinal reroll_planet = yes }		
-				25 = { change_pc = pc_forest reroll_planet = yes }		
-				25 = { change_pc = pc_lake reroll_planet = yes }
+				25 = { change_pc = pc_savannah reroll_planet = yes }	
+				25 = { change_pc = pc_veld reroll_planet = yes }		
+				25 = { change_pc = pc_steppe reroll_planet = yes }		
+				25 = { change_pc = pc_prairie reroll_planet = yes }
 			}
 		}
 		#Biolumen Player Start
@@ -517,6 +519,16 @@ country_event = {
 				25 = { change_pc = pc_swamp reroll_planet = yes }		
 			}
 		}
+		#Eyeball Start
+		every_planet = { 				
+			limit = { is_planet_class = pc_eyeball is_homeworld = no has_planet_flag = prescripted_ideal }
+			random_list = {
+				25 = { change_pc = pc_arctic reroll_planet = yes }
+				25 = { change_pc = pc_antarctic reroll_planet = yes }	
+				25 = { change_pc = pc_glacial reroll_planet = yes }
+				25 = { change_pc = pc_frozen_desert reroll_planet = yes }		
+			}
+		}
 		#Megaflora Start
 		every_planet = { 				
 			limit = { is_planet_class = pc_megaflora is_homeworld = no has_planet_flag = prescripted_ideal }
@@ -710,7 +722,7 @@ country_event = {
 	fire_only_once = yes
 	immediate = {
 		every_planet = {
-			limit = { is_planet_class = pc_tidallylocked  is_homeworld = yes is_moon = yes }
+			limit = { OR = { is_planet_class = pc_tidallylocked is_planet_class = pc_eyeball } is_homeworld = yes is_moon = yes }
 				ROOT = { set_country_flag = pdtidallylockedhomeworldmoon }
 		}
 	}
@@ -735,10 +747,10 @@ country_event = {
 			set_planet_size = 20
 			change_pc = pc_tidallylocked
 			generate_pd_start_deposits_and_blockers = yes
-			add_modifier = {
-				modifier = "tidal_locked2"
-				days = -1
-			}
+			#add_modifier = {
+			#	modifier = "tidal_locked2"
+			#	days = -1
+			#}
 			set_owner = ROOT
 			set_planet_flag = tidallylockedhomeworld
 			#All other pop types
@@ -749,6 +761,11 @@ country_event = {
 			set_capital = yes
 			generate_start_buildings_and_districts = yes
 			generate_start_pops = yes
+			IF = {
+				limit = { owner = { has_origin = origin_tree_of_life } }
+				add_deposit = d_tree_of_life_home
+				remove_modifier = no_lifetree
+			}
 		}
 		every_owned_pop = {
 			modify_species = {
@@ -1128,10 +1145,8 @@ planet_event = {
 					is_planet_class = pc_hive
 				}
 			}
-		remove_modifier = engineered_environment	
-		remove_modifier = engineered_environment2
-		remove_modifier = engineered_environment3
-		remove_modifier = engineered_environment4
+		remove_modifier = engineered_environment
+		remove_modifier = engineered_environment_gaia
 		}
 	}
 }
@@ -1193,6 +1208,11 @@ planet_event = {
 		limit = { is_planet_class = pc_rogue not = { has_deposit = d_rogue_geo }}
 		add_deposit = d_rogue_geo
 		add_modifier = { modifier = "pdrogue" days = -1 }
+		}
+		if = { 
+		limit = { is_planet_class = pc_eyeball not = { has_deposit = d_eyeball_site }}
+		add_deposit = d_eyeball_site
+		add_modifier = { modifier = "pdeyeball" days = -1 }
 		}
 		if = { 
 		limit = { is_planet_class = pc_megaflora not = { has_deposit = d_megaflora_deposit }}
@@ -1264,51 +1284,67 @@ planet_event = {
 		limit = { NOT = { is_planet_class = pc_geothermal } }
 		remove_deposit = d_geothermal_slurry_site
 		remove_modifier = geothermal
+		remove_building = building_geothermal_slurry_site
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_superhabitable } }
 		remove_deposit = d_ancient_motes
 		remove_modifier = superhabitable
+		remove_building = building_volatiles_mine
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_biolumen } }
 		remove_deposit = d_biolumen_nature_preserve
 		remove_modifier = biolumen
+		remove_building = building_nature_preserve
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_tidallylocked } }
 		remove_deposit = d_nightside_mining_operations
 		remove_modifier = tidal_locked2
+		remove_building = building_nightside_mining
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_karst } }
 		remove_deposit = d_karst_cave
 		remove_modifier = karst
+		remove_building = building_karst_mine
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_salt } }
 		remove_deposit = d_salt_caves
 		remove_modifier = pdsalt
+		remove_building = building_salt_mine
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_coral } }
 		remove_deposit = d_coral_fields
 		remove_modifier = pdcoral
+		remove_building = building_coral_mine
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_storm } }
 		remove_deposit = d_storm_corridor
 		remove_modifier = pdstorm
+		remove_building = building_storm_lab
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_rogue } }
 		remove_deposit = d_rogue_geo
 		remove_modifier = pdrogue
+		remove_building = building_rogue_mine
+		}
+		if = { 
+		limit = { NOT = { is_planet_class = pc_eyeball } }
+		remove_deposit = d_eyeball_site
+		remove_modifier = pdeyeball
+		remove_building = building_eyeball_lab
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_megaflora } }
 		remove_deposit = d_megaflora_deposit
 		remove_modifier = pdmegaflora
+		remove_building = building_megaflora_mine
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_primal } }
@@ -1321,32 +1357,38 @@ planet_event = {
 		if = { 
 		limit = { NOT = { OR = { is_planet_class = pc_ash is_planet_class = pc_primal } } }
 		remove_deposit = d_lava_lakes
+		remove_building = building_lava_mine
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_aquatic } }
 		remove_deposit = d_aquatic_trench
 		remove_modifier = aquatic
+		remove_building = building_undersea_gasmine
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_ammonia } }
 		remove_deposit = d_ammonia_sea
 		remove_modifier = ammonia
+		remove_building = building_ammonia_electrodeposition
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_acid } }
 		remove_deposit = d_acid_lakes
 		remove_deposit = d_pdacid_rain
 		remove_modifier = pdacid
+		remove_building = building_acid_lab
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_methane } }
 		remove_deposit = d_frozen_gas_mountain
 		remove_modifier = methane
+		remove_building = building_frozen_gas_mine
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_irradiated } }
 		remove_deposit = d_rad_blooms
 		remove_modifier = radiotrophic
+		remove_building = building_sugarbush
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_gaia } }
@@ -1976,6 +2018,7 @@ planet_event = {
 		if = { limit = { is_planet_class = pc_coral } set_planet_flag = pdhive_coral }
 		if = { limit = { is_planet_class = pc_storm } set_planet_flag = pdhive_storm }
 		if = { limit = { is_planet_class = pc_rogue } set_planet_flag = pdhive_rogue }
+		if = { limit = { is_planet_class = pc_eyeball } set_planet_flag = pdhive_eyeball }
 		IF = { limit = { is_planet_class = pc_megaflora } set_planet_flag = pdhive_megaflora }
 		#Exotic
 		if = { limit = { is_planet_class = pc_ammonia } set_planet_flag = pdhive_ammonia }
@@ -2832,11 +2875,17 @@ country_event = {
 					change_pc = pc_diamond
 					this = { clear_deposits = yes }
 					random_list = {
-						5 = { add_deposit = d_minerals_10 }
-						10 = { add_deposit = d_minerals_8 }
-						10 = { add_deposit = d_minerals_6 }
-						25 = { add_deposit = d_minerals_4 }
-						50 = { add_deposit = d_minerals_2 }
+						1 = { add_deposit = d_minerals_10 }
+						2 = { add_deposit = d_minerals_9 }
+						3 = { add_deposit = d_minerals_8 }
+						4 = { add_deposit = d_minerals_7 }
+						5 = { add_deposit = d_minerals_6 }
+						5 = { add_deposit = d_minerals_5 }
+						5 = { add_deposit = d_minerals_4 }
+						10 = { add_deposit = d_minerals_3 }
+						15 = { add_deposit = d_minerals_2 }
+						25 = { add_deposit = d_minerals_1 }
+						25 = { }
 					}
 					random_list = {
 						10 = { add_deposit = d_rare_crystals_3 }
@@ -2849,17 +2898,27 @@ country_event = {
 		}
 		every_planet = { 
 			limit = { 
-				is_planet_class = pc_barren
+				is_planet_class = pc_molten
 				not = { 
 					OR = {
 						has_modifier = terraforming_candidate 
 						is_moon = yes
 					}
 				}	
-				solar_system = { NOT = {	has_star_flag = empire_home_system } }
+				solar_system = { 
+					NOT = { has_star_flag = empire_home_system }
+					star = {
+						OR = {
+							is_star_class = sc_a
+							is_star_class = sc_b
+							is_star_class = sc_f
+							is_star_class = sc_k
+						}
+					}
+				}
 			}	
 			random_list = {
-				2 = {
+				15 = {
 					change_pc = pc_chthonian
 					this = { clear_deposits = yes }
 					random_list = {
@@ -2867,7 +2926,8 @@ country_event = {
 						10 = { add_deposit = d_alloys_4 }
 						10 = { add_deposit = d_alloys_3 }
 						25 = { add_deposit = d_alloys_2 }
-						50 = { add_deposit = d_alloys_1 }
+						25 = { add_deposit = d_alloys_1 }
+						25 = { }
 					}
 					random_list = {
 						10 = { add_deposit = d_volatile_motes_3 }
@@ -2875,24 +2935,41 @@ country_event = {
 						60 = { add_deposit = d_volatile_motes_1 }
 					}
 				}
-				98 = { }
+				85 = { }
 			}
 		}
 		every_planet = { 
 			limit = { 
-				is_planet_class = pc_gas_giant
-				solar_system = { NOT = { has_star_flag = empire_home_system } }
+				is_planet_class = pc_molten
+				NOT = { has_moon = yes }
+				NOT = { is_moon = yes }
+				solar_system = { 
+					NOT = { has_star_flag = empire_home_system }
+					star = {
+						OR = {
+							is_star_class = sc_a
+							is_star_class = sc_b
+							is_star_class = sc_f
+						}
+					}
+				}
 			}	
 			random_list = {
-				2 = { 
+				25 = { 
 					change_pc = pc_hot_gas_giant
 					this = { clear_deposits = yes }
 					random_list = {
-						5 = { add_deposit = d_energy_10 }
-						10 = { add_deposit = d_energy_8 }
-						10 = { add_deposit = d_energy_6 }
-						25 = { add_deposit = d_energy_4 }
-						50 = { add_deposit = d_energy_2 }
+						1 = { add_deposit = d_energy_10 }
+						2 = { add_deposit = d_energy_9 }
+						3 = { add_deposit = d_energy_8 }
+						4 = { add_deposit = d_energy_7 }
+						5 = { add_deposit = d_energy_6 }
+						5 = { add_deposit = d_energy_5 }
+						5 = { add_deposit = d_energy_4 }
+						10 = { add_deposit = d_energy_3 }
+						15 = { add_deposit = d_energy_2 }
+						25 = { add_deposit = d_energy_1 }
+						25 = { }
 					}
 					random_list = {
 						10 = { add_deposit = d_exotic_gases_3 }
@@ -2900,25 +2977,117 @@ country_event = {
 						60 = { add_deposit = d_exotic_gases_1 }
 					}
 				}
-				2 = { 
+				75 = { } 
+			}
+		}
+		every_planet = { 
+			limit = { 
+				is_planet_class = pc_gas_giant
+				solar_system = { 
+					NOT = { has_star_flag = empire_home_system } 
+					star = {
+						OR = {
+							is_star_class = sc_m
+							is_star_class = sc_m_giant
+							is_star_class = sc_k
+							is_star_class = sc_g
+						}
+					}
+				}
+			}	
+			random_list = {
+				15 = { 
 					change_pc = pc_cold_gas_giant
 					this = { clear_deposits = yes }
 					random_list = {
-						5 = { add_deposit = d_physics_10 }
-						10 = { add_deposit = d_physics_8 }
-						10 = { add_deposit = d_physics_6 }
-						25 = { add_deposit = d_physics_4 }
-						50 = { add_deposit = d_physics_2 }
+						1 = { add_deposit = d_physics_10 }
+						2 = { add_deposit = d_physics_9 }
+						3 = { add_deposit = d_physics_8 }
+						4 = { add_deposit = d_physics_7 }
+						5 = { add_deposit = d_physics_6 }
+						5 = { add_deposit = d_physics_5 }
+						5 = { add_deposit = d_physics_4 }
+						10 = { add_deposit = d_physics_3 }
+						15 = { add_deposit = d_physics_2 }
+						25 = { add_deposit = d_physics_1 }
+						25 = { }
 					}
 					random_list = {
-						5 = { add_deposit = d_engineering_10 }
-						10 = { add_deposit = d_engineering_8 }
-						10 = { add_deposit = d_engineering_6 }
-						25 = { add_deposit = d_engineering_4 }
-						50 = { add_deposit = d_engineering_2 }
+						1 = { add_deposit = d_engineering_10 }
+						2 = { add_deposit = d_engineering_9 }
+						3 = { add_deposit = d_engineering_8 }
+						4 = { add_deposit = d_engineering_7 }
+						5 = { add_deposit = d_engineering_6 }
+						5 = { add_deposit = d_engineering_5 }
+						5 = { add_deposit = d_engineering_4 }
+						10 = { add_deposit = d_engineering_3 }
+						15 = { add_deposit = d_engineering_2 }
+						25 = { add_deposit = d_engineering_1 }
+						25 = { }
 					}
 				}
-				96 = { } 
+				85 = { } 
+			}
+		}
+		every_planet = { 
+			limit = { 
+				is_planet_class = pc_toxic
+				solar_system = { 
+					NOT = { has_star_flag = empire_home_system } 
+					#star = {
+					#	OR = {
+					#		is_star_class = sc_m
+					#		is_star_class = sc_m_giant
+					#		is_star_class = sc_k
+					#		is_star_class = sc_g
+					#	}
+					#}
+				}
+			}	
+			random_list = {
+				10 = {
+					change_pc = pc_ethane_ocean
+					this = { clear_deposits = yes }
+					random_list = {
+						1 = { add_deposit = d_physics_10 }
+						2 = { add_deposit = d_physics_9 }
+						3 = { add_deposit = d_physics_8 }
+						4 = { add_deposit = d_physics_7 }
+						5 = { add_deposit = d_physics_6 }
+						5 = { add_deposit = d_physics_5 }
+						5 = { add_deposit = d_physics_4 }
+						10 = { add_deposit = d_physics_3 }
+						15 = { add_deposit = d_physics_2 }
+						25 = { add_deposit = d_physics_1 }
+						25 = { }
+					}
+					random_list = {
+						1 = { add_deposit = d_society_10 }
+						2 = { add_deposit = d_society_9 }
+						3 = { add_deposit = d_society_8 }
+						4 = { add_deposit = d_society_7 }
+						5 = { add_deposit = d_society_6 }
+						5 = { add_deposit = d_society_5 }
+						5 = { add_deposit = d_society_4 }
+						10 = { add_deposit = d_society_3 }
+						15 = { add_deposit = d_society_2 }
+						25 = { add_deposit = d_society_1 }
+						25 = { }
+					}
+				}
+				90 = { } 
+			}
+		}
+		every_planet = { 
+			limit = { 
+				is_planet_class = pc_forest
+				solar_system = { 
+					NOT = { has_star_flag = empire_home_system } 
+				}
+			}	
+			random_list = {
+				20 = { set_planet_entity = { picture = pc_forest2 } }
+				80 = { } 
 			}
 		}
 	}
@@ -3079,6 +3248,19 @@ country_event = {
 					25 = { change_pc = pc_mud }
 					25 = { change_pc = pc_mushroom }
 					25 = { change_pc = pc_swamp }
+				}
+				generate_pd_start_deposits_and_blockers = yes
+			}
+			if = {
+				limit = {
+					has_planet_flag = lost_colony_planet
+					is_planet_class = pc_eyeball
+				}
+				random_list = {
+					25 = { change_pc = pc_arctic }
+					25 = { change_pc = pc_antarctic }
+					25 = { change_pc = pc_glacial }
+					25 = { change_pc = pc_frozen_desert }
 				}
 				generate_pd_start_deposits_and_blockers = yes
 			}
@@ -3265,147 +3447,1262 @@ planet_event = {
 }
 
 
+# Randomize Necroids Starting Worlds for PD
 country_event = {
 	id = pdengine.51
-	hide_window = yes
 	is_triggered_only = yes
-	fire_only_once = yes
+	hide_window = yes
+
+	trigger = {
+		has_origin = origin_necrophage
+	}
+
 	immediate = {
-		every_planet = {
-			limit = { is_planet_class = pc_rogue  is_homeworld = yes }
-				ROOT = { set_country_flag = pdroguehomeworld }
+		capital_scope.solar_system = {
+			closest_system = {
+				limit = { has_star_flag = neighbor_t1_first_colony }
+				max_steps = 3
+				every_planet = {
+					limit = {
+						#is_colonizable = yes
+						has_planet_flag = prescripted_ideal
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_salt
+						}
+						random_list = {
+							25 = { change_pc = pc_desert }
+							25 = { change_pc = pc_sandsea }
+							25 = { change_pc = pc_outback }
+							25 = { change_pc = pc_oasis }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_superhabitable
+						}
+						random_list = {
+							25 = { change_pc = pc_tropical }
+							25 = { change_pc = pc_hajungle }
+							25 = { change_pc = pc_mangrove }
+							25 = { change_pc = pc_desertislands }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_geothermal
+						}
+						random_list = {
+							25 = { change_pc = pc_tropical }
+							25 = { change_pc = pc_hajungle }
+							25 = { change_pc = pc_mangrove }
+							25 = { change_pc = pc_desertislands }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_biolumen
+						}
+						random_list = {
+							25 = { change_pc = pc_tropical }
+							25 = { change_pc = pc_hajungle }
+							25 = { change_pc = pc_mangrove }
+							25 = { change_pc = pc_desertislands }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_karst
+						}
+						random_list = {
+							25 = { change_pc = pc_continental }
+							25 = { change_pc = pc_lake }
+							25 = { change_pc = pc_retinal }
+							25 = { change_pc = pc_forest }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_megaflora
+						}
+						random_list = {
+							25 = { change_pc = pc_continental }
+							25 = { change_pc = pc_lake }
+							25 = { change_pc = pc_retinal }
+							25 = { change_pc = pc_forest }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_aquatic
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_primal
+						}
+						random_list = {
+							25 = { change_pc = pc_savannah }
+							25 = { change_pc = pc_prairie }
+							25 = { change_pc = pc_veld }
+							25 = { change_pc = pc_steppe }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_tidallylocked
+						}
+						random_list = {
+							25 = { change_pc = pc_savannah }
+							25 = { change_pc = pc_prairie }
+							25 = { change_pc = pc_veld }
+							25 = { change_pc = pc_steppe }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_coral
+						}
+						random_list = {
+							25 = { change_pc = pc_arid }
+							25 = { change_pc = pc_mesa }
+							25 = { change_pc = pc_hadesert }
+							25 = { change_pc = pc_med }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_storm
+						}
+						random_list = {
+							25 = { change_pc = pc_arctic }
+							25 = { change_pc = pc_antarctic }
+							25 = { change_pc = pc_glacial }
+							25 = { change_pc = pc_frozen_desert }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_rogue
+						}
+						random_list = {
+							25 = { change_pc = pc_tundra }
+							25 = { change_pc = pc_mud }
+							25 = { change_pc = pc_mushroom }
+							25 = { change_pc = pc_swamp }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_eyeball
+						}
+						random_list = {
+							25 = { change_pc = pc_arctic }
+							25 = { change_pc = pc_antarctic }
+							25 = { change_pc = pc_glacial }
+							25 = { change_pc = pc_frozen_desert }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_ammonia
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_acid
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_methane
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_irradiated
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_ash
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_continental
+						}
+						random_list = {
+							10 = { change_pc = pc_continental reroll_planet = yes }		
+							30 = { change_pc = pc_retinal reroll_planet = yes }			
+							30 = { change_pc = pc_forest reroll_planet = yes }	
+							30 = { change_pc = pc_lake reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_retinal
+						}
+						random_list = {
+							30 = { change_pc = pc_continental reroll_planet = yes }		
+							10 = { change_pc = pc_retinal reroll_planet = yes }			
+							30 = { change_pc = pc_forest reroll_planet = yes }	
+							30 = { change_pc = pc_lake reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_forest
+						}
+						random_list = {
+							30 = { change_pc = pc_continental reroll_planet = yes }		
+							30 = { change_pc = pc_retinal reroll_planet = yes }			
+							10 = { change_pc = pc_forest reroll_planet = yes }	
+							30 = { change_pc = pc_lake reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_lake
+						}
+						random_list = {
+							30 = { change_pc = pc_continental reroll_planet = yes }		
+							30 = { change_pc = pc_retinal reroll_planet = yes }			
+							30 = { change_pc = pc_forest reroll_planet = yes }	
+							10 = { change_pc = pc_lake reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_ocean
+						}
+						random_list = {
+							30 = { change_pc = pc_wetswamp reroll_planet = yes }
+							30 = { change_pc = pc_cascadian reroll_planet = yes }	
+							10 = { change_pc = pc_ocean reroll_planet = yes	}		
+							30 = { change_pc = pc_subarctic reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_cascadian
+						}
+						random_list = {
+							30 = { change_pc = pc_wetswamp reroll_planet = yes }
+							10 = { change_pc = pc_cascadian reroll_planet = yes }	
+							30 = { change_pc = pc_ocean reroll_planet = yes	}		
+							30 = { change_pc = pc_subarctic reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_wetswamp
+						}
+						random_list = {
+							10 = { change_pc = pc_wetswamp reroll_planet = yes }
+							30 = { change_pc = pc_cascadian reroll_planet = yes }	
+							30 = { change_pc = pc_ocean reroll_planet = yes	}		
+							30 = { change_pc = pc_subarctic reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_subarctic
+						}
+						random_list = {
+							30 = { change_pc = pc_wetswamp reroll_planet = yes }
+							30 = { change_pc = pc_cascadian reroll_planet = yes }	
+							30 = { change_pc = pc_ocean reroll_planet = yes	}		
+							10 = { change_pc = pc_subarctic reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_tropical
+						}
+						random_list = {
+							10 = { change_pc = pc_tropical reroll_planet = yes }
+							30 = { change_pc = pc_desertislands reroll_planet = yes }	
+							30 = { change_pc = pc_mangrove reroll_planet = yes	}		
+							30 = { change_pc = pc_hajungle reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_desertislands
+						}
+						random_list = {
+							30 = { change_pc = pc_tropical reroll_planet = yes }
+							10 = { change_pc = pc_desertislands reroll_planet = yes }	
+							30 = { change_pc = pc_mangrove reroll_planet = yes	}		
+							30 = { change_pc = pc_hajungle reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_mangrove
+						}
+						random_list = {
+							30 = { change_pc = pc_tropical reroll_planet = yes }
+							30 = { change_pc = pc_desertislands reroll_planet = yes }	
+							10 = { change_pc = pc_mangrove reroll_planet = yes	}		
+							30 = { change_pc = pc_hajungle reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_hajungle
+						}
+						random_list = {
+							30 = { change_pc = pc_tropical reroll_planet = yes }
+							30 = { change_pc = pc_desertislands reroll_planet = yes }	
+							30 = { change_pc = pc_mangrove reroll_planet = yes	}		
+							10 = { change_pc = pc_hajungle reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_desert
+						}
+						random_list = {
+							10 = { change_pc = pc_desert reroll_planet = yes }
+							30 = { change_pc = pc_sandsea reroll_planet = yes }	
+							30 = { change_pc = pc_oasis reroll_planet = yes }	
+							30 = { change_pc = pc_outback reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_sandsea
+						}
+						random_list = {
+							30 = { change_pc = pc_desert reroll_planet = yes }
+							10 = { change_pc = pc_sandsea reroll_planet = yes }	
+							30 = { change_pc = pc_oasis reroll_planet = yes }	
+							30 = { change_pc = pc_outback reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_oasis
+						}
+						random_list = {
+							30 = { change_pc = pc_desert reroll_planet = yes }
+							30 = { change_pc = pc_sandsea reroll_planet = yes }	
+							10 = { change_pc = pc_oasis reroll_planet = yes }	
+							30 = { change_pc = pc_outback reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_outback
+						}
+						random_list = {
+							30 = { change_pc = pc_desert reroll_planet = yes }
+							30 = { change_pc = pc_sandsea reroll_planet = yes }	
+							30 = { change_pc = pc_oasis reroll_planet = yes }	
+							10 = { change_pc = pc_outback reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_arid
+						}
+						random_list = {
+							10 = { change_pc = pc_arid reroll_planet = yes	}	
+							30 = { change_pc = pc_mesa reroll_planet = yes }	
+							30 = { change_pc = pc_hadesert reroll_planet = yes }		
+							30 = { change_pc = pc_med reroll_planet = yes }			
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_mesa
+						}
+						random_list = {
+							30 = { change_pc = pc_arid reroll_planet = yes	}	
+							10 = { change_pc = pc_mesa reroll_planet = yes }	
+							30 = { change_pc = pc_hadesert reroll_planet = yes }		
+							30 = { change_pc = pc_med reroll_planet = yes }			
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_hadesert
+						}
+						random_list = {
+							30 = { change_pc = pc_arid reroll_planet = yes	}	
+							30 = { change_pc = pc_mesa reroll_planet = yes }	
+							10 = { change_pc = pc_hadesert reroll_planet = yes }		
+							30 = { change_pc = pc_med reroll_planet = yes }			
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_med
+						}
+						random_list = {
+							30 = { change_pc = pc_arid reroll_planet = yes	}	
+							30 = { change_pc = pc_mesa reroll_planet = yes }	
+							30 = { change_pc = pc_hadesert reroll_planet = yes }		
+							10 = { change_pc = pc_med reroll_planet = yes }			
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_savannah
+						}
+						random_list = {
+							10 = { change_pc = pc_savannah reroll_planet = yes }		
+							30 = { change_pc = pc_steppe reroll_planet = yes }
+							30 = { change_pc = pc_prairie reroll_planet = yes }	
+							30 = { change_pc = pc_veld reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_steppe
+						}
+						random_list = {
+							30 = { change_pc = pc_savannah reroll_planet = yes }		
+							10 = { change_pc = pc_steppe reroll_planet = yes }
+							30 = { change_pc = pc_prairie reroll_planet = yes }	
+							30 = { change_pc = pc_veld reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_prairie
+						}
+						random_list = {
+							30 = { change_pc = pc_savannah reroll_planet = yes }		
+							30 = { change_pc = pc_steppe reroll_planet = yes }
+							10 = { change_pc = pc_prairie reroll_planet = yes }	
+							30 = { change_pc = pc_veld reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_veld
+						}
+						random_list = {
+							30 = { change_pc = pc_savannah reroll_planet = yes }		
+							30 = { change_pc = pc_steppe reroll_planet = yes }
+							30 = { change_pc = pc_prairie reroll_planet = yes }	
+							10 = { change_pc = pc_veld reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_arctic
+						}
+						random_list = {
+							10 = { change_pc = pc_arctic reroll_planet = yes }
+							30 = { change_pc = pc_frozen_desert reroll_planet = yes }	
+							30 = { change_pc = pc_glacial reroll_planet = yes }	
+							30 = { change_pc = pc_antarctic reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_frozen_desert
+						}
+						random_list = {
+							30 = { change_pc = pc_arctic reroll_planet = yes }
+							10 = { change_pc = pc_frozen_desert reroll_planet = yes }	
+							30 = { change_pc = pc_glacial reroll_planet = yes }	
+							30 = { change_pc = pc_antarctic reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_glacial
+						}
+						random_list = {
+							30 = { change_pc = pc_arctic reroll_planet = yes }
+							30 = { change_pc = pc_frozen_desert reroll_planet = yes }	
+							10 = { change_pc = pc_glacial reroll_planet = yes }	
+							30 = { change_pc = pc_antarctic reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_antarctic
+						}
+						random_list = {
+							30 = { change_pc = pc_arctic reroll_planet = yes }
+							30 = { change_pc = pc_frozen_desert reroll_planet = yes }	
+							30 = { change_pc = pc_glacial reroll_planet = yes }	
+							10 = { change_pc = pc_antarctic reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_alpine
+						}
+						random_list = {
+							10 = { change_pc = pc_alpine reroll_planet = yes }		
+							30 = { change_pc = pc_boreal reroll_planet = yes }		
+							30 = { change_pc = pc_snow reroll_planet = yes }
+							30 = { change_pc = pc_highland reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_boreal
+						}
+						random_list = {
+							30 = { change_pc = pc_alpine reroll_planet = yes }		
+							10 = { change_pc = pc_boreal reroll_planet = yes }		
+							30 = { change_pc = pc_snow reroll_planet = yes }
+							30 = { change_pc = pc_highland reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_snow
+						}
+						random_list = {
+							30 = { change_pc = pc_alpine reroll_planet = yes }		
+							30 = { change_pc = pc_boreal reroll_planet = yes }		
+							10 = { change_pc = pc_snow reroll_planet = yes }
+							30 = { change_pc = pc_highland reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_highland
+						}
+						random_list = {
+							30 = { change_pc = pc_alpine reroll_planet = yes }		
+							30 = { change_pc = pc_boreal reroll_planet = yes }		
+							30 = { change_pc = pc_snow reroll_planet = yes }
+							10 = { change_pc = pc_highland reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_tundra
+						}
+						random_list = {
+							10 = { change_pc = pc_tundra reroll_planet = yes }		
+							30 = { change_pc = pc_swamp reroll_planet = yes }	
+							30 = { change_pc = pc_mushroom reroll_planet = yes }
+							30 = { change_pc = pc_mud reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_swamp
+						}
+						random_list = {
+							30 = { change_pc = pc_tundra reroll_planet = yes }		
+							10 = { change_pc = pc_swamp reroll_planet = yes }	
+							30 = { change_pc = pc_mushroom reroll_planet = yes }
+							30 = { change_pc = pc_mud reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_mushroom
+						}
+						random_list = {
+							30 = { change_pc = pc_tundra reroll_planet = yes }		
+							30 = { change_pc = pc_swamp reroll_planet = yes }	
+							10 = { change_pc = pc_mushroom reroll_planet = yes }
+							30 = { change_pc = pc_mud reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_mud
+						}
+						random_list = {
+							30 = { change_pc = pc_tundra reroll_planet = yes }		
+							30 = { change_pc = pc_swamp reroll_planet = yes }	
+							30 = { change_pc = pc_mushroom reroll_planet = yes }
+							10 = { change_pc = pc_mud reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+				}
+			}
+			closest_system = {
+				limit = { has_star_flag = neighbor_t2_second_colony }
+				max_steps = 6
+				every_planet = {
+					limit = {
+						#is_colonizable = yes
+						has_planet_flag = prescripted_ideal
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_salt
+						}
+						random_list = {
+							25 = { change_pc = pc_desert }
+							25 = { change_pc = pc_sandsea }
+							25 = { change_pc = pc_outback }
+							25 = { change_pc = pc_oasis }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_superhabitable
+						}
+						random_list = {
+							25 = { change_pc = pc_tropical }
+							25 = { change_pc = pc_hajungle }
+							25 = { change_pc = pc_mangrove }
+							25 = { change_pc = pc_desertislands }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_geothermal
+						}
+						random_list = {
+							25 = { change_pc = pc_tropical }
+							25 = { change_pc = pc_hajungle }
+							25 = { change_pc = pc_mangrove }
+							25 = { change_pc = pc_desertislands }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_biolumen
+						}
+						random_list = {
+							25 = { change_pc = pc_tropical }
+							25 = { change_pc = pc_hajungle }
+							25 = { change_pc = pc_mangrove }
+							25 = { change_pc = pc_desertislands }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_karst
+						}
+						random_list = {
+							25 = { change_pc = pc_continental }
+							25 = { change_pc = pc_lake }
+							25 = { change_pc = pc_retinal }
+							25 = { change_pc = pc_forest }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_megaflora
+						}
+						random_list = {
+							25 = { change_pc = pc_continental }
+							25 = { change_pc = pc_lake }
+							25 = { change_pc = pc_retinal }
+							25 = { change_pc = pc_forest }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_aquatic
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_primal
+						}
+						random_list = {
+							25 = { change_pc = pc_savannah }
+							25 = { change_pc = pc_prairie }
+							25 = { change_pc = pc_veld }
+							25 = { change_pc = pc_steppe }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_tidallylocked
+						}
+						random_list = {
+							25 = { change_pc = pc_savannah }
+							25 = { change_pc = pc_prairie }
+							25 = { change_pc = pc_veld }
+							25 = { change_pc = pc_steppe }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_coral
+						}
+						random_list = {
+							25 = { change_pc = pc_arid }
+							25 = { change_pc = pc_mesa }
+							25 = { change_pc = pc_hadesert }
+							25 = { change_pc = pc_med }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_storm
+						}
+						random_list = {
+							25 = { change_pc = pc_arctic }
+							25 = { change_pc = pc_antarctic }
+							25 = { change_pc = pc_glacial }
+							25 = { change_pc = pc_frozen_desert }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_rogue
+						}
+						random_list = {
+							25 = { change_pc = pc_tundra }
+							25 = { change_pc = pc_mud }
+							25 = { change_pc = pc_mushroom }
+							25 = { change_pc = pc_swamp }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_eyeball
+						}
+						random_list = {
+							25 = { change_pc = pc_arctic }
+							25 = { change_pc = pc_antarctic }
+							25 = { change_pc = pc_glacial }
+							25 = { change_pc = pc_frozen_desert }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_ammonia
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_acid
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_methane
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_irradiated
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_ash
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_continental
+						}
+						random_list = {
+							10 = { change_pc = pc_continental reroll_planet = yes }		
+							30 = { change_pc = pc_retinal reroll_planet = yes }			
+							30 = { change_pc = pc_forest reroll_planet = yes }	
+							30 = { change_pc = pc_lake reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_retinal
+						}
+						random_list = {
+							30 = { change_pc = pc_continental reroll_planet = yes }		
+							10 = { change_pc = pc_retinal reroll_planet = yes }			
+							30 = { change_pc = pc_forest reroll_planet = yes }	
+							30 = { change_pc = pc_lake reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_forest
+						}
+						random_list = {
+							30 = { change_pc = pc_continental reroll_planet = yes }		
+							30 = { change_pc = pc_retinal reroll_planet = yes }			
+							10 = { change_pc = pc_forest reroll_planet = yes }	
+							30 = { change_pc = pc_lake reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_lake
+						}
+						random_list = {
+							30 = { change_pc = pc_continental reroll_planet = yes }		
+							30 = { change_pc = pc_retinal reroll_planet = yes }			
+							30 = { change_pc = pc_forest reroll_planet = yes }	
+							10 = { change_pc = pc_lake reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_ocean
+						}
+						random_list = {
+							30 = { change_pc = pc_wetswamp reroll_planet = yes }
+							30 = { change_pc = pc_cascadian reroll_planet = yes }	
+							10 = { change_pc = pc_ocean reroll_planet = yes	}		
+							30 = { change_pc = pc_subarctic reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_cascadian
+						}
+						random_list = {
+							30 = { change_pc = pc_wetswamp reroll_planet = yes }
+							10 = { change_pc = pc_cascadian reroll_planet = yes }	
+							30 = { change_pc = pc_ocean reroll_planet = yes	}		
+							30 = { change_pc = pc_subarctic reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_wetswamp
+						}
+						random_list = {
+							10 = { change_pc = pc_wetswamp reroll_planet = yes }
+							30 = { change_pc = pc_cascadian reroll_planet = yes }	
+							30 = { change_pc = pc_ocean reroll_planet = yes	}		
+							30 = { change_pc = pc_subarctic reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_subarctic
+						}
+						random_list = {
+							30 = { change_pc = pc_wetswamp reroll_planet = yes }
+							30 = { change_pc = pc_cascadian reroll_planet = yes }	
+							30 = { change_pc = pc_ocean reroll_planet = yes	}		
+							10 = { change_pc = pc_subarctic reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_tropical
+						}
+						random_list = {
+							10 = { change_pc = pc_tropical reroll_planet = yes }
+							30 = { change_pc = pc_desertislands reroll_planet = yes }	
+							30 = { change_pc = pc_mangrove reroll_planet = yes	}		
+							30 = { change_pc = pc_hajungle reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_desertislands
+						}
+						random_list = {
+							30 = { change_pc = pc_tropical reroll_planet = yes }
+							10 = { change_pc = pc_desertislands reroll_planet = yes }	
+							30 = { change_pc = pc_mangrove reroll_planet = yes	}		
+							30 = { change_pc = pc_hajungle reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_mangrove
+						}
+						random_list = {
+							30 = { change_pc = pc_tropical reroll_planet = yes }
+							30 = { change_pc = pc_desertislands reroll_planet = yes }	
+							10 = { change_pc = pc_mangrove reroll_planet = yes	}		
+							30 = { change_pc = pc_hajungle reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_hajungle
+						}
+						random_list = {
+							30 = { change_pc = pc_tropical reroll_planet = yes }
+							30 = { change_pc = pc_desertislands reroll_planet = yes }	
+							30 = { change_pc = pc_mangrove reroll_planet = yes	}		
+							10 = { change_pc = pc_hajungle reroll_planet = yes }
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_desert
+						}
+						random_list = {
+							10 = { change_pc = pc_desert reroll_planet = yes }
+							30 = { change_pc = pc_sandsea reroll_planet = yes }	
+							30 = { change_pc = pc_oasis reroll_planet = yes }	
+							30 = { change_pc = pc_outback reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_sandsea
+						}
+						random_list = {
+							30 = { change_pc = pc_desert reroll_planet = yes }
+							10 = { change_pc = pc_sandsea reroll_planet = yes }	
+							30 = { change_pc = pc_oasis reroll_planet = yes }	
+							30 = { change_pc = pc_outback reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_oasis
+						}
+						random_list = {
+							30 = { change_pc = pc_desert reroll_planet = yes }
+							30 = { change_pc = pc_sandsea reroll_planet = yes }	
+							10 = { change_pc = pc_oasis reroll_planet = yes }	
+							30 = { change_pc = pc_outback reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_outback
+						}
+						random_list = {
+							30 = { change_pc = pc_desert reroll_planet = yes }
+							30 = { change_pc = pc_sandsea reroll_planet = yes }	
+							30 = { change_pc = pc_oasis reroll_planet = yes }	
+							10 = { change_pc = pc_outback reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_arid
+						}
+						random_list = {
+							10 = { change_pc = pc_arid reroll_planet = yes	}	
+							30 = { change_pc = pc_mesa reroll_planet = yes }	
+							30 = { change_pc = pc_hadesert reroll_planet = yes }		
+							30 = { change_pc = pc_med reroll_planet = yes }			
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_mesa
+						}
+						random_list = {
+							30 = { change_pc = pc_arid reroll_planet = yes	}	
+							10 = { change_pc = pc_mesa reroll_planet = yes }	
+							30 = { change_pc = pc_hadesert reroll_planet = yes }		
+							30 = { change_pc = pc_med reroll_planet = yes }			
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_hadesert
+						}
+						random_list = {
+							30 = { change_pc = pc_arid reroll_planet = yes	}	
+							30 = { change_pc = pc_mesa reroll_planet = yes }	
+							10 = { change_pc = pc_hadesert reroll_planet = yes }		
+							30 = { change_pc = pc_med reroll_planet = yes }			
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_med
+						}
+						random_list = {
+							30 = { change_pc = pc_arid reroll_planet = yes	}	
+							30 = { change_pc = pc_mesa reroll_planet = yes }	
+							30 = { change_pc = pc_hadesert reroll_planet = yes }		
+							10 = { change_pc = pc_med reroll_planet = yes }			
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_savannah
+						}
+						random_list = {
+							10 = { change_pc = pc_savannah reroll_planet = yes }		
+							30 = { change_pc = pc_steppe reroll_planet = yes }
+							30 = { change_pc = pc_prairie reroll_planet = yes }	
+							30 = { change_pc = pc_veld reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_steppe
+						}
+						random_list = {
+							30 = { change_pc = pc_savannah reroll_planet = yes }		
+							10 = { change_pc = pc_steppe reroll_planet = yes }
+							30 = { change_pc = pc_prairie reroll_planet = yes }	
+							30 = { change_pc = pc_veld reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_prairie
+						}
+						random_list = {
+							30 = { change_pc = pc_savannah reroll_planet = yes }		
+							30 = { change_pc = pc_steppe reroll_planet = yes }
+							10 = { change_pc = pc_prairie reroll_planet = yes }	
+							30 = { change_pc = pc_veld reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_veld
+						}
+						random_list = {
+							30 = { change_pc = pc_savannah reroll_planet = yes }		
+							30 = { change_pc = pc_steppe reroll_planet = yes }
+							30 = { change_pc = pc_prairie reroll_planet = yes }	
+							10 = { change_pc = pc_veld reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_arctic
+						}
+						random_list = {
+							10 = { change_pc = pc_arctic reroll_planet = yes }
+							30 = { change_pc = pc_frozen_desert reroll_planet = yes }	
+							30 = { change_pc = pc_glacial reroll_planet = yes }	
+							30 = { change_pc = pc_antarctic reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_frozen_desert
+						}
+						random_list = {
+							30 = { change_pc = pc_arctic reroll_planet = yes }
+							10 = { change_pc = pc_frozen_desert reroll_planet = yes }	
+							30 = { change_pc = pc_glacial reroll_planet = yes }	
+							30 = { change_pc = pc_antarctic reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_glacial
+						}
+						random_list = {
+							30 = { change_pc = pc_arctic reroll_planet = yes }
+							30 = { change_pc = pc_frozen_desert reroll_planet = yes }	
+							10 = { change_pc = pc_glacial reroll_planet = yes }	
+							30 = { change_pc = pc_antarctic reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_antarctic
+						}
+						random_list = {
+							30 = { change_pc = pc_arctic reroll_planet = yes }
+							30 = { change_pc = pc_frozen_desert reroll_planet = yes }	
+							30 = { change_pc = pc_glacial reroll_planet = yes }	
+							10 = { change_pc = pc_antarctic reroll_planet = yes }		
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_alpine
+						}
+						random_list = {
+							10 = { change_pc = pc_alpine reroll_planet = yes }		
+							30 = { change_pc = pc_boreal reroll_planet = yes }		
+							30 = { change_pc = pc_snow reroll_planet = yes }
+							30 = { change_pc = pc_highland reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_boreal
+						}
+						random_list = {
+							30 = { change_pc = pc_alpine reroll_planet = yes }		
+							10 = { change_pc = pc_boreal reroll_planet = yes }		
+							30 = { change_pc = pc_snow reroll_planet = yes }
+							30 = { change_pc = pc_highland reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_snow
+						}
+						random_list = {
+							30 = { change_pc = pc_alpine reroll_planet = yes }		
+							30 = { change_pc = pc_boreal reroll_planet = yes }		
+							10 = { change_pc = pc_snow reroll_planet = yes }
+							30 = { change_pc = pc_highland reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_highland
+						}
+						random_list = {
+							30 = { change_pc = pc_alpine reroll_planet = yes }		
+							30 = { change_pc = pc_boreal reroll_planet = yes }		
+							30 = { change_pc = pc_snow reroll_planet = yes }
+							10 = { change_pc = pc_highland reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_tundra
+						}
+						random_list = {
+							10 = { change_pc = pc_tundra reroll_planet = yes }		
+							30 = { change_pc = pc_swamp reroll_planet = yes }	
+							30 = { change_pc = pc_mushroom reroll_planet = yes }
+							30 = { change_pc = pc_mud reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_swamp
+						}
+						random_list = {
+							30 = { change_pc = pc_tundra reroll_planet = yes }		
+							10 = { change_pc = pc_swamp reroll_planet = yes }	
+							30 = { change_pc = pc_mushroom reroll_planet = yes }
+							30 = { change_pc = pc_mud reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_mushroom
+						}
+						random_list = {
+							30 = { change_pc = pc_tundra reroll_planet = yes }		
+							30 = { change_pc = pc_swamp reroll_planet = yes }	
+							10 = { change_pc = pc_mushroom reroll_planet = yes }
+							30 = { change_pc = pc_mud reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_mud
+						}
+						random_list = {
+							30 = { change_pc = pc_tundra reroll_planet = yes }		
+							30 = { change_pc = pc_swamp reroll_planet = yes }	
+							30 = { change_pc = pc_mushroom reroll_planet = yes }
+							10 = { change_pc = pc_mud reroll_planet = yes }	
+						}
+						generate_pd_start_deposits_and_blockers = yes
+					}
+				}
+			}
 		}
 	}
 }
-
-country_event = {
-	id = pdengine.52
-	hide_window = yes
-	is_triggered_only = yes
-	fire_only_once = yes
-		
-	trigger	 = { 
-		has_country_flag = pdroguehomeworld 
-		any_owned_planet = {
-			is_planet_class = pc_rogue
-		}
-	}
-
-	immediate = {
-		every_planet_within_border = {
-			limit = { 
-				is_asteroid = yes
-			}
-			clear_deposits = yes
-			if = {
-				limit = { has_mining_station = yes }
-				random_mining_station = { dismantle = yes }
-			}
-			if = {
-				limit = { has_research_station = yes }
-				random_mining_station = { dismantle = yes }
-			}
-		}
-		random_planet_within_border = {
-			limit = {
-				is_capital = no 
-				is_star = no 
-				is_asteroid = no
-				is_moon = no
-				habitable_structure =  no 
-			}
-			clear_deposits = yes
-			change_pc = pc_asteroid
-			set_planet_size = 3
-			set_planet_flag = pdrogueresource
-			add_deposit = d_minerals_10
-			if = {
-				limit = { has_research_station = yes }
-				random_research_station = { dismantle = yes }
-			}
-			if = {
-				limit = { has_mining_station = no }
-				create_mining_station = { owner = ROOT }
-			}
-		}
-		random_planet_within_border = {
-			limit = {
-				is_capital = no 
-				is_star = no 
-				habitable_structure =  no 
-				is_asteroid = no
-				is_moon = no
-			}
-			clear_deposits = yes
-			change_pc = pc_asteroid
-			set_planet_size = 3
-			set_planet_flag = pdrogueresource
-			add_deposit = d_energy_10
-			if = {
-				limit = { has_research_station = yes }
-				random_research_station = { dismantle = yes }
-			}
-			if = {
-				limit = { has_mining_station = no }
-				create_mining_station = { owner = ROOT }
-			}
-		}
-		random_planet_within_border = {
-			limit = {
-				is_asteroid = no
-				is_moon = no
-				is_capital = no 
-				is_star = no 
-				habitable_structure =  no 
-			}
-			clear_deposits = yes
-			change_pc = pc_asteroid
-			set_planet_size = 3
-			set_planet_flag = pdrogueresource
-			random_list = {
-				33 = { add_deposit = d_physics_2 add_deposit = d_society_2 }
-				33 = { add_deposit = d_physics_2 add_deposit = d_engineering_2 }
-				33 = { add_deposit = d_engineering_2 add_deposit = d_society_2 }
-			}
-			if = {
-				limit = { has_mining_station = yes }
-				random_mining_station = { dismantle = yes }
-			}
-			if = {
-				limit = { has_research_station = no }
-				create_research_station = { owner = ROOT }
-			}
-		}
-		every_planet_within_border = {
-			limit = { 
-				is_capital = no 
-				is_star = no 
-				is_asteroid = no
-				habitable_structure =  no 
-				NOT = { has_planet_flag = pdrogueresource }
-			}
-			remove_planet = yes
-			if = {
-				limit = { has_mining_station = yes }
-				random_mining_station = { dismantle = yes }
-			}
-			if = {
-				limit = { has_research_station = yes }
-				random_mining_station = { dismantle = yes }
-			}
-		}
-		every_planet_within_border = {
-			limit = { is_star = yes }
-			change_pc = pc_black_hole
-			reset_planet = yes
-			if = {
-				limit = { has_mining_station = yes }
-				random_mining_station = { dismantle = yes }
-			}
-			if = {
-				limit = { has_research_station = yes }
-				random_mining_station = { dismantle = yes }
-			}
-		}
-	}
-} 

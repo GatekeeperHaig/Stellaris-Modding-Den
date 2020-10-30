@@ -1,0 +1,228 @@
+
+@distance = 50
+@base_moon_distance = 10
+@jumps = 3
+
+# Tidally-Locked World
+pd_tidallylocked_start_init = {
+	class = "sc_m"
+	flags = { empire_home_system }
+	usage = custom_empire
+
+	init_effect = {
+		every_neighbor_system = {
+			set_star_flag = empire_cluster
+			every_neighbor_system = {
+				set_star_flag = empire_cluster
+			}
+		}
+		generate_home_system_resources = yes
+	}
+
+	planet = {
+		count = 1
+		class = "pc_m_star"
+		orbit_distance = 0
+		orbit_angle = 1
+		size = { min = 20 max = 30 }
+		has_ring = no
+	}
+	
+	change_orbit = 45
+	
+	planet = {
+		count = { min = 0 max = 1 }
+		orbit_distance = 20
+		orbit_angle = { min = 90 max = 270 }
+		class = rl_unhabitable_planets
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = { min = 0 max = 1 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = 5
+			class = rl_unhabitable_planets
+		}
+	}
+	
+	change_orbit = 20
+
+    planet = {
+		class = "pc_tidallylocked"
+		orbit_distance = 0
+		orbit_angle = 85
+		size = { min = 18 max = 21 }
+		modifiers = none
+		starting_planet = yes
+		
+		init_effect = {
+			IF = {
+				limit = { is_planet_class = pc_tidallylocked }
+				set_planet_flag = pd_tidallylocked_planet
+				add_modifier = {
+					modifier = tidal_locked2
+					days = -1
+				}
+				add_deposit = d_nightside_mining_operations
+			}
+			IF = {
+				limit = { is_planet_class = pc_eyeball }
+				set_planet_flag = pd_eyeball_planet
+				add_modifier = {
+					modifier = pdeyeball
+					days = -1
+				}
+				add_deposit = d_eyeball_site
+			}
+        }
+    }
+            	
+	change_orbit = 20
+	
+	planet = {
+		count = { min = 6 max = 9 }
+		orbit_distance = 20
+		orbit_angle = { min = 90 max = 270 }
+		class = rl_unhabitable_planets
+		
+		change_orbit = @base_moon_distance
+		
+		moon = {
+			count = { min = 0 max = 1 }
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = 5
+			class = rl_unhabitable_planets
+		}
+	}
+	
+	neighbor_system = {
+		trigger = { num_guaranteed_colonies >= 2 }
+		hyperlane_jumps = { min = 1 max = @jumps }
+		initializer = "neighbor_t1"
+	}
+	neighbor_system = {
+		trigger = { num_guaranteed_colonies >= 1 }
+		hyperlane_jumps = { min = 1 max = @jumps }
+		initializer = "neighbor_t1_first_colony"
+	}
+}
+
+# Rogue World
+pd_rogue_start_init = {
+	class = "sc_black_hole"
+
+	asteroid_belt = {
+		type = icy_asteroid_belt
+		radius = 157
+	}
+	
+	flags = { empire_home_system }
+	usage = custom_empire
+
+	init_effect = {
+		every_neighbor_system = {
+			set_star_flag = empire_cluster
+			every_neighbor_system = {
+				set_star_flag = empire_cluster
+			}
+		}
+		generate_home_system_resources = yes
+	}
+
+	planet = {
+		count = 1
+		class = "pc_black_hole"
+		orbit_distance = 0
+		orbit_angle = 1
+		size = { min = 20 max = 30 }
+		has_ring = no
+	}
+	
+	change_orbit = 105
+
+    planet = {
+		class = "pc_rogue"
+		orbit_distance = 0
+		orbit_angle = 85
+		size = { min = 18 max = 21 }
+		modifiers = none
+		starting_planet = yes
+		
+		init_effect = {
+			IF = {
+				limit = { is_planet_class = pc_rogue }
+				set_planet_flag = pd_rogue_planet
+				add_modifier = {
+					modifier = pdrogue
+					days = -1
+				}
+				add_deposit = d_rogue_geo
+			}
+        }
+    }
+	
+	change_orbit = 50
+
+	planet = {
+		class = "pc_ice_asteroid"
+		orbit_distance = 0
+		orbit_angle = -116
+		size = 5
+		has_ring = no
+	}
+
+	planet = {
+		class = "pc_asteroid"
+		orbit_distance = 0
+		orbit_angle = 50
+		size = 5
+		has_ring = no
+		init_effect = { add_deposit = d_engineering_2 }
+		
+	}
+
+	planet = {
+		class = "pc_ice_asteroid"
+		orbit_distance = 0
+		orbit_angle = -210
+		size = 5
+		has_ring = no
+	}
+	
+	planet = {
+		class = "pc_ice_asteroid"
+		orbit_distance = 0
+		orbit_angle = -95
+		size = 5
+		has_ring = no
+	}
+	
+	planet = {
+		class = "pc_asteroid"
+		orbit_distance = 0
+		orbit_angle = 285
+		size = 5
+		has_ring = no
+		init_effect = { add_deposit = d_physics_2 }
+	}
+	
+	planet = {
+		class = "pc_ice_asteroid"
+		orbit_distance = 0
+		orbit_angle = -80
+		size = 5
+		has_ring = no
+	}
+	
+	neighbor_system = {
+		trigger = { num_guaranteed_colonies >= 2 }
+		hyperlane_jumps = { min = 1 max = @jumps }
+		initializer = "neighbor_t1"
+	}
+	neighbor_system = {
+		trigger = { num_guaranteed_colonies >= 1 }
+		hyperlane_jumps = { min = 1 max = @jumps }
+		initializer = "neighbor_t1_first_colony"
+	}
+}
