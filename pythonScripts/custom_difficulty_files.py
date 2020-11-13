@@ -1142,7 +1142,7 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
     createEventTarget.add("remove_global_flag","MM_was_active_before_custom_difficulty")
     createEventTarget=immediate.addReturn("else")
     createEventTarget.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
-    for strength in [0.25, 0.5, 1, 2,3,4,5,25]:
+    for strength in [0.25, 0.5, 1, 2,3,4,5,10,15,20,25]:
       gameStartInitEvent.add("option", TagList("name", "custom_difficulty_{!s}_crisis.name".format(strength))
         .add("trigger", TagList("is_crises_allowed", yes))
         .add("hidden_effect", TagList(ET,TagList("set_variable", TagList("which","custom_difficulty_crisis_strength").add("value",str(strength))))))

@@ -1,4 +1,4 @@
-name="Dynamic Difficulty - Ultimate Customization"
+name="Dynamic Difficulty - Ultimate Customization test"
 path="modModding/gratak_mods/custom_difficulty"
 tags={
 	"Balance"
@@ -7,5 +7,5 @@ dependencies={
   "Dynamic Difficulty : More Modifiers"
 }
 picture="pyraSquare.jpg"
-supported_version="2.6.*"
+supported_version="2.8.*"
 remote_file_id="1590362799"
