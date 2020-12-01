@@ -21,6 +21,7 @@ decision_ecoarcology_project = {
 		NOR = {
 			is_planet_class = pc_pdshroud
 			is_planet_class = pc_ecocity
+			is_planet_class = pc_milarc
 			is_planet_class = pc_city
 			is_planet_class = pc_relic
 			has_modifier = resort_colony
@@ -87,6 +88,12 @@ decision_ecoarcology_project = {
 				set_planet_entity = { picture = pc_ammoniacity entity = ecocity_ammonia_planet_01_entity }
 			}
 			IF = {
+				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
+				IF = { limit = { NOT = { has_modifier = pdsulfuratmosphere } }	add_modifier = { modifier = pdsulfuratmosphere	} }
+				remove_modifier = pdsulfur
+				set_planet_entity = { picture = pc_sulfurcity entity = ecocity_sulfur_planet_01_entity }
+			}
+			IF = {
 				limit = { owner = { has_trait = trait_pc_methane_preference } }
 				IF = { limit = { NOT = { has_modifier = pdmethaneatmosphere } }	add_modifier = { modifier = pdmethaneatmosphere	} }
 				remove_modifier = methane
@@ -116,6 +123,134 @@ decision_ecoarcology_project = {
 			remove_modifier = engineered_environment
 			remove_modifier = engineered_environment_gaia
 			add_deposit = d_ecogarden
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}
+
+# Military Arcology Project
+decision_milarcology_project = {
+	owned_planets_only = yes
+	icon = decision_milarcology_project
+
+	enactment_time = 3600
+	resources = {
+		category = decisions
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+	
+	potential = {
+		NOR = {
+			is_planet_class = pc_pdshroud
+			is_planet_class = pc_ecocity
+			is_planet_class = pc_milarc
+			is_planet_class = pc_city
+			is_planet_class = pc_relic
+			has_modifier = resort_colony
+			has_modifier = penal_colony
+			has_modifier = slave_colony
+		}
+		habitable_structure = no
+		exists = owner
+		owner = { has_ascension_perk = ap_arcology_project }
+	}
+	
+	allow = {
+		custom_tooltip = {
+			fail_text = decision_mil_arcology_project_requirements
+			num_districts = { type = district_city value >= 10 }
+			num_districts = { type = district_farming value < 1 }
+			num_districts = { type = district_mining value < 1 }
+			num_districts = { type = district_generator value < 1 }
+		}
+		num_uncleared_blockers < 1
+	}
+	
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_arcology_project_effects
+		hidden_effect = {		
+			clear_deposits = yes
+			change_pc = pc_milarc
+			add_district = district_pdmilarc_housing
+			add_district = district_pdmilarc_housing
+			add_district = district_pdmilarc_housing
+			add_district = district_pdmilarc_housing
+			add_district = district_pdmilarc_housing
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = planet_earth
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_02_earth_entity"
+            #    }
+			#}
+			IF = {
+				limit = { 
+					owner = { NOT = { has_trait = trait_pc_aquatic_preference } }
+					NOT = { has_planet_flag = planet_earth }
+				 }
+				set_planet_entity = {
+					entity = "milarc_planet_entity"
+					graphical_culture = owner
+				}
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
+				set_planet_entity = {
+					entity = "aquaticcity_planet_01_entity"
+					picture = "pc_aquaticcity"
+				}
+				set_planet_flag = pdaquapicture
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
+				IF = { limit = { NOT = { has_modifier = pdammoniaatmosphere } }	add_modifier = { modifier = pdammoniaatmosphere	} }
+				remove_modifier = ammonia
+				set_planet_entity = { picture = pc_ammoniacity entity = ecocity_ammonia_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
+				IF = { limit = { NOT = { has_modifier = pdsulfuratmosphere } }	add_modifier = { modifier = pdsulfuratmosphere	} }
+				remove_modifier = pdsulfur
+				set_planet_entity = { picture = pc_sulfurcity entity = ecocity_sulfur_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_methane_preference } }
+				IF = { limit = { NOT = { has_modifier = pdmethaneatmosphere } }	add_modifier = { modifier = pdmethaneatmosphere	} }
+				remove_modifier = methane
+				set_planet_entity = { picture = pc_methanecity entity = ecocity_methane_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ash_preference } }
+				IF = { limit = { NOT = { has_modifier = pdashatmosphere } }	add_modifier = { modifier = pdashatmosphere	} }
+				remove_modifier = ash
+				set_planet_entity = { picture = pc_ashcity entity = ecocity_ash_planet_01_entity }
+			}
+			owner = {
+				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
+			}
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				owner = {
+					set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+				}
+			}
+			planet_event = { id = pdengine.54 }
+			remove_modifier = engineered_environment
+			remove_modifier = engineered_environment_gaia
+			add_deposit = d_milarc
 		}
 	}
 	
@@ -288,6 +423,11 @@ decision_ecoarcology_project_relic = {
 				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
 				add_modifier = { modifier = pdammoniaatmosphere	}
 				remove_modifier = ammonia
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
+				add_modifier = { modifier = pdsulfuratmosphere	}
+				remove_modifier = pdsulfur
 			}
 			IF = {
 				limit = { owner = { has_trait = trait_pc_methane_preference } }
