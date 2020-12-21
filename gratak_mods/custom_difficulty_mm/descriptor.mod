@@ -1,4 +1,4 @@
-name="Dynamic Difficulty : More Modifiers test"
+name="Dynamic Difficulty : More Modifiers"
 path="modModding/gratak_mods/custom_difficulty_mm"
 tags={
 	"Balance"

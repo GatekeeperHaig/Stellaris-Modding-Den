@@ -1,4 +1,4 @@
-name="Dynamic Difficulty - Ultimate Customization test"
+name="Dynamic Difficulty - Ultimate Customization"
 path="modModding/gratak_mods/custom_difficulty"
 tags={
 	"Balance"
