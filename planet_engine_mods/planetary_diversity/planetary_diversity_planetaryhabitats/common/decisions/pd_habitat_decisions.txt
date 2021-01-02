@@ -188,6 +188,51 @@ decision_mining2hab = {
 	}
 }
 
+# Make Military
+decision_milhab = {
+	icon = decision_milhab
+	owned_planets_only = yes
+	
+	#prerequisites = {
+	#	"tech_terrestrial_sculpting"		
+	#}
+
+	enactment_time = 1
+	resources = {
+		category = decisions
+		cost = {
+			energy = 250
+		}
+	}
+	
+	potential = { 
+		OR = {
+			is_planet_class = pc_pd_barren_hab
+			is_planet_class = pc_pd_barren_cold_hab
+			is_planet_class = pc_pd_frozen_hab
+			is_planet_class = pc_pd_molten_hab
+			is_planet_class = pc_pd_asteroid_hab
+			is_planet_class = pc_pd_toxic_hab
+			is_planet_class = pc_pd_hothouse_hab
+			is_planet_class = pc_pd_gas_giant_hab
+		}
+		NOT = { has_planet_flag = pd_hab_d2 }
+	}
+
+	effect = {
+		custom_tooltip = decision_mil_hab_effects_short
+		hidden_effect = {
+			set_planet_flag = pd_mil_hab
+			IF = { limit = { NOT = { has_planet_flag = pd_hab_d1 } } set_planet_flag = pd_hab_d1 }
+			ELSE_IF = { limit = { has_planet_flag = pd_hab_d1 } set_planet_flag = pd_hab_d2 }
+		}
+	}    
+	
+	ai_weight = { 
+		weight = 1
+	}
+}
+
 # Advanced Habitat
 decision_upgrade_pd_habitat = {
 	owned_planets_only = yes
@@ -293,6 +338,83 @@ decision_upgrade_pd_habitat_2 = {
 		hidden_effect = {
 			set_planet_flag = advanced_habitat_2
 		}
+	}
+
+	ai_weight = {
+		weight = 1
+	}
+}
+
+
+decision_destroy_planetary_hab = {
+	#owned_planets_only = yes
+	icon = decision_satellite_in_orbit #TODO
+
+	#enactment_time = 1440
+	resources = {
+		category = decisions
+		cost = {
+			energy = 1000
+		}
+	}
+
+	potential = {
+		OR = {
+		is_planet_class = pc_pd_barren_cold_hab
+		is_planet_class = pc_pd_barren_hab
+		is_planet_class = pc_pd_frozen_hab
+		is_planet_class = pc_pd_gas_giant_hab
+		is_planet_class = pc_pd_hothouse_hab
+		is_planet_class = pc_pd_toxic_hab
+		is_planet_class = pc_pd_molten_hab
+		is_planet_class = pc_pd_asteroid_hab
+		}
+		num_pops < 1
+	}
+
+	allow = {
+		num_pops < 1
+	}
+
+	effect = {
+		custom_tooltip = PD_REMOVE_HAB_TOOLTIP
+		owner = { add_resource = { alloys = 200	} }
+		hidden_effect = {
+		if = {
+			limit = { is_planet_class = pc_pd_barren_cold_hab }
+			change_pc = pc_barren_cold
+		}
+		if = {
+			limit = { is_planet_class = pc_pd_barren_hab }
+			change_pc = pc_barren
+		}
+		if = {
+			limit = { is_planet_class = pc_pd_frozen_hab }
+			change_pc = pc_frozen_desert
+		}
+		if = {
+			limit = { is_planet_class = pc_pd_gas_giant_hab }
+			change_pc = pc_gas_giant
+		}
+		if = {
+			limit = { is_planet_class = pc_pd_hothouse_hab }
+			change_pc = pc_hothouse
+		}
+		if = {
+			limit = { is_planet_class = pc_pd_toxic_hab }
+			change_pc = pc_toxic
+		}
+		if = {
+			limit = { is_planet_class = pc_pd_molten_hab }
+			change_pc = pc_molten
+		}
+		if = {
+			limit = { is_planet_class = pc_pd_asteroid_hab }
+			change_pc = pc_asteroid
+		}	
+		remove_deposit = d_expanded_dome_system
+		remove_deposit = d_expanded_dome_system_1
+	}
 	}
 
 	ai_weight = {

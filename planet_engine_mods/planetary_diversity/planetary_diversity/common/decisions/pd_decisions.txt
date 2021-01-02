@@ -47,6 +47,11 @@ decision_engineered_environment = {
 		NOT = { is_planet_class = pc_machine_factory }
 		NOT = { is_planet_class = pc_hive }
 		NOT = { is_planet_class = pc_bioforge }
+		NOT = { is_planet_class = pc_pdfloraforge }
+		NOT = { is_planet_class = pc_milarc }
+		NOT = { is_planet_class = pc_pdbiofort }
+		NOT = { is_planet_class = pc_megaflorafort }
+		NOT = { is_planet_class = pc_machine_fort }
 		NOT = { has_modifier = engineered_environment }
 		NOT = { has_modifier = engineered_environment_gaia }
 	}
@@ -180,6 +185,12 @@ decision_engineered_environment_gaia = {
 		NOT = { is_planet_class = pc_hive }
 		NOT = { is_planet_class = pc_pdhive1 }
 		NOT = { is_planet_class = pc_pdhive2 }
+		NOT = { is_planet_class = pc_bioforge }
+		NOT = { is_planet_class = pc_pdfloraforge }
+		NOT = { is_planet_class = pc_milarc }
+		NOT = { is_planet_class = pc_pdbiofort }
+		NOT = { is_planet_class = pc_megaflorafort }
+		NOT = { is_planet_class = pc_machine_fort }
 		has_modifier = engineered_environment
 		owner = { has_ascension_perk = ap_world_shaper }
 	}
@@ -405,6 +416,7 @@ decision_removeocean = {
 		NOT = { is_planet_class = pc_pd_toxic_hab }
 		NOT = { is_planet_class = pc_pd_hothouse_hab }
 		NOT = { is_planet_class = pc_pd_asteroid_hab }
+		habitable_structure = no
 		has_planet_flag = pdaquapicture
 	}
 
@@ -484,6 +496,7 @@ decision_oceancapital = {
 		NOT = { is_planet_class = pc_relic }
 		NOT = { is_planet_class = pc_city }
 		NOT = { is_planet_class = pc_ecocity }
+		NOT = { is_planet_class = pc_habitat }
 		NOT = { is_planet_class = pc_pd_gas_giant_hab }
 		NOT = { is_planet_class = pc_pd_barren_hab }
 		NOT = { is_planet_class = pc_pd_barren_cold_hab }
@@ -492,17 +505,7 @@ decision_oceancapital = {
 		NOT = { is_planet_class = pc_pd_toxic_hab }
 		NOT = { is_planet_class = pc_pd_hothouse_hab }
 		NOT = { is_planet_class = pc_pd_asteroid_hab }
-		NOT = { is_planet_class = pc_hadesert }
-		NOT = { is_planet_class = pc_antarctic }
-		NOT = { is_planet_class = pc_snow }
-		NOT = { is_planet_class = pc_highland }
-		NOT = { is_planet_class = pc_tundra }
-		NOT = { is_planet_class = pc_frozen_desert }
-		NOT = { is_planet_class = pc_mesa }
-		NOT = { is_planet_class = pc_outback }
-		NOT = { is_planet_class = pc_desert }
-		NOT = { is_planet_class = pc_arid }
-		NOT = { is_planet_class = pc_sandsea }
+		NOT = { is_dry = yes }
 	}
 
 	effect = {
@@ -534,6 +537,7 @@ decision_oceancapital = {
 			#IF = { limit = { is_planet_class = pc_antarctic } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_snow } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_highland } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
+			#IF = { limit = { is_planet_class = pc_duneforest } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_tundra } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_frozen_desert } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			#Tropical
@@ -848,9 +852,11 @@ decision_pdhive_uninfest = {
 			if = { limit = { has_planet_flag = pdhive_boreal } change_pc = pc_boreal remove_planet_flag = pdhive_boreal }
 			if = { limit = { has_planet_flag = pdhive_mushroom } change_pc = pc_mushroom remove_planet_flag = pdhive_mushroom }
 			if = { limit = { has_planet_flag = pdhive_antarctic } change_pc = pc_antarctic remove_planet_flag = pdhive_antarctic }
+			if = { limit = { has_planet_flag = pdhive_aeolian } change_pc = pc_aeolian remove_planet_flag = pdhive_aeolian }
 			if = { limit = { has_planet_flag = pdhive_snow } change_pc = pc_snow remove_planet_flag = pdhive_snow }
 			if = { limit = { has_planet_flag = pdhive_glacial } change_pc = pc_glacial remove_planet_flag = pdhive_glacial }
 			if = { limit = { has_planet_flag = pdhive_highland } change_pc = pc_highland remove_planet_flag = pdhive_highland }
+			if = { limit = { has_planet_flag = pdhive_duneforest } change_pc = pc_duneforest remove_planet_flag = pdhive_duneforest }
 			#Rare
 			if = { limit = { has_planet_flag = pdhive_geothermal } change_pc = pc_geothermal remove_planet_flag = pdhive_geothermal }
 			if = { limit = { has_planet_flag = pdhive_superhabitable } change_pc = pc_superhabitable remove_planet_flag = pdhive_superhabitable }
@@ -1772,5 +1778,50 @@ decision_tolbarren_no_colony = {
 		}
 	}
 }
+
+# Frozen gets Methane Terraforming=
+#decision_pd_scan_frozen_world = {
+#	icon = decision_pd_scan_frozen_world
+#	#owned_planets_only = yes
+#
+#	resources = {
+#		category = decisions
+#		cost = {
+#			energy = 200
+#		}
+#	}
+#	
+#	potential = {
+#		is_planet_class = pc_frozen
+#		from = { owner = { has_trait = trait_pc_methane_preference } }
+#		from = { owner = { has_technology = tech_terrestrial_sculpting } }
+#		planet_size > 9
+#		planet_size < 26	
+#		solar_system = {
+#			NOR = {
+#				is_star_class = sc_black_hole
+#				is_star_class = sc_neutron_star
+#				is_star_class = sc_pulsar
+#			}
+#		}
+#		NOT = { has_modifier = terraforming_methane }
+#		NOT = { has_planet_flag = pdmethanescan }
+#	}
+#
+#	effect = {
+#		custom_tooltip = decision_pd_scan_frozen_world_tooltip
+#		hidden_effect = {
+#			random_list = {
+#				66 = {}
+#				33 = { add_modifier = { modifier = terraforming_methane days = -1 } }
+#			}
+#			set_planet_flag = pdmethanescan
+#		}
+#	}
+#	
+#	ai_weight = {
+#		weight = 1000
+#	}
+#}
 
 
