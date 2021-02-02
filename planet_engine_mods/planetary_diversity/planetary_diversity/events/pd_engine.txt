@@ -1078,6 +1078,16 @@ country_event = {
 		every_planet = {
 			limit = {					
                 solar_system = { has_star_flag = sol }
+	            is_planet_class = pc_molten       
+				planet_size = 6   
+				is_moon = yes  
+					}
+			set_planet_flag = pdio
+			change_pc = pc_volcanic
+		}
+		every_planet = {
+			limit = {					
+                solar_system = { has_star_flag = sol }
 	            is_planet_class = pc_gas_giant       
 	            planet_size = 30     
 					}
@@ -1336,12 +1346,7 @@ planet_event = {
 		add_modifier = { modifier = "pdglacio" days = -1 }
 		}
 		if = { 
-		limit = { is_planet_class = pc_megaflora not = { has_deposit = d_megaflora_deposit }}
-		add_deposit = d_megaflora_deposit
-		add_modifier = { modifier = "pdmegaflora" days = -1 }
-		}
-		if = { 
-		limit = { is_planet_class = pc_megaflorahive not = { has_deposit = d_megaflora_deposit }}
+		limit = { OR = { is_planet_class = pc_megaflora is_planet_class = pc_megaflorahive is_planet_class = pc_megafloratol } not = { has_deposit = d_megaflora_deposit }}
 		add_deposit = d_megaflora_deposit
 		add_modifier = { modifier = "pdmegaflora" days = -1 }
 		}
@@ -1484,13 +1489,7 @@ planet_event = {
 		remove_building = building_glacio_forge
 		}
 		if = { 
-		limit = { NOT = { is_planet_class = pc_megaflora } }
-		remove_deposit = d_megaflora_deposit
-		remove_modifier = pdmegaflora
-		remove_building = building_megaflora_mine
-		}
-		if = { 
-		limit = { NOT = { is_planet_class = pc_megaflorahive } }
+		limit = { NOT = { OR = { is_planet_class = pc_megaflora is_planet_class = pc_megaflorahive is_planet_class = pc_megafloratol } } }
 		remove_deposit = d_megaflora_deposit
 		remove_modifier = pdmegaflora
 		remove_building = building_megaflora_mine
@@ -2034,6 +2033,16 @@ country_event = {
 	
 	immediate = {
 		give_technology = { tech = "tech_psionic_theory" message = no }
+		every_planet = {
+			IF = {
+				limit = {
+					has_planet_flag = planet_earth
+				}
+				set_planet_entity = {
+                    entity = "pdshroud_planet_earth_entity"
+				}
+			}
+		}
 	}
 	
 	#Eater
@@ -2386,6 +2395,24 @@ planet_event = {
 		remove_deposit = d_pdshroud
 		remove_modifier = pdsalt
 		remove_deposit = d_salt_caves
+		remove_modifier = pdmegaflora
+		remove_deposit = d_megaflora_deposit
+		remove_modifier = pdmegaflora
+		remove_deposit = d_megaflora_deposit
+		remove_modifier = pdcoral
+		remove_deposit = d_coral_fields
+		remove_modifier = supercon
+		remove_deposit = d_supercon_site
+		remove_modifier = pdstorm
+		remove_deposit = d_storm_corridor
+		remove_modifier = pdglacio
+		remove_deposit = d_glacio_lake
+		remove_modifier = pdrogue
+		remove_deposit = d_rogue_geo
+		remove_modifier = pdeyeball
+		remove_deposit = d_eyeball_site
+		remove_modifier = pdsulfur
+		remove_deposit = d_sulfur_pool
 	change_pc = pc_pdhive1
 	set_planet_flag = pd_infesting2
 	add_modifier = { modifier = pd_infestingplanet2 days = 7200 }
@@ -2867,6 +2894,20 @@ planet_event = {
 		remove_deposit = d_pdshroud
 		remove_modifier = pdsalt
 		remove_deposit = d_salt_caves
+		remove_modifier = pdcoral
+		remove_deposit = d_coral_fields
+		remove_modifier = supercon
+		remove_deposit = d_supercon_site
+		remove_modifier = pdstorm
+		remove_deposit = d_storm_corridor
+		remove_modifier = pdglacio
+		remove_deposit = d_glacio_lake
+		remove_modifier = pdrogue
+		remove_deposit = d_rogue_geo
+		remove_modifier = pdeyeball
+		remove_deposit = d_eyeball_site
+		remove_modifier = pdsulfur
+		remove_deposit = d_sulfur_pool
 		
 	}
 
@@ -3138,6 +3179,57 @@ country_event = {
 						10 = { add_deposit = d_volatile_motes_3 }
 						30 = { add_deposit = d_volatile_motes_2 }
 						60 = { add_deposit = d_volatile_motes_1 }
+					}
+				}
+				85 = { }
+			}
+		}
+		every_planet = { 
+			limit = { 
+				is_planet_class = pc_molten
+				is_moon = yes
+				not = { has_modifier = terraforming_candidate }
+				solar_system = { 
+					NOT = { has_star_flag = empire_home_system }
+					star = {
+						OR = {
+							is_star_class = sc_a
+							is_star_class = sc_b
+							is_star_class = sc_f
+							is_star_class = sc_k
+						}
+					}
+				}
+			}	
+			random_list = {
+				15 = {
+					change_pc = pc_volcanic
+					this = { clear_deposits = yes }
+					random_list = {
+						1 = { add_deposit = d_minerals_10 }
+						2 = { add_deposit = d_minerals_9 }
+						3 = { add_deposit = d_minerals_8 }
+						4 = { add_deposit = d_minerals_7 }
+						5 = { add_deposit = d_minerals_6 }
+						5 = { add_deposit = d_minerals_5 }
+						5 = { add_deposit = d_minerals_4 }
+						10 = { add_deposit = d_minerals_3 }
+						15 = { add_deposit = d_minerals_2 }
+						25 = { add_deposit = d_minerals_1 }
+						25 = { }
+					}
+					random_list = {
+						1 = { add_deposit = d_energy_10 }
+						2 = { add_deposit = d_energy_9 }
+						3 = { add_deposit = d_energy_8 }
+						4 = { add_deposit = d_energy_7 }
+						5 = { add_deposit = d_energy_6 }
+						5 = { add_deposit = d_energy_5 }
+						5 = { add_deposit = d_energy_4 }
+						10 = { add_deposit = d_energy_3 }
+						15 = { add_deposit = d_energy_2 }
+						25 = { add_deposit = d_energy_1 }
+						25 = { }
 					}
 				}
 				85 = { }
@@ -3569,7 +3661,7 @@ planet_event = {
 	}
 }
 
-# Mars Gets Special Pictures
+# Mars+Venus Gets Special Pictures
 planet_event = {
 	id = pdengine.48
 	hide_window = yes
@@ -3657,6 +3749,90 @@ planet_event = {
 			}
 			set_planet_entity = {
 				entity = "gaiamars_planet_entity"
+			}
+		}
+		#Venus
+		if = {
+			limit = { 
+				has_planet_flag = pdvenus
+				OR = {
+					is_planet_class = pc_ocean
+					is_planet_class = pc_continental
+					is_planet_class = pc_tropical
+					is_planet_class = pc_cascadian
+					is_planet_class = pc_desertislands
+					is_planet_class = pc_subarctic
+					is_planet_class = pc_mangrove
+					is_planet_class = pc_wetswamp
+					is_planet_class = pc_hajungle
+					is_planet_class = pc_biolumen
+					is_planet_class = pc_retinal
+					is_planet_class = pc_forest
+					is_planet_class = pc_lake
+					is_planet_class = pc_tepid
+				}
+			}
+			set_planet_entity = {
+				picture = pc_wetvenus
+				entity = "wetvenus_planet_entity"
+			}
+		}
+		if = {
+			limit = { 
+				has_planet_flag = pdvenus
+				OR = {
+					is_planet_class = pc_arid
+					is_planet_class = pc_desert
+					is_planet_class = pc_savannah
+					is_planet_class = pc_steppe
+					is_planet_class = pc_sandsea
+					is_planet_class = pc_oasis
+					is_planet_class = pc_mesa
+					is_planet_class = pc_outback
+					is_planet_class = pc_hadesert
+					is_planet_class = pc_prairie
+					is_planet_class = pc_veld
+					is_planet_class = pc_semiarid
+					is_planet_class = pc_med
+				}
+			}
+			set_planet_entity = {
+				picture = pc_dryvenus
+				entity = "dryvenus_planet_entity"
+			}
+		}
+		if = {
+			limit = { 
+				has_planet_flag = pdvenus
+				OR = {
+					is_planet_class = pc_arctic
+					is_planet_class = pc_tundra
+					is_planet_class = pc_alpine
+					is_planet_class = pc_swamp
+					is_planet_class = pc_mud
+					is_planet_class = pc_frozen_desert
+					is_planet_class = pc_glacial
+					is_planet_class = pc_boreal
+					is_planet_class = pc_mushroom
+					is_planet_class = pc_antarctic
+					is_planet_class = pc_aeolian
+					is_planet_class = pc_snow
+					is_planet_class = pc_highland
+					is_planet_class = pc_duneforest
+				}
+			}
+			set_planet_entity = {
+				picture = pc_coldvenus
+				entity = "coldvenus_planet_entity"
+			}
+		}
+		if = {
+			limit = { 
+				has_planet_flag = pdvenus
+				is_planet_class = pc_gaia
+			}
+			set_planet_entity = {
+				entity = "gaiavenus_planet_entity"
 			}
 		}
 	}
@@ -5444,5 +5620,66 @@ country_event = {
 				85 = { }	
 			}
 		}
+	}
+}
+
+# Infested to Barren after Orbital Bombardment
+planet_event = {
+	id = pdengine.60
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_planet_class = pc_infested
+	}
+
+	immediate = {
+		remove_modifier = geothermal
+		remove_deposit = d_geothermal_slurry_site
+		remove_modifier = superhabitable
+		remove_deposit = d_ancient_motes
+		remove_modifier = aquatic
+		remove_deposit = d_aquatic_trench
+		remove_modifier = tidal_locked2
+		remove_deposit = d_nightside_mining_operations
+		remove_modifier = karst
+		remove_deposit = d_karst_cave
+		remove_modifier = ammonia
+		remove_deposit = d_ammonia_sea
+		remove_modifier = pdsulfur
+		remove_deposit = d_sulfur_pool
+		remove_modifier = pdacid
+		remove_deposit = d_acid_lakes
+		remove_deposit = d_pdacid_rain
+		remove_modifier = methane
+		remove_deposit = d_frozen_gas_mountain
+		remove_modifier = ash
+		remove_modifier = primal
+		remove_deposit = d_lava_lakes
+		remove_modifier = radiotrophic
+		remove_deposit = d_rad_blooms
+		remove_modifier = biolumen
+		remove_deposit = d_biolumen_nature_preserve
+		remove_deposit = d_pdshroud
+		remove_modifier = pdsalt
+		remove_deposit = d_salt_caves
+		remove_modifier = pdmegaflora
+		remove_deposit = d_megaflora_deposit
+		remove_modifier = pdcoral
+		remove_deposit = d_coral_fields
+		remove_modifier = supercon
+		remove_deposit = d_supercon_site
+		remove_modifier = pdstorm
+		remove_deposit = d_storm_corridor
+		remove_modifier = pdglacio
+		remove_deposit = d_glacio_lake
+		remove_modifier = pdrogue
+		remove_deposit = d_rogue_geo
+		remove_modifier = pdeyeball
+		remove_deposit = d_eyeball_site
+		remove_modifier = pdsulfur
+		remove_deposit = d_sulfur_pool
+		
 	}
 }
