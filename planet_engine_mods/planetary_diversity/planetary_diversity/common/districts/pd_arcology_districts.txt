@@ -3409,7 +3409,7 @@ district_pdnecroarc_arms_industry = {
 	}
 }
 
-district_pdnecroarc_civilian_industry = {
+district_pdnecroarc_research = {
 	base_buildtime = 600
 	is_capped_by_modifier = no
 
@@ -3419,13 +3419,6 @@ district_pdnecroarc_civilian_industry = {
 
 	potential = {
 		uses_district_set = pdnecropolis
-		exists = owner
-		owner = {
-			OR = {
-				is_gestalt = no
-				has_valid_civic = civic_machine_servitor
-			}
-		}
 	}
 
 	conversion_ratio = 1
@@ -3454,10 +3447,20 @@ district_pdnecroarc_civilian_industry = {
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_gestalt = yes }
+			owner = { is_machine_empire = yes }
 		}
 		modifier = {
-			job_artisan_drone_add = 10
+			job_calculator_add = 10
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_hive_empire = yes }
+		}
+		modifier = {
+			job_brain_drone_add = 10
 		}
 	}
 
@@ -3467,7 +3470,7 @@ district_pdnecroarc_civilian_industry = {
 			owner = { is_regular_empire = yes }
 		}
 		modifier = {
-			job_artisan_add = 10
+			job_researcher_add = 10
 		}
 	}
 
@@ -3476,15 +3479,23 @@ district_pdnecroarc_civilian_industry = {
 			exists = owner
 			owner = { is_regular_empire = yes }
 		}
-		text = job_artisan_effect_desc
+		text = job_researcher_effect_desc
 	}
 
 	triggered_desc = {
 		trigger = {
 			exists = owner
-			owner = { is_gestalt = yes }
+			owner = { is_hive_empire = yes }
 		}
-		text = job_artisan_drone_effect_desc
+		text = job_brain_drone_effect_desc
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+		text = job_calculator_effect_desc
 	}
 
 	ai_weight = {
@@ -3493,21 +3504,12 @@ district_pdnecroarc_civilian_industry = {
 			weight = 500
 			owner = {
 				has_monthly_income = {
-					resource = consumer_goods
-					value < 200
+					resource = alloys
+					value < 500
 				}
 				has_monthly_income = {
 					resource = minerals
 					value > 99
-				}
-			}
-		}
-		modifier = {
-			weight = 1000
-			owner = {
-				has_monthly_income = {
-					resource = consumer_goods
-					value < 0
 				}
 			}
 		}
@@ -3521,7 +3523,13 @@ district_pdnecroarc_temple = {
 	show_on_uncolonized = {
 		uses_district_set = pdnecropolis
 		from = {
+			OR = {
 			is_regular_empire = yes
+			AND = {
+				is_hive_empire = yes
+				has_civic = civic_hive_memorialist
+				}
+			}
 		}
 	}
 
@@ -3529,7 +3537,13 @@ district_pdnecroarc_temple = {
 		uses_district_set = pdnecropolis
 		owner = {
 			exists = owner
-			is_regular_empire = yes
+			OR = {
+				is_regular_empire = yes
+				AND = {
+					is_hive_empire = yes
+					has_civic = civic_hive_memorialist
+				}
+			}
 		}
 	}
 
@@ -3562,14 +3576,9 @@ district_pdnecroarc_temple = {
 			exists = owner
 			owner = {
 				is_regular_empire = yes
-			}
-			NOT = {
-				OR = {
-					has_modifier = pdcomposer
-					has_modifier = pdwhispers
-					has_modifier = pdeater
-					has_modifier = pddesire
-				}
+				is_spiritualist = yes
+				NOT = { has_civic = civic_memorialist }
+				NOT = { has_civic = civic_death_cult }
 			}
 		}
 		modifier = {
@@ -3577,18 +3586,17 @@ district_pdnecroarc_temple = {
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
+	triggered_desc = {
+		trigger = {
 			exists = owner
 			owner = {
 				is_regular_empire = yes
+				is_spiritualist = yes
+				NOT = { has_civic = civic_memorialist }
+				NOT = { has_civic = civic_death_cult }
 			}
-			has_modifier = pdeater
 		}
-		modifier = {
-			job_priest_add = 5
-			job_warriorpriest_add = 5
-		}
+		text = job_priest_effect_desc
 	}
 
 	triggered_planet_modifier = {
@@ -3596,48 +3604,100 @@ district_pdnecroarc_temple = {
 			exists = owner
 			owner = {
 				is_regular_empire = yes
+				is_spiritualist = no
+				NOT = { has_civic = civic_memorialist }
+				NOT = { has_civic = civic_death_cult }
 			}
-			has_modifier = pdcomposer
 		}
 		modifier = {
-			job_priest_add = 5
-			job_medicalpriest_add = 5
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_regular_empire = yes
-			}
-			has_modifier = pddesire
-		}
-		modifier = {
-			job_priest_add = 5
-			job_desirepriest_add = 5
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = {
-				is_regular_empire = yes
-			}
-			has_modifier = pdwhispers
-		}
-		modifier = {
-			job_priest_add = 5
-			job_technopriest_add = 5
+			job_culture_worker_add = 10
 		}
 	}
 
 	triggered_desc = {
 		trigger = {
 			exists = owner
+			owner = {
+				is_regular_empire = yes
+				is_spiritualist = no
+				NOT = { has_civic = civic_memorialist }
+				NOT = { has_civic = civic_death_cult }
+			}
 		}
-		text = job_priest_effect_desc
+		text = job_culture_worker_effect_desc
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				has_civic = civic_memorialist
+			}
+		}
+		modifier = {
+			job_death_chronicler_add = 10
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				has_civic = civic_memorialist
+			}
+		}
+		text = job_death_chronicler_effect_desc
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_hive_empire = yes
+				has_civic = civic_hive_memorialist
+			}
+		}
+		modifier = {
+			job_chronicle_drone_add = 10
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_hive_empire = yes
+				has_civic = civic_hive_memorialist
+			}
+		}
+		text = job_chronicle_drone_effect_desc
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				has_civic = civic_death_cult
+			}
+		}
+		modifier = {
+			job_death_priest_add = 5
+			job_mortal_initiate_add = 5
+		}
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				has_civic = civic_death_cult
+			}
+		}
+		text = job_death_priest_effect_desc
 	}
 
 	ai_weight = {
