@@ -22,8 +22,10 @@ decision_ecoarcology_project = {
 			is_planet_class = pc_pdshroud
 			is_planet_class = pc_ecocity
 			is_planet_class = pc_milarc
+			is_planet_class = pc_necropolis
 			is_planet_class = pc_city
 			is_planet_class = pc_relic
+			is_planet_class = pc_necropolis
 			has_modifier = resort_colony
 			has_modifier = penal_colony
 			has_modifier = slave_colony
@@ -628,9 +630,11 @@ decision_milarcology_project = {
 		NOR = {
 			is_planet_class = pc_pdshroud
 			is_planet_class = pc_ecocity
+			is_planet_class = pc_necropolis
 			is_planet_class = pc_milarc
 			is_planet_class = pc_city
 			is_planet_class = pc_relic
+			is_planet_class = pc_necropolis
 			has_modifier = resort_colony
 			has_modifier = penal_colony
 			has_modifier = slave_colony
@@ -987,3 +991,457 @@ decision_milarc_project_regrelic = {
 		weight = 0
 	}
 }
+
+# Necropolis Reg Project
+decision_necropolis_reg_project = {
+	owned_planets_only = yes
+	icon = decision_necropolis_project
+
+	enactment_time = 3600
+	resources = {
+		category = decisions
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+	
+	potential = {
+		NOR = {
+			is_planet_class = pc_pdshroud
+			is_planet_class = pc_ecocity
+			is_planet_class = pc_necropolis
+			is_planet_class = pc_milarc
+			is_planet_class = pc_city
+			is_planet_class = pc_relic
+			is_planet_class = pc_necropolis
+			has_modifier = resort_colony
+			has_modifier = penal_colony
+			has_modifier = slave_colony
+		}
+		habitable_structure = no
+		exists = owner
+		owner = { 
+			OR = {
+				has_ascension_perk = ap_arcology_project 
+			}
+			OR = {
+				has_civic = civic_memorialist
+				has_civic = civic_death_cult
+				has_civic = civic_death_cult_corporate
+				has_civic = civic_reanimated_armies
+				has_origin = origin_necrophage
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			fail_text = decision_necropolis_reg_project_requirements
+			num_districts = { type = district_city value >= 10 }
+			num_districts = { type = district_farming value < 1 }
+			num_districts = { type = district_mining value < 1 }
+			num_districts = { type = district_generator value < 1 }
+		}
+		num_uncleared_blockers < 1
+	}
+	
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_necropolis_reg_project_effects
+		hidden_effect = {		
+			clear_deposits = yes
+			change_pc = pc_necropolis
+			add_district = district_pdnecroarc_housing
+			add_district = district_pdnecroarc_housing
+			add_district = district_pdnecroarc_housing
+			add_district = district_pdnecroarc_housing
+			add_district = district_pdnecroarc_housing
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = planet_earth
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_02_earth_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdmars
+			#	}
+			#	set_planet_entity = {
+            #       entity = "ecocity_planet_03_mars_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdvenus
+			#	}
+			#	set_planet_entity = {
+            #       entity = "ecocity_planet_04_venus_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = { 
+			#		owner = { NOT = { has_trait = trait_pc_aquatic_preference } }
+			#		NOT = { has_planet_flag = planet_earth }
+			#		NOT = { has_planet_flag = pdmars }
+			#		NOT = { has_planet_flag = pdvenus }
+			#	 }
+			#	set_planet_entity = {
+			#		entity = "ecocity_planet_entity"
+			#		graphical_culture = owner
+			#	}
+			#}
+			#IF = {
+			#	limit = { owner = { has_trait = trait_pc_aquatic_preference } }
+			#	set_planet_entity = {
+			#		entity = "aquaticcity_planet_01_entity"
+			#		picture = "pc_aquaticcity"
+			#	}
+			#	set_planet_flag = pdaquapicture
+			#}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
+				IF = { limit = { NOT = { has_modifier = pdammoniaatmosphere } }	add_modifier = { modifier = pdammoniaatmosphere	} }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
+				IF = { limit = { NOT = { has_modifier = pdsulfuratmosphere } }	add_modifier = { modifier = pdsulfuratmosphere	} }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_methane_preference } }
+				IF = { limit = { NOT = { has_modifier = pdmethaneatmosphere } }	add_modifier = { modifier = pdmethaneatmosphere	} }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ash_preference } }
+				IF = { limit = { NOT = { has_modifier = pdashatmosphere } }	add_modifier = { modifier = pdashatmosphere	} }
+			}
+			#IF = {
+			#	limit = { owner = { has_origin = origin_pd_shroud has_ascension_perk = ap_transcendence } }
+			#	set_planet_entity = { picture = pc_shroudcity entity = ecoshroud_planet_01_entity }
+			#}
+			owner = {
+				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
+			}
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				owner = {
+					set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+				}
+			}
+			#planet_event = { id = pdengine.09 }
+			remove_modifier = engineered_environment
+			remove_modifier = engineered_environment_gaia
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}
+
+# Necropolis Hive Project
+decision_necropolis_hive_project = {
+	owned_planets_only = yes
+	icon = decision_necropolis_project
+
+	enactment_time = 3600
+	resources = {
+		category = decisions
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+	
+	potential = {
+		NOR = {
+			is_planet_class = pc_pdshroud
+			is_planet_class = pc_ecocity
+			is_planet_class = pc_necropolis
+			is_planet_class = pc_milarc
+			is_planet_class = pc_city
+			is_planet_class = pc_relic
+			is_planet_class = pc_necropolis
+			has_modifier = resort_colony
+			has_modifier = penal_colony
+			has_modifier = slave_colony
+		}
+		habitable_structure = no
+		exists = owner
+		owner = { 
+			OR = {
+				has_ascension_perk = ap_hive_worlds 
+			}
+			OR = {
+				has_civic = civic_hive_memorialist
+				has_origin = origin_necrophage
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			fail_text = decision_necropolis_hive_project_requirements
+			num_districts = { type = district_hive value >= 10 }
+			num_districts = { type = district_farming value < 1 }
+			num_districts = { type = district_mining value < 1 }
+			num_districts = { type = district_generator value < 1 }
+		}
+		num_uncleared_blockers < 1
+	}
+	
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_necropolis_hive_project_effects
+		hidden_effect = {		
+			clear_deposits = yes
+			change_pc = pc_necropolis
+			add_district = district_pdnecroarc_housing
+			add_district = district_pdnecroarc_housing
+			add_district = district_pdnecroarc_housing
+			add_district = district_pdnecroarc_housing
+			add_district = district_pdnecroarc_housing
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = planet_earth
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_02_earth_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdmars
+			#	}
+			#	set_planet_entity = {
+            #       entity = "ecocity_planet_03_mars_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdvenus
+			#	}
+			#	set_planet_entity = {
+            #       entity = "ecocity_planet_04_venus_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = { 
+			#		owner = { NOT = { has_trait = trait_pc_aquatic_preference } }
+			#		NOT = { has_planet_flag = planet_earth }
+			#		NOT = { has_planet_flag = pdmars }
+			#		NOT = { has_planet_flag = pdvenus }
+			#	 }
+			#	set_planet_entity = {
+			#		entity = "ecocity_planet_entity"
+			#		graphical_culture = owner
+			#	}
+			#}
+			#IF = {
+			#	limit = { owner = { has_trait = trait_pc_aquatic_preference } }
+			#	set_planet_entity = {
+			#		entity = "aquaticcity_planet_01_entity"
+			#		picture = "pc_aquaticcity"
+			#	}
+			#	set_planet_flag = pdaquapicture
+			#}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
+				IF = { limit = { NOT = { has_modifier = pdammoniaatmosphere } }	add_modifier = { modifier = pdammoniaatmosphere	} }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
+				IF = { limit = { NOT = { has_modifier = pdsulfuratmosphere } }	add_modifier = { modifier = pdsulfuratmosphere	} }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_methane_preference } }
+				IF = { limit = { NOT = { has_modifier = pdmethaneatmosphere } }	add_modifier = { modifier = pdmethaneatmosphere	} }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ash_preference } }
+				IF = { limit = { NOT = { has_modifier = pdashatmosphere } }	add_modifier = { modifier = pdashatmosphere	} }
+			}
+			#IF = {
+			#	limit = { owner = { has_origin = origin_pd_shroud has_ascension_perk = ap_transcendence } }
+			#	set_planet_entity = { picture = pc_shroudcity entity = ecoshroud_planet_01_entity }
+			#}
+			owner = {
+				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
+			}
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				owner = {
+					set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+				}
+			}
+			#planet_event = { id = pdengine.09 }
+			remove_modifier = engineered_environment
+			remove_modifier = engineered_environment_gaia
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}
+
+# Necropolis Robo Project
+decision_necropolis_robo_project = {
+	owned_planets_only = yes
+	icon = decision_necropolis_project
+
+	enactment_time = 3600
+	resources = {
+		category = decisions
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+	
+	potential = {
+		NOR = {
+			is_planet_class = pc_pdshroud
+			is_planet_class = pc_ecocity
+			is_planet_class = pc_necropolis
+			is_planet_class = pc_milarc
+			is_planet_class = pc_city
+			is_planet_class = pc_relic
+			is_planet_class = pc_necropolis
+			has_modifier = resort_colony
+			has_modifier = penal_colony
+			has_modifier = slave_colony
+		}
+		habitable_structure = no
+		exists = owner
+		owner = { 
+			OR = {
+				has_ascension_perk = ap_machine_worlds 
+			}
+			has_civic = civic_machine_memorialist
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			fail_text = decision_necropolis_robo_project_requirements
+			num_districts = { type = district_nexus value >= 10 }
+			num_districts = { type = district_farming value < 1 }
+			num_districts = { type = district_mining value < 1 }
+			num_districts = { type = district_generator value < 1 }
+		}
+		num_uncleared_blockers < 1
+	}
+	
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_necropolis_robo_project_effects
+		hidden_effect = {		
+			clear_deposits = yes
+			change_pc = pc_necropolis
+			add_district = district_pdnecroarc_housing
+			add_district = district_pdnecroarc_housing
+			add_district = district_pdnecroarc_housing
+			add_district = district_pdnecroarc_housing
+			add_district = district_pdnecroarc_housing
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = planet_earth
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_02_earth_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdmars
+			#	}
+			#	set_planet_entity = {
+            #       entity = "ecocity_planet_03_mars_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdvenus
+			#	}
+			#	set_planet_entity = {
+            #       entity = "ecocity_planet_04_venus_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = { 
+			#		owner = { NOT = { has_trait = trait_pc_aquatic_preference } }
+			#		NOT = { has_planet_flag = planet_earth }
+			#		NOT = { has_planet_flag = pdmars }
+			#		NOT = { has_planet_flag = pdvenus }
+			#	 }
+			#	set_planet_entity = {
+			#		entity = "ecocity_planet_entity"
+			#		graphical_culture = owner
+			#	}
+			#}
+			#IF = {
+			#	limit = { owner = { has_trait = trait_pc_aquatic_preference } }
+			#	set_planet_entity = {
+			#		entity = "aquaticcity_planet_01_entity"
+			#		picture = "pc_aquaticcity"
+			#	}
+			#	set_planet_flag = pdaquapicture
+			#}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
+				IF = { limit = { NOT = { has_modifier = pdammoniaatmosphere } }	add_modifier = { modifier = pdammoniaatmosphere	} }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
+				IF = { limit = { NOT = { has_modifier = pdsulfuratmosphere } }	add_modifier = { modifier = pdsulfuratmosphere	} }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_methane_preference } }
+				IF = { limit = { NOT = { has_modifier = pdmethaneatmosphere } }	add_modifier = { modifier = pdmethaneatmosphere	} }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ash_preference } }
+				IF = { limit = { NOT = { has_modifier = pdashatmosphere } }	add_modifier = { modifier = pdashatmosphere	} }
+			}
+			#IF = {
+			#	limit = { owner = { has_origin = origin_pd_shroud has_ascension_perk = ap_transcendence } }
+			#	set_planet_entity = { picture = pc_shroudcity entity = ecoshroud_planet_01_entity }
+			#}
+			owner = {
+				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
+			}
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				owner = {
+					set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+				}
+			}
+			#planet_event = { id = pdengine.09 }
+			remove_modifier = engineered_environment
+			remove_modifier = engineered_environment_gaia
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}
+
