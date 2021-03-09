@@ -28,13 +28,41 @@ building_food_processing_center = {
 		}
 	}
 
+	destroy_trigger = {
+		OR = {
+			AND = {
+				exists = owner
+				owner = {
+					is_ai = yes
+					country_uses_food = no
+				}
+			}
+			is_planet_class = pc_machine
+			has_modifier = resort_colony
+			buildings_no_motes = yes
+		}
+	}
+
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_regular_empire = yes }
+			owner = {
+				is_regular_empire = yes
+				is_fallen_empire_spiritualist = no
+			}
 		}
 		modifier = {
 			job_farmer_add = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_fallen_empire_spiritualist = yes }
+		}
+		modifier = {
+			job_fe_acolyte_farm_add = 2
 		}
 	}
 
@@ -47,19 +75,39 @@ building_food_processing_center = {
 			job_agri_drone_add = 2
 		}
 	}
-	
+
 	resources = {
 		category = planet_buildings
 		cost = {
-			minerals = 500
-			volatile_motes = 50
+			minerals = @b2_minerals
+			volatile_motes = @b2_rare_cost
 		}
 		upkeep = {
-			energy = 1
-			volatile_motes = 1
+			energy = 2
+			volatile_motes = @b2_rare_upkeep
 		}
 	}	
 	
+	upgrades = {
+		building_crystal_pillar
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		text = building_food_processing_center_effect_desc
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = building_food_processing_center_gestalt_effect_desc
+	}
+
 	triggered_desc = {
 		trigger = {
 			exists = owner
@@ -70,41 +118,71 @@ building_food_processing_center = {
 	triggered_desc = {
 		trigger = {
 			exists = owner
-			owner = { is_gestalt = no }
+			owner = {
+				is_gestalt = no
+				is_fallen_empire_spiritualist = no
+			}
 		}
 		text = job_farmer_effect_desc
 	}
-	
-	upgrades = {
-		building_crystal_pillar
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_fallen_empire_spiritualist = yes }
+		}
+		text = job_fe_acolyte_farm_effect_desc
 	}
-	
+
 	prerequisites = {
 		"tech_food_processing_2"
-	}	
-	
+	}
+
 	ai_weight = {
-		weight = 1
+		weight = 0
 		modifier = {
-			factor = 0
-			buildings_has_motes = no
+			weight = 30
+			buildings_has_motes = yes
+		}
+		modifier = {
+			factor = 2
+			exists = owner
+			owner = {
+				has_monthly_income = {
+					resource = food
+					value < 50
+				}
+			}
 		}
 		modifier = {
 			factor = 0
-			owner = { has_country_flag = buildings_new_mote_building }
+			owner = { country_uses_food = no }
 		}
 	}
 
 	ai_resource_production = {
-		food = 1
+		food = 6
 		trigger = {
 			always = yes
 		}
 	}
-	
-	on_built = {
-		planet = { 
-			owner = { set_timed_country_flag = { flag = buildings_new_mote_building days = 480 } }
+	ai_resource_production = {
+		food = 6
+		trigger = {
+			planet_resource_compare = {
+				resource = food
+				value >= 24
+				type = produces
+			}
+		}
+	}
+	ai_resource_production = {
+		food = 6
+		trigger = {
+			planet_resource_compare = {
+				resource = food
+				value >= 48
+				type = produces
+			}
 		}
 	}
 }
@@ -122,26 +200,42 @@ building_crystal_pillar = {
 		exists = owner
 		has_upgraded_capital = yes
 	}
-	
+
 	destroy_trigger = {
-		owner = { is_ai = yes }
 		OR = {
+			AND = {
+				exists = owner
+				owner = {
+					is_ai = yes
+					country_uses_food = no
+				}
+			}
 			is_planet_class = pc_machine
 			has_modifier = resort_colony
-		}
-		OR = {
-			num_districts = { type = district_farming value < 6 }
-			num_districts = { type = district_farming_uncapped value < 6 }
+			buildings_no_motes = yes
 		}
 	}
 
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_regular_empire = yes }
+			owner = {
+				is_regular_empire = yes
+				is_fallen_empire_spiritualist = no
+			}
 		}
 		modifier = {
-			job_farmer_add = 4
+			job_farmer_add = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_fallen_empire_spiritualist = yes }
+		}
+		modifier = {
+			job_fe_acolyte_farm_add = 2
 		}
 	}
 
@@ -151,22 +245,38 @@ building_crystal_pillar = {
 			owner = { is_gestalt = yes }
 		}
 		modifier = {
-			job_agri_drone_add = 4
+			job_agri_drone_add = 2
 		}
 	}
-	
+
 	resources = {
 		category = planet_buildings
 		cost = {
-			minerals = 500
+			minerals = @b2_minerals
 			sr_acean = 250
 		}
 		upkeep = {
-			energy = 1
-			volatile_motes = 1
+			energy = 2
+			volatile_motes = @b2_rare_upkeep
 		}
-	}	
-	
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		text = building_food_processing_center_effect_desc
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		text = building_food_processing_center_gestalt_effect_desc
+	}
+
 	triggered_desc = {
 		trigger = {
 			exists = owner
@@ -177,23 +287,71 @@ building_crystal_pillar = {
 	triggered_desc = {
 		trigger = {
 			exists = owner
-			owner = { is_gestalt = no }
+			owner = {
+				is_gestalt = no
+				is_fallen_empire_spiritualist = no
+			}
 		}
 		text = job_farmer_effect_desc
+	}
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { is_fallen_empire_spiritualist = yes }
+		}
+		text = job_fe_acolyte_farm_effect_desc
 	}
 	
 	prerequisites = {
 		"tech_crystal_pillar"
 	}	
-	
+
 	ai_weight = {
-		weight = 1
+		weight = 0
+		modifier = {
+			weight = 30
+			buildings_has_motes = yes
+		}
+		modifier = {
+			factor = 2
+			exists = owner
+			owner = {
+				has_monthly_income = {
+					resource = food
+					value < 50
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			owner = { country_uses_food = no }
+		}
 	}
 
 	ai_resource_production = {
-		food = 1
+		food = 6
 		trigger = {
 			always = yes
+		}
+	}
+	ai_resource_production = {
+		food = 6
+		trigger = {
+			planet_resource_compare = {
+				resource = food
+				value >= 24
+				type = produces
+			}
+		}
+	}
+	ai_resource_production = {
+		food = 6
+		trigger = {
+			planet_resource_compare = {
+				resource = food
+				value >= 48
+				type = produces
+			}
 		}
 	}
 }

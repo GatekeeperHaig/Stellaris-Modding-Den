@@ -9,68 +9,6 @@
 
 namespace = colony
 
-@tier1influencecontact = 7
-@tier1influencecontactxenophile = 8
-@tier1influencecontactmin = 20
-@tier1influencecontactmax = 80
-
-@tier2influencecontact = 10
-@tier2influencecontactxenophile = 12
-@tier2influencecontactmin = 40
-@tier2influencecontactmax = 100
-
-@tier1materialreward = 6
-@tier1materialmin = 100
-@tier1materialmax = 500
-@tier2materialreward = 12
-@tier2materialmin = 150
-@tier2materialmax = 1000
-@tier3materialreward = 18
-@tier3materialmin = 250
-@tier3materialmax = 1500
-@tier4materialreward = 24
-@tier4materialmin = 350
-@tier4materialmax = 2000
-@tier5materialreward = 48
-@tier5materialmin = 700
-@tier5materialmax = 4000
-
-@tier1influencereward = 6
-@tier1influencemin = 40
-@tier1influencemax = 100
-@tier2influencereward = 12
-@tier2influencemin = 80
-@tier2influencemax = 175
-@tier3influencereward = 18
-@tier3influencemin = 125
-@tier3influencemax = 250
-@tier4influencereward = 24
-@tier4influencemin = 150
-@tier4influencemax = 300
-@tier5influencereward = 36
-@tier5influencemin = 250
-@tier5influencemax = 500
-@tier6influencereward = 48
-@tier6influencemin = 300
-@tier6influencemax = 600
-
-@tier1researchreward = 6
-@tier1researchmin = 60
-@tier1researchmax = 150
-@tier2researchreward = 12
-@tier2researchmin = 90
-@tier2researchmax = 250
-@tier3researchreward = 18
-@tier3researchmin = 120
-@tier3researchmax = 350
-@tier4researchreward = 24
-@tier4researchmin = 150
-@tier4researchmax = 500
-@tier5researchreward = 48
-@tier5researchmin = 300
-@tier5researchmax = 1000
-
-
 ### Migrating Forests
 planet_event = {
 	id = colony.1
@@ -178,6 +116,8 @@ planet_event = {
 	
 	trigger = {
 		num_pops > 0
+		habitable_planet = yes
+		uses_district_set = standard
 		NOR = {
 			has_planet_flag = abandoned_terraforming_planet
 			has_planet_flag = colony_event
@@ -460,8 +400,8 @@ planet_event = {
 	id = colony.102
 	title = "colony.102.name"
 	desc = "colony.102.desc"
-	picture = GFX_evt_burning_settlement
-	show_sound = event_air_raid_siren
+	picture = GFX_evt_burning_city
+	show_sound = event_burning_city
 	location = ROOT
 	
 	pre_triggers = {
@@ -536,7 +476,7 @@ planet_event = {
 	option = {
 		name = colony.103.b
 		trigger = {
-			count_pops = {
+			count_owned_pop = {
 				limit = { is_robot_pop = no }
 				count < 9
 			}
@@ -550,11 +490,11 @@ planet_event = {
 		name = colony.103.b
 		trigger = {
 			AND = {
-				count_pops = {
+				count_owned_pop = {
 					limit = { is_robot_pop = no }
 					count > 8
 				}
-				count_pops = {
+				count_owned_pop = {
 					limit = { is_robot_pop = no }
 					count < 17
 				}
@@ -568,7 +508,7 @@ planet_event = {
 	option = {
 		name = colony.103.b
 		trigger = {
-			count_pops = {
+			count_owned_pop = {
 				limit = { is_robot_pop = no }
 				count > 16
 			}
@@ -687,17 +627,17 @@ planet_event = {
 			}
 			create_army = {
 				name = "NAME_Deformed_Creatures"
-				owner = last_created
+				owner = last_created_country
 				type = "mutant_army"
 			}
 			create_army = {
 				name = "NAME_Twisted_Beasts"
-				owner = last_created
+				owner = last_created_country
 				type = "mutant_army"
 			}
 			create_army = {
 				name = "NAME_Mutated_Horrors"
-				owner = last_created
+				owner = last_created_country
 				type = "mutant_army"
 			}
 		}
@@ -772,6 +712,7 @@ planet_event = {
 		}
 		name = colony.107.a
 		change_pc = pc_nuked
+		hidden_effect = { set_planet_flag = nuked_planet_anomalies_disabled }
 		if = { #Destroys colony if no planet pops can live on Tomb Worlds
 			limit = {
 				NOT = {
@@ -814,7 +755,8 @@ planet_event = {
 			}
 		}
 		name = EXCELLENT
-		change_pc = pc_nuked
+		hidden_effect = { change_pc = pc_nuked }
+		set_planet_flag = nuked_planet_anomalies_disabled		
 		hidden_effect = {
 			remove_modifier = "abandoned_terraforming"
 			remove_planet_flag = pdaquapicture
