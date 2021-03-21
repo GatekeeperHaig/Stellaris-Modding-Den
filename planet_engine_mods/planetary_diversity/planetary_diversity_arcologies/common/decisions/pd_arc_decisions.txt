@@ -21,6 +21,8 @@ decision_ecoarcology_project = {
 		NOR = {
 			is_planet_class = pc_pdshroud
 			is_planet_class = pc_ecocity
+			is_planet_class = pc_palacearc
+			is_planet_class = pc_capitalarc
 			is_planet_class = pc_milarc
 			is_planet_class = pc_necropolis
 			is_planet_class = pc_city
@@ -630,6 +632,8 @@ decision_milarcology_project = {
 		NOR = {
 			is_planet_class = pc_pdshroud
 			is_planet_class = pc_ecocity
+			is_planet_class = pc_palacearc
+			is_planet_class = pc_capitalarc
 			is_planet_class = pc_necropolis
 			is_planet_class = pc_milarc
 			is_planet_class = pc_city
@@ -1445,3 +1449,867 @@ decision_necropolis_robo_project = {
 	}
 }
 
+# Palace Arc Project
+decision_palacearcology_project = {
+	owned_planets_only = yes
+	icon = decision_palacearcology_project
+
+	enactment_time = 3600
+	resources = {
+		category = decisions
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+	
+	potential = {
+		NOR = {
+			#is_planet_class = pc_pdshroud
+			is_planet_class = pc_ecocity
+			is_planet_class = pc_palacearc
+			is_planet_class = pc_capitalarc
+			is_planet_class = pc_milarc
+			is_planet_class = pc_necropolis
+			is_planet_class = pc_city
+			is_planet_class = pc_relic
+			has_modifier = resort_colony
+			has_modifier = penal_colony
+			has_modifier = slave_colony
+		}
+		habitable_structure = no
+		exists = owner
+		owner = { has_ascension_perk = ap_arcology_project }
+		owner = {
+			OR = {
+				has_authority = auth_imperial
+				has_authority = auth_dictatorial
+			}
+		}
+		owner = { is_regular_empire = yes }
+	}
+	
+	allow = {
+		custom_tooltip = {
+			fail_text = decision_palace_arcology_project_requirements
+			num_districts = { type = district_city value >= 10 }
+			num_districts = { type = district_farming value < 1 }
+			num_districts = { type = district_mining value < 1 }
+			num_districts = { type = district_generator value < 1 }
+			free_district_slots >= 5
+			free_building_slots >= 1
+		}
+		num_uncleared_blockers < 1
+	}
+	
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_palace_arcology_project_effects
+		hidden_effect = {		
+			clear_deposits = yes
+			change_pc = pc_palacearc
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			remove_deposit = d_pdshroud_desire
+			remove_modifier = pddesire
+			remove_deposit = d_pdshroud_composer
+			remove_modifier = pdcomposer
+			remove_deposit = d_pdshroud_whispers
+			remove_modifier = pdwhispers
+			remove_deposit = d_pdshroud_eater
+			remove_modifier = pdeater
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = planet_earth
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_02_earth_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdmars
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_03_mars_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdvenus
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_04_venus_entity"
+            #    }
+			#}
+			IF = {
+				limit = { 
+					owner = { NOT = { has_trait = trait_pc_aquatic_preference } }
+					NOT = { has_planet_flag = planet_earth }
+					NOT = { has_planet_flag = pdmars }
+					NOT = { has_planet_flag = pdvenus }
+				 }
+				set_planet_entity = {
+					entity = "palacearc_planet_entity"
+					graphical_culture = owner
+				}
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
+				set_planet_entity = {
+					entity = "aquaticcity_planet_01_entity"
+					picture = "pc_aquaticpalacearc"
+				}
+				set_planet_flag = pdaquapicture
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
+				IF = { limit = { NOT = { has_modifier = pdammoniaatmosphere } }	add_modifier = { modifier = pdammoniaatmosphere	} }
+				remove_modifier = ammonia
+				set_planet_entity = { picture = pc_ammoniapalacearc entity = ecocity_ammonia_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
+				IF = { limit = { NOT = { has_modifier = pdsulfuratmosphere } }	add_modifier = { modifier = pdsulfuratmosphere	} }
+				remove_modifier = pdsulfur
+				set_planet_entity = { picture = pc_sulfurpalacearc entity = ecocity_sulfur_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_methane_preference } }
+				IF = { limit = { NOT = { has_modifier = pdmethaneatmosphere } }	add_modifier = { modifier = pdmethaneatmosphere	} }
+				remove_modifier = methane
+				set_planet_entity = { picture = pc_methanepalacearc entity = ecocity_methane_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ash_preference } }
+				IF = { limit = { NOT = { has_modifier = pdashatmosphere } }	add_modifier = { modifier = pdashatmosphere	} }
+				remove_modifier = ash
+				set_planet_entity = { picture = pc_ashpalacearc entity = ecocity_ash_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_origin = origin_pd_shroud has_ascension_perk = ap_transcendence } }
+				set_planet_entity = { picture = pc_shroudpalacearc entity = shroudpalacearc_planet_01_entity }
+			}
+			owner = {
+				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
+			}
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				owner = {
+					set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+				}
+			}
+			planet_event = { id = pdengine.61 }
+			remove_modifier = engineered_environment
+			remove_modifier = engineered_environment_gaia
+			add_building = building_imperial_palace
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}
+
+# Palace Arcology Project (Relic Worlds)
+decision_palacearcology_project_relic = {
+	owned_planets_only = yes
+	icon = decision_palacearcology_project
+
+	enactment_time = 3600
+	resources = {
+		category = decisions
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+
+	potential = {
+		is_planet_class = pc_relic
+		habitable_structure = no
+		exists = owner
+		owner = { is_regular_empire = yes }
+		owner = {
+			OR = {
+				has_authority = auth_imperial
+				has_authority = auth_dictatorial
+			}
+		}
+		planet = { is_capital = yes }
+	}	
+	
+	allow = {
+		owner = { has_technology = tech_housing_2 }
+		num_uncleared_blockers < 1
+		free_district_slots >= 5
+		free_building_slots >= 1
+	}
+
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_palace_arcology_project_effects
+		hidden_effect = {		
+			clear_deposits = yes
+			change_pc = pc_palacearc
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			remove_deposit = d_pdshroud_desire
+			remove_modifier = pddesire
+			remove_deposit = d_pdshroud_composer
+			remove_modifier = pdcomposer
+			remove_deposit = d_pdshroud_whispers
+			remove_modifier = pdwhispers
+			remove_deposit = d_pdshroud_eater
+			remove_modifier = pdeater
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = planet_earth
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_02_earth_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdmars
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_03_mars_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdvenus
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_04_venus_entity"
+            #    }
+			#}
+			IF = {
+				limit = { 
+					owner = { NOT = { has_trait = trait_pc_aquatic_preference } }
+					NOT = { has_planet_flag = planet_earth }
+					NOT = { has_planet_flag = pdmars }
+					NOT = { has_planet_flag = pdvenus }
+				 }
+				set_planet_entity = {
+					entity = "palacearc_planet_entity"
+					graphical_culture = owner
+				}
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
+				set_planet_entity = {
+					entity = "aquaticcity_planet_01_entity"
+					picture = "pc_aquaticpalacearc"
+				}
+				set_planet_flag = pdaquapicture
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
+				IF = { limit = { NOT = { has_modifier = pdammoniaatmosphere } }	add_modifier = { modifier = pdammoniaatmosphere	} }
+				remove_modifier = ammonia
+				set_planet_entity = { picture = pc_ammoniapalacearc entity = ecocity_ammonia_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
+				IF = { limit = { NOT = { has_modifier = pdsulfuratmosphere } }	add_modifier = { modifier = pdsulfuratmosphere	} }
+				remove_modifier = pdsulfur
+				set_planet_entity = { picture = pc_sulfurpalacearc entity = ecocity_sulfur_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_methane_preference } }
+				IF = { limit = { NOT = { has_modifier = pdmethaneatmosphere } }	add_modifier = { modifier = pdmethaneatmosphere	} }
+				remove_modifier = methane
+				set_planet_entity = { picture = pc_methanepalacearc entity = ecocity_methane_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ash_preference } }
+				IF = { limit = { NOT = { has_modifier = pdashatmosphere } }	add_modifier = { modifier = pdashatmosphere	} }
+				remove_modifier = ash
+				set_planet_entity = { picture = pc_ashpalacearc entity = ecocity_ash_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_origin = origin_pd_shroud has_ascension_perk = ap_transcendence } }
+				set_planet_entity = { picture = pc_shroudpalacearc entity = shroudpalacearc_planet_01_entity }
+			}
+			add_deposit = d_former_relic_world
+			add_building = building_imperial_palace
+			planet_event = { id =  mega.201 }
+			while = {
+				count = 4
+				solar_system = {
+					random_system_ambient_object = {
+						limit = { has_ambient_object_flag = relic_world_debris }
+						destroy_ambient_object = this
+					}
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				owner = {
+					set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+# Capital Arc Project
+decision_capitalarcology_project = {
+	owned_planets_only = yes
+	icon = decision_capitalarcology_project
+
+	enactment_time = 3600
+	resources = {
+		category = decisions
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+	
+	potential = {
+		NOR = {
+			#is_planet_class = pc_pdshroud
+			is_planet_class = pc_ecocity
+			is_planet_class = pc_palacearc
+			is_planet_class = pc_capitalarc
+			is_planet_class = pc_milarc
+			is_planet_class = pc_necropolis
+			is_planet_class = pc_city
+			is_planet_class = pc_relic
+			has_modifier = resort_colony
+			has_modifier = penal_colony
+			has_modifier = slave_colony
+		}
+		habitable_structure = no
+		exists = owner
+		owner = { has_ascension_perk = ap_arcology_project }
+		owner = {
+			OR = {
+				has_authority = auth_democratic
+				has_authority = auth_oligarchic
+				has_authority = auth_corporate
+			}
+		}
+		owner = { is_regular_empire = yes }
+	}
+	
+	allow = {
+		custom_tooltip = {
+			fail_text = decision_capital_arcology_project_requirements
+			num_districts = { type = district_city value >= 10 }
+			num_districts = { type = district_farming value < 1 }
+			num_districts = { type = district_mining value < 1 }
+			num_districts = { type = district_generator value < 1 }
+			free_district_slots >= 5
+			free_building_slots >= 1
+		}
+		num_uncleared_blockers < 1
+	}
+	
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_capital_arcology_project_effects
+		hidden_effect = {		
+			clear_deposits = yes
+			change_pc = pc_capitalarc
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			remove_deposit = d_pdshroud_desire
+			remove_modifier = pddesire
+			remove_deposit = d_pdshroud_composer
+			remove_modifier = pdcomposer
+			remove_deposit = d_pdshroud_whispers
+			remove_modifier = pdwhispers
+			remove_deposit = d_pdshroud_eater
+			remove_modifier = pdeater
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = planet_earth
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_02_earth_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdmars
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_03_mars_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdvenus
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_04_venus_entity"
+            #    }
+			#}
+			IF = {
+				limit = { 
+					owner = { NOT = { has_trait = trait_pc_aquatic_preference } }
+					NOT = { has_planet_flag = planet_earth }
+					NOT = { has_planet_flag = pdmars }
+					NOT = { has_planet_flag = pdvenus }
+				 }
+				set_planet_entity = {
+					entity = "capitalarc_planet_entity"
+					graphical_culture = owner
+				}
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
+				set_planet_entity = {
+					entity = "aquaticcity_planet_01_entity"
+					picture = "pc_aquaticcapitalarc"
+				}
+				set_planet_flag = pdaquapicture
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
+				IF = { limit = { NOT = { has_modifier = pdammoniaatmosphere } }	add_modifier = { modifier = pdammoniaatmosphere	} }
+				remove_modifier = ammonia
+				set_planet_entity = { picture = pc_ammoniacapitalarc entity = ecocity_ammonia_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
+				IF = { limit = { NOT = { has_modifier = pdsulfuratmosphere } }	add_modifier = { modifier = pdsulfuratmosphere	} }
+				remove_modifier = pdsulfur
+				set_planet_entity = { picture = pc_sulfurcapitalarc entity = ecocity_sulfur_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_methane_preference } }
+				IF = { limit = { NOT = { has_modifier = pdmethaneatmosphere } }	add_modifier = { modifier = pdmethaneatmosphere	} }
+				remove_modifier = methane
+				set_planet_entity = { picture = pc_methanecapitalarc entity = ecocity_methane_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ash_preference } }
+				IF = { limit = { NOT = { has_modifier = pdashatmosphere } }	add_modifier = { modifier = pdashatmosphere	} }
+				remove_modifier = ash
+				set_planet_entity = { picture = pc_ashcapitalarc entity = ecocity_ash_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_origin = origin_pd_shroud has_ascension_perk = ap_transcendence } }
+				set_planet_entity = { picture = pc_shroudcapitalarc entity = shroudpalacearc_planet_01_entity }
+			}
+			owner = {
+				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
+			}
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				owner = {
+					set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+				}
+			}
+			planet_event = { id = pdengine.61 }
+			remove_modifier = engineered_environment
+			remove_modifier = engineered_environment_gaia
+			add_building = building_senate_building
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}
+
+# Capital Arcology Project (Relic Worlds)
+decision_capitalarcology_project_relic = {
+	owned_planets_only = yes
+	icon = decision_capitalarcology_project
+
+	enactment_time = 3600
+	resources = {
+		category = decisions
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+
+	potential = {
+		is_planet_class = pc_relic
+		habitable_structure = no
+		exists = owner
+		owner = { is_regular_empire = yes }
+		owner = {
+			OR = {
+				has_authority = auth_democratic
+				has_authority = auth_oligarchic
+				has_authority = auth_corporate
+			}
+		}
+		planet = { is_capital = yes }
+	}	
+	
+	allow = {
+		owner = { has_technology = tech_housing_2 }
+		num_uncleared_blockers < 1
+		free_district_slots >= 5
+		free_building_slots >= 1
+	}
+
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_capital_arcology_project_effects
+		hidden_effect = {		
+			clear_deposits = yes
+			change_pc = pc_capitalarc
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			add_district = district_palacearc_housing
+			remove_deposit = d_pdshroud_desire
+			remove_modifier = pddesire
+			remove_deposit = d_pdshroud_composer
+			remove_modifier = pdcomposer
+			remove_deposit = d_pdshroud_whispers
+			remove_modifier = pdwhispers
+			remove_deposit = d_pdshroud_eater
+			remove_modifier = pdeater
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = planet_earth
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_02_earth_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdmars
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_03_mars_entity"
+            #    }
+			#}
+			#IF = {
+			#	limit = {
+			#		has_planet_flag = pdvenus
+			#	}
+			#	set_planet_entity = {
+            #        entity = "ecocity_planet_04_venus_entity"
+            #    }
+			#}
+			IF = {
+				limit = { 
+					owner = { NOT = { has_trait = trait_pc_aquatic_preference } }
+					NOT = { has_planet_flag = planet_earth }
+					NOT = { has_planet_flag = pdmars }
+					NOT = { has_planet_flag = pdvenus }
+				 }
+				set_planet_entity = {
+					entity = "capitalarc_planet_entity"
+					graphical_culture = owner
+				}
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
+				set_planet_entity = {
+					entity = "aquaticcity_planet_01_entity"
+					picture = "pc_aquaticcapitalarc"
+				}
+				set_planet_flag = pdaquapicture
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
+				IF = { limit = { NOT = { has_modifier = pdammoniaatmosphere } }	add_modifier = { modifier = pdammoniaatmosphere	} }
+				remove_modifier = ammonia
+				set_planet_entity = { picture = pc_ammoniacapitalarc entity = ecocity_ammonia_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
+				IF = { limit = { NOT = { has_modifier = pdsulfuratmosphere } }	add_modifier = { modifier = pdsulfuratmosphere	} }
+				remove_modifier = pdsulfur
+				set_planet_entity = { picture = pc_sulfurcapitalarc entity = ecocity_sulfur_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_methane_preference } }
+				IF = { limit = { NOT = { has_modifier = pdmethaneatmosphere } }	add_modifier = { modifier = pdmethaneatmosphere	} }
+				remove_modifier = methane
+				set_planet_entity = { picture = pc_methanecapitalarc entity = ecocity_methane_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ash_preference } }
+				IF = { limit = { NOT = { has_modifier = pdashatmosphere } }	add_modifier = { modifier = pdashatmosphere	} }
+				remove_modifier = ash
+				set_planet_entity = { picture = pc_ashcapitalarc entity = ecocity_ash_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_origin = origin_pd_shroud has_ascension_perk = ap_transcendence } }
+				set_planet_entity = { picture = pc_shroudcapitalarc entity = shroudpalacearc_planet_01_entity }
+			}
+			add_deposit = d_former_relic_world
+			add_building = building_senate_building
+			planet_event = { id =  mega.201 }
+			while = {
+				count = 4
+				solar_system = {
+					random_system_ambient_object = {
+						limit = { has_ambient_object_flag = relic_world_debris }
+						destroy_ambient_object = this
+					}
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				owner = {
+					set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+				}
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
+# Palace -> Capital Arc
+decision_palacetocapital_project = {
+	owned_planets_only = yes
+	icon = decision_capitalarcology_project
+
+	enactment_time = 360
+	resources = {
+		category = decisions
+		cost = {
+			influence = 20
+			minerals = 2000
+		}
+	}
+
+	potential = {
+		is_planet_class = pc_palacearc
+		habitable_structure = no
+		exists = owner
+		owner = { is_regular_empire = yes }
+		owner = {
+			OR = {
+				has_authority = auth_democratic
+				has_authority = auth_oligarchic
+				has_authority = auth_corporate
+			}
+		}
+		planet = { is_capital = yes }
+	}	
+	
+	allow = {
+		planet = { has_building = building_imperial_palace }
+	}
+
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_capital_arcology_project_effects
+		hidden_effect = {		
+			change_pc = pc_capitalarc
+			IF = {
+				limit = { 
+					owner = { NOT = { has_trait = trait_pc_aquatic_preference } }
+					NOT = { has_planet_flag = planet_earth }
+					NOT = { has_planet_flag = pdmars }
+					NOT = { has_planet_flag = pdvenus }
+				 }
+				set_planet_entity = {
+					entity = "capitalarc_planet_entity"
+					graphical_culture = owner
+				}
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
+				set_planet_entity = {
+					entity = "aquaticcity_planet_01_entity"
+					picture = "pc_aquaticcapitalarc"
+				}
+				set_planet_flag = pdaquapicture
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
+				IF = { limit = { NOT = { has_modifier = pdammoniaatmosphere } }	add_modifier = { modifier = pdammoniaatmosphere	} }
+				remove_modifier = ammonia
+				set_planet_entity = { picture = pc_ammoniacapitalarc entity = ecocity_ammonia_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
+				IF = { limit = { NOT = { has_modifier = pdsulfuratmosphere } }	add_modifier = { modifier = pdsulfuratmosphere	} }
+				remove_modifier = pdsulfur
+				set_planet_entity = { picture = pc_sulfurcapitalarc entity = ecocity_sulfur_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_methane_preference } }
+				IF = { limit = { NOT = { has_modifier = pdmethaneatmosphere } }	add_modifier = { modifier = pdmethaneatmosphere	} }
+				remove_modifier = methane
+				set_planet_entity = { picture = pc_methanecapitalarc entity = ecocity_methane_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ash_preference } }
+				IF = { limit = { NOT = { has_modifier = pdashatmosphere } }	add_modifier = { modifier = pdashatmosphere	} }
+				remove_modifier = ash
+				set_planet_entity = { picture = pc_ashcapitalarc entity = ecocity_ash_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_origin = origin_pd_shroud has_ascension_perk = ap_transcendence } }
+				set_planet_entity = { picture = pc_shroudcapitalarc entity = shroudpalacearc_planet_01_entity }
+			}
+			remove_building = building_imperial_palace
+			IF = { 
+				limit = {
+					NOT = { owner = { has_authority = auth_corporate } }
+				}
+				add_building = building_senate_building
+			}
+			IF = { 
+				limit = {
+					owner = { has_authority = auth_corporate }
+				}
+				add_building = building_grand_boardroom
+			}
+		}
+	}
+
+	ai_weight = {
+		weight = 1
+	}
+}
+
+# Capital Arc -> Palace
+decision_capitaltopalace_project = {
+	owned_planets_only = yes
+	icon = decision_palacearcology_project
+
+	enactment_time = 360
+	resources = {
+		category = decisions
+		cost = {
+			influence = 20
+			minerals = 2000
+		}
+	}
+
+	potential = {
+		is_planet_class = pc_capitalarc
+		habitable_structure = no
+		exists = owner
+		owner = { is_regular_empire = yes }
+		owner = {
+			OR = {
+				has_authority = auth_imperial
+				has_authority = auth_dictatorial
+			}
+		}
+		planet = { is_capital = yes }
+	}	
+	
+	allow = {
+		planet = { 
+			OR = {
+				has_building = building_grand_boardroom 
+				has_building = building_senate_building
+			}
+		}
+	}
+
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_palace_arcology_project_effects
+		hidden_effect = {		
+			change_pc = pc_palacearc
+			IF = {
+				limit = { 
+					owner = { NOT = { has_trait = trait_pc_aquatic_preference } }
+					NOT = { has_planet_flag = planet_earth }
+					NOT = { has_planet_flag = pdmars }
+					NOT = { has_planet_flag = pdvenus }
+				 }
+				set_planet_entity = {
+					entity = "palacearc_planet_entity"
+					graphical_culture = owner
+				}
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
+				set_planet_entity = {
+					entity = "aquaticcity_planet_01_entity"
+					picture = "pc_aquaticpalacearc"
+				}
+				set_planet_flag = pdaquapicture
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
+				IF = { limit = { NOT = { has_modifier = pdammoniaatmosphere } }	add_modifier = { modifier = pdammoniaatmosphere	} }
+				remove_modifier = ammonia
+				set_planet_entity = { picture = pc_ammoniapalacearc entity = ecocity_ammonia_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
+				IF = { limit = { NOT = { has_modifier = pdsulfuratmosphere } }	add_modifier = { modifier = pdsulfuratmosphere	} }
+				remove_modifier = pdsulfur
+				set_planet_entity = { picture = pc_sulfurpalacearc entity = ecocity_sulfur_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_methane_preference } }
+				IF = { limit = { NOT = { has_modifier = pdmethaneatmosphere } }	add_modifier = { modifier = pdmethaneatmosphere	} }
+				remove_modifier = methane
+				set_planet_entity = { picture = pc_methanepalacearc entity = ecocity_methane_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ash_preference } }
+				IF = { limit = { NOT = { has_modifier = pdashatmosphere } }	add_modifier = { modifier = pdashatmosphere	} }
+				remove_modifier = ash
+				set_planet_entity = { picture = pc_ashpalacearc entity = ecocity_ash_planet_01_entity }
+			}
+			IF = {
+				limit = { owner = { has_origin = origin_pd_shroud has_ascension_perk = ap_transcendence } }
+				set_planet_entity = { picture = pc_shroudpalacearc entity = shroudpalacearc_planet_01_entity }
+			}
+			remove_building = building_senate_building
+			remove_building = building_grand_boardroom
+			add_building = building_imperial_palace
+		}
+	}
+
+	ai_weight = {
+		weight = 1
+	}
+}
+	
