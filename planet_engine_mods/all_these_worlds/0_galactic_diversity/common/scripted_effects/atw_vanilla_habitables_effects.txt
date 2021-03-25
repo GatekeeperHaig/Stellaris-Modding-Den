@@ -1,0 +1,819 @@
+convert_vanilla_habitable = {
+	if = { ## CONTINENTAL - Abundant Water hydrosphere
+		limit = { is_planet_class = pc_continental }
+		# Must convert to a world with Abundant Water hydrosphere, temperature zone modifier is already spawned, we also know planet size and whether its a moon or not, we use that to influence the remaining modifier spawning
+
+		# LITHOSPHERE: planets with moons get bonus odds to continental, jovian moons to uniform; Too smal get oods for continental halved, too large for oceanic
+		random_list = {
+			3 = {
+				add_modifier = {
+					modifier = "lithosphere-oceanic"
+					days = -1
+				}
+				modifier = { factor = 0.5 planet_size > 22 }
+			}
+			1 = {
+				add_modifier = {
+					modifier = "lithosphere-continental"
+					days = -1
+				}
+				modifier = { add = 5 has_moon = yes }
+				modifier = { add = 2 planet_size > 18 }
+				modifier = { factor = 0.5 planet_size < 16 }
+			}
+			1 = {
+				add_modifier = {
+					modifier = "lithosphere-uniform"
+					days = -1
+				}
+				modifier = { add = 5 is_moon = yes }
+			}
+		}
+		# HYDROSPHERE
+		add_modifier = {
+			modifier = "hydrosphere-water_abundant"
+			days = -1
+		}
+		# BIOSPHERE: we need a block for each lithosphere, as it cant be completely random, we only have so many different biome art
+		if = {
+			limit = { has_modifier = "lithosphere-oceanic" }
+			#Possibles - Pangaian
+			random_list = {
+				10 = {
+					modifier = { factor = 1.50 has_modifier = "temperature-temperate" }
+					modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_pangaian has_modifier = "vegetation-arboreal" } } } }
+					change_pc = orbit_pangaian
+					set_planet_entity = { entity = gd_pangaian_planet_lush_01_entity }
+					#Spawn Biosphere modifier
+					add_modifier = {
+						modifier = "biosphere-dense"
+						days = -1
+					}
+					#Spawn Atmosphere modifier
+					spawn_atmosphere_modifier = yes
+					#Spawn Gravity modifier
+					spawn_gravity_modifier = yes
+					set_planet_flag = "planet_converted"
+				}
+				10 = {
+					modifier = { factor = 1.50 has_modifier = "temperature-hot" }
+					modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_pangaian has_modifier = "vegetation-sparse" } } } }
+					change_pc = orbit_pangaian
+					set_planet_entity = { entity = gd_pangaian_planet_mixed_01_entity }
+					#Spawn Biosphere modifier
+					add_modifier = {
+						modifier = "biosphere-sparse"
+						days = -1
+					}
+					#Spawn Atmosphere modifier
+					spawn_atmosphere_modifier = yes
+					#Spawn Gravity modifier
+					spawn_gravity_modifier = yes
+					set_planet_flag = "planet_converted"
+				}
+			}
+		}
+		if = {
+			limit = { has_modifier = "lithosphere-continental" }
+			#Possibles - Chlorogenian;Retinalgenian;Xerosgenian;Geocrystallic;Geometallic;Hothouse
+			#There are so many options in this group, we should spawn a random biosphere modifier first, then pick the planet based on that
+			#Spawn Biosphere modifier
+			random_list = {
+				10 = {
+					modifier = { factor = 0.50 has_modifier = "temperature-hot" }
+					modifier = { factor = 1.50 has_modifier = "temperature-temperate" }
+					modifier = { factor = 0.75 has_modifier = "temperature-cold" }					
+					add_modifier = {
+						modifier = "biosphere-dense"
+						days = -1
+					}
+				}
+				10 = {
+					modifier = { factor = 0.75 has_modifier = "temperature-hot" }
+					modifier = { factor = 1.25 has_modifier = "temperature-temperate" }
+					modifier = { factor = 0.75 has_modifier = "temperature-cold" }					
+					add_modifier = {
+						modifier = "biosphere-diverse"
+						days = -1
+					}
+				}
+				10 = {
+					modifier = { factor = 1.25 has_modifier = "temperature-hot" }
+					modifier = { factor = 1.00 has_modifier = "temperature-temperate" }
+					modifier = { factor = 0.50 has_modifier = "temperature-cold" }					
+					add_modifier = {
+						modifier = "biosphere-sparse"
+						days = -1
+					}
+				}
+				10 = {
+					modifier = { factor = 1.50 has_modifier = "temperature-hot" }
+					modifier = { factor = 0.75 has_modifier = "temperature-temperate" }
+					modifier = { factor = 0.50 has_modifier = "temperature-cold" }					
+					add_modifier = {
+						modifier = "biosphere-barren"
+						days = -1
+					}
+				}
+				10 = {
+					modifier = { factor = 0.85 has_modifier = "temperature-hot" }
+					modifier = { factor = 0.85 has_modifier = "temperature-temperate" }
+					modifier = { factor = 0.85 has_modifier = "temperature-cold" }					
+					add_modifier = {
+						modifier = "biosphere-primal"
+						days = -1
+					}
+				}
+			}
+			random_list = {
+				0 = {
+					modifier = { add = 10 has_modifier = "biosphere-diverse" }
+					modifier = { add = 5 has_modifier = "temperature-temperate" }
+					modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_chlorogenian has_modifier = "vegetation-mixed" } } } }
+					change_pc = orbit_chlorogenian
+					set_planet_entity = { entity = gd_chlorogenian_planet_mixed_01_entity }
+					#Spawn Atmosphere modifier
+					spawn_atmosphere_modifier = yes
+					#Spawn Gravity modifier
+					spawn_gravity_modifier = yes
+					set_planet_flag = "planet_converted"
+				}
+				0 = {
+					modifier = { add = 10 has_modifier = "biosphere-sparse" }
+					modifier = { add = 5 has_modifier = "temperature-hot" }
+					modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_chlorogenian has_modifier = "vegetation-sparse" } } } }
+					change_pc = orbit_chlorogenian
+					set_planet_entity = { entity = gd_chlorogenian_planet_sparse_01_entity }
+					#Spawn Atmosphere modifier
+					spawn_atmosphere_modifier = yes
+					#Spawn Gravity modifier
+					spawn_gravity_modifier = yes
+					set_planet_flag = "planet_converted"
+				}
+				0 = {
+					modifier = { add = 10 has_modifier = "biosphere-sparse" }
+					modifier = { add = 5 has_modifier = "temperature-temperate" }
+					modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_xerosgenian has_modifier = "vegetation-mixed" } } } }
+					change_pc = orbit_xerosgenian
+					set_planet_entity = { entity = gd_xerosgenian_planet_mixed_01_entity }
+					#Spawn Atmosphere modifier
+					spawn_atmosphere_modifier = yes
+					#Spawn Gravity modifier
+					spawn_gravity_modifier = yes
+					set_planet_flag = "planet_converted"
+				}
+				0 = {
+					modifier = { add = 10 has_modifier = "biosphere-barren" }
+					modifier = { add = 5 has_modifier = "temperature-hot" }
+					modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_xerosgenian has_modifier = "vegetation-barren" } } } }
+					change_pc = orbit_xerosgenian
+					set_planet_entity = { entity = gd_xerosgenian_planet_barren_01_entity }
+					#Spawn Atmosphere modifier
+					spawn_atmosphere_modifier = yes
+					#Spawn Gravity modifier
+					spawn_gravity_modifier = yes
+					set_planet_flag = "planet_converted"
+				}
+				0 = {
+					modifier = { add = 10 has_modifier = "biosphere-primal" }
+					modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_geocrystallic has_modifier = "vegetation-mixed" } } } }
+					change_pc = orbit_geocrystallic
+					set_planet_entity = { entity = gd_geocrystallic_planet_01_entity }
+					#Spawn Atmosphere modifier
+					spawn_atmosphere_modifier = yes
+					#Spawn Gravity modifier
+					spawn_gravity_modifier = yes
+					set_planet_flag = "planet_converted"
+				}
+				0 = {
+					modifier = { add = 10 has_modifier = "biosphere-barren" }
+					modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_geometallic has_modifier = "vegetation-barren" } } } }
+					change_pc = orbit_geometallic
+					set_planet_entity = { entity = gd_geometallic_planet_01_entity }
+					#Spawn Atmosphere modifier
+					spawn_atmosphere_modifier = yes
+					#Spawn Gravity modifier
+					spawn_gravity_modifier = yes
+					set_planet_flag = "planet_converted"
+				}
+				0 = {
+					modifier = { add = 10 has_modifier = "biosphere-sparse" }
+					modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_hothouse has_modifier = "vegetation-sparse" } } } }
+					change_pc = orbit_hothouse
+					set_planet_entity = { entity = hothouse_gd_planet_01_entity }
+					#Spawn Atmosphere modifier
+					spawn_atmosphere_modifier = yes
+					#Spawn Gravity modifier
+					spawn_gravity_modifier = yes
+					set_planet_flag = "planet_converted"
+				}
+			}
+		}
+		if = {
+			limit = { has_modifier = "lithosphere-uniform" }
+			#Possibles - Megafloral;Wetland
+			random_list = {
+				10 = {
+					modifier = { factor = 0.50 planet_size > 17 }
+					modifier = { factor = 0.00 planet_size > 20 }
+					modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_megafloral } } } }
+					change_pc = orbit_megafloral
+					set_planet_entity = { entity = gd_megafloral_planet_01_entity }
+					#Spawn Biosphere modifier
+					add_modifier = {
+						modifier = "biosphere-diverse"
+						days = -1
+					}
+					#Spawn Atmosphere modifier
+					spawn_atmosphere_modifier = yes
+					#Spawn Gravity modifier
+					add_modifier = {
+						modifier = "low_gravity"
+						days = -1
+					}
+					set_planet_flag = "planet_converted"
+				}
+				10 = {
+					#modifier = { factor = 1.50 has_modifier = "temperature-temperate" }
+					modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_wetland } } } }
+					change_pc = orbit_wetland
+					set_planet_entity = { entity = wetland_planet_01_entity }
+					#Spawn Biosphere modifier
+					add_modifier = {
+						modifier = "biosphere-dense"
+						days = -1
+					}
+					#Spawn Atmosphere modifier
+					spawn_atmosphere_modifier = yes
+					#Spawn Gravity modifier
+					spawn_gravity_modifier = yes
+					set_planet_flag = "planet_converted"
+				}
+			}
+		}
+	} #End block
+
+	if = { ## OCEAN - Pelagic hydrosphere
+		limit = { is_planet_class = pc_ocean }
+		# LITHOSPHERE: planets with moons get bonus odds to continental, jovian moons to uniform; Too smal get oods for continental halved, too large for oceanic
+		add_modifier = {
+			modifier = "lithosphere-oceanic"
+			days = -1
+		}
+		# HYDROSPHERE
+		add_modifier = {
+			modifier = "hydrosphere-water_pelagic"
+			days = -1
+		}
+		# BIOSPHERE
+		#Possibles - Panthalassic;Archipelagic;Geocoral
+		random_list = {
+			10 = {
+				modifier = { factor = 1.50 planet_size > 20 }
+				modifier = { factor = 0.50 planet_size < 15 }
+				modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_panthalassic } } } }
+
+				change_pc = orbit_panthalassic
+				set_planet_entity = { entity = panthalassic_planet_01_entity }
+				#Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-aquatic"
+					days = -1
+				}
+				#Spawn Atmosphere modifier
+				spawn_atmosphere_modifier = yes
+				#Spawn Gravity modifier
+				spawn_gravity_modifier = yes
+				set_planet_flag = "planet_converted"
+			}
+			10 = {
+				modifier = { factor = 1.50 has_moon = yes }
+				modifier = { factor = 0.50 planet_size > 20 }
+				modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_archipelagic } } } }
+
+				change_pc = orbit_archipelagic
+				set_planet_entity = { entity = archipelagic_planet_01_entity }
+				#Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-aquatic"
+					days = -1
+				}
+				#Spawn Atmosphere modifier
+				spawn_atmosphere_modifier = yes
+				#Spawn Gravity modifier
+				spawn_gravity_modifier = yes
+				set_planet_flag = "planet_converted"
+			}
+			10 = {
+				modifier = { factor = 1.50 is_moon = yes }
+				modifier = { factor = 0.50 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.00 has_modifier = "temperature-freezing" }
+				modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_geocoral } } } }
+
+				change_pc = orbit_geocoral
+				set_planet_entity = { entity = gd_geocoral_planet_01_entity }
+				#Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-aquatic"
+					days = -1
+				}
+				#Spawn Atmosphere modifier
+				spawn_atmosphere_modifier = yes
+				#Spawn Gravity modifier
+				spawn_gravity_modifier = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	} #End block
+
+	if = { ## TROPICAL - Abundant Water hydrosphere (Bioluminescent)
+		limit = { is_planet_class = pc_tropical }
+		# LITHOSPHERE: planets with moons get bonus odds to continental, jovian moons to uniform; Too smal get oods for continental halved, too large for oceanic
+		add_modifier = {
+			modifier = "lithosphere-continental"
+			days = -1
+		}
+		# HYDROSPHERE
+		add_modifier = {
+			modifier = "hydrosphere-water_dark"
+			days = -1
+		}
+		# BIOSPHERE: we need a block for each lithosphere, as it cant be completely random, we only have so many different biome art
+		change_pc = orbit_biolumenal
+		set_planet_entity = { entity = gd_biolumenal_planet_01_entity }
+		#Spawn Biosphere modifier
+		add_modifier = {
+			modifier = "biosphere-diverse"
+			days = -1
+		}
+		#Spawn Atmosphere modifier
+		spawn_atmosphere_modifier = yes
+		#Spawn Gravity modifier
+		spawn_gravity_modifier = yes
+		set_planet_flag = "planet_converted"
+	} #End block
+
+	if = { ## DESERT - Abundant Water hydrosphere (Retinal)
+		limit = { is_planet_class = pc_desert }
+		# LITHOSPHERE: planets with moons get bonus odds to continental, jovian moons to uniform; Too smal get oods for continental halved, too large for oceanic
+		add_modifier = {
+			modifier = "lithosphere-continental"
+			days = -1
+		}
+		# HYDROSPHERE
+		add_modifier = {
+			modifier = "hydrosphere-water_abundant"
+			days = -1
+		}
+		# BIOSPHERE: we need a block for each lithosphere, as it cant be completely random, we only have so many different biome art
+		random_list = {
+			10 = {
+				modifier = { factor = 1.50 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.75 has_modifier = "temperature-temperate" }
+				modifier = { factor = 0.00 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_retinalgenian has_modifier = "vegetation-sparse" } } } }
+
+				change_pc = orbit_retinalgenian
+				set_planet_entity = { entity = gd_retinalgenian_planet_mixed_01_entity }
+				#Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-sparse"
+					days = -1
+				}
+				#Spawn Atmosphere modifier
+				spawn_atmosphere_modifier = yes
+				#Spawn Gravity modifier
+				spawn_gravity_modifier = yes
+				set_planet_flag = "planet_converted"
+			}
+			10 = {
+				modifier = { factor = 0.00 has_modifier = "temperature-hot" }
+				modifier = { factor = 1.50 has_modifier = "temperature-temperate" }
+				modifier = { factor = 0.75 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_retinalgenian has_modifier = "vegetation-mixed" } } } }
+
+				change_pc = orbit_retinalgenian
+				set_planet_entity = { entity = gd_retinalgenian_planet_lush_01_entity }
+				#Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-diverse"
+					days = -1
+				}
+				#Spawn Atmosphere modifier
+				spawn_atmosphere_modifier = yes
+				#Spawn Gravity modifier
+				spawn_gravity_modifier = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	} #End block
+	
+	if = { ## ARID - Abundant Ammonia hydrosphere
+		limit = { is_planet_class = pc_arid }
+		# LITHOSPHERE: planets with moons get bonus odds to continental, jovian moons to uniform; Too smal get oods for continental halved, too large for oceanic
+		add_modifier = {
+			modifier = "lithosphere-continental"
+			days = -1
+		}
+		# HYDROSPHERE
+		add_modifier = {
+			modifier = "hydrosphere-ammonia_abundant"
+			days = -1
+		}
+		# BIOSPHERE: we need a block for each lithosphere, as it cant be completely random, we only have so many different biome art
+		change_pc = orbit_ammonia
+		set_planet_entity = { entity = ammonia_gd_planet_01_entity }
+		#Spawn Biosphere modifier
+		add_modifier = {
+			modifier = "biosphere-exotic"
+			days = -1
+		}
+		#Spawn Atmosphere modifier
+		spawn_atmosphere_modifier = yes
+		#Spawn Gravity modifier
+		spawn_gravity_modifier = yes
+		set_planet_flag = "planet_converted"
+	} #End block
+
+	if = { ## SAVANNHA - Limited Water hydrosphere (Hot)
+		limit = { is_planet_class = pc_savannah }
+		# LITHOSPHERE: planets with moons get bonus odds to continental, jovian moons to uniform; Too smal get oods for continental halved, too large for oceanic
+		add_modifier = {
+			modifier = "lithosphere-uniform"
+			days = -1
+		}
+		# HYDROSPHERE
+		add_modifier = {
+			modifier = "hydrosphere-water_limited"
+			days = -1
+		}
+		# BIOSPHERE: we need a block for each lithosphere, as it cant be completely random, we only have so many different biome art
+		#Possibles - geolumenal;steppeland;desolate
+		random_list = {
+			10 = {
+				modifier = { factor = 1.50 has_modifier = "temperature-temperate" }
+				modifier = { factor = 0.75 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.75 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_geolumenal } } } }
+
+				change_pc = orbit_geolumenal
+				set_planet_entity = { entity = gd_geolumenal_planet_01_entity }
+				#Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-diverse"
+					days = -1
+				}
+				#Spawn Atmosphere modifier
+				spawn_atmosphere_modifier = yes
+				#Spawn Gravity modifier
+				spawn_gravity_modifier = yes
+				set_planet_flag = "planet_converted"
+			}
+			10 = {
+				modifier = { factor = 1.50 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.75 has_modifier = "temperature-temperate" }
+				modifier = { factor = 0.25 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_steppeland } } } }
+
+				change_pc = orbit_steppeland
+				set_planet_entity = { entity = steppeland_planet_01_entity }
+				#Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-sparse"
+					days = -1
+				}
+				#Spawn Atmosphere modifier
+				spawn_atmosphere_modifier = yes
+				#Spawn Gravity modifier
+				spawn_gravity_modifier = yes
+				set_planet_flag = "planet_converted"
+			}
+			10 = {
+				modifier = { factor = 1.50 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.75 has_modifier = "temperature-temperate" }
+				modifier = { factor = 0.25 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_desolate } } } }
+
+				change_pc = orbit_desolate
+				set_planet_entity = { entity = desolate_planet_01_entity }
+				#Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-barren"
+					days = -1
+				}
+				#Spawn Atmosphere modifier
+				spawn_atmosphere_modifier = yes
+				#Spawn Gravity modifier
+				spawn_gravity_modifier = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	} #End block
+
+	if = { ## TUNDRA - Limited Water hydrosphere (Cold)
+		limit = { is_planet_class = pc_tundra }
+		# LITHOSPHERE: planets with moons get bonus odds to continental, jovian moons to uniform; Too smal get oods for continental halved, too large for oceanic
+		add_modifier = {
+			modifier = "lithosphere-uniform"
+			days = -1
+		}
+		# HYDROSPHERE
+		add_modifier = {
+			modifier = "hydrosphere-water_limited"
+			days = -1
+		}
+		# BIOSPHERE: we need a block for each lithosphere, as it cant be completely random, we only have so many different biome art
+		#Possibles - geothermal;highland
+		random_list = {
+			10 = {
+				modifier = { factor = 1.50 is_moon = yes }
+				modifier = { factor = 0.75 is_moon = no }
+				modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_geothermal } } } }
+
+				change_pc = orbit_geothermal
+				set_planet_entity = { entity = gd_geothermal_planet_01_entity }
+				#Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-diverse"
+					days = -1
+				}
+				#Spawn Atmosphere modifier
+				spawn_atmosphere_modifier = yes
+				#Spawn Gravity modifier
+				spawn_gravity_modifier = yes
+				set_planet_flag = "planet_converted"
+			}
+			10 = {
+				modifier = { factor = 0.75 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.50 has_modifier = "temperature-temperate" }
+				modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_highland } } } }
+
+				change_pc = orbit_highland
+				set_planet_entity = { entity = highland_planet_01_entity }
+				#Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-sparse"
+					days = -1
+				}
+				#Spawn Atmosphere modifier
+				spawn_atmosphere_modifier = yes
+				#Spawn Gravity modifier
+				spawn_gravity_modifier = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	} #End block
+
+	if = { ## ARCTIC - Frozen Water hydrosphere
+		limit = { is_planet_class = pc_arctic }
+		# LITHOSPHERE: planets with moons get bonus odds to continental, jovian moons to uniform; Too smal get oods for continental halved, too large for oceanic
+		random_list = {
+			3 = {
+				add_modifier = {
+					modifier = "lithosphere-oceanic"
+					days = -1
+				}
+				modifier = { factor = 0.5 planet_size > 22 }
+			}
+			1 = {
+				add_modifier = {
+					modifier = "lithosphere-continental"
+					days = -1
+				}
+				modifier = { add = 5 has_moon = yes }
+				modifier = { factor = 0.5 planet_size < 16 }
+				modifier = { add = 1000 has_modifier = "temperature-temperate" }
+				modifier = { add = 1000 has_modifier = "temperature-hot" }
+			}
+		}
+		# HYDROSPHERE
+		add_modifier = {
+			modifier = "hydrosphere-water_frozen"
+			days = -1
+		}
+		# BIOSPHERE: we need a block for each lithosphere, as it cant be completely random, we only have so many different biome art
+		if = {
+			limit = { has_modifier = "lithosphere-oceanic" }
+			change_pc = orbit_cryothalassic
+			set_planet_entity = { entity = cryothalassic_planet_01_entity }
+			#Spawn Biosphere modifier
+			add_modifier = {
+				modifier = "biosphere-barren"
+				days = -1
+			}
+			#Spawn Atmosphere modifier
+			spawn_atmosphere_modifier = yes
+			#Spawn Gravity modifier
+			spawn_gravity_modifier = yes
+			set_planet_flag = "planet_converted"
+		}
+		if = {
+			limit = { has_modifier = "lithosphere-continental" }
+			random_list = {
+				5 = {
+					modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_cryogenian has_modifier = "vegetation-barren" } } } }
+					modifier = { factor = 0.50 has_modifier = "temperature-temperate" }
+					modifier = { factor = 2.00 has_modifier = "temperature-cold" }
+
+					change_pc = orbit_cryogenian
+					set_planet_entity = { entity = gd_cryogenian_planet_barren_01_entity }
+					#Spawn Biosphere modifier
+					add_modifier = {
+						modifier = "biosphere-barren"
+						days = -1
+					}
+					#Spawn Atmosphere modifier
+					spawn_atmosphere_modifier = yes
+					#Spawn Gravity modifier
+					spawn_gravity_modifier = yes
+					set_planet_flag = "planet_converted"
+				}
+				10 = {
+					modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_cryogenian has_modifier = "vegetation-mixed" } } } }
+					modifier = { factor = 2.00 has_modifier = "temperature-temperate" }
+					modifier = { factor = 0.50 has_modifier = "temperature-cold" }
+
+					change_pc = orbit_cryogenian
+					set_planet_entity = { entity = gd_cryogenian_planet_mixed_01_entity }
+					#Spawn Biosphere modifier
+					add_modifier = {
+						modifier = "biosphere-diverse"
+						days = -1
+					}
+					#Spawn Atmosphere modifier
+					spawn_atmosphere_modifier = yes
+					#Spawn Gravity modifier
+					spawn_gravity_modifier = yes
+					set_planet_flag = "planet_converted"
+				}
+			}
+		}
+	} #End block
+
+	if = { ## ALPINE - Negligible hydrosphere (aquifers or ice caps only)
+		limit = { is_planet_class = pc_alpine }
+		# LITHOSPHERE: planets with moons get bonus odds to continental, jovian moons to uniform; Too smal get oods for continental halved, too large for oceanic
+		add_modifier = {
+			modifier = "lithosphere-uniform"
+			days = -1
+		}
+		# HYDROSPHERE
+		add_modifier = {
+			modifier = "hydrosphere-negligible"
+			days = -1
+		}
+		# BIOSPHERE: we need a block for each lithosphere, as it cant be completely random, we only have so many different biome art
+		#Possibles - geoplastic;karstic;wasteland
+		random_list = {
+			10 = {
+				modifier = { factor = 1.50 has_ring = yes }
+				modifier = { factor = 0.75 has_moon = yes }
+				modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_geoplastic } } } }
+
+				change_pc = orbit_geoplastic
+				set_planet_entity = { entity = gd_geoplastic_planet_01_entity }
+				#Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-barren"
+					days = -1
+				}
+				#Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-toxic"
+					days = -1
+				}
+				#Spawn Gravity modifier
+				spawn_gravity_modifier = yes
+				set_planet_flag = "planet_converted"
+			}
+			10 = {
+				modifier = { factor = 0.75 has_modifier = "temperature-cold" }
+				modifier = { factor = 0.25 has_modifier = "temperature-temperate" }
+				modifier = { factor = 1.00 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_wasteland } } } }
+
+				change_pc = orbit_wasteland
+				set_planet_entity = { entity = gd_wasteland_planet_01_entity }
+				#Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-barren"
+					days = -1
+				}
+				#Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-marginal"
+					days = -1
+				}
+				#Spawn Gravity modifier
+				spawn_gravity_modifier = yes
+				set_planet_flag = "planet_converted"
+			}
+			10 = {
+				modifier = { factor = 0.75 has_modifier = "temperature-cold" }
+				modifier = { factor = 1.00 has_modifier = "temperature-temperate" }
+				modifier = { factor = 0.25 has_modifier = "temperature-hot" }
+				modifier = { factor = 0.33 solar_system = { any_neighbor_system = { any_system_planet = { is_planet_class = orbit_karstic } } } }
+
+				change_pc = orbit_karstic
+				set_planet_entity = { entity = gd_karstic_planet_01_entity }
+				#Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-sparse"
+					days = -1
+				}
+				#Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-marginal"
+					days = -1
+				}
+				#Spawn Gravity modifier
+				spawn_gravity_modifier = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	} #End block
+}
+
+roll_pc_nuked = {
+	
+	#Spawn Lithosphere modifier
+	random_list = {
+		1 = {
+			add_modifier = {
+				modifier = "lithosphere-oceanic"
+				days = -1
+			}
+		}
+		2 = {
+			add_modifier = {
+				modifier = "lithosphere-continental"
+				days = -1
+			}
+		}
+		1 = {
+			add_modifier = {
+				modifier = "lithosphere-uniform"
+				days = -1
+			}
+		}
+	}
+	#Spawn Hydrosphere modifier
+	random_list = {
+		0 = {
+			add_modifier = {
+				modifier = "hydrosphere-water_pelagic"
+				days = -1
+			}
+			modifier = { add = 5 has_modifier = "lithosphere-oceanic" }
+			modifier = { factor = 0.25 has_modifier = "temperature-cold" }
+			modifier = { factor = 0 has_modifier = "temperature-freezing" }
+		}
+		0 = {
+			add_modifier = {
+				modifier = "hydrosphere-water_frozen"
+				days = -1
+			}
+			modifier = { add = 2 has_modifier = "lithosphere-oceanic" }
+			modifier = { factor = 0 has_modifier = "temperature-scorching" }
+			modifier = { factor = 0 has_modifier = "temperature-hot" }
+			modifier = { factor = 0.25 has_modifier = "temperature-temperate" }
+		}
+		0 = {
+			add_modifier = {
+				modifier = "hydrosphere-water_abundant"
+				days = -1
+			}
+			modifier = { add = 5 has_modifier = "lithosphere-continental" }
+			modifier = { add = 2 has_modifier = "lithosphere-uniform" }
+		}
+		0 = {
+			add_modifier = {
+				modifier = "hydrosphere-water_limited"
+				days = -1
+			}
+			modifier = { add = 5 has_modifier = "lithosphere-uniform" }
+		}
+		0 = {
+			add_modifier = {
+				modifier = "hydrosphere-negligible"
+				days = -1
+			}
+			modifier = { add = 3 has_modifier = "lithosphere-uniform" }
+			modifier = { add = 1 has_modifier = "lithosphere-continental" }
+		}		
+	}
+	#Spawn Biosphere modifier
+	add_modifier = {
+		modifier = "biosphere-barren"
+		days = -1
+	}
+	#Spawn Atmosphere modifier
+	add_modifier = {
+		modifier = "atmosphere-toxic"
+		days = -1
+	}
+	#Spawn Gravity modifier
+	spawn_gravity_modifier = yes
+	
+	set_planet_flag = "planet_converted"
+}
