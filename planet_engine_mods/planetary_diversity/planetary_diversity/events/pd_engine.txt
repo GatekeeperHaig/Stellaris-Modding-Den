@@ -94,6 +94,7 @@ country_event = {
 				20 = { change_pc = pc_oasis reroll_planet = yes }	
 				20 = { change_pc = pc_outback reroll_planet = yes }		
 				20 = { change_pc = pc_salt reroll_planet = yes clear_planet_modifiers = yes add_deposit = d_salt_caves add_modifier = { modifier = pdsalt } }
+				20 = { change_pc = pc_aquifer reroll_planet = yes clear_planet_modifiers = yes add_deposit = d_aquifer_cave add_modifier = { modifier = pdaquifer } }
 			}
 		}
 		every_galaxy_planet = { 				
@@ -300,6 +301,8 @@ country_event = {
 		every_galaxy_planet = { limit = { is_planet_class = pc_aquatic is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Salt
 		every_galaxy_planet = { limit = { is_planet_class = pc_salt is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
+		#Aquifer
+		every_galaxy_planet = { limit = { is_planet_class = pc_aquifer is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Coral
 		every_galaxy_planet = { limit = { is_planet_class = pc_coral is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Storm
@@ -563,6 +566,16 @@ country_event = {
 		#Salt Start
 		every_galaxy_planet = { 				
 			limit = { is_planet_class = pc_salt is_homeworld = no has_planet_flag = prescripted_ideal }
+			random_list = {
+				25 = { change_pc = pc_desert reroll_planet = yes }
+				25 = { change_pc = pc_sandsea reroll_planet = yes }	
+				25 = { change_pc = pc_oasis reroll_planet = yes }
+				25 = { change_pc = pc_outback reroll_planet = yes }		
+			}
+		}
+		#Aquifer Start
+		every_galaxy_planet = { 				
+			limit = { is_planet_class = pc_aquifer is_homeworld = no has_planet_flag = prescripted_ideal }
 			random_list = {
 				25 = { change_pc = pc_desert reroll_planet = yes }
 				25 = { change_pc = pc_sandsea reroll_planet = yes }	
@@ -1278,7 +1291,7 @@ planet_event = {
 	}
 }
 
-# Bio-Forge complete
+# Hive Specialization Complete
 planet_event = {
 	id = pdengine.11
 	title = pdengine.11.name
@@ -1290,7 +1303,11 @@ planet_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		is_planet_class = pc_bioforge
+		OR = {
+			is_planet_class = pc_bioforge
+			is_planet_class = pc_biofort
+			is_planet_class = pc_biocapital
+		}
 	}
 
 	option = {
@@ -1400,6 +1417,11 @@ planet_event = {
 		add_modifier = { modifier = "pdsalt" days = -1 }
 		}
 		if = { 
+		limit = { is_planet_class = pc_aquifer not = { has_deposit = d_aquifer_cave }}
+		add_deposit = d_aquifer_cave
+		add_modifier = { modifier = "pdaquifer" days = -1 }
+		}
+		if = { 
 		limit = { is_planet_class = pc_coral not = { has_deposit = d_coral_fields }}
 		add_deposit = d_coral_fields
 		add_modifier = { modifier = "pdcoral" days = -1 }
@@ -1482,12 +1504,7 @@ planet_event = {
 		remove_modifier = engineered_environment_gaia
 		}
 		if = { 
-		limit = { 
-			OR = {
-			is_planet_class = pc_hive 
-			is_planet_class = pc_bioforge 
-			}
-			not = { has_deposit = d_pd_hive_world_boost } }
+		limit = { is_planet_class = pc_hive not = { has_deposit = d_pd_hive_world_boost } }
 		add_deposit = d_pd_hive_world_boost
 		}
 		if = { 
@@ -1495,6 +1512,7 @@ planet_event = {
 			OR = {
 			is_planet_class = pc_machine 
 			is_planet_class = pc_machine_factory 
+			is_planet_class = pc_machine_capital 
 			}
 			not = { has_deposit = d_pd_machine_world_boost } }
 		add_deposit = d_pd_machine_world_boost
@@ -1542,6 +1560,12 @@ planet_event = {
 		remove_deposit = d_salt_caves
 		remove_modifier = pdsalt
 		remove_building = building_salt_mine
+		}
+		if = { 
+		limit = { NOT = { is_planet_class = pc_aquifer } }
+		remove_deposit = d_aquifer_cave
+		remove_modifier = pdaquifer
+		remove_building = building_aquifer_lab
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_coral } }
@@ -1642,10 +1666,7 @@ planet_event = {
 		if = { 
 		limit = { 
 			NOT = {
-				OR = {
 				is_planet_class = pc_hive 
-				is_planet_class = pc_bioforge 
-				}
 			} 
 		}
 		remove_deposit = d_pd_hive_world_boost
@@ -2287,6 +2308,7 @@ planet_event = {
 		if = { limit = { is_planet_class = pc_primal } set_planet_flag = pdhive_primal }
 		if = { limit = { is_planet_class = pc_aquatic } set_planet_flag = pdhive_aquatic }
 		if = { limit = { is_planet_class = pc_salt } set_planet_flag = pdhive_salt }
+		if = { limit = { is_planet_class = pc_aquifer } set_planet_flag = pdhive_aquifer }
 		if = { limit = { is_planet_class = pc_coral } set_planet_flag = pdhive_coral }
 		if = { limit = { is_planet_class = pc_storm } set_planet_flag = pdhive_storm }
 		if = { limit = { is_planet_class = pc_rogue } set_planet_flag = pdhive_rogue }
@@ -2378,6 +2400,10 @@ planet_event = {
 		}
 		if = {
 			limit = { has_deposit = d_salt_caves }
+			set_planet_flag = pd_hive_crystal2
+		}
+		if = {
+			limit = { has_deposit = d_aquifer_cave }
 			set_planet_flag = pd_hive_crystal2
 		}
 		if = {
@@ -2486,6 +2512,8 @@ planet_event = {
 		remove_deposit = d_pdshroud
 		remove_modifier = pdsalt
 		remove_deposit = d_salt_caves
+		remove_modifier = pdaquifer
+		remove_deposit = d_aquifer_cave
 		remove_modifier = pdmegaflora
 		remove_deposit = d_megaflora_deposit
 		remove_modifier = pdmegaflora
@@ -2781,7 +2809,11 @@ planet_event = {
 				change_pc = pc_forest
 			}
 			if = {
-				limit = { is_planet_class = pc_pdfloraforge }
+				limit = { is_planet_class = pc_megafloraforge }
+				change_pc = pc_forest
+			}
+			if = {
+				limit = { is_planet_class = pc_megafloracapital }
 				change_pc = pc_forest
 			}
 			if = {
@@ -2820,7 +2852,12 @@ planet_event = {
 		remove_deposit = d_megaflora_deposit
 		remove_modifier = pdmegaflora
 		if = {
-			limit = { is_planet_class = pc_pdfloraforge }
+			limit = { is_planet_class = pc_megafloraforge }
+			change_pc = pc_forest
+			add_deposit = d_pd_tree_of_life_dead
+		}
+		if = {
+			limit = { is_planet_class = pc_megafloracapital }
 			change_pc = pc_forest
 			add_deposit = d_pd_tree_of_life_dead
 		}
@@ -2999,6 +3036,8 @@ planet_event = {
 		remove_deposit = d_pdshroud
 		remove_modifier = pdsalt
 		remove_deposit = d_salt_caves
+		remove_modifier = pdaquifer
+		remove_deposit = d_aquifer_cave
 		remove_modifier = pdcoral
 		remove_deposit = d_coral_fields
 		remove_modifier = supercon
@@ -3626,6 +3665,19 @@ country_event = {
 			if = {
 				limit = {
 					has_planet_flag = lost_colony_planet
+					is_planet_class = pc_aquifer
+				}
+				random_list = {
+					25 = { change_pc = pc_desert }
+					25 = { change_pc = pc_sandsea }
+					25 = { change_pc = pc_outback }
+					25 = { change_pc = pc_oasis }
+				}
+				generate_pd_start_deposits_and_blockers = yes
+			}
+			if = {
+				limit = {
+					has_planet_flag = lost_colony_planet
 					is_planet_class = pc_superhabitable
 				}
 				random_list = {
@@ -3879,7 +3931,11 @@ planet_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		is_planet_class = pc_pdfloraforge
+		OR = {
+			is_planet_class = pc_megafloraforge
+			is_planet_class = pc_megaflorafort
+			is_planet_class = pc_megafloracapital
+		}
 	}
 
 	option = {
@@ -4142,6 +4198,19 @@ country_event = {
 						}
 						reroll_deposits = yes
 						remove_modifier = pdsalt
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_aquifer
+						}
+						random_list = {
+							25 = { change_pc = pc_desert }
+							25 = { change_pc = pc_sandsea }
+							25 = { change_pc = pc_outback }
+							25 = { change_pc = pc_oasis }
+						}
+						reroll_deposits = yes
+						remove_modifier = pdaquifer
 					}
 					if = {
 						limit = {
@@ -4902,6 +4971,19 @@ country_event = {
 						}
 						reroll_deposits = yes
 						remove_modifier = pdsalt
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_aquifer
+						}
+						random_list = {
+							25 = { change_pc = pc_desert }
+							25 = { change_pc = pc_sandsea }
+							25 = { change_pc = pc_outback }
+							25 = { change_pc = pc_oasis }
+						}
+						reroll_deposits = yes
+						remove_modifier = pdaquifer
 					}
 					if = {
 						limit = {
@@ -5929,6 +6011,8 @@ planet_event = {
 		remove_deposit = d_pdshroud
 		remove_modifier = pdsalt
 		remove_deposit = d_salt_caves
+		remove_modifier = pdaquifer
+		remove_deposit = d_aquifer_cave
 		remove_modifier = pdmegaflora
 		remove_deposit = d_megaflora_deposit
 		remove_modifier = pdcoral

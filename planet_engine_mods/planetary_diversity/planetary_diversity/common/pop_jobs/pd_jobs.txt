@@ -5288,3 +5288,162 @@ capital_security = {
 		}
 	}
 }
+
+mil_brain_drone = {
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_fortress
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+	}
+
+	possible = {
+		drone_job_check_trigger = yes
+	}
+
+	resources = {
+		category = planet_researchers
+		produces = {
+			physics_research = 6
+			engineering_research = 6
+		}
+		upkeep = {
+			minerals = 6
+		}
+		upkeep = {
+			trigger = {
+				exists = owner
+				owner = {
+					has_edict = research_subsidies
+				}
+			}
+			energy = 1
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		modifier = {
+			factor = 3
+			has_trait = trait_erudite
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_intelligent
+		}
+		modifier = {
+			factor = 1.5
+			OR = {
+				has_trait = trait_natural_engineers
+				has_trait = trait_natural_physicists
+				has_trait = trait_natural_sociologists
+			}
+		}
+		modifier = {
+			factor = 0.65
+			OR = {
+				has_trait = trait_syncretic_proles
+				has_trait = trait_presapient_proles
+			}
+		}
+		modifier = {
+			factor = 0.9
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			has_trait = trait_cybernetic
+		}
+		modifier = {
+			factor = 0
+			planet = {
+				owner = {
+					is_ai = yes
+					has_resource = { type = minerals amount < 500 }
+					has_monthly_income = {
+						resource = minerals
+						value < 25
+					}
+				}
+			}
+		}
+	}
+}
+
+aquifer_tech = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_aquifer_lab
+	clothes_texture_index = 2
+
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+	
+	resources = {
+		category = planet_chemists
+		produces = {
+			society_research = 6
+			engineering_research = 6
+		}
+		upkeep = {
+			consumer_goods = 2
+		}	
+	} 
+	
+	weight = {
+		weight = @specialist_job_weight
+		modifier = {
+			factor = 3
+			has_trait = trait_erudite
+		}		
+		modifier = {
+			factor = 2
+			OR = {
+				has_trait = trait_robot_logic_engines
+				has_trait = trait_intelligent
+				has_trait = trait_brainslug
+			}
+		}
+		modifier = {
+			factor = 1.5
+			has_trait = trait_natural_sociologists
+		}
+		modifier = {
+			factor = 10
+			is_enslaved = yes
+			can_take_servant_job = no
+		}	
+		modifier = {
+			factor = 2
+			OR = {	
+				is_non_sapient_robot = yes
+				is_shackled_robot = yes
+			}
+			can_take_servant_job = no
+			owner = { has_technology = tech_droid_workers }
+		}	
+		modifier = {
+			factor = 10
+			OR = {	
+				is_non_sapient_robot = yes
+				is_shackled_robot = yes
+			}
+			can_take_servant_job = no
+			owner = { NOT = { has_technology = tech_droid_workers } }
+		}		
+		modifier = {
+			factor = 0.25
+			can_take_servant_job = yes
+		}		
+		modifier = {
+			factor = 2
+			species = {
+				has_species_flag = racket_species_flag
+			}
+		}	
+	}
+}
