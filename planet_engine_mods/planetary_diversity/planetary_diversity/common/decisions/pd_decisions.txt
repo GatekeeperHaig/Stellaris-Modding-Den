@@ -616,7 +616,10 @@ decision_pdcrystalpatch = {
 	}
 	
 	potential = {
+		NOT = { is_planet_class = pc_floating }
 		NOT = { is_planet_class = pc_crystal }
+		NOT = { is_planet_class = pc_technoorganic }
+		NOT = { is_planet_class = pc_graveyard }
 		NOT = { has_planet_flag = pdcrystalpatch }
 		NOT = { is_planet_class = pc_city }
 		NOT = { is_planet_class = pc_ecocity }
@@ -700,6 +703,9 @@ decision_tiyanki_prospecting = {
 	prerequisites = { "tech_tiyanki_prospecting" }
 	
 	potential = {
+		NOT = { is_planet_class = pc_floating }
+		NOT = { is_planet_class = pc_crystal }
+		NOT = { is_planet_class = pc_technoorganic }
 		NOT = { is_planet_class = pc_graveyard }
 		NOT = { has_planet_flag = tiyanki_prospected }
 		NOT = { is_planet_class = pc_city }
@@ -780,7 +786,10 @@ decision_techno_canal = {
 	}
 	
 	potential = {
+		NOT = { is_planet_class = pc_floating }
+		NOT = { is_planet_class = pc_crystal }
 		NOT = { is_planet_class = pc_technoorganic }
+		NOT = { is_planet_class = pc_graveyard }
 		NOT = { has_planet_flag = pdtechnocanal }
 		NOT = { is_planet_class = pc_city }
 		NOT = { is_planet_class = pc_ecocity }
@@ -832,6 +841,95 @@ decision_techno_canal = {
               type = district_farming
               value > 1
             }
+        }
+    }
+	}
+}
+
+# Add Floating Islands
+decision_pdfloatingislands = {
+	icon = decision_pdfloatingislands
+	owned_planets_only = yes
+
+	enactment_time = 900
+	resources = {
+		category = decisions
+		cost = {
+			sr_eludium = 500
+		}
+	}
+		
+	prerequisites = {
+		"tech_floating_islands"		
+	}
+	
+	potential = {
+		NOT = { is_planet_class = pc_floating }
+		NOT = { is_planet_class = pc_crystal }
+		NOT = { is_planet_class = pc_technoorganic }
+		NOT = { is_planet_class = pc_graveyard }
+		NOT = { has_planet_flag = pdfloatingislands }
+		NOT = { is_planet_class = pc_city }
+		NOT = { is_planet_class = pc_ecocity }
+		NOT = { is_planet_class = pc_palacearc }
+		NOT = { is_planet_class = pc_capitalarc }
+		NOT = { is_planet_class = pc_necropolis }
+		NOT = { is_planet_class = pc_milarc }
+		NOT = { is_planet_class = pc_shroudcity }
+		NOT = { is_planet_class = pc_hive }
+		NOT = { is_planet_class = pc_bioforge }
+		NOT = { is_planet_class = pc_biocapital }
+		NOT = { is_planet_class = pc_machine }
+		NOT = { is_planet_class = pc_machine_factory }
+		NOT = { is_planet_class = pc_machine_capital }
+		NOT = { is_planet_class = pc_machine_fort }
+		NOT = { is_planet_class = pc_shroudcity }
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = penal_colony }
+		NOT = { has_modifier = slave_colony }
+		habitable_structure = no
+	}
+
+	effect = {
+		add_deposit = d_pdfloatingislands
+		hidden_effect = { set_planet_flag = pdfloatingislands }
+	}
+	
+	ai_weight = {
+		weight = 1
+    modifier = {
+        factor = 0
+        or = {
+            num_pops < 15
+            and = {
+              # By late game, AI will likely keep some open building slots
+              # This is mostly harmless if there are still jobs available
+              # Otherwise, don't let them take this over building a building
+              free_building_slots > 0
+              free_jobs <= 0
+            }
+            free_building_slots > 2
+            owner = {
+                or = {
+                    resource_stockpile_compare = { resource = sr_acean value < 2500 }
+                    resource_income_compare = { resource = sr_acean value < 0 }
+                }
+            }
+            AND = {
+            	free_district_slots <= 0
+            	owner = { resource_income_compare = { resource = rare_crystals value > 2 } }
+          	}
+            AND = {
+		          num_free_districts = {
+		            type = district_mining
+		            value > 1
+		          }
+		          num_free_districts = {
+		            type = district_farming
+		            value > 1
+		          }
+	          }
+          	owner = { resource_income_compare = { resource = rare_crystals value > 2 } }
         }
     }
 	}
