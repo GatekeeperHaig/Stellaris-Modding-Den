@@ -23,6 +23,7 @@ name_defaultMenuEvent="custom_difficulty.1"
 name_customMenuEvent="custom_difficulty.2"
 name_optionsEvent="custom_difficulty.3"
 name_gameStartFireOnlyOnce="custom_difficulty.10"
+name_gameStartFireOnlyOnceWithDialog="custom_difficulty.12"
 name_randomDiffFireOnlyOnce="custom_difficulty.11"
 name_resetEvent="custom_difficulty.20" # same as above with triggered_only instead of fire_only_once
 name_resetConfirmationEvent="custom_difficulty.21" # same as above with triggered_only instead of fire_only_once
@@ -552,7 +553,6 @@ def main():
     if cat in difficultiesPresetProperties[difficulty]:
       et.addComment("Crisis strength multiply")
       values=difficultiesPresetProperties[difficulty][cat]
-      # et.add("get_galaxy_setup_value", TagList("setting", "crises").add("which", "custom_difficulty_crisis_strength").add("scale_by", "3"))
       for i, value in enumerate(values):
         if value:
           crisisVar="custom_difficulty_{}_{}_value".format(cat,possibleBoniNames[i])
@@ -613,7 +613,7 @@ def main():
   modifierRange=dict()
   modifierRange["player"]=[-10, 20] #[0]*10 to [1]*10
   modifierRange["ai"]=[-8, 11] #2^([0]-1)-1 to 2^([1]-1)-1
-  modifierRange["crisis"]=[-5, 11] #10*(2^([0]-1)-1) to 10*(2^([1]-1)-1)
+  modifierRange["crisis"]=[-5, 20] #10*(2^([0]-1)-1) to 10*(2^([1]-1)-1)
 
   updateFile=TagList()
   updateFile.add("namespace","custom_difficulty")
@@ -1114,16 +1114,21 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
 
 
   if not reducedMenu:
-    mainFileContent.add("","","#game start init")
+    gameStartInitEventWithDialog=TagList("id", name_gameStartFireOnlyOnceWithDialog) #still required for older versions
+    gameStartInitEventWithDialog.add("title","custom_difficulty_init" )
+    gameStartInitEventWithDialog.add("picture","GFX_evt_custom_difficulty")
+    gameStartInitEventWithDialog.add("is_triggered_only", yes)
     gameStartInitEvent=TagList("id", name_gameStartFireOnlyOnce)
-    gameStartInitEvent.add("title","custom_difficulty_init" )
-    gameStartInitEvent.add("picture","GFX_evt_custom_difficulty")
+    gameStartInitEvent.add("hide_window", yes)
     trigger=TagList()
-    gameStartInitEvent.add("desc", TagList("trigger", trigger)) #"" )
+    gameStartInitEventWithDialog.add("desc", TagList("trigger", trigger)) #"" )
     trigger.add("text","custom_difficulty_init_desc")
     trigger.add("success_text", TagList("text","custom_difficulty_init_crisis_desc").add("is_crises_allowed", "yes"))
     trigger.add("success_text", TagList("text", "custom_difficulty_init_no_crisis_desc").add("is_crises_allowed", "no"))
+    mainFileContent.add("","","#game start init")
     mainFileContent.add("country_event", gameStartInitEvent)
+    mainFileContent.add("","","#legacy game start init")
+    mainFileContent.add("country_event", gameStartInitEventWithDialog)
     gameStartInitEvent.add("fire_only_once", yes)
     # gameStartInitEvent.add("hide_window", yes)
     t_anyOption=TagList()
@@ -1142,30 +1147,39 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
     createEventTarget.add("remove_global_flag","MM_was_active_before_custom_difficulty")
     createEventTarget=immediate.addReturn("else")
     createEventTarget.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
+    immediate.add(ET,TagList("get_galaxy_setup_value", TagList("which", "custom_difficulty_crisis_strength").add("setting", "crisis_strength_scale")))#.add("scale_by", "3"))
+    # gameStartInitEvent.add("option", TagList("name", "OK").add("trigger", TagList(ET,TagList("check_variable",TagList("which", "custom_difficulty_crisis_strength").add("value","0","",">")))))
     for strength in [0.25, 0.5, 1, 2,3,4,5,10,15,20,25]:
-      gameStartInitEvent.add("option", TagList("name", "custom_difficulty_{!s}_crisis.name".format(strength))
+      gameStartInitEventWithDialog.add("option", TagList("name", "custom_difficulty_{!s}_crisis.name".format(strength))
         .add("trigger", TagList("is_crises_allowed", yes))
         .add("hidden_effect", TagList(ET,TagList("set_variable", TagList("which","custom_difficulty_crisis_strength").add("value",str(strength))))))
       locClass.addEntry("custom_difficulty_{!s}_crisis.name".format(strength), "§R{}x @crisisStrength§!".format(strength))
-    gameStartInitEvent.add("option", TagList("name", "OK").add("trigger", TagList("is_crises_allowed", "no")))
-    gameStartAfter=TagList()
-    gameStartInitEvent.add("after",TagList("hidden_effect", gameStartAfter))
-    gameStartAfter.add("set_global_flag", "custom_difficulty_active")
-    gameStartAfter.add("set_global_flag", f"dmm_mod_{dmmType}_{dmmId}")
-    gameStartAfter.add("set_global_flag","custom_difficulty_no_player_bonus")
-    gameStartAfter.add("set_global_flag","custom_difficulty_no_scaling")
+    gameStartInitEventWithDialog.add("option", TagList("name", "OK").add("trigger", TagList("is_crises_allowed", "no")))
+    for s in [gameStartInitEventWithDialog,gameStartInitEvent]:
+      gameStartAfter=TagList()
+      s.add("after",TagList("hidden_effect", gameStartAfter))
+      gameStartAfter2=gameStartAfter
+      if s==gameStartInitEvent:
+        gameStartAfter=gameStartAfter.createReturnIf(TagList(ET,TagList("OR", TagList("check_variable",TagList("which", "custom_difficulty_crisis_strength").add("value","0","",">")).add("is_crises_allowed", "no"))))
+      # gameStartInitEvent.add("option", TagList("name", "OK").add("trigger", TagList(ET,TagList("check_variable",TagList("which", "custom_difficulty_crisis_strength").add("value","0","",">")))))
+      gameStartAfter.add("set_global_flag", "custom_difficulty_active")
+      gameStartAfter.add("set_global_flag", f"dmm_mod_{dmmType}_{dmmId}")
+      gameStartAfter.add("set_global_flag","custom_difficulty_no_player_bonus")
+      gameStartAfter.add("set_global_flag","custom_difficulty_no_scaling")
 
-    vanillaDefaultDifficultyNames=difficulties[0:]
-    for i, difficulty in enumerate(difficulties):
-      if difficulty=="scaling":
-        continue
-      elif difficulty in vanillaDefaultDifficultyNames:
-        k=vanillaDefaultDifficultyNames.index(difficulty)
-      else:
-        continue #those cannot be preset in game creation
-      gameStartAfter.add("","","#"+difficulty)
-      gameStartAfter.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", eventNameSpace.format(id_defaultEvents+i))))
-    gameStartAfter.add("country_event", TagList("id", name_rootUpdateEvent))
+      vanillaDefaultDifficultyNames=difficulties[0:]
+      for i, difficulty in enumerate(difficulties):
+        if difficulty=="scaling":
+          continue
+        elif difficulty in vanillaDefaultDifficultyNames:
+          k=vanillaDefaultDifficultyNames.index(difficulty)
+        else:
+          continue #those cannot be preset in game creation
+        gameStartAfter.add("","","#"+difficulty)
+        gameStartAfter.add("if", TagList("limit", TagList("is_difficulty", str(k))).add("country_event",TagList("id", eventNameSpace.format(id_defaultEvents+i))))
+      gameStartAfter.add("country_event", TagList("id", name_rootUpdateEvent))
+      if s==gameStartInitEvent:
+        gameStartAfter2.add("else",TagList("country_event",TagList("id",name_gameStartFireOnlyOnceWithDialog)))
 
   mainFileContent.addComment("Assign a variable to each default country that will decide how much their difficulty modifiers are decreased by randomness")
   randomInitEvent=mainFileContent.addReturn("country_event")
@@ -1261,7 +1275,7 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
         inverseIsDefault=True
     if not inverseIsDefault:
       for name, val in effect.getNameVal():
-        gameStartAfter.insert(0, name, deepcopy(val))
+        gameStartAfter2.insert(0, name, deepcopy(val))
       # gameStartAfter.addTagList(deepcopy(effect))
       defaultOptions.append(key)
     if key in optionExtraEvents:
@@ -1648,6 +1662,7 @@ def globalAddLocs(locClass):
     " The option chosen during game start will not have an effect anymore."+
     " The value chosen below is translated into a bonus using the same formula as Vanilla Stellaris and can be customized at any time."+
     " This later custumization also allows values beyond the maximum offered in Vanilla.")
+    # locClass.addLoc("crisis_from_galaxy_setup", "Use value from Galaxy setup")
   locClass.addLoc("noCrisisInit","This game has crisis disabled via the game start options. Crisis options are thus also disabled in this mod. You can activate crisis only with a new game or a save-game edit.")
   locClass.addLoc("crisisStrength","Crisis Strength")
   locClass.addLoc("current_options", "Currently active options")
@@ -1676,6 +1691,8 @@ def globalAddLocs(locClass):
   locClass.addLoc("activate_host_only"+"Desc", "Only the host of the game will be able to change any settings. Other players can open the dynamic difficulty menu and see the settings, but won't be able to change anything")
   locClass.addLoc("deactivate_host_only", "Deactivate Host Changes Only")
   locClass.addLoc("deactivate_host_only"+"Desc", "Everybody can change any dynamic difficulty settings, unless settings have been locked")
+
+
 
 if __name__ == "__main__":
   main()

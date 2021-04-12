@@ -640,21 +640,7 @@ country_event = {
  #game start init
 country_event = {
 	id = custom_difficulty.10
-	title = custom_difficulty_init
-	picture = GFX_evt_custom_difficulty
-	desc = {
-		trigger = {
-			text = custom_difficulty_init_desc
-			success_text = {
-				text = custom_difficulty_init_crisis_desc
-				is_crises_allowed = yes
-			}
-			success_text = {
-				text = custom_difficulty_init_no_crisis_desc
-				is_crises_allowed = no
-			}
-		}
-	}
+	hide_window = yes
 	fire_only_once = yes
 	trigger = {
 		is_ai = no
@@ -702,6 +688,100 @@ country_event = {
 			remove_global_flag = MM_was_active_before_custom_difficulty
 		}
 		else = { random_planet = { save_global_event_target_as = custom_difficulty_var_storage } }
+		event_target:custom_difficulty_var_storage = {
+			get_galaxy_setup_value = {
+				which = custom_difficulty_crisis_strength
+				setting = crisis_strength_scale
+			}
+		}
+	}
+	after = {
+		hidden_effect = {
+			remove_global_flag = custom_difficulty_deactivate_host_only
+			set_global_flag = custom_difficulty_activate_host_only
+			remove_global_flag = custom_difficulty_deactivate_edict
+			set_global_flag = custom_difficulty_activate_edict
+			remove_global_flag = custom_difficulty_activate_delay_mode
+			set_global_flag = custom_difficulty_deactivate_delay_mode
+			remove_global_flag = custom_difficulty_activate_player_vassal_ai_boni
+			set_global_flag = custom_difficulty_deactivate_player_vassal_ai_boni
+			remove_global_flag = custom_difficulty_activate_simple_mode
+			set_global_flag = custom_difficulty_activate_custom_mode
+			if = {
+				limit = {
+					event_target:custom_difficulty_var_storage = {
+						OR = {
+							check_variable = {
+								which = custom_difficulty_crisis_strength
+								value > 0
+							}
+							is_crises_allowed = no
+						}
+					}
+				}
+				set_global_flag = custom_difficulty_active
+				set_global_flag = dmm_mod_utilities_4
+				set_global_flag = custom_difficulty_no_player_bonus
+				set_global_flag = custom_difficulty_no_scaling
+				 #cadet
+				if = {
+					limit = { is_difficulty = 0 }
+					country_event = { id = custom_difficulty.100 }
+				}
+				 #ensign
+				if = {
+					limit = { is_difficulty = 1 }
+					country_event = { id = custom_difficulty.101 }
+				}
+				 #captain
+				if = {
+					limit = { is_difficulty = 2 }
+					country_event = { id = custom_difficulty.102 }
+				}
+				 #commodore
+				if = {
+					limit = { is_difficulty = 3 }
+					country_event = { id = custom_difficulty.103 }
+				}
+				 #admiral
+				if = {
+					limit = { is_difficulty = 4 }
+					country_event = { id = custom_difficulty.104 }
+				}
+				 #grand_admiral
+				if = {
+					limit = { is_difficulty = 5 }
+					country_event = { id = custom_difficulty.105 }
+				}
+				 #no_scaling
+				if = {
+					limit = { is_difficulty = 7 }
+					country_event = { id = custom_difficulty.107 }
+				}
+				country_event = { id = custom_difficulty.40 }
+			}
+			else = { country_event = { id = custom_difficulty.12 } }
+		}
+	}
+}
+ #legacy game start init
+country_event = {
+	id = custom_difficulty.12
+	title = custom_difficulty_init
+	picture = GFX_evt_custom_difficulty
+	is_triggered_only = yes
+	desc = {
+		trigger = {
+			text = custom_difficulty_init_desc
+			success_text = {
+				text = custom_difficulty_init_crisis_desc
+				is_crises_allowed = yes
+			}
+			success_text = {
+				text = custom_difficulty_init_no_crisis_desc
+				is_crises_allowed = no
+			}
+		}
 	}
 	option = {
 		name = custom_difficulty_0.25_crisis.name
@@ -788,6 +868,42 @@ country_event = {
 		}
 	}
 	option = {
+		name = custom_difficulty_10_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 10
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_15_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 15
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_20_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 20
+				}
+			}
+		}
+	}
+	option = {
 		name = custom_difficulty_25_crisis.name
 		trigger = { is_crises_allowed = yes }
 		hidden_effect = {
@@ -805,16 +921,6 @@ country_event = {
 	}
 	after = {
 		hidden_effect = {
-			remove_global_flag = custom_difficulty_deactivate_host_only
-			set_global_flag = custom_difficulty_activate_host_only
-			remove_global_flag = custom_difficulty_deactivate_edict
-			set_global_flag = custom_difficulty_activate_edict
-			remove_global_flag = custom_difficulty_activate_delay_mode
-			set_global_flag = custom_difficulty_deactivate_delay_mode
-			remove_global_flag = custom_difficulty_activate_player_vassal_ai_boni
-			set_global_flag = custom_difficulty_deactivate_player_vassal_ai_boni
-			remove_global_flag = custom_difficulty_activate_simple_mode
-			set_global_flag = custom_difficulty_activate_custom_mode
 			set_global_flag = custom_difficulty_active
 			set_global_flag = dmm_mod_utilities_4
 			set_global_flag = custom_difficulty_no_player_bonus
@@ -1004,21 +1110,7 @@ country_event = {
  #reset event
 country_event = {
 	id = custom_difficulty.20
-	title = custom_difficulty_init
-	picture = GFX_evt_custom_difficulty
-	desc = {
-		trigger = {
-			text = custom_difficulty_init_desc
-			success_text = {
-				text = custom_difficulty_init_crisis_desc
-				is_crises_allowed = yes
-			}
-			success_text = {
-				text = custom_difficulty_init_no_crisis_desc
-				is_crises_allowed = no
-			}
-		}
-	}
+	hide_window = yes
 	immediate = {
 		country_event = { id = custom_difficulty.78 }  #removeEventTarget
 		country_event = { id = custom_difficulty.22 }  #resetFlagsEvent
@@ -1029,106 +1121,12 @@ country_event = {
 			remove_global_flag = MM_was_active_before_custom_difficulty
 		}
 		else = { random_planet = { save_global_event_target_as = custom_difficulty_var_storage } }
-	}
-	option = {
-		name = custom_difficulty_0.25_crisis.name
-		trigger = { is_crises_allowed = yes }
-		hidden_effect = {
-			event_target:custom_difficulty_var_storage = {
-				set_variable = {
-					which = custom_difficulty_crisis_strength
-					value = 0.25
-				}
+		event_target:custom_difficulty_var_storage = {
+			get_galaxy_setup_value = {
+				which = custom_difficulty_crisis_strength
+				setting = crisis_strength_scale
 			}
 		}
-	}
-	option = {
-		name = custom_difficulty_0.5_crisis.name
-		trigger = { is_crises_allowed = yes }
-		hidden_effect = {
-			event_target:custom_difficulty_var_storage = {
-				set_variable = {
-					which = custom_difficulty_crisis_strength
-					value = 0.5
-				}
-			}
-		}
-	}
-	option = {
-		name = custom_difficulty_1_crisis.name
-		trigger = { is_crises_allowed = yes }
-		hidden_effect = {
-			event_target:custom_difficulty_var_storage = {
-				set_variable = {
-					which = custom_difficulty_crisis_strength
-					value = 1
-				}
-			}
-		}
-	}
-	option = {
-		name = custom_difficulty_2_crisis.name
-		trigger = { is_crises_allowed = yes }
-		hidden_effect = {
-			event_target:custom_difficulty_var_storage = {
-				set_variable = {
-					which = custom_difficulty_crisis_strength
-					value = 2
-				}
-			}
-		}
-	}
-	option = {
-		name = custom_difficulty_3_crisis.name
-		trigger = { is_crises_allowed = yes }
-		hidden_effect = {
-			event_target:custom_difficulty_var_storage = {
-				set_variable = {
-					which = custom_difficulty_crisis_strength
-					value = 3
-				}
-			}
-		}
-	}
-	option = {
-		name = custom_difficulty_4_crisis.name
-		trigger = { is_crises_allowed = yes }
-		hidden_effect = {
-			event_target:custom_difficulty_var_storage = {
-				set_variable = {
-					which = custom_difficulty_crisis_strength
-					value = 4
-				}
-			}
-		}
-	}
-	option = {
-		name = custom_difficulty_5_crisis.name
-		trigger = { is_crises_allowed = yes }
-		hidden_effect = {
-			event_target:custom_difficulty_var_storage = {
-				set_variable = {
-					which = custom_difficulty_crisis_strength
-					value = 5
-				}
-			}
-		}
-	}
-	option = {
-		name = custom_difficulty_25_crisis.name
-		trigger = { is_crises_allowed = yes }
-		hidden_effect = {
-			event_target:custom_difficulty_var_storage = {
-				set_variable = {
-					which = custom_difficulty_crisis_strength
-					value = 25
-				}
-			}
-		}
-	}
-	option = {
-		name = OK
-		trigger = { is_crises_allowed = no }
 	}
 	after = {
 		hidden_effect = {
@@ -1142,46 +1140,60 @@ country_event = {
 			set_global_flag = custom_difficulty_deactivate_player_vassal_ai_boni
 			remove_global_flag = custom_difficulty_activate_simple_mode
 			set_global_flag = custom_difficulty_activate_custom_mode
-			set_global_flag = custom_difficulty_active
-			set_global_flag = dmm_mod_utilities_4
-			set_global_flag = custom_difficulty_no_player_bonus
-			set_global_flag = custom_difficulty_no_scaling
-			 #cadet
 			if = {
-				limit = { is_difficulty = 0 }
-				country_event = { id = custom_difficulty.100 }
+				limit = {
+					event_target:custom_difficulty_var_storage = {
+						OR = {
+							check_variable = {
+								which = custom_difficulty_crisis_strength
+								value > 0
+							}
+							is_crises_allowed = no
+						}
+					}
+				}
+				set_global_flag = custom_difficulty_active
+				set_global_flag = dmm_mod_utilities_4
+				set_global_flag = custom_difficulty_no_player_bonus
+				set_global_flag = custom_difficulty_no_scaling
+				 #cadet
+				if = {
+					limit = { is_difficulty = 0 }
+					country_event = { id = custom_difficulty.100 }
+				}
+				 #ensign
+				if = {
+					limit = { is_difficulty = 1 }
+					country_event = { id = custom_difficulty.101 }
+				}
+				 #captain
+				if = {
+					limit = { is_difficulty = 2 }
+					country_event = { id = custom_difficulty.102 }
+				}
+				 #commodore
+				if = {
+					limit = { is_difficulty = 3 }
+					country_event = { id = custom_difficulty.103 }
+				}
+				 #admiral
+				if = {
+					limit = { is_difficulty = 4 }
+					country_event = { id = custom_difficulty.104 }
+				}
+				 #grand_admiral
+				if = {
+					limit = { is_difficulty = 5 }
+					country_event = { id = custom_difficulty.105 }
+				}
+				 #no_scaling
+				if = {
+					limit = { is_difficulty = 7 }
+					country_event = { id = custom_difficulty.107 }
+				}
+				country_event = { id = custom_difficulty.40 }
 			}
-			 #ensign
-			if = {
-				limit = { is_difficulty = 1 }
-				country_event = { id = custom_difficulty.101 }
-			}
-			 #captain
-			if = {
-				limit = { is_difficulty = 2 }
-				country_event = { id = custom_difficulty.102 }
-			}
-			 #commodore
-			if = {
-				limit = { is_difficulty = 3 }
-				country_event = { id = custom_difficulty.103 }
-			}
-			 #admiral
-			if = {
-				limit = { is_difficulty = 4 }
-				country_event = { id = custom_difficulty.104 }
-			}
-			 #grand_admiral
-			if = {
-				limit = { is_difficulty = 5 }
-				country_event = { id = custom_difficulty.105 }
-			}
-			 #no_scaling
-			if = {
-				limit = { is_difficulty = 7 }
-				country_event = { id = custom_difficulty.107 }
-			}
-			country_event = { id = custom_difficulty.40 }
+			else = { country_event = { id = custom_difficulty.12 } }
 		}
 	}
 	is_triggered_only = yes
