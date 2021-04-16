@@ -27,6 +27,8 @@ decision_shroud_world = {
 		NOT = { is_planet_class = pc_capitalarc }
 		NOT = { is_planet_class = pc_milarc }
 		NOT = { is_planet_class = pc_necropolis }
+		NOT = { is_planet_class = pc_machine_necropolis }
+		NOT = { is_planet_class = pc_necrohive }
 		NOT = { is_planet_class = pc_relic }
 		NOT = { is_planet_class = pc_milarc_relic }
 		NOT = { is_planet_class = pc_crystal }
@@ -213,6 +215,8 @@ decision_shroud_arc = {
 			is_planet_class = pc_palacearc
 			is_planet_class = pc_capitalarc
 			is_planet_class = pc_necropolis
+			is_planet_class = pc_machine_necropolis
+			is_planet_class = pc_necrohive
 			is_planet_class = pc_milarc
 		}
 		NOT = { has_planet_flag = shroudedarc }
@@ -1256,4 +1260,74 @@ decision_shroud_planet_patron = {
             }
         }
     }
+}
+
+# Eco-Arcology Project
+decision_shroud_to_shroud_arc = {
+	owned_planets_only = yes
+	icon = decision_shroud_arc
+
+	enactment_time = 3600
+	resources = {
+		category = decisions
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+	
+	potential = {
+		is_planet_class = pc_pdshroud
+		exists = owner
+		owner = { 
+			has_ascension_perk = ap_arcology_project 
+			has_ascension_perk = ap_transcendence
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			fail_text = decision_eco_arcology_project_requirements
+			num_districts = { type = district_city value >= 10 }
+			num_districts = { type = district_farming value < 1 }
+			num_districts = { type = district_mining value < 1 }
+			num_districts = { type = district_generator value < 1 }
+		}
+		num_uncleared_blockers < 1
+	}
+	
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_arcology_project_effects
+		hidden_effect = {		
+			clear_deposits = yes
+			change_pc = pc_shroudcity
+			add_district = district_pdshroudarc_housing
+			add_district = district_pdshroudarc_housing
+			add_district = district_pdshroudarc_housing
+			add_district = district_pdshroudarc_housing
+			add_district = district_pdshroudarc_housing
+			owner = {
+				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
+			}
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				owner = {
+					set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+				}
+			}
+			planet_event = { id = pdengine.09 }
+			remove_modifier = engineered_environment
+			remove_modifier = engineered_environment_gaia
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
 }

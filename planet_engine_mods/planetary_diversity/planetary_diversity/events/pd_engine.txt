@@ -159,7 +159,8 @@ country_event = {
 				20 = { change_pc = pc_swamp reroll_planet = yes }	
 				20 = { change_pc = pc_mushroom reroll_planet = yes }					
 				20 = { change_pc = pc_mud reroll_planet = yes }			
-				20 = { change_pc = pc_rogue reroll_planet = yes clear_planet_modifiers = yes add_deposit = d_rogue_geo add_modifier = { modifier = pdrogue } }			
+				20 = { change_pc = pc_rogue reroll_planet = yes clear_planet_modifiers = yes add_deposit = d_rogue_geo add_modifier = { modifier = pdrogue } }
+				20 = { change_pc = pc_lichen reroll_planet = yes clear_planet_modifiers = yes add_deposit = d_lichen_forest add_modifier = { modifier = pdlichen } }			
 			}
 		}
 	}
@@ -309,6 +310,8 @@ country_event = {
 		every_galaxy_planet = { limit = { is_planet_class = pc_storm is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Rogue
 		every_galaxy_planet = { limit = { is_planet_class = pc_rogue is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
+		#Lichen
+		every_galaxy_planet = { limit = { is_planet_class = pc_lichen is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Eyeball
 		every_galaxy_planet = { limit = { is_planet_class = pc_eyeball is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Glaciovolcanic
@@ -607,6 +610,16 @@ country_event = {
 		#Rogue Start
 		every_galaxy_planet = { 				
 			limit = { is_planet_class = pc_rogue is_homeworld = no has_planet_flag = prescripted_ideal }
+			random_list = {
+				25 = { change_pc = pc_tundra reroll_planet = yes }
+				25 = { change_pc = pc_mud reroll_planet = yes }	
+				25 = { change_pc = pc_mushroom reroll_planet = yes }
+				25 = { change_pc = pc_swamp reroll_planet = yes }		
+			}
+		}
+		#Lichen Start
+		every_galaxy_planet = { 				
+			limit = { is_planet_class = pc_lichen is_homeworld = no has_planet_flag = prescripted_ideal }
 			random_list = {
 				25 = { change_pc = pc_tundra reroll_planet = yes }
 				25 = { change_pc = pc_mud reroll_planet = yes }	
@@ -1125,6 +1138,14 @@ country_event = {
 			set_planet_flag = pdnecropolis
 		}
 		every_galaxy_planet = {
+			limit = { is_planet_class = pc_machine_necropolis }
+			set_planet_flag = pdmachine_necropolis
+		}
+		every_galaxy_planet = {
+			limit = { is_planet_class = pc_necrohive }
+			set_planet_flag = pdnecrohvie
+		}
+		every_galaxy_planet = {
 			limit = { is_planet_class = pc_forest }
 			set_planet_flag = pdforest
 		}
@@ -1449,6 +1470,11 @@ planet_event = {
 		add_modifier = { modifier = "pdrogue" days = -1 }
 		}
 		if = { 
+		limit = { is_planet_class = pc_lichen not = { has_deposit = d_lichen_forest }}
+		add_deposit = d_lichen_forest
+		add_modifier = { modifier = "pdlichen" days = -1 }
+		}
+		if = { 
 		limit = { is_planet_class = pc_eyeball not = { has_deposit = d_eyeball_site }}
 		add_deposit = d_eyeball_site
 		add_modifier = { modifier = "pdeyeball" days = -1 }
@@ -1597,6 +1623,12 @@ planet_event = {
 		remove_building = building_rogue_mine
 		}
 		if = { 
+		limit = { NOT = { is_planet_class = pc_lichen } }
+		remove_deposit = d_lichen_forest
+		remove_modifier = pdlichen
+		remove_building = building_lichen_farm
+		}
+		if = { 
 		limit = { NOT = { is_planet_class = pc_eyeball } }
 		remove_deposit = d_eyeball_site
 		remove_modifier = pdeyeball
@@ -1692,6 +1724,30 @@ planet_event = {
 			} 
 		}
 		remove_deposit = d_pd_machine_world_boost
+		}
+		if = { 
+			limit = { 
+				NOT = { 
+					OR = {
+						is_planet_class = pc_hothouse 
+						is_planet_class = pc_toxic 
+						is_planet_class = pc_gas_giant 
+					}
+				} 
+			}
+		remove_modifier = pdhabcalmwinds
+		}
+		if = { 
+		limit = { NOT = { is_planet_class = pc_barren } }
+		remove_modifier = pdhabcavesystem
+		}
+		if = { 
+		limit = { NOT = { is_planet_class = pc_frozen } }
+		remove_modifier = pdhabsubglacialocean
+		}
+		if = { 
+		limit = { NOT = { is_planet_class = pc_molten } }
+		remove_modifier = pdhabvolcanicminerals
 		}
 	}
 }
@@ -2324,6 +2380,7 @@ planet_event = {
 		if = { limit = { is_planet_class = pc_coral } set_planet_flag = pdhive_coral }
 		if = { limit = { is_planet_class = pc_storm } set_planet_flag = pdhive_storm }
 		if = { limit = { is_planet_class = pc_rogue } set_planet_flag = pdhive_rogue }
+		if = { limit = { is_planet_class = pc_lichen } set_planet_flag = pdhive_lichen }
 		if = { limit = { is_planet_class = pc_eyeball } set_planet_flag = pdhive_eyeball }
 		if = { limit = { is_planet_class = pc_glacio } set_planet_flag = pdhive_glacio }
 		if = { limit = { is_planet_class = pc_lanthanide } set_planet_flag = pdhive_lanthanide }
@@ -2542,6 +2599,8 @@ planet_event = {
 		remove_deposit = d_lanthanide_deposit
 		remove_modifier = pdrogue
 		remove_deposit = d_rogue_geo
+		remove_modifier = pdlichen
+		remove_deposit = d_lichen_forest
 		remove_modifier = pdeyeball
 		remove_deposit = d_eyeball_site
 		remove_modifier = pdsulfur
@@ -2736,6 +2795,8 @@ planet_event = {
 				NOT = { is_planet_class = pc_palacearc }
 				NOT = { is_planet_class = pc_capitalarc }
 				NOT = { is_planet_class = pc_necropolis }
+				NOT = { is_planet_class = pc_machine_necropolis }
+				NOT = { is_planet_class = pc_necrohive }
 				NOT = { is_planet_class = pc_relic }
 				NOT = { is_planet_class = pc_milarc_relic }
 				NOT = { is_planet_class = pc_city }
@@ -2767,6 +2828,8 @@ planet_event = {
 				OR = {
 				is_planet_class = pc_ecocity
 				is_planet_class = pc_necropolis
+				is_planet_class = pc_machine_necropolis
+				is_planet_class = pc_necrohive
 				is_planet_class = pc_relic
 				is_planet_class = pc_milarc_relic
 				is_planet_class = pc_city
@@ -2958,6 +3021,8 @@ planet_event = {
 		NOT = { is_planet_class = pc_palacearc }
 		NOT = { is_planet_class = pc_capitalarc }
 		NOT = { is_planet_class = pc_necropolis }
+		NOT = { is_planet_class = pc_machine_necropolis }
+		NOT = { is_planet_class = pc_necrohive }
 		NOT = { is_planet_class = pc_relic }
 		NOT = { is_planet_class = pc_milarc_relic }
 		NOT = { is_planet_class = pc_city }
@@ -2999,6 +3064,8 @@ planet_event = {
 		NOT = { is_planet_class = pc_palacearc }
 		NOT = { is_planet_class = pc_capitalarc }
 		NOT = { is_planet_class = pc_necropolis }
+		NOT = { is_planet_class = pc_machine_necropolis }
+		NOT = { is_planet_class = pc_necrohive }
 		NOT = { is_planet_class = pc_relic }
 		NOT = { is_planet_class = pc_milarc_relic }
 		NOT = { is_planet_class = pc_city }
@@ -3067,6 +3134,8 @@ planet_event = {
 		remove_deposit = d_lanthanide_deposit
 		remove_modifier = pdrogue
 		remove_deposit = d_rogue_geo
+		remove_modifier = pdlichen
+		remove_deposit = d_lichen_forest
 		remove_modifier = pdeyeball
 		remove_deposit = d_eyeball_site
 		remove_modifier = pdsulfur
@@ -3098,6 +3167,8 @@ planet_event = {
 		NOT = { is_planet_class = pc_palacearc }
 		NOT = { is_planet_class = pc_capitalarc }
 		NOT = { is_planet_class = pc_necropolis }
+		NOT = { is_planet_class = pc_machine_necropolis }
+		NOT = { is_planet_class = pc_necrohive }
 		NOT = { is_planet_class = pc_relic }
 		NOT = { is_planet_class = pc_milarc_relic }
 		NOT = { is_planet_class = pc_city }
@@ -3833,6 +3904,19 @@ country_event = {
 			if = {
 				limit = {
 					has_planet_flag = lost_colony_planet
+					is_planet_class = pc_lichen
+				}
+				random_list = {
+					25 = { change_pc = pc_tundra }
+					25 = { change_pc = pc_mud }
+					25 = { change_pc = pc_mushroom }
+					25 = { change_pc = pc_swamp }
+				}
+				generate_pd_start_deposits_and_blockers = yes
+			}
+			if = {
+				limit = {
+					has_planet_flag = lost_colony_planet
 					is_planet_class = pc_eyeball
 				}
 				random_list = {
@@ -4364,6 +4448,19 @@ country_event = {
 						}
 						reroll_deposits = yes
 						remove_modifier = pdrogue
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_lichen
+						}
+						random_list = {
+							25 = { change_pc = pc_tundra }
+							25 = { change_pc = pc_mud }
+							25 = { change_pc = pc_mushroom }
+							25 = { change_pc = pc_swamp }
+						}
+						reroll_deposits = yes
+						remove_modifier = pdlichen
 					}
 					if = {
 						limit = {
@@ -5137,6 +5234,19 @@ country_event = {
 						}
 						reroll_deposits = yes
 						remove_modifier = pdrogue
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_lichen
+						}
+						random_list = {
+							25 = { change_pc = pc_tundra }
+							25 = { change_pc = pc_mud }
+							25 = { change_pc = pc_mushroom }
+							25 = { change_pc = pc_swamp }
+						}
+						reroll_deposits = yes
+						remove_modifier = pdlichen
 					}
 					if = {
 						limit = {
@@ -6026,6 +6136,8 @@ planet_event = {
 		remove_deposit = d_lanthanide_deposit
 		remove_modifier = pdrogue
 		remove_deposit = d_rogue_geo
+		remove_modifier = pdlichen
+		remove_deposit = d_lichen_forest
 		remove_modifier = pdeyeball
 		remove_deposit = d_eyeball_site
 		remove_modifier = pdsulfur
@@ -6162,6 +6274,14 @@ country_event = {
 				}
 				IF = { limit = { not = { has_modifier = pdrogue } }
 				add_modifier = { modifier = "pdrogue" days = -1 }
+				}
+			}		
+			IF = { limit = { is_planet_class = pc_lichen } 
+				IF = { limit = { not = { has_deposit = d_lichen_forest } }
+				add_deposit = d_lichen_forest
+				}
+				IF = { limit = { not = { has_modifier = pdlichen } }
+				add_modifier = { modifier = "pdlichen" days = -1 }
 				}
 			}	
 			IF = { limit = { is_planet_class = pc_eyeball } 
