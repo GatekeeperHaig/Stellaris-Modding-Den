@@ -1,5 +1,5 @@
 d_frozen_wasteland = {
-	time = 180
+	time = 520
 
 	is_for_colonizeable = yes
 	category = deposit_cat_blockers
@@ -7,7 +7,7 @@ d_frozen_wasteland = {
 	resources = {
 		category = deposit_blockers
 		cost = {
-			energy = 500
+			energy = 1000
 		}
 	}
 	use_weights_for_blocker_swap_types = no
@@ -32,10 +32,34 @@ d_frozen_wasteland = {
 
 	planet_modifier = {
 		planet_max_districts_add = -1
-		pop_environment_tolerance = -0.03
+		pop_environment_tolerance = -0.05
 	}
 
 	all_blocker_swap_types = yes
 
 	prerequisites = { "tech_massive_glacier" }
+	
+	on_cleared = {
+		hidden_effect = {
+			custom_tooltip = frozen_wasteland_clearing_effect
+			if = {
+				limit = { count_deposits = { type = d_frozen_wasteland count = 3 } }
+				remove_modifier = snowball_frozen_wasteland
+				add_modifier = {
+					modifier = "snowball_recovering_biosphere"
+					days = -1
+				}
+				set_planet_entity = { entity = "snow_planet_01_entity" picture = "pc_snow" }
+			}
+			if = {
+				limit = { count_deposits = { type = d_frozen_wasteland count = 1 } }
+				remove_modifier = snowball_recovering_biosphere
+				add_modifier = {
+					modifier = "snowball_temperate_world"
+					days = 3600
+				}
+				set_planet_entity = { entity = "continental_planet_earth_entity" picture = "pc_continental" }
+			}
+		}
+	}
 }
