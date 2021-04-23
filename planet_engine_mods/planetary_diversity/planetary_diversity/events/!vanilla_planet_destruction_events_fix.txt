@@ -18,9 +18,20 @@ planet_event = {
 			}
 		}
 
+		#Dismantle observation post
+		if = {
+			limit = {
+				has_observation_outpost = yes
+			}
+			observation_outpost_owner = {
+				country_event = { id = planet_destruction.1000 days = 1 }
+			}
+		}
+
 		# Swarm Situation Log counter
 		if = {
 			limit = {
+				exists = owner
 				owner = { is_country_type = swarm }
 			}
 			every_country = {
@@ -35,6 +46,19 @@ planet_event = {
 					counter = "infested_worlds_cleansed"
 					amount = 1 
 				}
+			}
+		}
+
+		if = {
+			limit = {
+				OR = {
+					is_active_resolution = "resolution_rulesofwar_independent_tribunals"
+					is_active_resolution = "resolution_rulesofwar_last_resort_doctrine"
+					is_active_resolution = "resolution_rulesofwar_demobilization_initiative"
+				}
+			}
+			from.owner = {
+				set_timed_country_flag = { flag = resolution_breached_fired_neutron days = 3600 }
 			}
 		}
 
@@ -149,19 +173,32 @@ planet_event = {
 				}
 			}
 		}
-		# Add war exhaustion to planet owner 
+		# Add war exhaustion to planet owner
 		owner = {
-			add_static_war_exhaustion = {
-				attacker = from.fleet.owner
-				location = root
-				value_for_planet_destruction = 1.0
+			if = {
+				limit = { #isn't the case when the crisis bombards planets, for instance
+					is_at_war_with = from.fleet.owner
+				}
+				add_static_war_exhaustion = {
+					attacker = from.fleet.owner
+					location = root
+					value_for_planet_destruction = 1.0
+				}
+			}
+		}
+		every_owned_pop = {
+			from.owner = {
+				if = {
+					limit = { has_ascension_perk = ap_become_the_crisis }
+					complete_crisis_objective = crisobj_purge_pops
+				}
 			}
 		}
 		destroy_colony = yes
 		add_modifier = {
 			modifier = neutron_bombarded
 			days = 3600
-		}		
+		}	
 		# Special graphics for Habitats and Ring Worlds
 		if = {
 			limit = {
@@ -525,12 +562,17 @@ planet_event = {
 					}
 				}
 			}
-			# Add war exhaustion to planet owner 
+			# Add war exhaustion to planet owner
 			owner = {
-				add_static_war_exhaustion = {
-					attacker = from.fleet.owner
-					location = root
-					value_for_planet_destruction = 1.0
+				if = {
+					limit = { #isn't the case when the crisis bombards planets, for instance
+						is_at_war_with = from.fleet.owner
+					}
+					add_static_war_exhaustion = {
+						attacker = from.fleet.owner
+						location = root
+						value_for_planet_destruction = 1.0
+					}
 				}
 			}
 		}
@@ -547,6 +589,12 @@ planet_event = {
 				}
 			}
 			kill_pop = yes
+			from.owner = {
+				if = {
+					limit = { has_ascension_perk = ap_become_the_crisis }
+					complete_crisis_objective = crisobj_purge_pops
+				}
+			}
 		}
 		every_owned_pop = {
 			limit = {
@@ -857,15 +905,20 @@ planet_event = {
 				}
 			}
 		}
-		# Add war exhaustion to planet owner 
+		# Add war exhaustion to planet owner
 		owner = {
-			add_static_war_exhaustion = {
-				attacker = from.fleet.owner
-				location = root
-				value_for_planet_destruction = 1.0
+			if = {
+				limit = { #isn't the case when the crisis bombards planets, for instance
+					is_at_war_with = from.fleet.owner
+				}
+				add_static_war_exhaustion = {
+					attacker = from.fleet.owner
+					location = root
+					value_for_planet_destruction = 1.0
+				}
 			}
 		}
-		if = {
+				if = {
 			limit = {
 				exists = owner
 				owner = { is_same_value = from.owner }
