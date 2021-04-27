@@ -32,7 +32,7 @@ country_event = {
 	option = {
 		name = custom_difficulty_close.name
 		hidden_effect = {
-			country_event = { id = custom_difficulty.40 }
+			country_event = { id = custom_difficulty.41 }
 			if = {
 				limit = { has_global_flag = custom_difficultyMM_active }
 				country_event = { id = custom_difficulty_mm.2 }
@@ -198,7 +198,7 @@ country_event = {
 	option = {
 		name = custom_difficulty_close.name
 		hidden_effect = {
-			country_event = { id = custom_difficulty.40 }
+			country_event = { id = custom_difficulty.41 }
 			if = {
 				limit = { has_global_flag = custom_difficultyMM_active }
 				country_event = { id = custom_difficulty_mm.2 }
@@ -209,6 +209,12 @@ country_event = {
  #root update event
 event = {
 	id = custom_difficulty.40
+	is_triggered_only = yes
+	hide_window = yes
+}
+ #root update event
+country_event = {
+	id = custom_difficulty.41
 	is_triggered_only = yes
 	hide_window = yes
 }
@@ -230,6 +236,255 @@ country_event = {
 				id = custom_difficulty.50
 				days = 1
 			}
+		}
+	}
+}
+ #new dmm init event
+event = {
+	id = custom_difficulty.13
+	is_triggered_only = yes
+	hide_window = yes
+	immediate = {
+		dmm_register_mod = {
+			DMM_NAME = custom_difficulty_dmm_loc
+			DMM_FLAG = custom_difficuly_new_dmm_menu_flag
+		}
+	}
+}
+ #dmm new menu starter
+country_event = {
+	id = custom_difficulty.14
+	is_triggered_only = yes
+	hide_window = yes
+	trigger = { from = { has_leader_flag = custom_difficuly_new_dmm_menu_flag } }
+	immediate = { country_event = { id = custom_difficulty.0 } }
+}
+ #game start init
+country_event = {
+	id = custom_difficulty.10
+	hide_window = yes
+	fire_only_once = yes
+	trigger = {
+		is_ai = no
+		or = {
+			NOR = { }
+			not = { has_global_flag = custom_difficulty_active }
+			has_global_flag = MM_was_active_before_custom_difficulty
+		}
+	}
+	immediate = {
+		country_event = { id = custom_difficulty.11 }
+		set_country_flag = custom_difficulty_game_host
+		if = {
+			limit = {
+				NOR = { }
+				has_global_flag = custom_difficulty_active
+			}
+			country_event = { id = custom_difficulty.22 }  #resetFlagsEvent
+			country_event = { id = custom_difficulty.78 }  #removeEventTarget
+		}
+		if = {
+			limit = { has_global_flag = MM_was_active_before_custom_difficulty }
+			remove_global_flag = MM_was_active_before_custom_difficulty
+		}
+		else = {
+			random_galaxy_planet = { save_global_event_target_as = custom_difficulty_var_storage }
+			random_planet = { save_global_event_target_as = custom_difficulty_var_storage }
+		}
+		event_target:custom_difficulty_var_storage = {
+			get_galaxy_setup_value = {
+				which = custom_difficulty_crisis_strength
+				setting = crisis_strength_scale
+			}
+		}
+	}
+	after = {
+		hidden_effect = {
+			remove_global_flag = custom_difficulty_deactivate_host_only
+			set_global_flag = custom_difficulty_activate_host_only
+			remove_global_flag = custom_difficulty_deactivate_edict
+			set_global_flag = custom_difficulty_activate_edict
+			if = {
+				limit = {
+					event_target:custom_difficulty_var_storage = {
+						OR = {
+							check_variable = {
+								which = custom_difficulty_crisis_strength
+								value > 0
+							}
+							is_crises_allowed = no
+						}
+					}
+				}
+				set_global_flag = custom_difficulty_active
+				set_global_flag = dmm_mod_utilities_4
+				set_global_flag = custom_difficulty_no_player_bonus
+				set_global_flag = custom_difficulty_no_scaling
+			}
+		}
+	}
+}
+ #legacy game start init
+country_event = {
+	id = custom_difficulty.12
+	title = custom_difficulty_init
+	picture = GFX_evt_custom_difficulty
+	is_triggered_only = yes
+	desc = {
+		trigger = {
+			text = custom_difficulty_init_desc
+			success_text = {
+				text = custom_difficulty_init_crisis_desc
+				is_crises_allowed = yes
+			}
+			success_text = {
+				text = custom_difficulty_init_no_crisis_desc
+				is_crises_allowed = no
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_0.25_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 0.25
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_0.5_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 0.5
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_1_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 1
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_2_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 2
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_3_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 3
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_4_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 4
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_5_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 5
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_10_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 10
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_15_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 15
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_20_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 20
+				}
+			}
+		}
+	}
+	option = {
+		name = custom_difficulty_25_crisis.name
+		trigger = { is_crises_allowed = yes }
+		hidden_effect = {
+			event_target:custom_difficulty_var_storage = {
+				set_variable = {
+					which = custom_difficulty_crisis_strength
+					value = 25
+				}
+			}
+		}
+	}
+	option = {
+		name = OK
+		trigger = { is_crises_allowed = no }
+	}
+	after = {
+		hidden_effect = {
+			set_global_flag = custom_difficulty_active
+			set_global_flag = dmm_mod_utilities_4
+			set_global_flag = custom_difficulty_no_player_bonus
+			set_global_flag = custom_difficulty_no_scaling
 		}
 	}
 }
@@ -387,7 +642,7 @@ country_event = {
 		name = OK
 		hidden_effect = {
 			set_global_flag = custom_difficulty_locked
-			country_event = { id = custom_difficulty.40 }
+			country_event = { id = custom_difficulty.41 }
 		}
 	}
 	option = {
