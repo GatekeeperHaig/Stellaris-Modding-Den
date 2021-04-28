@@ -2286,13 +2286,13 @@ planet_event = {
 		NOT = { has_planet_flag = pd_infesting2 }
 		NOT = { is_planet_class = pc_hive }
 		#NOT = { is_planet_class = pc_pdhive1 }
-		NOT = { is_planet_class = pc_pdhive2 }
+		#NOT = { is_planet_class = pc_pdhive2 }
 		NOT = { habitable_structure = yes }
 	}
 
 	immediate = {
 		IF = {
-			limit = { not = { is_planet_class = pc_pdhive1 } }
+			limit = { not = { OR = { is_planet_class = pc_pdhive1 is_planet_class = pc_pdhive2 } } }
 			set_planet_flag = pd_infesting1	
 			add_modifier = { modifier = pd_infestingplanet days = 3600 }
 			planet_event = { id = pdengine.30 days = 3600 }
@@ -2303,6 +2303,13 @@ planet_event = {
 			set_planet_flag = pd_infesting2
 			add_modifier = { modifier = pd_infestingplanet2 days = 7200 }
 			planet_event = { id = pdengine.31 days = 7200 }
+			remove_planet_flag = pdremovehive
+			remove_modifier = pdremovehive
+			remove_modifier = land_appropriation
+			remove_planet_flag = pd_restart_infesting
+		}
+		ELSE_IF = {
+			limit = { is_planet_class = pc_pdhive2 }
 			remove_planet_flag = pdremovehive
 			remove_modifier = pdremovehive
 			remove_modifier = land_appropriation
@@ -2716,11 +2723,11 @@ planet_event = {
 			remove_modifier = pd_infestingplanet2
 			add_modifier = {
 				modifier = pdremovehive
-				days = 1800
+				days = 3600
 			}
 			planet_event = {
 				id = pdengine.63
-				days = 1800
+				days = 3600
 			}
 			set_planet_flag = pdremovehive
 		}
@@ -2758,6 +2765,8 @@ planet_event = {
 	}
 
 	immediate = {
+		remove_planet_flag = pdremovehive
+		remove_modifier = pdremovehive
 		if = {
 			limit = {
 				FROM = { has_origin = origin_pd_hive }
@@ -2768,8 +2777,6 @@ planet_event = {
 			planet_event = {
 				id = pdengine.29
 			}
-			remove_planet_flag = pdremovehive
-			remove_modifier = pdremovehive
 		}
 		if = {
 			limit = {
@@ -2781,11 +2788,11 @@ planet_event = {
 			remove_modifier = pd_infestingplanet2
 			add_modifier = {
 				modifier = pdremovehive
-				days = 1800
+				days = 3600
 			}
 			planet_event = {
 				id = pdengine.63
-				days = 1800
+				days = 3600
 			}
 			set_planet_flag = pdremovehive
 		}
