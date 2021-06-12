@@ -1,0 +1,253 @@
+
+building_eludium_mine = {
+	base_buildtime = @b1_time
+	icon = building_eludium_mines
+
+	is_capped_by_modifier = yes
+
+	category = resource
+	
+	potential = {
+		NOT = { has_modifier = resort_colony }
+	}
+
+	show_tech_unlock_if = {
+		owner = { any_owned_planet = { is_planet_class = pc_floating } }
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_eludium_expert_add = 1
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_hive_empire = yes }
+		}
+		modifier = {
+			job_eludium_drone_add = 1
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+		modifier = {
+			job_eludium_drone_add = 1
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 400
+		}
+		upkeep = {
+			energy = 1
+		}
+	}	
+	
+	ai_weight = {
+		weight = 10000	
+	}
+	
+	prerequisites = {
+		"tech_eludium_mine"
+	}
+}
+
+building_eludium_institute = {
+	base_buildtime = @b2_time
+	base_cap_amount = 1
+
+	category = research
+
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = slave_colony }
+		exists = owner
+		owner = { is_regular_empire = yes }
+		text = EMPIRE_UNIQUE_BUILDING
+		owner = {
+			NOT = {
+				has_country_flag = building_eludium_institute
+			}
+		}
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			has_modifier = resort_colony
+			has_modifier = slave_colony
+			owner = { is_regular_empire = no }
+		}
+	}
+
+	#convert_to = {
+	#	building_supercomputer
+	#}
+
+	allow = {
+		has_major_upgraded_capital = yes
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b3_minerals
+			sr_eludium = 20000
+		}
+		upkeep = {
+			energy = @b3_upkeep
+			sr_eludium = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_eludium } }
+		}
+		planet_researchers_produces_mult = 0.1
+		job_head_researcher_add = 1
+	}
+
+	country_modifier = {
+		all_technology_research_speed = 0.05
+		#planet_researchers_produces_mult = 0.05
+	}
+
+	prerequisites = {
+		"tech_eludium_research_initiative"
+	}
+
+	triggered_desc = {
+		text = job_head_researcher_effect_desc
+	}
+
+	show_tech_unlock_if = {
+		is_regular_empire = yes
+	}
+
+	ai_resource_production = {
+		trigger = { always = yes }
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+	ai_resource_production = {
+		trigger = {
+			planet_resource_compare = {
+				resource = physics_research
+				value >= 20
+			}
+		}
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+	ai_resource_production = {
+		trigger = {
+			planet_resource_compare = {
+				resource = physics_research
+				value >= 40
+			}
+		}
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+
+	on_built = {
+		owner = { set_country_flag = building_eludium_institute }
+	}
+
+	on_destroy = {
+		owner = {
+			if = {
+				limit = {
+					has_country_flag = building_eludium_institute
+				}
+				remove_country_flag = building_eludium_institute
+			}
+		}
+	}
+}
+
+building_eludium_floating_islands = {
+	base_buildtime = @b3_time
+	can_be_disabled = no
+	can_be_ruined = no
+	can_demolish = no
+	base_cap_amount = 1
+	
+
+	category = amenity
+
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = slave_colony }
+		NOR = { 
+			is_planet_class = pc_floating
+			is_planet_class = pc_crystal
+			is_planet_class = pc_graveyard
+			is_planet_class = pc_technoorganic
+		}
+	}
+
+	allow = {
+		buildings_simple_allow = yes
+		has_major_upgraded_capital = yes
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = { is_regular_empire = no }
+			has_modifier = slave_colony
+			has_modifier = resort_colony
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			is_artificial = no
+		}
+		planet_max_districts_add = 2
+		planet_housing_add = 20
+		planet_amenities_add = 20
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			is_artificial = yes
+		}
+		planet_max_districts_add = 1
+		planet_housing_add = 20
+		planet_amenities_add = 20
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b3_minerals
+			sr_eludium = 1000
+		}
+		upkeep = {
+			energy = @b3_upkeep
+		}
+	}
+
+	prerequisites = {
+		"tech_eludium_floating_islands"
+	}
+}

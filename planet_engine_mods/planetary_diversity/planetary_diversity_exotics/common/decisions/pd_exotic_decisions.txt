@@ -1,0 +1,156 @@
+##########################################################################
+# Exotic Decisions
+##########################################################################
+
+
+# Radiotophic Uncolonized World
+decision_radiotrophic_world_nocolony = {
+	icon = decision_radiotrophic
+
+	resources = {
+		category = decisions
+		cost = {
+			energy = 5000
+			sr_rad_bloom = 1000
+		}
+	}
+	
+	potential = {
+		exists = space_owner
+		space_owner = { is_same_value = from }
+		from = { 
+			has_trait = trait_pc_irradiated_preference 
+			has_technology = tech_climate_restoration
+		}
+		OR = {
+			is_wet = yes
+			is_cold = yes
+			is_dry = yes
+			is_pd_exotic = yes
+		}
+		is_colony = no
+		NOT = { has_planet_flag = pd_radiotrophic_transformation }
+	}
+
+	effect = {
+		custom_tooltip = decision_radiotrophic_world_effects_custom
+		#change_pc = pc_pdshroud
+		hidden_effect = { 
+			set_planet_flag = pd_radiotrophic_transformation 
+			planet_event = { id = pdexotic.07 days = 1800 } 
+			add_modifier = {
+				modifier = pdradiotrophictransformation days = -1
+			}
+		}
+	}   
+
+	ai_weight = {
+        weight = 0
+        modifier = {
+            factor = 0
+            or = {
+                free_building_slots > 0
+                owner = {
+                    or = {
+                        resource_stockpile_compare = { resource = energy value < 6000 } 
+                        resource_stockpile_compare = { resource = influence value < 150 }
+					} 
+				}
+            }
+        }
+    }
+}
+
+# Nuked to Radiotophic
+decision_radiotrophic_world_nuked = {
+	icon = decision_radiotrophic
+	owned_planets_only = yes
+
+	enactment_time = 1800
+	resources = {
+		category = decisions
+		cost = {
+			energy =  2000
+			sr_rad_bloom = 500
+		}
+	}
+	
+	potential = {
+		from = { 
+			has_trait = trait_pc_irradiated_preference 
+			has_technology = tech_ecological_adaptation
+		}
+		is_planet_class = pc_nuked
+	}
+
+	effect = {
+		change_pc = pc_irradiated
+		add_deposit = d_rad_blooms_transplant
+		add_modifier = {
+			modifier = radiotrophic days = -1
+		}
+	}   
+
+	ai_weight = {
+        weight = 0
+        modifier = {
+            factor = 0
+            or = {
+                free_building_slots > 0
+                owner = {
+                    or = {
+                        resource_stockpile_compare = { resource = energy value < 6000 } 
+                        resource_stockpile_compare = { resource = influence value < 150 }
+                     } 
+				}
+            }
+        }
+    }
+}
+
+# Upgrade Rad-Bloom Transplant Deposit
+decision_radiotrophic_upgrade_radblooms = {
+	icon = decision_radiotrophic
+	owned_planets_only = yes
+
+	enactment_time = 1800
+	resources = {
+		category = decisions
+		cost = {
+			energy =  500
+			sr_rad_bloom = 500
+		}
+	}
+		
+	prerequisites = { "tech_upgrade_rad_blooms" }
+	
+	potential = {
+		from = { 
+			has_trait = trait_pc_irradiated_preference 
+			has_technology = tech_upgrade_rad_blooms
+		}
+		is_planet_class = pc_irradiated
+		has_deposit = d_rad_blooms_transplant
+	}
+
+	effect = {
+		remove_deposit = d_rad_blooms_transplant
+		add_deposit = d_rad_blooms_transplant_upgrade
+	}   
+
+	ai_weight = {
+        weight = 0
+        modifier = {
+            factor = 0
+            or = {
+                free_building_slots > 0
+                owner = {
+                    or = {
+                        resource_stockpile_compare = { resource = energy value < 6000 } 
+                        resource_stockpile_compare = { resource = influence value < 150 }
+                     } 
+				}
+            }
+        }
+    }
+}

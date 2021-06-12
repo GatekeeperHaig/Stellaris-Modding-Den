@@ -1,4 +1,4 @@
-version="2.8.*"
+version="3.0.*"
 tags={
 	"Graphics"
 }

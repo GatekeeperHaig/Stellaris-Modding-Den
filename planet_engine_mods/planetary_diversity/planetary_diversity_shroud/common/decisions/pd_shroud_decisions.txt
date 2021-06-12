@@ -26,6 +26,7 @@ decision_shroud_world = {
 		NOT = { is_planet_class = pc_shroudcapitalarc }
 		NOT = { is_planet_class = pc_shroudpalacearc }
 		NOT = { is_planet_class = pc_shroudmilarc }
+		NOT = { is_planet_class = pc_shroudcorpoarc }
 		NOT = { is_planet_class = pc_ecocity }
 		NOT = { is_planet_class = pc_corpoarc }
 		NOT = { is_planet_class = pc_palacearc }
@@ -119,10 +120,9 @@ decision_shroud_world = {
 			remove_modifier = primal
 			remove_deposit = d_lava_lakes
 			remove_modifier = radiotrophic
-			remove_deposit = d_rad_blooms
+			remove_deposit = d_rad_blooms_field
 			remove_modifier = biolumen
 			remove_deposit = d_biolumen_nature_preserve
-			remove_deposit = d_pdshroud
 			remove_modifier = pdsalt
 			remove_deposit = d_salt_caves
 			remove_modifier = pdaquifer
@@ -495,6 +495,7 @@ decision_shroud_planet_patron = {
 			is_planet_class = pc_shroudcapitalarc
 			is_planet_class = pc_shroudpalacearc
 			is_planet_class = pc_shroudmilarc
+			is_planet_class = pc_shroudcorpoarc
 		}
 		NOT = { 
 			OR = {
@@ -727,12 +728,12 @@ decision_shroud_to_shroudcapitalarcology_project = {
 		hidden_effect = {		
 			clear_deposits = yes
 			change_pc = pc_shroudcapitalarc
-			add_district = district_palacearc_housing
-			add_district = district_palacearc_housing
-			add_district = district_palacearc_housing
-			add_district = district_palacearc_housing
-			add_district = district_palacearc_housing
-			add_district = district_palacearc_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
 			owner = {
 				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
 			}
@@ -802,11 +803,11 @@ decision_shroud_to_shroudmilarcology_project = {
 		hidden_effect = {		
 			clear_deposits = yes
 			change_pc = pc_shroudmilarc
-			add_district = district_pdmilarc_housing
-			add_district = district_pdmilarc_housing
-			add_district = district_pdmilarc_housing
-			add_district = district_pdmilarc_housing
-			add_district = district_pdmilarc_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
 			owner = {
 				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
 			}
@@ -889,12 +890,12 @@ decision_shroud_to_shroudpalacearcology_project = {
 		hidden_effect = {		
 			clear_deposits = yes
 			change_pc = pc_shroudpalacearc
-			add_district = district_palacearc_housing
-			add_district = district_palacearc_housing
-			add_district = district_palacearc_housing
-			add_district = district_palacearc_housing
-			add_district = district_palacearc_housing
-			add_district = district_palacearc_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
 			owner = {
 				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
 			}
@@ -921,4 +922,82 @@ decision_shroud_to_shroudpalacearcology_project = {
 		weight = 0
 	}
 }
+
+# Shroud to Corpo Arc Project
+decision_shroud_to_shroudcorpoarcology_project = {
+	owned_planets_only = yes
+	icon = decision_corpoarcology_project
+
+	enactment_time = 3600
+	resources = {
+		category = decisions
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+	
+	potential = {
+		is_planet_class = pc_pdshroud
+		is_artificial = no
+		exists = owner
+		owner = { 
+			has_ascension_perk = ap_arcology_project 
+			has_ascension_perk = ap_transcendence
+		}
+		is_artificial = no
+		exists = owner
+		owner = { is_megacorp = yes }
+	}
+	
+	allow = {
+		custom_tooltip = {
+			fail_text = decision_eco_arcology_project_requirements
+			num_districts = { type = district_city value >= 10 }
+			num_districts = { type = district_industrial value < 1 }
+			num_districts = { type = district_farming value < 1 }
+			num_districts = { type = district_mining value < 1 }
+			num_districts = { type = district_generator value < 1 }
+		}
+		num_uncleared_blockers < 1
+	}
+	
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_eco_arcology_project_effects
+		hidden_effect = {		
+			clear_deposits = yes
+			change_pc = pc_shroudcorpoarc
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			owner = {
+				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
+			}
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				owner = {
+					set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+				}
+			}
+			planet_event = { id = pdengine.64 }
+			remove_modifier = engineered_environment
+			remove_modifier = engineered_environment_gaia
+			planet_event = { id = pdengine.14 }
+		}
+	}
+	
+	ai_weight = {
+		weight = 0
+	}
+}
+
 
