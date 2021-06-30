@@ -296,6 +296,7 @@ pdhabitat_sol_system_initializer = {
 	}
 }
 
+#Snowball Earth
 pdsnowball_sol_system_initializer = {
 	name = "NAME_Sol"
 	
@@ -379,7 +380,7 @@ pdsnowball_sol_system_initializer = {
 			flags = { pd_snowball_start_luna  }
 		
 			init_effect = {
-				#add_deposit = d_bblock3
+				add_deposit = d_bblock3
 				prevent_anomaly = yes
 			}
 		}
@@ -651,7 +652,7 @@ pdhabitat_system_initializer = {
 		size = { min = 16 max = 20 }
 		deposit_blockers = none
 		modifiers = none
-		flags = { pd_habitat_start }
+		flags = { pd_snowball_start_earth colony_event }
 		
 		init_effect = {
 			generate_empire_home_planet = yes			
@@ -736,3 +737,155 @@ pdhabitat_system_initializer = {
 		initializer = "neighbor_t1_first_colony"
 	}
 }
+
+# Snowball General Start
+pdsnowbal_system_initializer = {
+	class = "rl_starting_stars"
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 50
+	}
+	
+	usage = origin
+	
+	flags = { empire_home_system }
+
+	init_effect = {
+		every_neighbor_system = {
+			set_star_flag = empire_cluster
+			every_neighbor_system = {
+				set_star_flag = empire_cluster
+			}
+		}
+		
+		generate_home_system_resources = yes
+	}
+	
+	planet = {
+		count = 1
+		class = star
+		orbit_distance = 0
+		orbit_angle = 1
+		size = { min = 20 max = 30 }
+		has_ring = no
+	}
+	
+	change_orbit = 50
+	
+	planet = {
+		count = { min = 1 max = 3 }
+		class = pc_asteroid
+		orbit_distance = 0
+		orbit_angle = { min = 40 max = 100 }
+	}
+	
+	planet = {
+		count = { min = 0 max = 2 }
+		orbit_distance = 20
+		class = random_non_colonizable
+		orbit_angle = { min = 90 max = 270 }
+		
+		change_orbit = @base_moon_distance
+
+		moon = {
+			count = { min = 0 max = 1 }
+			class = random_non_colonizable
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = 5
+		}
+	}
+	
+	planet = {
+		count = 1
+		orbit_distance = 20
+		home_planet = yes
+		class = pc_continental
+		orbit_angle = { min = 90 max = 270 }
+		size = { min = 16 max = 20 }
+		deposit_blockers = none
+		modifiers = none
+		flags = { pd_snowball_start_earth }
+		
+		init_effect = {
+			generate_empire_home_planet = yes			
+			prevent_anomaly = yes
+		}
+
+		moon = {
+			class = "pc_pd_barren_hab"
+			size = 5
+			orbit_distance = 12
+			orbit_angle = 40
+			has_ring = no
+			flags = { pd_snowball_start_luna colony_event }
+		
+			init_effect = {
+				add_deposit = d_bblock3	
+				prevent_anomaly = yes
+				set_planet_entity = { entity = "pdcmoon2_planet_01_entity" picture = pc_pd_barren_moon	}
+			}
+		}
+	}
+	
+	planet = {
+		class = "pc_barren_cold"
+		orbit_distance = 25
+		orbit_angle = 60
+		size = 13
+		has_ring = no
+		
+		init_effect = {
+			add_modifier = {
+				modifier = "terraforming_candidate"
+				days = -1
+			}
+			add_deposit = d_bblock5
+			add_deposit = d_bblock4
+			prevent_anomaly = yes
+		}		
+	}
+	
+	planet = {
+		count = { min = 2 max = 4 }
+		orbit_distance = 20
+		class = random_non_colonizable
+		orbit_angle = { min = 90 max = 270 }
+		
+		change_orbit = @base_moon_distance
+
+		moon = {
+			count = { min = 0 max = 1 }
+			class = random_non_colonizable
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = 5
+		}
+	}
+	
+	planet = {
+		count = { min = 1 max = 2 }
+		orbit_distance = 20
+		class = pc_gas_giant
+		orbit_angle = { min = 90 max = 270 }
+		
+		change_orbit = @base_moon_distance
+
+		moon = {
+			count = { min = 0 max = 3 }
+			class = random_non_colonizable
+			orbit_angle = { min = 90 max = 270 }
+			orbit_distance = 5
+		}
+	}
+	
+	neighbor_system = {
+		trigger = { num_guaranteed_colonies >= 2 }
+		hyperlane_jumps = { min = 1 max = 2 }
+		initializer = "neighbor_t1"
+	}
+	neighbor_system = {
+		trigger = { num_guaranteed_colonies >= 1 }
+		hyperlane_jumps = { min = 1 max = 1 }
+		initializer = "neighbor_t1_first_colony"
+	}
+}
+

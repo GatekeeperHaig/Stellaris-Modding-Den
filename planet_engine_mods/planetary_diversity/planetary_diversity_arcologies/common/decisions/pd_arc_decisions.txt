@@ -110,7 +110,7 @@ decision_ecoarcology_project = {
 			IF = {
 				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
 				set_planet_entity = {
-					entity = "aquaticcity_planet_01_entity"
+					entity = "aquaticecocity_planet_01_entity"
 					picture = "pc_aquaticcity"
 				}
 				set_planet_flag = pdaquapicture
@@ -467,7 +467,7 @@ decision_ecoarcology_project_relic = {
 			IF = {
 				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
 				set_planet_entity = {
-					entity = "aquaticcity_planet_01_entity"
+					entity = "aquaticecocity_planet_01_entity"
 					picture = "pc_aquaticcity"
 				}
 				set_planet_flag = pdaquapicture
@@ -1408,6 +1408,93 @@ decision_necropolis_reg_project = {
 	}
 }
 
+# Necropolis Project (Relic Worlds)
+decision_necropolis_project_relic = {
+	owned_planets_only = yes
+	icon = decision_necropolis_project
+
+	enactment_time = 3600
+	resources = {
+		category = decisions
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+
+	potential = {
+		is_planet_class = pc_relic
+		is_artificial = no
+		exists = owner
+		owner = { is_regular_empire = yes }
+	}
+
+	allow = {
+		num_uncleared_blockers < 1
+		owner = { 
+			has_technology = tech_housing_2 
+			OR = {
+				has_civic = civic_memorialist
+				has_civic = civic_death_cult
+				has_civic = civic_death_cult_corporate
+				has_civic = civic_reanimated_armies
+				has_origin = origin_necrophage
+			}
+		}
+	}
+
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_necropolis_reg_project_effects
+		hidden_effect = {		
+			clear_deposits = yes
+			change_pc = pc_necropolis
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			add_district = district_pdarcology_housing
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
+				IF = { limit = { NOT = { has_modifier = pdammoniaatmosphere } }	add_modifier = { modifier = pdammoniaatmosphere	} }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
+				IF = { limit = { NOT = { has_modifier = pdsulfuratmosphere } }	add_modifier = { modifier = pdsulfuratmosphere	} }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_methane_preference } }
+				IF = { limit = { NOT = { has_modifier = pdmethaneatmosphere } }	add_modifier = { modifier = pdmethaneatmosphere	} }
+			}
+			IF = {
+				limit = { owner = { has_trait = trait_pc_ash_preference } }
+				IF = { limit = { NOT = { has_modifier = pdashatmosphere } }	add_modifier = { modifier = pdashatmosphere	} }
+			}
+			owner = {
+				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
+			}
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				owner = {
+					set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+				}
+			}
+			remove_modifier = engineered_environment
+			remove_modifier = engineered_environment_gaia
+			planet_event = { id = pdengine.14 }
+		}
+	}
+
+	ai_weight = {
+		weight = 0
+	}
+}
+
 # Necropolis Hive Project
 decision_necropolis_hive_project = {
 	owned_planets_only = yes
@@ -1646,9 +1733,10 @@ decision_palacearcology_project = {
 				limit = {
 					has_planet_flag = planet_earth
 				}
-				set_planet_entity = {
-                    entity = "earthpalacearc_planet_01_entity"
-                }
+				planet_event = { id = pdarcs.01 } 
+				#set_planet_entity = {
+                #    entity = "earthpalacearc_planet_01_entity"
+                #}
 			}
 			#IF = {
 			#	limit = {
@@ -1672,7 +1760,7 @@ decision_palacearcology_project = {
 					NOT = { has_planet_flag = planet_earth }
 					NOT = { has_planet_flag = pdmars }
 					NOT = { has_planet_flag = pdvenus }
-				 }
+				}
 				set_planet_entity = {
 					entity = "palacearc_planet_entity"
 					graphical_culture = owner
@@ -1681,7 +1769,7 @@ decision_palacearcology_project = {
 			IF = {
 				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
 				set_planet_entity = {
-					entity = "aquaticcity_planet_01_entity"
+					entity = "aquaticpalace_planet_01_entity"
 					picture = "pc_aquaticpalacearc"
 				}
 				set_planet_flag = pdaquapicture
@@ -1805,7 +1893,7 @@ decision_palacearcology_project_relic = {
 					has_planet_flag = planet_earth
 				}
 				set_planet_entity = {
-                    entity = "earthpalacearc_planet_01_entity"
+                    entity = "earthpalacearc_planet_02_entity"
                 }
 			}
 			#IF = {
@@ -1839,7 +1927,7 @@ decision_palacearcology_project_relic = {
 			IF = {
 				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
 				set_planet_entity = {
-					entity = "aquaticcity_planet_01_entity"
+					entity = "aquaticpalace_planet_01_entity"
 					picture = "pc_aquaticpalacearc"
 				}
 				set_planet_flag = pdaquapicture
@@ -1997,9 +2085,10 @@ decision_capitalarcology_project = {
 				limit = {
 					has_planet_flag = planet_earth
 				}
-				set_planet_entity = {
-                    entity = "earthcapitalarc_planet_01_entity"
-                }
+				planet_event = { id = pdarcs.02 } 
+				#set_planet_entity = {
+                #    entity = "earthcapitalarc_planet_01_entity"
+                #}
 			}
 			#IF = {
 			#	limit = {
@@ -2032,7 +2121,7 @@ decision_capitalarcology_project = {
 			IF = {
 				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
 				set_planet_entity = {
-					entity = "aquaticcity_planet_01_entity"
+					entity = "aquaticpalace_planet_01_entity"
 					picture = "pc_aquaticcapitalarc"
 				}
 				set_planet_flag = pdaquapicture
@@ -2168,7 +2257,7 @@ decision_capitalarcology_project_relic = {
 					has_planet_flag = planet_earth
 				}
 				set_planet_entity = {
-                    entity = "earthcapitalarc_planet_01_entity"
+                    entity = "earthcapitalarc_planet_02_entity"
                 }
 			}
 			#IF = {
@@ -2202,7 +2291,7 @@ decision_capitalarcology_project_relic = {
 			IF = {
 				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
 				set_planet_entity = {
-					entity = "aquaticcity_planet_01_entity"
+					entity = "aquaticpalace_planet_01_entity"
 					picture = "pc_aquaticcapitalarc"
 				}
 				set_planet_flag = pdaquapicture
@@ -2343,7 +2432,7 @@ decision_palacetocapital_project = {
 			IF = {
 				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
 				set_planet_entity = {
-					entity = "aquaticcity_planet_01_entity"
+					entity = "aquaticpalace_planet_01_entity"
 					picture = "pc_aquaticcapitalarc"
 				}
 				set_planet_flag = pdaquapicture
@@ -2467,7 +2556,7 @@ decision_capitaltopalace_project = {
 			IF = {
 				limit = { owner = { has_trait = trait_pc_aquatic_preference } }
 				set_planet_entity = {
-					entity = "aquaticcity_planet_01_entity"
+					entity = "aquaticpalace_planet_01_entity"
 					picture = "pc_aquaticpalacearc"
 				}
 				set_planet_flag = pdaquapicture
@@ -2760,7 +2849,11 @@ decision_rebuildarccapital_project = {
 		is_planet_class = pc_capitalarc
 		exists = owner
 		planet = { is_capital = yes }
-		planet = { NOT = { has_building = building_senate_building }
+		planet = { 
+			OR = {
+				NOT = { has_building = building_senate_building }
+				NOT = { has_building = building_grand_boardroom }
+			}
 		}
 	}	
 
@@ -2769,7 +2862,16 @@ decision_rebuildarccapital_project = {
 		free_building_slots >= 1
 	}
 
-	effect = { add_building = building_senate_building }
+	effect = { 
+		IF = {
+			limit = { owner = { is_megacorp = no } }
+			add_building = building_senate_building 
+		}
+		ELSE_IF = {
+			limit = { owner = { is_megacorp = yes } }
+			add_building = building_grand_boardroom 
+		}
+	}
 
 	ai_weight = {
 		weight = 1000

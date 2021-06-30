@@ -333,6 +333,7 @@ decision_removeocean = {
 			IF = { limit = { is_planet_class = pc_steppe } set_planet_entity = { picture = pc_steppe } }
 			IF = { limit = { is_planet_class = pc_swamp } set_planet_entity = { picture = pc_swamp } }
 			IF = { limit = { is_planet_class = pc_mud } set_planet_entity = { picture = pc_mud } }
+			IF = { limit = { is_planet_class = pc_basalt } set_planet_entity = { picture = pc_basalt } }
 			IF = { limit = { is_planet_class = pc_glacial } set_planet_entity = { picture = pc_glacial } }
 			IF = { limit = { is_planet_class = pc_boreal } set_planet_entity = { picture = pc_boreal } }
 			IF = { limit = { is_planet_class = pc_arctic } set_planet_entity = { picture = pc_arctic } }
@@ -435,6 +436,7 @@ decision_oceancapital = {
 			IF = { limit = { is_planet_class = pc_subarctic } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_swamp } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_mud } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
+			#IF = { limit = { is_planet_class = pc_basalt } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_glacial } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_boreal } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_arctic } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
@@ -1985,7 +1987,132 @@ decision_tolbarren_no_colony = {
 
 	effect = {
 		add_modifier = { modifier = pdintoaforest days = -1 }
-		hidden_effect = { planet_event = { id = pdengine.50 days = 3600 } }
+		hidden_effect = { 
+			remove_modifier = hab_terraforming_candidate
+			remove_modifier = terraforming_candidate
+			remove_modifier = pdhabcavesystem
+			remove_modifier = pdhabcalmwinds
+			remove_modifier = pdhabsubglacialocean
+			remove_modifier = pdhabvolcanicminerals
+			remove_modifier = geothermal
+			remove_deposit = d_geothermal_slurry_site
+			remove_modifier = superhabitable
+			remove_deposit = d_ancient_motes
+			remove_modifier = aquatic
+			remove_deposit = d_aquatic_trench
+			remove_modifier = tidal_locked2
+			remove_deposit = d_nightside_mining_operations
+			remove_modifier = karst
+			remove_deposit = d_karst_cave
+			remove_modifier = ammonia
+			remove_deposit = d_ammonia_sea
+			remove_modifier = pdsulfur
+			remove_deposit = d_sulfur_pool
+			remove_modifier = pdacid
+			remove_deposit = d_acid_lakes
+			remove_deposit = d_pdacid_rain
+			remove_modifier = methane
+			remove_deposit = d_frozen_gas_mountain
+			remove_modifier = ash
+			remove_modifier = primal
+			remove_deposit = d_lava_lakes
+			remove_modifier = radiotrophic
+			remove_deposit = d_rad_blooms_field
+			remove_modifier = biolumen
+			remove_deposit = d_biolumen_nature_preserve
+			remove_deposit = d_pdshroud
+			remove_modifier = pdsalt
+			remove_deposit = d_salt_caves
+			remove_modifier = pdaquifer
+			remove_deposit = d_aquifer_cave
+			remove_modifier = pdcoral
+			remove_deposit = d_coral_fields
+			remove_modifier = supercon
+			remove_deposit = d_supercon_site
+			remove_modifier = pdstorm
+			remove_deposit = d_storm_corridor
+			remove_modifier = pdglacio
+			remove_deposit = d_glacio_lake
+			remove_modifier = pdlanthanide
+			remove_deposit = d_lanthanide_deposit
+			remove_modifier = pdrogue
+			remove_deposit = d_rogue_geo
+			remove_modifier = pdlichen
+			remove_deposit = d_lichen_forest
+			remove_modifier = pdeyeball
+			remove_deposit = d_eyeball_site
+			remove_modifier = pdsulfur
+			remove_deposit = d_sulfur_pool
+			planet_event = { id = pdengine.50 days = 3600 } 
+		}
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+		}
+	}
+}
+
+# TOL Can Terraform phab
+decision_tolbarren_phab = {
+	icon = decision_pd_transplant_tree
+	owned_planets_only = yes
+
+	enactment_time = 7200
+
+	resources = {
+		category = decisions
+		cost = {
+			energy = 10000
+		}
+	}
+	
+	potential = {
+		is_pd_habitat = yes
+		owner = { 
+			has_origin = origin_pd_tree_of_life 
+			has_technology = tech_climate_restoration 
+		}
+		has_modifier = hab_terraforming_candidate
+	}
+
+	effect = {
+		change_pc = pc_forest
+		hidden_effect = {
+			remove_modifier = hab_terraforming_candidate
+			remove_modifier = pdhabcavesystem
+			remove_modifier = pdhabcalmwinds
+			remove_modifier = pdhabsubglacialocean
+			remove_modifier = pdhabvolcanicminerals
+			reroll_planet = yes
+			clear_blockers = yes
+			remove_deposit = d_pd_tree_of_life_habitat
+			remove_planet_flag = pdhab
+			remove_planet_flag = pd_hab_d1
+			remove_planet_flag = pd_hab_d2
+			remove_planet_flag = pd_mining_hab
+			remove_planet_flag = pd_science_hab
+			remove_planet_flag = pd_farming_hab
+			remove_planet_flag = pd_foundry_hab
+			remove_planet_flag = pd_mil_hab
+			remove_planet_flag = pd_energy_hab
+			remove_planet_flag = pd_commercial_hab
+			remove_planet_flag = pd_tolx
+			planet_event = { id = pdengine.35 }
+			planet_event = { id = pdengine.39 }
+			if = {
+				limit = { has_building = building_hab_capital }
+				remove_building = building_hab_capital
+				add_building = building_capital		
+			}
+			if = {
+				limit = { has_building = building_hab_major_capital }
+				remove_building = building_hab_major_capital
+				add_building = building_major_capital		
+			}
+		}
 	}
 	
 	ai_weight = {
@@ -2040,5 +2167,127 @@ decision_tolbarren_no_colony = {
 #		weight = 1000
 #	}
 #}
+
+# Storm Nice Transplant
+decision_d_pdstorm_nice_2 = {
+	owned_planets_only = yes
+
+	enactment_time = 1800
+	resources = {
+		category = decisions
+		cost = {
+			minerals = 1000
+			influence = 100
+		}
+	}
+		
+	prerequisites = { "tech_d_pdstorm_nice_2" }
+	
+	allow = {
+		free_district_slots >= 1
+	}
+	
+	potential = {
+		is_artificial = no
+		is_pd_unique = no
+		OR = {
+			is_wet = yes
+			is_cold = yes
+		}
+		NOT = { has_deposit = d_pdstorm_nice_2 }
+	}
+
+	effect = {
+		custom_tooltip = decision_d_pdstorm_nice_2_tooltip
+		hidden_effect = {
+			add_deposit = d_pdstorm_nice_2
+		}
+	}   
+	
+	ai_weight = {
+        weight = 3
+        modifier = {
+            factor = 0
+            or = {
+                num_pops < 20
+                and = {
+                  # By late game, AI will likely keep some open building slots
+                  # This is mostly harmless if there are still jobs available
+                  # Otherwise, don't let them take this over building a building
+                  free_building_slots > 0
+                  free_jobs <= 0
+                }
+                free_building_slots > 2
+                owner = {
+                    or = {
+                        resource_stockpile_compare = { resource = energy value < 10000 }
+                        resource_stockpile_compare = { resource = influence value < 150 }
+                    }
+                }
+            }
+        }
+  }
+}
+
+# Storm Greedy Transplant
+decision_d_pdstorm_greedy_2 = {
+	owned_planets_only = yes
+
+	enactment_time = 1800
+	resources = {
+		category = decisions
+		cost = {
+			energy = 1000
+			influence = 100
+		}
+	}
+		
+	prerequisites = { "tech_d_pdstorm_greedy_2" }
+	
+	#allow = {
+	#	free_district_slots >= 1
+	#}
+	
+	potential = {
+		is_artificial = no
+		is_pd_unique = no
+		OR = {
+			is_wet = yes
+			is_cold = yes
+		}
+		NOT = { has_deposit = d_pdstorm_greedy_2 }
+	}
+
+	effect = {
+		custom_tooltip = decision_d_pdstorm_greedy_2_tooltip
+		hidden_effect = {
+			add_deposit = d_pdstorm_greedy_2
+		}
+	}   
+	
+	ai_weight = {
+        weight = 3
+        modifier = {
+            factor = 0
+            or = {
+                num_pops < 20
+                and = {
+                  # By late game, AI will likely keep some open building slots
+                  # This is mostly harmless if there are still jobs available
+                  # Otherwise, don't let them take this over building a building
+                  free_building_slots > 0
+                  free_jobs <= 0
+                }
+                free_building_slots > 2
+                owner = {
+                    or = {
+                        resource_stockpile_compare = { resource = energy value < 10000 }
+                        resource_stockpile_compare = { resource = influence value < 150 }
+                    }
+                }
+            }
+        }
+  }
+}
 
 
