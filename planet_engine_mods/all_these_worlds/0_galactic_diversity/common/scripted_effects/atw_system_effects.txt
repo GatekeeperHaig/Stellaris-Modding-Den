@@ -1,0 +1,99 @@
+# Used to process systems generated after game-start
+process_system = {
+	every_system_planet = {
+		limit = { NOT = { habitable_planet = yes } }
+		if = {
+			limit = { is_gas_giant = yes has_moon = yes }
+			every_moon = { set_planet_flag = "gas_giant_moon" }
+		}
+		if = {
+			limit = { NOR = { has_planet_flag = "temperature_spawned" is_moon = yes} }
+			spawn_temperature_zone_modifier = yes # Also clears vanilla modifiers
+		}
+		# Stars
+		if = {
+			limit = { is_star = yes OR = { has_standard_orbital_deposit = yes has_deposit = no } NOT = { solar_system = { has_star_flag = "custom_deposits" } } NOT = { solar_system = { has_star_flag = "empire_home_system" } } }
+			clear_deposits = yes
+			spawn_star_features = yes
+		}
+		# Asteroids
+		if = { 			
+			limit = { is_asteroid = yes }
+			adjust_asteroid_size = yes
+			if = {
+				limit = { OR = { has_standard_orbital_deposit = yes has_deposit = no } NOT = { solar_system = { has_star_flag = "custom_deposits" } } NOT = { solar_system = { has_star_flag = "empire_home_system" } } }
+				clear_deposits = yes
+				spawn_asteroid_features = yes
+			}			
+		}
+		# Super-giants
+		if = {
+			limit = { is_planet_class = ph_super_jovian }
+			change_pc = orbit_super_giant
+			if = {
+				limit = { OR = { has_standard_orbital_deposit = yes has_deposit = no } }
+				clear_deposits = yes
+				spawn_giant_features = yes
+			}
+		}
+		# Remaining Giants
+		if = {
+			limit = { 
+				OR = {
+					#is_planet_class = pc_gas_giant
+					is_planet_class = ph_jovian
+					is_planet_class = ph_neptunian
+				}
+			}
+			convert_ph_giant = yes
+			if = { 
+				limit = { OR = { has_standard_orbital_deposit = yes has_deposit = no } }
+				clear_deposits = yes
+				spawn_giant_features = yes
+			}
+		}
+		# Rockies
+		if = {
+			limit = { is_planet_class = ph_super_terran	}
+			spawn_super_terran_atmosphere = yes
+		}
+		if = {
+			limit = { is_planet_class = ph_terran	}
+			spawn_terran_atmosphere = yes
+		}
+		if = {
+			limit = { is_planet_class = ph_dwarf	}
+			spawn_dwarf_atmosphere = yes
+		}
+		if = {
+			limit = { is_planet_class = ph_super_terran	}
+			convert_super_terran = yes
+			# Spawn random modifiers and deposits
+			if = {
+				limit = { OR = { has_standard_orbital_deposit = yes has_deposit = no } NOT = { solar_system = { has_star_flag = "empire_home_system" } } }
+				clear_deposits = yes
+				spawn_uninhabitable_features = yes
+			}
+		}
+		if = {
+			limit = { is_planet_class = ph_terran	}
+			convert_terran = yes
+			# Spawn random modifiers and deposits
+			if = {
+				limit = { OR = { has_standard_orbital_deposit = yes has_deposit = no } NOT = { solar_system = { has_star_flag = "empire_home_system" } } }
+				clear_deposits = yes
+				spawn_uninhabitable_features = yes
+			}
+		}
+		if = {
+			limit = { is_planet_class = ph_dwarf	}
+			convert_dwarf = yes
+			# Spawn random modifiers and deposits
+			if = {
+				limit = { OR = { has_standard_orbital_deposit = yes has_deposit = no } NOT = { solar_system = { has_star_flag = "empire_home_system" } } }
+				clear_deposits = yes
+				spawn_uninhabitable_features = yes
+			}			
+		}
+	}
+}

@@ -113,10 +113,11 @@ vechtar_zavonia_system = {
 		
 		change_orbit = @giant_moon_distance		
 		moon = {
-			count = { min = 3 max = 3 } flags = { erasable }
+			count = { min = 2 max = 3 }
 			orbit_angle = { min = 90 max = 270 }
 			orbit_distance = { min = 1 max = 2 }
 			flags = { temperate_eco_zone } #ideal for temperate worlds with water hydrospheres
+			class = "ph_dwarf"
 		}
 		moon = {
 			count = 1
@@ -136,7 +137,7 @@ vechtar_zavonia_system = {
 	# Outer Zone
 
 	planet = {
-		count = { min = 1 max = 1 } flags = { erasable }
+		count = 1
 		orbit_distance = 0
 		class = "rl_sub_giant"
 		orbit_angle = { min = 90 max = 270 }
@@ -144,17 +145,17 @@ vechtar_zavonia_system = {
 		
 		change_orbit = @sub_giant_moon_distance		
 		moon = {
-			count = { min = 4 max = 4 } flags = { erasable }
+			count = { min = 2 max = 3 }
 			orbit_angle = { min = 90 max = 270 }
 			orbit_distance = { min = 1 max = 2 }
 			flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
-			class = random_non_colonizable
+			class = "ph_dwarf"
 		}
 	}
 	
 	change_orbit = 30 #145
 	planet = {
-		count = { min = 1 max = 1 } flags = { erasable }
+		count = { min = 0 max = 1 }
 		orbit_distance = 0
 		class = "rl_sub_giant"
 		orbit_angle = { min = 90 max = 270 }
@@ -162,11 +163,11 @@ vechtar_zavonia_system = {
 		
 		change_orbit = @sub_giant_moon_distance		
 		moon = {
-			count = { min = 4 max = 4 } flags = { erasable }
+			count = { min = 1 max = 2 }
 			orbit_angle = { min = 90 max = 270 }
 			orbit_distance = { min = 1 max = 2 }
 			flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
-			class = random_non_colonizable
+			class = "ph_dwarf"
 		}
 	}
 
@@ -180,17 +181,17 @@ vechtar_zavonia_system = {
 		
 		change_orbit = @super_giant_moon_distance		
 		moon = {
-			count = { min = 3 max = 3 } flags = { erasable }
+			count = { min = 2 max = 3 }
 			orbit_angle = { min = 90 max = 270 }
 			orbit_distance = { min = 1 max = 2 }
 			flags = { frigid_zone } #possible frozen water or ammonia hydrospheres only in jovian moons
-			class = random_non_colonizable
+			class = "ph_terran"
 		}
 	}
 
 	change_orbit = 90 #340
 	planet = {
-		count = { min = 1 max = 1 } flags = { erasable }
+		count = 1
 		orbit_distance = 0
 		class = "ph_dwarf"
 		orbit_angle = { min = 90 max = 270 }
@@ -199,7 +200,7 @@ vechtar_zavonia_system = {
 
 	change_orbit = 15 #355
 	planet = {
-		count = { min = 1 max = 1 } flags = { erasable }
+		count = 1
 		orbit_distance = 0
 		class = "ph_dwarf"
 		orbit_angle = { min = 90 max = 270 }
@@ -208,10 +209,13 @@ vechtar_zavonia_system = {
 
 	change_orbit = 15 #370
 	planet = {
-		count = { min = 6 max = 6 } flags = { erasable }
+		count = { min = 4 max = 6 }
 		orbit_distance = 0
 		orbit_angle = { min = 90 max = 270 }
 		class = "pc_ice_asteroid"
+	}
+	init_effect = {
+		process_system = yes
 	}
 }
 
@@ -2741,7 +2745,7 @@ collapse_system = {
 						civic = civic_secret_of_fire
 						civic = civic_the_wheel
 					}
-					species = last_created
+					species = last_created_species
 					ethos = {
 						ethic = "ethic_fanatic_pacifist"
 						ethic = "ethic_materialist"
@@ -2779,7 +2783,7 @@ collapse_system = {
 				while = {
 					count = 4
 					create_pop = {
-						species = last_created
+						species = last_created_species
 					}					
 				}
 				add_building = building_crude_huts
@@ -2966,7 +2970,7 @@ old_foes_system = {
 							civic = civic_secret_of_fire
 							civic = civic_the_wheel
 						}
-						species = last_created
+						species = last_created_species
 						ethos = random
 						origin = "origin_enlightened" # Should only be visible if they become spacefaring
 						flag = {
@@ -2997,7 +3001,7 @@ old_foes_system = {
 					while = {
 						count = 8
 						create_pop = {
-							species = last_created
+							species = last_created_species
 						}					
 					}
 					add_building = building_primitive_dwellings
@@ -3105,7 +3109,7 @@ old_foes_system = {
 						civic = civic_secret_of_fire
 						civic = civic_the_wheel
 					}
-					species = last_created
+					species = last_created_species
 					ethos = random
 					origin = "origin_enlightened" # Should only be visible if they become spacefaring
 					flag = {
@@ -3136,7 +3140,7 @@ old_foes_system = {
 				while = {
 					count = 8
 					create_pop = {
-						species = last_created
+						species = last_created_species
 					}					
 				}
 				add_building = building_primitive_dwellings
@@ -3662,6 +3666,7 @@ scavenger_system = {
 			}
 		}
 		last_created_country = {
+			set_country_flag = guardian_scavenger_bot
 			if = {
 				limit = { NOT = { has_modifier = scavenger_bot_power } }
 				add_modifier = { modifier = scavenger_bot_power	days = -1 }
@@ -5487,6 +5492,14 @@ distar_sealed_1_1 = {
 # Sealed System
 distar_sealed_1_2 = {
 	class = "rl_trinary_orphan_twins"
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 195
+	}
+	asteroid_belt = {
+		type = rocky_asteroid_belt
+		radius = 240
+	}
 
 	flags = { sealed_system yellow_star neutron_star atw_edited }
 
@@ -6136,7 +6149,6 @@ distantstars_init_00 = {
 			type = lgate_base
 			orbit_angle = 225
 			orbit_distance = 30
-			location = solar_system
 		}
 	}
 }
@@ -6209,7 +6221,6 @@ distantstars_init_06 = {
 			type = lgate_base
 			orbit_angle = 225
 			orbit_distance = 30
-			location = solar_system
 		}
 	}
 }
@@ -6495,7 +6506,6 @@ distantstars_init_01 = {
 			type = lgate_base
 			orbit_angle = 225
 			orbit_distance = 360
-			location = solar_system
 		}
 	}
 }
