@@ -462,7 +462,8 @@ decision_oceancapital = {
 			IF = { limit = { is_planet_class = pc_ringworld_habitable } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_mesa } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_badlands } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_outback } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
+			#IF = { limit = { is_planet_class = pc_outback } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }}
+			IF = { limit = { is_planet_class = pc_coastal } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_desert } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_arid } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
 			#IF = { limit = { is_planet_class = pc_sandsea } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
@@ -572,94 +573,6 @@ decision_pdcrystalpatch = {
 		          }
 	          }
           	owner = { resource_income_compare = { resource = rare_crystals value > 2 } }
-        }
-    }
-	}
-}
-
-# Tiyanki Prospecting
-decision_tiyanki_prospecting = {
-	icon = decision_tiyanki_prospecting
-	owned_planets_only = yes
-
-	enactment_time = 500
-	resources = {
-		category = decisions
-		cost = {
-			energy = 1000
-		}
-	}
-		
-	prerequisites = { "tech_tiyanki_prospecting" }
-	
-	potential = {
-		NOT = { is_planet_class = pc_floating }
-		NOT = { is_planet_class = pc_crystal }
-		NOT = { is_planet_class = pc_technoorganic }
-		NOT = { is_planet_class = pc_graveyard }
-		NOT = { has_planet_flag = tiyanki_prospected }
-		NOT = { is_planet_class = pc_city }
-		NOT = { is_planet_class = pc_ecocity }
-		NOT = { is_planet_class = pc_corpoarc }
-		NOT = { is_planet_class = pc_palacearc }
-		NOT = { is_planet_class = pc_capitalarc }
-		NOT = { is_planet_class = pc_necropolis }
-		NOT = { is_planet_class = pc_machine_necropolis }
-		NOT = { is_planet_class = pc_necrohive }
-		NOT = { is_planet_class = pc_milarc }
-		NOT = { is_planet_class = pc_shroudcity }
-		NOT = { is_planet_class = pc_shroudecocity }
-		NOT = { is_planet_class = pc_shroudcapitalarc }
-		NOT = { is_planet_class = pc_shroudpalacearc }
-		NOT = { is_planet_class = pc_shroudmilarc }
-		NOT = { is_planet_class = pc_shroudcorpoarc }
-		NOT = { is_planet_class = pc_hive }
-		NOT = { is_planet_class = pc_bioforge }
-		NOT = { is_planet_class = pc_biocapital }
-		NOT = { is_planet_class = pc_machine }
-		NOT = { is_planet_class = pc_machine_factory }
-		NOT = { is_planet_class = pc_machine_capital }
-		NOT = { is_planet_class = pc_machine_fort }
-		NOT = { has_modifier = resort_colony }
-		NOT = { has_modifier = penal_colony }
-		NOT = { has_modifier = slave_colony }
-		is_artificial = no
-	}
-
-	effect = {
-		custom_tooltip = decision_tiyanki_prospect_effects_short
-		hidden_effect = {
-			set_planet_flag = tiyanki_prospected
-			random_list = {
-				40 = { add_deposit = d_tiyanki_small }
-				30 = { add_deposit = d_bubbling_swamp }
-				20 = { add_deposit = d_fuming_bog }
-				10 = { add_deposit = d_tiyanki_large }
-			}
-		}
-	}
-	
-	ai_weight = {
-		weight = 2
-    modifier = {
-        factor = 0
-        or = {
-            # Deliberately start not on a multiple of 5 boundary, so hopefully this
-            # will be done by the time the next building slot opens up.
-            num_pops < 13
-            and = {
-              # By late game, AI will likely keep some open building slots
-              # This is mostly harmless if there are still jobs available
-              # Otherwise, don't let them take this over building a building
-              free_building_slots > 0
-              free_jobs <= 0
-            }
-            free_building_slots > 2
-            owner = {
-                or = {
-                    resource_stockpile_compare = { resource = energy value < 8000 }
-                }
-            }
         }
     }
 	}
@@ -1780,12 +1693,14 @@ decision_noexoitchabs = {
 		has_modifier = pdashatmosphere
 		}
 		owner = { 
-			NOT = { 
-				OR = {
-					has_trait = trait_pc_ash_preference
-					has_trait = trait_pc_methane_preference
-					has_trait = trait_pc_ammonia_preference
-					has_trait = trait_pc_sulfur_preference
+			any_owned_pop = {
+				NOT = { 
+					OR = {
+						has_trait = trait_pc_ash_preference
+						has_trait = trait_pc_methane_preference
+						has_trait = trait_pc_ammonia_preference
+						has_trait = trait_pc_sulfur_preference
+					}
 				}
 			}
 		}
@@ -2123,51 +2038,6 @@ decision_tolbarren_phab = {
 	}
 }
 
-# Frozen gets Methane Terraforming=
-#decision_pd_scan_frozen_world = {
-#	icon = decision_pd_scan_frozen_world
-#	#owned_planets_only = yes
-#
-#	resources = {
-#		category = decisions
-#		cost = {
-#			energy = 200
-#		}
-#	}
-#	
-#	potential = {
-#		is_planet_class = pc_frozen
-#		from = { owner = { has_trait = trait_pc_methane_preference } }
-#		from = { owner = { has_technology = tech_terrestrial_sculpting } }
-#		planet_size > 9
-#		planet_size < 26	
-#		solar_system = {
-#			NOR = {
-#				is_star_class = sc_black_hole
-#				is_star_class = sc_neutron_star
-#				is_star_class = sc_pulsar
-#			}
-#		}
-#		NOT = { has_modifier = terraforming_methane }
-#		NOT = { has_planet_flag = pdmethanescan }
-#	}
-#
-#	effect = {
-#		custom_tooltip = decision_pd_scan_frozen_world_tooltip
-#		hidden_effect = {
-#			random_list = {
-#				66 = {}
-#				33 = { add_modifier = { modifier = terraforming_methane days = -1 } }
-#			}
-#			set_planet_flag = pdmethanescan
-#		}
-#	}
-#	
-#	ai_weight = {
-#		weight = 1000
-#	}
-#}
-
 # Storm Nice Transplant
 decision_d_pdstorm_nice_2 = {
 	owned_planets_only = yes
@@ -2288,6 +2158,45 @@ decision_d_pdstorm_greedy_2 = {
             }
         }
   }
+}
+
+# Tiyanki Planet, Under New Managment
+decision_change_tiyanki_choice = {
+	owned_planets_only = yes
+
+	enactment_time = 0
+	resources = {
+		category = decisions
+		cost = {
+			influence = 100
+		}
+	}
+	
+	#allow = {
+	#	free_district_slots >= 1
+	#}
+	
+	potential = {
+		is_planet_class = pc_graveyard
+		NOT = { has_planet_flag = tiyankidefault }
+		NOT = { owner = { has_country_flag = pdtiyankichoice } }
+	}
+
+	effect = {
+		custom_tooltip = decision_change_tiyanki_choice_tooltip
+		hidden_effect = {
+			planet_event = { id = pdgraveyard.30 days = 0 }
+			remove_planet_flag = tiyankileavebe
+			remove_planet_flag = tiyankinobutcher
+			remove_planet_flag = tiyankibutchertown
+			remove_planet_flag = tiyankicolonyprotect
+			remove_planet_flag = tiyankinofalling
+		}
+	}   
+	
+	ai_weight = {
+        weight = 0
+ 	}
 }
 
 

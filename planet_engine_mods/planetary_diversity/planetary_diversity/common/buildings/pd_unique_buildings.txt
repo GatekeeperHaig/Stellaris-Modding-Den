@@ -1,3 +1,4 @@
+#Floating
 
 building_eludium_mine = {
 	base_buildtime = @b1_time
@@ -48,10 +49,10 @@ building_eludium_mine = {
 	resources = {
 		category = planet_buildings
 		cost = {
-			minerals = 400
+			minerals = 2000
 		}
 		upkeep = {
-			energy = 1
+			energy = 20
 		}
 	}	
 	
@@ -65,7 +66,7 @@ building_eludium_mine = {
 }
 
 building_eludium_institute = {
-	base_buildtime = @b2_time
+	base_buildtime = @b3_time
 	base_cap_amount = 1
 
 	category = research
@@ -74,7 +75,6 @@ building_eludium_institute = {
 		NOT = { has_modifier = resort_colony }
 		NOT = { has_modifier = slave_colony }
 		exists = owner
-		owner = { is_regular_empire = yes }
 		text = EMPIRE_UNIQUE_BUILDING
 		owner = {
 			NOT = {
@@ -88,7 +88,6 @@ building_eludium_institute = {
 		OR = {
 			has_modifier = resort_colony
 			has_modifier = slave_colony
-			owner = { is_regular_empire = no }
 		}
 	}
 
@@ -116,22 +115,38 @@ building_eludium_institute = {
 		potential = {
 			exists = owner
 			owner = { NOT = { has_deficit = sr_eludium } }
+			owner = { is_regular_empire = yes }
 		}
 		planet_researchers_produces_mult = 0.1
 		job_head_researcher_add = 1
 	}
 
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_eludium } }
+			owner = { is_hive_empire = yes }
+		}
+		planet_researchers_produces_mult = 0.1
+		job_brain_drone_add = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_eludium } }
+			owner = { is_machine_empire = yes }
+		}
+		planet_researchers_produces_mult = 0.1
+		job_calculator_add = 2
+	}
+
 	country_modifier = {
 		all_technology_research_speed = 0.05
-		#planet_researchers_produces_mult = 0.05
 	}
 
 	prerequisites = {
 		"tech_eludium_research_initiative"
-	}
-
-	triggered_desc = {
-		text = job_head_researcher_effect_desc
 	}
 
 	show_tech_unlock_if = {
@@ -212,7 +227,6 @@ building_eludium_floating_islands = {
 	destroy_trigger = {
 		exists = owner
 		OR = {
-			owner = { is_regular_empire = no }
 			has_modifier = slave_colony
 			has_modifier = resort_colony
 		}
@@ -249,5 +263,614 @@ building_eludium_floating_islands = {
 
 	prerequisites = {
 		"tech_eludium_floating_islands"
+	}
+}
+
+#Graveyard
+
+building_graveyard_well = {
+	base_buildtime = 360
+
+	is_capped_by_modifier = yes
+
+	category = resource
+	
+	potential = {
+		NOT = { has_modifier = resort_colony }
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	prerequisites = {
+		"tech_mine_tiyanki_butcher"
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_graveyard_driller_add = 1
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			job_graveyard_drone_add = 1
+		}
+	}
+
+	show_tech_unlock_if = {
+		owner = { any_owned_planet = { is_planet_class = pc_graveyard } }
+	}	
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 2000
+		}
+		upkeep = {
+			energy = 20
+		}
+	}	
+	
+	ai_weight = {
+		weight = 10	
+	}
+}
+
+building_tiyanki_research_centre = {
+	base_buildtime = @b3_time
+	base_cap_amount = 1
+
+	category = research
+
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = slave_colony }
+		exists = owner
+		text = EMPIRE_UNIQUE_BUILDING
+		owner = {
+			NOT = {
+				has_country_flag = building_tiyanki_research_centre
+			}
+		}
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			has_modifier = resort_colony
+			has_modifier = slave_colony
+		}
+		NOT = { owner = { has_country_flag = pdtiyankiharvest } }
+	}
+
+	allow = {
+		has_major_upgraded_capital = yes
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b3_minerals
+			sr_tiyanki_parts = 2000
+		}
+		upkeep = {
+			energy = @b3_upkeep
+			sr_tiyanki_parts = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_tiyanki_parts } }
+			owner = { is_regular_empire = yes }
+		}
+		planet_jobs_society_research_produces_mult = 0.25
+		job_head_researcher_add = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_tiyanki_parts } }
+			owner = { is_hive_empire = yes }
+		}
+		planet_jobs_society_research_produces_mult = 0.25
+		job_brain_drone_add = 4
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_tiyanki_parts } }
+			owner = { is_machine_empire = yes }
+		}
+		planet_jobs_society_research_produces_mult = 0.25
+		job_calculator_add = 4
+	}
+
+	country_modifier = {
+		all_technology_research_speed = 0.05
+	}
+
+	prerequisites = {
+		"tech_tiyanki_research_centre"
+	}
+
+	ai_resource_production = {
+		trigger = { always = yes }
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+	ai_resource_production = {
+		trigger = {
+			planet_resource_compare = {
+				resource = physics_research
+				value >= 20
+			}
+		}
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+	ai_resource_production = {
+		trigger = {
+			planet_resource_compare = {
+				resource = physics_research
+				value >= 40
+			}
+		}
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+
+	on_built = {
+		owner = { set_country_flag = building_tiyanki_research_centre }
+	}
+
+	on_destroy = {
+		owner = {
+			if = {
+				limit = {
+					has_country_flag = building_tiyanki_research_centre
+				}
+				remove_country_flag = building_tiyanki_research_centre
+			}
+		}
+	}
+}
+
+building_tiyanki_parts_market = {
+	base_buildtime = @b3_time
+	base_cap_amount = 1
+
+	category = trade
+
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = slave_colony }
+	}
+
+	allow = {
+		buildings_simple_allow = yes
+		has_major_upgraded_capital = yes
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = { is_regular_empire = no }
+			has_modifier = slave_colony
+			has_modifier = resort_colony
+		}
+		NOT = { owner = { has_country_flag = pdtiyankiharvest } }
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_tiyanki_parts } }
+			owner = { is_regular_empire = yes }
+		}
+		job_merchant_add = 2
+		trade_value_mult = 0.20
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b3_minerals
+			sr_tiyanki_parts = 500
+		}
+		upkeep = {
+			energy = @b3_upkeep
+			sr_tiyanki_parts = 1
+		}
+	}
+
+	prerequisites = {
+		"tech_tiyanki_parts_market"
+	}
+
+	triggered_desc = {
+		text = job_merchant_effect_desc
+	}
+
+	ai_resource_production = {
+		energy = 3
+		trigger = {
+			always = yes
+		}
+	}
+	ai_resource_production = {
+		energy = 5
+		trigger = {
+			solar_system = {
+				has_system_trade_value >= 50
+			}
+		}
+	}
+	ai_resource_production = {
+		energy = 3
+		trigger = {
+			solar_system = {
+				has_system_trade_value >= 80
+			}
+		}
+	}
+}
+
+building_tiyanki_power_plant = {
+	base_buildtime = @b3_time
+	base_cap_amount = 1
+
+	category = trade
+
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = slave_colony }
+	}
+
+	allow = {
+		buildings_simple_allow = yes
+		has_major_upgraded_capital = yes
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			owner = { is_gestalt = no }
+			has_modifier = slave_colony
+			has_modifier = resort_colony
+		}
+		NOT = { owner = { has_country_flag = pdtiyankiharvest } }
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_tiyanki_parts } }
+			owner = { is_gestalt = yes }
+		}
+		job_technician_drone_add = 4
+		planet_jobs_energy_produces_mult = 0.20
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b3_minerals
+			sr_tiyanki_parts = 500
+		}
+		upkeep = {
+			energy = @b3_upkeep
+			sr_tiyanki_parts = 1
+		}
+	}
+
+	prerequisites = {
+		"tech_tiyanki_power_plant"
+	}
+
+	triggered_desc = {
+		text = job_technician_drone_desc
+	}
+
+	ai_resource_production = {
+		energy = 6
+		trigger = {
+			always = yes
+		}
+	}
+	ai_resource_production = {
+		energy = 6
+		trigger = {
+			planet_resource_compare = {
+				resource = energy
+				value >= 24
+				type = produces
+			}
+		}
+	}
+	ai_resource_production = {
+		energy = 6
+		trigger = {
+			planet_resource_compare = {
+				resource = energy
+				value >= 48
+				type = produces
+			}
+		}
+	}
+}
+
+building_tiyanki_observation_headquarters = {
+	base_buildtime = @b3_time
+	base_cap_amount = 1
+
+	category = research
+
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = slave_colony }
+		exists = owner
+		text = EMPIRE_UNIQUE_BUILDING
+		owner = {
+			NOT = {
+				has_country_flag = building_tiyanki_observation_headquarters
+			}
+		}
+		is_planet_class = pc_graveyard
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			has_modifier = resort_colony
+			has_modifier = slave_colony
+		}
+		NOT = { owner = { has_country_flag = pdtiyankistudyonly } }
+	}
+
+	allow = {
+		has_major_upgraded_capital = yes
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b3_minerals
+			exotic_gases = 200
+		}
+		upkeep = {
+			energy = @b3_upkeep
+			exotic_gases = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+			owner = { NOT = { is_spiritualist = yes } }
+		}
+		planet_jobs_society_research_produces_mult = 0.25
+		planet_jobs_unity_produces_mult = 0.25
+		job_head_researcher_add = 4
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+			owner = { is_spiritualist = yes }
+		}
+		planet_jobs_society_research_produces_mult = 0.25
+		planet_jobs_unity_produces_mult = 0.25
+		job_head_researcher_add = 2
+		job_high_priest_add = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_hive_empire = yes }
+		}
+		planet_jobs_society_research_produces_mult = 0.25
+		planet_jobs_unity_produces_mult = 0.25
+		job_brain_drone_add = 6
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+		planet_jobs_society_research_produces_mult = 0.25
+		planet_jobs_unity_produces_mult = 0.25
+		job_calculator_add = 6
+	}
+
+	country_modifier = {
+		all_technology_research_speed = 0.1
+	}
+
+	prerequisites = {
+		"tech_tiyanki_observation_headquarters"
+	}
+
+	ai_resource_production = {
+		trigger = { always = yes }
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+	ai_resource_production = {
+		trigger = {
+			planet_resource_compare = {
+				resource = physics_research
+				value >= 20
+			}
+		}
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+	ai_resource_production = {
+		trigger = {
+			planet_resource_compare = {
+				resource = physics_research
+				value >= 40
+			}
+		}
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+
+	on_built = {
+		owner = { set_country_flag = building_tiyanki_observation_headquarters }
+	}
+
+	on_destroy = {
+		owner = {
+			if = {
+				limit = {
+					has_country_flag = building_tiyanki_observation_headquarters
+				}
+				remove_country_flag = building_tiyanki_observation_headquarters
+			}
+		}
+	}
+}
+
+building_tiyanki_observation_lab = {
+	base_buildtime = @b3_time
+	base_cap_amount = 1
+
+	category = trade
+
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = slave_colony }
+		NOT = { is_planet_class = pc_graveyard }
+	}
+
+	allow = {
+		buildings_simple_allow = yes
+		has_major_upgraded_capital = yes
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			has_modifier = slave_colony
+			has_modifier = resort_colony
+		}
+		NOT = { owner = { has_country_flag = pdtiyankistudyonly } }
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+			owner = { NOT = { is_spiritualist = yes } }
+		}
+		planet_jobs_society_research_produces_mult = 0.1
+		planet_jobs_unity_produces_mult = 0.1
+		job_head_researcher_add = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+			owner = { is_spiritualist = yes }
+		}
+		planet_jobs_society_research_produces_mult = 0.1
+		planet_jobs_unity_produces_mult = 0.1
+		job_head_researcher_add = 1
+		job_high_priest_add = 1
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_hive_empire = yes }
+		}
+		planet_jobs_society_research_produces_mult = 0.1
+		planet_jobs_unity_produces_mult = 0.1
+		job_brain_drone_add = 3
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+		planet_jobs_society_research_produces_mult = 0.1
+		planet_jobs_unity_produces_mult = 0.1
+		job_calculator_add = 3
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b3_minerals
+			exotic_gases = 50
+		}
+		upkeep = {
+			energy = @b3_upkeep
+			exotic_gases = 1
+		}
+	}
+
+	prerequisites = {
+		"tech_tiyanki_observation_lab"
+	}
+
+	triggered_desc = {
+		text = job_head_researcher_effect_desc
+	}
+
+	ai_resource_production = {
+		trigger = { always = yes }
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+	ai_resource_production = {
+		trigger = {
+			planet_resource_compare = {
+				resource = physics_research
+				value >= 20
+			}
+		}
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+	ai_resource_production = {
+		trigger = {
+			planet_resource_compare = {
+				resource = physics_research
+				value >= 40
+			}
+		}
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
 	}
 }
