@@ -1,0 +1,1045 @@
+namespace = planet_destruction
+
+# Neutron Beam
+planet_event = {
+	id = planet_destruction.300
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				exists = owner
+				owner = { NOT = { is_same_value = from.owner } }
+			}
+			from.owner = {
+				country_event = { id = planet_destruction.301 }
+			}
+		}
+
+		#Dismantle observation post
+		if = {
+			limit = {
+				has_observation_outpost = yes
+			}
+			observation_outpost_owner = {
+				country_event = { id = planet_destruction.1000 days = 1 }
+			}
+		}
+
+		# Swarm Situation Log counter
+		if = {
+			limit = {
+				exists = owner
+				owner = { is_country_type = swarm }
+			}
+			every_country = {
+				limit = { has_event_chain = "prethoryn_scourge_chain" }
+				add_event_chain_counter = {
+					event_chain = "prethoryn_scourge_chain"
+					counter = "infested_worlds"
+					amount = -1 
+				}
+				add_event_chain_counter = {
+					event_chain = "prethoryn_scourge_chain"
+					counter = "infested_worlds_cleansed"
+					amount = 1 
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				OR = {
+					is_active_resolution = "resolution_rulesofwar_independent_tribunals"
+					is_active_resolution = "resolution_rulesofwar_last_resort_doctrine"
+					is_active_resolution = "resolution_rulesofwar_demobilization_initiative"
+				}
+			}
+			from.owner = {
+				set_timed_country_flag = { flag = resolution_breached_fired_neutron days = 3600 }
+			}
+		}
+
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NOT = { is_same_value = from.owner }
+					OR = {
+						is_country_type = default
+						is_country_type = fallen_empire
+						is_country_type = awakened_fallen_empire
+					}
+				}
+			}
+			# Generate threat
+			add_threat = { who = from.owner amount = 3 }
+			# modifier for allies + those upset by genocide
+			every_country = {
+				limit = {
+					NOR = {
+						is_same_value = from.owner
+						is_same_value = root.owner
+						AND = {
+							has_federation = yes
+							is_in_federation_with = from.owner
+						}
+					}
+					OR = {
+						has_communications = from.owner
+						has_communications = root.owner
+					}
+					OR = {
+						AND = {
+							has_federation = yes
+							is_in_federation_with = root.owner
+						}
+						has_ai_personality = awakened_fallen_empire_xenophile
+						AND = {
+							is_country_type = default
+							OR = {
+								is_egalitarian = yes
+								is_xenophile = yes
+								is_spiritualist = yes
+							}
+						}
+					}
+				}
+				add_opinion_modifier = {
+					modifier = opinion_swept_a_world
+					who = from.owner
+				}
+			}
+			# modifiers for victim
+			owner = {
+				add_opinion_modifier = {
+					modifier = opinion_swept_my_world
+					who = from.owner
+				}
+				if = {
+					limit = { NOT = { has_ethic = ethic_gestalt_consciousness } }
+					add_modifier = {
+						modifier = colossus_victim
+						days = 10800 # 30 years
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				exists = owner
+				owner = { is_country_type = primitive }
+			}
+			# modifier for allies + those upset by genocide
+			every_country = {
+				limit = {
+					NOT = { is_same_value = from.owner }
+					OR = {
+						has_communications = from.owner
+						has_communications = root.owner
+					}
+					is_country_type = default
+					NOR = {
+						is_xenophobe = yes
+						is_homicidal = yes
+						is_xenophile = yes
+					}
+				}
+				add_opinion_modifier = {
+					modifier = opinion_swept_a_primitive_world
+					who = from.owner
+				}
+			}
+			every_country = {
+				limit = {
+					NOT = { is_same_value = from.owner }
+					OR = {
+						has_communications = from.owner
+						has_communications = root.owner
+					}
+					OR = {
+						has_ai_personality = awakened_fallen_empire_xenophile
+						AND = {
+							is_country_type = default
+							is_xenophile = yes
+						}
+					}
+				}
+				add_opinion_modifier = {
+					modifier = opinion_swept_a_primitive_world_phile
+					who = from.owner
+				}
+			}
+		}
+		# Add war exhaustion to planet owner
+		owner = {
+			if = {
+				limit = { #isn't the case when the crisis bombards planets, for instance
+					is_at_war_with = from.fleet.owner
+				}
+				add_static_war_exhaustion = {
+					attacker = from.fleet.owner
+					location = root
+					value_for_planet_destruction = 1.0
+				}
+			}
+		}
+		every_owned_pop = {
+			from.owner = {
+				if = {
+					limit = { has_ascension_perk = ap_become_the_crisis }
+					complete_crisis_objective = crisobj_purge_pops
+				}
+			}
+		}
+		destroy_colony = yes
+		add_modifier = {
+			modifier = neutron_bombarded
+			days = 3600
+		}	
+		# Special graphics for Habitats and Ring Worlds
+		if = {
+			limit = {
+				is_planet_class = pc_habitat
+			}
+			spawn_habitat_neutron_effect = yes
+		}
+		else_if = {
+			limit = {
+				is_planet_class = pc_ringworld_habitable
+			}
+			spawn_ringworld_neutron_effect = yes
+		}
+		if = {
+			limit = {
+				OR = {
+					is_planet_class = pc_habitat
+					is_planet_class = pc_ringworld_habitable
+				}
+			}
+			# nothing
+		}
+		else = {
+			switch = {
+				trigger = is_planet_class
+				#Terrestrial
+				orbit_chlorogenian = { change_pc = orbit_chlorogenian }
+				pc_chlorogenian = { change_pc = pc_chlorogenian }
+				orbit_retinalgenian = { change_pc = orbit_retinalgenian }
+				pc_retinalgenian = { change_pc = pc_retinalgenian }
+				orbit_xerosgenian = { change_pc = orbit_xerosgenian }
+				pc_xerosgenian = { change_pc = pc_xerosgenian }
+				orbit_cryogenian = { change_pc = orbit_cryogenian }
+				pc_cryogenian = { change_pc = pc_cryogenian }
+				orbit_biolumenal = { change_pc = orbit_biolumenal }
+				pc_biolumenal = { change_pc = pc_biolumenal }
+				#Oceanic
+				orbit_pangaian = { change_pc = orbit_pangaian }
+				pc_pangaian = { change_pc = pc_pangaian }
+				orbit_archipelagic = { change_pc = orbit_archipelagic }
+				pc_archipelagic = { change_pc = pc_archipelagic }
+				orbit_cryothalassic = { change_pc = orbit_cryothalassic }
+				pc_cryothalassic = { change_pc = pc_cryothalassic }
+				orbit_erimospelagic = { change_pc = orbit_erimospelagic }
+				pc_erimospelagic = { change_pc = pc_erimospelagic }
+				orbit_geocoral = { change_pc = orbit_geocoral }
+				pc_geocoral = { change_pc = pc_geocoral }
+				#Panthalassic
+				orbit_water_panthalassic = { change_pc = orbit_water_panthalassic }
+				pc_water_panthalassic = { change_pc = pc_water_panthalassic }
+				orbit_ammonia_panthalassic = { change_pc = orbit_ammonia_panthalassic }
+				pc_ammonia_panthalassic = { change_pc = pc_ammonia_panthalassic }
+				#Sub-terrestrial
+				orbit_geothermal = { change_pc = orbit_geothermal }
+				pc_geothermal = { change_pc = pc_geothermal }
+				orbit_megafloral = { change_pc = orbit_megafloral }
+				pc_megafloral = { change_pc = pc_megafloral }
+				orbit_geoalgae = { change_pc = orbit_geoalgae }
+				pc_geoalgae = { change_pc = pc_geoalgae }
+				orbit_wetland = { change_pc = orbit_wetland }
+				pc_wetland = { change_pc = pc_wetland }
+				orbit_steppeland = { change_pc = orbit_steppeland }
+				pc_steppeland = { change_pc = pc_steppeland }
+				orbit_highland = { change_pc = orbit_highland }
+				pc_highland = { change_pc = pc_highland }
+				#Tidally-locked
+				orbit_geotidal_twilight = { change_pc = orbit_geotidal_twilight }
+				pc_geotidal = { change_pc = pc_geotidal }
+				orbit_geotidal_darkside = { change_pc = orbit_geotidal_darkside }
+				pc_geotidal_biolumen = { change_pc = pc_geotidal_biolumen }
+				orbit_geotidal_eyeball = { change_pc = orbit_geotidal_eyeball }
+				pc_geotidal_eyeball = { change_pc = pc_geotidal_eyeball }
+				#Primordial
+				orbit_geoplastic = { change_pc = orbit_geoplastic }
+				pc_geoplastic = { change_pc = pc_geoplastic }
+				orbit_geocarbonic = { change_pc = orbit_geocarbonic }
+				pc_carbonic = { change_pc = pc_carbonic }
+				orbit_geometallic = { change_pc = orbit_geometallic }
+				pc_geometallic = { change_pc = pc_geometallic }
+				orbit_geocrystallic = { change_pc = orbit_geocrystallic }
+				pc_geocrystallic = { change_pc = pc_geocrystallic }
+				#Marginal
+				orbit_desolate = { change_pc = orbit_desolate }
+				pc_desolate = { change_pc = pc_desolate }
+				orbit_irradiated = { change_pc = orbit_irradiated }
+				pc_irradiated = { change_pc = pc_irradiated }
+				orbit_karstic = { change_pc = orbit_karstic }
+				pc_karstic = { change_pc = pc_karstic }
+				orbit_ammonia_toxic = { change_pc = orbit_ammonia_toxic }
+				pc_ammonia = { change_pc = pc_ammonia }
+				#Sub-marginal
+				orbit_barren = { change_pc = orbit_barren }
+				pc_gd_barren = { change_pc = pc_gd_barren }
+				orbit_wasteland = { change_pc = orbit_wasteland }
+				pc_wasteland = { change_pc = pc_wasteland }
+				orbit_hydrocarbonal_toxic = { change_pc = orbit_hydrocarbonal_toxic }
+				pc_hydrocarbonal = { change_pc = pc_hydrocarbonal }
+				orbit_alkali_toxic = { change_pc = orbit_alkali_toxic }
+				pc_alkali = { change_pc = pc_alkali }
+				orbit_sulfur_toxic = { change_pc = orbit_sulfur_toxic }
+				pc_sulfur = { change_pc = pc_sulfur }
+				orbit_lanthanide_toxic = { change_pc = orbit_lanthanide_toxic }
+				pc_lanthanide = { change_pc = pc_lanthanide }
+				
+			}
+		}
+		# For Infested worlds
+		if = {
+			limit = { is_planet_class = pc_infested }
+			random_list = {
+				50 = { change_pc = orbit_dusty_telluric }
+				50 = { change_pc = orbit_volcanic_telluric }
+			}
+			add_modifier = { modifier = "terraforming_candidate" days = -1 }
+		}
+	}
+}
+
+country_event = {
+	id = planet_destruction.301
+	title = planet_destruction.301.name
+	desc = {
+		text = planet_destruction.301.nobots.desc
+		trigger = {
+			from = {
+				NOT = { 
+					OR = {
+						is_planet_class = pc_infested 
+						is_planet_class = orbit_dusty_telluric
+						is_planet_class = orbit_volcanic_telluric
+					}
+				}
+				count_owned_pop = {
+					count < 1
+				}
+			}
+		}
+	}
+	desc = {
+		text = planet_destruction.301.bots.desc
+		trigger = {
+			from = {
+				count_owned_pop = {
+					count > 0
+				}
+			}
+		}
+	}
+	desc = {
+		text = planet_destruction.301.infested.desc
+		trigger = {
+			from = {
+				OR = {
+					is_planet_class = pc_infested 
+					is_planet_class = orbit_dusty_telluric
+					is_planet_class = orbit_volcanic_telluric
+				}
+			}
+		}
+	}
+	picture = GFX_evt_planet_beam
+	show_sound = event_solar_fusion
+	location = from
+	
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = fired_neutron }
+	}
+
+	immediate = {
+		set_country_flag = fired_neutron
+	}
+
+	option = {
+		name = OK
+		trigger = {
+			NOR = {
+				has_valid_civic = civic_fanatic_purifiers
+				has_valid_civic = civic_machine_terminator
+			}
+		}
+	}
+
+	option = {
+		name = planet_destruction.101.a.purifexter
+		trigger = {
+			OR = {
+				has_valid_civic = civic_fanatic_purifiers
+				has_valid_civic = civic_machine_terminator
+			}
+		}
+		add_monthly_resource_mult = {
+			resource = unity
+			value = 60
+			min = 600
+			max = 3000
+		}
+	}
+}
+
+# God Ray
+planet_event = {
+	id = planet_destruction.400
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				NOT = { is_planet_class = pc_ai }
+				exists = owner
+				owner = { NOT = { is_same_value = from.owner } }
+			}
+			from.owner = {
+				country_event = { id = planet_destruction.401 }
+			}
+		}
+
+		# Contingency Machine World
+		if = {
+			limit = {
+				is_planet_class = pc_ai
+				NOT = { has_planet_flag = machine_lair }
+			}
+			set_planet_flag = destroyed_by_colossus
+			set_planet_flag = planet_godrayed
+			planet_event = { id = crisis.2040 }
+			create_ambient_object = {
+				location = this
+				type = habitat_cracker_object
+				duration = 5
+
+				use_3d_location = yes
+				base_angle_towards = star
+				entity_face_object = star
+
+				entity_offset = { min = 0 max = 0 }
+
+				entity_scale_to_size = yes
+				scale = 0.5
+			}
+		}
+
+		# Contingency Final Machine World
+		if = {
+			limit = {
+				is_planet_class = pc_ai
+				has_planet_flag = machine_lair
+			}
+			set_planet_flag = destroyed_by_colossus
+			set_planet_flag = planet_godrayed
+			from.owner = { save_event_target_as = final_machine_world_destroyer }
+			stop_crisis_sound = yes
+			planet_event = { id = crisis.2046 }
+			create_ambient_object = {
+				location = this
+				type = habitat_cracker_object
+				duration = 5
+
+				use_3d_location = yes
+				base_angle_towards = star
+				entity_face_object = star
+
+				entity_offset = { min = 0 max = 0 }
+
+				entity_scale_to_size = yes
+				scale = 0.5
+			}
+		}
+
+		if = {
+			limit = {
+				OR = {
+					is_active_resolution = "resolution_rulesofwar_independent_tribunals"
+					is_active_resolution = "resolution_rulesofwar_last_resort_doctrine"
+					is_active_resolution = "resolution_rulesofwar_demobilization_initiative"
+				}
+			}
+			from.owner = {
+				set_timed_country_flag = { flag = resolution_breached_fired_godray days = 3600 }
+			}
+		}
+
+		if = {
+			limit = {
+				NOT = { is_planet_class = pc_ai }
+				exists = owner
+				owner = {
+					NOT = { is_same_value = from.owner }
+					OR = {
+						is_country_type = default
+						is_country_type = fallen_empire
+						is_country_type = awakened_fallen_empire
+					}
+				}
+			}
+			# Generate threat
+			add_threat = { who = from.owner amount = 3 }
+			# modifier for allies + those upset by conversion
+			every_country = {
+				limit = {
+					NOR = {
+						is_same_value = from.owner
+						is_same_value = root.owner
+						AND = {
+							has_federation = yes
+							is_in_federation_with = from.owner
+						}
+					}
+					OR = {
+						has_communications = from.owner
+						has_communications = root.owner
+					}
+					OR = {
+						AND = {
+							has_federation = yes
+							is_in_federation_with = root.owner
+						}
+						has_ai_personality = awakened_fallen_empire_materialist
+						AND = {
+							is_country_type = default
+							OR = {
+								is_materialist = yes
+								is_egalitarian = yes
+								has_authority = auth_machine_intelligence
+							}
+						}
+					}
+				}
+				add_opinion_modifier = {
+					modifier = opinion_converted_a_world
+					who = from.owner
+				}
+			}
+			# modifiers for victim
+			owner = {
+				add_opinion_modifier = {
+					modifier = opinion_converted_my_world
+					who = from.owner
+				}
+				if = {
+					limit = { NOT = { has_ethic = ethic_gestalt_consciousness } }
+					add_modifier = {
+						modifier = colossus_victim
+						days = 10800 # 30 years
+					}
+				}
+			}
+			# Add war exhaustion to planet owner
+			owner = {
+				if = {
+					limit = { #isn't the case when the crisis bombards planets, for instance
+						is_at_war_with = from.fleet.owner
+					}
+					add_static_war_exhaustion = {
+						attacker = from.fleet.owner
+						location = root
+						value_for_planet_destruction = 1.0
+					}
+				}
+			}
+		}
+		every_owned_pop = {
+			limit = {
+				OR = {
+					has_trait = trait_mechanical
+					has_trait = trait_machine_unit
+					has_trait = trait_hive_mind
+					has_living_standard = { # Bio-trophies die without care
+						country = root.owner
+						type = living_standard_organic_trophy
+					}
+				}
+			}
+			kill_pop = yes
+			from.owner = {
+				if = {
+					limit = { has_ascension_perk = ap_become_the_crisis }
+					complete_crisis_objective = crisobj_purge_pops
+				}
+			}
+		}
+		every_owned_pop = {
+			limit = {
+				NOR = {
+					has_trait = trait_mechanical
+					has_trait = trait_machine_unit
+					has_trait = trait_hive_mind
+					has_living_standard = {
+						country = root.owner
+						type = living_standard_organic_trophy
+					}
+				}
+			}
+			pop_change_ethic = ethic_spiritualist
+		}
+		# Special graphics for Habitats and Ring Worlds
+		if = {
+			limit = {
+				is_planet_class = pc_habitat
+			}
+			spawn_habitat_divine_effect = yes
+		}
+		else_if = {
+			limit = {
+				is_planet_class = pc_ringworld_habitable
+			}
+			spawn_ringworld_divine_effect = yes
+		}
+		if = {
+			limit = {
+				OR = {
+					is_planet_class = pc_habitat
+					is_planet_class = pc_ringworld_habitable
+				}
+			}
+			# nothing
+		}
+		else = {
+			switch = {
+				trigger = is_planet_class
+				#Terrestrial
+				orbit_chlorogenian = { change_pc = orbit_chlorogenian }
+				pc_chlorogenian = { change_pc = pc_chlorogenian }
+				orbit_retinalgenian = { change_pc = orbit_retinalgenian }
+				pc_retinalgenian = { change_pc = pc_retinalgenian }
+				orbit_xerosgenian = { change_pc = orbit_xerosgenian }
+				pc_xerosgenian = { change_pc = pc_xerosgenian }
+				orbit_cryogenian = { change_pc = orbit_cryogenian }
+				pc_cryogenian = { change_pc = pc_cryogenian }
+				orbit_biolumenal = { change_pc = orbit_biolumenal }
+				pc_biolumenal = { change_pc = pc_biolumenal }
+				#Oceanic
+				orbit_pangaian = { change_pc = orbit_pangaian }
+				pc_pangaian = { change_pc = pc_pangaian }
+				orbit_archipelagic = { change_pc = orbit_archipelagic }
+				pc_archipelagic = { change_pc = pc_archipelagic }
+				orbit_cryothalassic = { change_pc = orbit_cryothalassic }
+				pc_cryothalassic = { change_pc = pc_cryothalassic }
+				orbit_erimospelagic = { change_pc = orbit_erimospelagic }
+				pc_erimospelagic = { change_pc = pc_erimospelagic }
+				orbit_geocoral = { change_pc = orbit_geocoral }
+				pc_geocoral = { change_pc = pc_geocoral }
+				#Panthalassic
+				orbit_water_panthalassic = { change_pc = orbit_water_panthalassic }
+				pc_water_panthalassic = { change_pc = pc_water_panthalassic }
+				orbit_ammonia_panthalassic = { change_pc = orbit_ammonia_panthalassic }
+				pc_ammonia_panthalassic = { change_pc = pc_ammonia_panthalassic }
+				#Sub-terrestrial
+				orbit_geothermal = { change_pc = orbit_geothermal }
+				pc_geothermal = { change_pc = pc_geothermal }
+				orbit_megafloral = { change_pc = orbit_megafloral }
+				pc_megafloral = { change_pc = pc_megafloral }
+				orbit_geoalgae = { change_pc = orbit_geoalgae }
+				pc_geoalgae = { change_pc = pc_geoalgae }
+				orbit_wetland = { change_pc = orbit_wetland }
+				pc_wetland = { change_pc = pc_wetland }
+				orbit_steppeland = { change_pc = orbit_steppeland }
+				pc_steppeland = { change_pc = pc_steppeland }
+				orbit_highland = { change_pc = orbit_highland }
+				pc_highland = { change_pc = pc_highland }
+				#Tidally-locked
+				orbit_geotidal_twilight = { change_pc = orbit_geotidal_twilight }
+				pc_geotidal = { change_pc = pc_geotidal }
+				orbit_geotidal_darkside = { change_pc = orbit_geotidal_darkside }
+				pc_geotidal_biolumen = { change_pc = pc_geotidal_biolumen }
+				orbit_geotidal_eyeball = { change_pc = orbit_geotidal_eyeball }
+				pc_geotidal_eyeball = { change_pc = pc_geotidal_eyeball }
+				#Primordial
+				orbit_geoplastic = { change_pc = orbit_geoplastic }
+				pc_geoplastic = { change_pc = pc_geoplastic }
+				orbit_geocarbonic = { change_pc = orbit_geocarbonic }
+				pc_carbonic = { change_pc = pc_carbonic }
+				orbit_geometallic = { change_pc = orbit_geometallic }
+				pc_geometallic = { change_pc = pc_geometallic }
+				orbit_geocrystallic = { change_pc = orbit_geocrystallic }
+				pc_geocrystallic = { change_pc = pc_geocrystallic }
+				#Marginal
+				orbit_desolate = { change_pc = orbit_desolate }
+				pc_desolate = { change_pc = pc_desolate }
+				orbit_irradiated = { change_pc = orbit_irradiated }
+				pc_irradiated = { change_pc = pc_irradiated }
+				orbit_karstic = { change_pc = orbit_karstic }
+				pc_karstic = { change_pc = pc_karstic }
+				orbit_ammonia_toxic = { change_pc = orbit_ammonia_toxic }
+				pc_ammonia = { change_pc = pc_ammonia }
+				#Sub-marginal
+				orbit_barren = { change_pc = orbit_barren }
+				pc_gd_barren = { change_pc = pc_gd_barren }
+				orbit_wasteland = { change_pc = orbit_wasteland }
+				pc_wasteland = { change_pc = pc_wasteland }
+				orbit_hydrocarbonal_toxic = { change_pc = orbit_hydrocarbonal_toxic }
+				pc_hydrocarbonal = { change_pc = pc_hydrocarbonal }
+				orbit_alkali_toxic = { change_pc = orbit_alkali_toxic }
+				pc_alkali = { change_pc = pc_alkali }
+				orbit_sulfur_toxic = { change_pc = orbit_sulfur_toxic }
+				pc_sulfur = { change_pc = pc_sulfur }
+				orbit_lanthanide_toxic = { change_pc = orbit_lanthanide_toxic }
+				pc_lanthanide = { change_pc = pc_lanthanide }
+			}
+		}
+		add_modifier = {
+			modifier = god_rayed
+			days = 3600
+		}
+		# self-raying
+		if = {
+			limit = {
+				exists = owner
+				owner = { is_same_value = from.owner }
+			}
+			add_modifier = {
+				modifier = uneasy_faith
+				days = 3600
+			}
+		}
+	}
+}
+
+country_event = {
+	id = planet_destruction.401
+	title = planet_destruction.401.name
+	desc = planet_destruction.401.desc
+	picture = GFX_evt_planet_beam
+	show_sound = event_mystic_reveal
+	location = from
+	
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_country_flag = fired_godray }
+	}
+
+	immediate = {
+		set_country_flag = fired_godray
+	}
+
+	option = {
+		name = OK
+		from = {
+			custom_tooltip = planet_destruction.401.tooltip
+		}
+	}
+}
+
+# Nanobot Assimilation
+planet_event = {
+	id = planet_destruction.500
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = { # remove hive mind?
+		from.owner = { country_event = { id = planet_destruction.501 } }
+
+		if = {
+			limit = {
+				OR = {
+					is_active_resolution = "resolution_rulesofwar_independent_tribunals"
+					is_active_resolution = "resolution_rulesofwar_last_resort_doctrine"
+					is_active_resolution = "resolution_rulesofwar_demobilization_initiative"
+				}
+			}
+			from.owner = {
+				set_timed_country_flag = { flag = resolution_breached_fired_assimilator days = 3600 }
+			}
+		}
+		
+		if = {
+			limit = {
+				exists = owner
+				owner = {
+					NOT = { is_same_value = from.owner }
+					OR = {
+						is_country_type = default
+						is_country_type = fallen_empire
+						is_country_type = awakened_fallen_empire
+					}
+				}
+			}
+			# Generate threat
+			add_threat = { who = from.owner amount = 3 }
+			# modifier for allies + those upset by robots
+			every_country = {
+				limit = {
+					NOR = {
+						is_same_value = from.owner
+						is_same_value = root.owner
+						AND = {
+							has_federation = yes
+							is_in_federation_with = from.owner
+						}
+					}
+					OR = {
+						has_communications = from.owner
+						has_communications = root.owner
+					}
+					OR = {
+						AND = {
+							has_federation = yes
+							is_in_federation_with = root.owner
+						}
+						has_ai_personality = awakened_fallen_empire_spiritualist
+						AND = {
+							is_country_type = default
+							OR = {
+								is_egalitarian = yes
+								is_spiritualist = yes
+							}
+						}
+					}
+				}
+				add_opinion_modifier = {
+					modifier = opinion_assimilated_a_world
+					who = from.owner
+				}
+			}
+			# modifiers for victim
+			owner = {
+				add_opinion_modifier = {
+					modifier = opinion_assimilated_my_world
+					who = from.owner
+				}
+				if = {
+					limit = { NOT = { has_ethic = ethic_gestalt_consciousness } }
+					add_modifier = {
+						modifier = colossus_victim
+						days = 10800 # 30 years
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				exists = owner
+				owner = { is_country_type = primitive }
+			}
+			# modifier for allies + those upset by genocide
+			every_country = {
+				limit = {
+					NOR = { is_same_value = from.owner }
+					OR = {
+						has_communications = from.owner
+						has_communications = root.owner
+					}
+					is_country_type = default
+					NOR = {
+						is_xenophobe = yes
+						is_homicidal = yes
+						is_xenophile = yes
+					}
+				}
+				add_opinion_modifier = {
+					modifier = opinion_assimilated_a_primitive_world
+					who = from.owner
+				}
+			}
+			every_country = {
+				limit = {
+					NOR = { is_same_value = from.owner }
+					OR = {
+						has_communications = from.owner
+						has_communications = root.owner
+					}
+					OR = {
+						has_ai_personality = awakened_fallen_empire_xenophile
+						AND = {
+							is_country_type = default
+							is_xenophile = yes
+						}
+					}
+				}
+				add_opinion_modifier = {
+					modifier = opinion_assimilated_a_primitive_world_phile
+					who = from.owner
+				}
+			}
+		}
+		# Add war exhaustion to planet owner
+		owner = {
+			if = {
+				limit = { #isn't the case when the crisis bombards planets, for instance
+					is_at_war_with = from.fleet.owner
+				}
+				add_static_war_exhaustion = {
+					attacker = from.fleet.owner
+					location = root
+					value_for_planet_destruction = 1.0
+				}
+			}
+		}
+				if = {
+			limit = {
+				exists = owner
+				owner = { is_same_value = from.owner }
+			}
+			# already owned
+		}
+		else = {
+			set_owner = from.owner
+		}
+		every_owned_pop = {
+			limit = {
+				is_valid_pop_for_PLANET_KILLER_NANOBOTS = yes
+			}
+			modify_species = {
+				species = this
+				add_trait = trait_cybernetic
+				add_traits_at_start_of_list = yes
+				change_scoped_species = yes
+			}
+		}
+		every_owned_pop = {
+			limit = {
+				OR = {
+					has_trait = trait_hive_mind
+					has_trait = trait_mechanical
+					has_trait = trait_machine_unit
+				}
+			}
+			kill_pop = yes
+		}
+		every_owned_pop = {
+			limit = {
+				has_modifier = pop_recently_conquered
+			}
+			remove_modifier = pop_recently_conquered
+		}
+		every_owned_pop = {
+			set_citizenship_type = {
+				type = citizenship_full_machine
+				cooldown = yes
+			}
+		}
+		# Special graphics for Habitats and Ring Worlds
+		if = {
+			limit = {
+				is_planet_class = pc_habitat
+			}
+			spawn_habitat_nanobot_effect = yes
+		}
+		else_if = {
+			limit = {
+				is_planet_class = pc_ringworld_habitable
+			}
+			spawn_ringworld_nanobot_effect = yes
+		}
+		if = {
+			limit = {
+				OR = {
+					is_planet_class = pc_habitat
+					is_planet_class = pc_ringworld_habitable
+				}
+			}
+			# nothing
+		}
+		else = {
+			switch = {
+				trigger = is_planet_class
+				#Terrestrial
+				orbit_chlorogenian = { change_pc = orbit_chlorogenian }
+				pc_chlorogenian = { change_pc = pc_chlorogenian }
+				orbit_retinalgenian = { change_pc = orbit_retinalgenian }
+				pc_retinalgenian = { change_pc = pc_retinalgenian }
+				orbit_xerosgenian = { change_pc = orbit_xerosgenian }
+				pc_xerosgenian = { change_pc = pc_xerosgenian }
+				orbit_cryogenian = { change_pc = orbit_cryogenian }
+				pc_cryogenian = { change_pc = pc_cryogenian }
+				orbit_biolumenal = { change_pc = orbit_biolumenal }
+				pc_biolumenal = { change_pc = pc_biolumenal }
+				#Oceanic
+				orbit_pangaian = { change_pc = orbit_pangaian }
+				pc_pangaian = { change_pc = pc_pangaian }
+				orbit_archipelagic = { change_pc = orbit_archipelagic }
+				pc_archipelagic = { change_pc = pc_archipelagic }
+				orbit_cryothalassic = { change_pc = orbit_cryothalassic }
+				pc_cryothalassic = { change_pc = pc_cryothalassic }
+				orbit_erimospelagic = { change_pc = orbit_erimospelagic }
+				pc_erimospelagic = { change_pc = pc_erimospelagic }
+				orbit_geocoral = { change_pc = orbit_geocoral }
+				pc_geocoral = { change_pc = pc_geocoral }
+				#Panthalassic
+				orbit_water_panthalassic = { change_pc = orbit_water_panthalassic }
+				pc_water_panthalassic = { change_pc = pc_water_panthalassic }
+				orbit_ammonia_panthalassic = { change_pc = orbit_ammonia_panthalassic }
+				pc_ammonia_panthalassic = { change_pc = pc_ammonia_panthalassic }
+				#Sub-terrestrial
+				orbit_geothermal = { change_pc = orbit_geothermal }
+				pc_geothermal = { change_pc = pc_geothermal }
+				orbit_megafloral = { change_pc = orbit_megafloral }
+				pc_megafloral = { change_pc = pc_megafloral }
+				orbit_geoalgae = { change_pc = orbit_geoalgae }
+				pc_geoalgae = { change_pc = pc_geoalgae }
+				orbit_wetland = { change_pc = orbit_wetland }
+				pc_wetland = { change_pc = pc_wetland }
+				orbit_steppeland = { change_pc = orbit_steppeland }
+				pc_steppeland = { change_pc = pc_steppeland }
+				orbit_highland = { change_pc = orbit_highland }
+				pc_highland = { change_pc = pc_highland }
+				#Tidally-locked
+				orbit_geotidal_twilight = { change_pc = orbit_geotidal_twilight }
+				pc_geotidal = { change_pc = pc_geotidal }
+				orbit_geotidal_darkside = { change_pc = orbit_geotidal_darkside }
+				pc_geotidal_biolumen = { change_pc = pc_geotidal_biolumen }
+				orbit_geotidal_eyeball = { change_pc = orbit_geotidal_eyeball }
+				pc_geotidal_eyeball = { change_pc = pc_geotidal_eyeball }
+				#Primordial
+				orbit_geoplastic = { change_pc = orbit_geoplastic }
+				pc_geoplastic = { change_pc = pc_geoplastic }
+				orbit_geocarbonic = { change_pc = orbit_geocarbonic }
+				pc_carbonic = { change_pc = pc_carbonic }
+				orbit_geometallic = { change_pc = orbit_geometallic }
+				pc_geometallic = { change_pc = pc_geometallic }
+				orbit_geocrystallic = { change_pc = orbit_geocrystallic }
+				pc_geocrystallic = { change_pc = pc_geocrystallic }
+				#Marginal
+				orbit_desolate = { change_pc = orbit_desolate }
+				pc_desolate = { change_pc = pc_desolate }
+				orbit_irradiated = { change_pc = orbit_irradiated }
+				pc_irradiated = { change_pc = pc_irradiated }
+				orbit_karstic = { change_pc = orbit_karstic }
+				pc_karstic = { change_pc = pc_karstic }
+				orbit_ammonia_toxic = { change_pc = orbit_ammonia_toxic }
+				pc_ammonia = { change_pc = pc_ammonia }
+				#Sub-marginal
+				orbit_barren = { change_pc = orbit_barren }
+				pc_gd_barren = { change_pc = pc_gd_barren }
+				orbit_wasteland = { change_pc = orbit_wasteland }
+				pc_wasteland = { change_pc = pc_wasteland }
+				orbit_hydrocarbonal_toxic = { change_pc = orbit_hydrocarbonal_toxic }
+				pc_hydrocarbonal = { change_pc = pc_hydrocarbonal }
+				orbit_alkali_toxic = { change_pc = orbit_alkali_toxic }
+				pc_alkali = { change_pc = pc_alkali }
+				orbit_sulfur_toxic = { change_pc = orbit_sulfur_toxic }
+				pc_sulfur = { change_pc = pc_sulfur }
+				orbit_lanthanide_toxic = { change_pc = orbit_lanthanide_toxic }
+				pc_lanthanide = { change_pc = pc_lanthanide }
+			}
+		}
+	}
+}

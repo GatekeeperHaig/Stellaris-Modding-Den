@@ -1,0 +1,1299 @@
+namespace = atw_engine
+
+event = {
+	id = atw_engine.00
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	immediate = {
+		set_global_flag = all_these_worlds
+		set_global_flag = galactic_diversity
+		#set_global_flag = increased_habitable_moons
+		every_galaxy_planet = { 
+			if = {
+				limit = { is_gas_giant = yes has_moon = yes }
+				every_moon = { set_planet_flag = "gas_giant_moon" }
+			}
+			if = {
+				limit = { NOR = { has_planet_flag = "temperature_spawned" is_moon = yes} }
+				spawn_temperature_zone_modifier = yes # Also clears vanilla modifiers
+			}
+			#correct_prespawned_habitables = yes # This will convert vanilla habitables based on hydrosphere and the star's temperature zone
+		}
+		
+		## Convert unintended random habitables to an uninhabitable/nuked class
+		every_galaxy_planet = {
+			
+				limit = {
+					AND = {
+						OR = {
+							is_colonizable = yes
+							exists = owner
+						}
+						NOT = { has_planet_flag = "planet_converted" }
+					}
+				}
+								
+				if = { 
+					limit = {
+						NOR = {
+							is_untouchable_planet = yes
+							is_planet_class = pc_ringworld_habitable
+							is_planet_class = pc_habitat
+						}
+					}
+					random_list = {
+						1 = {
+							change_pc = pc_barren
+							#reroll_planet_modifiers	= yes
+						}
+						1 = {
+							change_pc = pc_toxic
+							#reroll_planet_modifiers	= yes
+						}
+						#0 = {
+						#	change_pc = pc_nuked
+						#	#reroll_planet_modifiers	= yes
+						#}
+					}
+				}
+				if = { 
+					limit = { is_planet_class = pc_nuked }
+					remove_vanilla_planet_modifiers = yes
+					roll_pc_nuked = yes
+				}
+				if = { 
+					limit = { is_planet_class = pc_gaia }
+					remove_vanilla_planet_modifiers = yes
+					roll_pc_gaia = yes
+				}
+						
+		}
+		
+		## Convert vanilla uninhabitables in edited systems to a placeholder class, for the stage 1 of the mod's planet conversion process
+		## Clears standard deposits of converted planets
+		
+		every_galaxy_planet = {
+			if = {
+				limit = {
+					OR = {
+						is_planet_class = ph_dwarf
+						is_planet_class = ph_terran
+						is_planet_class = ph_super_terran
+						is_planet_class = ph_neptunian
+						is_planet_class = ph_jovian
+						is_planet_class = ph_super_jovian
+					}
+				}
+				clear_deposits = yes
+			}
+			if = {
+				limit = { 
+					solar_system = { has_star_flag = "atw_edited" }
+					uninhabitable_regular_planet = yes
+				}
+				random_list = {
+					0 = {
+						change_pc = ph_dwarf
+						modifier  = { add = 1  planet_size < 12 }
+					}
+					0 = {
+						change_pc = ph_terran
+						modifier  = { add = 1  planet_size > 11 planet_size < 24 }
+					}
+					0 = {
+						change_pc = ph_super_terran
+						modifier  = { add = 1  planet_size > 23 }
+					}
+				}
+			}
+			if = {
+				limit = { 
+					solar_system = { has_star_flag = "atw_edited" }
+					is_planet_class = pc_gas_giant
+				}
+				random_list = {
+					0 = {
+						change_pc = ph_neptunian
+						modifier  = { add = 1  planet_size < 28 }
+					}
+					0 = {
+						change_pc = ph_jovian
+						modifier  = { add = 1  planet_size > 27 planet_size < 40 }
+					}
+					0 = {
+						change_pc = ph_super_jovian
+						modifier  = { add = 1  planet_size > 39 }
+					}
+				}
+			}
+		}
+		
+		every_galaxy_planet = {
+			if = {
+				limit = { 
+					solar_system = { has_star_flag = "primitive_system" }
+				}
+				planet_event = { id = atw_engine.11 } # Generate primitives after converting their homeworld targets to proper classes
+			}			
+		}
+		
+		every_galaxy_planet = {
+			if = {
+				limit = { 
+					NOR = {
+						solar_system = { has_star_flag = "empire_home_system" }
+						solar_system = { has_star_flag = "primitive_system" }
+					}
+					has_owner = yes				
+				}
+				#The homeworld conversion function is called directly in the empire system initializers
+				#This event converts the colonies of advanced or fallen empires
+				planet_event = { id = atw_engine.12 } # Convert Empire colony class
+				
+			}			
+		}
+		
+		every_galaxy_planet = {
+			planet_event = { id = atw_engine.02 } # Convert vanilla habitable classes - Stage 1, habitables
+		}
+		
+		every_galaxy_planet = {
+			planet_event = { id = atw_engine.03 } # Convert placeholder classes - Stage 2, uninhabitables
+		}
+		
+		every_galaxy_planet = {
+			planet_event = { id = atw_engine.04 days = 1 } # Eliminate a random number of planets from each non capital star system, affected by player choice
+			#if = {
+			#	limit = {
+			#		NOR = {
+			#			has_modifier = "asteroid-rare_crystals"
+			#			has_modifier = "extremophile_environment"
+			#			has_modifier = "geological_activity"
+			#			has_modifier = "stable_dual_moon_system"
+			#		}
+			#	}
+			#	planet_event = { id = atw_engine.04 days = 1 } # Eliminate a random number of planets from each non capital star system, affected by player choice
+			#}			
+		}
+		
+		every_galaxy_planet = {
+			planet_event = { id = atw_engine.05 days = 2 } # Convert placeholder classes - Stage 3, low habitables
+		}
+		
+	}
+}
+
+planet_event = {
+	id = atw_engine.11 # GENERATE PRIMITIVES
+	hide_window = yes
+	is_triggered_only = yes
+	#fire_only_once = yes
+	
+	immediate = {
+		if = {
+			limit = { has_planet_flag = "eco_temp_primitives" }
+			generate_primitives_on_temperate_planet = yes
+		}
+		if = {
+			limit = { has_planet_flag = "eco_cold_primitives" }
+			generate_primitives_on_cold_planet = yes
+		}
+		if = {
+			limit = { has_planet_flag = "eco_hot_primitives" }
+			generate_primitives_on_hot_planet = yes
+		}
+	}
+}
+
+planet_event = {
+	id = atw_engine.12 # CONVERT EMPIRE HOMEWORLD as well as secondary colonies
+	hide_window = yes
+	is_triggered_only = yes
+	#fire_only_once = yes
+	
+	immediate = {
+		if = {
+			limit = { has_owner = yes has_modifier = "temperature-temperate" NOT = { has_planet_flag = "planet_converted" } }
+			convert_homeworld = yes
+		}
+		if = {
+			limit = { has_owner = yes has_modifier = "temperature-cold" NOT = { has_planet_flag = "planet_converted" } }
+			convert_homeworld = yes
+		}
+		if = {
+			limit = { has_owner = yes has_modifier = "temperature-hot" NOT = { has_planet_flag = "planet_converted" } }
+			convert_homeworld = yes
+		}
+	}
+}
+
+planet_event = {
+	id = atw_engine.02 # CONVERT VANILLA HABITABLES
+	hide_window = yes
+	is_triggered_only = yes
+	#fire_only_once = yes
+	
+	immediate = {
+		if = {
+			limit = { 
+				is_vanilla_habitable_planet = yes
+				NOT = { is_homeworld = yes }
+				NOT = { has_owner = yes }
+				NOT = { has_planet_flag = "planet_converted" }
+				OR = {
+					has_planet_flag = "torrid_zone"
+					has_planet_flag = "hot_zone"
+					has_planet_flag = "warm_eco_zone"
+					has_planet_flag = "temperate_eco_zone"
+					has_planet_flag = "cool_eco_zone"
+					has_planet_flag = "cold_zone"
+					has_planet_flag = "frigid_zone"
+				}
+			}
+			convert_vanilla_habitable = yes
+		}
+	}
+}
+
+planet_event = {
+	id = atw_engine.03 # CONVERT THE PLACEHOLDERS INTO UNINHABITABLES AND RE-BALANCE DEPOSITS INCLUDING STARS AND ASTEROIDS
+	hide_window = yes
+	is_triggered_only = yes
+	#fire_only_once = yes
+	
+	immediate = {
+		# Stars
+		if = {
+			limit = { is_star = yes OR = { has_standard_orbital_deposit = yes has_deposit = no } NOT = { solar_system = { has_star_flag = "custom_deposits" } } NOT = { solar_system = { has_star_flag = "empire_home_system" } } }
+			clear_deposits = yes
+			spawn_star_features = yes
+		}
+		# Asteroids
+		if = { 			
+			limit = { is_asteroid = yes }
+			adjust_asteroid_size = yes
+			if = {
+				limit = { OR = { has_standard_orbital_deposit = yes has_deposit = no } NOT = { solar_system = { has_star_flag = "custom_deposits" } } NOT = { solar_system = { has_star_flag = "empire_home_system" } } }
+				clear_deposits = yes
+				spawn_asteroid_features = yes
+			}			
+		}
+		# Super-giants
+		if = {
+			limit = { is_planet_class = ph_super_jovian }
+			change_pc = orbit_super_giant
+			set_planet_flag = "planet_converted"
+			if = {
+				limit = { OR = { has_standard_orbital_deposit = yes has_deposit = no } }
+				clear_deposits = yes
+				spawn_giant_features = yes
+			}
+		}
+		# Remaining Giants
+		if = {
+			limit = { 
+				OR = {
+					#is_planet_class = pc_gas_giant
+					is_planet_class = ph_jovian
+					is_planet_class = ph_neptunian
+				}
+			}
+			convert_ph_giant = yes
+			set_planet_flag = "planet_converted"
+			if = { 
+				limit = { OR = { has_standard_orbital_deposit = yes has_deposit = no } }
+				clear_deposits = yes
+				spawn_giant_features = yes
+			}
+		}
+		# Rocky worlds
+		# Convert special cases to habitable classes
+		if = {
+			limit = { 
+				OR = { 
+					has_planet_flag = "warm_eco_zone"
+					has_planet_flag = "temperate_eco_zone"
+					has_planet_flag = "cool_eco_zone"
+				}
+				has_planet_flag = "locked"
+				NOT = { has_planet_flag = "planet_converted" }
+				NOT = { solar_system = { has_star_flag = "empire_home_system" } }
+			}
+			random_list = {
+				50 = {
+					#do nothing, proceed as uninhabitable
+				}
+				50 = {
+					roll_tidally_locked_twilight = yes
+					modifier = { factor = 0.50 solar_system = { any_system_planet = { is_planet_class = "orbit_geotidal_twilight" }}}
+					modifier = { factor = 0.50 solar_system = { any_system_planet = { is_planet_class = "orbit_geotidal_darkside" }}}
+					modifier = { factor = 0.50 solar_system = { any_system_planet = { is_planet_class = "orbit_geotidal_eyeball" }}}
+				}
+			}			
+		}
+		if = {
+			limit = { 
+				has_planet_flag = "hot_zone"
+				has_planet_flag = "locked"
+				NOT = { has_planet_flag = "planet_converted" }
+				NOT = { solar_system = { has_star_flag = "empire_home_system" } }
+			}			
+			random_list = {
+				50 = {
+					#do nothing, proceed as uninhabitable
+				}
+				50 = {
+					roll_tidally_locked_darkside = yes
+					modifier = { factor = 0.50 solar_system = { any_system_planet = { is_planet_class = "orbit_geotidal_twilight" }}}
+					modifier = { factor = 0.50 solar_system = { any_system_planet = { is_planet_class = "orbit_geotidal_darkside" }}}
+					modifier = { factor = 0.50 solar_system = { any_system_planet = { is_planet_class = "orbit_geotidal_eyeball" }}}
+				}
+			}
+		}
+		if = {
+			limit = { 
+				has_planet_flag = "cold_zone"
+				has_planet_flag = "locked"
+				NOT = { has_planet_flag = "planet_converted" }
+				NOT = { solar_system = { has_star_flag = "empire_home_system" } }
+			}			
+			random_list = {
+				50 = {
+					#do nothing, proceed as uninhabitable
+				}
+				50 = {
+					roll_tidally_locked_eyeball = yes
+					modifier = { factor = 0.50 solar_system = { any_system_planet = { is_planet_class = "orbit_geotidal_twilight" }}}
+					modifier = { factor = 0.50 solar_system = { any_system_planet = { is_planet_class = "orbit_geotidal_darkside" }}}
+					modifier = { factor = 0.50 solar_system = { any_system_planet = { is_planet_class = "orbit_geotidal_eyeball" }}}
+				}
+			}
+		}
+		# Convert other special cases to specific uninhabitable classes
+		if = {
+			limit = {
+				has_planet_flag = "water_panthalassic"
+				NOT = { has_planet_flag = "planet_converted" }
+			}
+			roll_water_panthalassic = yes
+		}
+		# For the remaining, start with atmosphere-type
+		if = {
+			limit = { is_planet_class = ph_super_terran	NOT = { has_planet_flag = "planet_converted" } }
+			spawn_super_terran_atmosphere = yes
+		}
+		if = {
+			limit = { is_planet_class = ph_terran NOT = { has_planet_flag = "planet_converted" } }
+			spawn_terran_atmosphere = yes
+		}
+		if = {
+			limit = { is_planet_class = ph_dwarf NOT = { has_planet_flag = "planet_converted" } }
+			spawn_dwarf_atmosphere = yes
+		}
+		# Convert planet class
+		if = {
+			limit = { is_planet_class = ph_super_terran	}
+			convert_super_terran = yes
+			# Spawn random modifiers and deposits
+			if = {
+				limit = { OR = { has_standard_orbital_deposit = yes has_deposit = no } NOT = { solar_system = { has_star_flag = "empire_home_system" } } }
+				clear_deposits = yes
+				spawn_uninhabitable_features = yes
+			}
+		}
+		if = {
+			limit = { is_planet_class = ph_terran	}
+			convert_terran = yes
+			# Spawn random modifiers and deposits
+			if = {
+				limit = { OR = { has_standard_orbital_deposit = yes has_deposit = no } NOT = { solar_system = { has_star_flag = "empire_home_system" } } }
+				clear_deposits = yes
+				spawn_uninhabitable_features = yes
+			}
+		}
+		if = {
+			limit = { is_planet_class = ph_dwarf	}
+			convert_dwarf = yes
+			# Spawn random modifiers and deposits
+			if = {
+				limit = { OR = { has_standard_orbital_deposit = yes has_deposit = no } NOT = { solar_system = { has_star_flag = "empire_home_system" } } }
+				clear_deposits = yes
+				spawn_uninhabitable_features = yes
+			}			
+		}
+		# Add features and balance deposits to uninhabitables manually defined in the initializers
+		if = {
+			limit = { is_orbit_rocky_uninhabitable = yes NOT = { has_planet_flag = "planet_converted" } }
+			random_list = {
+				0 = {
+					add_modifier = {
+						modifier = "atmosphere-airless"
+						days = -1
+					}
+					modifier  = { add = 1  is_planet_class = orbit_icy }
+					modifier  = { add = 1  is_planet_class = orbit_chthonian }
+					modifier  = { add = 1  is_planet_class = orbit_iron_telluric }
+					modifier  = { add = 1  is_planet_class = orbit_silicate_telluric }
+				}
+				0 = {
+					add_modifier = {
+						modifier = "atmosphere-thin"
+						days = -1
+					}
+					modifier  = { add = 1  is_planet_class = orbit_dusty_telluric }
+					modifier  = { add = 1  is_planet_class = orbit_volcanic_telluric }
+					modifier  = { add = 1  is_planet_class = orbit_frozen_telluric }
+					modifier  = { add = 1  is_planet_class = orbit_molten }
+				}
+				0 = {
+					add_modifier = {
+						modifier = "atmosphere-greenhouse"
+						days = -1
+					}
+					modifier  = { add = 1  is_planet_class = orbit_hothouse_toxic }
+					modifier  = { add = 1  is_planet_class = orbit_methane_toxic }
+					modifier  = { add = 1  is_planet_class = orbit_carbonyl_toxic }
+					modifier  = { add = 1  is_planet_class = orbit_water_panthalassic }
+					modifier  = { add = 1  is_planet_class = orbit_ammonia_panthalassic }
+					modifier  = { add = 1  is_planet_class = orbit_methane_panthalassic }
+				}
+			}
+			if = {
+				limit = { NOT = { solar_system = { has_star_flag = "empire_home_system" } } }
+				spawn_uninhabitable_features = yes
+			}			
+		}
+		if = {
+			limit = { is_orbit_giant_uninhabitable = yes NOT = { has_planet_flag = "planet_converted" } }
+			clear_deposits = yes
+			spawn_giant_features = yes
+		}
+	}
+	
+}
+
+planet_event = {
+	id = atw_engine.04 # ERASE RANDOM WORLDS
+	hide_window = yes
+	is_triggered_only = yes
+	#fire_only_once = yes
+	
+	immediate = {
+		if = {
+			limit = { has_planet_flag = "erasable" }
+			
+			if = {
+				limit = { is_moon = yes } # Remove moon, or not
+				random_list = {
+					8 = {
+						remove_planet = yes
+						modifier = { factor = 0.10 has_global_flag = "very_high_expectations" }
+						modifier = { factor = 0.50 has_global_flag = "high_expectations" }
+						modifier = { factor = 2.00 has_global_flag = "low_expectations" }
+						modifier = { factor = 3.00 has_global_flag = "very_low_expectations" }
+					}
+					12 = {
+						#Do nothing
+						modifier = { factor = 3.00 has_global_flag = "very_high_expectations" }
+						modifier = { factor = 1.50 has_global_flag = "high_expectations" }
+						modifier = { factor = 0.35 has_global_flag = "low_expectations" }
+						modifier = { factor = 0.15 has_global_flag = "very_low_expectations" }
+					}
+				}
+			}
+			if = {
+				limit = {
+					AND = {
+						NOT = { is_moon = yes }
+						NOT = { is_asteroid = yes }
+					}
+				}
+				if = {
+					limit = { has_moon = yes } # Remove planet and all moons, or not
+					random_list = {
+						1 = {
+							every_moon = { remove_planet = yes }
+							#if = {
+							#	limit = { NOT = { has_moon = yes } }
+							#	remove_planet = yes
+							#}
+							remove_planet = yes
+							modifier = { factor = 0.05 has_global_flag = "very_high_expectations" }
+							modifier = { factor = 0.25 has_global_flag = "high_expectations" }
+							modifier = { factor = 1.25 has_global_flag = "low_expectations" }
+							modifier = { factor = 2.00 has_global_flag = "very_low_expectations" }
+						}
+						15 = {
+							#Do nothing
+							modifier = { factor = 2.00 has_global_flag = "very_high_expectations" }
+							modifier = { factor = 1.25 has_global_flag = "high_expectations" }
+							modifier = { factor = 0.50 has_global_flag = "low_expectations" }
+							modifier = { factor = 0.25 has_global_flag = "very_low_expectations" }
+						}
+					}
+				}
+				if = {
+					limit = { NOT = { has_moon = yes } } # Remove planet if no moons exist, or not
+					random_list = {
+						8 = {
+							remove_planet = yes
+							modifier = { factor = 0.05 has_global_flag = "very_high_expectations" }
+							modifier = { factor = 0.25 has_global_flag = "high_expectations" }
+							modifier = { factor = 1.25 has_global_flag = "low_expectations" }
+							modifier = { factor = 2.00 has_global_flag = "very_low_expectations" }
+						}
+						12 = {
+							#Do nothing
+							modifier = { factor = 2.00 has_global_flag = "very_high_expectations" }
+							modifier = { factor = 1.25 has_global_flag = "high_expectations" }
+							modifier = { factor = 0.25 has_global_flag = "low_expectations" }
+							modifier = { factor = 0.01 has_global_flag = "very_low_expectations" }
+						}
+					}
+				}
+			}
+			if = {
+				limit = { is_asteroid = yes }
+				random_list = {
+					10 = {
+						remove_planet = yes
+						modifier = { factor = 0.50 has_global_flag = "very_high_expectations" }
+						modifier = { factor = 0.75 has_global_flag = "high_expectations" }
+						modifier = { factor = 1.25 has_global_flag = "low_expectations" }
+						modifier = { factor = 1.50 has_global_flag = "very_low_expectations" }
+					}
+					10 = {
+						#Do nothing
+						modifier = { factor = 1.50 has_global_flag = "very_high_expectations" }
+						modifier = { factor = 1.25 has_global_flag = "high_expectations" }
+						modifier = { factor = 0.75 has_global_flag = "low_expectations" }
+						modifier = { factor = 0.50 has_global_flag = "very_low_expectations" }
+					}
+				}
+			}
+		}
+		
+	}
+}
+
+planet_event = {
+	id = atw_engine.05 # CONVERT A SMALL AMMOUNT OF UNINHABITABLES INTO LOW HABITABILITY CLASSES
+	hide_window = yes
+	is_triggered_only = yes
+	#fire_only_once = yes
+	
+	immediate = {
+		
+	}
+}
+
+planet_event = {
+	id = atw_engine.06 # UPGRADE COLONY AFTER CAPITAL BUILDING UPGRADE
+	title = atw_engine.06.name
+	desc = atw_engine.06.desc
+	picture = GFX_evt_colony_settlement
+	show_sound = event_default
+	location = root
+
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = {
+				OR = {
+					last_building_changed = building_capital
+					last_building_changed = building_hive_capital
+					last_building_changed = building_machine_capital
+					last_building_changed = building_resort_capital
+					last_building_changed = building_slave_capital
+					last_building_changed = building_ancient_control_center
+					last_building_changed = building_ancient_palace
+				}
+				
+			}
+			colony_update = yes
+		}
+	}
+
+	option = {
+		name = atw_engine.06.a
+		custom_tooltip = atw_engine.06.a.tooltip
+	}
+}
+
+event = {
+    id = atw_engine.91 # HOMEWORLD CUSTOMIZATION PROMPT - PELAGIC WATER
+	title = atw_engine.91.name
+	desc = atw_engine.91.desc
+	picture = GFX_evt_alien_planet
+	show_sound = event_default
+	location = root
+
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { is_ai = no }
+		capital_scope = {
+			is_ocean_replacement = yes
+			NOT = { has_planet_flag = scripted }
+		}
+	}
+	
+	option = {
+		name = atw_engine.91.a
+        custom_tooltip = atw_engine.91.a.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_erimospelagic"
+				set_planet_entity = { picture = biome_erimospelagic entity = erimospelagic_planet_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-oceanic"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_pelagic"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-sparse"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}		
+	}	
+	option = {
+		name = atw_engine.91.b
+        custom_tooltip = atw_engine.91.b.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_archipelagic"
+				set_planet_entity = { picture = biome_archipelagic_lush entity = archipelagic_planet_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-oceanic"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_pelagic"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-aquatic"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	}
+	
+}
+
+event = {
+    id = atw_engine.92 # HOMEWORLD CUSTOMIZATION PROMPT - FROZEN WATER
+	title = atw_engine.92.name
+	desc = atw_engine.92.desc
+	picture = GFX_evt_alien_planet
+	show_sound = event_default
+	location = root
+
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { is_ai = no }
+		capital_scope = {
+			is_arctic_replacement = yes
+			NOT = { has_planet_flag = scripted }
+		}
+	}
+	
+	option = {
+		name = atw_engine.92.a
+        custom_tooltip = atw_engine.92.a.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_cryothalassic"
+				set_planet_entity = { picture = biome_cryothalassic entity = cryothalassic_planet_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-oceanic"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_frozen"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-barren"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}		
+	}	
+	option = {
+		name = atw_engine.92.b
+        custom_tooltip = atw_engine.92.b.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_cryogenian"
+				set_planet_entity = { picture = biome_cryogenian_mixed entity = gd_cryogenian_planet_mixed_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-continental"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_frozen"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-diverse"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	}
+	option = {
+		name = atw_engine.92.c
+        custom_tooltip = atw_engine.92.c.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_geothermal"
+				set_planet_entity = { picture = biome_geothermal entity = gd_geothermal_planet_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-uniform"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_frozen"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-diverse"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	}
+	
+}
+
+event = {
+    id = atw_engine.93 # HOMEWORLD CUSTOMIZATION PROMPT - LIMITED WATER
+	title = atw_engine.93.name
+	desc = atw_engine.93.desc
+	picture = GFX_evt_alien_planet
+	show_sound = event_default
+	location = root
+
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { is_ai = no }
+		capital_scope = {
+			is_savannah_replacement = yes
+			NOT = { has_planet_flag = scripted }
+		}
+	}
+	
+	option = {
+		name = atw_engine.93.a
+        custom_tooltip = atw_engine.93.a.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_geoalgae"
+				set_planet_entity = { picture = biome_geoalgae entity = gd_geoalgae_planet_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-uniform"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_limited"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-diverse"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}		
+	}	
+	option = {
+		name = atw_engine.93.b
+        custom_tooltip = atw_engine.93.b.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_desolate"
+				set_planet_entity = { picture = biome_desolate_temperate entity = desolate_planet_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-uniform"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_limited"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-barren"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	}
+	
+}
+
+event = {
+    id = atw_engine.94 # HOMEWORLD CUSTOMIZATION PROMPT - ABUNDANT WATER
+	title = atw_engine.94.name
+	desc = atw_engine.94.desc
+	picture = GFX_evt_alien_planet
+	show_sound = event_default
+	location = root
+
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { is_ai = no }
+		capital_scope = {
+			is_continental_replacement = yes
+			NOT = { solar_system = { has_star_flag = "sol_system" } }
+			NOT = { has_planet_flag = scripted }
+		}
+	}
+	
+	option = {
+		name = atw_engine.94.a
+        custom_tooltip = atw_engine.94.a.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_pangaian"
+				set_planet_entity = { picture = biome_pangaian_lush entity = gd_pangaian_planet_lush_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-oceanic"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_abundant"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-dense"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}		
+	}	
+	option = {
+		name = atw_engine.94.b
+        custom_tooltip = atw_engine.94.b.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_pangaian"
+				set_planet_entity = { picture = biome_pangaian_sparse entity = gd_pangaian_planet_mixed_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-oceanic"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_abundant"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-sparse"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	}
+	option = {
+		name = atw_engine.94.c
+        custom_tooltip = atw_engine.94.c.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_chlorogenian"
+				set_planet_entity = { picture = biome_chlorogenian_mixed entity = gd_chlorogenian_planet_mixed_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-continental"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_abundant"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-diverse"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	}
+	option = {
+		name = atw_engine.94.d
+        custom_tooltip = atw_engine.94.d.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_chlorogenian"
+				set_planet_entity = { picture = biome_chlorogenian_arboreal entity = gd_chlorogenian_planet_lush_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-continental"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_abundant"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-dense"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	}
+	option = {
+		name = atw_engine.94.e
+        custom_tooltip = atw_engine.94.e.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_chlorogenian"
+				set_planet_entity = { picture = biome_chlorogenian_sparse entity = gd_chlorogenian_planet_sparse_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-continental"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_abundant"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-sparse"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	}
+	option = {
+		name = atw_engine.94.f
+        custom_tooltip = atw_engine.94.f.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_xerosgenian"
+				set_planet_entity = { picture = biome_xerosgenian_mixed entity = gd_xerosgenian_planet_mixed_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-continental"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_abundant"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-sparse"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	}
+	option = {
+		name = atw_engine.94.g
+        custom_tooltip = atw_engine.94.g.tooltip
+		hidden_effect = {
+			capital_scope = {
+				change_pc = "pc_xerosgenian"
+				set_planet_entity = { picture = biome_xerosgenian_barren entity = gd_xerosgenian_planet_barren_01_entity }
+				clear_base_modifiers = yes
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-continental"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_abundant"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-barren"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
+			}
+		}
+	}
+	
+}
+
+event = {
+    id = atw_engine.99 # CALL PROMPT FOR PLANET ODDS
+	title = atw_engine.99.name
+	desc = atw_engine.99.desc
+	picture = GFX_evt_star_chart
+	show_sound = event_default
+	location = root
+
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { is_ai = no }
+	}
+	
+	option = {
+		name = atw_engine.99.a
+        custom_tooltip = atw_engine.99.a.tooltip
+		hidden_effect = {
+			set_global_flag = very_high_expectations
+		}
+		
+		
+	}
+	
+	option = {
+		name = atw_engine.99.b
+        custom_tooltip = atw_engine.99.b.tooltip
+		hidden_effect = {
+			set_global_flag = high_expectations
+		}
+	}
+
+	option = {
+		name = atw_engine.99.c
+        custom_tooltip = atw_engine.99.c.tooltip
+		hidden_effect = {
+			#do nothing, use default odds
+		}
+	}
+	
+	option = {
+		name = atw_engine.99.d
+        custom_tooltip = atw_engine.99.d.tooltip
+		hidden_effect = {
+			set_global_flag = low_expectations
+		}
+	}
+	
+	option = {
+		name = atw_engine.99.e
+        custom_tooltip = atw_engine.99.e.tooltip
+		hidden_effect = {
+			set_global_flag = very_low_expectations
+		}
+	}
+
+	
+}

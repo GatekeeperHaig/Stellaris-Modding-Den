@@ -1,0 +1,169 @@
+namespace = leviathans
+
+# Stellarite system is updated and Gaia world unlocks
+ship_event = {
+	id = leviathans.1018
+	title = leviathans.1000.name
+	desc = {
+		trigger = {
+			hidden:owner = {
+				switch = {
+					trigger = has_country_flag
+					stellarite_project_success = { text = leviathans.1018.desc }
+					default = { text = leviathans.1018.alt.desc }
+				}
+			}
+		}
+	}
+	picture = GFX_evt_star_yellow
+	show_sound = event_radio_chatter
+	location = root
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_system = {
+			limit = {
+				has_star_flag = guardians_stellarite_system
+			}
+			save_event_target_as = guardians_stellarite_home_system
+			random_system_planet = {
+				limit = {
+					is_planet_class = orbit_frozen_telluric
+				}
+				save_event_target_as = stellarite_rich_planet
+			}
+		}
+		random_list = {
+			70 = { owner = { set_country_flag = stellarite_project_success } }
+			30 = {
+				root = {
+					kill_leader = { type = scientist show_notification = no }
+					fleet = {
+						destroy_fleet = this
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+		custom_tooltip = leviathans.1018.c.tooltip
+		trigger = {
+			owner = {
+				has_country_flag = stellarite_project_success
+			}
+		}
+		hidden_effect = {
+			owner = { remove_country_flag = stellarite_project_success }
+			random_system = {
+				limit = {
+					has_star_flag = guardians_stellarite_system
+				}
+				random_system_planet = {
+					limit = {
+						is_star = yes
+					}
+					change_planet_size = 12
+					spawn_sun_temperature_effect = yes
+				}
+				every_system_planet = {
+					limit = {
+						is_star = no
+						is_asteroid = no
+					}
+					spawn_planet_temperature_effect = yes
+					remove_modifier = stellarite_low_temp
+					if = {
+						limit = {
+							is_planet_class = orbit_frozen_telluric
+							NOT = { has_planet_flag = stellarite_terraformed }
+							solar_system = {
+								NOT = { has_star_flag = gaia_planet_gained }
+							}
+						}
+						change_pc = pc_chlorogaian
+						set_planet_flag = stellarite_terraformed
+						remove_modifier = atmosphere-thin
+						roll_pc_gaia = yes
+						solar_system = { set_star_flag = gaia_planet_gained }
+					}
+					else_if = {
+						limit = {
+							is_planet_class = orbit_frozen_telluric
+							NOT = { has_planet_flag = stellarite_terraformed }
+							solar_system = {
+								has_star_flag = gaia_planet_gained
+							}
+						}
+						increase_planet_temperature = yes
+						set_planet_flag = stellarite_terraformed
+					}
+					else = {
+						increase_planet_temperature = yes
+						set_planet_flag = stellarite_terraformed
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = UNFORTUNATE
+		custom_tooltip = leviathans.1018.d.tooltip
+		trigger = {
+			owner = {
+				NOT = { has_country_flag = stellarite_project_success }
+			}
+		}
+		hidden_effect = {
+			random_system = {
+				limit = {
+					has_star_flag = guardians_stellarite_system
+				}
+				random_system_planet = {
+					limit = {
+						is_star = yes
+					}
+					change_planet_size = 8
+					planet_event = { id = leviathans.1019 }
+				}
+				every_system_planet = {
+					limit = {
+						is_star = no
+						is_asteroid = no
+					}
+					spawn_planet_temperature_effect = yes
+					remove_modifier = stellarite_low_temp
+					if = {
+						limit = {
+							is_planet_class = orbit_frozen_telluric
+							NOT = { has_planet_flag = stellarite_terraformed }
+						}
+						change_pc = pc_arctic
+						set_planet_flag = stellarite_terraformed
+						remove_modifier = atmosphere-thin
+						convert_vanilla_habitable = yes
+					}
+					else_if = {
+						limit = {
+							is_planet_class = orbit_frozen_telluric
+							NOT = { has_planet_flag = stellarite_terraformed }
+							solar_system = {
+								has_star_flag = gaia_planet_gained
+							}
+						}
+						increase_planet_temperature = yes
+						set_planet_flag = stellarite_terraformed
+						#reroll_planet = yes
+					}
+					else = {
+						increase_planet_temperature = yes
+						set_planet_flag = stellarite_terraformed
+						#reroll_planet = yes
+					}
+				}
+			}
+		}
+	}
+}

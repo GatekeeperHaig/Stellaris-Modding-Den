@@ -138,6 +138,7 @@ hauer_system_initializer = {
 
 		moon = {
 			count = { min = 2 max = 2 } flags = { erasable }
+			flags = { frigid_zone }
 			orbit_angle = { min = 90 max = 270 }
 			orbit_distance = @base_moon_distance
 		}
@@ -166,6 +167,7 @@ hauer_system_initializer = {
 		
 		moon = {
 			count = { min = 1 max = 1 } flags = { erasable }
+			flags = { frigid_zone }
 			orbit_angle = { min = 90 max = 270 }
 			orbit_distance = @base_moon_distance
 		}
@@ -1288,6 +1290,12 @@ lost_colony_1 = {
 				NOT = {
 					has_country_flag = parent_system_spawned
 					species_portrait = human
+					# don't spawn if AI-generated and adv start disabled
+					# see game_start.1
+					AND = {
+						is_ai = yes
+						check_galaxy_setup_value = { setting = num_advanced_empires value < 1 }
+					}
 				}
 			}
 			NOT = { has_star_flag = empire_cluster }
@@ -1329,10 +1337,16 @@ lost_colony_1 = {
 
 	change_orbit = 6 #34
 	planet = {
-		count = 0
+		count = 1
 		orbit_distance = 0
 		orbit_angle = { min = 90 max = 270 }
+		home_planet = yes
+		class = pc_continental
+		size = { min = 18 max = 22 }
 		flags = { warm_eco_zone } #ideal for hot dry worlds with water hydrospheres
+		deposit_blockers = none
+		modifiers = none
+		flags = { lost_colony_homeworld }
 
 		init_effect = {	
 			prevent_anomaly = yes
@@ -1387,6 +1401,7 @@ lost_colony_1 = {
 				country_event = { id = game_start.33 days = 1 } # needs delay for system ownership to settle
 				owner_species = { set_species_homeworld = prevprev }
 				set_name = random # Fixes some naming issues
+				log = "LOST COLONY PARENT CREATED"
 			}
 		}
 		
@@ -1853,7 +1868,7 @@ lost_colony_neighbor_t1_first_colony = {
 				flags = { cool_eco_zone } #ideal for cold worlds with water hydrospheres
 			}
 			moon = {
-				count = 0
+				count = 1
 				class = pc_continental
 				modifiers = none
 				anomaly = none
@@ -2319,7 +2334,7 @@ scion_fallen_1 = {
 					civic = civic_lethargic_leadership
 					civic = civic_empire_in_decline
 				}
-				species = last_created
+				species = last_created_species
 				ethos = {
 					ethic = ethic_fanatic_materialist
 				}
@@ -2359,12 +2374,8 @@ scion_fallen_1 = {
 			add_building = building_nourishment_center
 			add_building = building_nourishment_center
 			add_building = building_class_4_singularity
-			add_building = building_class_4_singularity
-			add_building = building_class_4_singularity
 			add_building = building_dimensional_fabricator
 			add_building = building_dimensional_fabricator
-			add_building = building_dimensional_fabricator
-			add_building = building_nano_forge
 			add_building = building_nano_forge
 			add_building = building_nano_forge
 			while = {
@@ -2397,6 +2408,7 @@ scion_fallen_1 = {
 					save_event_target_as = scion_vassal
 				}
 				set_country_flag = scion_master
+				save_event_target_as = scion_master
 				add_opinion_modifier = {
 					who = event_target:scion_vassal
 					modifier = opinion_scion
@@ -2413,6 +2425,8 @@ scion_fallen_1 = {
 						modifier = opinion_scion
 					}
 					country_event = { id = origin.10 days = 3 }
+					
+					create_scion_wormhole_link = yes
 				}
 			}
 			event_target:scion_fe = { create_fe_servant_robots = yes }
@@ -2574,7 +2588,7 @@ scion_fallen_2 = {
 					civic = civic_lethargic_leadership
 					civic = civic_empire_in_decline
 				}
-				species = last_created
+				species = last_created_species
 				ethos = {
 					ethic = ethic_fanatic_spiritualist
 				}			
@@ -2613,16 +2627,12 @@ scion_fallen_2 = {
 			add_building = building_fe_dome
 			add_building = building_fe_dome
 			add_building = building_fe_dome
-			add_building = building_fe_dome
-			add_building = building_fe_dome
-			add_building = building_fe_dome
 			add_building = building_fe_stronghold
 			add_building = building_fe_stronghold
 			add_building = building_dimensional_fabricator			
 			add_building = building_class_4_singularity
 			add_building = building_class_4_singularity
 			add_building = building_nano_forge
-			add_building = building_nano_forge	
 			add_building = building_nano_forge
 			while = {
 				count = 14
@@ -2662,6 +2672,7 @@ scion_fallen_2 = {
 			}
 			event_target:scion_fe = {
 				set_country_flag = scion_master
+				save_event_target_as = scion_master
 				add_opinion_modifier = {
 					who = event_target:scion_vassal
 					modifier = opinion_scion
@@ -2679,6 +2690,8 @@ scion_fallen_2 = {
 					modifier = opinion_scion
 				}
 				country_event = { id = origin.10 days = 3 }
+				
+				create_scion_wormhole_link = yes
 			}		
 		}
 
@@ -2721,8 +2734,6 @@ scion_fallen_2 = {
 			add_building = building_fe_dome
 			add_building = building_fe_dome
 			add_building = building_fe_dome
-			add_building = building_fe_dome
-			add_building = building_nano_forge
 			add_building = building_fe_stronghold
 			add_building = building_fe_stronghold
 			add_building = building_class_4_singularity
@@ -2918,13 +2929,11 @@ shattered_ring_start = {
 			type = "ring_world_ruined"
 			orbit_angle = 0
 			orbit_distance = 45
-			location = planet
 		}
 		spawn_megastructure = {
 			type = "ring_world_ruined"
 			orbit_angle = 180
 			orbit_distance = 45
-			location = planet
 		}
 	}
 
@@ -3245,7 +3254,7 @@ mega_shipyard_init_01 = {
 	init_effect = {		
 		spawn_megastructure = { 
 			type = "mega_shipyard_ruined" 
-			location = star
+			planet = star
 
 			init_effect = {
 				create_ambient_object = {
@@ -3723,7 +3732,7 @@ wenkwort_initializer = {
 		type = icy_asteroid_belt
 		radius = 350
 	}
-	flags = { wenkwort_system }
+	flags = { wenkwort_system white_star atw_edited }
 	
 	usage = misc_system_init	#The game can pick this initialiser randomly for misc. purposes, i.e those which have not been initialised by empires or fallen empires
 	usage_odds = {
@@ -3917,8 +3926,8 @@ sol_system_void_dweller_system = {
 	
 	planet = {
 		name = "NAME_Mercury"
-		class = "pc_radiated"
-		entity = "radiated_planet_01_entity"
+		class = "orbit_iron_telluric"
+		entity = "iron_telluric_planet_01_entity"
 		orbit_distance = 20
 		orbit_angle = 15
 		size = 13
@@ -3928,8 +3937,8 @@ sol_system_void_dweller_system = {
 	
 	planet = {
 		name = "NAME_Venus"
-		class = "pc_hot_reducing"
-		entity = "hot_reducing_planet_01_entity"
+		class = "orbit_hothouse_toxic"
+		flags = { planet_converted }
 		orbit_distance = 15 #35
 		orbit_angle = 125
 		size = 18
@@ -3939,7 +3948,7 @@ sol_system_void_dweller_system = {
 	
 	planet = {
 		name = "NAME_Old_Earth"
-		class = "pc_toxic"
+		class = "orbit_hothouse_toxic"
 		orbit_distance = 15 #50
 		orbit_angle = 120
 		size = 19
@@ -3961,7 +3970,7 @@ sol_system_void_dweller_system = {
 		
 		moon = {
 			name = "NAME_Luna"
-			class = "pc_barren_cold"
+			class = "orbit_silicate_telluric"
 			size = 11
 			orbit_distance = 2
 			orbit_angle = 40
@@ -3989,7 +3998,7 @@ sol_system_void_dweller_system = {
 	
 	planet = {
 		name = "NAME_Mars"
-		class = "pc_barren"
+		class = "orbit_dusty_telluric"
 		orbit_distance = 20 #70
 		orbit_angle = 60
 		flags = {
@@ -4007,6 +4016,10 @@ sol_system_void_dweller_system = {
 			set_planet_entity = { picture = pc_barren_mars entity = barren_planet_mars_entity }
 			clear_deposits = yes
 			add_deposit = d_minerals_3
+			add_modifier = {
+				modifier = "terraforming_candidate"
+				days = -1
+			}
 		}
 
 		moon = {
@@ -4026,10 +4039,11 @@ sol_system_void_dweller_system = {
 	
 	planet = {
 		name = "NAME_1_Ceres"
-		class = "pc_asteroid"
+		class = "orbit_silicate_telluric"
+		entity = "silicate_telluric_planet_01_entity"
 		orbit_distance = 30 #100
 		orbit_angle = -210
-		size = 5
+		size = 7
 		has_ring = no
 	}
 	
@@ -4038,7 +4052,7 @@ sol_system_void_dweller_system = {
 		class = "pc_asteroid"
 		orbit_distance = 0
 		orbit_angle = -95
-		size = 5
+		size = 4
 		has_ring = no
 	}
 	
@@ -4047,7 +4061,7 @@ sol_system_void_dweller_system = {
 		class = "pc_asteroid"
 		orbit_distance = 0
 		orbit_angle = 285
-		size = 5
+		size = 3
 		has_ring = no
 	}
 	
@@ -4056,25 +4070,25 @@ sol_system_void_dweller_system = {
 		class = "pc_asteroid"
 		orbit_distance = 0
 		orbit_angle = -80
-		size = 5
+		size = 4
 		has_ring = no
 	}
 	
 	planet = {
 		name = "NAME_Jupiter"
-		class = "pc_gas_giant"
+		class = "orbit_ammonia-clouded_giant"
 		orbit_distance = 40 #140
-		flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
 		orbit_angle = -160
 		size = 35
 		has_ring = no
-		entity = "gas_giant_jupiter_entity"
+		entity = "ammonia-clouded_giant_01_entity"
+		flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
 		
 		moon = {
 			name = "NAME_Io"
-			class = "pc_volcanic"
+			class = "orbit_volcanic_telluric"
 			flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
-			entity = "io_entity"
+			entity = "volcanic_telluric_planet_03_entity"
 			size = 11
 			orbit_distance = 7
 			orbit_angle = 110
@@ -4082,20 +4096,26 @@ sol_system_void_dweller_system = {
 		}
 		moon = {
 			name = "NAME_Europa"
-			class = "pc_frozen"
+			class = "orbit_frozen_telluric"
 			flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
-			entity = "frozen_planet_05_entity"
+			entity = "frozen_telluric_planet_01_entity"
 			size = 11
 			orbit_distance = 1
 			orbit_angle = 60
 			has_ring = no
-			flags = { sol_europa }
+			
+			init_effect = {
+				add_modifier = {
+					modifier = "subterranean_icy_candidate"
+					days = -1
+				}
+			}
 		}
 		moon = {
 			name = "NAME_Ganymede"
-			class = "pc_frozen"
+			class = "orbit_frozen_telluric"
 			flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
-			entity = "frozen_planet_06_entity"
+			entity = "frozen_telluric_planet_02_entity"
 			size = 14
 			orbit_distance = 2
 			orbit_angle = 80
@@ -4103,9 +4123,9 @@ sol_system_void_dweller_system = {
 		}
 		moon = {
 			name = "NAME_Callisto"
-			class = "pc_frozen"
+			class = "orbit_frozen_telluric"
 			flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
-			entity = "frozen_planet_07_entity"
+			entity = "frozen_telluric_planet_03_entity"
 			size = 13
 			orbit_distance = 2
 			orbit_angle = -155
@@ -4115,12 +4135,12 @@ sol_system_void_dweller_system = {
 	
 	planet = {
 		name = "NAME_Saturn"
-		class = "pc_gas_giant"
+		class = "orbit_ammonia-clouded_giant"
 		orbit_distance = 50 #190
 		orbit_angle = 170
 		size = 30
 		has_ring = yes
-		entity = "gas_giant_saturn_entity"
+		entity = "ammonia-clouded_giant_02_entity"
 		flags = {
 			ignore_startup_effect
 			habitat_3_planet
@@ -4128,15 +4148,9 @@ sol_system_void_dweller_system = {
 		}
 		flags = { frigid_zone } #possible frozen water or ammonia hydrospheres only in jovian moons
 
-		init_effect = {
-			clear_deposits = yes
-			add_deposit = d_energy_4
-		}
-
 		moon = {
 			name = "Rhea"
-			class = "pc_frozen"
-			entity = "frozen_planet_04_entity"
+			class = "orbit_icy"
 			size = 6
 			orbit_distance = 11
 			orbit_angle = { min = 90 max = 270 }
@@ -4145,8 +4159,7 @@ sol_system_void_dweller_system = {
 		}
 		moon = {
 			name = "NAME_Titan"
-			class = "pc_cold_reducing"
-			entity = "cold_reducing_planet_01_entity"
+			class = "orbit_methane_toxic"
 			size = 14
 			orbit_distance = 2
 			orbit_angle = 320
@@ -4171,29 +4184,29 @@ sol_system_void_dweller_system = {
 	
 	planet = {
 		name = "NAME_Uranus"
-		class = "pc_ice_giant"
+		class = "orbit_frigid_giant"
 		orbit_distance = 70 #260
 		orbit_angle = 125
-		size = 20
+		size = 26
 		has_ring = no
-		entity = "gas_giant_uranus_entity"
+		#entity = "gas_giant_uranus_entity"
 		flags = { frigid_zone } #possible frozen water or ammonia hydrospheres only in jovian moons
 	}
 	
 	planet = {
 		name = "NAME_Neptune"
-		class = "pc_ice_giant"
+		class = "orbit_methane_giant"
 		orbit_distance = 60 #320
 		orbit_angle = -195
-		size = 20
+		size = 26
 		has_ring = no
-		entity = "gas_giant_neptune_entity"
+		entity = "methane_giant_01_entity"
 		flags = { frigid_zone } #possible frozen water or ammonia hydrospheres only in jovian moons
 		
 		moon = {
 			name = "NAME_Triton"
-			class = "pc_frozen"
-			entity = "frozen_planet_01_entity"
+			class = "orbit_frozen_telluric"
+			entity = "frozen_telluric_planet_01_entity"
 			size = 11
 			orbit_distance = 7
 			orbit_angle = 115
@@ -4204,12 +4217,12 @@ sol_system_void_dweller_system = {
 	
 	planet = {
 		name = "NAME_134340_Pluto"
-		class = "pc_frozen"
+		class = "orbit_frozen_telluric"
 		orbit_distance = 50 #370
 		orbit_angle = -210
 		size = 9
 		has_ring = no
-		entity = "dwarf_planetoid_05_entity"
+		entity = "frozen_telluric_planet_04_entity"
 		flags = { frigid_zone } #possible frozen water or ammonia hydrospheres only in jovian moons
 	}
 	

@@ -1,6 +1,7 @@
-@distance = 50
 @base_moon_distance = 1
+@sub_giant_moon_distance = 3
 @giant_moon_distance = 6
+@super_giant_moon_distance = 16
 @jumps = 3
 
 ### Aldaberan System initializer for playing the Commonwealth of Man
@@ -10,10 +11,11 @@
 ### Commonwealth of Man's Aldebaran System
 com_aldebaran_system = {
 	name = "NAME_Aldebaran"
+	
 	class = "sc_binary_father_and_son_3"
 	asteroid_belt = {
 		type = rocky_asteroid_belt
-		radius = 90
+		radius = 140
 	}
 
 	init_effect = {
@@ -27,7 +29,7 @@ com_aldebaran_system = {
 		generate_home_system_resources = yes
 	}
 	
-	flags = { empire_home_system aldebaran_system }
+	flags = { empire_home_system atw_edited aldebaran_system research_deposit_spawned }
 	
 	usage = custom_empire
 	
@@ -36,68 +38,123 @@ com_aldebaran_system = {
 		class = star
 		orbit_distance = 0
 		orbit_angle = 0
-		size = 30
+		size = 31
+		flags = { ignore_startup_effect starting_research_target }
 		has_ring = no
+		init_effect = {
+			clear_deposits = yes
+			add_modifier = {
+				modifier = "dying_star"
+				days = -1
+			}
+			add_deposit = d_physics_4
+		}
 	}
 	
 	planet = {
-		name = "NAME_Inferno"
+		name = "NAME_Helios"
 		class = "pc_broken"
 		orbit_distance = 25
 		orbit_angle = 45
 		size = 10
 		has_ring = no
+		flags = { torrid_zone } #only scorched and molten rocky worlds or hot giants
+	}
+
+	planet = {
+		name = "NAME_Inferno"
+		class = "orbit_chthonian"
+		orbit_distance = 25 #50
+		orbit_angle = 45
+		size = 16
+		has_ring = no
+		flags = { torrid_zone } #only scorched and molten rocky worlds or hot giants
 	}
 
 	planet = {
 		name = "NAME_Olympus"
 		class = star
-		orbit_distance = 35
+		orbit_distance = 45 #95
 		orbit_angle = 200
 		size = 20
 		has_ring = no
 		
 		planet = {
 			name = "NAME_New_Luna"
-			class = "pc_barren_cold"
-			size = 12
+			class = "orbit_silicate_telluric"
+			size = 6
 			orbit_distance = 8
 			orbit_angle = 100
 			has_ring = no
+			flags = { temperate_eco_zone } #ideal for temperate worlds with water hydrospheres
 		}
 		planet = {
 			name = "NAME_Unity"
 			class = ideal_planet_class
-			flags = { unity }
+			flags = { unity scripted }
+			flags = { temperate_eco_zone } #ideal for temperate worlds with water hydrospheres
 			orbit_distance = 2
 			orbit_angle = 340
 			size = 18
 			starting_planet = yes
-			has_ring = no
-			entity = "continental_planet_01_entity"	
+			has_ring = yes
 			deposit_blockers = none
 			modifiers = none
 			
 			init_effect = {
 				prevent_anomaly = yes
+				# Spawn Temperature modifier
+				spawn_temperature_zone_modifier = yes
+				set_planet_flag = "temperature_spawned"
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-continental"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_abundant"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-primal"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				# Convert planet class manually and set picture/entity
+				change_pc = "pc_geocrystallic"
+				set_planet_entity = { picture = biome_geocrystallic entity = gd_geocrystallic_planet_01_entity }
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
 			}
 		
-			init_effect = {
-				generate_empire_home_planet = yes		
-			}
 		}
 		planet = {
 			name = "NAME_Marble"
-			class = "pc_barren_cold"
+			class = "orbit_water_panthalassic"
+			flags = { temperate_eco_zone } #ideal for temperate worlds with water hydrospheres
 			orbit_distance = 3
 			orbit_angle = 160
-			size = 14
+			size = 16
 			has_ring = no
+
 			init_effect = {
 				add_modifier = {
-					modifier = "subterranean_rocky_candidate"
+					modifier = "shallow_water_world"
 					days = -1
 				}
+				set_planet_entity = { entity = water_panthalassic_planet_01_entity }
+				set_planet_flag = "deposit_spawned"
 			}
 		}
 	}
@@ -105,7 +162,7 @@ com_aldebaran_system = {
 	planet = {
 		name = "NAME_DT4-298"
 		class = "pc_asteroid"
-		orbit_distance = 30
+		orbit_distance = 45 #140
 		orbit_angle = 340
 		size = 5
 		has_ring = no
@@ -133,33 +190,27 @@ com_aldebaran_system = {
 	
 	planet = {
 		name = "NAME_Hyperion"
-		class = "pc_gas_giant"
-		orbit_distance = 45
+		class = "orbit_turbulent_giant"
+		has_ring = yes
+		orbit_distance = 45 #185
 		orbit_angle = 110
 		size = 30
 		has_ring = no
-		entity = "gas_giant_05_entity"
+		flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
 		
 		moon = {
-			name = "NAME_Helios"
-			flags = { aldebaran_helios }
-			class = "pc_frozen"
-			size = 12
-			orbit_distance = 7
-			orbit_angle = 14
-			has_ring = no
-		}
-		moon = {
 			name = "NAME_Tumbleweed"
-			class = "pc_barren"
-			orbit_distance = 1.5
+			class = "orbit_dusty_telluric"
+			flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
+			orbit_distance = 6
 			orbit_angle = 35
 			size = 15
 			has_ring = no
 		}
 		moon = {
 			name = "NAME_Jackson's_Planet"
-			class = "pc_ethaneworld"
+			class = "orbit_volcanic_telluric"
+			flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
 			orbit_distance = 2
 			orbit_angle = 150
 			size = 13
@@ -167,54 +218,46 @@ com_aldebaran_system = {
 	}
   
 	planet = {
+		name = "Aldebaran B"
 		count = 1
 		class = star
-		orbit_distance = 125
+		orbit_distance = 125 #310
 		orbit_angle = 180
-		size = 25
+		size = 23
 		has_ring = no
 		satellite_naming_policy = upper_case_roman_numerals
 	
-	
 		change_orbit = 10
 	
-		# Eco Zone
-	
+		# Inner Zone
 		planet = {
 			count = 1
 			orbit_distance = 5
-			orbit_angle = { min = 90 max = 270 }
-			class = "pc_desolate"
+			orbit_angle = 360
+			class = "orbit_hothouse_toxic"
 			size = 15
 			has_ring = no
 			#deposit_blockers = none
 			flags = { aldebaran_ki }
-		
-			init_effect = {
-				
-			}
-		
-			change_orbit = @base_moon_distance
-			moon = {
-				count = 1
-				orbit_angle = { min = 90 max = 270 }
-				orbit_distance = { min = 1 max = 2 }
-				class = "pc_frozen"
-			}
+			flags = { hot_zone } #possible limited water hydrosphere only on tidally-locked's dark sides
 		}
 		
+		change_orbit = 6
+
 		# Outer Zone
 		planet = {
 			count = 2
 			orbit_distance = { min = 4 max = 10 }
 			orbit_angle = { min = 90 max = 270 }
-			class = rl_outer_cold_planet
+			class = "ph_terran"
+			flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
 			change_orbit = @base_moon_distance
 			moon = {
 				count = { min = 0 max = 1 }
 				orbit_angle = { min = 90 max = 270 }
 				orbit_distance = { min = 1 max = 2 }
-				class = rl_outer_cold_moon
+				class = "ph_dwarf"
+				flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
 			}
 		}
 	
@@ -238,7 +281,7 @@ une_aldebaran_system = {
 	class = "sc_binary_father_and_son_3"
 	asteroid_belt = {
 		type = rocky_asteroid_belt
-		radius = 90
+		radius = 140
 	}
 
 	init_effect = {
@@ -251,7 +294,7 @@ une_aldebaran_system = {
 		generate_home_system_resources = yes
 	}
 	
-	flags = { empire_home_system aldebaran_system }
+	flags = { empire_home_system atw_edited aldebaran_system research_deposit_spawned }
 	
 	usage = misc_system_init
 
@@ -266,7 +309,7 @@ une_aldebaran_system = {
 			NOT = { has_star_flag = empire_cluster }
 			num_ai_empires_setting  >= 1
 			
-			#add = 99999
+			add = 99999
 		}
 	}
 
@@ -277,50 +320,104 @@ une_aldebaran_system = {
 		class = star
 		orbit_distance = 0
 		orbit_angle = 0
-		size = 30
+		size = 31
+		flags = { ignore_startup_effect starting_research_target }
 		has_ring = no
+		init_effect = {
+			clear_deposits = yes
+			add_modifier = {
+				modifier = "dying_star"
+				days = -1
+			}
+			add_deposit = d_physics_4
+		}
 	}
 	
 	planet = {
-		name = "NAME_Inferno"
+		name = "NAME_Helios"
 		class = "pc_broken"
 		orbit_distance = 25
 		orbit_angle = 45
 		size = 10
 		has_ring = no
+		flags = { torrid_zone } #only scorched and molten rocky worlds or hot giants
+	}
+
+	planet = {
+		name = "NAME_Inferno"
+		class = "orbit_chthonian"
+		orbit_distance = 25 #50
+		orbit_angle = 45
+		size = 16
+		has_ring = no
+		flags = { torrid_zone } #only scorched and molten rocky worlds or hot giants
 	}
 
 	planet = {
 		name = "NAME_Olympus"
 		class = star
-		orbit_distance = 35
+		orbit_distance = 45 #95
 		orbit_angle = 200
 		size = 20
 		has_ring = no
 		
 		planet = {
 			name = "NAME_New_Luna"
-			class = "pc_barren_cold"
-			size = 12
+			class = "orbit_silicate_telluric"
+			size = 6
 			orbit_distance = 8
 			orbit_angle = 100
 			has_ring = no
+			flags = { temperate_eco_zone } #ideal for temperate worlds with water hydrospheres
 		}
 		planet = {
 			name = "NAME_Unity"
 			class = "pc_geocrystallic"
 			flags = { unity planet_converted }
+			flags = { temperate_eco_zone } #ideal for temperate worlds with water hydrospheres
 			orbit_distance = 2
 			orbit_angle = 340
 			size = 18
 			starting_planet = yes
-			has_ring = no
+			has_ring = yes
 			deposit_blockers = none
 			modifiers = none
 		
 			init_effect = {
 				prevent_anomaly = yes
-				#check_pc_geocrystallic = yes
+				# Spawn Temperature modifier
+				spawn_temperature_zone_modifier = yes
+				set_planet_flag = "temperature_spawned"
+				# Spawn Lithosphere modifier
+				add_modifier = {
+					modifier = "lithosphere-continental"
+					days = -1
+				}
+				# Spawn Hydrosphere modifier
+				add_modifier = {
+					modifier = "hydrosphere-water_abundant"
+					days = -1
+				}
+				# Spawn Biosphere modifier
+				add_modifier = {
+					modifier = "biosphere-primal"
+					days = -1
+				}
+				# Spawn Atmosphere modifier
+				add_modifier = {
+					modifier = "atmosphere-optimal"
+					days = -1
+				}
+				# Spawn Gravity modifier
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				# Convert planet class manually and set picture/entity
+				change_pc = "pc_geocrystallic"
+				set_planet_entity = { picture = biome_geocrystallic entity = gd_geocrystallic_planet_01_entity }
+				generate_start_deposits_and_blockers = yes
+				set_planet_flag = "planet_converted"
 				random_country = {
 					limit = { has_country_flag = human_1 }
 					save_event_target_as = une
@@ -330,6 +427,7 @@ une_aldebaran_system = {
 				}
 				create_country = {
 					name = "NAME_Commonwealth_of_Man"
+					adjective = "PRESCRIPTED_adjective_humans2"
 					authority = "auth_dictatorial"
 
 
@@ -387,7 +485,7 @@ une_aldebaran_system = {
 					owner = event_target:npc_CoM
 				}
 				#generate_start_deposits_and_blockers = yes
-				clear_blockers = yes
+				#clear_blockers = yes
 				generate_start_buildings_and_districts = yes
 				generate_start_pops = yes
 				event_target:npc_CoM = {
@@ -402,16 +500,20 @@ une_aldebaran_system = {
 		}
 		planet = {
 			name = "NAME_Marble"
-			class = "pc_barren_cold"
+			class = "orbit_water_panthalassic"
+			flags = { temperate_eco_zone } #ideal for temperate worlds with water hydrospheres
 			orbit_distance = 3
 			orbit_angle = 160
-			size = 14
+			size = 16
 			has_ring = no
+
 			init_effect = {
 				add_modifier = {
-					modifier = "subterranean_rocky_candidate"
+					modifier = "shallow_water_world"
 					days = -1
 				}
+				set_planet_entity = { entity = water_panthalassic_planet_01_entity }
+				set_planet_flag = "deposit_spawned"
 			}
 		}
 	}
@@ -419,7 +521,7 @@ une_aldebaran_system = {
 	planet = {
 		name = "NAME_DT4-298"
 		class = "pc_asteroid"
-		orbit_distance = 30
+		orbit_distance = 45 #140
 		orbit_angle = 340
 		size = 5
 		has_ring = no
@@ -447,39 +549,27 @@ une_aldebaran_system = {
 	
 	planet = {
 		name = "NAME_Hyperion"
-		class = "pc_gas_giant"
-		orbit_distance = 45
+		class = "orbit_turbulent_giant"
+		has_ring = yes
+		orbit_distance = 45 #185
 		orbit_angle = 110
 		size = 30
 		has_ring = no
-		entity = "gas_giant_05_entity"
+		flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
 		
 		moon = {
-			name = "NAME_Helios"
-			flags = { aldebaran_helios }
-			class = "pc_frozen"
-			size = 12
-			orbit_distance = 7
-			orbit_angle = 14
-			has_ring = no
-		}
-		moon = {
 			name = "NAME_Tumbleweed"
-			class = "pc_barren"
-			orbit_distance = 1.5
+			class = "orbit_dusty_telluric"
+			flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
+			orbit_distance = 6
 			orbit_angle = 35
 			size = 15
 			has_ring = no
-			init_effect = {
-				add_modifier = {
-					modifier = "terraforming_candidate"
-					days = -1
-				}
-			}
 		}
 		moon = {
 			name = "NAME_Jackson's_Planet"
-			class = "pc_ethaneworld"
+			class = "orbit_volcanic_telluric"
+			flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
 			orbit_distance = 2
 			orbit_angle = 150
 			size = 13
@@ -487,54 +577,46 @@ une_aldebaran_system = {
 	}
   
 	planet = {
+		name = "Aldebaran B"
 		count = 1
 		class = star
-		orbit_distance = 125
+		orbit_distance = 125 #310
 		orbit_angle = 180
-		size = 25
+		size = 23
 		has_ring = no
 		satellite_naming_policy = upper_case_roman_numerals
 	
-	
 		change_orbit = 10
 	
-		# Eco Zone
-	
+		# Inner Zone
 		planet = {
 			count = 1
 			orbit_distance = 5
-			orbit_angle = { min = 90 max = 270 }
-			class = "pc_desolate"
+			orbit_angle = 360
+			class = "orbit_hothouse_toxic"
 			size = 15
 			has_ring = no
 			#deposit_blockers = none
 			flags = { aldebaran_ki }
-		
-			init_effect = {
-				
-			}
-		
-			change_orbit = @base_moon_distance
-			moon = {
-				count = 1
-				orbit_angle = { min = 90 max = 270 }
-				orbit_distance = { min = 1 max = 2 }
-				class = "pc_frozen"
-			}
+			flags = { hot_zone } #possible limited water hydrosphere only on tidally-locked's dark sides
 		}
 		
+		change_orbit = 6
+
 		# Outer Zone
 		planet = {
 			count = 2
 			orbit_distance = { min = 4 max = 10 }
 			orbit_angle = { min = 90 max = 270 }
-			class = rl_outer_cold_planet
+			class = "ph_terran"
+			flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
 			change_orbit = @base_moon_distance
 			moon = {
 				count = { min = 0 max = 1 }
 				orbit_angle = { min = 90 max = 270 }
 				orbit_distance = { min = 1 max = 2 }
-				class = rl_outer_cold_moon
+				class = "ph_dwarf"
+				flags = { cold_zone } #possible frozen water or ammonia hydrospheres, or liquid water on tidally-locked's day sides
 			}
 		}
 	
