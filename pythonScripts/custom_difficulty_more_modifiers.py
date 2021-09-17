@@ -80,7 +80,7 @@ def main():
   immediate.add_event("name_randomDiffFireOnlyOnce")
   immediate.add("set_country_flag", "custom_difficulty_game_host")
   immediate.add("random_galaxy_planet", TagList("save_global_event_target_as", "custom_difficulty_MM_var_storage"))
-  immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_MM_var_storage"))
+  # immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_MM_var_storage"))
   gameStartAfter=TagList()
   gameStartInitEvent.add("after",TagList("hidden_effect", gameStartAfter))
   gameStartAfter.add("set_global_flag", "custom_difficultyMM_active")
@@ -91,7 +91,7 @@ def main():
   cdNotActive.add("set_global_flag", "MM_was_active_before_custom_difficulty")
   cdNotActive.addComment("main mod event target to save randomnessfactor:")
   cdNotActive.add("random_galaxy_planet", TagList("save_global_event_target_as", cdf.ET.replace("event_target:","")))
-  cdNotActive.add("random_planet", TagList("save_global_event_target_as", cdf.ET.replace("event_target:","")))
+  # cdNotActive.add("random_planet", TagList("save_global_event_target_as", cdf.ET.replace("event_target:","")))
 
 
   mainFileContent.add("","","#more modifiers main event")

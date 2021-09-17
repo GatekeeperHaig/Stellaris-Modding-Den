@@ -326,7 +326,7 @@ def main():
           locClass.addEntry("custom_difficulty_{}_{}_inc_desc".format(cat,bonusesListName),"{0} @{1} : 1 @step @increase @every [this.custom_difficulty_{2}_{3}_value] @years".format(icons, bonusesListName, cat,firstVarName)) #local tmp var
           locClass.addEntry("custom_difficulty_{}_{}_dec_desc".format(cat,bonusesListName),"{0} @{1} : 1 @step @decrease @every [this.custom_difficulty_{2}_{3}_value] @years".format(icons, bonusesListName, cat,firstVarName)) #local tmp var
           #create a local variable and make sure it is positive!
-          immediate.add("set_variable", TagList().add("which", localVarName).add("value",ET))
+          immediate.variableOp("set",localVarName, ET)
           immediateIf=TagList().add("limit",TagList().add("check_variable",checkVar)) #<0
           immediateIf.add("multiply_variable", TagList().add("which", localVarName).add("value","-1"))
           immediate.add("if",immediateIf)
@@ -344,7 +344,7 @@ def main():
         locClass.addEntry("custom_difficulty_{}_{}_inc_desc".format(cat,bonus),"{} §{}@{} : 1 @step @increase @every [this.custom_difficulty_{}_{}_value] @years".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonus)) #local tmp var
         locClass.addEntry("custom_difficulty_{}_{}_dec_desc".format(cat,bonus),"{} §{}@{} : 1 @step @decrease @every [this.custom_difficulty_{}_{}_value] @years".format(possibleBoniIcons[bonusI], possibleBoniColor[bonusI], bonus, cat,bonus)) #local tmp var
         #create a local variable and make sure it is positive!
-        immediate.add("set_variable", TagList().add("which", localVarName).add("value",ET))
+        immediate.variableOp("set",localVarName, ET)
         immediateIf=TagList().add("limit",TagList().add("check_variable",checkVar)) #<0
         immediateIf.add("multiply_variable", TagList().add("which", localVarName).add("value","-1"))
         immediate.add("if",immediateIf)
@@ -703,9 +703,7 @@ def main():
           continue
         et.add("set_variable", TagList().add("which", "custom_difficulty_{}_value".format(bonus)).add("value", "custom_difficulty_{}_{}_value".format(cat,bonus)))
         ifChanged=TagList("limit", TagList("not", 
-          TagList("check_variable", 
-            TagList("which","custom_difficulty_{}_value".format(bonus))
-            .add("value", ET))))
+          variableOpNew("check","custom_difficulty_{}_value".format(bonus), ET)))
         # ifChanged=TagList("limit", TagList("not", 
         #   TagList("check_variable", 
         #     TagList("which","custom_difficulty_{}_value".format(bonus))
@@ -714,7 +712,7 @@ def main():
         ifChanged.add("set_country_flag", "custom_difficulty_{}_changed".format(bonus))
         if debugMode:
           ifChanged.add("log",'"setting flag {}"'.format("custom_difficulty_{}_changed".format(bonus)))
-        ifChanged.add("set_variable", TagList().add("which", "custom_difficulty_{}_value".format(bonus)).add("value", ET))
+        ifChanged.variableOp("set","custom_difficulty_{}_value".format(bonus), ET)
         if bonus=="minerals":
           ifChanged.createReturnIf(TagList("has_global_flag","core_game_mechanics_and_ai")).add("check_country_imbalanced_difficulty_bonuses","yes")
         if cat in modifierCats: #only create the modifier for these cats. Rest use the same as one of those!
@@ -815,7 +813,7 @@ def main():
 
   removeALLmodifiersEvent=TagList("id", name_removeAllModifiers)
   removeEvents.addComment("remove ALL modifier no matter what. Slow but sure. Not called on yearly stuff.")
-  removeEvents.add("event", removeALLmodifiersEvent)
+  removeEvents.add("country_event", removeALLmodifiersEvent)
   removeALLmodifiersEvent.add("is_triggered_only",yes)
   removeALLmodifiersEvent.add("hide_window",yes)
   everyCountry=TagList()
@@ -828,7 +826,7 @@ def main():
 
   removeEventTargetEvent=TagList("id", name_removeEventTarget)
   removeEvents.addComment("remove everything on event target. Slow but sure. Not called on yearly stuff.")
-  removeEvents.add("event", removeEventTargetEvent)
+  removeEvents.add("country_event", removeEventTargetEvent)
   removeEventTargetEvent.add("is_triggered_only",yes)
   removeEventTargetEvent.add("hide_window",yes)
   et=TagList()
@@ -1172,7 +1170,7 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
   createEventTarget.add("remove_global_flag","MM_was_active_before_custom_difficulty")
   createEventTarget=immediate.addReturn("else")
   createEventTarget.add("random_galaxy_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
-  createEventTarget.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
+  # createEventTarget.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
   immediate.add(ET,TagList("get_galaxy_setup_value", TagList("which", "custom_difficulty_crisis_strength").add("setting", "crisis_strength_scale")))#.add("scale_by", "3"))
   # gameStartInitEvent.add("option", TagList("name", "OK").add("trigger", TagList(ET,TagList("check_variable",TagList("which", "custom_difficulty_crisis_strength").add("value","0","",">")))))
   for strength in [0.25, 0.5, 1, 2,3,4,5,10,15,20,25]:
@@ -1526,11 +1524,15 @@ TagList.triggeredHidden=triggeredHidden
 
 def variableOpNew(opName, varName, val, sep="=",comment=""):
   self=TagList()
+  if type(val)==str and val.startswith("event_target"):
+    val=f"{val}.{varName}"
   self.add(opName+"_variable", TagList("which", varName).add("value", val, comment,sep))
   return self
 def variableOp(self, opName, varName, val, sep="=",comment=""):
   if self==None:
     self=TagList()
+  if type(val)==str and val.startswith("event_target"):
+    val=f"{val}.{varName}"
   self.add(opName+"_variable", TagList("which", varName).add("value", val, comment,sep))
   return self
 TagList.variableOp=variableOp
