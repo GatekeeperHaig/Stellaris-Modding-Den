@@ -59,6 +59,7 @@ decision_arcology_project = {
 		custom_tooltip = decision_arcology_project_effects
 		hidden_effect = {		
 			clear_deposits = yes
+			set_industrial_focus_flags = yes
 			change_pc = pc_city
 			IF = {
 				limit = { owner = { NOT = { has_trait = trait_pc_aquatic_preference } } }
@@ -113,6 +114,15 @@ decision_arcology_project = {
 			owner = {
 				country_event = { id = distar.201 } # port for living planet distar.197, triggers in event
 			}
+			relic_world_conversion_effect = {
+				DISTRICT = district_arcology_housing
+				VARIABLE = num_housing_districts
+			}
+			relic_world_conversion_effect = {
+				DISTRICT = district_arcology_arms_industry
+				VARIABLE = num_industrial_districts
+			}
+			set_ecu_industrial_districts_effect = yes
 			planet_event = { id = mega.200 }
 			planet_event = { id = pdengine.14 }
 			if = {
@@ -130,7 +140,11 @@ decision_arcology_project = {
 	}
 	
 	ai_weight = {
-		weight = 0
+		weight = 10
+		modifier = { 
+			factor = 0	
+			owner = { any_owned_planet = { is_planet_class = pc_city } }
+		}
 	}
 }
 
@@ -147,12 +161,17 @@ decision_arcology_project_relic = {
 			minerals = 20000
 		}
 	}
-	
+
 	potential = {
 		is_planet_class = pc_relic
 		is_artificial = no
 		exists = owner
-		owner = { is_regular_empire = yes }
+		owner = {
+			OR = {
+				is_regular_empire = yes
+				has_valid_civic = civic_machine_servitor
+			}
+		}
 	}
 	
 	allow = {
@@ -165,7 +184,17 @@ decision_arcology_project_relic = {
 		custom_tooltip = decision_arcology_project_effects
 		hidden_effect = {		
 			clear_deposits = yes
+			set_industrial_focus_flags = yes
 			change_pc = pc_city
+			relic_world_conversion_effect = {
+				DISTRICT = district_arcology_housing
+				VARIABLE = num_housing_districts
+			}
+			relic_world_conversion_effect = {
+				DISTRICT = district_arcology_arms_industry
+				VARIABLE = num_industrial_districts
+			}
+			set_ecu_industrial_districts_effect = yes
 			IF = {
 				limit = { owner = { NOT = { has_trait = trait_pc_aquatic_preference } } }
 				set_planet_entity = {
@@ -242,6 +271,10 @@ decision_arcology_project_relic = {
 	}
 	
 	ai_weight = {
-		weight = 0
+		weight = 10
+		modifier = { 
+			factor = 0	
+			owner = { any_owned_planet = { is_planet_class = pc_city }
+		}
 	}
 }

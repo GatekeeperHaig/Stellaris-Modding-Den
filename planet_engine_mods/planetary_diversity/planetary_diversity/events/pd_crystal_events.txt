@@ -46,11 +46,12 @@ ship_event = {
 	picture = GFX_evt_crystal2
 	location = from
 	show_sound = event_ship_bridge
+	fire_only_once = yes
 
 	is_triggered_only = yes
 
 	trigger = {
-		from = {
+		FROM = {
 			has_planet_flag = crystal_planet
 		}
 		owner = {
@@ -67,199 +68,140 @@ ship_event = {
 
 	immediate = { owner = {	set_country_flag = found_crystal_planet	} }
 
-	option = { name = pdcrystal.20.a }
-}
-
-#Crsytal Temple
-planet_event = {
-	id = pdcrystal.30
-	title = pdcrystal.30.name
-	desc = pdcrystal.30.desc
-	picture = GFX_evt_crystal3
-	show_sound = event_activating_unknown_technology
-	location = root
-
-	pre_triggers = {
-		has_owner = yes
-		is_homeworld = no
-		original_owner = yes
-		has_ground_combat = no
-		is_occupied_flag = no
-	}
-	trigger = {
-		has_planet_flag = crystal_planet				
-		owner = {
-			NOR = {
-				has_country_flag = colony_crystal_temple
-				has_authority = auth_machine_intelligence
-			}
-		}		
-	}
-
-	is_triggered_only = yes
-
-	immediate = {
-		owner = { save_event_target_as = crystal_choice }
-		set_planet_flag = colony_event		
-		set_planet_flag = crystal_temple_choice
-		owner = { set_country_flag = colony_crystal_temple }
-		add_deposit = d_crystal_temple
-	}
-
-	option = {
-		name = "ONSCREEN"
-		hidden_effect = {
-			owner = { country_event = { id = pdcrystal.40 } }
-		}
+	option = { 
+		name = pdcrystal.20.a 
+		owner = { country_event = { id = story.5 days = 30 } }
+		FROM = { create_archaeological_site = pdcrystal_site }
 	}
 }
 
-# Incoming Transmission
-country_event = {
-	id = pdcrystal.40
-	title = "pdcrystal.40.name"
-	desc = "pdcrystal.40.desc"
-	
-	diplomatic = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {	
-		random_owned_leader = {
-			limit = {
-				leader_class = scientist
-			}
-			save_event_target_as = scientist_portrait
-			}
-	}
-		
-	picture_event_data = {
-		portrait = event_target:scientist_portrait
-		room = temple_room
-	}
-	
-	option = {
-		name = pdcrystal.40.a
-		response_text = pdcrystal.40.a.response
-		is_dialog_only = yes
-	}
-	option = {
-		name = pdcrystal.40.b
-		response_text = pdcrystal.40.b.response
-		is_dialog_only = yes
-	}
-	option = {
-		name = pdcrystal.40.c
-		response_text = pdcrystal.40.c.response
-		is_dialog_only = yes
-	}
-	option = {
-		name = pdcrystal.40.d
-		response_text = pdcrystal.40.d.response	
-		hidden_effect = {
-			FROM = { 
-				planet_event = { id = pdcrystal.50 days = 14 }
-			}
-		}
-	}
-}
-
-#Crsytal Temple Choice
-planet_event = {
+#Crystal Arc Event
+fleet_event = { 
 	id = pdcrystal.50
-	title = pdcrystal.50.name
+	title = "pdcrystal.50.name"
 	desc = pdcrystal.50.desc
-	picture = GFX_evt_arguing_senate
-	show_sound = event_activating_unknown_technology
-	location = root
-		
+	picture = GFX_evt_crystal2
+	show_sound = event_mystic_reveal
+	location = from
+
+	archaeology = yes
+
 	is_triggered_only = yes
-	
+
 	option = {
 		name = pdcrystal.50.a
-		custom_tooltip = pdcrystal.50.a.tooltip
-	}
-	
-	option = {
-		name = pdcrystal.50.b
-		custom_tooltip = pdcrystal.50.b.tooltip		
-		hidden_effect = {
-			root = { planet_event = { id = pdcrystal.51 days = 14 } }
-		}
-	}
-	
-	option = {
-		name = pdcrystal.50.c
-		custom_tooltip = pdcrystal.50.c.tooltip
-		remove_deposit = d_crystal_temple
-		add_deposit = d_holy_temple
-		trigger = {
-			owner = { 
-			OR = { 
-				has_ethic = ethic_spiritualist 
-				has_ethic = ethic_fanatic_spiritualist 
-				}
+		owner = {
+			add_monthly_resource_mult = {
+     			resource = society_research
+     			value = @tier2researchreward
+     			min = @tier2researchmin
+     			max = @tier2researchmax
 			}
-		}		
-	}
-	
-	option = {
-		name = pdcrystal.50.d
-		custom_tooltip = pdcrystal.50.d.tooltip
-		trigger = {
-			owner = { 
-			OR = { 
-				has_ethic = ethic_materialist 
-				has_ethic = ethic_fanatic_materialist 
-				}
-			}
-		}
-		hidden_effect = {
-			owner = { country_event = { id = pdcrystal.52 days = 14 } }
 		}
 	}
 }
 
-#Crsytal Temple Choice (Destory Temple)
-planet_event = {
+fleet_event = { 
 	id = pdcrystal.51
-	title = pdcrystal.51.name
+	title = "pdcrystal.50.name"
 	desc = pdcrystal.51.desc
-	picture = GFX_evt_psionics
-	show_sound = event_air_raid_siren
-	location = root
-		
+	picture = GFX_evt_crystal2
+	show_sound = event_mystic_reveal
+	location = from
+
+	archaeology = yes
+
 	is_triggered_only = yes
-	
-	immediate = { remove_deposit = d_crystal_temple }
 
 	option = {
-		name = pdcrystal.51.a
-		custom_tooltip = pdcrystal.51.a.tooltip
-		hidden_effect = {
-			remove_modifier = "crystal"
-			add_modifier = {
-				modifier = "deadcrystal"
-				days = -1
-			}	
+		name = ancrel.51.a
+		owner = {
+			add_monthly_resource_mult = {
+     			resource = society_research
+     			value = @tier2researchreward
+     			min = @tier2researchmin
+     			max = @tier2researchmax
+			}
 		}
 	}
 }
 
-#Crsytal Temple Choice (Materialist Scan)
-country_event = {
+fleet_event = { 
 	id = pdcrystal.52
-	title = pdcrystal.52.name
+	title = "pdcrystal.50.name"
 	desc = pdcrystal.52.desc
-	picture = GFX_evt_psionics
+	picture = GFX_evt_crystal2
 	show_sound = event_mystic_reveal
-	location = root
-		
+	location = from
+
+	archaeology = yes
+
 	is_triggered_only = yes
-	
+
 	option = {
 		name = pdcrystal.52.a
-		custom_tooltip = pdcrystal.52.a.tooltip
-		root = { give_technology = { tech = tech_psionic_theory } }	
+		owner = {
+			add_monthly_resource_mult = {
+     			resource = society_research
+     			value = @tier2researchreward
+     			min = @tier2researchmin
+     			max = @tier2researchmax
+			}
+		}
+	}
+}
+
+fleet_event = { 
+	id = pdcrystal.53
+	title = "pdcrystal.50.name"
+	desc = pdcrystal.53.desc
+	picture = GFX_evt_crystal2
+	show_sound = event_mystic_reveal
+	location = from
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = pdcrystal.53.a
+		owner = {
+			add_monthly_resource_mult = {
+     			resource = society_research
+     			value = @tier3researchreward
+     			min = @tier3researchmin
+     			max = @tier3researchmax
+			}
+		}
+	}
+}
+
+fleet_event = { 
+	id = pdcrystal.54
+	title = "pdcrystal.50.name"
+	desc = pdcrystal.54.desc
+	picture = GFX_evt_crystal2
+	show_sound = event_mystic_reveal
+	location = from
+
+	archaeology = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		owner = {
+			add_monthly_resource_mult = {
+     			resource = society_research
+     			value = @tier4researchreward
+     			min = @tier4researchmin
+     			max = @tier2researchmax
+			}
+		}
+		hidden_effect = {
+			from = {
+				set_planet_flag = pdcrystal_support
+			}
+		}
 	}
 }

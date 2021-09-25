@@ -61,6 +61,7 @@ country_event = {
 					has_planet_flag = prescripted_ideal
 					has_planet_flag = pd_ignore 
 				    has_planet_flag = living_planet
+					has_planet_flag = polaris_patrol_3
 					solar_system = { has_star_flag = empire_cluster }
 				}
 			}
@@ -2111,7 +2112,7 @@ country_event = {
 		if = { limit = { any_country = { has_origin = origin_archive_world } }
         every_galaxy_planet = {
             if = {
-                limit = { solar_system = { has_star_flag = archive_system } is_planet_class = pc_archive }
+                limit = { solar_system = { has_star_flag = archive_system_notorigin } is_planet_class = pc_archive }
 					change_pc = pc_broken
 					remove_planet_flag = archive_planet
 					remove_planet_flag = pdarchive
@@ -2120,7 +2121,7 @@ country_event = {
 				}
 			}
 		every_system = {
-			remove_star_flag = archive_system
+			remove_star_flag = archive_system_notorigin
 			} 
 		}
 		if = { limit = { any_country = { has_origin = origin_crucible_world } }
@@ -2182,39 +2183,6 @@ country_event = {
 				set_planet_flag = graveyard_planet
 				planet_event = { id = pdgraveyard.30 days = 5 } 
 		}
-	}
-}
-
-#Techno-Organc Starting Events
-country_event = {
-	id = pdengine.22
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		owner = { has_origin = origin_techno_world }
-	}
-
-   	immediate = {
-		every_galaxy_planet = {
-			limit = { is_planet_class = pc_technoorganic }
-			add_deposit = d_home04
-		}
-	}
-}
-
-#Archive Starting Event
-country_event = {
-	id = pdengine.23
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		owner = { has_origin = origin_archive_world }
-	}
-
-   	immediate = {
-		add_relic = r_pdarchive
 	}
 }
 
@@ -2333,7 +2301,6 @@ country_event = {
 	}
 	
 	immediate = {
-		give_technology = { tech = "tech_psionic_theory" message = no }
 		every_galaxy_planet = {
 			IF = {
 				limit = {
@@ -2563,63 +2530,11 @@ planet_event = {
 			}
 			add_deposit = d_pdhive4
 		}
-		remove_modifier = geothermal
-		remove_deposit = d_geothermal_slurry_site
-		remove_modifier = superhabitable
-		remove_deposit = d_ancient_motes
-		remove_modifier = aquatic
-		remove_deposit = d_aquatic_trench
-		remove_modifier = tidal_locked2
-		remove_deposit = d_nightside_mining_operations
-		remove_modifier = karst
-		remove_deposit = d_karst_cave
-		remove_modifier = ammonia
-		remove_deposit = d_ammonia_sea
-		remove_modifier = pdsulfur
-		remove_deposit = d_sulfur_pool
-		remove_modifier = pdacid
-		remove_deposit = d_acid_lakes
-		remove_deposit = d_pdacid_rain
-		remove_modifier = methane
-		remove_deposit = d_frozen_gas_mountain
-		remove_modifier = ash
-		remove_modifier = primal
-		remove_deposit = d_lava_lakes
-		remove_modifier = radiotrophic
-		remove_deposit = d_rad_blooms_field
-		remove_modifier = biolumen
-		remove_deposit = d_biolumen_nature_preserve
-		remove_deposit = d_pdshroud
-		remove_modifier = pdsalt
-		remove_deposit = d_salt_caves
-		remove_modifier = pdaquifer
-		remove_deposit = d_aquifer_cave
-		remove_modifier = pdmegaflora
-		remove_deposit = d_megaflora_deposit
-		remove_modifier = pdmegaflora
-		remove_deposit = d_megaflora_deposit
-		remove_modifier = pdcoral
-		remove_deposit = d_coral_fields
-		remove_modifier = supercon
-		remove_deposit = d_supercon_site
-		remove_modifier = pdstorm
-		remove_deposit = d_storm_corridor
-		remove_modifier = pdglacio
-		remove_deposit = d_glacio_lake
-		remove_modifier = pdlanthanide
-		remove_deposit = d_lanthanide_deposit
-		remove_modifier = pdrogue
-		remove_deposit = d_rogue_geo
-		remove_modifier = pdlichen
-		remove_deposit = d_lichen_forest
-		remove_modifier = pdeyeball
-		remove_deposit = d_eyeball_site
-		remove_modifier = pdsulfur
-		remove_deposit = d_sulfur_pool
-	change_pc = pc_pdhive1
-	set_planet_flag = pd_infesting2
-	add_modifier = { modifier = pd_infestingplanet2 days = 7200 }
-	planet_event = { id = pdengine.31 days = 7200 }
+		pd_remove_special_deposits_modifiers = yes
+		change_pc = pc_pdhive1
+		set_planet_flag = pd_infesting2
+		add_modifier = { modifier = pd_infestingplanet2 days = 7200 }
+		planet_event = { id = pdengine.31 days = 7200 }
 	}
 }
 
@@ -2948,7 +2863,7 @@ planet_event = {
 				NOT = { is_planet_class = pc_floating }
 				NOT = { is_planet_class = pc_crucible }
 				NOT = { is_planet_class = pc_shroud_crucible }
-				NOT = { is_planet_class = pc_shroud_crucible }
+				NOT = { is_planet_class = pc_clean_crucible }
 				NOT = { is_planet_class = pc_crystal }
 				NOT = { is_planet_class = pc_technoorganic }
 				NOT = { is_planet_class = pc_graveyard }
@@ -2986,7 +2901,7 @@ planet_event = {
 				is_planet_class = pc_floating
 				is_planet_class = pc_crucible
 				is_planet_class = pc_shroud_crucible
-				is_planet_class = pc_shroud_crucible
+				is_planet_class = pc_clean_crucible
 				is_planet_class = pc_crystal
 				is_planet_class = pc_technoorganic
 				is_planet_class = pc_graveyard
@@ -3188,7 +3103,7 @@ planet_event = {
 		NOT = { is_planet_class = pc_graveyard }
 		NOT = { is_planet_class = pc_shroud_crucible }
 		NOT = { is_planet_class = pc_crucible }
-		NOT = { is_planet_class = pc_shroud_crucible }
+		NOT = { is_planet_class = pc_clean_crucible }
 	}
 
 	immediate = {
@@ -3235,11 +3150,12 @@ planet_event = {
 		NOT = { is_planet_class = pc_graveyard }
 		NOT = { is_planet_class = pc_shroud_crucible }
 		NOT = { is_planet_class = pc_crucible }
-		NOT = { is_planet_class = pc_shroud_crucible }
+		NOT = { is_planet_class = pc_clean_crucible }
 	}
 
 	immediate = {
 		change_pc = pc_megaflorahive
+		pd_remove_special_deposits_modifiers = yes
 		remove_planet_flag = pd_tol1
 		set_planet_flag = pd_tol2
 		add_modifier = { modifier = pdmegaflora }
@@ -3254,56 +3170,6 @@ planet_event = {
 			limit = { owner = { has_technology = tech_pdtoltech } }
 			planet_event = { id = pdengine.41 days = 5400 random = 5400 }
 		}
-		remove_modifier = geothermal
-		remove_deposit = d_geothermal_slurry_site
-		remove_modifier = superhabitable
-		remove_deposit = d_ancient_motes
-		remove_modifier = aquatic
-		remove_deposit = d_aquatic_trench
-		remove_modifier = tidal_locked2
-		remove_deposit = d_nightside_mining_operations
-		remove_modifier = karst
-		remove_deposit = d_karst_cave
-		remove_modifier = ammonia
-		remove_deposit = d_ammonia_sea
-		remove_modifier = pdsulfur
-		remove_deposit = d_sulfur_pool
-		remove_modifier = pdacid
-		remove_deposit = d_acid_lakes
-		remove_deposit = d_pdacid_rain
-		remove_modifier = methane
-		remove_deposit = d_frozen_gas_mountain
-		remove_modifier = ash
-		remove_modifier = primal
-		remove_deposit = d_lava_lakes
-		remove_modifier = radiotrophic
-		remove_deposit = d_rad_blooms_field
-		remove_modifier = biolumen
-		remove_deposit = d_biolumen_nature_preserve
-		remove_deposit = d_pdshroud
-		remove_modifier = pdsalt
-		remove_deposit = d_salt_caves
-		remove_modifier = pdaquifer
-		remove_deposit = d_aquifer_cave
-		remove_modifier = pdcoral
-		remove_deposit = d_coral_fields
-		remove_modifier = supercon
-		remove_deposit = d_supercon_site
-		remove_modifier = pdstorm
-		remove_deposit = d_storm_corridor
-		remove_modifier = pdglacio
-		remove_deposit = d_glacio_lake
-		remove_modifier = pdlanthanide
-		remove_deposit = d_lanthanide_deposit
-		remove_modifier = pdrogue
-		remove_deposit = d_rogue_geo
-		remove_modifier = pdlichen
-		remove_deposit = d_lichen_forest
-		remove_modifier = pdeyeball
-		remove_deposit = d_eyeball_site
-		remove_modifier = pdsulfur
-		remove_deposit = d_sulfur_pool
-		
 	}
 
 	option = {
@@ -6454,7 +6320,7 @@ country_event = {
 			}
 			random_list = {
 				25 = { 
-					add_modifier = { modifier = terraforming_ash days = -1	} 
+					add_modifier = { modifier = terraforming_methane days = -1	} 
 				}
 				75 = { }	
 			}
@@ -6467,7 +6333,7 @@ country_event = {
 	hide_window = yes
 	is_triggered_only = yes
 	fire_only_once = yes
-	#Terraforming Candidate Methane
+	#Terraforming Candidate Sulfur
 
 	trigger = {	owner = { has_trait = trait_pc_sulfur_preference }}
 
@@ -6491,7 +6357,7 @@ country_event = {
 			}	
 			random_list = {
 				25 = { 
-					add_modifier = { modifier = terraforming_ash days = -1	} 
+					add_modifier = { modifier = terraforming_sulfur days = -1	} 
 				}
 				75 = { }	
 			}
@@ -6504,7 +6370,7 @@ country_event = {
 	hide_window = yes
 	is_triggered_only = yes
 	fire_only_once = yes
-	#Terraforming Candidate Methane
+	#Terraforming Candidate Ammonia
 
 	trigger = {	owner = { has_trait = trait_pc_ammonia_preference }}
 
@@ -6528,7 +6394,7 @@ country_event = {
 			}	
 			random_list = {
 				25 = { 
-					add_modifier = { modifier = terraforming_ash days = -1	} 
+					add_modifier = { modifier = terraforming_ammonia days = -1	} 
 				}
 				75 = { }	
 			}
@@ -6582,60 +6448,7 @@ planet_event = {
 	}
 
 	immediate = {
-		remove_modifier = geothermal
-		remove_deposit = d_geothermal_slurry_site
-		remove_modifier = superhabitable
-		remove_deposit = d_ancient_motes
-		remove_modifier = aquatic
-		remove_deposit = d_aquatic_trench
-		remove_modifier = tidal_locked2
-		remove_deposit = d_nightside_mining_operations
-		remove_modifier = karst
-		remove_deposit = d_karst_cave
-		remove_modifier = ammonia
-		remove_deposit = d_ammonia_sea
-		remove_modifier = pdsulfur
-		remove_deposit = d_sulfur_pool
-		remove_modifier = pdacid
-		remove_deposit = d_acid_lakes
-		remove_deposit = d_pdacid_rain
-		remove_modifier = methane
-		remove_deposit = d_frozen_gas_mountain
-		remove_modifier = ash
-		remove_modifier = primal
-		remove_deposit = d_lava_lakes
-		remove_modifier = radiotrophic
-		remove_deposit = d_rad_blooms_field
-		remove_modifier = biolumen
-		remove_deposit = d_biolumen_nature_preserve
-		remove_deposit = d_pdshroud
-		remove_modifier = pdsalt
-		remove_deposit = d_salt_caves
-		remove_modifier = pdaquifer
-		remove_deposit = d_aquifer_cave
-		remove_modifier = pdmegaflora
-		remove_deposit = d_megaflora_deposit
-		remove_modifier = pdmegaflora
-		remove_deposit = d_megaflora_deposit
-		remove_modifier = pdcoral
-		remove_deposit = d_coral_fields
-		remove_modifier = supercon
-		remove_deposit = d_supercon_site
-		remove_modifier = pdstorm
-		remove_deposit = d_storm_corridor
-		remove_modifier = pdglacio
-		remove_deposit = d_glacio_lake
-		remove_modifier = pdlanthanide
-		remove_deposit = d_lanthanide_deposit
-		remove_modifier = pdrogue
-		remove_deposit = d_rogue_geo
-		remove_modifier = pdlichen
-		remove_deposit = d_lichen_forest
-		remove_modifier = pdeyeball
-		remove_deposit = d_eyeball_site
-		remove_modifier = pdsulfur
-		remove_deposit = d_sulfur_pool
-		
+		pd_remove_special_deposits_modifiers = yes	
 	}
 }
 
@@ -6864,12 +6677,52 @@ country_event = {
 			}
 			every_galaxy_planet = { 
 				limit = { 
-					has_planet_flag = pd_crucible_planet 
+					has_planet_flag = pd_crucible_planet_origin 
 					is_planet_class = pc_shielded
 					FROM = { space_owner = { has_origin = origin_crucible_world } }
 				}
 				enable_special_project = { name = pd_crucible_shieldbreaker }
 			}
+		}
+	}
+}
+
+country_event = {
+	id = pdengine.66
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	#Crucible Start
+
+	trigger = {	NOT = { owner = { has_origin = origin_crucible_world } } }
+
+	immediate = {
+		every_galaxy_planet = { 
+			limit = { 
+				has_planet_flag = pd_crucible_planet 
+				is_planet_class = pc_shielded
+				}
+			create_archaeological_site = pdcrucible_site
+		}
+	}
+}
+
+country_event = {
+	id = pdengine.67
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	#Archive Start
+
+	trigger = {	NOT = { owner = { has_origin = origin_archive_world } } }
+
+	immediate = {
+		every_galaxy_planet = { 
+			limit = { 
+				has_planet_flag = archive_planet_notorigin 
+				is_planet_class = pc_archive
+				}
+			create_archaeological_site = pdarchive_site
 		}
 	}
 }

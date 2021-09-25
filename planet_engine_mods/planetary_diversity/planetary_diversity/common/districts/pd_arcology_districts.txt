@@ -63,10 +63,10 @@ district_pdarcology_housing = {
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { has_non_swapped_tradition = tr_prosperity_public_works }
+			owner = { has_active_tradition = tr_prosperity_public_works }
 		}
 		modifier = {
-			planet_housing_add = 3
+			planet_housing_add = 1
 		}
 	}
 
@@ -123,7 +123,7 @@ district_pdarcology_housing = {
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { has_non_swapped_tradition = tr_prosperity_interstellar_franchising }
+			owner = { has_active_tradition = tr_prosperity_interstellar_franchising }
 		}
 		modifier = {
 			job_clerk_add = 3
@@ -146,14 +146,6 @@ district_pdarcology_housing = {
 			owner = { is_gestalt = yes }
 		}
 		text = job_maintenance_drone_effect_desc
-	}
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 5
-			free_housing < 10
-		}
 	}
 }
 
@@ -255,75 +247,10 @@ district_pdhive = {
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { has_swapped_tradition = tr_prosperity_extended_hives }
+			owner = { has_active_tradition = tr_prosperity_extended_hives }
 		}
 		modifier = {
 			planet_housing_add = 1
-		}
-	}
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 100
-			planet = {
-				planet_devastation < 1
-				years_passed > 10
-				free_housing < 4
-			}
-		}
-		modifier = {
-			weight = 1
-			num_free_districts = { type = district_mining value = 0 }
-			num_free_districts = { type = district_generator value = 0 }
-			num_free_districts = { type = district_farming value = 0 }
-		}
-		modifier = {
-			factor = 0
-			NOT = {
-				num_free_districts = { type = district_mining value = 0 }
-				num_free_districts = { type = district_generator value = 0 }
-				num_free_districts = { type = district_farming value = 0 }
-			}
-			OR = {
-				num_free_districts = { type = district_mining value > 0 }
-				num_free_districts = { type = district_generator value > 0 }
-				num_free_districts = { type = district_farming value > 0 }
-			}
-			count_owned_pop = {
-				limit = {
-					is_unemployed = yes
-					NOR = {
-						is_pop_category = specialist
-						is_pop_category = ruler
-					}
-				}
-				count >= 1
-			}
-		}
-		modifier = {
-			factor = 0
-			NOT = {
-				num_free_districts = { type = district_mining value = 0 }
-				num_free_districts = { type = district_generator value = 0 }
-				num_free_districts = { type = district_farming value = 0 }
-			}
-			owner = {
-				has_resource = {
-					type = minerals
-					amount < 400
-				}
-			}
-		}
-		modifier = {
-			factor = 0
-			NOT = {
-				num_free_districts = { type = district_mining value = 0 }
-				num_free_districts = { type = district_generator value = 0 }
-				num_free_districts = { type = district_farming value = 0 }
-			}
-			free_jobs > 1
-			free_housing > 1
 		}
 	}
 }
@@ -403,75 +330,10 @@ district_pdnexus = {
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { has_swapped_tradition = tr_prosperity_optimized_nexus }
+			owner = { has_active_tradition = tr_prosperity_extended_hives }
 		}
 		modifier = {
 			planet_housing_add = 1
-		}
-	}
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 100
-			planet = {
-				planet_devastation < 1
-				years_passed > 10
-				free_housing < 4
-			}
-		}
-		modifier = {
-			weight = 1
-			num_free_districts = { type = district_mining value = 0 }
-			num_free_districts = { type = district_generator value = 0 }
-			num_free_districts = { type = district_farming value = 0 }
-		}
-		modifier = {
-			factor = 0
-			NOT = {
-				num_free_districts = { type = district_mining value = 0 }
-				num_free_districts = { type = district_generator value = 0 }
-				num_free_districts = { type = district_farming value = 0 }
-			}
-			OR = {
-				num_free_districts = { type = district_mining value > 0 }
-				num_free_districts = { type = district_generator value > 0 }
-				num_free_districts = { type = district_farming value > 0 }
-			}
-			count_owned_pop = {
-				limit = {
-					is_unemployed = yes
-					NOR = {
-						is_pop_category = specialist
-						is_pop_category = ruler
-					}
-				}
-				count >= 1
-			}
-		}
-		modifier = {
-			factor = 0
-			NOT = {
-				num_free_districts = { type = district_mining value = 0 }
-				num_free_districts = { type = district_generator value = 0 }
-				num_free_districts = { type = district_farming value = 0 }
-			}
-			owner = {
-				has_resource = {
-					type = minerals
-					amount < 400
-				}
-			}
-		}
-		modifier = {
-			factor = 0
-			NOT = {
-				num_free_districts = { type = district_mining value = 0 }
-				num_free_districts = { type = district_generator value = 0 }
-				num_free_districts = { type = district_farming value = 0 }
-			}
-			free_jobs > 1
-			free_housing > 1
 		}
 	}
 }
@@ -529,7 +391,11 @@ district_corp_industrial = {
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_regular_empire = yes }
+			owner = {
+				is_regular_empire = yes
+				is_crafter_empire = no
+				is_catalytic_empire = no
+			}
 		}
 		modifier = {
 			job_artisan_add = 3
@@ -540,7 +406,55 @@ district_corp_industrial = {
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_hive_empire = yes }
+			owner = {
+				is_regular_empire = yes
+				is_crafter_empire = yes
+				is_catalytic_empire = no
+			}
+		}
+		modifier = {
+			job_artificer_add = 3
+			job_foundry_add = 3
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				is_crafter_empire = no
+				is_catalytic_empire = yes
+			}
+		}
+		modifier = {
+			job_artisan_add = 3
+			job_catalytic_technician_add = 3
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				is_crafter_empire = yes
+				is_catalytic_empire = yes
+			}
+		}
+		modifier = {
+			job_artificer_add = 3
+			job_catalytic_technician_add = 3
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_hive_empire = yes
+				is_catalytic_empire = no
+			}
 		}
 		modifier = {
 			job_alloy_drone_add = @pdarcjobs
@@ -550,10 +464,26 @@ district_corp_industrial = {
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
-			owner = { is_machine_empire = yes }
+			owner = {
+				is_machine_empire = yes
+				is_catalytic_empire = no
+			}
 		}
 		modifier = {
 			job_fabricator_add = @pdarcjobs
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = {
+				is_gestalt = yes
+				is_catalytic_empire = yes
+			}
+		}
+		modifier = {
+			job_catalytic_drone_add = @pdarcjobs
 		}
 	}
 
@@ -562,11 +492,95 @@ district_corp_industrial = {
 		potential = {
 			has_designation = col_ecu_foundry
 			exists = owner
-			owner = { is_regular_empire = yes }
+			owner = {
+				is_regular_empire = yes
+				is_crafter_empire = no
+				is_catalytic_empire = no
+			}
 		}
 		modifier = {
-			job_artisan_add = -3
-			job_foundry_add = 3
+			job_artisan_add = -1
+			job_foundry_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_designation = col_ecu_foundry
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				is_crafter_empire = yes
+				is_catalytic_empire = no
+			}
+		}
+		modifier = {
+			job_artificer_add = -1
+			job_foundry_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_designation = col_ecu_foundry
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				is_crafter_empire = no
+				is_catalytic_empire = no
+			}
+		}
+		modifier = {
+			job_artisan_add = 1
+			job_foundry_add = -1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_designation = col_ecu_foundry
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				is_crafter_empire = yes
+				is_catalytic_empire = no
+			}
+		}
+		modifier = {
+			job_artificer_add = 1
+			job_foundry_add = -1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_designation = col_ecu_foundry
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				is_crafter_empire = yes
+				is_catalytic_empire = yes
+			}
+		}
+		modifier = {
+			job_artisan_add = -1
+			job_catalytic_technician_add = 1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_designation = col_ecu_foundry
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				is_crafter_empire = yes
+				is_catalytic_empire = yes
+			}
+		}
+		modifier = {
+			job_artificer_add = -1
+			job_catalytic_technician_add = 1
 		}
 	}
 
@@ -574,62 +588,63 @@ district_corp_industrial = {
 		potential = {
 			has_designation = col_ecu_factory
 			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		modifier = {
-			job_artisan_add = 3
-			job_foundry_add = -3
-		}
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		text = job_artisan_effect_desc
-	}	
-	
-	# Designation Job Changes
-	triggered_planet_modifier = {
-		potential = {
-			has_designation = col_foundry
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		modifier = {
-			job_artisan_add = -3
-			job_foundry_add = 3
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			has_designation = col_factory
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		modifier = {
-			job_artisan_add = 3
-			job_foundry_add = -3
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			OR = {
-				has_designation = col_factory
-				has_designation = col_mac_factory
+			owner = {
+				is_regular_empire = yes
+				is_crafter_empire = no
+				is_catalytic_empire = yes
 			}
+		}
+		modifier = {
+			job_artisan_add = 1
+			job_catalytic_technician_add = -1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_designation = col_ecu_factory
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				is_crafter_empire = yes
+				is_catalytic_empire = yes
+			}
+		}
+		modifier = {
+			job_artificer_add = 1
+			job_catalytic_technician_add = -1
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_designation = col_ecu_factory
 			exists = owner
 			owner = {
 				is_machine_empire = yes
 				country_uses_consumer_goods = yes
+				is_catalytic_empire = no
 			}
 		}
 		modifier = {
-			job_artisan_drone_add = 3
-			job_alloy_drone_add = -3
+			job_artisan_drone_add = 2
+			job_fabricator_add = -2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			has_designation = col_ecu_factory
+			exists = owner
+			owner = {
+				is_machine_empire = yes
+				country_uses_consumer_goods = yes
+				is_catalytic_empire = yes
+			}
+		}
+		modifier = {
+			job_artisan_drone_add = 2
+			job_catalytic_drone_add = -2
 		}
 	}
 
@@ -647,7 +662,20 @@ district_corp_industrial = {
 	triggered_desc = {
 		trigger = {
 			exists = owner
-			owner = { is_regular_empire = yes }
+			owner = {
+				is_crafter_empire = yes
+			}
+		}
+		text = job_artificer_effect_desc
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_regular_empire = yes
+				is_catalytic_empire = no
+			}
 		}
 		text = job_foundry_effect_desc
 	}
@@ -655,7 +683,21 @@ district_corp_industrial = {
 	triggered_desc = {
 		trigger = {
 			exists = owner
-			owner = { is_machine_empire = yes }
+			owner = {
+				is_regular_empire = yes
+				is_catalytic_empire = yes
+			}
+		}
+		text = job_catalytic_technician_effect_desc
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_machine_empire = yes
+				is_catalytic_empire = no
+			}
 		}
 		text = job_fabricator_effect_desc
 	}
@@ -663,9 +705,23 @@ district_corp_industrial = {
 	triggered_desc = {
 		trigger = {
 			exists = owner
-			owner = { is_hive_empire = yes }
+			owner = {
+				is_hive_empire = yes
+				is_catalytic_empire = no
+			}
 		}
 		text = job_alloy_drone_effect_desc
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = {
+				is_gestalt = yes
+				is_catalytic_empire = yes
+			}
+		}
+		text = job_catalytic_drone_effect_desc
 	}
 
 	triggered_planet_modifier = {
@@ -690,21 +746,6 @@ district_corp_industrial = {
 			}
 		}
 		text = job_maintenance_drone_effect_desc
-	}
-
-	ai_resource_production = {
-		alloys = 1
-		trigger = {
-			always = yes
-		}
-	}
-	ai_resource_production = {
-		consumer_goods = 1
-		trigger = {
-			owner = {
-				country_uses_consumer_goods = yes
-			}
-		}
 	}
 }
 
@@ -793,23 +834,6 @@ district_mf_alloy = {
 		}
 		text = job_maintenance_drone_effect_desc
 	}
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 500
-			owner = {
-				has_monthly_income = {
-					resource = alloys
-					value < 500
-				}
-				has_monthly_income = {
-					resource = minerals
-					value > 99
-				}
-			}
-		}
-	}
 }
 
 district_bioforge_stomach = {
@@ -896,23 +920,6 @@ district_bioforge_stomach = {
 
 	triggered_desc = {
 		text = job_alloy_drone_effect_desc
-	}
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 500
-			owner = {
-				has_monthly_income = {
-					resource = alloys
-					value < 500
-				}
-				has_monthly_income = {
-					resource = minerals
-					value > 99
-				}
-			}
-		}
 	}
 }
 
@@ -1116,27 +1123,6 @@ district_ecoarcology_leisure = {
 		}
 		text = job_bureaucrat_effect_desc
 	}	
-	
-	ai_weight = {
-		weight = 0
-
-		modifier = {
-			weight = 20
-			owner = { empire_sprawl_over_cap > 0 }
-		}
-		modifier = {
-			weight = 50
-			owner = { empire_sprawl_over_cap > 10 }
-		}
-		modifier = {
-			weight = 100
-			owner = { empire_sprawl_over_cap > 20 }
-		}
-		modifier = {
-			weight = 500
-			owner = { empire_sprawl_over_cap > 40 }
-		}
-	}
 }
 
 district_mf_replicator = {
@@ -1144,11 +1130,18 @@ district_mf_replicator = {
 	is_capped_by_modifier = no
 	
 	show_on_uncolonized = {
-		uses_district_set = pdmachinecapital
+		from = { is_machine_empire = yes }
+		OR = {
+			uses_district_set = pdmachinecapital
+			uses_district_set = pdecocity
+		}
 	}
 	
 	potential = {
-		uses_district_set = pdmachinecapital
+		OR = {
+			uses_district_set = pdmachinecapital
+			uses_district_set = pdecocity
+		}
 		owner = { 
 			exists = owner
 			is_machine_empire = yes
@@ -1192,10 +1185,6 @@ district_mf_replicator = {
 
 	triggered_desc = {
 		text = job_coordinator_effect_desc
-	}
-
-	ai_weight = {
-		weight = 1
 	}
 }
 
@@ -1257,27 +1246,6 @@ district_bioforge_maintenance = {
 
 	triggered_desc = {
 		text = job_synapse_drone_effect_desc
-	}	
-	
-	ai_weight = {
-		weight = 0
-
-		modifier = {
-			weight = 20
-			owner = { empire_sprawl_over_cap > 0 }
-		}
-		modifier = {
-			weight = 50
-			owner = { empire_sprawl_over_cap > 10 }
-		}
-		modifier = {
-			weight = 100
-			owner = { empire_sprawl_over_cap > 20 }
-		}
-		modifier = {
-			weight = 500
-			owner = { empire_sprawl_over_cap > 40 }
-		}
 	}
 }
 
@@ -1386,46 +1354,6 @@ district_pdmilarc_naval = {
 		}
 		text = job_naval_admin_hive_effect_desc
 	}
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 10
-			owner = {
-				owner = { empire_sprawl_over_cap > 20 }
-			}
-		}
-		modifier = {
-			factor = 10
-			owner = {
-				empire_sprawl_over_cap > 50
-				resource_income_compare = {
-					resource = consumer_goods
-					value > -5
-				}
-			}
-		}
-		modifier = {
-			factor = 10
-			owner = {
-				empire_sprawl_over_cap > 100
-				resource_income_compare = {
-					resource = consumer_goods
-					value > 10
-				}
-			}
-		}
-		modifier = {
-			factor = 10
-			owner = {
-				empire_sprawl_over_cap > 200
-				resource_income_compare = {
-					resource = consumer_goods
-					value > 10
-				}
-			}
-		}
-	}
 }
 
 district_pdbiofort_naval = {
@@ -1493,46 +1421,6 @@ district_pdbiofort_naval = {
 			owner = { is_hive_empire = yes }
 		}
 		text = job_naval_admin_hive_effect_desc
-	}	
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 10
-			owner = {
-				owner = { empire_sprawl_over_cap > 20 }
-			}
-		}
-		modifier = {
-			factor = 10
-			owner = {
-				empire_sprawl_over_cap > 50
-				resource_income_compare = {
-					resource = consumer_goods
-					value > -5
-				}
-			}
-		}
-		modifier = {
-			factor = 10
-			owner = {
-				empire_sprawl_over_cap > 100
-				resource_income_compare = {
-					resource = consumer_goods
-					value > 10
-				}
-			}
-		}
-		modifier = {
-			factor = 10
-			owner = {
-				empire_sprawl_over_cap > 200
-				resource_income_compare = {
-					resource = consumer_goods
-					value > 10
-				}
-			}
-		}
 	}
 }
 
@@ -1598,10 +1486,6 @@ district_pdmachinefort_naval = {
 		}
 		text = job_naval_admin_hive_effect_desc
 	}	
-
-	ai_weight = {
-		weight = 5
-	}
 }
 
 #Military Research
@@ -1686,19 +1570,6 @@ district_pdmilarc_research = {
 		}
 		text = job_brain_drone_effect_desc
 	}	
-
-	ai_weight = {
-		weight = 10
-		modifier = {
-			factor = 10
-			owner = {
-				resource_income_compare = {
-					resource = physics_research
-					value < 200
-				}
-			}
-		}
-	}
 }
 
 district_pdbiofort_research = {
@@ -1762,19 +1633,6 @@ district_pdbiofort_research = {
 			owner = { is_gestalt = yes }
 		}
 		text = job_mil_brain_drone_effect_desc
-	}	
-
-	ai_weight = {
-		weight = 10
-		modifier = {
-			factor = 10
-			owner = {
-				resource_income_compare = {
-					resource = physics_research
-					value < 200
-				}
-			}
-		}
 	}
 }
 
@@ -1833,19 +1691,6 @@ district_pdmachinefort_research = {
 			owner = { is_machine_empire = yes }
 		}
 		text = job_calculator_effect_desc
-	}		
-
-	ai_weight = {
-		weight = 10
-		modifier = {
-			factor = 10
-			owner = {
-				resource_income_compare = {
-					resource = physics_research
-					value < 50
-				}
-			}
-		}
 	}
 }
 
@@ -1941,29 +1786,6 @@ district_arcology_research_complex = {
 		}
 		text = job_brain_drone_effect_desc
 	}	
-
-    ai_weight = {
-		weight = 0
-
-		modifier = {
-			weight = 250
-			owner = {
-				has_monthly_income = {
-					resource = consumer_goods
-					value > 50
-				}
-			}
-		}
-
-		modifier = {
-			factor = 0.01
-			OR = {
-				planet = { has_district = district_rw_farming }
-				planet = { has_district = district_rw_commercial }
-				planet = { has_district = district_rw_generator }
-			}
-		}
-	}
 }
 
 district_bioforge_brain = {
@@ -2026,10 +1848,6 @@ district_bioforge_brain = {
 
 	triggered_desc = {
 		text = job_brain_drone_effect_desc
-	}
-
-	ai_weight = {
-		weight = 1
 	}
 }
 
@@ -2121,23 +1939,6 @@ district_pdnecroarc_research = {
 		}
 		text = job_calculator_effect_desc
 	}
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 500
-			owner = {
-				has_monthly_income = {
-					resource = alloys
-					value < 500
-				}
-				has_monthly_income = {
-					resource = minerals
-					value > 99
-				}
-			}
-		}
-	}
 }
 
 #Trade
@@ -2205,23 +2006,6 @@ district_arcology_pdtrade = {
 		}
 		text = job_merchant_effect_desc
 	}
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 250
-			owner = {
-				has_monthly_income = {
-					resource = consumer_goods
-					value > 200
-				}
-				has_monthly_income = {
-					resource = alloys
-					value > 500
-				}
-			}
-		}
-	}
 }
 
 #Consumer Goods
@@ -2276,14 +2060,6 @@ district_mf_chem = {
 			job_gas_refiner_drone_add = 1
 			job_translucer_drone_add = 1
 		}
-	}
-
-	triggered_desc = {
-		text = chem_distict_desc
-	}
-
-	ai_weight = {
-		weight = 1
 	}
 }
 
@@ -2561,46 +2337,6 @@ district_arcology_vertical_farms = {
 			owner = { is_regular_empire = yes }
 		}
 		text = job_culture_worker_effect_desc
-	}	
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 1
-			owner = {
-				resource_income_compare = {
-					resource = food
-					value < 20
-				}
-			}
-		}
-		modifier = {
-			factor = 10
-			owner = {
-				resource_income_compare = {
-					resource = food
-					value < 2
-				}
-			}
-		}
-		modifier = {
-			factor = 10
-			owner = {
-				resource_income_compare = {
-					resource = food
-					value < 0
-				}
-			}
-		}
-		modifier = {
-			factor = 0.25
-			owner = {
-				resource_stockpile_compare = {
-					resource = food
-					value > 1000
-				}
-			}
-		}
 	}
 }
 
@@ -2795,47 +2531,6 @@ district_shroud_arcology_temple = {
 		}
 		text = job_priest_effect_desc
 	}	
-
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 1
-			owner = {
-				resource_income_compare = {
-					resource = food
-					value < 20
-				}
-			}
-		}
-		modifier = {
-			factor = 10
-			owner = {
-				resource_income_compare = {
-					resource = food
-					value < 2
-				}
-			}
-		}
-		modifier = {
-			factor = 10
-			owner = {
-				resource_income_compare = {
-					resource = food
-					value < 0
-				}
-			}
-		}
-		modifier = {
-			factor = 0.25
-			owner = {
-				resource_stockpile_compare = {
-					resource = food
-					value > 1000
-				}
-			}
-		}
-	}
 }
 
 district_pdhivefort_synapse = {
@@ -2917,27 +2612,6 @@ district_pdhivefort_synapse = {
 		}
 		text = job_maintenance_drone_effect_desc
 	}	
-	
-	ai_weight = {
-		weight = 0
-
-		modifier = {
-			weight = 20
-			owner = { empire_sprawl_over_cap > 0 }
-		}
-		modifier = {
-			weight = 50
-			owner = { empire_sprawl_over_cap > 10 }
-		}
-		modifier = {
-			weight = 100
-			owner = { empire_sprawl_over_cap > 20 }
-		}
-		modifier = {
-			weight = 500
-			owner = { empire_sprawl_over_cap > 40 }
-		}
-	}
 }
 
 district_pdmachinefort_synapse = {
@@ -3004,27 +2678,6 @@ district_pdmachinefort_synapse = {
 			owner = { is_machine_empire = yes }
 		}
 		text = job_maintenance_drone_effect_desc
-	}		
-	
-	ai_weight = {
-		weight = 0
-
-		modifier = {
-			weight = 20
-			owner = { empire_sprawl_over_cap > 0 }
-		}
-		modifier = {
-			weight = 50
-			owner = { empire_sprawl_over_cap > 10 }
-		}
-		modifier = {
-			weight = 100
-			owner = { empire_sprawl_over_cap > 20 }
-		}
-		modifier = {
-			weight = 500
-			owner = { empire_sprawl_over_cap > 40 }
-		}
 	}
 }
 
@@ -3239,23 +2892,6 @@ district_pdnecroarc_temple = {
 		}
 		text = job_death_priest_effect_desc
 	}
-
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 250
-			owner = {
-				has_monthly_income = {
-					resource = consumer_goods
-					value > 200
-				}
-				has_monthly_income = {
-					resource = alloys
-					value > 500
-				}
-			}
-		}
-	}
 }
 
 district_corp_manager = {
@@ -3320,22 +2956,58 @@ district_corp_manager = {
 		}
 		text = job_manager_effect_desc
 	}
+}
 
-	ai_weight = {
-		weight = 0
-		modifier = {
-			weight = 250
-			owner = {
-				has_monthly_income = {
-					resource = consumer_goods
-					value > 200
-				}
-				has_monthly_income = {
-					resource = alloys
-					value > 500
-				}
-			}
+district_pdarcology_organic_housing = {
+	base_buildtime = 600
+	is_capped_by_modifier = no
+
+	show_on_uncolonized = {
+		uses_district_set = pdecocity
+		from = {
+			has_valid_civic = civic_machine_servitor
 		}
+	}
+
+	potential = {
+		uses_district_set = pdecocity
+		owner = {
+			exists = owner
+			has_valid_civic = civic_machine_servitor
+		}
+	}
+
+	conversion_ratio = 1
+	convert_to = {
+		district_arcology_leisure
+		district_city
+		district_nexus
+		district_hive
+		district_arcology_housing
+	}
+
+	resources = {
+		category = planet_districts
+		cost = {
+			minerals = 1000
+			exotic_gases = 50
+		}
+		upkeep = {
+			energy = 5
+			exotic_gases = 1
+		}
+	}
+
+	planet_modifier = {
+		job_bio_trophy_add = 15
+	}
+
+	triggered_desc = {
+		trigger = {
+			exists = owner
+			owner = { has_valid_civic = civic_machine_servitor }
+		}
+		text = job_bio_trophy_effect_desc
 	}
 }
 

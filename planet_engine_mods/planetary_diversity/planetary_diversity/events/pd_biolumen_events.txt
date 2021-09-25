@@ -1,81 +1,5 @@
 namespace = pdbiolumen
 
-#EnterSystem
-ship_event = {
-	id = pdbiolumen.10
-	title = pdbiolumen.10.name
-	desc = pdbiolumen.10.desc
-	picture = GFX_evt_biolumen
-	location = from
-	show_sound = event_ship_bridge
-
-	is_triggered_only = yes
-
-	trigger = {
-		from = {
-			has_star_flag = biolumen_system
-		}
-		owner = {
-			NOT = {
-				has_country_flag = biolumen_encounter
-			}
-			OR = {
-				is_country_type = default
-				is_country_type = fallen_empire
-				is_country_type = awakened_fallen_empire
-			}
-		}
-	}
-
-	immediate = {
-		owner = {
-			set_country_flag = biolumen_encounter
-		}
-	}
-
-	option = {
-		name = pdbiolumen.10.a
-	}
-}
-
-#SurveyPlanet
-ship_event = {
-	id = pdbiolumen.20
-	title = pdbiolumen.20.name
-	desc = pdbiolumen.20.desc
-	picture = GFX_evt_biolumen2
-	location = from
-	show_sound = event_ship_bridge
-
-	is_triggered_only = yes
-
-	trigger = {
-		from = {
-			has_planet_flag = biolumen_planet
-		}
-		owner = {
-			NOT = {
-				has_country_flag = found_biolumen_planet
-			}
-			OR = {
-				is_country_type = default
-				is_country_type = fallen_empire
-				is_country_type = awakened_fallen_empire
-			}
-		}
-	}
-
-	immediate = {
-		owner = {
-			set_country_flag = found_biolumen_planet
-		}
-	}
-
-	option = {
-		name = pdbiolumen.20.a
-	}
-}
-
 #EventStart
 planet_event = {
 	id = pdbiolumen.30
@@ -90,19 +14,30 @@ planet_event = {
 	pre_triggers = {
 		has_owner = yes
 		is_homeworld = no
+		original_owner = yes
+		is_ai = no
 		has_ground_combat = no
+		is_capital = no
 		is_occupied_flag = no
 	}
-	trigger = {
-		has_planet_flag = biolumen_planet			
+	trigger = {		
 		owner = {
 			NOT = {
 				has_authority = auth_machine_intelligence
+				has_authority = auth_hive_mind
 			}
+		}
+		num_pops > 2
+		is_planet_class = pc_biolumen
+		NOR = { 
+			has_global_flag = pd_biolumen_hunters
+			has_planet_flag = colony_event
 		}
 	}
 
 	immediate = {
+		set_global_flag = pd_biolumen_hunters
+		set_planet_flag = colony_event
 		owner = {
 			set_country_flag = biolumen_planet_event
 		}
@@ -183,7 +118,6 @@ planet_event = {
 	option = {
 		name = pdbiolumen.32.a
 		hidden_effect = {
-			remove_modifier = scaredofthedark
 			planet_event = { id = pdbiolumen.33 days = 360 random = 360 }
 		}
 	}
@@ -203,6 +137,7 @@ planet_event = {
 	option = {
 		name = pdbiolumen.33.a
 		custom_tooltip = pdbiolumen.33.a.tooltip
+		remove_modifier = scaredofthedark
 		hidden_effect = {
 			owner = { country_event = { id = pdbiolumen.40 days = 360 random = 360 }
 			}
@@ -212,6 +147,7 @@ planet_event = {
 	option = {
 		name = pdbiolumen.33.b
 		custom_tooltip = pdbiolumen.33.b.tooltip
+		remove_modifier = scaredofthedark
 		hidden_effect = {
 			planet_event = { id = pdbiolumen.41 days = 360 random = 360 }
 		}
@@ -220,6 +156,7 @@ planet_event = {
 	option = {
 		name = pdbiolumen.33.c	
 		custom_tooltip = pdbiolumen.33.c.tooltip
+		remove_modifier = scaredofthedark
 			trigger = {
 				owner = { 
 				OR = { 
@@ -236,6 +173,7 @@ planet_event = {
 	option = {
 		name = pdbiolumen.33.d
 		custom_tooltip = pdbiolumen.33.d.tooltip
+		remove_modifier = scaredofthedark
 			trigger = {
 				owner = { 
 				OR = { 
@@ -268,7 +206,7 @@ country_event = {
 		hidden_effect = {
 			fromfrom = {
 				create_species = {
-				name = "Hunters"
+				name = "Yirzin"
 					class = "REP"
 					portrait = rep13
 					traits = {
@@ -350,7 +288,7 @@ planet_event = {
 		hidden_effect = {
 			fromfrom = {
 				create_species = {
-				name = "Hunters"
+				name = "Yirzin"
 					class = "REP"
 					portrait = rep13
 					traits = {
