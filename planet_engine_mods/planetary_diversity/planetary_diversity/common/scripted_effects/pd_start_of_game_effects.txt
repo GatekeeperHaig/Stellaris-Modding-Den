@@ -2365,9 +2365,7 @@ generate_pd_start_deposits_and_blockers = {
 	}
 	
 	if = {
-		limit = {
-			is_planet_class = pc_aquatic
-		}
+		limit = { is_planet_class = pc_aquatic }
 		
 		# 3 + 3 energy		
 		add_deposit = d_strong_currents			
@@ -2406,6 +2404,78 @@ generate_pd_start_deposits_and_blockers = {
 		if = { limit = { not = { has_modifier = aquatic } } add_modifier = { modifier = aquatic days = -1 } }
 	}
 
+	if = {
+		limit = {
+			owner = { is_anglers_empire = yes }
+			OR = {
+				is_planet_class = pc_aquatic
+			}
+		}
+		while = {
+			limit = { num_districts = { type = district_farming value > 0 } }
+			remove_district = district_farming
+			add_district_and_planet_size_if_needed_effect = {
+				district = district_farming_uncapped
+			}
+		}
+	}
+
+	# Aquatic Paradise Origin
+	if = {
+		limit = {
+			owner = {
+				has_origin = origin_aquatic_paradise
+			}
+		}
+		clear_deposits = yes
+		clear_blockers = yes
+
+		# Food
+		add_deposit = d_teeming_reef
+		add_deposit = d_teeming_reef
+		add_deposit = d_teeming_reef
+		add_deposit = d_teeming_reef
+		add_deposit = d_teeming_reef
+		add_deposit = d_teeming_reef
+		add_deposit = d_teeming_reef
+		add_deposit = d_teeming_reef
+
+		# Minerals
+		add_deposit = d_submerged_ore_veins
+		add_deposit = d_submerged_ore_veins
+		add_deposit = d_submerged_ore_veins
+
+		# Energy
+		add_deposit = d_underwater_vent
+		add_deposit = d_underwater_vent
+		add_deposit = d_underwater_vent
+
+		# Bonus
+		add_deposit = d_crystal_reef
+		random_list = {
+			50 = { add_deposit = d_submerged_ore_veins }
+			50 = { add_deposit = d_underwater_vent }
+		}
+		add_deposit = d_aquatic_trench
+		if = {
+			limit = {
+				owner = { is_hive_empire = yes }
+			}
+			if = { limit = { not = { has_modifier = ocean_paradise_hive } } add_modifier = { modifier = ocean_paradise_hive days = -1 } }
+			#add_district = district_generator
+			remove_district = district_mining
+		}
+		else = {
+			if = { limit = { not = { has_modifier = ocean_paradise } } add_modifier = { modifier = ocean_paradise days = -1 } }
+			while = {
+				limit = { num_districts = { type = district_generator value < 2 } }
+				add_district = district_generator
+			}
+			remove_district = district_mining
+		}
+		set_planet_flag = pdaquapicture
+		add_district = district_mining
+	}
 	if = {
 		limit = {
 			is_planet_class = pc_irradiated

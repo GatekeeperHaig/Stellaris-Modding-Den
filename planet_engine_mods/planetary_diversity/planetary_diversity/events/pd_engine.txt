@@ -142,10 +142,9 @@ country_event = {
 			random_list = {
 				20 = { }
 				20 = { change_pc = pc_frozen_desert reroll_planet = yes }
-				20 = { }
 				20 = { change_pc = pc_antarctic reroll_planet = yes }
 				20 = { change_pc = pc_aeolian reroll_planet = yes }
-				20 = { change_pc = pc_storm reroll_planet = yes }	
+				20 = { change_pc = pc_storm reroll_planet = yes clear_planet_modifiers = yes add_deposit = d_storm_corridor add_modifier = { modifier = pdstorm } }	
 			}
 		}
 		every_galaxy_planet = { 				
@@ -1492,6 +1491,7 @@ planet_event = {
 					is_planet_class = pc_machine
 					is_planet_class = pc_gaia
 					is_planet_class = pc_hive
+					is_planet_class = pc_aquatic
 				}
 			}
 		remove_modifier = engineered_environment
@@ -1604,11 +1604,7 @@ planet_event = {
 		add_modifier = { modifier = "ash" days = -1 }
 		}
 		if = { 
-		limit = { 
-			is_planet_class = pc_aquatic  
-			from = { has_ascension_perk = ap_world_shaper } 
-			not = { has_deposit = d_aquatic_trench } 
-		}
+		limit = { is_planet_class = pc_aquatic not = { has_deposit = d_aquatic_trench } }
 		add_deposit = d_aquatic_trench
 		add_modifier = { modifier = "aquatic" days = -1 }
 		}
@@ -1634,8 +1630,8 @@ planet_event = {
 		add_modifier = { modifier = "methane" days = -1 }
 		}
 		if = { 
-		limit = { is_planet_class = pc_irradiated not = { has_deposit = d_rad_blooms_field }}
-		add_deposit = d_rad_blooms_field
+		limit = { is_planet_class = pc_irradiated not = { has_deposit = d_rad_blooms_transplant }}
+		add_deposit = d_rad_blooms_transplant
 		add_modifier = { modifier = "radiotrophic" days = -1 }
 		}
 		if = { 
@@ -1776,7 +1772,7 @@ planet_event = {
 		remove_building = building_lava_mine
 		}
 		if = { 
-		limit = { NOT = { is_planet_class = pc_aquatic } }
+		limit = { NOT = { OR = { is_planet_class = pc_aquatic is_planet_class = pc_tidallyaquatic } } }
 		remove_deposit = d_aquatic_trench
 		remove_modifier = aquatic
 		remove_building = building_undersea_gasmine
@@ -1912,11 +1908,11 @@ planet_event = {
 		remove_modifier = pdterra_salt
 		}
 		if = { 
-		limit = { NOR = { is_planet_class = pc_sandsea } }
+		limit = { NOT = { is_planet_class = pc_sandsea } }
 		remove_modifier = pdterra_aquifer
 		}
 		if = { 
-		limit = { NOR = { is_planet_class = pc_arid } }
+		limit = { NOT = { is_planet_class = pc_arid } }
 		remove_modifier = pdterra_coral
 		}
 		if = { 
@@ -1924,12 +1920,35 @@ planet_event = {
 		remove_modifier = pdterra_primal
 		}
 		if = { 
-		limit = { NOR = { is_planet_class = pc_savannah } }
+		limit = { NOT = { is_planet_class = pc_savannah } }
 		remove_modifier = pdterra_supercon
 		}
 		if = { 
-		limit = { NOR = { is_planet_class = pc_ocean } }
+		limit = { NOT = { is_planet_class = pc_ocean } }
 		remove_modifier = pdterra_reef
+		}
+		if = { 
+		limit = { NOT = { is_planet_class = pc_pdshroud } }
+		remove_modifier = pdcomposer
+		remove_deposit = d_pdshroud_composer
+		remove_modifier = pdeater
+		remove_deposit = d_pdshroud_eater
+		remove_modifier = pddesire
+		remove_deposit = d_pdshroud_desire
+		remove_modifier = pdwhispers
+		remove_deposit = d_pdshroud_whispers
+		}
+		if = {
+			limit = { has_planet_flag = pdaquapicture NOT = { OR = { has_planet_flag = hotaquatic has_planet_flag = coldaquatic } } }
+			set_planet_entity = { picture = pc_aquatic }
+		}
+		if = {
+			limit = { has_planet_flag = pdaquapicture has_planet_flag = hotaquatic }
+			set_planet_entity = { picture = pc_aquatichot_uw }
+		}
+		if = {
+			limit = { has_planet_flag = pdaquapicture has_planet_flag = coldaquatic }
+			set_planet_entity = { picture = pc_aquaticcold_uw }
 		}
 	}
 }
@@ -1945,11 +1964,12 @@ country_event = {
 			limit = { 
 				is_planet_class = pc_aquatic
 				is_homeworld = no 
+				is_colony = no
 				}
 				random_list = {
-					50 = {}
-					25 = { set_planet_entity = { entity = "aquatichot_planet_01_entity" picture = pc_aquatichot } }
-					25 = { set_planet_entity = { entity = "aquaticcold_planet_01_entity" picture = pc_aquaticcold } }
+					50 = { set_planet_entity = { picture = pc_aquatic_surface } }
+					25 = { set_planet_entity = { entity = "aquatichot_planet_01_entity" picture = pc_aquatichot } set_planet_flag = hotaquatic }
+					25 = { set_planet_entity = { entity = "aquaticcold_planet_01_entity" picture = pc_aquaticcold } set_planet_flag = coldaquatic }
 			}
 		}
 	}
@@ -1985,8 +2005,8 @@ planet_event = {
 			is_planet_class = pc_veld
 			is_planet_class = pc_semiarid
 			is_planet_class = pc_swamp
-			#is_planet_class = pc_mud
-			#is_planet_class = pc_basalt
+			is_planet_class = pc_mud
+			is_planet_class = pc_basalt
 			is_planet_class = pc_glacial
 			is_planet_class = pc_boreal
 			is_planet_class = pc_arctic
@@ -1998,30 +2018,37 @@ planet_event = {
 			is_planet_class = pc_savannah
 			is_planet_class = pc_ringworld_habitable
 			is_planet_class = pc_city
-			#is_planet_class = pc_mesa
-			#is_planet_class = pc_badlands
-			#is_planet_class = pc_outback
-			#is_planet_class = pc_coastal
-			#is_planet_class = pc_hadesert
-			#is_planet_class = pc_desert
-			#is_planet_class = pc_arid
-			#is_planet_class = pc_sandsea
-			#is_planet_class = pc_antarctic
-			#is_planet_class = pc_aeolian
-			#is_planet_class = pc_snow
-			#is_planet_class = pc_tundra
+			is_planet_class = pc_mesa
+			is_planet_class = pc_badlands
+			is_planet_class = pc_outback
+			is_planet_class = pc_coastal
+			is_planet_class = pc_hadesert
+			is_planet_class = pc_desert
+			is_planet_class = pc_arid
+			is_planet_class = pc_sandsea
+			is_planet_class = pc_antarctic
+			is_planet_class = pc_aeolian
+			is_planet_class = pc_snow
+			is_planet_class = pc_tundra
 			is_planet_class = pc_geothermal
 			is_planet_class = pc_superhabitable
 			is_planet_class = pc_tidallylocked
 			is_planet_class = pc_supercon
 			is_planet_class = pc_biolumen
-			#is_planet_class = pc_karst
+			is_planet_class = pc_karst
 			is_planet_class = pc_reef
 			is_planet_class = pc_primal
+			is_planet_class = pc_pdshroud
+			is_planet_class = pc_aquatic
 		}
 	}
 
 	immediate = {
+			#Aquatics
+			IF = { limit = { OR = { is_planet_class = pc_aquatic is_planet_class = pc_tidallyaquatic } NOT = { OR = { has_planet_flag = hotaquatic has_planet_flag = coldaquatic } } } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_aquatic has_planet_flag = hotaquatic } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_aquatic has_planet_flag = coldaquatic } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture }
+			#Wet
 			IF = { limit = { is_planet_class = pc_ocean } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_continental } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_forest } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
@@ -2031,52 +2058,71 @@ planet_event = {
 			IF = { limit = { is_planet_class = pc_retinal } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_steppe } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_city } set_planet_entity = { picture = pc_aquaticcity } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_hadesert } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_tidallylocked } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_hadesert } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_tidallylocked } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture  }
 			IF = { limit = { is_planet_class = pc_supercon } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_karst } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_karst } set_planet_entity = { picture = pc_aquatickarst_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_reef } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			#Cold
-			IF = { limit = { is_planet_class = pc_subarctic } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_swamp } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_mud } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_basalt } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_glacial } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_boreal } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_arctic } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_alpine } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_highland } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_duneforest } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_mushroom } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_wetswamp } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_fog } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_antarctic } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_aeolian } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_snow } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_tundra } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_frozen_desert } set_planet_entity = { picture = pc_aquaticcold } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_subarctic } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_swamp } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_mud } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_basalt } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_glacial } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_boreal } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_arctic } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_alpine } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_highland } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_duneforest } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_mushroom } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_wetswamp } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_fog } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_antarctic } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_aeolian } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_snow } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_tundra } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_frozen_desert } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
 			#Tropical
-			IF = { limit = { is_planet_class = pc_desertislands } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_tropical } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_mangrove } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_hajungle } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_cenote } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_oasis } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_med } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_savannah } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_gaia } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_ringworld_habitable } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_mesa } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_badlands } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_outback } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_coastal } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_desert } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_arid } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			#IF = { limit = { is_planet_class = pc_sandsea } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_geothermal } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_superhabitable } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_biolumen } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
-			IF = { limit = { is_planet_class = pc_primal } set_planet_entity = { picture = pc_aquatichot } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_desertislands } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_tropical } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_mangrove } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_hajungle } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_cenote } set_planet_entity = { picture = pc_aquaticcenote_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_oasis } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_med } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_savannah } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_gaia } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_ringworld_habitable } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_mesa } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_badlands } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_outback } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_coastal } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_desert } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_arid } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_sandsea } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_geothermal } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_superhabitable } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_biolumen } set_planet_entity = { picture = pc_aquaticbio_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_primal } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			#Shroud
+			IF = { limit = { is_planet_class = pc_pdshroud } set_planet_entity = { picture = pc_aquaticshroud_uw } set_planet_flag = pdaquapicture }
+	}
+}
+#Non-Aquatic Race lands on Aquaitc Planet
+planet_event = {
+	id = pdengine.161
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { NOT =  { has_trait = trait_pc_aquatic_preference } }
+		is_planet_class = pc_aquatic
+	}
+
+	immediate = {
+		IF = { limit = { OR = { is_planet_class = pc_aquatic is_planet_class = pc_tidallyaquatic } NOT = { OR = { has_planet_flag = hotaquatic has_planet_flag = coldaquatic } } } set_planet_entity = { picture = pc_aquatichab } }
+		IF = { limit = { is_planet_class = pc_aquatic has_planet_flag = hotaquatic } set_planet_entity = { picture = pc_aquatichothab } }
+		IF = { limit = { is_planet_class = pc_aquatic has_planet_flag = coldaquatic } set_planet_entity = { picture = pc_aquaticcoldhab } }
 	}
 }
 
@@ -3481,13 +3527,6 @@ country_event = {
 						20 = { add_deposit = d_rare_crystals_2 }
 						40 = { add_deposit = d_rare_crystals_1 }
 					}
-					random_list = {
-						10 = { add_deposit = d_rare_crystals_5 }
-						10 = { add_deposit = d_rare_crystals_4 }
-						20 = { add_deposit = d_rare_crystals_3 }
-						20 = { add_deposit = d_rare_crystals_2 }
-						40 = { add_deposit = d_rare_crystals_1 }
-					}
 				}
 				97 = { }	
 			}
@@ -3790,13 +3829,6 @@ country_event = {
 						20 = { add_deposit = d_exotic_gases_2 }
 						40 = { add_deposit = d_exotic_gases_1 }
 					}
-					random_list = {
-						10 = { add_deposit = d_exotic_gases_5 }
-						10 = { add_deposit = d_exotic_gases_4 }
-						20 = { add_deposit = d_exotic_gases_3 }
-						20 = { add_deposit = d_exotic_gases_2 }
-						40 = { add_deposit = d_exotic_gases_1 }
-					}
 				}
 				75 = { } 
 			}
@@ -3915,13 +3947,6 @@ country_event = {
 				10 = {
 					change_pc = pc_ethane_ocean
 					this = { clear_deposits = yes }
-					random_list = {
-						10 = { add_deposit = d_volatile_motes_5 }
-						10 = { add_deposit = d_volatile_motes_4 }
-						20 = { add_deposit = d_volatile_motes_3 }
-						20 = { add_deposit = d_volatile_motes_2 }
-						40 = { add_deposit = d_volatile_motes_1 }
-					}
 					random_list = {
 						10 = { add_deposit = d_volatile_motes_5 }
 						10 = { add_deposit = d_volatile_motes_4 }
@@ -4287,6 +4312,15 @@ planet_event = {
 			}
 			set_planet_entity = {
 				entity = "gaia_planet_earth_entity"
+			}
+		}
+		if = {
+			limit = { 
+				has_planet_flag = planet_earth
+				is_planet_class = pc_pdshroud
+			}
+			set_planet_entity = {
+				entity = "pdshroud_planet_earth_entity"
 			}
 		}
 		if = {
@@ -6313,54 +6347,54 @@ country_event = {
 }
 
 #Levithan Storm World Origin
-country_event = {
-	id = pdengine.52
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		owner = { has_origin = origin_pd_storm }
-	}
-
-   	immediate = {
-		every_galaxy_planet = {
-			limit = { is_planet_class = pc_storm is_capital = yes owner = { has_origin = origin_pd_storm } }
-			set_planet_flag = pd_storm_planet
-			add_deposit = d_storm_waters
-		}
-		every_galaxy_planet = {
-			limit = { has_planet_flag = pd_remove_storm_event }
-			remove_deposit = d_storm_waters
-			set_planet_flag = pdnoseamonster
-		}
-	}
-}
+#country_event = {
+#	id = pdengine.52
+#	hide_window = yes
+#	is_triggered_only = yes
+#
+#	trigger = {
+#		owner = { has_origin = origin_pd_storm }
+#	}
+#
+#   	immediate = {
+#		every_galaxy_planet = {
+#			limit = { is_planet_class = pc_storm is_capital = yes owner = { has_origin = origin_pd_storm } }
+#			set_planet_flag = pd_storm_planet
+#			add_deposit = d_storm_waters
+#		}
+#		every_galaxy_planet = {
+#			limit = { has_planet_flag = pd_remove_storm_event }
+#			remove_deposit = d_storm_waters
+#			set_planet_flag = pdnoseamonster
+#		}
+#	}
+#}
 
 #Coral World Mystery Origin
-country_event = {
-	id = pdengine.53
-	hide_window = yes
-	is_triggered_only = yes
-
-	trigger = {
-		owner = { has_origin = origin_pd_coral }
-	}
-
-   	immediate = {
-		every_galaxy_planet = {
-			limit = { is_planet_class = pc_coral is_capital = yes owner = { has_origin = origin_pd_coral } }
-			set_planet_flag = pd_coral_planet
-			set_planet_flag = pd_coral_event
-			add_modifier = { modifier = pdaquaticpreservation days = -1 }
-			planet_event = { id = pdcoral.10 days = 10 }
-		}
-		every_galaxy_planet = {
-			limit = { has_planet_flag = pd_remove_coral_event }
-			set_planet_flag = pdnocoralevent
-			remove_planet_flag = pd_coral_event
-		}
-	}
-}
+#country_event = {
+#	id = pdengine.53
+#	hide_window = yes
+#	is_triggered_only = yes
+#
+#	trigger = {
+#		owner = { has_origin = origin_pd_coral }
+#	}
+#
+#  	immediate = {
+#		every_galaxy_planet = {
+#			limit = { is_planet_class = pc_coral is_capital = yes owner = { has_origin = origin_pd_coral } }
+#			set_planet_flag = pd_coral_planet
+#			set_planet_flag = pd_coral_event
+#			add_modifier = { modifier = pdaquaticpreservation days = -1 }
+#			planet_event = { id = pdcoral.10 days = 10 }
+#		}
+#		every_galaxy_planet = {
+#			limit = { has_planet_flag = pd_remove_coral_event }
+#			set_planet_flag = pdnocoralevent
+#			remove_planet_flag = pd_coral_event
+#		}
+#	}
+#}
 
 # Milarc complete
 planet_event = {
@@ -6748,7 +6782,7 @@ country_event = {
 				add_modifier = { modifier = "pdmegaflora" days = -1 }
 				}
 			}	
-			IF = { limit = { is_planet_class = pc_aquatic } 
+			IF = { limit = { OR = { is_planet_class = pc_aquatic is_planet_class = pc_tidallyaquatic } }
 				IF = { limit = { not = { has_deposit = d_aquatic_trench } }
 				add_deposit = d_aquatic_trench
 				}
@@ -7025,6 +7059,24 @@ country_event = {
 				}
 			}
 			while = {
+				count = 3
+				random_galaxy_planet = { 		
+					limit = { 
+						is_planet_class = pc_frozen 
+						planet_size > 10 
+						planet_size < 26
+						is_homeworld = no 
+						NOR = { 
+							has_planet_flag = pd_ignore 
+							solar_system = { has_star_flag = empire_cluster } } 
+						}
+					clear_planet_modifiers = yes 
+					clear_deposits = yes  
+					add_deposit = d_society_5 
+					add_modifier = { modifier = pdterra_aquatic }
+				}
+			}
+			while = {
 				count = 2
 				random_galaxy_planet = { 		
 					limit = { 
@@ -7158,6 +7210,7 @@ country_event = {
 						is_homeworld = no
 						NOR = { 
 							has_planet_flag = pd_ignore 
+							has_planet_flag = living_planet
 							solar_system = { has_star_flag = empire_cluster } 
 							has_modifier = pdterra_reef
 						}
@@ -7405,6 +7458,24 @@ country_event = {
 				}
 			}
 			while = {
+				count = 2
+				random_galaxy_planet = { 		
+					limit = { 
+						is_planet_class = pc_frozen 
+						planet_size > 10 
+						planet_size < 26
+						is_homeworld = no 
+						NOR = { 
+							has_planet_flag = pd_ignore 
+							solar_system = { has_star_flag = empire_cluster } } 
+						}
+					clear_planet_modifiers = yes 
+					clear_deposits = yes  
+					add_deposit = d_society_5 
+					add_modifier = { modifier = pdterra_aquatic }
+				}
+			}
+			while = {
 				count = 1
 				random_galaxy_planet = { 		
 					limit = { 
@@ -7538,6 +7609,7 @@ country_event = {
 						is_homeworld = no
 						NOR = { 
 							has_planet_flag = pd_ignore 
+							has_planet_flag = living_planet
 							solar_system = { has_star_flag = empire_cluster } 
 							has_modifier = pdterra_reef
 						}
@@ -7624,8 +7696,7 @@ country_event = {
 		IF = { 
 			limit = { 
 				OR = {
-					galaxy_size = small
-					galaxy_size = tiny 
+					galaxy_size = huge
 				}
 			}
 			while = {
@@ -7785,6 +7856,24 @@ country_event = {
 				}
 			}
 			while = {
+				count = 8
+				random_galaxy_planet = { 		
+					limit = { 
+						is_planet_class = pc_frozen 
+						planet_size > 10 
+						planet_size < 26
+						is_homeworld = no 
+						NOR = { 
+							has_planet_flag = pd_ignore 
+							solar_system = { has_star_flag = empire_cluster } } 
+						}
+					clear_planet_modifiers = yes 
+					clear_deposits = yes  
+					add_deposit = d_society_5 
+					add_modifier = { modifier = pdterra_aquatic }
+				}
+			}
+			while = {
 				count = 4
 				random_galaxy_planet = { 		
 					limit = { 
@@ -7917,6 +8006,7 @@ country_event = {
 						}
 						is_homeworld = no
 						NOR = { 
+							has_planet_flag = living_planet
 							has_planet_flag = pd_ignore 
 							solar_system = { has_star_flag = empire_cluster } 
 							has_modifier = pdterra_reef
@@ -8002,4 +8092,72 @@ country_event = {
 			}
 		}
 	}	
+}
+
+## Aquatic Paradise Origin
+
+# Initial setup
+country_event = {
+	id = pdengine.69
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		every_playable_country = {
+			limit = { has_origin = origin_aquatic_paradise }
+			country_event = { id = pdengine.70 }
+		}
+	}
+}
+
+# Change starting colonisables into Frozen Worlds and nearby asteroids into Ice Asteroids
+country_event = {
+	id = pdengine.70
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		has_origin = origin_aquatic_paradise
+	}
+
+	immediate = {
+		capital_scope.solar_system = {
+			closest_system = {
+				limit = { has_star_flag = neighbor_t1_first_colony }
+				max_steps = 3
+				random_system_planet = {
+					limit = {
+						is_colonizable = yes
+						is_colony = no
+						has_planet_flag = prescripted_ideal
+					}
+					change_pc = pc_frozen
+				}
+				random_system_planet = {
+					limit = {
+						is_asteroid = yes
+					}
+					change_pc = pc_ice_asteroid
+				}
+			}
+			closest_system = {
+				limit = { has_star_flag = neighbor_t2_second_colony }
+				max_steps = 6
+				random_system_planet = {
+					limit = {
+						is_colonizable = yes
+						is_colony = no
+						has_planet_flag = prescripted_ideal
+					}
+					change_pc = pc_frozen
+				}
+				random_system_planet = {
+					limit = {
+						is_asteroid = yes
+					}
+					change_pc = pc_ice_asteroid
+				}
+			}
+		}
+	}
 }
