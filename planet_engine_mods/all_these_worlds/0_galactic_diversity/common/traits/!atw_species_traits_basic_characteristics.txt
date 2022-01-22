@@ -1,0 +1,117 @@
+trait_aquatic = {
+	cost = 1
+	host_has_dlc = "Aquatics Species Pack"
+
+	sorting_priority = 20
+
+	random_weight = {
+		AQUATIC = 100
+		MOL = 10
+		HUM = 2
+		MAM = 2
+		LITHOID = 0.5
+	 }
+
+	allowed_planet_classes = {
+		pc_ocean
+	}
+
+	species_possible_remove = {
+		if = {
+			limit = {
+				exists = from
+			}
+			if = {
+				limit = { NOT = { from = { has_ascension_perk = ap_hydrocentric } } }
+				custom_tooltip = {
+					fail_text = trait_aquatic_remove_evolutionary_mastery
+					from = { has_ascension_perk = ap_evolutionary_mastery }
+				}
+			}
+			else = {
+				custom_tooltip = {
+					fail_text = trait_aquatic_remove_hydrocentric
+					always = no
+				}
+			}
+		}
+	}
+	species_potential_add = {
+		exists = from
+		from = {
+			has_ascension_perk = ap_evolutionary_mastery
+		}
+	}
+	initial = yes
+
+	allowed_archetypes = { BIOLOGICAL LITHOID }
+
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			NOT = { has_trait = trait_pc_ocean_preference }
+		}
+	}
+
+	custom_tooltip_with_modifiers = trait_aquatic_tooltip
+	triggered_pop_modifier = {
+		potential = {
+			exists = planet
+			planet = { is_ocean_replacement = yes }
+		}
+		pop_housing_usage_mult = -0.1
+		planet_jobs_food_produces_mult = 0.1
+		planet_jobs_minerals_produces_mult = 0.1
+		planet_jobs_energy_produces_mult = 0.1
+	}
+	triggered_pop_modifier = {
+		potential = {
+			exists = planet
+			planet = {
+				is_ocean_replacement = yes
+				exists = owner
+				owner = { has_ascension_perk = ap_hydrocentric }
+			}
+		}
+		pop_housing_usage_mult = -0.05
+		planet_jobs_food_produces_mult = 0.05
+		planet_jobs_minerals_produces_mult = 0.05
+		planet_jobs_energy_produces_mult = 0.05
+	}
+	triggered_pop_modifier = {
+		potential = {
+			exists = planet
+			planet = {
+				NOR = { 
+					has_modifier = "hydrosphere-water_pelagic"
+					has_modifier = "hydrosphere-water_abundant"
+				}
+				is_ideal = no
+			}
+		}
+		pop_environment_tolerance = -0.2
+		pop_housing_usage_mult = 0.3
+	}
+	triggered_pop_modifier = {
+		potential = {
+			exists = planet
+			planet = {
+				NOR = { 
+					has_modifier = "hydrosphere-water_pelagic"
+					has_modifier = "hydrosphere-water_abundant"
+				}
+				is_ideal = no
+				exists = owner
+				owner = { has_ascension_perk = ap_hydrocentric }
+			}
+		}
+		pop_environment_tolerance = -0.1
+		pop_housing_usage_mult = 0.15
+	}
+	modifier = {
+		pc_ocean_habitability = 0.2
+	}
+
+	icon = "gfx/interface/icons/traits/trait_aquatic.dds"
+}
