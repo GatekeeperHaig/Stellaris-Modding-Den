@@ -1,4 +1,4 @@
-﻿name="Dynamic Difficulty : More Modifiers"
+name="Dynamic Difficulty : More Modifiers"
 tags={
 	"Balance"
 }
