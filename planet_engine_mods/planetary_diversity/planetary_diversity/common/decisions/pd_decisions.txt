@@ -30,6 +30,8 @@ decision_engineered_environment = {
 		is_pd_rare = no
 		NOT = { is_planet_class = pc_pdshroud }
 		NOT = { is_planet_class = pc_gaia }
+		NOT = { is_planet_class = pc_cold_gaia }
+		NOT = { is_planet_class = pc_hot_gaia }
 		NOT = { is_planet_class = pc_relic }
 		NOT = { is_planet_class = pc_milarc_relic }
 		NOT = { is_planet_class = pc_hive }
@@ -39,10 +41,15 @@ decision_engineered_environment = {
 		NOT = { is_planet_class = pc_hive }
 		NOT = { has_modifier = engineered_environment }
 		NOT = { has_modifier = engineered_environment_gaia }
+		NOT = { owner = { has_origin = origin_pd_tree_of_life } }
 	}
 
 	effect = {
-		if = { limit = { NOT = { is_planet_class = pc_gaia } }
+		if = { limit = { 
+			NOT = { is_planet_class = pc_gaia } 
+			NOT = { is_planet_class = pc_cold_gaia }
+			NOT = { is_planet_class = pc_hot_gaia }
+		}
 			add_modifier = {
 				modifier = engineered_environment
 				days = -1
@@ -144,13 +151,17 @@ decision_engineered_environment_gaia = {
 
 	allow = {
 		NOT = { is_planet_class = pc_gaia }
+		NOT = { is_planet_class = pc_cold_gaia }
+		NOT = { is_planet_class = pc_hot_gaia }
 	}
 	
 	potential = {
 		is_artificial = no
-		is_artificial = no
+		is_pd_arcology = no
 		NOT = { is_planet_class = pc_pdshroud }
 		NOT = { is_planet_class = pc_gaia }
+		NOT = { is_planet_class = pc_cold_gaia }
+		NOT = { is_planet_class = pc_hot_gaia }
 		NOT = { is_planet_class = pc_city }
 		NOT = { is_planet_class = pc_ecocity }
 		NOT = { is_planet_class = pc_corpoarc }
@@ -196,7 +207,11 @@ decision_engineered_environment_gaia = {
 	}
 
 	effect = {
-		if = { limit = { NOT = { is_planet_class = pc_gaia } }
+		if = { limit = { 
+			NOT = { is_planet_class = pc_gaia } 
+			NOT = { is_planet_class = pc_cold_gaia }
+			NOT = { is_planet_class = pc_hot_gaia }
+		}
 			add_modifier = {
 				modifier = engineered_environment_gaia
 				days = -1
@@ -241,12 +256,12 @@ decision_removeocean = {
 	resources = {
 		category = decisions
 		cost = {
-			influence = 25
+			unity = 100
 		}
 	}
 	
 	potential = {
-		NOT = { owner = { has_trait = trait_pc_aquatic_preference } }
+		#NOT = { owner = { has_trait = trait_aquatic } }
 		NOT = { is_planet_class = pc_relic }
 		NOT = { is_planet_class = pc_milarc_relic }
 		NOT = { is_planet_class = pc_city }
@@ -297,6 +312,8 @@ decision_removeocean = {
 			IF = { limit = { is_planet_class = pc_hajungle } set_planet_entity = { picture = pc_hajungle } }
 			IF = { limit = { is_planet_class = pc_cenote } set_planet_entity = { picture = pc_cenote } }
 			IF = { limit = { is_planet_class = pc_gaia } set_planet_entity = { picture = pc_gaia } }
+			IF = { limit = { is_planet_class = pc_hot_gaia } set_planet_entity = { picture = pc_hot_gaia } }
+			IF = { limit = { is_planet_class = pc_cold_gaia } set_planet_entity = { picture = pc_cold_gaia } }
 			IF = { limit = { is_planet_class = pc_prairie } set_planet_entity = { picture = pc_prairie } }
 			IF = { limit = { is_planet_class = pc_veld } set_planet_entity = { picture = pc_veld } }
 			IF = { limit = { is_planet_class = pc_semiarid } set_planet_entity = { picture = pc_semiarid } }
@@ -332,10 +349,7 @@ decision_removeocean = {
 	}
 	
 	ai_weight = {
-		weight = 1
-		modifier = {
-			factor = 0
-		}
+		weight = 0
 	}
 }
 
@@ -348,12 +362,12 @@ decision_oceancapital = {
 	resources = {
 		category = decisions
 		cost = {
-			influence = 25
+			unity = 100
 		}
 	}
 	
 	potential = {
-		owner = { has_trait = trait_pc_aquatic_preference }
+		owner = { has_trait = trait_aquatic }
 		NOT = { is_planet_class = pc_pdshroud }
 		NOT = { is_planet_class = pc_aquatic }
 		NOT = { has_planet_flag = pdaquapicture }
@@ -405,6 +419,7 @@ decision_oceancapital = {
 			IF = { limit = { is_planet_class = pc_supercon } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_karst } set_planet_entity = { picture = pc_aquatickarst_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_reef } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_cold_gaia } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			#Cold
 			IF = { limit = { is_planet_class = pc_subarctic } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_swamp } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture }
@@ -434,6 +449,7 @@ decision_oceancapital = {
 			IF = { limit = { is_planet_class = pc_med } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_savannah } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_gaia } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_hot_gaia } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_ringworld_habitable } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_mesa } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_badlands } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture }
@@ -452,10 +468,7 @@ decision_oceancapital = {
 	}
 	
 	ai_weight = {
-		weight = 1
-		modifier = {
-			factor = 0
-		}
+		weight = 0
 	}
 }
 
@@ -1515,7 +1528,18 @@ decision_noexoitchabsnocolony = {
 	}
 
 	ai_weight = {
-		weight = 1
+		weight = 10
+		modifier = {
+			factor = 0
+			owner = { 
+				OR = {
+					has_trait = trait_pc_ash_preference
+					has_trait = trait_pc_methane_preference
+					has_trait = trait_pc_ammonia_preference
+					has_trait = trait_pc_sulfur_preference
+				}
+			}
+		}
 	}
 }
 
@@ -1649,7 +1673,18 @@ decision_noexoitchabs = {
 	}
 
 	ai_weight = {
-		weight = 1
+		weight = 10
+		modifier = {
+			factor = 0
+			owner = { 
+				OR = {
+					has_trait = trait_pc_ash_preference
+					has_trait = trait_pc_methane_preference
+					has_trait = trait_pc_ammonia_preference
+					has_trait = trait_pc_sulfur_preference
+				}
+			}
+		}
 	}
 }
 
@@ -1665,7 +1700,7 @@ decision_armbombownplanet = {
 		category = decisions
 		cost = {
 			energy = 1000
-			influence = 50
+			unity = 100
 		}
 	}
 
@@ -1824,128 +1859,6 @@ decision_tolbarren_phab = {
 	}
 }
 
-# Storm Nice Transplant
-decision_d_pdstorm_nice_2 = {
-	owned_planets_only = yes
-
-	enactment_time = 1800
-	resources = {
-		category = decisions
-		cost = {
-			minerals = 1000
-			influence = 100
-		}
-	}
-		
-	prerequisites = { "tech_d_pdstorm_nice_2" }
-	
-	allow = {
-		free_district_slots >= 1
-	}
-	
-	potential = {
-		is_artificial = no
-		is_pd_unique = no
-		OR = {
-			is_wet = yes
-			is_cold = yes
-		}
-		NOT = { has_deposit = d_pdstorm_nice_2 }
-	}
-
-	effect = {
-		custom_tooltip = decision_d_pdstorm_nice_2_tooltip
-		hidden_effect = {
-			add_deposit = d_pdstorm_nice_2
-		}
-	}   
-	
-	ai_weight = {
-        weight = 3
-        modifier = {
-            factor = 0
-            or = {
-                num_pops < 20
-                and = {
-                  # By late game, AI will likely keep some open building slots
-                  # This is mostly harmless if there are still jobs available
-                  # Otherwise, don't let them take this over building a building
-                  free_building_slots > 0
-                  free_jobs <= 0
-                }
-                free_building_slots > 2
-                owner = {
-                    or = {
-                        resource_stockpile_compare = { resource = energy value < 10000 }
-                        resource_stockpile_compare = { resource = influence value < 150 }
-                    }
-                }
-            }
-        }
-  }
-}
-
-# Storm Greedy Transplant
-decision_d_pdstorm_greedy_2 = {
-	owned_planets_only = yes
-
-	enactment_time = 1800
-	resources = {
-		category = decisions
-		cost = {
-			energy = 1000
-			influence = 100
-		}
-	}
-		
-	prerequisites = { "tech_d_pdstorm_greedy_2" }
-	
-	#allow = {
-	#	free_district_slots >= 1
-	#}
-	
-	potential = {
-		is_artificial = no
-		is_pd_unique = no
-		OR = {
-			is_wet = yes
-			is_cold = yes
-		}
-		NOT = { has_deposit = d_pdstorm_greedy_2 }
-	}
-
-	effect = {
-		custom_tooltip = decision_d_pdstorm_greedy_2_tooltip
-		hidden_effect = {
-			add_deposit = d_pdstorm_greedy_2
-		}
-	}   
-	
-	ai_weight = {
-        weight = 3
-        modifier = {
-            factor = 0
-            or = {
-                num_pops < 20
-                and = {
-                  # By late game, AI will likely keep some open building slots
-                  # This is mostly harmless if there are still jobs available
-                  # Otherwise, don't let them take this over building a building
-                  free_building_slots > 0
-                  free_jobs <= 0
-                }
-                free_building_slots > 2
-                owner = {
-                    or = {
-                        resource_stockpile_compare = { resource = energy value < 10000 }
-                        resource_stockpile_compare = { resource = influence value < 150 }
-                    }
-                }
-            }
-        }
-  }
-}
-
 # Tiyanki Planet, Under New Managment
 decision_change_tiyanki_choice = {
 	owned_planets_only = yes
@@ -1954,7 +1867,7 @@ decision_change_tiyanki_choice = {
 	resources = {
 		category = decisions
 		cost = {
-			influence = 100
+			unity = 100
 		}
 	}
 	
@@ -1993,7 +1906,7 @@ decision_clean_crucible = {
 	resources = {
 		category = decisions
 		cost = {
-			influence = 100
+			unity = 1000
 			energy = 5000
 		}
 	}
@@ -2025,7 +1938,7 @@ decision_shroud_crucible = {
 	resources = {
 		category = decisions
 		cost = {
-			influence = 100
+			unity = 100
 			sr_zro = 2500
 		}
 	}

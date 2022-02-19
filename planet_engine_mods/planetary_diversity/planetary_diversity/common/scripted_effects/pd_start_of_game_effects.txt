@@ -2409,13 +2409,17 @@ generate_pd_start_deposits_and_blockers = {
 			owner = { is_anglers_empire = yes }
 			OR = {
 				is_planet_class = pc_aquatic
+				is_planet_class = pc_reef
+				is_planet_class = pc_storm
+				is_planet_class = pc_desertislands
+				is_planet_class = pc_subarctic
 			}
 		}
 		while = {
 			limit = { num_districts = { type = district_farming value > 0 } }
 			remove_district = district_farming
 			add_district_and_planet_size_if_needed_effect = {
-				district = district_farming_uncapped
+			district = district_farming_uncapped
 			}
 		}
 	}
@@ -2889,8 +2893,19 @@ generate_pd_start_deposits_and_blockers = {
 		remove_district = district_farming
 		add_district = district_generator_uncapped
 		add_district = district_mining_uncapped
-		add_district = district_farming_uncapped
-		add_district = district_farming_uncapped
+		IF = {
+			limit = {
+				is_lithoid_empire = no
+			}
+			add_district = district_farming_uncapped
+			add_district = district_farming_uncapped
+		}
+		IF = {
+			limit = {
+				is_lithoid_empire = yes
+			}
+			add_district = district_mining_uncapped
+		}
 		add_deposit = d_pd_hive_world_boost
 	}
 
@@ -3148,6 +3163,117 @@ pdhabitat_sol_system_setup = {
 			IF = {
 				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
 				add_modifier = { modifier = pdsulfuratmosphere days = -1	}
+			}
+		}
+	}
+}
+
+pd_generate_start_pops = {
+	if = {
+		limit = {
+			owner = {
+				OR = {
+					has_valid_civic = civic_machine_servitor
+					has_valid_civic = civic_machine_assimilator
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				owner = { has_valid_civic = civic_machine_servitor }
+			}
+			last_created_species = {
+				if = {
+					limit = {
+						ROOT = { 
+							OR = {
+								is_planet_class = pc_floating 
+								is_planet_class = pc_crystal 
+								is_planet_class = pc_technoorganic
+								is_planet_class = pc_graveyard
+							}	
+						}
+					}
+					modify_species = {
+						species = this
+						ideal_planet_class = home_planet
+					}
+				}
+				set_citizenship_type = {
+					country = root.owner
+					type = citizenship_limited
+				}
+				set_living_standard = {
+					country = root.owner
+					type = living_standard_organic_trophy
+				}
+			}
+			while = {
+				count = 5
+				random_owned_pop = {
+					limit = { is_robot_pop = no	}
+					kill_pop = yes
+				}
+			}
+			while = {
+				count = 5
+				create_pop = {
+					species = last_created_species
+					ethos = random
+				}
+				last_created_pop = {
+					clear_ethos = yes
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				owner = { has_valid_civic = civic_machine_assimilator }
+			}
+			last_created_species = {
+				if = {
+					limit = {
+						ROOT = {
+							OR = {
+								is_planet_class = pc_floating 
+								is_planet_class = pc_crystal 
+								is_planet_class = pc_technoorganic
+								is_planet_class = pc_graveyard
+							}
+						}
+					}
+					modify_species = {
+						species = this
+						ideal_planet_class = home_planet
+					}
+				}
+				set_citizenship_type = {
+					country = root.owner
+					type = citizenship_full_machine
+				}
+				set_living_standard = {
+					country = root.owner
+					type = living_standard_hive_mind
+				}
+			}
+			while = {
+				count = 10
+				random_owned_pop = {
+					limit = { is_robot_pop = no	}
+					kill_pop = yes
+				}
+			}
+			while = {
+				count = 10
+				create_pop = {
+					species = last_created_species
+					ethos = random
+				}
+				last_created_pop = {
+					clear_ethos = yes
+				}
 			}
 		}
 	}

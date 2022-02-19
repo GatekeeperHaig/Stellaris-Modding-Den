@@ -9,8 +9,13 @@ building_foundry_1 = {
 	potential = {
 		NOT = { has_modifier = resort_colony }
 		NOT = { has_modifier = slave_colony }
-		OR = {
-			building_relaxed_basic_income_check = yes
+		NOT = {
+			AND = {
+				owner = {
+					is_ai = yes
+				}	
+				has_any_industry_district = no
+			}
 		}
 	}
 
@@ -18,6 +23,12 @@ building_foundry_1 = {
 		OR = {
 			has_modifier = resort_colony
 			has_modifier = slave_colony
+			AND = {
+				owner = {
+					is_ai = yes
+				}	
+				has_any_industry_district = no
+			}
 		}
 	}
 
@@ -208,65 +219,12 @@ building_foundry_1 = {
 		text = job_catalytic_drone_effect_desc
 	}
 
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-			is_planet_class = pc_crucible
-		}
-		text = job_crucible_foundry_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_hive_empire = yes }
-			is_planet_class = pc_crucible
-		}
-		text = job_crucible_alloy_drone_effect_desc
-	}
-
-	triggered_desc = {
-		trigger = {
-			exists = owner
-			owner = { is_machine_empire = yes }
-			is_planet_class = pc_crucible
-		}
-		text = job_crucible_fabricator_effect_desc
-	}
-
 	ai_resource_production = {
-		alloys = 4 # This is an important building for future upgrades
-		trigger = {
-			always = yes
-		}
-	}
-	ai_resource_production = { # Overvalue this building if this planet is a major source of alloys.
-		alloys = 4
+		alloys = 8
 		trigger = {
 			planet_resource_compare = {
 				resource = alloys
-				value >= 8
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		alloys = 4
-		trigger = {
-			planet_resource_compare = {
-				resource = alloys
-				value >= 16
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		alloys = 4
-		trigger = {
-			planet_resource_compare = {
-				resource = alloys
-				value >= 24
+				value >= 20
 				type = produces
 			}
 		}
@@ -289,6 +247,12 @@ building_foundry_2 = {
 			AND = {
 				exists = owner
 				buildings_no_motes = yes
+			}
+			AND = {
+				owner = {
+					is_ai = yes
+				}	
+				has_any_industry_district = no
 			}
 		}
 	}
@@ -540,43 +504,6 @@ building_foundry_2 = {
 		}
 		text = job_crucible_fabricator_effect_desc
 	}
-
-	ai_resource_production = {
-		alloys = 8
-		trigger = {
-			always = yes
-		}
-	}
-	ai_resource_production = {
-		alloys = 8
-		trigger = {
-			planet_resource_compare = {
-				resource = alloys
-				value >= 8
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		alloys = 8
-		trigger = {
-			planet_resource_compare = {
-				resource = alloys
-				value >= 16
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		alloys = 8
-		trigger = {
-			planet_resource_compare = {
-				resource = alloys
-				value >= 24
-				type = produces
-			}
-		}
-	}
 }
 
 building_foundry_3 = {
@@ -586,7 +513,6 @@ building_foundry_3 = {
 
 	allow = {
 		has_major_upgraded_capital = yes
-		buildings_upgrade_allow = yes
 	}
 
 	destroy_trigger = {
@@ -596,6 +522,12 @@ building_foundry_3 = {
 			AND = {
 				exists = owner
 				buildings_no_motes = yes
+			}
+			AND = {
+				owner = {
+					is_ai = yes
+				}	
+				has_any_industry_district = no
 			}
 		}
 	}
@@ -842,43 +774,6 @@ building_foundry_3 = {
 		}
 		text = job_crucible_fabricator_effect_desc
 	}
-
-	ai_resource_production = {
-		alloys = 16
-		trigger = {
-			always = yes
-		}
-	}
-	ai_resource_production = {
-		alloys = 16
-		trigger = {
-			planet_resource_compare = {
-				resource = alloys
-				value >= 16
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		alloys = 16
-		trigger = {
-			planet_resource_compare = {
-				resource = alloys
-				value >= 32
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		alloys = 16
-		trigger = {
-			planet_resource_compare = {
-				resource = alloys
-				value >= 48
-				type = produces
-			}
-		}
-	}
 }
 
 building_factory_1 = {
@@ -893,7 +788,14 @@ building_factory_1 = {
 		}
 		NOT = { has_modifier = resort_colony }
 		NOT = { has_modifier = slave_colony }
-		building_relaxed_basic_income_check = yes
+		NOT = {
+			AND = {
+				owner = {
+					is_ai = yes
+				}	
+				has_any_industry_district = no
+			}
+		}
 	}
 
 	destroy_trigger = {
@@ -903,9 +805,19 @@ building_factory_1 = {
 
 			AND = {
 				exists = owner
-				owner = {
-					is_ai = yes
-					country_uses_consumer_goods = no
+				OR = {
+					owner = {
+						is_ai = yes
+						country_uses_consumer_goods = no
+					}
+					AND = {
+						owner = {
+							is_ai = yes
+						}
+						NOT = { has_district = district_rw_industrial }
+						NOT = { has_district = district_hab_industrial }
+						NOT = { has_district = district_industrial }	
+					}
 				}
 			}
 		}
@@ -994,43 +906,6 @@ building_factory_1 = {
 		}
 		text = job_artisan_drone_effect_desc
 	}
-
-	ai_resource_production = {
-		consumer_goods = 8 # This is an important building for future upgrades
-		trigger = {
-			always = yes
-		}
-	}
-	ai_resource_production = { # Overvalue this building if this planet is a major source of consumer goods
-		consumer_goods = 8
-		trigger = {
-			planet_resource_compare = {
-				resource = consumer_goods
-				value >= 16
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		consumer_goods = 8
-		trigger = {
-			planet_resource_compare = {
-				resource = consumer_goods
-				value >= 32
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		consumer_goods = 8
-		trigger = {
-			planet_resource_compare = {
-				resource = consumer_goods
-				value >= 48
-				type = produces
-			}
-		}
-	}
 }
 
 building_factory_2 = {
@@ -1055,12 +930,19 @@ building_factory_2 = {
 		OR = {
 			has_modifier = resort_colony
 			has_modifier = slave_colony
-
 			AND = {
 				exists = owner
-				owner = {
-					is_ai = yes
-					country_uses_consumer_goods = no
+				OR = {
+					owner = {
+						is_ai = yes
+						country_uses_consumer_goods = no
+					}
+					AND = {
+						owner = {
+							is_ai = yes
+						}
+						has_any_industry_district = no		
+					}
 				}
 			}
 			buildings_no_crystals = yes
@@ -1157,43 +1039,6 @@ building_factory_2 = {
 		}
 		text = job_artisan_drone_effect_desc
 	}
-
-	ai_resource_production = {
-		consumer_goods = 16
-		trigger = {
-			always = yes
-		}
-	}
-	ai_resource_production = {
-		consumer_goods = 16
-		trigger = {
-			planet_resource_compare = {
-				resource = consumer_goods
-				value >= 16
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		consumer_goods = 16
-		trigger = {
-			planet_resource_compare = {
-				resource = consumer_goods
-				value >= 32
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		consumer_goods = 16
-		trigger = {
-			planet_resource_compare = {
-				resource = consumer_goods
-				value >= 48
-				type = produces
-			}
-		}
-	}
 }
 
 building_factory_3 = {
@@ -1204,7 +1049,6 @@ building_factory_3 = {
 
 	allow = {
 		has_major_upgraded_capital = yes
-		buildings_upgrade_allow = yes
 	}
 
 	potential = {
@@ -1223,9 +1067,17 @@ building_factory_3 = {
 
 			AND = {
 				exists = owner
-				owner = {
-					is_ai = yes
-					country_uses_consumer_goods = no
+				OR = {
+					owner = {
+						is_ai = yes
+						country_uses_consumer_goods = no
+					}
+					AND = {
+						owner = {
+							is_ai = yes
+						}
+						has_any_industry_district = no	
+					}
 				}
 			}
 			buildings_no_crystals = yes
@@ -1319,54 +1171,17 @@ building_factory_3 = {
 		}
 		text = job_artisan_drone_effect_desc
 	}
-
-	ai_resource_production = {
-		consumer_goods = 24
-		trigger = {
-			always = yes
-		}
-	}
-	ai_resource_production = {
-		consumer_goods = 24
-		trigger = {
-			planet_resource_compare = {
-				resource = consumer_goods
-				value >= 24
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		consumer_goods = 20
-		trigger = {
-			planet_resource_compare = {
-				resource = consumer_goods
-				value >= 44
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		consumer_goods = 20
-		trigger = {
-			planet_resource_compare = {
-				resource = consumer_goods
-				value >= 64
-				type = produces
-			}
-		}
-	}
 }
 
 building_refinery = {
 	base_buildtime = @b2_time
 
+	exempt_from_ai_planet_specialization = no
 	category = manufacturing
 
 	potential = {
 		NOT = { has_modifier = resort_colony }
 		NOT = { has_modifier = slave_colony }
-		building_basic_income_check = yes
 	}
 
 	allow = {
@@ -1434,24 +1249,17 @@ building_refinery = {
 		}
 		text = job_gas_refiner_drone_effect_desc
 	}
-
-	ai_resource_production = {
-		exotic_gases = 1
-		trigger = {
-			always = yes
-		}
-	}
 }
 
 building_chemical_plant = {
 	base_buildtime = @b2_time
 
+	exempt_from_ai_planet_specialization = no
 	category = manufacturing
 
 	potential = {
 		NOT = { has_modifier = resort_colony }
 		NOT = { has_modifier = slave_colony }
-		building_basic_income_check = yes
 	}
 
 	allow = {
@@ -1518,24 +1326,17 @@ building_chemical_plant = {
 		}
 		text = job_chemist_drone_effect_desc
 	}
-
-	ai_resource_production = {
-		volatile_motes = 1
-		trigger = {
-			always = yes
-		}
-	}
 }
 
 building_crystal_plant = {
 	base_buildtime = @b2_time
 
+	exempt_from_ai_planet_specialization = no
 	category = manufacturing
 
 	potential = {
 		NOT = { has_modifier = resort_colony }
 		NOT = { has_modifier = slave_colony }
-		building_basic_income_check = yes
 	}
 
 	allow = {
@@ -1607,13 +1408,6 @@ building_crystal_plant = {
 	upgrades = {
 		"building_crystal_plant_2"
 	}
-
-	ai_resource_production = {
-		rare_crystals = 1
-		trigger = {
-			always = yes
-		}
-	}
 }
 
 building_nanite_transmuter = {
@@ -1642,7 +1436,6 @@ building_nanite_transmuter = {
 			has_modifier = resort_colony
 			has_modifier = slave_colony
 		}
-		building_basic_income_check = yes
 	}
 
 	allow = {
@@ -1709,6 +1502,12 @@ building_ministry_production = {
 			has_modifier = resort_colony
 			has_modifier = slave_colony
 			buildings_no_motes = yes
+			AND = {
+				owner = {
+					is_ai = yes
+				}	
+				has_any_industry_district = no
+			}
 		}
 	}
 
@@ -1717,7 +1516,7 @@ building_ministry_production = {
 	}
 
 	planet_modifier = {
-		job_administrator_add = 1
+		job_politician_add = 1
 		planet_metallurgists_produces_mult = 0.15
 		planet_artisans_produces_mult = 0.15
 	}
@@ -1739,7 +1538,7 @@ building_ministry_production = {
 	}
 
 	triggered_desc = {
-		text = job_administrator_effect_desc
+		text = job_politician_effect_desc
 	}
 
 	show_tech_unlock_if = {
@@ -1747,22 +1546,7 @@ building_ministry_production = {
 	}
 
 	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 3
-		consumer_goods = 6
-	}
-	ai_resource_production = {
-		alloys = 3
-		trigger = {
-			planet_resource_compare = {
-				resource = alloys
-				value >= 20
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		alloys = 3
+		alloys = 6
 		trigger = {
 			planet_resource_compare = {
 				resource = alloys
@@ -1772,21 +1556,11 @@ building_ministry_production = {
 		}
 	}
 	ai_resource_production = {
-		consumer_goods = 5
+		consumer_goods = 8
 		trigger = {
 			planet_resource_compare = {
 				resource = consumer_goods
-				value >= 33
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		consumer_goods = 5
-		trigger = {
-			planet_resource_compare = {
-				resource = consumer_goods
-				value >= 66
+				value >= 50
 				type = produces
 			}
 		}
@@ -1809,6 +1583,7 @@ building_production_center = {
 		OR = {
 			owner = { is_gestalt = no }
 			buildings_no_motes = yes
+			has_any_industry_district = no
 		}
 	}
 
@@ -1919,29 +1694,7 @@ building_production_center = {
 	}
 
 	ai_resource_production = {
-		trigger = { always = yes }
-		alloys = 3
-	}
-	ai_resource_production = {
-		trigger = {
-			owner = {
-				country_uses_consumer_goods = yes
-			}
-		}
-		consumer_goods = 6
-	}
-	ai_resource_production = {
-		alloys = 3
-		trigger = {
-			planet_resource_compare = {
-				resource = alloys
-				value >= 20
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		alloys = 3
+		alloys = 6
 		trigger = {
 			planet_resource_compare = {
 				resource = alloys
@@ -1951,21 +1704,12 @@ building_production_center = {
 		}
 	}
 	ai_resource_production = {
-		consumer_goods = 5
+		consumer_goods = 8
 		trigger = {
+			owner = { country_uses_consumer_goods = yes }
 			planet_resource_compare = {
 				resource = consumer_goods
-				value >= 33
-				type = produces
-			}
-		}
-	}
-	ai_resource_production = {
-		consumer_goods = 5
-		trigger = {
-			planet_resource_compare = {
-				resource = consumer_goods
-				value >= 66
+				value >= 50
 				type = produces
 			}
 		}
