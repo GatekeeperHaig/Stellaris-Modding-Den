@@ -49,7 +49,7 @@ spawn_temperature_zone_modifier = {
 					set_planet_flag = "temperature_spawned"
 				}
 			}
-			10 = {
+			0 = {
 				modifier = { factor = 0.50 planet_size < 20 }
 				add_modifier = {
 					modifier = "temperature-temperate"
@@ -100,7 +100,7 @@ spawn_temperature_zone_modifier = {
 					set_planet_flag = "temperature_spawned"
 				}
 			}
-			10 = {
+			0 = {
 				modifier = { factor = 0.50 planet_size < 20 }
 				add_modifier = {
 					modifier = "temperature-temperate"
@@ -152,31 +152,101 @@ spawn_temperature_zone_modifier = {
 }
 
 spawn_gravity_modifier = {
-	random_list = {
-		33 = {
-			add_modifier = {
-				modifier = "low_gravity"
-				days = -1
+	# Spawn gravity modifier
+	if = {
+		limit = { has_modifier = low_gravity }
+		remove_modifier = low_gravity #in case the vanilla modifier spawned already
+	}
+	if = {
+		limit = { has_modifier = high_gravity }
+		remove_modifier = high_gravity #in case the vanilla modifier spawned already
+	}
+	if = {
+		limit = {
+			OR = {
+				# Add special planets we dont want random gravities here
+				has_planet_flag = "planet_venus"
+				has_planet_flag = "planet_mars"
+				has_planet_flag = "moon_luna"
+				has_planet_flag = "moon_europa"
+				has_planet_flag = "moon_titan"
 			}
-			modifier = { factor = 2.00 planet_size < 15 }
-			modifier = { factor = 0.25 planet_size > 18 }
 		}
-		33 = {
-			add_modifier = {
-				modifier = "standard_gravity"
-				days = -1
+		random_list = {
+			0 = {
+				add_modifier = {
+					modifier = "low_gravity"
+					days = -1
+				}
+				modifier = { add = 100 has_planet_flag = "planet_mars" }
+				modifier = { add = 100 has_planet_flag = "moon_luna" }
+				modifier = { add = 100 has_planet_flag = "moon_europa" }
+				modifier = { add = 100 has_planet_flag = "moon_titan" }
 			}
-			modifier = { factor = 2.00 AND = { planet_size > 14 planet_size < 24 } }
-		}
-		33 = {
-			add_modifier = {
-				modifier = "high_gravity"
-				days = -1
+			0 = {
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				modifier = { add = 100 has_planet_flag = "planet_venus" }
 			}
-			modifier = { factor = 2.00 planet_size > 23 }
-			modifier = { factor = 0.25 planet_size < 20 }
 		}
 	}
+	else = {
+		random_list = {
+			0 = {
+				add_modifier = {
+					modifier = "low_gravity"
+					days = -1
+				}
+				modifier = { add = 20 planet_size < 16 }
+				modifier = { add = 80 planet_size < 14 }
+			}
+			20 = {
+				add_modifier = {
+					modifier = "standard_gravity"
+					days = -1
+				}
+				#modifier = { factor = 2.00 AND = { planet_size > 14 planet_size < 24 } }
+			}
+			0 = {
+				add_modifier = {
+					modifier = "high_gravity"
+					days = -1
+				}
+				modifier = { add = 10 planet_size > 22 }
+				modifier = { add = 40 planet_size > 24 }
+			}
+		}
+	}	
+}
+
+respawn_gravity_modifier = {
+	# For those cases we just want to re-order the modifiers, sending the gravity to last
+	if = {
+		limit = { has_modifier = low_gravity }
+		remove_modifier = low_gravity
+		add_modifier = {
+			modifier = "low_gravity"
+			days = -1
+		}
+	}
+	if = {
+		limit = { has_modifier = standard_gravity }
+		remove_modifier = standard_gravity
+		add_modifier = {
+			modifier = "standard_gravity"
+			days = -1
+		}
+	}
+	if = {
+		limit = { has_modifier = high_gravity }
+		remove_modifier = high_gravity
+		add_modifier = {
+			modifier = "high_gravity"
+			days = -1
+		}
+	}	
 }
 
 spawn_atmosphere_modifier = {

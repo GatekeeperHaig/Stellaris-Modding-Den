@@ -1,0 +1,1669 @@
+############################
+#
+# Aquatics Events
+#
+# Written by Pierre du Plessis
+#
+############################
+
+namespace = aquatics
+
+## Hydrocentric Ascension Perk
+
+# Evolved Aquatics
+country_event = {
+	id = aquatics.1
+	title = aquatics.1.name
+	desc = aquatics.1.desc
+	picture = GFX_evt_ocean
+	show_sound = event_the_great_awakening
+
+	is_triggered_only = yes
+
+	option = {
+		name = "aquatic.1.A"
+	}
+}
+
+
+## Here Be Dragons Origin
+
+# Initial setup
+country_event = {
+	id = aquatics.100
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		save_event_target_as = empire_with_dragon
+		capital_scope = {
+			save_event_target_as = here_be_dragons_planet
+			solar_system = {
+				set_star_flag = here_be_dragons_system
+			}
+		}
+		create_country = {
+			name = "NAME_Sky_Dragon"
+			type = origin_dragon
+			auto_delete = no
+			use_hostilities_from = root
+			flag = {
+				icon = {
+					category = "spherical"
+					file = "flag_spherical_6.dds"
+				}
+				background = {
+					category = "backgrounds"
+					file = "00_solid.dds"
+				}
+				colors = {
+					"dark_blue"
+					"dark_blue"
+					"null"
+					"null"
+				}
+			}
+			effect = {
+				establish_communications_no_message = root
+				set_faction_hostility = {
+					target = root
+					set_hostile = no
+					set_neutral = no
+					set_friendly = yes
+				}
+				save_event_target_as = here_be_the_dragon_country
+				set_country_flag = here_be_the_dragon
+				set_country_flag = here_be_the_dragon@root
+				create_origin_dragon_fleet_effect = yes
+			}
+		}
+		capital_scope = {
+			planet_event = { id = aquatics.150 days = 3300 random = 1000 }
+			solar_system = {
+				closest_system = {
+					min_steps = 2
+					limit = {
+						any_system_planet = {
+							is_colonizable = no
+							is_colony = no
+							NOR = {
+								has_deposit_for = shipclass_research_station
+								is_star = yes
+								is_planet_class = pc_gas_giant
+							}
+						}
+					}
+					random_system_planet = {
+						limit = {
+							is_colonizable = no
+							is_colony = no
+							NOR = {
+								has_deposit_for = shipclass_research_station
+								is_star = yes
+								is_planet_class = pc_gas_giant
+							}
+						}
+						weights = {
+							base = 1
+							modifier = {
+								factor = 100
+								OR = {
+									is_planet_class = pc_asteroid
+									is_planet_class = pc_ice_asteroid
+								}
+							}
+						}
+						add_deposit = d_living_metal_deposit
+					}
+				}
+			}
+		}
+	}
+}
+
+
+#Gotta start with the important things... killing the dragon :(
+
+# This = owner of fleet 1 (combatant)
+# From = owner of fleet 2 (destroyed)
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2
+country_event = {
+	id = aquatics.105
+	title = aquatics.105.name
+	desc = {
+		text = aquatics.105.desc.origin_normal
+		trigger = {
+			from = { has_country_flag = here_be_the_dragon@root }
+			NOT = { has_ethic = ethic_gestalt_consciousness }
+			is_materialist = no
+		}
+	}
+	desc = {
+		text = aquatics.105.desc.origin_materialist
+		trigger = {
+			from = { has_country_flag = here_be_the_dragon@root }
+			is_materialist = yes
+		}
+	}
+	desc = {
+		text = aquatics.105.desc.origin_hive
+		trigger = {
+			from = { has_country_flag = here_be_the_dragon@root }
+			is_hive_empire = yes
+		}
+	}
+	desc = {
+		text = aquatics.105.desc.origin_machine
+		trigger = {
+			from = { has_country_flag = here_be_the_dragon@root }
+			is_machine_empire = yes
+		}
+	}
+	desc = {
+		text = aquatics.105.desc.others
+		trigger = {
+			NOT = { from = { has_country_flag = here_be_the_dragon@root } }
+		}
+	}
+
+	picture = GFX_evt_here_be_dragons
+	location = fromfrom
+	show_sound = event_mystic_reveal
+
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			is_country_type = origin_dragon
+			has_country_flag = here_be_the_dragon
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				NOT = { from = { has_country_flag = here_be_the_dragon@root } }
+			}
+			random_country = {
+				limit = { from = { has_country_flag = here_be_the_dragon@prev } }
+				country_event = { id = aquatics.110 }
+			}
+		}
+		fromfrom.solar_system = {
+			save_event_target_as = dragon_system
+			random_system_planet = {
+				limit = {
+					is_colony = yes
+				}
+				weights = {
+					base = 1
+					modifier = {
+						factor = 1000
+						NOT = { is_planet_class = pc_habitat }
+					}
+				}
+				save_event_target_as = dragon_planet
+			}
+		}
+		random_country = {
+			limit = { has_country_flag = dragon_dummy_for@from }
+			destroy_country = yes
+		}
+	}
+
+	option = {
+		name = aquatics.105.A
+		trigger = { from = { has_country_flag = here_be_the_dragon@root } }
+		grant_dragon_armor_effect = yes
+		add_modifier = {
+			modifier = slew_origin_dragon
+		}
+	}
+
+	option = {
+		name = aquatics.105.A
+		trigger = { NOT = { from = { has_country_flag = here_be_the_dragon@root } } }
+		grant_dragon_armor_effect = yes
+	}
+
+	option = {
+		name = galactic_features.385.reanimated
+		trigger = {
+			has_valid_civic = civic_reanimated_armies
+			from = { has_country_flag = here_be_the_dragon@root }
+		}
+		add_modifier = {
+			modifier = slew_origin_dragon
+		}
+		enable_special_project = {
+			name = "REANIMATE_ORIGIN_DRAGON"
+			location = event_target:dragon_system.star
+			owner = root
+		}
+	}
+
+	option = {
+		name = galactic_features.385.reanimated
+		trigger = {
+			has_valid_civic = civic_reanimated_armies
+			NOT = { from = { has_country_flag = here_be_the_dragon@root } }
+		}
+		enable_special_project = {
+			name = "REANIMATE_ORIGIN_DRAGON"
+			location = event_target:dragon_system.star
+			owner = root
+		}
+	}
+
+	after = {
+		if = {
+			limit = { exists = fromfrom.leader }
+			fromfrom.leader = {
+				if = {
+					limit = {
+						leader_class = admiral
+					}
+					add_trait = leader_trait_dragonslayer
+				}
+				ELSE_IF = {
+					limit = {
+						leader_class = general
+					}
+					add_trait = leader_trait_dragonbane
+				}
+			}
+		}
+	}
+}
+
+#Slain by someone else
+country_event = {
+	id = aquatics.110
+	title = aquatics.110.name
+	desc = aquatics.110.desc
+	picture = GFX_evt_here_be_dragons
+	location = fromfrom
+	show_sound = event_bad_omen
+	is_triggered_only = yes
+
+	option = {
+		name = aquatics.110.A
+	}
+}
+
+#Reanimated Dragon
+country_event = {
+	id = aquatics.115
+	title = aquatics.115.name
+	desc = aquatics.115.desc
+	picture = GFX_evt_here_be_dragons
+	location = from
+	show_sound = event_mystic_reveal
+	is_triggered_only = yes
+
+	option = {
+		name = aquatics.115.A
+
+		create_fleet = {
+			name = "NAME_Hrozgar_of_the_Endless_Flames"
+			effect = {
+				set_owner = root
+				create_ship = {
+					name = "NAME_Hrozgar_of_the_Endless_Flames"
+					design = "NAME_Sky_Dragon"
+					prefix = no
+					upgradable = no
+				}
+				set_location = {
+					target = from
+					distance = 0
+					angle = random
+				}
+				set_fleet_stance = passive
+			}
+			settings = {
+				can_upgrade = no
+				can_change_composition = no
+				can_change_leader = no
+				uses_naval_capacity = no
+				spawn_debris = no
+			}
+		}
+	}
+}
+
+
+# Happy Dragon wants to start a family with you
+country_event = {
+	id = aquatics.120
+	title = aquatics.120.diplo_name
+	diplomatic_title = aquatics.120.name
+	desc = aquatics.120.desc
+	location = capital_star
+	show_sound = event_mystic_reveal
+	diplomatic = yes
+	is_triggered_only = yes
+
+	picture_event_data = {
+		room = no_video_feed_room
+	}
+
+	trigger = {
+		has_origin = origin_here_be_dragons
+		has_country_flag = origin_dragon_not_ready
+		has_non_hostile_origin_dragon_trigger = yes
+		if = { #Finished ascension path or quite far with all the traditions
+			limit = {
+				OR = {
+					has_ascension_perk = ap_evolutionary_mastery
+					has_ascension_perk = ap_synthetic_evolution
+					has_ascension_perk = ap_transcendence
+				}
+			}
+			num_ascension_perks >= 4
+		}
+		else = { num_ascension_perks >= 6 }
+	}
+
+	immediate = {
+		remove_country_flag = origin_dragon_not_ready
+		random_country = {
+			limit = { has_country_flag = here_be_the_dragon@root }
+			save_event_target_as = dragon_country
+		}
+	}
+
+	option = {
+		name = aquatics.120.dialog.1
+		response_text = aquatics.120.dialog.1.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = aquatics.120.dialog.2
+		response_text = aquatics.120.dialog.2.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = aquatics.120.dialog.3
+		response_text = aquatics.120.dialog.3.response
+		is_dialog_only = yes
+	}
+	option = {
+		name = aquatics.120.dialog.4
+		response_text = aquatics.120.dialog.4.response
+		is_dialog_only = yes
+	}
+
+	option = { #accept, of course
+		name = aquatics.120.A
+		response_text = aquatics.120.A.response
+
+		event_target:dragon_country = {
+			random_owned_fleet = {
+				hidden_effect = { clear_fleet_actions = this }
+				set_owner = root
+			}
+		}
+		custom_tooltip = aquatics.120.A.tooltip
+		hidden_effect = {
+			set_country_flag = dragon_breeders
+			create_ship_design = { design = "NAME_Sky_Dragon_Baby" }
+			add_ship_design = last_created_design
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+
+	option = { #reject, just because
+		name = aquatics.120.B
+		response_text = aquatics.120.B.response
+		custom_tooltip = aquatics.120.B.tooltip
+
+		add_resource = {
+			influence = 500
+		}
+		hidden_effect = {
+			event_target:dragon_country = {
+				every_owned_fleet = {
+					delete_fleet = this
+				}
+			}
+		}
+		ai_chance = {
+			factor = 0
+		}
+	}
+}
+
+# Hungry Dragon wants food pleeese
+planet_event = {
+	id = aquatics.150
+	title = aquatics.150.name
+	desc = aquatics.150.desc
+	picture = GFX_evt_here_be_dragons
+	show_sound = event_aqu_dragon
+
+	is_triggered_only = yes
+	location = root
+
+	trigger = {
+		exists = event_target:empire_with_dragon
+		is_owned_by = event_target:empire_with_dragon
+		exists = event_target:here_be_the_dragon_ship
+		owner = { has_non_hostile_origin_dragon_trigger = yes }
+	}
+
+	immediate = {
+		event_target:here_be_the_dragon_ship = {
+			fleet = {
+				save_event_target_as = here_be_the_dragon_fleet
+				clear_fleet_actions = this
+				queue_actions = {
+					repeat = { #repeating it creates a visual effect of swooping around the planet
+						find_random_planet = {
+							trigger = {
+								id = aquatics.150.t
+								is_same_value = root
+							}
+							found_planet = {
+								move_to = this
+								orbit_planet = THIS
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = aquatics.150.A
+		custom_tooltip = aquatics.150.A.tooltip
+
+		hidden_effect = {
+			planet_event = { id = aquatics.155 days = 10 }
+		}
+
+		ai_chance = {
+			factor = 100
+			modifier = {
+				factor = 0
+				owner = {
+					NOR = {
+						resource_stockpile_compare = {
+							resource = food
+							value < 50
+						}
+						resource_income_compare = {
+							resource = food
+							value > 0
+						}
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = aquatics.150.B
+		custom_tooltip = aquatics.150.B.tooltip
+
+		allow = {
+			owner = {
+				resource_stockpile_compare = {
+					resource = influence
+					value >= 75
+				}
+			}
+		}
+		owner = {
+			add_resource = {
+				influence = -75
+			}
+		}
+
+		hidden_effect = {
+			planet_event = { id = aquatics.160 days = 30 }
+		}
+
+		ai_chance = {
+			factor = 100
+			modifier = {
+				factor = 0
+				owner = {
+					OR = {
+						resource_stockpile_compare = {
+							resource = food
+							value < 50
+						}
+						resource_income_compare = {
+							resource = food
+							value > 0
+						}
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = aquatics.150.C
+
+		hidden_effect = {
+			planet_event = { id = aquatics.165 days = 30 }
+		}
+
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 0
+				owner = {
+					OR = {
+						resource_stockpile_compare = {
+							resource = food
+							value < 50
+						}
+						resource_income_compare = {
+							resource = food
+							value > 0
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Dragon shall smite yee down in anger!
+planet_event = {
+	id = aquatics.155
+	title = aquatics.155.name
+	desc = {
+		text = aquatics.155.desc.normal
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+	}
+	desc = {
+		text = aquatics.155.desc.gestalt
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+	}
+	picture = GFX_evt_death_from_above
+	show_sound = event_aqu_dragon
+
+	is_triggered_only = yes
+	location = root
+
+	trigger = {
+		exists = event_target:empire_with_dragon
+		is_owned_by = event_target:empire_with_dragon
+		exists = event_target:here_be_the_dragon_ship
+	}
+
+	option = {
+		name = UNFORTUNATE
+
+		random_owned_pop = {
+			kill_pop = yes
+		}
+		random_owned_pop = {
+			kill_pop = yes
+		}
+		add_blocker = {
+			type = d_ruined_building_blocker
+		}
+		add_blocker = {
+			type = d_massive_glacier
+		}
+
+		hidden_effect = {
+			owner = { set_country_flag = dragon_displeased }
+			event_target:here_be_the_dragon_fleet = {
+				clear_fleet_actions = this
+				queue_actions = {
+					repeat = {
+						find_random_planet = {
+							found_planet = {
+								move_to = this
+								orbit_planet = THIS
+								wait = 30
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Happy Dragon purrs (and eats a lot of food)
+planet_event = {
+	id = aquatics.160
+	title = aquatics.160.name
+	desc = aquatics.160.desc
+
+	picture = GFX_evt_here_be_dragons
+	show_sound = event_aqu_dragon
+
+	is_triggered_only = yes
+	location = root
+
+	trigger = {
+		exists = event_target:empire_with_dragon
+		is_owned_by = event_target:empire_with_dragon
+		exists = event_target:here_be_the_dragon_ship
+	}
+
+	option = {
+		name = aquatics.160.A
+
+		hidden_effect = {
+			owner = { set_country_flag = dragon_pleased }
+		}
+
+		#This will remove the ship, create the deposit, and fire an event to respawn the ship in 15 years
+		create_origin_dragon_deposit_effect = yes
+	}
+}
+
+# Dragon lands somewhere. A few people are squashed.
+planet_event = {
+	id = aquatics.165
+	title = aquatics.165.name
+	desc = {
+		text = aquatics.165.desc.normal
+		trigger = {
+			owner = { is_gestalt = no }
+		}
+	}
+	desc = {
+		text = aquatics.165.desc.gestalt
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+	}
+
+	picture = GFX_evt_here_be_dragons
+	show_sound = event_aqu_dragon
+
+	is_triggered_only = yes
+	location = root
+
+	trigger = {
+		exists = event_target:empire_with_dragon
+		is_owned_by = event_target:empire_with_dragon
+		exists = event_target:here_be_the_dragon_ship
+	}
+
+	option = {
+		name = INTERESTING
+
+		random_owned_pop = {
+			kill_pop = yes
+		}
+
+		#This will remove the ship, create the deposit, and fire an event to respawn the ship in 15 years
+		create_origin_dragon_deposit_effect = yes
+	}
+}
+
+# Dragon takes off again after gouging itself for 15 years
+planet_event = {
+	id = aquatics.170
+	title = aquatics.170.name
+	desc = aquatics.170.desc
+	picture = GFX_evt_here_be_dragons
+	show_sound = event_aqu_dragon
+
+	is_triggered_only = yes
+
+	trigger = {
+		exists = event_target:empire_with_dragon
+		is_owned_by = event_target:empire_with_dragon
+		has_deposit = d_landed_dragon
+	}
+
+	immediate = {
+		hidden_effect = {
+			create_origin_dragon_fleet_effect = yes
+		}
+	}
+
+	option = {
+		name = aquatics.170.A
+		custom_tooltip = aquatics.170.tooltip
+		remove_deposit = d_landed_dragon
+
+		owner = { #not very much of all three
+			add_monthly_resource_mult = {
+				resource = physics_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+			add_monthly_resource_mult = {
+				resource = engineering_research
+				value = @tier1researchreward
+				min = @tier1researchmin
+				max = @tier1researchmax
+			}
+		}
+	}
+
+	option = {
+		name = aquatics.170.B
+		custom_tooltip = aquatics.170.tooltip
+		remove_deposit = d_landed_dragon
+
+		owner = {
+			add_resource = {
+				energy = 1000
+				exotic_gases = 100
+			}
+		}
+	}
+}
+
+# Notification that Dragon goes Vrrrawr! - vrrrawred empire
+# on_entering_system_fleet
+# from = system
+fleet_event = {
+	id = aquatics.180
+	title = aquatics.180.name
+	desc = aquatics.180.desc
+	picture = GFX_evt_here_be_dragons
+	show_sound = event_aqu_dragon
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_star_flag = here_be_dragons_system
+			NOT = { has_star_flag = dragon_attack@root.owner }
+			owner = {
+				is_hostile = root.owner
+				has_origin = origin_here_be_dragons
+			}
+			OR = {
+				any_fleet_in_system = {
+					is_ship_size = space_dragon_origin
+					NOT = { owner = { is_country_type = default } }
+				}
+				any_system_planet = {
+					has_deposit = d_landed_dragon
+				}
+			}
+		}
+		fleet_power > from.starbase.fleet.trigger:fleet_power #there are some pathetic early game mobs that show up, don't really wanna fire the event for those
+		NOT = { is_ship_size = space_dragon_origin }
+	}
+
+	immediate = {
+		from = { #first time notification for owner
+			set_star_flag = dragon_attack@root.owner
+
+			if = {
+				limit = {
+					any_system_planet = {
+						has_deposit = d_landed_dragon
+					}
+				}
+				random_system_planet = {
+					limit = {
+						has_deposit = d_landed_dragon
+					}
+					save_event_target_as = here_be_dragons_planet
+				}
+				set_star_flag = dragon_attack
+				owner = {
+					country_event = { id = aquatics.185 }
+				}
+			}
+			else = {
+				random_system_planet = {
+					limit = {
+						is_colony = yes
+						is_artificial = no
+					}
+					save_event_target_as = here_be_dragons_planet
+				}
+				if = {
+					limit = { NOT = { has_star_flag = dragon_attack } }
+					set_star_flag = dragon_attack
+					owner = {
+						country_event = { id = aquatics.185 }
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = BATTLESTATIONS
+	}
+}
+
+# Notification that Dragon goes Vrrrawr! - dragon empire
+# from = attacking fleet
+# fromfrom = system
+country_event = {
+	id = aquatics.185
+	title = aquatics.185.name
+	desc = {
+		text = aquatics.185.desc
+		trigger = {
+			fromfrom = {
+				NOT = {
+					any_system_planet = {
+						has_deposit = d_landed_dragon
+					}
+				}
+			}
+		}
+	}
+	desc = {
+		text = aquatics.185.desc.landed
+		trigger = {
+			fromfrom = {
+				any_system_planet = {
+					has_deposit = d_landed_dragon
+				}
+			}
+		}
+	}
+	picture = GFX_evt_here_be_dragons
+	show_sound = event_aqu_dragon
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				fromfrom = {
+					any_system_planet = {
+						has_deposit = d_landed_dragon
+					}
+				}
+			}
+			set_country_flag = landed_dragon_takeoff
+			random_country = {
+				limit = {
+					has_country_flag = here_be_the_dragon@root
+				}
+				save_event_target_as = here_be_the_dragon_country
+			}
+			fromfrom = {
+				random_system_planet = {
+					limit = {
+						has_deposit = d_landed_dragon
+					}
+					save_event_target_as = here_be_dragons_planet
+					create_origin_dragon_fleet_effect = yes
+				}
+			}
+		}
+	}
+	option = {
+		name = {
+			text = aquatics.185.A
+			trigger = {
+				is_gestalt = no
+			}
+		}
+		name = {
+			text = aquatics.185.B
+			trigger = {
+				is_gestalt = yes
+			}
+		}
+
+		if = {
+			limit = {
+				has_country_flag = landed_dragon_takeoff
+			}
+			custom_tooltip = aquatics.170.tooltip
+			event_target:here_be_dragons_planet = { remove_deposit = d_landed_dragon }
+			hidden_effect = {
+				remove_country_flag = landed_dragon_takeoff
+			}
+		}
+	}
+}
+
+
+# Dragon Material Study
+# on_tech_increased
+country_event = {
+	id = aquatics.190
+	title = aquatics.190.name
+	desc = {
+		text = aquatics.190.desc
+		trigger = {
+			is_gestalt = no
+		}
+	}
+	desc = {
+		text = aquatics.190.desc.gestalt
+		trigger = {
+			is_gestalt = yes
+		}
+	}
+	picture = GFX_evt_here_be_dragons
+	show_sound = event_aqu_dragon
+	is_triggered_only = yes
+
+	trigger = {
+		has_origin = origin_here_be_dragons
+		years_passed > 12 #It should happen after the Hungry Dragon chain
+		NOT = { has_country_flag = dragon_materials_study }
+		if = {
+			limit = { years_passed < 50 } #upper limit in case people don't research the right techs
+			calc_true_if = { #know a bit of xenobiology
+				amount >= 2
+				has_technology = tech_society_1
+				has_technology = tech_society_2
+				has_technology = tech_society_3
+				has_technology = tech_alien_life_studies
+				has_technology = tech_arcane_deciphering
+				has_technology = tech_genome_mapping
+				has_technology = tech_gene_tailoring
+				has_technology = tech_glandular_acclimation
+				has_technology = tech_gene_expressions
+				has_technology = tech_regenerative_hull_tissue
+			}
+			calc_true_if = { #know a bit of space materials
+				amount >= 2
+	#			has_technology = tech_ship_armor_1 #starting tech
+				has_technology = tech_ship_armor_2
+				has_technology = tech_ship_armor_3
+				has_technology = tech_ship_armor_4
+				has_technology = tech_ship_armor_5
+				has_technology = tech_regenerative_hull_tissue
+				has_technology = tech_crystal_armor_1
+				has_technology = tech_crystal_armor_2
+				has_technology = tech_rare_crystals
+				has_technology = tech_mine_rare_crystals
+				has_technology = tech_starbase_3
+				has_technology = tech_starbase_4
+			}
+		}
+		has_non_hostile_origin_dragon_trigger = yes
+	}
+
+	immediate = {
+		set_country_flag = dragon_materials_study
+		random_system_within_border = {
+			limit = { has_star_flag = here_be_dragons_system }
+			star = { save_event_target_as = dragon_star }
+		}
+	}
+
+	option = {
+		name = aquatics.190.A
+		enable_special_project = {
+			name = "DRAGON_MATERIAL_STUDY"
+			location = event_target:dragon_star
+			owner = ROOT
+		}
+	}
+	option = {
+		name = aquatics.190.B
+		enable_special_project = {
+			name = "DRAGON_REMOTE_SCANS"
+			location = event_target:dragon_star
+			owner = ROOT
+		}
+	}
+}
+
+# Remote Scans Outcome
+ship_event = {
+	id = aquatics.195
+	title = aquatics.195.name
+	desc = aquatics.195.desc
+
+	picture = GFX_evt_here_be_dragons
+	show_sound = event_aqu_dragon
+	is_triggered_only = yes
+
+	immediate = {
+		owner = { set_country_flag = dragon_materials_study_complete }
+	}
+
+	option = {
+		name = FASCINATING
+
+		owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier2researchreward
+				min = @tier2researchmin
+				max = @tier2researchmax
+			}
+		}
+	}
+}
+
+# Intrusive Scans: Chomp
+ship_event = {
+	id = aquatics.200
+	title = aquatics.200.name
+	desc = aquatics.200.desc
+
+	picture = GFX_evt_exploding_ship
+	show_sound = event_aqu_dragon
+	is_triggered_only = yes
+
+	immediate = {
+		leader = {
+			save_event_target_as = doomed_leader
+		}
+	}
+
+	option = {
+		name = aquatics.200.A
+		hidden_effect = {
+			owner = {
+				set_country_flag = dragon_materials_study_complete
+				set_timed_country_flag = {
+					flag = dragon_materials_cooldown
+					years = 10
+				}
+			}
+		}
+	}
+	option = {
+		name = aquatics.200.B
+		hidden_effect = {
+			owner = { set_country_flag = dragon_materials_attempted }
+		}
+		enable_special_project = {
+			name = "DRAGON_MATERIAL_STUDY"
+			location = solar_system.star
+			owner = root.owner
+		}
+	}
+
+	after = {
+		event_target:doomed_leader = {
+			kill_leader = { show_notification = no }
+		}
+		destroy_ship = this
+	}
+}
+
+# Intrusive Scans: Slam
+ship_event = {
+	id = aquatics.205
+	title = aquatics.205.name
+	desc = aquatics.205.desc
+
+	picture = GFX_evt_here_be_dragons
+	show_sound = event_aqu_dragon
+	is_triggered_only = yes
+
+	immediate = {
+		solar_system = {
+			random_system_planet = {
+				limit = { is_star = no }
+				root.fleet = { set_location = prev }
+			}
+		}
+	}
+
+	option = {
+		name = aquatics.205.A
+		hidden_effect = {
+			owner = {
+				set_country_flag = dragon_materials_study_complete
+				set_timed_country_flag = {
+					flag = dragon_materials_cooldown
+					years = 10
+				}
+			}
+		}
+	}
+	option = {
+		name = aquatics.205.B
+		hidden_effect = {
+			owner = { set_country_flag = dragon_materials_attempted }
+		}
+		enable_special_project = {
+			name = "DRAGON_MATERIAL_STUDY"
+			location = solar_system.star
+			owner = root.owner
+		}
+	}
+}
+
+# Intrusive Scans: Planet Attack
+ship_event = {
+	id = aquatics.210
+	title = aquatics.210.name
+	desc = {
+		trigger = { owner = { is_gestalt = no } }
+		text = aquatics.210.desc.normal
+	}
+	desc = {
+		trigger = { owner = { is_gestalt = yes } }
+		text = aquatics.210.desc.gestalt
+	}
+
+	picture = GFX_evt_death_from_above
+	show_sound = event_aqu_dragon
+	is_triggered_only = yes
+
+	immediate = {
+		solar_system = {
+			random_system_planet = {
+				limit = {
+					is_colony = yes
+					is_artificial = no
+				}
+				save_event_target_as = dragon_colony
+			}
+		}
+	}
+
+	option = {
+		name = aquatics.210.A
+		event_target:dragon_colony = {
+			random_owned_pop = {
+				kill_pop = yes
+			}
+			random_owned_pop = {
+				kill_pop = yes
+			}
+			add_blocker = {
+				type = d_ruined_building_blocker
+			}
+			add_blocker = {
+				type = d_massive_glacier
+			}
+		}
+
+		hidden_effect = {
+			owner = {
+				set_country_flag = dragon_displeased
+				set_country_flag = dragon_materials_study_complete
+				set_timed_country_flag = {
+					flag = dragon_materials_cooldown
+					years = 10
+				}
+			}
+		}
+	}
+}
+
+# Intrusive Scans: Success (yes, it is possible)
+ship_event = {
+	id = aquatics.215
+	title = aquatics.215.name
+	desc = aquatics.215.desc
+
+	picture = GFX_evt_here_be_dragons
+	show_sound = event_mystic_reveal
+	is_triggered_only = yes
+
+	immediate = {
+		owner = {
+			set_country_flag = dragon_materials_study_complete
+			set_timed_country_flag = {
+				flag = dragon_materials_cooldown
+				years = 10
+			}
+		}
+		solar_system = {
+			random_system_planet = {
+				limit = {
+					is_colony = yes
+					is_artificial = no
+				}
+				save_event_target_as = dragon_colony
+			}
+		}
+		fleet = { set_mia = yes }
+	}
+
+	option = {
+		name = FASCINATING
+
+		owner = {
+			give_next_armor_tech_option_effect = yes
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = @tier3researchreward
+				min = @tier3researchmin
+				max = @tier3researchmax
+			}
+		}
+	}
+}
+
+
+# Dragon Communications
+# on_tech_increased - just because it's reliable and semi-common
+country_event = {
+	id = aquatics.250
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		has_country_flag = dragon_materials_study_complete
+		NOR = {
+			has_country_flag = dragon_materials_cooldown
+			has_country_flag = dragon_communications
+		}
+		OR = {
+			has_modifier = first_contact_skill_4
+			perc_communications_with_playable >= 0.7 #galcom established
+		}
+		has_non_hostile_origin_dragon_trigger = yes
+	}
+
+	immediate = {
+		random_system_within_border = {
+			limit = {
+				has_star_flag = here_be_dragons_system
+				any_fleet_in_system = {
+					is_ship_size = space_dragon_origin
+					owner = { has_country_flag = here_be_the_dragon@root }
+				}
+			}
+			save_event_target_as = this_system
+			random_fleet_in_system = {
+				limit = {
+					is_ship_size = space_dragon_origin
+					owner = { has_country_flag = here_be_the_dragon@root }
+				}
+				owner = {
+					save_event_target_as = the_dragon
+				}
+			}
+		}
+		set_country_flag = dragon_communications
+		create_country = { #This will create a dummy country that will not be deleted. It will be used for "first contact" with the dragon
+			type = dragon_dummy
+			effect = {
+				set_country_flag = dragon_of@root
+				set_country_flag = dragon_dummy_for@event_target:the_dragon
+				establish_contact = {
+					who = root
+					location = event_target:this_system
+				}
+			}
+		}
+	}
+}
+
+# Comms Study 1
+first_contact_event = {
+	id = aquatics.255
+	title = aquatics.255.name
+	desc = aquatics.255.desc
+	picture = GFX_evt_society_research
+	show_sound = event_laboratory_sound
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		set_site_progress_locked = yes
+	}
+
+	after = {
+		set_site_progress_locked = no
+	}
+
+	option = {
+		name = first_contact.5.A
+		custom_tooltip = draconic_communications_continues
+		hidden_effect = {
+			set_first_contact_stage = origin_dragon_stage_2
+		}
+	}
+}
+
+# Comms Study 2
+first_contact_event = {
+	id = aquatics.260
+	title = aquatics.260.name
+	desc = aquatics.260.desc
+	picture = GFX_evt_mysterious_signal
+	show_sound = event_aqu_dragon
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		set_site_progress_locked = yes
+	}
+
+	after = {
+		set_site_progress_locked = no
+	}
+
+	option = {
+		name = aquatics.260.A
+		custom_tooltip = draconic_communications_continues
+		hidden_effect = {
+			set_first_contact_stage = origin_dragon_finish
+		}
+	}
+}
+
+# Comms Study Finale
+first_contact_event = {
+	id = aquatics.265
+	title = aquatics.265.name
+	desc = {
+		trigger = {
+			owner = { is_regular_empire = yes }
+		}
+		text = aquatics.265.desc.normal
+	}
+	desc = {
+		trigger = {
+			owner = { is_gestalt = yes }
+		}
+		text = aquatics.265.desc.gestalt
+	}
+	picture = GFX_evt_here_be_dragons
+	show_sound = event_mystic_reveal
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		set_site_progress_locked = yes
+	}
+
+	after = {
+		set_site_progress_locked = no
+		hidden_effect = { finish_first_contact = yes }
+	}
+
+	option = {
+		name = aquatics.265.A
+
+		owner = {
+			add_resource = {
+				influence = 150
+			}
+			country_event = { id = aquatics.270 }
+		}
+	}
+}
+
+# The Dragon has something to say...
+country_event = {
+	id = aquatics.270
+	title = aquatics.120.diplo_name
+	diplomatic_title = aquatics.270.name
+	desc = aquatics.270.desc
+	show_sound = event_aqu_dragon
+
+	is_triggered_only = yes
+
+	diplomatic = yes
+
+	picture_event_data = {
+		room = no_video_feed_room
+	}
+
+	option = {
+		name = aquatics.270.A
+		custom_tooltip = aquatics.270.A.tooltip
+		add_monthly_resource_mult = {
+			resource = unity
+			value = @tier3unityreward
+			min = @tier3unitymin
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			set_country_flag = origin_dragon_not_ready
+			#Fires the finale with a slight delay if you actually already qualify for it
+			#Since the country flag is removed by the fired event, we need not worry about it happening twice
+			country_event = { id = aquatics.120 days = 2400 }
+
+			from.contact_country = {
+				destroy_country = yes
+			}
+		}
+	}
+}
+
+
+# Comms Study Woopsie
+first_contact_event = {
+	id = aquatics.280
+	title = aquatics.280.name
+	desc = aquatics.280.desc
+	picture = GFX_evt_exploding_ship
+	show_sound = event_screams
+	is_triggered_only = yes
+	first_contact = yes
+
+	immediate = {
+		set_site_progress_locked = yes
+		set_first_contact_flag = aquatics_280_fired
+	}
+
+	after = {
+		set_site_progress_locked = no
+	}
+
+	option = {
+		name = UNFORTUNATE
+		add_stage_clues = -2
+
+		if = { #I don't think anyone will actually reassign the envoy to save them, but technically they could
+			limit = { exists = leader }
+			leader = { kill_leader = { show_notification = no } }
+		}
+	}
+}
+
+# When you attack the dragon during first contact with the origin empire
+# on_fleet_combat_joined_attacker
+# This = Aggressor Fleet
+# From = Attacked Fleet
+# FromFrom = Additional Attacked Fleet (if part of ongoing combat)
+# FromFromFrom = Additional Attacked Fleet (if part of ongoing combat)
+fleet_event = {
+	id = aquatics.300
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		from = {
+			is_ship_size = space_dragon_origin
+			exists = owner
+			exists = space_owner
+			space_owner = {
+				NOT = { is_same_value = root.owner }
+			}
+			owner = {
+				is_country_type = origin_dragon
+				has_country_flag = here_be_the_dragon@root.space_owner
+				NOT = { is_hostile = root.space_owner }
+			}
+		}
+		owner = {
+			NOR = {
+				has_communications = root.space_owner
+				is_hostile = root.space_owner
+			}
+		}
+	}
+
+	immediate = {
+		space_owner = {
+			set_hostile = root.owner
+		}
+	}
+}
+
+# This event tells the player if they entered the dragon system before establishing comms
+# on_entering_system_first_time
+# Scope = Ship
+# From = System
+# FromFrom = Country
+ship_event = {
+	id = aquatics.305
+	title = aquatics.305.name
+	desc = aquatics.305.desc
+	picture = GFX_evt_here_be_dragons
+	show_sound = event_aqu_dragon
+	is_triggered_only = yes
+
+	trigger = {
+		from = {
+			has_star_flag = here_be_dragons_system
+			owner = {
+				has_origin = origin_here_be_dragons
+				NOT = { has_communications = root.owner }
+			}
+			any_fleet_in_system = {
+				is_ship_size = space_dragon_origin
+				NOT = {
+					owner = {
+						OR = {
+							is_country_type = default
+							is_hostile = root.space_owner
+						}
+					}
+				}
+			}
+		}
+		NOT = { is_ship_size = space_dragon_origin }
+	}
+
+	option = {
+		name = CURIOUS
+	}
+}
+
+# When you attack the dragon while you are doing the first contact story with it
+# on_fleet_combat_joined_attacker
+# This = Aggressor Fleet
+# From = Attacked Fleet
+# FromFrom = Additional Attacked Fleet (if part of ongoing combat)
+# FromFromFrom = Additional Attacked Fleet (if part of ongoing combat)
+fleet_event = {
+	id = aquatics.310
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		from = {
+			is_ship_size = space_dragon_origin
+			exists = owner
+			owner = {
+				is_country_type = origin_dragon
+				has_country_flag = here_be_the_dragon@root.owner
+			}
+		}
+		owner = {
+			any_active_first_contact = {
+				contact_country = { is_country_type = dragon_dummy }
+			}
+		}
+	}
+
+	immediate = {
+		owner = {
+			random_active_first_contact = {
+				limit = {
+					contact_country = { is_country_type = dragon_dummy }
+				}
+				finish_first_contact = yes
+				contact_country = { destroy_country = yes }
+			}
+		}
+	}
+}
+
+
+## Ocean Paradise Origin
+
+# Initial setup
+country_event = {
+	id = aquatics.1000
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		country_event = { id = aquatics.1001 }
+		# WIP - prob. more things to come here
+	}
+}
+
+# Change starting colonisables into Frozen Worlds and nearby asteroids into Ice Asteroids
+country_event = {
+	id = aquatics.1001
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		has_origin = origin_ocean_paradise
+	}
+
+	immediate = {
+		capital_scope.solar_system = {
+			closest_system = {
+				limit = { has_star_flag = neighbor_t1_first_colony }
+				max_steps = 3
+				random_system_planet = {
+					limit = {
+						is_colonizable = yes
+						is_colony = no
+						has_planet_flag = prescripted_ideal
+					}
+					change_pc = orbit_water_panthalassic
+				}
+				
+			}
+			closest_system = {
+				limit = { has_star_flag = neighbor_t2_second_colony }
+				max_steps = 6
+				random_system_planet = {
+					limit = {
+						is_colonizable = yes
+						is_colony = no
+						has_planet_flag = prescripted_ideal
+					}
+					change_pc = orbit_water_panthalassic
+				}
+				
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = aquatics.1005
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		OR = {
+			has_modifier = ocean_paradise
+			has_modifier = ocean_paradise_hive
+		}
+		NOT = { is_planet_class = pc_water_panthalassic } #should never be possible, but just in case
+	}
+
+	immediate = {
+		if = {
+			limit = { has_modifier = ocean_paradise }
+			remove_modifier = ocean_paradise
+		}
+		else = { remove_modifier = ocean_paradise_hive }
+	}
+}

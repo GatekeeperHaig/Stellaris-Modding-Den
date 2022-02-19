@@ -178,7 +178,16 @@ event = {
 		}
 		
 		every_galaxy_planet = {
-			planet_event = { id = atw_engine.05 days = 2 } # Convert placeholder classes - Stage 3, low habitables
+			planet_event = { id = atw_engine.05 days = 2 } # Convert placeholder classes - Stage 3, extra low habitables and terraforming candidates
+		}
+
+		every_system = {
+			limit = {
+				has_star_flag = "atw_edited"
+				NOT = { has_star_flag = "atw_re-edited" }
+			}			
+			system_event = { id = atw_engine.07 days = 3 } # Convert specific uninhabitable orbit classes back to vanilla classes (with modified localization and art to make them look the same) for compatibility with vanilla events
+			
 		}
 		
 	}
@@ -578,13 +587,282 @@ planet_event = {
 }
 
 planet_event = {
-	id = atw_engine.05 # CONVERT A SMALL AMMOUNT OF UNINHABITABLES INTO LOW HABITABILITY CLASSES
+	id = atw_engine.05 # CONVERT A SMALL AMMOUNT OF UNINHABITABLES INTO LOW HABITABILITY CLASSES AS WELL AS SPAWN TERRAFORMING CANDIDATES
 	hide_window = yes
 	is_triggered_only = yes
 	#fire_only_once = yes
 	
 	immediate = {
-		
+		# Dusty Telluric Terraforming Candidates:
+		if = {
+			limit = { is_planet_class = orbit_dusty_telluric }
+			random_list = {
+				0 = {
+					# base value depending on star's temperature zone
+					modifier = { add = 0 has_modifier = "temperature-scorching" }
+					modifier = { add = 0 has_modifier = "temperature-hot" }
+					modifier = { add = 10 has_modifier = "temperature-temperate" }
+					modifier = { add = 5 has_modifier = "temperature-cold" }
+					modifier = { add = 0 has_modifier = "temperature-freezing" }
+					# extra bonus conditions
+					modifier = { factor = 1.25 planet_size > 13 }
+					# modifiers based on star type
+					modifier = { factor = 0.75 solar_system = { has_star_flag = "white_dwarf" } }
+					modifier = { factor = 1.00 solar_system = { has_star_flag = "red_dwarf" } }
+					modifier = { factor = 1.50 solar_system = { has_star_flag = "yellow_star" } }
+					modifier = { factor = 1.25 solar_system = { has_star_flag = "white_star" } }
+					modifier = { factor = 1.25 solar_system = { has_star_flag = "red_giant" } }
+					modifier = { factor = 0.75 solar_system = { has_star_flag = "white_giant" } }
+					modifier = { factor = 0.50 solar_system = { has_star_flag = "red_supergiant" } }
+					modifier = { factor = 0.25 solar_system = { has_star_flag = "blue_giant" } }
+					modifier = { factor = 0.25 solar_system = { has_star_flag = "neutron_star" } }
+					modifier = { factor = 0.25 solar_system = { has_star_flag = "pulsar" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "black_hole" } }
+					# disable on below
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "sol_system" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "aldebaran_system" } }
+					modifier = { factor = 0.00 solar_system = { NOT = { has_star_flag = "atw_edited" } } }
+					# final roll based on where inside the temperate zone the planet is
+					modifier = { factor = 0.25 has_planet_flag = "warm_eco_zone" }
+					modifier = { factor = 0.75 has_planet_flag = "temperate_eco_zone" }
+					modifier = { factor = 1.50 has_planet_flag = "cool_eco_zone" }
+
+					add_modifier = {
+						modifier = "terraforming_candidate"
+						days = -1
+					}
+				}
+				90 = {
+					# do nothing
+				}
+			}
+		}
+		# Frozen Telluric Terraforming Candidates:
+		if = {
+			limit = { is_planet_class = orbit_frozen_telluric }
+			random_list = {
+				0 = {
+					# base value depending on star's temperature zone
+					modifier = { add = 0 has_modifier = "temperature-scorching" }
+					modifier = { add = 0 has_modifier = "temperature-hot" }
+					modifier = { add = 10 has_modifier = "temperature-temperate" }
+					modifier = { add = 5 has_modifier = "temperature-cold" }
+					modifier = { add = 0 has_modifier = "temperature-freezing" }
+					# extra bonus conditions
+					modifier = { factor = 1.25 is_moon = yes }
+					# modifiers based on star type
+					modifier = { factor = 0.75 solar_system = { has_star_flag = "white_dwarf" } }
+					modifier = { factor = 1.00 solar_system = { has_star_flag = "red_dwarf" } }
+					modifier = { factor = 1.50 solar_system = { has_star_flag = "yellow_star" } }
+					modifier = { factor = 1.25 solar_system = { has_star_flag = "white_star" } }
+					modifier = { factor = 1.25 solar_system = { has_star_flag = "red_giant" } }
+					modifier = { factor = 0.75 solar_system = { has_star_flag = "white_giant" } }
+					modifier = { factor = 0.50 solar_system = { has_star_flag = "red_supergiant" } }
+					modifier = { factor = 0.25 solar_system = { has_star_flag = "blue_giant" } }
+					modifier = { factor = 0.25 solar_system = { has_star_flag = "neutron_star" } }
+					modifier = { factor = 0.25 solar_system = { has_star_flag = "pulsar" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "black_hole" } }
+					# disable on below
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "sol_system" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "aldebaran_system" } }
+					modifier = { factor = 0.00 solar_system = { NOT = { has_star_flag = "atw_edited" } } }
+					# final roll based on planet size
+					modifier = { factor = 0.00 planet_size < 10 }
+					modifier = { factor = 0.75 planet_size > 9 planet_size < 15 }
+					modifier = { factor = 1.25 planet_size > 14 planet_size < 21 }
+					modifier = { factor = 1.50 planet_size > 20 }
+
+					add_modifier = {
+						modifier = "defrost_candidate"
+						days = -1
+					}
+				}
+				90 = {
+					# do nothing
+				}
+			}
+		}
+		# Volcanic Telluric Terraforming Candidates:
+		if = {
+			limit = { is_planet_class = orbit_volcanic_telluric }
+			random_list = {
+				0 = {
+					# base value depending on star's temperature zone
+					modifier = { add = 0 has_modifier = "temperature-scorching" }
+					modifier = { add = 10 has_modifier = "temperature-hot" }
+					modifier = { add = 5 has_modifier = "temperature-temperate" }
+					modifier = { add = 0 has_modifier = "temperature-cold" }
+					modifier = { add = 0 has_modifier = "temperature-freezing" }
+					# extra bonus conditions
+					modifier = { factor = 1.25 planet_size > 13 }
+					# modifiers based on star type
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "white_dwarf" } }
+					modifier = { factor = 0.25 solar_system = { has_star_flag = "red_dwarf" } }
+					modifier = { factor = 0.50 solar_system = { has_star_flag = "yellow_star" } }
+					modifier = { factor = 1.50 solar_system = { has_star_flag = "white_star" } }
+					modifier = { factor = 1.00 solar_system = { has_star_flag = "red_giant" } }
+					modifier = { factor = 1.25 solar_system = { has_star_flag = "white_giant" } }
+					modifier = { factor = 0.75 solar_system = { has_star_flag = "red_supergiant" } }
+					modifier = { factor = 0.50 solar_system = { has_star_flag = "blue_giant" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "neutron_star" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "pulsar" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "black_hole" } }
+					# disable on below
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "sol_system" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "aldebaran_system" } }
+					modifier = { factor = 0.00 solar_system = { NOT = { has_star_flag = "atw_edited" } } }
+					# final roll based on planet size
+					modifier = { factor = 0.00 planet_size < 10 }
+					modifier = { factor = 1.00 planet_size > 9 planet_size < 15 }
+					modifier = { factor = 1.25 planet_size > 14 planet_size < 21 }
+					modifier = { factor = 0.50 planet_size > 20 }
+
+					add_modifier = {
+						modifier = "detox_candidate"
+						days = -1
+					}
+				}
+				90 = {
+					# do nothing
+				}
+			}
+		}
+		# Hothouse Toxic Terraforming Candidates:
+		if = {
+			limit = { is_planet_class = orbit_hothouse_toxic }
+			random_list = {
+				0 = {
+					# base value depending on star's temperature zone
+					modifier = { add = 0 has_modifier = "temperature-scorching" }
+					modifier = { add = 5 has_modifier = "temperature-hot" }
+					modifier = { add = 10 has_modifier = "temperature-temperate" }
+					modifier = { add = 5 has_modifier = "temperature-cold" }
+					modifier = { add = 0 has_modifier = "temperature-freezing" }
+					# extra bonus conditions
+					modifier = { factor = 1.25 planet_size > 13 }
+					# modifiers based on star type
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "white_dwarf" } }
+					modifier = { factor = 0.75 solar_system = { has_star_flag = "red_dwarf" } }
+					modifier = { factor = 1.00 solar_system = { has_star_flag = "yellow_star" } }
+					modifier = { factor = 1.25 solar_system = { has_star_flag = "white_star" } }
+					modifier = { factor = 1.50 solar_system = { has_star_flag = "red_giant" } }
+					modifier = { factor = 1.25 solar_system = { has_star_flag = "white_giant" } }
+					modifier = { factor = 1.00 solar_system = { has_star_flag = "red_supergiant" } }
+					modifier = { factor = 0.75 solar_system = { has_star_flag = "blue_giant" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "neutron_star" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "pulsar" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "black_hole" } }
+					# disable on below
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "sol_system" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "aldebaran_system" } }
+					modifier = { factor = 0.00 solar_system = { NOT = { has_star_flag = "atw_edited" } } }
+					# final roll based on where inside the temperate zone the planet is
+					modifier = { factor = 1.50 has_planet_flag = "warm_eco_zone" }
+					modifier = { factor = 0.75 has_planet_flag = "temperate_eco_zone" }
+					modifier = { factor = 0.00 has_planet_flag = "cool_eco_zone" }
+
+					add_modifier = {
+						modifier = "detox_candidate"
+						days = -1
+					}
+				}
+				90 = {
+					# do nothing
+				}
+			}
+		}
+		# Methane Toxic Terraforming Candidates:
+		if = {
+			limit = { is_planet_class = orbit_methane_toxic }
+			random_list = {
+				0 = {
+					# base value depending on star's temperature zone
+					modifier = { add = 0 has_modifier = "temperature-scorching" }
+					modifier = { add = 0 has_modifier = "temperature-hot" }
+					modifier = { add = 0 has_modifier = "temperature-temperate" }
+					modifier = { add = 10 has_modifier = "temperature-cold" }
+					modifier = { add = 15 has_modifier = "temperature-freezing" }
+					# extra bonus conditions
+					modifier = { factor = 0.25 NOT = { is_moon = yes } }
+					# modifiers based on star type
+					modifier = { factor = 1.50 solar_system = { has_star_flag = "white_dwarf" } }
+					modifier = { factor = 1.50 solar_system = { has_star_flag = "red_dwarf" } }
+					modifier = { factor = 1.25 solar_system = { has_star_flag = "yellow_star" } }
+					modifier = { factor = 0.75 solar_system = { has_star_flag = "white_star" } }
+					modifier = { factor = 1.00 solar_system = { has_star_flag = "red_giant" } }
+					modifier = { factor = 0.50 solar_system = { has_star_flag = "white_giant" } }
+					modifier = { factor = 0.50 solar_system = { has_star_flag = "red_supergiant" } }
+					modifier = { factor = 0.25 solar_system = { has_star_flag = "blue_giant" } }
+					modifier = { factor = 0.75 solar_system = { has_star_flag = "neutron_star" } }
+					modifier = { factor = 0.75 solar_system = { has_star_flag = "pulsar" } }
+					modifier = { factor = 0.50 solar_system = { has_star_flag = "black_hole" } }
+					# disable on below
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "sol_system" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "aldebaran_system" } }
+					modifier = { factor = 0.00 solar_system = { NOT = { has_star_flag = "atw_edited" } } }
+					# final roll based on planet size
+					modifier = { factor = 1.00 planet_size < 10 }
+					modifier = { factor = 1.50 planet_size > 9 planet_size < 15 }
+					modifier = { factor = 0.25 planet_size > 14 planet_size < 21 }
+					modifier = { factor = 0.00 planet_size > 20 }
+
+					add_modifier = {
+						modifier = "detox_candidate"
+						days = -1
+					}
+				}
+				90 = {
+					# do nothing
+				}
+			}
+		}
+		# Molten Terraforming Candidates:
+		if = {
+			limit = { is_planet_class = orbit_molten }
+			random_list = {
+				0 = {
+					# base value depending on star's temperature zone
+					modifier = { add = 0 has_modifier = "temperature-scorching" }
+					modifier = { add = 0 has_modifier = "temperature-hot" }
+					modifier = { add = 15 has_modifier = "temperature-temperate" }
+					modifier = { add = 0 has_modifier = "temperature-cold" }
+					modifier = { add = 0 has_modifier = "temperature-freezing" }
+					# extra bonus conditions
+					modifier = { factor = 1.25 planet_size > 13 }
+					# modifiers based on star type
+					modifier = { factor = 0.75 solar_system = { has_star_flag = "white_dwarf" } }
+					modifier = { factor = 1.00 solar_system = { has_star_flag = "red_dwarf" } }
+					modifier = { factor = 1.50 solar_system = { has_star_flag = "yellow_star" } }
+					modifier = { factor = 1.25 solar_system = { has_star_flag = "white_star" } }
+					modifier = { factor = 1.25 solar_system = { has_star_flag = "red_giant" } }
+					modifier = { factor = 0.75 solar_system = { has_star_flag = "white_giant" } }
+					modifier = { factor = 0.50 solar_system = { has_star_flag = "red_supergiant" } }
+					modifier = { factor = 0.25 solar_system = { has_star_flag = "blue_giant" } }
+					modifier = { factor = 0.25 solar_system = { has_star_flag = "neutron_star" } }
+					modifier = { factor = 0.25 solar_system = { has_star_flag = "pulsar" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "black_hole" } }
+					# disable on below
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "sol_system" } }
+					modifier = { factor = 0.00 solar_system = { has_star_flag = "aldebaran_system" } }
+					modifier = { factor = 0.00 solar_system = { NOT = { has_star_flag = "atw_edited" } } }
+					# final roll based on planet size
+					modifier = { factor = 0.00 planet_size < 10 }
+					modifier = { factor = 0.50 planet_size > 9 planet_size < 15 }
+					modifier = { factor = 1.50 planet_size > 14 planet_size < 21 }
+					modifier = { factor = 0.50 planet_size > 20 }
+
+					add_modifier = {
+						modifier = "detox_candidate"
+						days = -1
+					}
+				}
+				90 = {
+					# do nothing
+				}
+			}
+		}
+		# add low habitability classes later if necessary
+		# to-do
 	}
 }
 
@@ -619,6 +897,122 @@ planet_event = {
 	option = {
 		name = atw_engine.06.a
 		custom_tooltip = atw_engine.06.a.tooltip
+	}
+}
+
+system_event = {
+	id = atw_engine.07 # VANILLA EVENTS COMPATIBILITY - Convert some system planets back to vanilla planet classes
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+	# Convert one gaseous giant to pc_gas_giant, higher odds of picking a proper gas giant and not an ice giant
+	random_system_planet = {
+		limit = {
+			is_orbit_giant_uninhabitable = yes
+		}
+		weights = {
+			base = 100
+			modifier = { factor = 0.00 is_planet_class = orbit_super_giant }
+			modifier = { factor = 2.00 is_planet_class = orbit_ammonia-clouded_giant }
+			modifier = { factor = 1.00 is_planet_class = orbit_water-clouded_giant }
+			modifier = { factor = 0.50 is_planet_class = orbit_cloudless_giant }
+			modifier = { factor = 0.00 is_planet_class = orbit_alkaline_giant }
+			modifier = { factor = 0.00 is_planet_class = orbit_silicate_giant }
+			modifier = { factor = 0.00 is_planet_class = orbit_frigid_giant }
+			modifier = { factor = 0.00 is_planet_class = orbit_methane_giant }
+			modifier = { factor = 0.00 is_planet_class = orbit_turbulent_giant }
+			modifier = { factor = 0.00 is_planet_class = orbit_temperate_giant }
+			modifier = { factor = 0.00 is_planet_class = orbit_helium_giant }
+			modifier = { factor = 0.00 is_planet_class = orbit_chthonian }
+		}
+		change_pc = pc_gas_giant
+	}
+	# Convert one rocky greenhouse to pc_toxic
+	random_system_planet = {
+		limit = {
+			is_rocky_greenhouse_planet = yes
+		}
+		weights = {
+			base = 100
+			modifier = { factor = 0.00 is_planet_class = orbit_ammonia_toxic }
+			modifier = { factor = 0.00 is_planet_class = orbit_hydrocarbonal_toxic }
+			modifier = { factor = 0.00 is_planet_class = orbit_alkali_toxic }
+			modifier = { factor = 0.00 is_planet_class = orbit_sulfur_toxic }
+			modifier = { factor = 2.00 is_planet_class = orbit_methane_toxic }
+			modifier = { factor = 0.00 is_planet_class = orbit_hothouse_toxic }
+			modifier = { factor = 0.50 is_planet_class = orbit_carbonyl_toxic }
+		}
+		change_pc = pc_toxic
+	}
+	# Convert one frozen telluric to pc_frozen
+	random_system_planet = {
+		limit = {
+			is_planet_class = orbit_frozen_telluric
+		}
+		change_pc = pc_frozen
+	}
+	# Convert one molten or volcanic telluric to pc_molten
+	random_system_planet = {
+		limit = {
+			OR = {
+				is_planet_class = orbit_molten
+				is_planet_class = orbit_volcanic_telluric
+			}
+		}
+		weights = {
+			base = 100
+			modifier = { factor = 2.00 is_planet_class = orbit_molten }
+			modifier = { factor = 0.50 is_planet_class = orbit_volcanic_telluric }
+		}
+		change_pc = pc_molten
+	}
+	# Convert one telluric to pc_barren
+	random_system_planet = {
+		limit = {
+			is_orbit_rocky_uninhabitable = yes
+		}
+		weights = {
+			base = 100
+			modifier = { factor = 0.00 is_planet_class = orbit_molten }
+			modifier = { factor = 0.00 is_planet_class = orbit_icy }
+			modifier = { factor = 2.00 is_planet_class = orbit_dusty_telluric }
+			modifier = { factor = 0.50 is_planet_class = orbit_iron_telluric }
+			modifier = { factor = 0.50 is_planet_class = orbit_silicate_telluric }
+			modifier = { factor = 1.25 is_planet_class = orbit_volcanic_telluric }
+			modifier = { factor = 0.75 is_planet_class = orbit_frozen_telluric }
+			modifier = { factor = 0.05 is_planet_class = orbit_methane_toxic }
+			modifier = { factor = 0.10 is_planet_class = orbit_hothouse_toxic }
+			modifier = { factor = 0.05 is_planet_class = orbit_carbonyl_toxic }
+			modifier = { factor = 0.00 is_planet_class = orbit_water_panthalassic }
+			modifier = { factor = 0.00 is_planet_class = orbit_ammonia_panthalassic }
+			modifier = { factor = 0.00 is_planet_class = orbit_methane_panthalassic }
+		}
+		change_pc = pc_barren
+	}
+	# Convert one telluric to pc_barren_cold
+	random_system_planet = {
+		limit = {
+			is_orbit_rocky_uninhabitable = yes
+		}
+		weights = {
+			base = 100
+			modifier = { factor = 0.00 is_planet_class = orbit_molten }
+			modifier = { factor = 1.00 is_planet_class = orbit_icy }
+			modifier = { factor = 0.75 is_planet_class = orbit_dusty_telluric }
+			modifier = { factor = 0.50 is_planet_class = orbit_iron_telluric }
+			modifier = { factor = 2.00 is_planet_class = orbit_silicate_telluric }
+			modifier = { factor = 0.50 is_planet_class = orbit_volcanic_telluric }
+			modifier = { factor = 1.50 is_planet_class = orbit_frozen_telluric }
+			modifier = { factor = 0.15 is_planet_class = orbit_methane_toxic }
+			modifier = { factor = 0.00 is_planet_class = orbit_hothouse_toxic }
+			modifier = { factor = 0.00 is_planet_class = orbit_carbonyl_toxic }
+			modifier = { factor = 0.00 is_planet_class = orbit_water_panthalassic }
+			modifier = { factor = 0.00 is_planet_class = orbit_ammonia_panthalassic }
+			modifier = { factor = 0.00 is_planet_class = orbit_methane_panthalassic }
+		}
+		change_pc = pc_barren_cold
+	}
+	set_star_flag = "atw_re-edited"
 	}
 }
 
