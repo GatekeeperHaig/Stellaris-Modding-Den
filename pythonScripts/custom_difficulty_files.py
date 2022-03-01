@@ -70,6 +70,14 @@ playerFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configurat
 scalingFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_scaling")
 otherFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_other")
 
+aiFlag="custom_difficulty_ai_flag"
+feFlag="custom_difficulty_fe_ae_flag"
+leviathanFlag="custom_difficulty_leviathan_flag"
+playerFlag="custom_difficulty_player_flag"
+crisisFlag="custom_difficulty_crisis_flag"
+marauderFlag="custom_difficulty_marauder_flag"
+noBonusFlag="custom_difficulty_no_bonuses_flag"
+
 
 def main():
   os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -200,13 +208,7 @@ def main():
   # bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
   # bonusesListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
 
-  aiFlag="custom_difficulty_ai_flag"
-  feFlag="custom_difficulty_fe_ae_flag"
-  leviathanFlag="custom_difficulty_leviathan_flag"
-  playerFlag="custom_difficulty_player_flag"
-  crisisFlag="custom_difficulty_crisis_flag"
-  marauderFlag="custom_difficulty_marauder_flag"
-  noBonusFlag="custom_difficulty_no_bonuses_flag"
+
 
   cats=["ai","ai_yearly","fe","leviathan","player","crisis","marauders", "other"]
   catToModifierType=dict()
