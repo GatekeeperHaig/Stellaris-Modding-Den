@@ -70,13 +70,6 @@ playerFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configurat
 scalingFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_scaling")
 otherFlags=TagList("remove_global_flag", "custom_difficulty_advanced_configuration_other")
 
-aiFlag="custom_difficulty_ai_flag"
-feFlag="custom_difficulty_fe_ae_flag"
-leviathanFlag="custom_difficulty_leviathan_flag"
-playerFlag="custom_difficulty_player_flag"
-crisisFlag="custom_difficulty_crisis_flag"
-marauderFlag="custom_difficulty_marauder_flag"
-noBonusFlag="custom_difficulty_no_bonuses_flag"
 
 def main():
   os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -207,6 +200,14 @@ def main():
   # bonusesListEntries=[[0,1,2,3,4,5,6,7,8,9,10,11,12], [0,1,2,3,4,6], [7,8,9,10]]
   # bonusesListPictures=["GFX_evt_towel", "GFX_evt_alien_city","GFX_evt_federation_fleet"]
 
+  aiFlag="custom_difficulty_ai_flag"
+  feFlag="custom_difficulty_fe_ae_flag"
+  leviathanFlag="custom_difficulty_leviathan_flag"
+  playerFlag="custom_difficulty_player_flag"
+  crisisFlag="custom_difficulty_crisis_flag"
+  marauderFlag="custom_difficulty_marauder_flag"
+  noBonusFlag="custom_difficulty_no_bonuses_flag"
+
   cats=["ai","ai_yearly","fe","leviathan","player","crisis","marauders", "other"]
   catToModifierType=dict()
   catToModifierType["ai"]="ai"
@@ -217,6 +218,7 @@ def main():
   catToModifierType["crisis"]="crisis"
   catToModifierType["marauders"]="crisis"
   catToModifierType["other"]="ai"
+  catToModifierType["no_bonuses"]=""
   catCountryType=[
   ["default"], 
   ["default"],
@@ -229,6 +231,9 @@ def main():
   catNotCountryType=[[], [],[],[],[],[],[],catCountryType]
   catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire_awakes","GFX_evt_wraith","GFX_evt_towel","GFX_evt_ai_planet","GFX_evt_khan_throne_room","GFX_evt_unknown_ships"]
   catColors="BHBBGRBB"
+
+  allFlags=[aiFlag, feFlag, leviathanFlag, playerFlag, crisisFlag, marauderFlag, noBonusFlag]
+  specificFlags=[aiFlag, aiFlag, feFlag, leviathanFlag, playerFlag, crisisFlag, marauderFlag, None, noBonusFlag]
 
   # difficulties=["easy", "no_player_bonus", "ensign","captain","commodore","admiral", "grand_admiral", "scaling", "no_scaling"]
   difficulties=[#"easy", "no_player_bonus",
@@ -645,9 +650,10 @@ def main():
     updateEvent.add("immediate",immediate)
     after=TagList()
     # updateEvent.add("after",after)
-    for catI,cat in enumerate(cats):
+    for catI,cat in enumerate(cats+["no_bonuses"]):
       if catToModifierType[cat]=="none":
         continue
+      applyBonuses=cat!="no_bonuses"
         
       immediate.addComment(cat)
         
@@ -655,165 +661,178 @@ def main():
       immediate.add("if",ifTagList)
       limit=TagList()
       ifTagList.add("limit",limit)
+      # topLimit=limit
+      if applyBonuses:
+        limit=limit.addReturn("or")
+      if not specificFlags[catI] is None:
+        limit.add("has_country_flag", specificFlags[catI])
+      if applyBonuses:
+        limit=limit.addReturn("and")
+        for f in allFlags:
+          if f!=specificFlags[catI]:
+            limit.add("not", TagList("has_country_flag", f))
 
-      if cat=="ai":
-        handicapChangedTest=ifTagList.createReturnIf(TagList("NOT",variableOpNew("check", "custom_difficulty_random_handicap_perc", ET)))
-        for bonus in possibleBoniNames:
-          if not groupUpdate or bonus in representGroup:
-            handicapChangedTest.add("set_country_flag", "custom_difficulty_{}_changed".format(bonus))
-        handicapChangedTest.variableOp("set", "custom_difficulty_random_handicap_perc", ET)
+        if cat=="ai":
+          handicapChangedTest=ifTagList.createReturnIf(TagList("NOT",variableOpNew("check", "custom_difficulty_random_handicap_perc", ET)))
+          for bonus in possibleBoniNames:
+            if not groupUpdate or bonus in representGroup:
+              handicapChangedTest.add("set_country_flag", "custom_difficulty_{}_changed".format(bonus))
+          handicapChangedTest.variableOp("set", "custom_difficulty_random_handicap_perc", ET)
 
 
-      et=TagList()
-      ifTagList.add(ET,et)
-      if len(catCountryType[catI])>1:
-        limitOr=TagList()
-        limit.add("or",limitOr)
-        for countryType in catCountryType[catI]:
-          limitOr.add("is_country_type", countryType)
-      elif len(catCountryType[catI])==1:
-        limit.add("is_country_type", catCountryType[catI][0])
+        et=TagList()
+        ifTagList.add(ET,et)
+        if len(catCountryType[catI])>1:
+          limitOr=TagList()
+          limit.add("or",limitOr)
+          for countryType in catCountryType[catI]:
+            limitOr.add("is_country_type", countryType)
+        elif len(catCountryType[catI])==1:
+          limit.add("is_country_type", catCountryType[catI][0])
 
 
-      if catNotCountryType[catI]:
-        norSet=set()
-        toParseList=deepcopy(catNotCountryType[catI])
-        while toParseList:
-          # print(toParseList)
-          entry=toParseList.pop(0)
-          if isinstance(entry, list):
-            toParseList+=entry
+        if catNotCountryType[catI]:
+          norSet=set()
+          toParseList=deepcopy(catNotCountryType[catI])
+          while toParseList:
+            # print(toParseList)
+            entry=toParseList.pop(0)
+            if isinstance(entry, list):
+              toParseList+=entry
+            else:
+              norSet.add(entry)
+          norTagList=TagList()
+          limit.add("NOR", norTagList)
+          for entry in sorted(norSet):
+            norTagList.add("is_country_type", entry)
+        if "player"==cat or "ai" in cat:
+          orTagList=TagList()
+          if cat=="player":
+            orTagList.add("is_ai", "no")
+            orTagList.add("and", TagList().add("has_global_flag", "custom_difficulty_deactivate_player_vassal_ai_boni").add("exists","overlord").add("overlord",TagList().add("is_ai","no")))
           else:
-            norSet.add(entry)
-        norTagList=TagList()
-        limit.add("NOR", norTagList)
-        for entry in sorted(norSet):
-          norTagList.add("is_country_type", entry)
-      if "player"==cat or "ai" in cat:
-        orTagList=TagList()
-        if cat=="player":
-          orTagList.add("is_ai", "no")
-          orTagList.add("and", TagList().add("has_global_flag", "custom_difficulty_deactivate_player_vassal_ai_boni").add("exists","overlord").add("overlord",TagList().add("is_ai","no")))
+            limit.add("is_ai", yes)
+            orTagList.add("has_global_flag", "custom_difficulty_activate_player_vassal_ai_boni")
+            orTagList.add("not", TagList().add("exists","overlord"))
+            orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","yes")))
+          limit.add("or",orTagList)
         else:
-          limit.add("is_ai", yes)
-          orTagList.add("has_global_flag", "custom_difficulty_activate_player_vassal_ai_boni")
-          orTagList.add("not", TagList().add("exists","overlord"))
-          orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","yes")))
-        limit.add("or",orTagList)
-      else:
-        limit.add("is_ai", "yes")
-      # afterIfTaglist=deepcopy(ifTagList)
-      # after.add("if",afterIfTaglist)
-      shortened=False
+          limit.add("is_ai", "yes")
+        # afterIfTaglist=deepcopy(ifTagList)
+        # after.add("if",afterIfTaglist)
+        shortened=False
 
-      for bonus, bonusModifier in zip(possibleBoniNames,possibleBoniModifier):
-        if groupUpdate and not bonus in representGroup:
-          continue
-        et.add("set_variable", TagList().add("which", "custom_difficulty_{}_value".format(bonus)).add("value", "custom_difficulty_{}_{}_value".format(cat,bonus)))
-        ifChanged=TagList("limit", TagList("not", 
-          variableOpNew("check","custom_difficulty_{}_value".format(bonus), ET)))
-        # ifChanged=TagList("limit", TagList("not", 
-        #   TagList("check_variable", 
-        #     TagList("which","custom_difficulty_{}_value".format(bonus))
-        #     .add("value", ET+":custom_difficulty_{}_value".format(bonus)))))
-        ifTagList.add("if",ifChanged)
-        ifChanged.add("set_country_flag", "custom_difficulty_{}_changed".format(bonus))
-        if debugMode:
-          ifChanged.add("log",'"setting flag {}"'.format("custom_difficulty_{}_changed".format(bonus)))
-        ifChanged.variableOp("set","custom_difficulty_{}_value".format(bonus), ET)
-        if bonus=="minerals":
-          ifChanged.createReturnIf(TagList("has_global_flag","core_game_mechanics_and_ai")).add("check_country_imbalanced_difficulty_bonuses","yes")
-        if cat in modifierCats: #only create the modifier for these cats. Rest use the same as one of those!
-          removeIFChanged=TagList("limit", TagList("has_country_flag", "custom_difficulty_{}_changed".format(bonus)))
-          addIFChanged=deepcopy(removeIFChanged)
-          if groupUpdate:
-            removeGroupModifierImmediates[cat].add("if",removeIFChanged)
-            addGroupModifierImmediates[cat].add("if",addIFChanged)
-          else:
-            removeModifierImmediates[cat].add("if",removeIFChanged)
-            addModifierImmediates[cat].add("if",addIFChanged)
-          addIFChanged.add("remove_country_flag","custom_difficulty_{}_changed".format(bonus) )
-          addIFChanged.add("set_variable",TagList("which", "custom_difficulty_tmp").add("value","custom_difficulty_{}_value".format(bonus)))
-          if cat == "ai":
-            addIFChanged.variableOp("multiply", "custom_difficulty_tmp", "custom_difficulty_randomness_factor")
-          for i in range(modifierRange[cat][0],modifierRange[cat][1]+1):
-            #compare signs and stop for i==0
-            if i<0:
-              compSign="<"
-              sign=-1
-              signName="neg"
-            elif i>0:
-              compSign=">"
-              sign=1
-              signName="pos"
-            else:
-              continue
-            i=abs(i)
-            if cat!="player":
-              i-=1
-            changeValOrig=modifierFuns[cat](i)
-            changeVal=sign*abs(boniFactor[bonus])*changeValOrig
-            changeValModifier=changeVal
-            if boniUnit[bonus]=="%":
-              changeValModifier/=100
-            ifModifierApplied=TagList()
-            if sign>0:
-              addIFChanged.insert(addIFChanged.names.index("if"),"if", ifModifierApplied)
-            else:
-              addIFChanged.add("if", ifModifierApplied)
-            ifModifierApplied.add("limit",TagList().add("check_variable",
-              TagList().add("which","custom_difficulty_tmp")
-              .add("value", "{:.3f}".format(changeVal-sign*0.01),"",compSign)))
+        for bonus, bonusModifier in zip(possibleBoniNames,possibleBoniModifier):
+          if groupUpdate and not bonus in representGroup:
+            continue
+          et.add("set_variable", TagList().add("which", "custom_difficulty_{}_value".format(bonus)).add("value", "custom_difficulty_{}_{}_value".format(cat,bonus)))
+          ifChanged=TagList("limit", TagList("not", 
+            variableOpNew("check","custom_difficulty_{}_value".format(bonus), ET)))
+          # ifChanged=TagList("limit", TagList("not", 
+          #   TagList("check_variable", 
+          #     TagList("which","custom_difficulty_{}_value".format(bonus))
+          #     .add("value", ET+":custom_difficulty_{}_value".format(bonus)))))
+          ifTagList.add("if",ifChanged)
+          ifChanged.add("set_country_flag", "custom_difficulty_{}_changed".format(bonus))
+          if debugMode:
+            ifChanged.add("log",'"setting flag {}"'.format("custom_difficulty_{}_changed".format(bonus)))
+          ifChanged.variableOp("set","custom_difficulty_{}_value".format(bonus), ET)
+          if bonus=="minerals":
+            ifChanged.createReturnIf(TagList("has_global_flag","core_game_mechanics_and_ai")).add("check_country_imbalanced_difficulty_bonuses","yes")
+          if cat in modifierCats: #only create the modifier for these cats. Rest use the same as one of those!
+            removeIFChanged=TagList("limit", TagList("has_country_flag", "custom_difficulty_{}_changed".format(bonus)))
+            addIFChanged=deepcopy(removeIFChanged)
             if groupUpdate:
-              modifierName="custom_difficulty_{:02d}_{}_{}_{}_value".format(i,representGroup[bonus],signName,cat)
+              removeGroupModifierImmediates[cat].add("if",removeIFChanged)
+              addGroupModifierImmediates[cat].add("if",addIFChanged)
             else:
-              modifierName="custom_difficulty_{:02d}_{}_{}_{}_value".format(i,bonus,signName,cat)
-            modifier=TagList()
-            if groupUpdate:
-              for i in bonusesListEntries[bonusesListNames.index(representGroup[bonus])]:
-                bonusModifier=[]
-                localModifier=possibleBoniModifier[i]
-                localBonus=possibleBoniNames[i]
-                if isinstance(localModifier,list):
-                  bonusModifier+=localModifier
-                else:
-                  bonusModifier.append(localModifier)
-                changeValLoc=sign*boniFactor[localBonus]*changeValOrig #NO ABS HERE. WE ACTUALLY NEED NEGATIVE
-                if boniUnit[localBonus]=="%":
-                  changeValLoc/=100
+              removeModifierImmediates[cat].add("if",removeIFChanged)
+              addModifierImmediates[cat].add("if",addIFChanged)
+            addIFChanged.add("remove_country_flag","custom_difficulty_{}_changed".format(bonus) )
+            addIFChanged.add("set_variable",TagList("which", "custom_difficulty_tmp").add("value","custom_difficulty_{}_value".format(bonus)))
+            if cat == "ai":
+              addIFChanged.variableOp("multiply", "custom_difficulty_tmp", "custom_difficulty_randomness_factor")
+            for i in range(modifierRange[cat][0],modifierRange[cat][1]+1):
+              #compare signs and stop for i==0
+              if i<0:
+                compSign="<"
+                sign=-1
+                signName="neg"
+              elif i>0:
+                compSign=">"
+                sign=1
+                signName="pos"
+              else:
+                continue
+              i=abs(i)
+              if cat!="player":
+                i-=1
+              changeValOrig=modifierFuns[cat](i)
+              changeVal=sign*abs(boniFactor[bonus])*changeValOrig
+              changeValModifier=changeVal
+              if boniUnit[bonus]=="%":
+                changeValModifier/=100
+              ifModifierApplied=TagList()
+              if sign>0:
+                addIFChanged.insert(addIFChanged.names.index("if"),"if", ifModifierApplied)
+              else:
+                addIFChanged.add("if", ifModifierApplied)
+              ifModifierApplied.add("limit",TagList().add("check_variable",
+                TagList().add("which","custom_difficulty_tmp")
+                .add("value", "{:.3f}".format(changeVal-sign*0.01),"",compSign)))
+              if groupUpdate:
+                modifierName="custom_difficulty_{:02d}_{}_{}_{}_value".format(i,representGroup[bonus],signName,cat)
+              else:
+                modifierName="custom_difficulty_{:02d}_{}_{}_{}_value".format(i,bonus,signName,cat)
+              modifier=TagList()
+              if groupUpdate:
+                for i in bonusesListEntries[bonusesListNames.index(representGroup[bonus])]:
+                  bonusModifier=[]
+                  localModifier=possibleBoniModifier[i]
+                  localBonus=possibleBoniNames[i]
+                  if isinstance(localModifier,list):
+                    bonusModifier+=localModifier
+                  else:
+                    bonusModifier.append(localModifier)
+                  changeValLoc=sign*boniFactor[localBonus]*changeValOrig #NO ABS HERE. WE ACTUALLY NEED NEGATIVE
+                  if boniUnit[localBonus]=="%":
+                    changeValLoc/=100
+                  for modifierEntry in bonusModifier:
+                    modifier.add(modifierEntry,str(changeValLoc))
+              else:
+                if not isinstance(bonusModifier,list):
+                  bonusModifier=[bonusModifier]
                 for modifierEntry in bonusModifier:
-                  modifier.add(modifierEntry,str(changeValLoc))
-            else:
-              if not isinstance(bonusModifier,list):
-                bonusModifier=[bonusModifier]
-              for modifierEntry in bonusModifier:
-                modifier.add(modifierEntry,str(changeValModifier))
-              # if bonus=="upkeep":
-                # modifier.add(modifierEntry,str(-sign*changeVal/100))
-              # else:
-                # modifier.add(modifierEntry,str(sign*changeVal/100))
-            locClass.append(modifierName,"@difficulty")
-            staticModifiers.add(modifierName,modifier)
-            ifModifierApplied.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
-            if debugMode:
-              ifModifierApplied.add("log",'"adding modifier {}"'.format(modifierName))
-            removeIFChanged.add("remove_modifier", modifierName)
-            if debugMode and i==1:
-              removeIFChanged.add("log",'"removing modifiers (all of them, not only 1) {}"'.format(modifierName))
-            ifModifierApplied.add("change_variable",TagList().add("which","custom_difficulty_tmp").add("value", str(-1*changeVal)))
+                  modifier.add(modifierEntry,str(changeValModifier))
+                # if bonus=="upkeep":
+                  # modifier.add(modifierEntry,str(-sign*changeVal/100))
+                # else:
+                  # modifier.add(modifierEntry,str(sign*changeVal/100))
+              locClass.append(modifierName,"@difficulty")
+              staticModifiers.add(modifierName,modifier)
+              ifModifierApplied.add("add_modifier", TagList().add("modifier",modifierName).add("days","-1"))
+              if debugMode:
+                ifModifierApplied.add("log",'"adding modifier {}"'.format(modifierName))
+              removeIFChanged.add("remove_modifier", modifierName)
+              if debugMode and i==1:
+                removeIFChanged.add("log",'"removing modifiers (all of them, not only 1) {}"'.format(modifierName))
+              ifModifierApplied.add("change_variable",TagList().add("which","custom_difficulty_tmp").add("value", str(-1*changeVal)))
       for modifierCat in modifierCats:
         ifModifierCat=TagList("limit", TagList("has_country_flag","custom_difficulty_{}_modifier_active".format(modifierCat)))
         if groupUpdate:
           ifModifierCat.add("country_event", TagList("id", name_removeGroupModifiers[modifierCat]))
         else:
           ifModifierCat.add("country_event", TagList("id", name_removeModifiers[modifierCat]))
+        if not applyBonuses:
+          ifModifierCat.add("country_event", TagList("id", name_removeAllModifiers))
         ifTagList.addComment("removing {} bonuses if they exist".format(modifierCat))
         ifTagList.add("if", ifModifierCat)
-      ifTagList.addComment("adding {} bonuses".format(catToModifierType[cat]))
-      if groupUpdate:
-        ifTagList.add("country_event", TagList("id", name_addGroupModifiers[catToModifierType[cat]]))
-      else:
-        ifTagList.add("country_event", TagList("id", name_addModifiers[catToModifierType[cat]]))
+      if applyBonuses:
+        ifTagList.addComment("adding {} bonuses".format(catToModifierType[cat]))
+        if groupUpdate:
+          ifTagList.add("country_event", TagList("id", name_addGroupModifiers[catToModifierType[cat]]))
+        else:
+          ifTagList.add("country_event", TagList("id", name_addModifiers[catToModifierType[cat]]))
     # immediate.addTagList(after)
 
 
