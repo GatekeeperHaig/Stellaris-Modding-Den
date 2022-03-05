@@ -201,7 +201,7 @@ def main():
   representGroup["station"]="systems"
   representGroup["damage"]="allShip"
   bonusListNPC=[    False,   False, False,  True]
-  bonusesListEntries=[[i for i in range(len(possibleBoniNames))], [1,5,6],[0,2,3,4], [7,8,9,10]]
+  bonusesListEntries=[[i for i in range(len(possibleBoniNames))], [1,5,6],[0,2,3,4], [7,8,9,10,11]]
   bonusesListPictures=["GFX_evt_alien_city", "GFX_evt_galactic_market", "GFX_evt_satellite_in_orbit","GFX_evt_federation_fleet"]
   # bonusesListNames=["all","default", "allShip"]
   # bonusListNPC=[    True,   False,    False]
