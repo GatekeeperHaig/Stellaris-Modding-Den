@@ -1,0 +1,187 @@
+# Techno Canal
+decision_techno_canal = {
+	icon = decision_techno_canal
+	owned_planets_only = yes
+
+	enactment_time = 900
+	resources = {
+		category = decisions
+		cost = {
+			energy = 1000
+			minerals = 1000
+		}
+	}
+		
+	prerequisites = {
+		"tech_techno_canal"		
+	}
+	
+	potential = {
+		NOT = { has_planet_flag = pdtechnocanal }
+		NOT = { is_planet_class = pc_city }
+		NOT = { is_planet_class = pc_ecocity }
+		NOT = { is_planet_class = pc_corpoarc }
+		NOT = { is_planet_class = pc_palacearc }
+		NOT = { is_planet_class = pc_capitalarc }
+		NOT = { is_planet_class = pc_necropolis }
+		NOT = { is_planet_class = pc_machine_necropolis }
+		NOT = { is_planet_class = pc_necrohive }
+		NOT = { is_planet_class = pc_milarc }
+		NOT = { is_planet_class = pc_shroudcity }
+		NOT = { is_planet_class = pc_shroudecocity }
+		NOT = { is_planet_class = pc_shroudcapitalarc }
+		NOT = { is_planet_class = pc_shroudpalacearc }
+		NOT = { is_planet_class = pc_shroudmilarc }
+		NOT = { is_planet_class = pc_shroudcorpoarc }
+		NOT = { is_planet_class = pc_hive }
+		NOT = { is_planet_class = pc_bioforge }
+		NOT = { is_planet_class = pc_biocapital }
+		NOT = { is_planet_class = pc_machine }
+		NOT = { is_planet_class = pc_machine_factory }
+		NOT = { is_planet_class = pc_machine_capital }
+		NOT = { is_planet_class = pc_machine_fort }
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = penal_colony }
+		NOT = { has_modifier = slave_colony }
+		is_artificial = no
+		is_pd_unique = no
+	}
+
+	effect = {
+		add_deposit = d_technocanal
+		hidden_effect = { set_planet_flag = pdtechnocanal }
+	}
+	
+	ai_weight = {
+		weight = 1
+		modifier = {
+			factor = 0
+			or = {
+				num_pops < 15
+				and = {
+				# By late game, AI will likely keep some open building slots
+				# This is mostly harmless if there are still jobs available
+				# Otherwise, don't let them take this over building a building
+				free_building_slots > 0
+				free_jobs <= 0
+				}
+				free_building_slots > 2
+				owner = {
+					or = {
+						resource_stockpile_compare = { resource = energy value < 8000 } 
+						resource_stockpile_compare = { resource = minerals value < 8000 } 
+					}
+				}
+				free_district_slots <= 0
+				num_free_districts = {
+				type = district_farming
+				value > 1
+				}
+			}
+		}
+	}
+}
+
+
+# Tiyanki Planet, Under New Managment
+decision_change_tiyanki_choice = {
+	owned_planets_only = yes
+
+	enactment_time = 0
+	resources = {
+		category = decisions
+		cost = {
+			unity = 100
+		}
+	}
+	
+	#allow = {
+	#	free_district_slots >= 1
+	#}
+	
+	potential = {
+		is_planet_class = pc_graveyard
+		NOT = { has_planet_flag = tiyankidefault }
+		NOT = { owner = { has_country_flag = pdtiyankichoice } }
+	}
+
+	effect = {
+		custom_tooltip = decision_change_tiyanki_choice_tooltip
+		hidden_effect = {
+			planet_event = { id = pdgraveyard.30 days = 0 }
+			remove_planet_flag = tiyankileavebe
+			remove_planet_flag = tiyankinobutcher
+			remove_planet_flag = tiyankibutchertown
+			remove_planet_flag = tiyankicolonyprotect
+			remove_planet_flag = tiyankinofalling
+		}
+	}   
+	
+	ai_weight = {
+        weight = 0
+ 	}
+}
+
+# Crucible Upgrade to Clean
+decision_clean_crucible = {
+	owned_planets_only = yes
+
+	enactment_time = 1800
+	resources = {
+		category = decisions
+		cost = {
+			unity = 1000
+			energy = 5000
+		}
+	}
+	
+	potential = {
+		is_planet_class = pc_crucible
+		owner = { has_technology = tech_crucible_upgrade }
+	}
+
+	effect = {
+		custom_tooltip = decision_clean_crucible_tooltip
+		hidden_effect = {
+			change_pc = pc_clean_crucible
+			remove_modifier = crucible
+			add_modifier = { modifier = clean_crucible days = -1 }
+		}
+	}   
+	
+	ai_weight = {
+        weight = 0
+ 	}
+}
+
+# Crucible Upgrade to Shroud
+decision_shroud_crucible = {
+	owned_planets_only = yes
+
+	enactment_time = 1800
+	resources = {
+		category = decisions
+		cost = {
+			unity = 100
+			sr_zro = 2500
+		}
+	}
+	
+	potential = {
+		is_planet_class = pc_crucible
+		owner = { has_technology = tech_crucible_upgrade }
+	}
+
+	effect = {
+		custom_tooltip = decision_shroud_crucible_tooltip
+		hidden_effect = {
+			change_pc = pc_shroud_crucible
+			remove_modifier = crucible
+			add_modifier = { modifier = shroud_crucible days = -1 }
+		}
+	}   
+	
+	ai_weight = {
+        weight = 0
+ 	}
+}
