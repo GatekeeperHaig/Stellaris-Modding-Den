@@ -34,12 +34,15 @@ planet_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		OR = {
-			owner = { has_origin = origin_floating_world }
-			owner = { has_origin = origin_crystal_world }
-			owner = { has_origin = origin_graveyard_world }
-			owner = { has_origin = origin_techno_world }
-		}	
+		exists = owner
+		owner = {
+			OR = {
+				has_origin = origin_floating_world
+				has_origin = origin_crystal_world 
+				has_origin = origin_graveyard_world 
+				has_origin = origin_techno_world 
+			}	
+		}
 	}
 	immediate = { pd_unique_generate_start_pops = yes }
 }
@@ -143,6 +146,189 @@ country_event = {
 
 			# Debug growth/decline.
 			#log = "technos on '[This.GetName]'. techno_pops_missing is: [This.techno_pops_missing], techno_pops_missing_per_vat: [This.techno_pops_missing_per_vat], techno_pops_decline_factor: [This.techno_pops_decline_factor]"
+		}
+	}
+}
+
+
+
+#Destory Double Unique Worlds and set flags
+country_event = {
+	id = pdunique.12
+	hide_window = yes
+	is_triggered_only = yes
+
+   	immediate = {
+		if = { limit = { any_country = { has_origin = origin_floating_world } }
+        every_galaxy_planet = {
+            if = {
+                limit = { solar_system = { has_star_flag = floating_system } is_planet_class = pc_floating }
+					change_pc = pc_broken
+					remove_planet_flag = floating_planet
+					remove_planet_flag = pdfloating
+					remove_modifier = floating
+					remove_deposit = d_eludium_islands
+					set_deposit = d_volatile_motes_5
+				}
+			}
+		every_system = {
+			remove_star_flag = floating_system
+			} 
+		}
+		if = { limit = { any_country = { has_origin = origin_crystal_world } }
+        every_galaxy_planet = {
+            if = {
+                limit = { solar_system = { has_star_flag = pdcrystal_system } is_planet_class = pc_crystal }
+					change_pc = pc_broken
+					remove_planet_flag = crystal_planet
+					remove_planet_flag = pdcrystal
+					remove_modifier = crystal
+					remove_deposit = d_crystal_guild
+					set_deposit = d_rare_crystals_5
+				}
+			}
+		every_system = {
+			remove_star_flag = pdcrystal_system
+			} 
+		}
+		if = { limit = { any_country = { has_origin = origin_graveyard_world } }
+        every_galaxy_planet = {
+            if = {
+                limit = { solar_system = { has_star_flag = graveyard_system } is_planet_class = pc_graveyard }
+					change_pc = pc_broken
+					remove_planet_flag = graveyard_planet
+					remove_planet_flag = pdgraveyard
+					remove_modifier = graveyard
+					remove_deposit = d_graveyard_well
+					set_deposit = d_exotic_gases_5
+				}
+			}
+		every_system = {
+			remove_star_flag = graveyard_system
+			} 
+		}
+		if = { limit = { any_country = { has_origin = origin_techno_world } }
+        every_galaxy_planet = {
+            if = {
+                limit = { solar_system = { has_star_flag = technoorganic_system } is_planet_class = pc_technoorganic }
+					change_pc = pc_broken
+					remove_planet_flag = technoorganic_planet
+					remove_planet_flag = pdtechnoorganic
+					remove_modifier = technoorganic
+					remove_deposit = d_subsurface_assembly
+					set_deposit = d_living_metal_deposit
+				}
+			}
+		every_system = {
+			remove_star_flag = technoorganic_system
+			} 
+		}
+		if = { limit = { any_country = { has_origin = origin_archive_world } }
+        every_galaxy_planet = {
+            if = {
+                limit = { solar_system = { has_star_flag = archive_system_notorigin } is_planet_class = pc_archive }
+					change_pc = pc_broken
+					remove_planet_flag = archive_planet
+					remove_planet_flag = pdarchive
+					remove_modifier = archive
+					set_deposit = d_physics_10
+				}
+			}
+		every_system = {
+			remove_star_flag = archive_system_notorigin
+			} 
+		}
+		if = { limit = { any_country = { has_origin = origin_crucible_world } }
+        every_galaxy_planet = {
+            if = {
+                limit = { solar_system = { has_star_flag = crucible_notorigin } is_planet_class = pc_shielded has_planet_flag = pd_crucible_homeplanet }
+				change_pc = pc_broken
+				remove_planet_flag = pd_crucible_homeplanet
+				remove_modifier = crucible_homeplanet
+			}
+		}
+        every_galaxy_planet = {
+            if = {
+                limit = { solar_system = { has_star_flag = crucible_notorigin } is_planet_class = pc_shielded has_planet_flag = pd_crucible_planet }
+				change_pc = pc_broken
+				remove_planet_flag = pd_crucible_planet
+				remove_modifier = crucible_shieldedplanet
+				add_deposit = d_physics_10
+				add_deposit = d_zro_deposit_1
+			}
+		}
+        every_galaxy_planet = {
+            if = {
+                limit = { solar_system = { has_star_flag = crucible_notorigin } is_planet_class = pc_broken has_planet_flag = pd_crucible_military_moon }
+				change_pc = pc_broken
+				remove_planet_flag = pd_crucible_military_moon
+				remove_modifier = crucible_military_moon
+			}
+		}
+		every_system = {
+			IF = {
+				limit = { has_star_flag = crucible_notorigin }
+				remove_star_flag = crucible_notorigin
+				remove_star_flag = crucible_system
+				}
+			} 
+		}
+
+		every_galaxy_planet = {
+			limit = { is_planet_class = pc_floating }
+			set_planet_flag = pdfloating
+		}
+		every_galaxy_planet = {
+			limit = { is_planet_class = pc_crystal }
+			set_planet_flag = pdcrystal
+		}
+		every_galaxy_planet = {
+			limit = { is_planet_class = pc_graveyard }
+				set_planet_flag = pdgraveyard
+		}
+		every_galaxy_planet = {
+			limit = { is_planet_class = pc_technoorganic }
+			set_planet_flag = pdtechnoorganic
+		}
+		every_galaxy_planet = {
+			limit = { is_planet_class = pc_archive }
+			set_planet_flag = pdarchive
+		}
+	}
+}
+
+
+
+# Check Planet Class for Deposits + Modifiers
+planet_event = {
+	id = pdunique.13
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = { 
+		limit = { NOT = { is_planet_class = pc_floating } }
+		remove_deposit = d_eludium_islands
+		remove_modifier = floating
+		remove_building = building_eludium_mine
+		}
+		if = { 
+		limit = { NOT = { is_planet_class = pc_graveyard } }
+		remove_deposit = d_graveyard_well
+		remove_modifier = graveyard
+		remove_building = building_graveyard_well
+		}
+		if = { 
+		limit = { NOT = { is_planet_class = pc_crystal } }
+		remove_deposit = d_crystal_guild
+		remove_modifier = crystal
+		remove_building = building_crystal_carver
+		}
+		if = { 
+		limit = { NOT = { is_planet_class = pc_technoorganic } }
+		remove_deposit = d_subsurface_assembly
+		remove_modifier = technoorganic
+		remove_building = building_subsurface_assembly
 		}
 	}
 }
