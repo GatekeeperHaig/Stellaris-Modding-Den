@@ -2,140 +2,6 @@
 # Decisions
 ##########################################################################
 
-# Adapted Environment
-decision_engineered_environment = {
-	icon = decision_engineered_environment
-	owned_planets_only = yes
-	
-	prerequisites = {
-		"tech_terrestrial_sculpting"		
-	}
-
-	enactment_time = 1800
-	resources = {
-		category = decisions
-		cost = {
-			energy = 2500
-		}
-	}
-	
-	potential = {
-		is_artificial = no
-		is_pd_unique = no
-		is_pd_arcology = no
-		is_pd_exotic = no
-		is_pd_habitat = no
-		is_pd_hive_arcology = no
-		is_pd_robot_arcology = no
-		is_pd_rare = no
-		NOT = { is_planet_class = pc_pdshroud }
-		NOT = { is_planet_class = pc_gaia }
-		NOT = { is_planet_class = pc_cold_gaia }
-		NOT = { is_planet_class = pc_hot_gaia }
-		NOT = { is_planet_class = pc_relic }
-		NOT = { is_planet_class = pc_milarc_relic }
-		NOT = { is_planet_class = pc_hive }
-		NOT = { is_planet_class = pc_pdhive1 }
-		NOT = { is_planet_class = pc_pdhive2 }
-		NOT = { is_planet_class = pc_machine }
-		NOT = { is_planet_class = pc_hive }
-		NOT = { has_modifier = engineered_environment }
-		NOT = { has_modifier = engineered_environment_gaia }
-		NOT = { owner = { has_origin = origin_pd_tree_of_life } }
-	}
-
-	effect = {
-		if = { limit = { 
-			NOT = { is_planet_class = pc_gaia } 
-			NOT = { is_planet_class = pc_cold_gaia }
-			NOT = { is_planet_class = pc_hot_gaia }
-		}
-			add_modifier = {
-				modifier = engineered_environment
-				days = -1
-			}
-		}
-		if = {
-			limit = { has_modifier = bleak_planet }
-			remove_modifier = bleak_planet
-		}
-		if = {
-			limit = { has_modifier = high_gravity }
-			remove_modifier = high_gravity
-		}
-		if = {
-			limit = { has_modifier = irradiated_planet }
-			remove_modifier = irradiated_planet
-		}
-		if = {
-			limit = { has_modifier = mineral_poor }
-			remove_modifier = mineral_poor
-		}
-		if = {
-			limit = { has_modifier = unstable_tectonics }
-			remove_modifier = unstable_tectonics
-		}
-		if = {
-			limit = { has_modifier = weak_magnetic_field }
-			remove_modifier = weak_magnetic_field
-		}
-		if = {
-			limit = { has_modifier = exofungus }
-			remove_modifier = exofungus
-		}
-	}    
-	
-	ai_weight = {
-        weight = 3
-        modifier = {
-            factor = 0
-            or = {
-            		num_pops < 15
-                and = {
-                  # By late game, AI will likely keep some open building slots
-                  # This is mostly harmless if there are still jobs available
-                  # Otherwise, don't let them take this over building a building
-                  free_building_slots > 0
-                  free_jobs <= 0
-                }
-                free_building_slots > 2
-                owner = {
-                    or = {
-                        resource_stockpile_compare = { resource = energy value < 6000 } 
-                        resource_stockpile_compare = { resource = influence value < 150 }
-                    }
-                }
-            }
-        }
-        modifier = {
-        	# Will still be above 1
-          factor = 0.5
-          # We want to move along to perfect world shaping for its 10% jobs bonus if we have world shaper
-          NOT = { owner = { has_ascension_perk = ap_world_shaper } }
-          NOT = { any_owned_pop = {
-            prev = {
-              habitability = { who = prev value < 1.0 }
-            }
-          } }
-        }
-        modifier = {
-          factor = 0
-				  owner = {
-            or = {
-              has_civic = civic_barbaric_despoilers
-              has_civic = civic_fanatic_purifiers
-              has_origin = origin_post_apocalyptic
-              has_civic = civic_hive_devouring_swarm			
-            }
-          }
-        }
-        modifier = {
-          factor = 0
-          owner = { is_machine_empire = yes }
-        }
-    }
-}
-
 # Adapted Environment Gaia
 decision_engineered_environment_gaia = {
 	icon = decision_engineered_environment_gaia
@@ -145,7 +11,7 @@ decision_engineered_environment_gaia = {
 	resources = {
 		category = decisions
 		cost = {
-			energy = 5000
+			energy = 7500
 		}
 	}
 
@@ -158,62 +24,40 @@ decision_engineered_environment_gaia = {
 	potential = {
 		is_artificial = no
 		is_pd_arcology = no
+		is_pd_hive_arcology = no
+		is_pd_robot_arcology = no
+		is_pd_unique = no
+		is_pd_gaia = no
 		NOT = { is_planet_class = pc_pdshroud }
 		NOT = { is_planet_class = pc_gaia }
-		NOT = { is_planet_class = pc_cold_gaia }
-		NOT = { is_planet_class = pc_hot_gaia }
-		NOT = { is_planet_class = pc_city }
-		NOT = { is_planet_class = pc_ecocity }
-		NOT = { is_planet_class = pc_corpoarc }
-		NOT = { is_planet_class = pc_palacearc }
-		NOT = { is_planet_class = pc_capitalarc }
-		NOT = { is_planet_class = pc_necropolis }
-		NOT = { is_planet_class = pc_machine_necropolis }
-		NOT = { is_planet_class = pc_necrohive }
 		NOT = { is_planet_class = pc_relic }
 		NOT = { is_planet_class = pc_milarc_relic }
-		NOT = { is_planet_class = pc_crystal }
-		NOT = { is_planet_class = pc_graveyard }
-		NOT = { is_planet_class = pc_floating }
-		NOT = { is_planet_class = pc_archive }
-		NOT = { is_planet_class = pc_technoorganic }
-		NOT = { is_planet_class = pc_pd_gas_giant_hab }
-		NOT = { is_planet_class = pc_pd_barren_hab }
-		NOT = { is_planet_class = pc_pd_barren_cold_hab }
-		NOT = { is_planet_class = pc_pd_frozen_hab }
-		NOT = { is_planet_class = pc_pd_molten_hab }
-		NOT = { is_planet_class = pc_pd_toxic_hab }
-		NOT = { is_planet_class = pc_pd_hothouse_hab }
-		NOT = { is_planet_class = pc_pd_asteroid_hab }
 		NOT = { is_planet_class = pc_hive }
+		NOT = { is_planet_class = pc_machine }
 		NOT = { is_planet_class = pc_pdhive1 }
 		NOT = { is_planet_class = pc_pdhive2 }
-		NOT = { is_planet_class = pc_bioforge }
-		NOT = { is_planet_class = pc_biocapital }
-		NOT = { is_planet_class = pc_megafloraforge }
-		NOT = { is_planet_class = pc_megafloracapital }
-		NOT = { is_planet_class = pc_milarc }
-		NOT = { is_planet_class = pc_biofort }
-		NOT = { is_planet_class = pc_megaflorafort }
-		NOT = { is_planet_class = pc_machine_fort }
-		NOT = { is_planet_class = pc_shroudcity }
-		NOT = { is_planet_class = pc_shroudecocity }
-		NOT = { is_planet_class = pc_shroudcapitalarc }
-		NOT = { is_planet_class = pc_shroudpalacearc }
-		NOT = { is_planet_class = pc_shroudmilarc }
-		NOT = { is_planet_class = pc_shroudcorpoarc }
-		has_modifier = engineered_environment
 		owner = { has_ascension_perk = ap_world_shaper }
 	}
 
 	effect = {
-		if = { limit = { 
-			NOT = { is_planet_class = pc_gaia } 
-			NOT = { is_planet_class = pc_cold_gaia }
-			NOT = { is_planet_class = pc_hot_gaia }
-		}
+		if = { 
+			limit = { 
+				NOT = { is_planet_class = pc_gaia } 
+				NOT = { is_planet_class = pc_cold_gaia }
+				NOT = { is_planet_class = pc_hot_gaia }
+				is_pd_rare = no
+			}
 			add_modifier = {
 				modifier = engineered_environment_gaia
+				days = -1
+			}
+		}
+		if = { 
+			limit = { 
+				is_pd_rare = yes
+			}
+			add_modifier = {
+				modifier = engineered_environment_rare
 				days = -1
 			}
 		}
@@ -223,28 +67,8 @@ decision_engineered_environment_gaia = {
 	}   
 	
 	ai_weight = {
-        weight = 3
-        modifier = {
-            factor = 0
-            or = {
-                num_pops < 20
-                and = {
-                  # By late game, AI will likely keep some open building slots
-                  # This is mostly harmless if there are still jobs available
-                  # Otherwise, don't let them take this over building a building
-                  free_building_slots > 0
-                  free_jobs <= 0
-                }
-                free_building_slots > 2
-                owner = {
-                    or = {
-                        resource_stockpile_compare = { resource = energy value < 10000 }
-                        resource_stockpile_compare = { resource = influence value < 150 }
-                    }
-                }
-            }
-        }
-  }
+        weight = 1
+  	}
 }
 
 # Change Ocean Picture

@@ -1042,8 +1042,10 @@ tech_crucible_upgrade = {
 	}
 }
 
-# Techno Organic
+#Techno-Organic World
 
+#Event Rewards
+#SyntheicLifeforms
 tech_syntheticlifeforms = {
 	cost = @tier4cost2
 	area = engineering
@@ -1074,7 +1076,7 @@ tech_dead04 = {
 	is_reverse_engineerable = no
 
 	modifier = {
-		planet_jobs_robotic_produces_mult = 0.2
+		planet_jobs_robotic_produces_mult = 0.1
 		planet_researchers_engineering_research_produces_mult = 0.25
 	}
 
@@ -1082,7 +1084,6 @@ tech_dead04 = {
 		factor = 0
 	}
 }
-
 
 #Synth Trait
 tech_fourschildren = {
@@ -1132,7 +1133,11 @@ tech_techno_canal = {
 	is_reverse_engineerable = no
 	
 	weight_modifier = {
-		factor = 2
+		factor = 0
+	}
+	
+	ai_weight = {
+		factor = 4 #strategic resource
 		modifier = {
 			factor = 1.25
 			research_leader = {
@@ -1140,12 +1145,34 @@ tech_techno_canal = {
 				has_trait = "leader_trait_expertise_new_worlds"
 			}
 		}
+	}	
+}
+
+tech_techno_synth_workshop = {
+	cost = @tier3cost3
+	area = society
+	tier = 3
+	category = { new_worlds  }
+	prerequisites = { "tech_basic_industry" "tech_subsurface_assembly" }
+	weight = @tier3weight3
+	is_rare = yes
+	is_reverse_engineerable = no
+	
+	weight_modifier = {
+		factor = 25
 		modifier = {
 			factor = 0
 			NOT = {
-				any_owned_planet = {
+				any_owned_planet =  {
 					has_deposit = d_subsurface_assembly
 				}
+			}
+		}
+		modifier = {
+			factor = 1.25
+			research_leader = {
+				area = society
+				has_trait = "leader_trait_expertise_new_worlds"
 			}
 		}
 	}
@@ -1161,43 +1188,43 @@ tech_techno_canal = {
 		}
 	}	
 }
-
-
-tech_techno_eng = {
-	cost = @tier3cost3
+tech_subsurface_assembly = {
+	icon = tech_subsurface_assembly
+	cost = @tier2cost1
 	area = engineering
-	tier = 3
-	category = { industry  }
-	weight = @tier3weight3
+	tier = 2
+	category = { industry }	
+	prerequisites = { "tech_basic_industry" }
+	weight = @tier2weight1
 	is_rare = yes
 	is_reverse_engineerable = no
-
-	modifier = {
-		planet_jobs_robotic_produces_mult = 0.1
-		planet_jobs_engineering_research_produces_mult = 0.2
-	}
+	start_tech = no
 	
 	weight_modifier = {
-		factor = 2
+		factor = 25
+		modifier = {
+			factor = 0
+			NOT = {
+				any_owned_planet =  {
+					has_deposit = d_subsurface_assembly
+				}
+			}
+		}
+		modifier = {
+			factor = 0
+			has_origin = origin_techno_world
+		}
 		modifier = {
 			factor = 1.25
 			research_leader = {
 				area = engineering
 				has_trait = "leader_trait_expertise_industry"
-			}
-		}
-		modifier = {
-			factor = 0
-			NOT = {
-				any_owned_planet = {
-					has_deposit = d_subsurface_assembly
-				}
 			}
 		}
 	}
 	
 	ai_weight = {
-		factor = 4 #strategic resource
+		factor = 5 #important resource
 		modifier = {
 			factor = 1.25
 			research_leader = {
@@ -1205,5 +1232,37 @@ tech_techno_eng = {
 				has_trait = "leader_trait_expertise_industry"
 			}
 		}
-	}	
+	}
+}
+tech_biosynth_lm_refinery = {
+	cost = @tier3cost1
+	area = engineering
+	tier = 3
+	category = { materials }
+	prerequisites = { "tech_basic_industry" "tech_exotic_gases" "tech_volatile_motes" "tech_rare_crystals" }
+	weight = @tier3weight1
+	is_rare = yes
+	is_reverse_engineerable = no
+
+	weight_modifier = {
+		factor = 10
+		modifier = {
+			factor = value:tech_weight_likelihood
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
+
+	ai_weight = {
+		factor = @strategic_resource_ai_tech_factor #important resource
+		modifier = {
+			factor = 1.25
+			research_leader = {
+				area = engineering
+				has_trait = "leader_trait_expertise_materials"
+			}
+		}
+	}
 }
