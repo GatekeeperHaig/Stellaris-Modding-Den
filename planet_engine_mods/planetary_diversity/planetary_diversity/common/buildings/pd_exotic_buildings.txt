@@ -125,57 +125,112 @@ building_acid_lab = {
 	}	 
 }
 
-building_acid_maker = {
-	base_buildtime = 360
+building_acidseeders_1 = {
+	base_buildtime = @b4_time
 	base_cap_amount = 1
-	category = resource
-	
+	category = government
+	can_be_disabled = no
+	upgrades = { "building_acidseeders_2" }
+
 	potential = {
-		#NOT = { has_modifier = resort_colony }
-		NOT = { is_planet_class = pc_acid }
-		owner = { has_trait = trait_pc_acid_preference }
+		exists = owner
+		owner = {
+			owner = { has_trait = trait_pc_acid_preference }
+		}
+		NOR = {
+			is_planet_class = pc_acid	# No double bonuses if player uses other tools to turn it into a Gaia world.
+			is_planet_class = pc_city
+			is_pd_arcology = yes
+			is_planet_class = pc_hive
+			is_pd_hive_arcology = yes
+			is_planet_class = pc_machine
+			is_pd_robot_arcology = yes
+			is_planet_class = pc_relic
+		}
+		is_artificial = no
 	}
+
 
 	prerequisites = {
 		"tech_acid_lab_building"
 	}
 
 	allow = {
+		has_upgraded_capital = yes
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_regular_empire = yes }
-		}
-		modifier = {
-			#job_soldier_add = 2
-			planet_jobs_food_produces_mult = -0.25
+	destroy_trigger = {
+		OR = {
+			is_planet_class = pc_acid	# No double bonuses if player uses other tools to turn it into a Gaia world.
+			is_planet_class = pc_city
+			is_pd_arcology = yes
+			is_planet_class = pc_hive
+			is_pd_hive_arcology = yes
+			is_planet_class = pc_machine
+			is_pd_robot_arcology = yes
+			is_planet_class = pc_relic
+			NOT = { exists = owner }
+			owner = {
+				NOT = { has_trait = trait_pc_acid_preference }
+			}
 		}
 	}
 
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { is_gestalt = yes }
-		}
-		modifier = {
-			#job_warrior_drone_add = 2
-			planet_jobs_food_produces_mult = -0.25
-		}
-	}
-	
-	planet_modifier = {
-		pop_environment_tolerance = 0.35
-	}
-	
 	resources = {
 		category = planet_buildings
 		cost = {
-			minerals = 500
+			energy = 3000
 		}
 		upkeep = {
-			energy = 2
+			energy = 20
+			exotic_gases = 2
 		}
-	}	 
+	}
+
+	planet_modifier = {
+		pop_growth_speed = 0.1
+		pop_environment_tolerance = -0.3
+	}
+}
+
+building_acidseeders_2 = {
+	base_buildtime = @b4_time
+	can_build = no
+	category = government
+	can_be_disabled = no
+
+	destroy_trigger = {
+		OR = {
+			is_planet_class = pc_acid	# No double bonuses if player uses other tools to turn it into a Gaia world.
+			is_planet_class = pc_city
+			is_pd_arcology = yes
+			is_planet_class = pc_hive
+			is_pd_hive_arcology = yes
+			is_planet_class = pc_machine
+			is_pd_robot_arcology = yes
+			is_planet_class = pc_relic
+			NOT = { exists = owner }
+			owner = {
+				NOT = { has_trait = trait_pc_acid_preference }
+				has_tech_option = tech_ecological_adaptation
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			energy = 3000
+			exotic_gases = 350
+		}
+	}
+
+	allow = {
+		owner = { has_trait = trait_pc_acid_preference }
+		has_major_upgraded_capital = yes
+	}
+
+	triggered_desc = {
+		text = building_acidseeders_2_effect_desc
+	}
 }
