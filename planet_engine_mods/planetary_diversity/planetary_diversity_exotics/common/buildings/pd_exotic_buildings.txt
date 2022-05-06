@@ -1,0 +1,589 @@
+#Radiotrophic
+building_sugarbush = {
+	base_buildtime = 360
+
+	is_capped_by_modifier = yes
+
+	category = resource
+	
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_irradiated
+	}
+
+	prerequisites = {
+		"tech_rad_bloom_farm"
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_bloom_evaporator_add = 1
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_hive_empire = yes }
+		}
+		modifier = {
+			job_bloom_hive_add = 1
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 400
+		}
+		upkeep = {
+			energy = 1
+		}
+	}	 
+}
+
+#Acid
+building_acid_lab = {
+	base_buildtime = 360
+
+	is_capped_by_modifier = yes
+
+	category = resource
+	
+	convert_to = {
+		building_volatiles_mine
+		building_geothermal_slurry_site
+		building_ammonia_electrodeposition
+		building_frozen_gas_mine
+		building_lava_mine
+		building_karst_mine
+		building_reef_lab
+		building_nature_preserve
+		building_nightside_mining
+		building_sugarbush
+		building_undersea_gasmine
+		building_salt_mine
+		building_aquifer_lab
+		building_megaflora_mine
+		building_storm_lab
+		building_coral_mine
+		#building_acid_lab
+		building_rogue_mine
+		building_lichen_farm
+		building_eyeball_lab
+		building_sulfur_lab
+		building_glacio_forge 
+		building_supercon_lab
+		building_lanthanide_mine
+	}
+	
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_acid
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+
+	#prerequisites = {
+	#	"tech_acid_lab_building"
+	#}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_acid_tech_add = 6
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			job_acid_drone_add = 6
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 400
+		}
+		upkeep = {
+			energy = 1
+		}
+	}	 
+}
+
+building_acidseeders_1 = {
+	base_buildtime = @b4_time
+	base_cap_amount = 1
+	category = government
+	can_be_disabled = no
+	upgrades = { "building_acidseeders_2" }
+
+	potential = {
+		exists = owner
+		owner = {
+			owner = { has_trait = trait_pc_acid_preference }
+		}
+		NOR = {
+			is_planet_class = pc_acid	# No double bonuses if player uses other tools to turn it into a Gaia world.
+			is_planet_class = pc_city
+			is_pd_arcology = yes
+			is_planet_class = pc_hive
+			is_pd_hive_arcology = yes
+			is_planet_class = pc_machine
+			is_pd_robot_arcology = yes
+			is_planet_class = pc_relic
+		}
+		is_artificial = no
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+
+	destroy_trigger = {
+		OR = {
+			is_planet_class = pc_acid	# No double bonuses if player uses other tools to turn it into a Gaia world.
+			is_planet_class = pc_city
+			is_pd_arcology = yes
+			is_planet_class = pc_hive
+			is_pd_hive_arcology = yes
+			is_planet_class = pc_machine
+			is_pd_robot_arcology = yes
+			is_planet_class = pc_relic
+			NOT = { exists = owner }
+			owner = {
+				NOT = { has_trait = trait_pc_acid_preference }
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			energy = 3000
+		}
+		upkeep = {
+			energy = 20
+			exotic_gases = 2
+		}
+	}
+
+	planet_modifier = {
+		pop_growth_speed = 0.1
+		pop_environment_tolerance = -0.3
+	}
+}
+
+building_acidseeders_2 = {
+	base_buildtime = @b4_time
+	can_build = no
+	category = government
+	can_be_disabled = no
+
+	destroy_trigger = {
+		OR = {
+			is_planet_class = pc_acid	# No double bonuses if player uses other tools to turn it into a Gaia world.
+			is_planet_class = pc_city
+			is_pd_arcology = yes
+			is_planet_class = pc_hive
+			is_pd_hive_arcology = yes
+			is_planet_class = pc_machine
+			is_pd_robot_arcology = yes
+			is_planet_class = pc_relic
+			NOT = { exists = owner }
+			owner = {
+				NOT = { has_trait = trait_pc_acid_preference }
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			energy = 3000
+			exotic_gases = 350
+		}
+	}
+
+	prerequisites = {
+		"tech_acid_lab_building"
+	}
+
+	allow = {
+		owner = { 
+			has_trait = trait_pc_acid_preference 
+			has_technology = tech_ecological_adaptation
+		}
+		has_major_upgraded_capital = yes
+	}
+
+	triggered_desc = {
+		text = building_acidseeders_2_effect_desc
+	}
+}
+
+#Ash
+building_pd_tectonic_drills = {
+	base_buildtime = @b4_time
+	base_cap_amount = 1
+	category = government
+	can_be_disabled = no
+	upgrades = { "building_pd_tectonic_drills_2" }
+
+	potential = {
+		exists = owner
+		owner = { has_trait = trait_pc_ash_preference }
+		has_deposit = d_pd_tectonic_fissure
+	}
+
+	#allow = {
+	#	has_upgraded_capital = yes
+	#}
+
+	destroy_trigger = {
+		OR = {
+			is_planet_class = pc_ash	# No double bonuses if player uses other tools to turn it into a Gaia world.
+			is_planet_class = pc_city
+			is_pd_arcology = yes
+			is_planet_class = pc_hive
+			is_pd_hive_arcology = yes
+			is_planet_class = pc_machine
+			is_pd_robot_arcology = yes
+			is_planet_class = pc_relic
+			NOT = { exists = owner }
+			owner = {
+				NOT = { has_trait = trait_pc_ash_preference }
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			energy = 3000
+		}
+		upkeep = {
+			energy = 20
+			rare_crystals = 2
+		}
+	}
+
+	planet_modifier = {
+		planet_jobs_minerals_produces_mult = 0.1
+		planet_jobs_energy_produces_mult = 0.1
+		pop_environment_tolerance =  -0.2
+	}
+
+}
+
+building_pd_tectonic_drills_2 = {
+	icon = building_pd_tectonic_drills
+	base_buildtime = @b4_time
+	can_build = no
+	category = government
+	can_be_disabled = no
+
+	destroy_trigger = {
+		OR = {
+			is_planet_class = pc_ash	# No double bonuses if player uses other tools to turn it into a Gaia world.
+			is_planet_class = pc_city
+			is_pd_arcology = yes
+			is_planet_class = pc_hive
+			is_pd_hive_arcology = yes
+			is_planet_class = pc_machine
+			is_pd_robot_arcology = yes
+			is_planet_class = pc_relic
+			NOT = { exists = owner }
+			owner = {
+				NOT = { has_trait = trait_pc_ash_preference }
+			}
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			energy = 3000
+			rare_crystals = 350
+		}
+	}
+
+	allow = {
+		owner = { 
+			has_trait = trait_pc_ash_preference
+			has_technology = tech_ecological_adaptation 
+		}
+		has_major_upgraded_capital = yes
+	}
+
+	triggered_desc = {
+		text = building_acidseeders_2_effect_desc
+	}
+}
+
+#Methane
+building_frozen_gas_mine = {
+	base_buildtime = 360
+
+	is_capped_by_modifier = yes
+	
+	convert_to = {
+		building_volatiles_mine
+		building_geothermal_slurry_site
+		building_ammonia_electrodeposition
+		#building_frozen_gas_mine
+		building_lava_mine
+		building_karst_mine
+		building_reef_lab
+		building_nature_preserve
+		building_nightside_mining
+		building_sugarbush
+		building_undersea_gasmine
+		building_salt_mine
+		building_aquifer_lab
+		building_megaflora_mine
+		building_storm_lab
+		building_coral_mine
+		building_acid_lab
+		building_rogue_mine
+		building_lichen_farm
+		building_eyeball_lab
+		building_sulfur_lab
+		building_glacio_forge
+		building_lanthanide_mine 
+		building_supercon_lab
+	}
+
+	category = resource
+	
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_methane
+	}
+	
+	#prerequisites = {
+	#	"tech_mine_exotic_gases"
+	#}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_methane_miner_add = 6
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_hive_empire = yes }
+		}
+		modifier = {
+			job_brain_drone_add = 6
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+		modifier = {
+			job_calculator_add = 6
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 400
+		}
+		upkeep = {
+			energy = 1
+		}
+	}	
+
+	ai_resource_production = {
+		trigger = { always = yes }
+		physics_research = 30
+		minerals = 20
+	} 
+}
+
+#Sulfur
+building_sulfur_lab = {
+	base_buildtime = 360
+
+	category = amenity
+	
+	potential = {
+		#NOT = { has_modifier = resort_colony }
+		NOT = { is_planet_class = pc_sulfur }
+		NOT = {	owner = { is_robot_empire = yes } }
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	prerequisites = {
+		"tech_pd_sulfur_springs"
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_sulfur_ent_add = 4
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_hive_empire = yes }
+		}
+		modifier = {
+			job_sulfur_ent_drone_add = 4
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 400
+		}
+		upkeep = {
+			energy = 1
+		}
+	}
+
+	ai_resource_production = {
+		trigger = { always = yes }
+		society_research = 30
+		minerals = 20
+	}	 
+
+	destroy_trigger = {
+		NOT = {
+			owner = { has_origin = origin_pd_sulfur_springs }
+		}
+	}
+}
+
+#Ammonia
+building_ammonia_electrodeposition = {
+	base_buildtime = 360
+
+	is_capped_by_modifier = yes
+
+	category = resource
+	
+	convert_to = {
+		building_volatiles_mine
+		building_geothermal_slurry_site
+		#building_ammonia_electrodeposition
+		building_frozen_gas_mine
+		building_lava_mine
+		building_karst_mine
+		building_reef_lab
+		building_nature_preserve
+		building_nightside_mining
+		building_sugarbush
+		building_undersea_gasmine
+		building_salt_mine
+		building_aquifer_lab
+		building_megaflora_mine
+		building_storm_lab
+		building_coral_mine
+		building_acid_lab
+		building_rogue_mine
+		building_lichen_farm
+		building_eyeball_lab
+		building_sulfur_lab
+		building_glacio_forge 
+		building_lanthanide_mine
+		building_supercon_lab
+	}
+	
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_ammonia
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+	
+	#prerequisites = {
+	#	"tech_mine_volatile_motes"
+	#}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_electrodepositionist_add = 6
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_hive_empire = yes }
+		}
+		modifier = {
+			job_alloy_drone_add = 6
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+		modifier = {
+			job_fabricator_add = 6
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 400
+		}
+		upkeep = {
+			energy = 1
+		}
+	}	
+
+	ai_resource_production = {
+		trigger = { always = yes }
+		alloys = 10
+		minerals = 20
+	}	 
+}

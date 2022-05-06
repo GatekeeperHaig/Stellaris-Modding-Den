@@ -540,3 +540,173 @@ planet_event = {
 	}
 }
 
+# Ash Seed building chain completed.
+planet_event = {
+	id = pdexotic.10
+	is_triggered_only = yes
+	title = "pdexotic.10.name"
+	desc = "pdexotic.10.desc"
+	picture = GFX_evt_pdash
+
+	trigger = {
+		last_building_changed = building_pd_tectonic_drills_2
+		NOT = {
+			is_planet_class = pc_ash
+		}
+	}
+
+	immediate = {
+		# Turn planet into Ash world.
+		change_pc = pc_ash
+
+		# Remove Ash Seed building.
+		remove_building = building_pd_tectonic_drills_2
+	}
+
+	option = {
+		name = pdexotic.10.a
+		hidden_effect = {
+			add_modifier = {
+				modifier = ash
+				days = -1
+			}
+			add_deposit = d_lava_lakes	
+			remove_deposit = d_pd_tectonic_fissure
+		}
+	}
+
+	after = {
+		tooltip = {
+			change_pc = pc_ash
+			remove_building = building_pd_tectonic_drills_2
+		}
+	}
+}
+
+# Ammonia Suits 1 Project Start
+country_event = {
+	id = pdexotic.11
+	title = "pdexotic.11.name"
+	desc = "pdexotic.11.desc"
+	picture = GFX_evt_cybernetics
+	show_sound = event_laboratory_sound
+	trackable = yes
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	trigger = {	
+		owner = { 
+			has_origin = origin_pd_ammonia_breathers
+			last_increased_tech = tech_ammonia_suits
+			NOT = { any_owned_pop = { has_trait = trait_pd_ammonia_suits } }
+		} 
+	}
+
+	option = {
+		name = "pdexotic.11.a"
+		hidden_effect = { save_event_target_as = ammonia_suits_owner }
+		capital_scope = {
+			enable_special_project = {
+				name = "AMMONIA_SUITS_1"
+				location = this
+				owner = root
+			}
+		}
+	}
+}
+
+
+# Ammonia Suits 1 Project End
+country_event = {
+	id = pdexotic.12
+	title = "pdexotic.12.name"
+	desc = "pdexotic.12.desc"
+	picture = GFX_evt_cybernetics
+	show_sound = event_laboratory_sound
+
+	is_triggered_only = yes
+
+	immediate = {
+		every_galaxy_pop = {
+			limit = {
+				is_same_species = root
+				NOT = { species = { has_trait = trait_pd_ammonia_suits } }
+			}
+			modify_species = {
+				species = this
+				add_trait = trait_pd_ammonia_suits
+			}
+			species = { save_event_target_as = ammonia_suit_species }
+		}
+		change_dominant_species = { species = event_target:ammonia_suit_species change_all = yes }
+	}
+
+	option = {
+		name = "pdexotic.12.a"
+	}
+}
+
+
+# Ammonia Suits 2 Tech
+country_event = {
+	id = pdexotic.13
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {	
+		owner = { 
+			has_origin = origin_pd_ammonia_breathers
+			last_increased_tech = tech_pd_ammonia_suits_2
+		} 
+	}
+
+	immediate = {
+		every_galaxy_pop = {
+			limit = {
+				is_same_species = root
+				NOT = { species = { has_trait = trait_pd_ammonia_suits_2 } }
+			}
+			modify_species = {
+				species = this
+				add_trait = trait_pd_ammonia_suits_2
+				remove_trait = trait_pd_ammonia_suits
+			}
+			#species = { save_event_target_as = ammonia_suit_species }
+		}
+		change_dominant_species = { species = event_target:ammonia_suit_species change_all = yes }
+	}
+}
+
+
+# Ammonia Suits 3 Tech
+country_event = {
+	id = pdexotic.14
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {	
+		owner = { 
+			has_origin = origin_pd_ammonia_breathers
+			last_increased_tech = tech_pd_ammonia_suits_3
+		} 
+	}
+
+	immediate = {
+		every_galaxy_pop = {
+			limit = {
+				is_same_species = root
+				NOT = { species = { has_trait = trait_pd_ammonia_suits_3 } }
+			}
+			modify_species = {
+				species = this
+				add_trait = trait_pd_ammonia_suits_3
+				remove_trait = trait_pd_ammonia_suits_2
+			}
+			#species = { save_event_target_as = ammonia_suit_species }
+		}
+		change_dominant_species = { species = event_target:ammonia_suit_species change_all = yes }
+	}
+}
