@@ -1,3 +1,4 @@
+#Floating Jobs
 eludium_expert = {	
 	category = worker
 	condition_string = WORKER_JOB_TRIGGER
@@ -14,7 +15,7 @@ eludium_expert = {
 	possible_precalc = can_fill_worker_job
 
 	resources = {
-		category = planet_miners
+		category = planet_sr_miners
 		produces = {
 			sr_eludium = 2
 		}
@@ -31,10 +32,12 @@ eludium_expert = {
 
 	weight = {
 		weight = @specialist_job_weight # Important job
+		mult = value:job_weights_modifier|JOB|mote_harvester|RESOURCE|volatile_motes|
 		modifier = {
 			factor = 10
 			is_enslaved = yes
 			can_take_servant_job = no
+			NOT = { has_slavery_type = { type = slavery_indentured } }
 		}
 		modifier = {
 			factor = 2
@@ -57,47 +60,6 @@ eludium_expert = {
 		modifier = {
 			factor = 0.1
 			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 5
-			has_trait = trait_syncretic_proles
-		}
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_very_strong
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_strong
-		}
-		modifier = {
-			factor = 0.1
-			has_trait = trait_weak
-		}
-		modifier = {
-			factor = 3
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_void_dweller_1
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_nerve_stapled
-		}
-		modifier = {
-			factor = 0.75
-			has_trait = trait_necrophage
 		}
 	}
 }
@@ -117,10 +79,10 @@ eludium_drone = {
 
 	possible_precalc = can_fill_drone_job
 
-	possible = { NOT = { has_trait = trait_nerve_stapled } }
+	possible = { can_think = yes }
 
 	resources = {
-		category = planet_miners
+		category = planet_sr_miners
 		produces = {
 			sr_eludium = 2
 		}
@@ -131,6 +93,7 @@ eludium_drone = {
 
 	weight = {
 		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|mote_harvesting_drone|RESOURCE|volatile_motes|
 		modifier = {
 			factor = 1.1
 			exists = owner
@@ -138,55 +101,40 @@ eludium_drone = {
 			owner = { has_valid_civic = civic_machine_assimilator }
 			has_trait = trait_cybernetic
 		}
-		modifier = {
-			factor = 5
-			has_job = mote_harvesting_drone
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
 	}
 }	
 
 #Graveyard Jobs
-
 graveyard_driller = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
+	category = worker
+	condition_string = WORKER_JOB_TRIGGER
 	building_icon = building_graveyard_well
 	clothes_texture_index = 2
 
 	possible_pre_triggers = {
 		has_owner = yes
-		#is_enslaved = no
 		is_being_purged = no
 		is_being_assimilated = no
 		is_sapient = yes
 	}
 
 	possible_precalc = can_fill_specialist_job
-
-	pop_modifier = {
-		pop_defense_armies_add = 1
-	}
 	
 	resources = {
-		category = planet_miners
+		category = planet_sr_miners
 		produces = {
 			sr_tiyanki_parts = 2
-		}
-		upkeep = {
-			energy = 1
 		}
 	}
 
 	weight = {
 		weight = @specialist_job_weight # Important job
+		mult = value:job_weights_modifier|JOB|mote_harvester|RESOURCE|volatile_motes|
 		modifier = {
 			factor = 10
 			is_enslaved = yes
 			can_take_servant_job = no
+			NOT = { has_slavery_type = { type = slavery_indentured } }
 		}
 		modifier = {
 			factor = 2
@@ -210,47 +158,6 @@ graveyard_driller = {
 			factor = 0.1
 			can_take_servant_job = yes
 		}
-		modifier = {
-			factor = 5
-			has_trait = trait_syncretic_proles
-		}
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_very_strong
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_strong
-		}
-		modifier = {
-			factor = 0.1
-			has_trait = trait_weak
-		}
-		modifier = {
-			factor = 3
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_void_dweller_1
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_nerve_stapled
-		}
-		modifier = {
-			factor = 0.75
-			has_trait = trait_necrophage
-		}
 	}
 }
 
@@ -258,7 +165,6 @@ graveyard_drone = {
 	category = complex_drone
 	condition_string = SPECIALIST_JOB_TRIGGER
 	building_icon = building_graveyard_well
-	clothes_texture_index = 2
 
 	possible_pre_triggers = {
 		has_owner = yes
@@ -270,12 +176,10 @@ graveyard_drone = {
 
 	possible_precalc = can_fill_specialist_job
 
-	pop_modifier = {
-		pop_defense_armies_add = 1
-	}
+	possible = { can_think = yes }
 	
 	resources = {
-		category = planet_miners
+		category = planet_sr_miners
 		produces = {
 			sr_tiyanki_parts = 2
 		}
@@ -286,6 +190,7 @@ graveyard_drone = {
 
 	weight = {
 		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|mote_harvesting_drone|RESOURCE|volatile_motes|
 		modifier = {
 			factor = 1.1
 			exists = owner
@@ -293,20 +198,10 @@ graveyard_drone = {
 			owner = { has_valid_civic = civic_machine_assimilator }
 			has_trait = trait_cybernetic
 		}
-		modifier = {
-			factor = 5
-			has_job = mote_harvesting_drone
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
 	}
 }	
 
 #Crucible Jobs
-
-
 crucible_foundry = {
 	category = specialist
 	condition_string = SPECIALIST_JOB_TRIGGER
@@ -320,9 +215,11 @@ crucible_foundry = {
 	}
 
 	possible_precalc = can_fill_specialist_job
-
-	pop_modifier = {
-		pop_defense_armies_add = 1
+	possible = {
+		hidden_trigger = { exists = owner }
+		owner = {
+			is_gestalt = no
+		}
 	}
 
 	resources = {
@@ -395,36 +292,47 @@ crucible_foundry = {
 			}
 			energy = 4
 		}
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_reduction
+		}
+		upkeep = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			minerals = 2
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_alloys
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_overlord
+		}
 	}
 
 	weight = {
 		weight = @specialist_job_weight # Fairly important job
+		mult = value:job_weights_modifier|JOB|foundry|RESOURCE|alloys|
 		modifier = {
 			factor = 2
 			is_enslaved = yes
 			can_take_servant_job = no
 		}
 		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}
-		modifier = {
 			factor = 5
 			has_job = foundry
-		}
-		modifier = {
-			factor = 15
-			has_job = foundry
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_void_dweller_1
 		}
 	}
 }
@@ -444,7 +352,7 @@ crucible_fabricator = {
 
 	possible_precalc = can_fill_drone_job
 
-	possible = { NOT = { has_trait = trait_nerve_stapled } }
+	possible = { can_think = yes }
 
 	resources = {
 		category = planet_metallurgists
@@ -516,24 +424,46 @@ crucible_fabricator = {
 			}
 			energy = 4
 		}
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_reduction
+		}
+
+		upkeep = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			minerals = 2
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_alloys
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_overlord
+		}
 	}
 
 	weight = {
 		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|fabricator|RESOURCE|alloys|
 		modifier = {
 			factor = 0.9
 			exists = owner
 			years_passed < 1
 			owner = { has_valid_civic = civic_machine_assimilator }
 			has_trait = trait_cybernetic
-		}
-		modifier = {
-			factor = 5
-			has_job = fabricator
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
 		}
 	}
 }
@@ -553,7 +483,7 @@ crucible_alloy_drone = {
 
 	possible_precalc = can_fill_drone_job
 
-	possible = { NOT = { has_trait = trait_nerve_stapled } }
+	possible = { can_think = yes }
 
 	resources = {
 		category = planet_metallurgists
@@ -625,21 +555,43 @@ crucible_alloy_drone = {
 			}
 			energy = 4
 		}
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_reduction
+		}
+		upkeep = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			minerals = 2
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_alloys
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_overlord
+		}
 	}
 
 	weight = {
 		weight = @complex_drone_job_weight
-		modifier = {
-			factor = 5
-			has_job = alloy_drone
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
+		mult = value:job_weights_modifier|JOB|alloy_drone|RESOURCE|alloys|
 	}
 }
 
+#Techno Jobs
 pd_lm_refiner = {
 	category = specialist
 	condition_string = SPECIALIST_JOB_TRIGGER
@@ -669,6 +621,7 @@ pd_lm_refiner = {
 
 	weight = {
 		weight = @specialist_job_weight
+		mult = value:job_weights_modifier|JOB|chemist|RESOURCE|volatile_motes|
 		modifier = {
 			factor = 0.2
 			has_citizenship_rights = no
@@ -679,43 +632,8 @@ pd_lm_refiner = {
 			can_take_servant_job = yes
 		}
 		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}
-		modifier = {
 			factor = 7
-			has_job = gas_refiner
-		}
-		modifier = {
-			factor = 15
-			has_job = gas_refiner
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.2
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_indentured }
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_void_dweller_1
-			exists = planet
-			planet = { is_planet_class = pc_habitat }
-		}
-		modifier = {
-			factor = 0.85
-			has_trait = trait_void_dweller_1
-			exists = planet
-			planet = { is_artificial = no }
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_necrophage
+			has_job = chemist
 		}
 	}
 }
@@ -735,7 +653,7 @@ pd_lm_refiner_drone = {
 
 	possible_precalc = can_fill_drone_job
 
-	possible = { NOT = { has_trait = trait_nerve_stapled } }
+	possible = { can_think = yes }
 
 	resources = {
 		category = planet_refiners
@@ -751,24 +669,13 @@ pd_lm_refiner_drone = {
 
 	weight = {
 		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|chemist_drone|RESOURCE|volatile_motes|
 		modifier = {
 			factor = 0.9
 			exists = owner
 			years_passed < 1
 			owner = { has_valid_civic = civic_machine_assimilator }
 			has_trait = trait_cybernetic
-		}
-		modifier = {
-			factor = 5
-			has_job = gas_refiner_drone
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_necrophage
 		}
 	}
 }

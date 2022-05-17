@@ -1,95 +1,3 @@
-tiyankicleanup = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_tinyanki_cleanup
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_miners
-		produces = {
-			energy = 4
-			minerals = 4
-		}	
-	}	
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 1.5
-			OR = {
-				has_trait = trait_industrious
-				has_trait = trait_robot_power_drills
-			}		
-		}
-        modifier = {
-            factor = 1.5
-            OR = {
-                has_trait = trait_robot_superconductive
-                has_trait = trait_ingenious
-            }
-        }
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-				has_trait = trait_brainslug
-			}
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_natural_sociologists
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}	
-		modifier = {
-			factor = 2
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { has_technology = tech_droid_workers }
-		}	
-		modifier = {
-			factor = 10
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { NOT = { has_technology = tech_droid_workers } }
-		}		
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}		
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}
-	}
-}
-
 slurry_distillers = {	
 	category = specialist
 	condition_string = SPECIALIST_JOB_TRIGGER
@@ -98,10 +6,9 @@ slurry_distillers = {
 
 	possible_pre_triggers = {
 		has_owner = yes
-		#is_enslaved = no
+		has_owner = yes
 		is_being_purged = no
 		is_being_assimilated = no
-		is_sapient = yes
 	}
 
 	possible_precalc = can_fill_specialist_job
@@ -116,36 +23,48 @@ slurry_distillers = {
 		upkeep = {
 			consumer_goods = 2
 		}
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_reduction
+		}
+		upkeep = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			minerals = 2
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_alloys
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_overlord
+		}
 	}
 
 	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }	
-		}		
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
+		weight = @specialist_job_weight # Fairly important job
+		mult = value:job_weights_modifier|JOB|catalytic_technician|RESOURCE|alloys|
 		modifier = {
 			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
+			is_enslaved = yes
+			can_take_servant_job = no
 		}
 		modifier = {
-			factor = 1.5
-			has_job = foundry
-		}		
+			factor = 5
+			has_job = catalytic_technician
+		}
 	}
 }
 
@@ -172,60 +91,79 @@ nightside_miner = {
 			minerals = 4
 			physics_research = 6
 		}
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			minerals = @requisitorium_minerals_reduction
+		}
 		upkeep = {
 			consumer_goods = 2
 		}
 	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-		modifier = {
-			factor = 1.5
-			OR = {
-				has_trait = trait_industrious
-				has_trait = trait_robot_power_drills
-			}		
+
+	overlord_resources = {
+		category = planet_requisitioned_minerals
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			minerals = @requisitorium_minerals_overlord
 		}
+	}
+
+	weight = {
+		weight = @worker_job_weight
+		mult = value:job_weights_modifier|JOB|miner|RESOURCE|minerals|
 		modifier = {
 			factor = 10
 			is_enslaved = yes
 			can_take_servant_job = no
-		}	
+			NOT = { has_slavery_type = { type = slavery_indentured } }
+		}
 		modifier = {
-			factor = 2
-			OR = {	
+			factor = 3
+			OR = {
 				is_non_sapient_robot = yes
 				is_shackled_robot = yes
 			}
 			can_take_servant_job = no
 			owner = { has_technology = tech_droid_workers }
-		}	
+		}
 		modifier = {
-			factor = 10
-			OR = {	
+			factor = 200
+			OR = {
 				is_non_sapient_robot = yes
 				is_shackled_robot = yes
 			}
 			can_take_servant_job = no
 			owner = { NOT = { has_technology = tech_droid_workers } }
-		}		
+		}
 		modifier = {
 			factor = 0.25
 			can_take_servant_job = yes
-		}		
+		}
+
+		# low income modifier
 		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
+			factor = 1.1
+			exists = planet
+			planet = {
+				has_available_jobs = "miner"
 			}
-		}			
+			exists = owner
+			owner = {
+				is_ai = yes
+				has_monthly_income = {
+					resource = minerals
+					value < 0
+				}
+			}
+		}
 	}
 }
 
@@ -237,13 +175,15 @@ volatile_miner = {
 
 	possible_pre_triggers = {
 		has_owner = yes
-		#is_enslaved = no
 		is_being_purged = no
 		is_being_assimilated = no
 		is_sapient = yes
 	}
 
 	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
 
 
 	resources = {
@@ -256,12 +196,13 @@ volatile_miner = {
 			consumer_goods = 2
 		}
 	}
-	
+
 	weight = {
 		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
 		modifier = {
 			factor = 0.2
-			has_citizenship_rights = no	
+			has_citizenship_rights = no
 			NOT = { has_trait = trait_mechanical }
 		}
 		modifier = {
@@ -269,47 +210,18 @@ volatile_miner = {
 			has_living_standard = { type = living_standard_academic_privilege }
 		}
 		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_brainslug
-		}
-		modifier = {			
-            factor = 1.5
-			OR = {
-				has_trait = trait_natural_engineers
-				has_trait = trait_natural_physicists
-				has_trait = trait_natural_sociologists
-			}
-		}
-        modifier = {
-            factor = 1.1
-            OR = {
-                has_trait = trait_robot_propaganda_machines
-                has_trait = trait_traditional
-            }
-        }
-        modifier = {
-            factor = 0.9
-			has_trait = trait_quarrelsome
-        }
-		modifier = {
 			factor = 0.1
 			can_take_servant_job = yes
 		}
 		modifier = {
 			factor = 1.5
 			has_job = researcher
-		}		
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
 	}
 }
 
@@ -321,13 +233,15 @@ jungle_ranger = {
 
 	possible_pre_triggers = {
 		has_owner = yes
-		#is_enslaved = no
 		is_being_purged = no
 		is_being_assimilated = no
 		is_sapient = yes
 	}
 
 	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
 
 	
 	resources = {
@@ -340,58 +254,32 @@ jungle_ranger = {
 			consumer_goods = 2
 		}
 	}
-	
+
 	weight = {
 		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
 		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
 		modifier = {
 			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-				has_trait = trait_brainslug
-			}
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
 		}
 		modifier = {
 			factor = 1.5
-			has_trait = trait_natural_sociologists
+			has_job = researcher
 		}
 		modifier = {
-			factor = 10
+			factor = 0.8
 			is_enslaved = yes
-			can_take_servant_job = no
-		}	
-		modifier = {
-			factor = 2
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { has_technology = tech_droid_workers }
-		}	
-		modifier = {
-			factor = 10
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { NOT = { has_technology = tech_droid_workers } }
-		}		
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}		
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}	
+			has_slavery_type = { type = slavery_indentured }
+		}
 	}
 }
 
@@ -403,13 +291,16 @@ crystal_carver = {
 
 	possible_pre_triggers = {
 		has_owner = yes
-		#is_enslaved = no
 		is_being_purged = no
 		is_being_assimilated = no
 		is_sapient = yes
 	}
 
 	possible_precalc = can_fill_specialist_job
+	possible = {
+		hidden_trigger = { exists = owner }
+		owner = { is_gestalt = no }
+	}
 
 	
 	resources = {
@@ -418,29 +309,38 @@ crystal_carver = {
 			sr_acean = 1
 		}
 	}	
-	
+
 	weight = {
-		weight = @specialist_job_weight
+		weight = @specialist_job_weight # Important job
+		mult = value:job_weights_modifier|JOB|crystal_miner|RESOURCE|rare_crystals|
 		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }
+			factor = 10
+			is_enslaved = yes
+			can_take_servant_job = no
+			NOT = { has_slavery_type = { type = slavery_indentured } }
 		}
 		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
+			factor = 2
+			OR = {
+				is_non_sapient_robot = yes
+				is_shackled_robot = yes
+			}
+			can_take_servant_job = no
+			owner = { has_technology = tech_droid_workers }
+		}
+		modifier = {
+			factor = 200
+			OR = {
+				is_non_sapient_robot = yes
+				is_shackled_robot = yes
+			}
+			can_take_servant_job = no
+			owner = { NOT = { has_technology = tech_droid_workers } }
+		}
 		modifier = {
 			factor = 0.1
 			can_take_servant_job = yes
 		}
-		modifier = {
-			factor = 1.5
-			has_job = artisan
-		}		
 	}
 }
 
@@ -460,36 +360,28 @@ crystal_hive = {
 
 	possible_precalc = can_fill_specialist_job
 
+	possible = { can_think = yes }
 	
 	resources = {
 		category = planet_artisans
 		produces = {
 			sr_acean = 1
 		}
+		upkeep = {
+			energy = 1
+		}
 	}
-	
+
 	weight = {
-		weight = @specialist_job_weight
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|crystal_mining_drone|RESOURCE|rare_crystals|
 		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }
+			factor = 1.1
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			has_trait = trait_cybernetic
 		}
-		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.5
-			has_job = artisan
-		}		
 	}
 }
 
@@ -509,350 +401,28 @@ crystal_robot = {
 
 	possible_precalc = can_fill_specialist_job
 
+	possible = { can_think = yes }
 	
 	resources = {
 		category = planet_artisans
 		produces = {
 			sr_acean = 1
 		}
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.5
-			has_job = artisan
-		}		
-	}
-}
-
-tiyanki_roughneck = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_graveyard_well
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_miners
-		produces = {
-			exotic_gases = 3
-		}	
-	}	
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-        modifier = {
-            factor = 1.5
-            OR = {
-                has_trait = trait_robot_superconductive
-                has_trait = trait_ingenious
-            }
-        }
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}	
-		modifier = {
-			factor = 2
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { has_technology = tech_droid_workers }
-		}	
-		modifier = {
-			factor = 10
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { NOT = { has_technology = tech_droid_workers } }
-		}		
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}		
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}	
-	}
-}
-
-tiyanki_hive = {	
-	category = complex_drone
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_graveyard_well
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_miners
-		produces = {
-			energy = 12
-			exotic_gases = 3
-		}
 		upkeep = {
-			food = 5
-		}		
-	}	
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-        modifier = {
-            factor = 1.5
-            OR = {
-                has_trait = trait_robot_superconductive
-                has_trait = trait_ingenious
-            }
-        }
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}	
-		modifier = {
-			factor = 2
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { has_technology = tech_droid_workers }
-		}	
-		modifier = {
-			factor = 10
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { NOT = { has_technology = tech_droid_workers } }
-		}		
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}		
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}	
-	}
-}
-
-tiyanki_robot = {	
-	category = complex_drone
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_graveyard_well
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_miners
-		produces = {
-			energy = 12
-			exotic_gases = 3
-		}
-		upkeep = {
-			minerals = 5
-		}		
-	}	
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-        modifier = {
-            factor = 1.5
-            OR = {
-                has_trait = trait_robot_superconductive
-                has_trait = trait_ingenious
-            }
-        }
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}	
-		modifier = {
-			factor = 2
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { has_technology = tech_droid_workers }
-		}	
-		modifier = {
-			factor = 10
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { NOT = { has_technology = tech_droid_workers } }
-		}		
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}		
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}	
-	}
-}
-
-synth_assembler = {
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_subsurface_assembly
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	planet_modifier = {
-		planet_pop_assembly_add = 2
-	}
-
-	resources = {
-		category = planet_pop_assemblers
-		produces = {
-			engineering_research = 12
-		}
-		upkeep = {
-			minerals = 6
+			energy = 1
 		}
 	}
 
 	weight = {
-		weight = @specialist_job_weight
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_modifier|JOB|crystal_mining_drone|RESOURCE|rare_crystals|
 		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-				has_trait = trait_brainslug
-			}
+			factor = 1.1
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			has_trait = trait_cybernetic
 		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_natural_engineers
-		}
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }	
-		}		
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}
-		modifier = {
-			factor = 100
-			planet = {
-				exists = owner
-				owner = { is_mechanical_empire = yes }
-			}		
-		}
-		modifier = {
-			factor = 1.5
-			has_job =roboticist
-		}		
 	}
 }
 
@@ -864,13 +434,15 @@ preserve_ranger = {
 
 	possible_pre_triggers = {
 		has_owner = yes
-		#is_enslaved = no
 		is_being_purged = no
 		is_being_assimilated = no
 		is_sapient = yes
 	}
 
 	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
 
 	
 	resources = {
@@ -887,58 +459,32 @@ preserve_ranger = {
 	planet_modifier = {
 		trade_value_add = 2
 	}
-	
+
 	weight = {
 		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
 		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
 		modifier = {
 			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-				has_trait = trait_brainslug
-			}
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
 		}
 		modifier = {
 			factor = 1.5
-			has_trait = trait_natural_sociologists
+			has_job = researcher
 		}
 		modifier = {
-			factor = 10
+			factor = 0.8
 			is_enslaved = yes
-			can_take_servant_job = no
-		}	
-		modifier = {
-			factor = 2
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { has_technology = tech_droid_workers }
-		}	
-		modifier = {
-			factor = 10
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { NOT = { has_technology = tech_droid_workers } }
-		}		
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}		
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}	
+			has_slavery_type = { type = slavery_indentured }
+		}
 	}
 }
 
@@ -950,13 +496,15 @@ supercon_tech = {
 
 	possible_pre_triggers = {
 		has_owner = yes
-		#is_enslaved = no
 		is_being_purged = no
 		is_being_assimilated = no
 		is_sapient = yes
 	}
 
 	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
 
 	
 	resources = {
@@ -969,67 +517,2243 @@ supercon_tech = {
 			consumer_goods = 2
 		}	
 	}
-	
+
 	weight = {
 		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
 		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
 		modifier = {
 			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-				has_trait = trait_brainslug
-			}
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
 		}
 		modifier = {
 			factor = 1.5
-			has_trait = trait_natural_physicists
+			has_job = researcher
 		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+reef_researcher = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_reef_lab
+	clothes_texture_index = 2
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+
+	planet_modifier = {
+		pop_growth_speed = 0.05
+	}
+	
+	resources = {
+		category = planet_researchers
+		produces = {
+			society_research = 6
+		}
+		upkeep = {
+			consumer_goods = 2
+		}		
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = researcher
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+lava_miner = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_lava_mine
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		hidden_trigger = { exists = owner }
+		owner = {
+			is_gestalt = no
+		}
+	}
+
+	
+	resources = {
+		category = planet_metallurgists
+		produces = {
+			alloys = 1.5
+			engineering_research = 6
+		}
+		upkeep = {
+			consumer_goods = 2
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_reduction
+		}
+		upkeep = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			minerals = 2
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_alloys
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_overlord
+		}
+	}
+
+	weight = {
+		weight = @specialist_job_weight # Fairly important job
+		mult = value:job_weights_modifier|JOB|foundry|RESOURCE|alloys|
+		modifier = {
+			factor = 2
+			is_enslaved = yes
+			can_take_servant_job = no
+		}
+		modifier = {
+			factor = 5
+			has_job = foundry
+		}
+	}
+}
+
+storm_researcher = {
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_storm_lab
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+	
+	resources = {
+		category = planet_researchers
+		produces = {
+			physics_research = 3
+			engineering_research = 3
+		}
+		upkeep = {
+			consumer_goods = 2
+		}
+	}
+
+	planet_modifier = {
+		planet_housing_mult = 0.025
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = researcher
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+underwater_venter = {
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_undersea_gasmine
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+	
+	resources = {
+		category = planet_researchers
+		produces = {
+			energy = 4
+			physics_research = 6
+		}
+		upkeep = {
+			consumer_goods = 2
+		}
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = researcher
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+cave_eng = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_karst_mine
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+
+	resources = {
+		category = planet_researchers
+		produces = {
+			engineering_research = 6
+		}	
+		upkeep = {
+			consumer_goods = 2
+		}
+	}
+
+	planet_modifier = {
+		planet_housing_mult = 0.025
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = researcher
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+salt_miner = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_salt_mine
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		hidden_trigger = { exists = owner }
+		owner = {
+			is_gestalt = no
+		}
+	}
+
+	
+	resources = {
+		category = planet_miners
+		produces = {
+			minerals = 4
+		}
+		upkeep = {
+			consumer_goods = 1
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			minerals = @requisitorium_minerals_reduction
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_minerals
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			minerals = @requisitorium_minerals_overlord
+		}
+	}
+
+	planet_modifier = {
+		trade_value_add = 4
+		planet_amenities_add = 5
+	}
+
+	weight = {
+		weight = @worker_job_weight
+		mult = value:job_weights_modifier|JOB|miner|RESOURCE|minerals|
 		modifier = {
 			factor = 10
 			is_enslaved = yes
 			can_take_servant_job = no
-		}	
+			NOT = { has_slavery_type = { type = slavery_indentured } }
+		}
 		modifier = {
-			factor = 2
-			OR = {	
+			factor = 3
+			OR = {
 				is_non_sapient_robot = yes
 				is_shackled_robot = yes
 			}
 			can_take_servant_job = no
 			owner = { has_technology = tech_droid_workers }
-		}	
+		}
 		modifier = {
-			factor = 10
-			OR = {	
+			factor = 200
+			OR = {
 				is_non_sapient_robot = yes
 				is_shackled_robot = yes
 			}
 			can_take_servant_job = no
 			owner = { NOT = { has_technology = tech_droid_workers } }
-		}		
+		}
 		modifier = {
 			factor = 0.25
 			can_take_servant_job = yes
-		}		
+		}
+
+		# low income modifier
 		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
+			factor = 1.1
+			exists = planet
+			planet = {
+				has_available_jobs = "miner"
 			}
-		}	
+			exists = owner
+			owner = {
+				is_ai = yes
+				has_monthly_income = {
+					resource = minerals
+					value < 0
+				}
+			}
+		}
 	}
 }
+
+coral_miner = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_coral_mine
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		hidden_trigger = { exists = owner }
+		owner = {
+			is_gestalt = no
+		}
+	}
+
+	
+	resources = {
+		category = planet_artisans
+		produces = {
+			consumer_goods = 3
+		}
+		upkeep = {
+			minerals = 2
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_produce_requisitorium
+					exists = owner.overlord
+					owner.overlord = { is_gestalt = no }
+				}
+			}
+			consumer_goods = @requisitorium_consumer_goods_reduction
+		}
+		upkeep = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_produce_requisitorium
+					exists = owner.overlord
+					owner.overlord = { is_gestalt = no }
+				}
+			}
+			minerals = 1
+		}
+	}
+
+	planet_modifier = {
+		trade_value_add = 4
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_consumer_goods
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_produce_requisitorium
+					exists = owner.overlord
+					owner.overlord = { is_gestalt = no }
+				}
+			}
+			consumer_goods = @requisitorium_consumer_goods_overlord
+		}
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_modifier|JOB|artisan|RESOURCE|consumer_goods|
+		modifier = {
+			factor = 2
+			is_enslaved = yes
+			can_take_servant_job = no
+		}
+		modifier = {
+			factor = 5
+			has_job = artisan
+		}
+
+		# low income modifier
+		modifier = {
+			factor = 1.2
+			exists = planet
+			planet = {
+				has_available_jobs = "artisan"
+			}
+			exists = owner
+			owner = {
+				is_ai = yes
+				has_monthly_income = {
+					resource = consumer_goods
+					value < 5
+				}
+			}
+		}
+	}
+}
+
+mega_eng = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_megaflora_mine
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+
+	resources = {
+		category = planet_researchers
+		produces = {
+			engineering_research = 6	
+		}	
+		upkeep = {
+			consumer_goods = 2
+		}
+	}
+
+	planet_modifier = {
+		planet_housing_mult = 0.025
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = researcher
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+mega_eng_hive = {	
+	category = complex_drone
+	condition_string = DRONE_JOB_TRIGGER
+	building_icon = building_megaflora_mine
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+
+	possible = { can_think = yes }
+
+	resources = {
+		category = planet_researchers
+		produces = {
+			engineering_research = 6		
+		}	
+		upkeep = {
+			energy = 2
+			minerals = 2
+		}
+	}
+
+	planet_modifier = {
+		planet_amenities_add = 5
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_research_modifier|JOB|brain_drone|
+		modifier = {
+			factor = 0.9
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			has_trait = trait_cybernetic
+		}
+	}
+}
+
+eyeball_tech = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_eyeball_lab
+	clothes_texture_index = 2
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+	
+	resources = {
+		category = planet_researchers
+		produces = {
+			engineering_research = 6
+			society_research = 6
+		}
+		upkeep = {
+			consumer_goods = 2
+		}	
+	} 
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = researcher
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+glacio_metal = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_glacio_forge
+	clothes_texture_index = 2
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		hidden_trigger = { exists = owner }
+		owner = {
+			is_gestalt = no
+		}
+	}
+
+	
+	resources = {
+		category = planet_metallurgists
+		produces = {
+			alloys = 1.5
+			engineering_research = 6
+		}	
+		upkeep = {
+			consumer_goods = 2
+		}
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_reduction
+		}
+		upkeep = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			minerals = 2
+		}
+	}
+
+	overlord_resources = {
+		category = planet_requisitioned_alloys
+		produces = {
+			trigger = {
+				planet = {
+					has_planet_flag = has_material_requisitorium
+				}
+			}
+			alloys = @requisitorium_alloys_overlord
+		}
+	}
+
+	weight = {
+		weight = @specialist_job_weight # Fairly important job
+		mult = value:job_weights_modifier|JOB|foundry|RESOURCE|alloys|
+		modifier = {
+			factor = 2
+			is_enslaved = yes
+			can_take_servant_job = no
+		}
+		modifier = {
+			factor = 5
+			has_job = foundry
+		}
+	}
+}
+
+lanthanide_miner = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_lanthanide_mine
+	clothes_texture_index = 2
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+	
+	resources = {
+		category = planet_researchers
+		produces = {
+			physics_research = 6
+			minerals = 4
+		}	
+		upkeep = {
+			consumer_goods = 2
+		}
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = researcher
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+rogue_miner = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_rogue_mine
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+
+	resources = {
+		category = planet_researchers
+		produces = {
+			physics_research = 6
+			minerals = 4
+		}	
+		upkeep = {
+			consumer_goods = 2
+		}
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = researcher
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+lichen_farmer = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_lichen_farm
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+
+	resources = {
+		category = planet_researchers
+		produces = {
+			society_research =  6
+			food = 4
+		}	
+		upkeep = {
+			consumer_goods = 2
+		}
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = researcher
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+naval_admin = {
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_stronghold
+	clothes_texture_index = 4
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	country_modifier = {
+		country_naval_cap_add = 4
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			exists = planet
+			planet = {
+				exists = owner
+				owner = { has_technology = "tech_ground_defense_planning" }
+			}
+		}
+		modifier = {
+			country_naval_cap_add = 2
+		}
+	}
+
+	resources = {
+		category = planet_soldiers
+		produces = {
+			unity = 3
+			society_research = 3
+		}
+		upkeep = {
+			consumer_goods = 2
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_valid_civic = civic_citizen_service }
+			}
+			unity = 2
+		}
+	}
+
+	possible = {
+		soldier_job_check_trigger = yes
+		owner = { is_gestalt = no }
+	}
+
+	triggered_planet_modifier = {
+		modifier = {
+			planet_stability_add = 1
+		}
+		mult = planet.modifier:job_soldier_stability_add
+	}
+
+	weight = {
+		weight = @soldier_job_weight
+		modifier = {
+			factor = 10
+			exists = planet
+			planet = { has_modifier = martial_law }
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_resilient
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_very_strong
+		}
+		modifier = {
+			factor = 1.5
+			has_trait = trait_strong
+		}
+		modifier = {
+			factor = 0.5
+			has_trait = trait_weak
+		}
+		modifier = {
+			factor = 0.1
+			is_enslaved = yes
+			NOT = { has_slavery_type = { type = slavery_military } }
+		}
+		modifier = {
+			factor = 10
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_military }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.1
+			has_trait = trait_cybernetic
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_presapient_earthbound
+		}
+		modifier = {
+			factor = 1.1
+			has_trait = trait_limited_regeneration
+		}
+		modifier = {
+			factor = 0
+			species = { can_be_soldier = no }
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_lithoid
+		}
+	}
+}
+
+naval_admin_hive = {
+	category = complex_drone
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_stronghold
+	clothes_texture_index = 4
+
+	country_modifier = {
+		country_naval_cap_add = 3
+	}
+	resources = {
+		category = planet_soldiers
+		produces = {
+			unity = 3
+			society_research = 2
+		}
+		upkeep = {
+			minerals = 2
+			energy = 2
+		}
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			exists = planet
+			planet = {
+				exists = owner
+				owner = { has_technology = "tech_ground_defense_planning" }
+			}
+		}
+		modifier = {
+			country_naval_cap_add = 1
+		}
+	}
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_drone_job
+
+	weight = {
+		weight = 5
+		modifier = {
+			weight = 100
+			exists = owner
+			owner = { is_at_war = yes }
+		}
+		modifier = {
+			factor = 10
+			planet = {
+				OR = {
+					has_modifier = compliance_protocols
+					has_modifier = hunter_killer_drones
+				}
+			}
+		}
+		modifier = {
+			factor = 4
+			has_trait = trait_resilient
+		}
+		modifier = {
+			factor = 4
+			has_trait = trait_very_strong
+		}
+		modifier = {
+			factor = 3
+			has_trait = trait_strong
+		}
+		modifier = {
+			factor = 0.5
+			has_trait = trait_weak
+		}
+		modifier = {
+			factor = 0.9
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			has_trait = trait_cybernetic
+		}
+		modifier = {
+			factor = 0
+			planet = { num_pops < 12 }
+			owner = { is_ai = yes }
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_lithoid
+		}
+		modifier = {
+			factor = 1.2
+			has_trait = trait_cybernetic
+		}
+	}
+}
+
+warriorpriest = {
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_temple
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+	
+	country_modifier = {
+		country_naval_cap_add = 3
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			exists = planet
+			planet = {
+				exists = owner
+				owner = { has_technology = "tech_ground_defense_planning" }
+			}
+		}
+		modifier = {
+			country_naval_cap_add = 2
+		}
+	}
+
+	pop_modifier = {
+		pop_defense_armies_add = 2
+	}
+
+	resources = {
+		category = planet_priests
+		produces = {
+			unity = 4
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_valid_civic = civic_exalted_priesthood }
+			}
+			unity = 1
+		}
+		upkeep = {
+			consumer_goods = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_add = 2
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_modifier|JOB|priest|RESOURCE|unity|
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			exists = owner
+			owner = { has_civic = civic_exalted_priesthood }
+		}
+		modifier = {
+			factor = 1.2
+			has_ethic = ethic_spiritualist
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 0.1
+			has_ethic = ethic_materialist
+			NOT = { has_job = priest }
+		}
+		modifier = {
+			factor = 1.5
+			has_job = priest
+		}
+		modifier = {
+			factor = 0.1
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+medicalpriest = {
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_temple
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+	resources = {
+		category = planet_priests
+		produces = {
+			unity = 4
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_valid_civic = civic_exalted_priesthood }
+			}
+			unity = 1
+		}
+		upkeep = {
+			consumer_goods = 2
+		}
+	}
+
+	planet_modifier = {
+		planet_amenities_add = 5
+		pop_growth_speed = 0.02
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_add = 2
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_modifier|JOB|priest|RESOURCE|unity|
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			exists = owner
+			owner = { has_civic = civic_exalted_priesthood }
+		}
+		modifier = {
+			factor = 1.2
+			has_ethic = ethic_spiritualist
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 0.1
+			has_ethic = ethic_materialist
+			NOT = { has_job = priest }
+		}
+		modifier = {
+			factor = 1.5
+			has_job = priest
+		}
+		modifier = {
+			factor = 0.1
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+desirepriest = {
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_temple
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+
+	resources = {
+		category = planet_priests
+		produces = {
+			unity = 4
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_valid_civic = civic_exalted_priesthood }
+			}
+			unity = 1
+		}
+		upkeep = {
+			consumer_goods = 2
+		}
+	}
+
+	planet_modifier = {
+		planet_amenities_add = 10
+		pop_happiness = 0.02
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_add = 2
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_modifier|JOB|priest|RESOURCE|unity|
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			exists = owner
+			owner = { has_civic = civic_exalted_priesthood }
+		}
+		modifier = {
+			factor = 1.2
+			has_ethic = ethic_spiritualist
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 0.1
+			has_ethic = ethic_materialist
+			NOT = { has_job = priest }
+		}
+		modifier = {
+			factor = 1.5
+			has_job = priest
+		}
+		modifier = {
+			factor = 0.1
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+technopriest = {
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_temple
+	clothes_texture_index = 3
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+
+	resources = {
+		category = planet_priests
+		produces = {
+			physics_research = 3
+			society_research = 3
+			engineering_research = 3
+			unity = 3
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_valid_civic = civic_exalted_priesthood }
+			}
+			unity = 1
+		}
+		upkeep = {
+			consumer_goods = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			always = yes
+		}
+		planet_amenities_add = 2
+		mult = value:scripted_modifier_mult|MODIFIER|pop_job_amenities_mult|
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_modifier|JOB|priest|RESOURCE|unity|
+		mult = value:scripted_modifier_job_weight_mult|MODIFIER|pop_job_amenities_mult|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			exists = owner
+			owner = { has_civic = civic_exalted_priesthood }
+		}
+		modifier = {
+			factor = 1.2
+			has_ethic = ethic_spiritualist
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 0.1
+			has_ethic = ethic_materialist
+			NOT = { has_job = priest }
+		}
+		modifier = {
+			factor = 1.5
+			has_job = priest
+		}
+		modifier = {
+			factor = 0.1
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+inquisitor = {
+	category = specialist
+	condition_string = BATTLE_THRALL_JOB_TRIGGER
+	building_icon = building_precinct_house
+	clothes_texture_index = 5
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible = {
+		battle_thrall_job_check_trigger = yes
+	}
+
+	resources = {
+		category = planet_enforcers
+		produces = {
+			unity = 1
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_valid_civic = civic_police_state }
+			}
+			unity = 1
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_active_tradition = tr_domination_judgment_corps }
+			}
+			unity = 1
+		}
+		upkeep = {
+			trigger = {
+				exists = planet
+				planet = { has_modifier = anticrime_campaign }
+			}
+			energy = 2
+		}
+	}
+
+	pop_modifier = {
+		pop_defense_armies_add = 2
+	}
+
+	planet_modifier = {
+		planet_crime_add = -10
+		pop_government_ethic_attraction = 0.05
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = planet
+			planet = { has_modifier = anticrime_campaign }
+		}
+		modifier = {
+			planet_crime_add = -10
+		}
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+
+		modifier = {
+			mult = value:job_weights_modifier|JOB|enforcer|RESOURCE|unity|FACTOR|0.25|
+			owner = { has_active_tradition = tr_domination_judgment_corps }
+		}
+
+		modifier = {
+			factor = 10
+			has_job = enforcer
+		}
+		modifier = {
+			factor = 10
+			planet = { planet_crime > 15}
+			NOT = { has_job = enforcer }
+		}
+		modifier = {
+			factor = 0.01
+			planet = { planet_crime <= 15}
+			NOT = { has_job = enforcer }
+		}
+
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_resilient
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_very_strong
+		}
+		modifier = {
+			factor = 1.5
+			has_trait = trait_strong
+		}
+		modifier = {
+			factor = 10
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_military }
+		}
+		modifier = {
+			factor = 0.50
+			has_trait = trait_weak
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.1
+			has_trait = trait_cybernetic
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_presapient_earthbound
+		}
+		modifier = {
+			factor = 1.1
+			has_trait = trait_limited_regeneration
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_lithoid
+		}
+	}
+}
+
+high_inquisitor = {
+	category = ruler
+	condition_string = BATTLE_THRALL_JOB_TRIGGER
+	building_icon = building_major_capital
+	clothes_texture_index = 5
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible = {
+		battle_thrall_job_check_trigger = yes
+	}
+
+	resources = {
+		category = planet_enforcers
+		produces = {
+			unity = 4
+			society_research = 4
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_active_tradition = tr_domination_judgment_corps }
+			}
+			unity = 1
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_valid_civic = civic_police_state }
+			}
+			unity = 1
+		}
+	}
+
+	planet_modifier = {
+		planet_stability_add = 5
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+
+		modifier = {
+			mult = value:job_weights_modifier|JOB|enforcer|RESOURCE|unity|FACTOR|0.25|
+			owner = { has_active_tradition = tr_domination_judgment_corps }
+		}
+
+		modifier = {
+			factor = 10
+			has_job = enforcer
+		}
+		modifier = {
+			factor = 10
+			planet = { planet_crime > 15}
+			NOT = { has_job = enforcer }
+		}
+		modifier = {
+			factor = 0.01
+			planet = { planet_crime <= 15}
+			NOT = { has_job = enforcer }
+		}
+
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_resilient
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_very_strong
+		}
+		modifier = {
+			factor = 1.5
+			has_trait = trait_strong
+		}
+		modifier = {
+			factor = 10
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_military }
+		}
+		modifier = {
+			factor = 0.50
+			has_trait = trait_weak
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.1
+			has_trait = trait_cybernetic
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_presapient_earthbound
+		}
+		modifier = {
+			factor = 1.1
+			has_trait = trait_limited_regeneration
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_lithoid
+		}
+	}
+}
+
+palace_guard = {
+	category = specialist
+	condition_string = BATTLE_THRALL_JOB_TRIGGER
+	building_icon = building_precinct_house
+	clothes_texture_index = 5
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible = {
+		battle_thrall_job_check_trigger = yes
+	}
+
+	resources = {
+		category = planet_enforcers
+		produces = {
+			unity = 2
+			society_research = 2
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_active_tradition = tr_domination_judgment_corps }
+			}
+			unity = 1
+		}
+		upkeep = {
+			trigger = {
+				exists = planet
+				planet = { has_modifier = anticrime_campaign }
+			}
+			energy = 2
+		}
+	}
+
+	pop_modifier = {
+		pop_defense_armies_add = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = planet
+			planet = { has_modifier = anticrime_campaign }
+		}
+		modifier = {
+			planet_crime_add = -10
+		}
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+
+		modifier = {
+			mult = value:job_weights_modifier|JOB|enforcer|RESOURCE|unity|FACTOR|0.25|
+			owner = { has_active_tradition = tr_domination_judgment_corps }
+		}
+
+		modifier = {
+			factor = 10
+			has_job = enforcer
+		}
+		modifier = {
+			factor = 10
+			planet = { planet_crime > 15}
+			NOT = { has_job = enforcer }
+		}
+		modifier = {
+			factor = 0.01
+			planet = { planet_crime <= 15}
+			NOT = { has_job = enforcer }
+		}
+
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_resilient
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_very_strong
+		}
+		modifier = {
+			factor = 1.5
+			has_trait = trait_strong
+		}
+		modifier = {
+			factor = 10
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_military }
+		}
+		modifier = {
+			factor = 0.50
+			has_trait = trait_weak
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.1
+			has_trait = trait_cybernetic
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_presapient_earthbound
+		}
+		modifier = {
+			factor = 1.1
+			has_trait = trait_limited_regeneration
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_lithoid
+		}
+	}
+}
+
+capital_security = {
+	category = specialist
+	condition_string = BATTLE_THRALL_JOB_TRIGGER
+	building_icon = building_senate_building
+	clothes_texture_index = 5
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible = {
+		battle_thrall_job_check_trigger = yes
+	}
+
+	resources = {
+		category = planet_enforcers
+		produces = {
+			unity = 2
+			society_research = 2
+		}
+		produces = {
+			trigger = {
+				exists = owner
+				owner = { has_active_tradition = tr_domination_judgment_corps }
+			}
+			unity = 1
+		}
+		upkeep = {
+			trigger = {
+				exists = planet
+				planet = { has_modifier = anticrime_campaign }
+			}
+			energy = 2
+		}
+	}
+
+	pop_modifier = {
+		pop_defense_armies_add = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = planet
+			planet = { has_modifier = anticrime_campaign }
+		}
+		modifier = {
+			planet_crime_add = -10
+		}
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+
+		modifier = {
+			mult = value:job_weights_modifier|JOB|enforcer|RESOURCE|unity|FACTOR|0.25|
+			owner = { has_active_tradition = tr_domination_judgment_corps }
+		}
+
+		modifier = {
+			factor = 10
+			has_job = enforcer
+		}
+		modifier = {
+			factor = 10
+			planet = { planet_crime > 15}
+			NOT = { has_job = enforcer }
+		}
+		modifier = {
+			factor = 0.01
+			planet = { planet_crime <= 15}
+			NOT = { has_job = enforcer }
+		}
+
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_resilient
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_very_strong
+		}
+		modifier = {
+			factor = 1.5
+			has_trait = trait_strong
+		}
+		modifier = {
+			factor = 10
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_military }
+		}
+		modifier = {
+			factor = 0.50
+			has_trait = trait_weak
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.1
+			has_trait = trait_cybernetic
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_presapient_earthbound
+		}
+		modifier = {
+			factor = 1.1
+			has_trait = trait_limited_regeneration
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+		modifier = {
+			factor = 2
+			has_trait = trait_lithoid
+		}
+	}
+}
+
+aquifer_tech = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_aquifer_lab
+	clothes_texture_index = 2
+
+	possible_pre_triggers = {
+		has_owner = yes
+		#is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+	
+	resources = {
+		category = planet_researchers
+		produces = {
+			society_research = 6
+			engineering_research = 6
+		}
+		upkeep = {
+			consumer_goods = 2
+		}	
+	} 
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = researcher
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+#Techno-Organic Jobs
+
+techno_eng = {	
+	category = specialist
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_subsurface_assembly
+	clothes_texture_index = 2
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+	possible = {
+		complex_specialist_job_check_trigger = yes
+	}
+
+	
+	resources = {
+		category = planet_miners
+		produces = {
+			engineering_research = 6
+			sr_living_metal = 1
+		}
+		upkeep = {
+			consumer_goods = 2
+		}
+	}
+
+	weight = {
+		weight = @specialist_job_weight
+		mult = value:job_weights_research_modifier|JOB|researcher|
+		modifier = {
+			factor = 0.2
+			has_citizenship_rights = no
+			NOT = { has_trait = trait_mechanical }
+		}
+		modifier = {
+			factor = 2
+			has_living_standard = { type = living_standard_academic_privilege }
+		}
+		modifier = {
+			factor = 0.1
+			can_take_servant_job = yes
+		}
+		modifier = {
+			factor = 1.5
+			has_job = researcher
+		}
+		modifier = {
+			factor = 0.8
+			is_enslaved = yes
+			has_slavery_type = { type = slavery_indentured }
+		}
+	}
+}
+
+techno_drone = {	
+	category = complex_drone
+	condition_string = SPECIALIST_JOB_TRIGGER
+	building_icon = building_subsurface_assembly
+	clothes_texture_index = 2
+
+	possible_pre_triggers = {
+		has_owner = yes
+		is_enslaved = no
+		is_being_purged = no
+		is_being_assimilated = no
+		is_sapient = yes
+	}
+
+	possible_precalc = can_fill_specialist_job
+
+	possible = { can_think = yes }
+	
+	resources = {
+		category = planet_researchers
+		produces = {
+			engineering_research = 6
+			sr_living_metal = 1
+		}
+		upkeep = {
+			energy = 2
+			minerals = 2
+		}
+	}
+
+	weight = {
+		weight = @complex_drone_job_weight
+		mult = value:job_weights_research_modifier|JOB|brain_drone|
+		modifier = {
+			factor = 0.9
+			exists = owner
+			years_passed < 1
+			owner = { has_valid_civic = civic_machine_assimilator }
+			has_trait = trait_cybernetic
+		}
+	}
+}
+
+#Things to Fix Redo
+
 
 pdzro_harvester = {	
 	category = specialist
@@ -1236,3139 +2960,6 @@ zro_robot = {
 		upkeep = {
 			energy = 5
 		}	
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-				has_trait = trait_brainslug
-			}
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_natural_physicists
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}	
-		modifier = {
-			factor = 2
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { has_technology = tech_droid_workers }
-		}	
-		modifier = {
-			factor = 10
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { NOT = { has_technology = tech_droid_workers } }
-		}		
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}		
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}	
-	}
-}
-
-karst_miner = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_karst_mine
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_miners
-		produces = {
-			minerals = 8
-			rare_crystals = 2
-		}
-		upkeep = {
-			consumer_goods = 2
-		}		
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-		modifier = {
-			factor = 1.5
-			OR = {
-				has_trait = trait_industrious
-				has_trait = trait_robot_power_drills
-			}		
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}	
-		modifier = {
-			factor = 2
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { has_technology = tech_droid_workers }
-		}	
-		modifier = {
-			factor = 10
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { NOT = { has_technology = tech_droid_workers } }
-		}		
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}		
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}			
-	}
-}
-
-reef_researcher = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_reef_lab
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-
-	planet_modifier = {
-		pop_growth_speed = 0.05
-	}
-	
-	resources = {
-		category = planet_miners
-		produces = {
-			society_research = 6
-		}
-		upkeep = {
-			consumer_goods = 2
-		}		
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_living_standard = { type = living_standard_academic_privilege }
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_brainslug
-		}
-		modifier = {			
-            factor = 1.5
-			OR = {
-				has_trait = trait_natural_engineers
-				has_trait = trait_natural_physicists
-				has_trait = trait_natural_sociologists
-			}
-		}
-        modifier = {
-            factor = 1.1
-            OR = {
-                has_trait = trait_robot_propaganda_machines
-                has_trait = trait_traditional
-            }
-        }
-        modifier = {
-            factor = 0.9
-			has_trait = trait_quarrelsome
-        }
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.5
-			has_job = researcher
-		}		
-	}
-}
-
-lava_miner = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_lava_mine
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_metallurgists
-		produces = {
-			alloys = 1.5
-			engineering_research = 6
-		}
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }	
-		}		
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}
-		modifier = {
-			factor = 1.5
-			has_job = foundry
-		}		
-	}
-}
-
-storm_researcher = {
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_storm_lab
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-	
-	resources = {
-		category = planet_researchers
-		produces = {
-			physics_research = 3
-			engineering_research = 3
-		}
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-
-	planet_modifier = {
-		planet_housing_mult = 0.025
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_living_standard = { type = living_standard_academic_privilege }
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_brainslug
-		}
-		modifier = {			
-            factor = 1.5
-			OR = {
-				has_trait = trait_natural_engineers
-				has_trait = trait_natural_physicists
-				has_trait = trait_natural_sociologists
-			}
-		}
-        modifier = {
-            factor = 1.1
-            OR = {
-                has_trait = trait_robot_propaganda_machines
-                has_trait = trait_traditional
-            }
-        }
-        modifier = {
-            factor = 0.9
-			has_trait = trait_quarrelsome
-        }
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.5
-			has_job = researcher
-		}		
-	}
-}
-
-underwater_venter = {
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_undersea_gasmine
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-	
-	resources = {
-		category = planet_researchers
-		produces = {
-			energy = 4
-			physics_research = 6
-		}
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_living_standard = { type = living_standard_academic_privilege }
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_brainslug
-		}
-		modifier = {			
-            factor = 1.5
-			OR = {
-				has_trait = trait_natural_engineers
-				has_trait = trait_natural_physicists
-				has_trait = trait_natural_sociologists
-			}
-		}
-        modifier = {
-            factor = 1.1
-            OR = {
-                has_trait = trait_robot_propaganda_machines
-                has_trait = trait_traditional
-            }
-        }
-        modifier = {
-            factor = 0.9
-			has_trait = trait_quarrelsome
-        }
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.5
-			has_job = researcher
-		}		
-	}
-}
-
-cave_eng = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_karst_mine
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-
-	resources = {
-		category = planet_researchers
-		produces = {
-			engineering_research = 6
-		}	
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-
-	planet_modifier = {
-		planet_housing_mult = 0.025
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_living_standard = { type = living_standard_academic_privilege }
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_brainslug
-		}
-		modifier = {			
-            factor = 1.5
-			OR = {
-				has_trait = trait_natural_engineers
-				has_trait = trait_natural_physicists
-				has_trait = trait_natural_sociologists
-			}
-		}
-        modifier = {
-            factor = 1.1
-            OR = {
-                has_trait = trait_robot_propaganda_machines
-                has_trait = trait_traditional
-            }
-        }
-        modifier = {
-            factor = 0.9
-			has_trait = trait_quarrelsome
-        }
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.5
-			has_job = researcher
-		}		
-	}
-}
-
-salt_miner = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_salt_mine
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_metallurgists
-		produces = {
-			minerals = 4
-		}
-		upkeep = {
-			consumer_goods = 1
-		}
-	}
-
-	planet_modifier = {
-		trade_value_add = 4
-		planet_amenities_add = 5
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }	
-		}		
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}
-		modifier = {
-			factor = 1.5
-			has_job = foundry
-		}		
-	}
-}
-
-coral_miner = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_coral_mine
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_artisans
-		produces = {
-			consumer_goods = 3
-		}
-		upkeep = {
-			minerals = 2
-		}
-	}
-
-	planet_modifier = {
-		trade_value_add = 4
-	}
-
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 5
-			has_job = artisan
-		}
-		modifier = {
-			factor = 10
-			has_job = artisan
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.2
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_indentured }
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_void_dweller_1
-		}
-	}
-}
-
-mega_eng = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_megaflora_mine
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-
-	resources = {
-		category = planet_researchers
-		produces = {
-			engineering_research = 6	
-		}	
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-
-	planet_modifier = {
-		planet_housing_mult = 0.025
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_living_standard = { type = living_standard_academic_privilege }
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_brainslug
-		}
-		modifier = {			
-            factor = 1.5
-			OR = {
-				has_trait = trait_natural_engineers
-				has_trait = trait_natural_physicists
-				has_trait = trait_natural_sociologists
-			}
-		}
-        modifier = {
-            factor = 1.1
-            OR = {
-                has_trait = trait_robot_propaganda_machines
-                has_trait = trait_traditional
-            }
-        }
-        modifier = {
-            factor = 0.9
-			has_trait = trait_quarrelsome
-        }
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.5
-			has_job = researcher
-		}		
-	}
-}
-
-mega_eng_hive = {	
-	category = complex_drone
-	condition_string = DRONE_JOB_TRIGGER
-	building_icon = building_megaflora_mine
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-
-	resources = {
-		category = planet_researchers
-		produces = {
-			engineering_research = 6		
-		}	
-		upkeep = {
-			energy = 2
-			minerals = 2
-		}
-	}
-
-	planet_modifier = {
-		planet_amenities_add = 5
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_living_standard = { type = living_standard_academic_privilege }
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_brainslug
-		}
-		modifier = {			
-            factor = 1.5
-			OR = {
-				has_trait = trait_natural_engineers
-				has_trait = trait_natural_physicists
-				has_trait = trait_natural_sociologists
-			}
-		}
-        modifier = {
-            factor = 1.1
-            OR = {
-                has_trait = trait_robot_propaganda_machines
-                has_trait = trait_traditional
-            }
-        }
-        modifier = {
-            factor = 0.9
-			has_trait = trait_quarrelsome
-        }
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.5
-			has_job = researcher
-		}		
-	}
-}
-
-eyeball_tech = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_eyeball_lab
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_researchers
-		produces = {
-			engineering_research = 6
-			society_research = 6
-		}
-		upkeep = {
-			consumer_goods = 2
-		}	
-	} 
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-				has_trait = trait_brainslug
-			}
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_natural_sociologists
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}	
-		modifier = {
-			factor = 2
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { has_technology = tech_droid_workers }
-		}	
-		modifier = {
-			factor = 10
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { NOT = { has_technology = tech_droid_workers } }
-		}		
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}		
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}	
-	}
-}
-
-glacio_metal = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_glacio_forge
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_metallurgists
-		produces = {
-			alloys = 1.5
-			engineering_research = 6
-		}	
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }	
-		}		
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}
-		modifier = {
-			factor = 1.5
-			has_job = foundry
-		}		
-	}
-}
-
-lanthanide_miner = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_lanthanide_mine
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_researchers
-		produces = {
-			physics_research = 6
-			minerals = 4
-		}	
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_living_standard = { type = living_standard_academic_privilege }
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_brainslug
-		}
-		modifier = {			
-            factor = 1.5
-			OR = {
-				has_trait = trait_natural_engineers
-				has_trait = trait_natural_physicists
-				has_trait = trait_natural_sociologists
-			}
-		}
-        modifier = {
-            factor = 1.1
-            OR = {
-                has_trait = trait_robot_propaganda_machines
-                has_trait = trait_traditional
-            }
-        }
-        modifier = {
-            factor = 0.9
-			has_trait = trait_quarrelsome
-        }
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.5
-			has_job = researcher
-		}		
-	}
-}
-
-rogue_miner = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_rogue_mine
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-
-	resources = {
-		category = planet_researchers
-		produces = {
-			physics_research = 6
-			minerals = 4
-		}	
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_living_standard = { type = living_standard_academic_privilege }
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_brainslug
-		}
-		modifier = {			
-            factor = 1.5
-			OR = {
-				has_trait = trait_natural_engineers
-				has_trait = trait_natural_physicists
-				has_trait = trait_natural_sociologists
-			}
-		}
-        modifier = {
-            factor = 1.1
-            OR = {
-                has_trait = trait_robot_propaganda_machines
-                has_trait = trait_traditional
-            }
-        }
-        modifier = {
-            factor = 0.9
-			has_trait = trait_quarrelsome
-        }
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.5
-			has_job = researcher
-		}		
-	}
-}
-
-lichen_farmer = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_lichen_farm
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-
-	resources = {
-		category = planet_researchers
-		produces = {
-			society_research =  6
-			food = 4
-		}	
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_living_standard = { type = living_standard_academic_privilege }
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_brainslug
-		}
-		modifier = {			
-            factor = 1.5
-			OR = {
-				has_trait = trait_natural_engineers
-				has_trait = trait_natural_physicists
-				has_trait = trait_natural_sociologists
-			}
-		}
-        modifier = {
-            factor = 1.1
-            OR = {
-                has_trait = trait_robot_propaganda_machines
-                has_trait = trait_traditional
-            }
-        }
-        modifier = {
-            factor = 0.9
-			has_trait = trait_quarrelsome
-        }
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.5
-			has_job = researcher
-		}		
-	}
-}
-
-naval_admin = {
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_stronghold
-	clothes_texture_index = 4
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	country_modifier = {
-		country_naval_cap_add = 4
-	}
-
-	triggered_country_modifier = {
-		potential = {
-			exists = planet
-			planet = {
-				exists = owner
-				owner = { has_technology = "tech_ground_defense_planning" }
-			}
-		}
-		modifier = {
-			country_naval_cap_add = 2
-		}
-	}
-
-	resources = {
-		category = planet_soldiers
-		produces = {
-			unity = 3
-			society_research = 3
-		}
-		upkeep = {
-			consumer_goods = 2
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = { has_valid_civic = civic_citizen_service }
-			}
-			unity = 2
-		}
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	pop_modifier = {
-		pop_defense_armies_add = 1
-	}
-
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 10
-			exists = planet
-			planet = { has_modifier = martial_law }
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_resilient
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_very_strong
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_strong
-		}
-		modifier = {
-			factor = 0.5
-			has_trait = trait_weak
-		}
-		modifier = {
-			factor = 0.1
-			is_enslaved = yes
-			NOT = { has_slavery_type = { type = slavery_military } }
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_military }
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_cybernetic
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_presapient_earthbound
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_limited_regeneration
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_presapient_proles
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_brainslug
-		}
-		modifier = {
-			factor = 1.05
-			has_trait = trait_presapient_natural_intellectuals
-		}
-		modifier = {
-			factor = 1.05
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.05
-			has_trait = trait_nerve_stapled
-		}
-		modifier = {
-			factor = 1.1
-			OR = {
-				has_trait = trait_robot_propaganda_machines
-				has_trait = trait_traditional
-			}
-		}
-		modifier = {
-			factor = 0.9
-			has_trait = trait_quarrelsome
-		}
-		modifier = {
-			factor = 0
-			can_be_soldier = no
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_lithoid
-		}
-	}
-}
-
-naval_admin_hive = {
-	category = complex_drone
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_stronghold
-	clothes_texture_index = 4
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	country_modifier = {
-		country_naval_cap_add = 3
-	}
-
-	triggered_country_modifier = {
-		potential = {
-			exists = planet
-			planet = {
-				exists = owner
-				owner = { has_technology = "tech_ground_defense_planning" }
-			}
-		}
-		modifier = {
-			country_naval_cap_add = 1
-		}
-	}
-
-	resources = {
-		category = planet_soldiers
-		produces = {
-			unity = 3
-			society_research = 2
-		}
-		upkeep = {
-			minerals = 2
-			energy = 2
-		}
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	pop_modifier = {
-		pop_defense_armies_add = 1
-	}
-
-	weight = {
-		weight = @soldier_job_weight
-		modifier = {
-			factor = 10
-			exists = planet
-			planet = { has_modifier = martial_law }
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_resilient
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_very_strong
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_strong
-		}
-		modifier = {
-			factor = 0.5
-			has_trait = trait_weak
-		}
-		modifier = {
-			factor = 0.1
-			is_enslaved = yes
-			NOT = { has_slavery_type = { type = slavery_military } }
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_military }
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_cybernetic
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_presapient_earthbound
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_limited_regeneration
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_presapient_proles
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_brainslug
-		}
-		modifier = {
-			factor = 1.05
-			has_trait = trait_presapient_natural_intellectuals
-		}
-		modifier = {
-			factor = 1.05
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.05
-			has_trait = trait_nerve_stapled
-		}
-		modifier = {
-			factor = 1.1
-			OR = {
-				has_trait = trait_robot_propaganda_machines
-				has_trait = trait_traditional
-			}
-		}
-		modifier = {
-			factor = 0.9
-			has_trait = trait_quarrelsome
-		}
-		modifier = {
-			factor = 0
-			can_be_soldier = no
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_lithoid
-		}
-	}
-}
-
-weapons_researcher = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_stronghold
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-
-	resources = {
-		category = planet_researchers
-		produces = {
-			physics_research = 6
-			engineering_research = 6
-		}	
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no	
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_living_standard = { type = living_standard_academic_privilege }
-		}
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_brainslug
-		}
-		modifier = {			
-            factor = 1.5
-			OR = {
-				has_trait = trait_natural_engineers
-				has_trait = trait_natural_physicists
-				has_trait = trait_natural_sociologists
-			}
-		}
-        modifier = {
-            factor = 1.1
-            OR = {
-                has_trait = trait_robot_propaganda_machines
-                has_trait = trait_traditional
-            }
-        }
-        modifier = {
-            factor = 0.9
-			has_trait = trait_quarrelsome
-        }
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.5
-			has_job = researcher
-		}		
-	}
-}
-
-warriorpriest = {
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_temple
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	country_modifier = {
-		country_naval_cap_add = 3
-	}
-
-	triggered_country_modifier = {
-		potential = {
-			exists = planet
-			planet = {
-				exists = owner
-				owner = { has_technology = "tech_ground_defense_planning" }
-			}
-		}
-		modifier = {
-			country_naval_cap_add = 2
-		}
-	}
-
-	pop_modifier = {
-		pop_defense_armies_add = 2
-	}
-
-	resources = {
-		category = planet_priests
-		produces = {
-			unity = 4
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = { has_valid_civic = civic_exalted_priesthood }
-			}
-			unity = 1
-		}
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			exists = owner
-			owner = { has_civic = civic_exalted_priesthood }
-		}
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_domestic_protocols
-				has_trait = trait_charismatic
-			}
-		}
-		modifier = {
-			factor = 0.5
-			has_trait = trait_repugnant
-		}
-		modifier = {
-			factor = 1.5
-			OR = {
-				has_trait = trait_robot_propaganda_machines
-				has_trait = trait_traditional
-			}
-		}
-		modifier = {
-			factor = 1.2
-			has_ethic = ethic_spiritualist
-		}
-		modifier = {
-			factor = 0.5
-			has_trait = trait_quarrelsome
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_natural_sociologists
-		}
-		modifier = {
-			factor = 0.1
-			has_ethic = ethic_materialist
-			NOT = { has_job = priest }
-		}
-		modifier = {
-			factor = 1.5
-			has_job = priest
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_brainslug
-		}
-		modifier = {
-			factor = 1.3
-			has_trait = trait_presapient_natural_intellectuals
-		}
-		modifier = {
-			factor = 1.3
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.15
-			has_trait = trait_erudite
-		}
-		modifier = {
-			factor = 1.05
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 0.9
-			has_trait = trait_presapient_proles
-		}
-		modifier = {
-			factor = 1.05
-			has_trait = trait_psionic
-		}
-		modifier = {
-			factor = 0.7
-			has_trait = trait_enigmatic_intelligence_failed
-		}
-		modifier = {
-			factor = 1.05
-			OR = {
-				has_trait = trait_enigmatic_intelligence
-				has_trait = trait_enigmatic_intelligence_poor
-			}
-		}
-		modifier = {
-			factor = 0.1
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_indentured }
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_necrophage
-		}
-	}
-}
-
-medicalpriest = {
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_temple
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-
-	resources = {
-		category = planet_priests
-		produces = {
-			unity = 4
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = { has_valid_civic = civic_exalted_priesthood }
-			}
-			unity = 1
-		}
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-
-	planet_modifier = {
-		planet_amenities_add = 5
-		pop_growth_speed = 0.02
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			OR = {
-				has_trait = trait_robot_domestic_protocols
-				has_trait = trait_charismatic
-			}
-		}
-		modifier = {
-			planet_amenities_add = 1
-		}
-	}
-	triggered_planet_modifier = {
-		potential = {
-			has_trait = trait_repugnant
-		}
-		modifier = {
-			planet_amenities_add = -1
-		}
-	}
-
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			exists = owner
-			owner = { has_civic = civic_exalted_priesthood }
-		}
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_domestic_protocols
-				has_trait = trait_charismatic
-			}
-		}
-		modifier = {
-			factor = 0.5
-			has_trait = trait_repugnant
-		}
-		modifier = {
-			factor = 1.5
-			OR = {
-				has_trait = trait_robot_propaganda_machines
-				has_trait = trait_traditional
-			}
-		}
-		modifier = {
-			factor = 1.2
-			has_ethic = ethic_spiritualist
-		}
-		modifier = {
-			factor = 0.5
-			has_trait = trait_quarrelsome
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_natural_sociologists
-		}
-		modifier = {
-			factor = 0.1
-			has_ethic = ethic_materialist
-			NOT = { has_job = priest }
-		}
-		modifier = {
-			factor = 1.5
-			has_job = priest
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_brainslug
-		}
-		modifier = {
-			factor = 1.3
-			has_trait = trait_presapient_natural_intellectuals
-		}
-		modifier = {
-			factor = 1.3
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.15
-			has_trait = trait_erudite
-		}
-		modifier = {
-			factor = 1.05
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 0.9
-			has_trait = trait_presapient_proles
-		}
-		modifier = {
-			factor = 1.05
-			has_trait = trait_psionic
-		}
-		modifier = {
-			factor = 0.7
-			has_trait = trait_enigmatic_intelligence_failed
-		}
-		modifier = {
-			factor = 1.05
-			OR = {
-				has_trait = trait_enigmatic_intelligence
-				has_trait = trait_enigmatic_intelligence_poor
-			}
-		}
-		modifier = {
-			factor = 0.1
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_indentured }
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_necrophage
-		}
-	}
-}
-
-desirepriest = {
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_temple
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-
-	resources = {
-		category = planet_priests
-		produces = {
-			unity = 4
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = { has_valid_civic = civic_exalted_priesthood }
-			}
-			unity = 1
-		}
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-
-	planet_modifier = {
-		planet_amenities_add = 10
-		pop_happiness = 0.02
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			OR = {
-				has_trait = trait_robot_domestic_protocols
-				has_trait = trait_charismatic
-			}
-		}
-		modifier = {
-			planet_amenities_add = 1
-		}
-	}
-	triggered_planet_modifier = {
-		potential = {
-			has_trait = trait_repugnant
-		}
-		modifier = {
-			planet_amenities_add = -1
-		}
-	}
-
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			exists = owner
-			owner = { has_civic = civic_exalted_priesthood }
-		}
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_domestic_protocols
-				has_trait = trait_charismatic
-			}
-		}
-		modifier = {
-			factor = 0.5
-			has_trait = trait_repugnant
-		}
-		modifier = {
-			factor = 1.5
-			OR = {
-				has_trait = trait_robot_propaganda_machines
-				has_trait = trait_traditional
-			}
-		}
-		modifier = {
-			factor = 1.2
-			has_ethic = ethic_spiritualist
-		}
-		modifier = {
-			factor = 0.5
-			has_trait = trait_quarrelsome
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_natural_sociologists
-		}
-		modifier = {
-			factor = 0.1
-			has_ethic = ethic_materialist
-			NOT = { has_job = priest }
-		}
-		modifier = {
-			factor = 1.5
-			has_job = priest
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_brainslug
-		}
-		modifier = {
-			factor = 1.3
-			has_trait = trait_presapient_natural_intellectuals
-		}
-		modifier = {
-			factor = 1.3
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.15
-			has_trait = trait_erudite
-		}
-		modifier = {
-			factor = 1.05
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 0.9
-			has_trait = trait_presapient_proles
-		}
-		modifier = {
-			factor = 1.05
-			has_trait = trait_psionic
-		}
-		modifier = {
-			factor = 0.7
-			has_trait = trait_enigmatic_intelligence_failed
-		}
-		modifier = {
-			factor = 1.05
-			OR = {
-				has_trait = trait_enigmatic_intelligence
-				has_trait = trait_enigmatic_intelligence_poor
-			}
-		}
-		modifier = {
-			factor = 0.1
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_indentured }
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_necrophage
-		}
-	}
-}
-
-technopriest = {
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_temple
-	clothes_texture_index = 3
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-
-	resources = {
-		category = planet_priests
-		produces = {
-			physics_research = 3
-			society_research = 3
-			engineering_research = 3
-			unity = 3
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = { has_valid_civic = civic_exalted_priesthood }
-			}
-			unity = 1
-		}
-		upkeep = {
-			consumer_goods = 2
-		}
-	}
-
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			exists = owner
-			owner = { has_civic = civic_exalted_priesthood }
-		}
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_domestic_protocols
-				has_trait = trait_charismatic
-			}
-		}
-		modifier = {
-			factor = 0.5
-			has_trait = trait_repugnant
-		}
-		modifier = {
-			factor = 1.5
-			OR = {
-				has_trait = trait_robot_propaganda_machines
-				has_trait = trait_traditional
-			}
-		}
-		modifier = {
-			factor = 1.2
-			has_ethic = ethic_spiritualist
-		}
-		modifier = {
-			factor = 0.5
-			has_trait = trait_quarrelsome
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_natural_sociologists
-		}
-		modifier = {
-			factor = 0.1
-			has_ethic = ethic_materialist
-			NOT = { has_job = priest }
-		}
-		modifier = {
-			factor = 1.5
-			has_job = priest
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_brainslug
-		}
-		modifier = {
-			factor = 1.3
-			has_trait = trait_presapient_natural_intellectuals
-		}
-		modifier = {
-			factor = 1.3
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.15
-			has_trait = trait_erudite
-		}
-		modifier = {
-			factor = 1.05
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-			}
-		}
-		modifier = {
-			factor = 0.9
-			has_trait = trait_presapient_proles
-		}
-		modifier = {
-			factor = 1.05
-			has_trait = trait_psionic
-		}
-		modifier = {
-			factor = 0.7
-			has_trait = trait_enigmatic_intelligence_failed
-		}
-		modifier = {
-			factor = 1.05
-			OR = {
-				has_trait = trait_enigmatic_intelligence
-				has_trait = trait_enigmatic_intelligence_poor
-			}
-		}
-		modifier = {
-			factor = 0.1
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_indentured }
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_necrophage
-		}
-	}
-}
-
-inquisitor = {
-	category = specialist
-	condition_string = BATTLE_THRALL_JOB_TRIGGER
-	building_icon = building_precinct_house
-	clothes_texture_index = 5
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible = {
-		battle_thrall_job_check_trigger = yes
-	}
-
-	resources = {
-		category = planet_enforcers
-		produces = {
-			unity = 1
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = { has_valid_civic = civic_police_state }
-			}
-			unity = 1
-		}
-		upkeep = {
-			trigger = {
-				exists = planet
-				planet = { has_modifier = anticrime_campaign }
-			}
-			energy = 2
-		}
-	}
-
-	pop_modifier = {
-		pop_defense_armies_add = 2
-	}
-
-	planet_modifier = {
-		planet_crime_add = -10
-		pop_government_ethic_attraction = 0.05
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = owner
-			owner = { has_active_tradition = tr_domination_imperious_architecture }
-		}
-		modifier = {
-			planet_housing_add = 1
-		}
-	}
-
-	triggered_planet_modifier = {
-		potential = {
-			exists = planet
-			planet = { has_modifier = anticrime_campaign }
-		}
-		modifier = {
-			planet_crime_add = -10
-		}
-	}
-
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_resilient
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_very_strong
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_strong
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_military }
-		}
-		modifier = {
-			factor = 0.50
-			has_trait = trait_weak
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 10
-			has_job = enforcer
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_cybernetic
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_presapient_earthbound
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_limited_regeneration
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_presapient_proles
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_brainslug
-			exists = owner
-			owner = { has_valid_civic = civic_police_state }
-		}
-		modifier = {
-			factor = 1.05
-			has_trait = trait_presapient_natural_intellectuals
-			exists = owner
-			owner = { has_valid_civic = civic_police_state }
-		}
-		modifier = {
-			factor = 20
-			has_job = enforcer
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.1
-			OR = {
-				has_trait = trait_robot_propaganda_machines
-				has_trait = trait_traditional
-			}
-			exists = owner
-			owner = { has_valid_civic = civic_police_state }
-		}
-		modifier = {
-			factor = 0.9
-			has_trait = trait_quarrelsome
-		}
-		modifier = {
-			factor = 0.8
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_indentured }
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_lithoid
-		}
-	}
-}
-
-high_inquisitor = {
-	category = ruler
-	condition_string = BATTLE_THRALL_JOB_TRIGGER
-	building_icon = building_major_capital
-	clothes_texture_index = 5
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible = {
-		battle_thrall_job_check_trigger = yes
-	}
-
-	resources = {
-		category = planet_enforcers
-		produces = {
-			unity = 4
-			society_research = 4
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = { has_valid_civic = civic_police_state }
-			}
-			unity = 1
-		}
-	}
-
-	planet_modifier = {
-		planet_stability_add = 5
-	}
-
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_resilient
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_very_strong
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_strong
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_military }
-		}
-		modifier = {
-			factor = 0.50
-			has_trait = trait_weak
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 10
-			has_job = enforcer
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_cybernetic
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_presapient_earthbound
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_limited_regeneration
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_presapient_proles
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_brainslug
-			exists = owner
-			owner = { has_valid_civic = civic_police_state }
-		}
-		modifier = {
-			factor = 1.05
-			has_trait = trait_presapient_natural_intellectuals
-			exists = owner
-			owner = { has_valid_civic = civic_police_state }
-		}
-		modifier = {
-			factor = 20
-			has_job = enforcer
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.1
-			OR = {
-				has_trait = trait_robot_propaganda_machines
-				has_trait = trait_traditional
-			}
-			exists = owner
-			owner = { has_valid_civic = civic_police_state }
-		}
-		modifier = {
-			factor = 0.9
-			has_trait = trait_quarrelsome
-		}
-		modifier = {
-			factor = 0.8
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_indentured }
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_lithoid
-		}
-	}
-}
-
-palace_guard = {
-	category = specialist
-	condition_string = BATTLE_THRALL_JOB_TRIGGER
-	building_icon = building_precinct_house
-	clothes_texture_index = 5
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible = {
-		battle_thrall_job_check_trigger = yes
-	}
-
-	resources = {
-		category = planet_enforcers
-		produces = {
-			unity = 2
-			society_research = 2
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = { has_valid_civic = civic_police_state }
-			}
-			unity = 1
-		}
-		upkeep = {
-			trigger = {
-				exists = planet
-				planet = { has_modifier = anticrime_campaign }
-			}
-			energy = 2
-		}
-	}
-
-	pop_modifier = {
-		pop_defense_armies_add = 2
-	}
-
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_resilient
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_very_strong
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_strong
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_military }
-		}
-		modifier = {
-			factor = 0.50
-			has_trait = trait_weak
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 10
-			has_job = enforcer
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_cybernetic
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_presapient_earthbound
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_limited_regeneration
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_presapient_proles
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_brainslug
-			exists = owner
-			owner = { has_valid_civic = civic_police_state }
-		}
-		modifier = {
-			factor = 1.05
-			has_trait = trait_presapient_natural_intellectuals
-			exists = owner
-			owner = { has_valid_civic = civic_police_state }
-		}
-		modifier = {
-			factor = 20
-			has_job = palace_guard
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.1
-			OR = {
-				has_trait = trait_robot_propaganda_machines
-				has_trait = trait_traditional
-			}
-			exists = owner
-			owner = { has_valid_civic = civic_police_state }
-		}
-		modifier = {
-			factor = 0.9
-			has_trait = trait_quarrelsome
-		}
-		modifier = {
-			factor = 0.8
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_indentured }
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_lithoid
-		}
-	}
-}
-
-capital_security = {
-	category = specialist
-	condition_string = BATTLE_THRALL_JOB_TRIGGER
-	building_icon = building_senate_building
-	clothes_texture_index = 5
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible = {
-		battle_thrall_job_check_trigger = yes
-	}
-
-	resources = {
-		category = planet_enforcers
-		produces = {
-			unity = 2
-			society_research = 2
-		}
-		produces = {
-			trigger = {
-				exists = owner
-				owner = { has_valid_civic = civic_police_state }
-			}
-			unity = 1
-		}
-		upkeep = {
-			trigger = {
-				exists = planet
-				planet = { has_modifier = anticrime_campaign }
-			}
-			energy = 2
-		}
-	}
-
-	pop_modifier = {
-		pop_defense_armies_add = 2
-	}
-
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 0.2
-			has_citizenship_rights = no
-			NOT = { has_trait = trait_mechanical }
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_resilient
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_very_strong
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_strong
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_military }
-		}
-		modifier = {
-			factor = 0.50
-			has_trait = trait_weak
-		}
-		modifier = {
-			factor = 0.1
-			can_take_servant_job = yes
-		}
-		modifier = {
-			factor = 10
-			has_job = enforcer
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_cybernetic
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_presapient_earthbound
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_limited_regeneration
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_presapient_proles
-		}
-		modifier = {
-			factor = 1.1
-			has_trait = trait_brainslug
-			exists = owner
-			owner = { has_valid_civic = civic_police_state }
-		}
-		modifier = {
-			factor = 1.05
-			has_trait = trait_presapient_natural_intellectuals
-			exists = owner
-			owner = { has_valid_civic = civic_police_state }
-		}
-		modifier = {
-			factor = 20
-			has_job = capital_security
-			OR = {
-				has_trait = trait_robust
-				has_trait = trait_robot_efficient_processors
-			}
-		}
-		modifier = {
-			factor = 1.1
-			OR = {
-				has_trait = trait_robot_propaganda_machines
-				has_trait = trait_traditional
-			}
-			exists = owner
-			owner = { has_valid_civic = civic_police_state }
-		}
-		modifier = {
-			factor = 0.9
-			has_trait = trait_quarrelsome
-		}
-		modifier = {
-			factor = 0.8
-			is_enslaved = yes
-			has_slavery_type = { type = slavery_indentured }
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_lithoid
-		}
-	}
-}
-
-mil_brain_drone = {
-	category = complex_drone
-	condition_string = DRONE_JOB_TRIGGER
-	building_icon = building_fortress
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-	}
-
-	possible_precalc = can_fill_drone_job
-
-	possible = { NOT = { has_trait = trait_nerve_stapled } }
-
-	resources = {
-		category = planet_researchers
-		produces = {
-			physics_research = 6
-			engineering_research = 6
-		}
-		upkeep = {
-			minerals = 6
-		}
-		upkeep = {
-			trigger = {
-				exists = owner
-				owner = {
-					has_edict = research_subsidies
-				}
-			}
-			energy = 1
-		}
-	}
-
-	weight = {
-		weight = @complex_drone_job_weight
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}
-		modifier = {
-			factor = 2
-			has_trait = trait_intelligent
-		}
-		modifier = {
-			factor = 1.5
-			OR = {
-				has_trait = trait_natural_engineers
-				has_trait = trait_natural_physicists
-				has_trait = trait_natural_sociologists
-			}
-		}
-		modifier = {
-			factor = 0.65
-			OR = {
-				has_trait = trait_syncretic_proles
-				has_trait = trait_presapient_proles
-			}
-		}
-		modifier = {
-			factor = 0.9
-			exists = owner
-			years_passed < 1
-			owner = { has_valid_civic = civic_machine_assimilator }
-			has_trait = trait_cybernetic
-		}
-		modifier = {
-			factor = 0
-			planet = {
-				owner = {
-					is_ai = yes
-					has_resource = { type = minerals amount < 500 }
-					has_monthly_income = {
-						resource = minerals
-						value < 25
-					}
-				}
-			}
-		}
-	}
-}
-
-aquifer_tech = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_aquifer_lab
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_researchers
-		produces = {
-			society_research = 6
-			engineering_research = 6
-		}
-		upkeep = {
-			consumer_goods = 2
-		}	
-	} 
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-				has_trait = trait_brainslug
-			}
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_natural_sociologists
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}	
-		modifier = {
-			factor = 2
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { has_technology = tech_droid_workers }
-		}	
-		modifier = {
-			factor = 10
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { NOT = { has_technology = tech_droid_workers } }
-		}		
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}		
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}	
-	}
-}
-
-#Techno-Organic Jobs
-
-techno_eng = {	
-	category = specialist
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_subsurface_assembly
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		#is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_miners
-		produces = {
-			engineering_research = 6
-			sr_living_metal = 1
-		}
-	}
-	
-	weight = {
-		weight = @specialist_job_weight
-		modifier = {
-           factor = 2
-           OR = {
-               has_trait = trait_robust
-               has_trait = trait_robot_efficient_processors
-           }
-        }
-		modifier = {
-			factor = 3
-			has_trait = trait_erudite
-		}		
-		modifier = {
-			factor = 2
-			OR = {
-				has_trait = trait_robot_logic_engines
-				has_trait = trait_intelligent
-				has_trait = trait_brainslug
-			}
-		}
-		modifier = {
-			factor = 1.5
-			has_trait = trait_natural_physicists
-		}
-		modifier = {
-			factor = 10
-			is_enslaved = yes
-			can_take_servant_job = no
-		}	
-		modifier = {
-			factor = 2
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { has_technology = tech_droid_workers }
-		}	
-		modifier = {
-			factor = 10
-			OR = {	
-				is_non_sapient_robot = yes
-				is_shackled_robot = yes
-			}
-			can_take_servant_job = no
-			owner = { NOT = { has_technology = tech_droid_workers } }
-		}		
-		modifier = {
-			factor = 0.25
-			can_take_servant_job = yes
-		}		
-		modifier = {
-			factor = 2
-			species = {
-				has_species_flag = racket_species_flag
-			}
-		}	
-	}
-}
-
-techno_drone = {	
-	category = complex_drone
-	condition_string = SPECIALIST_JOB_TRIGGER
-	building_icon = building_subsurface_assembly
-	clothes_texture_index = 2
-
-	possible_pre_triggers = {
-		has_owner = yes
-		is_enslaved = no
-		is_being_purged = no
-		is_being_assimilated = no
-		is_sapient = yes
-	}
-
-	possible_precalc = can_fill_specialist_job
-
-	
-	resources = {
-		category = planet_researchers
-		produces = {
-			engineering_research = 6
-			sr_living_metal = 1
-		}
 	}
 	
 	weight = {
