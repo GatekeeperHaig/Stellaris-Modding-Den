@@ -126,7 +126,7 @@ def main():
   "ships_upkeep_mult", 
   "starbase_shipyard_build_cost_mult",
   "planet_stability_add",
-  "diplomacy_upkeep_mult",
+  "pop_resettlement_cost_mult",
   ["weapon_type_strike_craft_weapon_fire_rate_mult","ship_weapon_damage"],
   "ship_hull_mult",
   "ship_armor_mult",
@@ -142,7 +142,7 @@ def main():
   possibleBoniColor=["E","B","G","P","Y","H","M","R","G","H","B","R","G"
   # ,"T","G"
   ]
-  defaultEmpireBonusMultList=[25,25,15,-10,-10,5,-15,0,0,0,0,0,25]
+  defaultEmpireBonusMultList=[25,25,15,-10,-10,5,-25,0,0,0,0,0,25]
   defaultEmpireBonusMult=dict()
   for i,bonus in enumerate(possibleBoniNames):
     defaultEmpireBonusMult[bonus]=defaultEmpireBonusMultList[i]
@@ -151,9 +151,7 @@ def main():
   npcBonusAdd=5
   npcBonusBase=30
 
-# playable_ai_empire = {
-#   diplomacy_upkeep_mult = -0.5 GFX_evt_arguing_senate "E"
-# }
+
 
   # stations_produces_mult = 1 GFX_evt_mining_station £systems "T"
   # planet_jobs_produces_mult = 1 GFX_evt_metropolis £job "M"
@@ -1613,7 +1611,7 @@ def globalAddLocs(locClass):
   locClass.addLoc("jobs", "$mod_planet_jobs_produces_mult$","all")
   locClass.addLoc("ship_cost", "$MOD_STARBASE_SHIPYARD_BUILD_COST_MULT$","all")
   locClass.addLoc("stability", "$PLANET_STABILITY_TITLE$","all")
-  locClass.addLoc("diplo_upkeep", "$mod_diplomacy_upkeep_mult$","all")
+  locClass.addLoc("diplo_upkeep", "$mod_pop_resettlement_cost_mult$","all")
   locClass.addLoc("fire_rate", "$MOD_SHIP_FIRE_RATE_MULT$","all")
   locClass.addLoc("trade_value", "$MOD_TRADE_VALUE_MULT$","all")
   locClass.addLoc("cap", "$NAVY_SIZE_TITLE$","all")
