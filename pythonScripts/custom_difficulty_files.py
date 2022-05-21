@@ -230,7 +230,7 @@ def main():
   ["swarm", "extradimensional", "extradimensional_2", "extradimensional_3", "ai_empire","cybrex_empire","sentinels", "portal_holders", "feral_prethoryn","feral_prethoryn_infighting"],
   ["dormant_marauders","ruined_marauders", "awakened_marauders","marauder_raiders"],
   []]
-  catNotCountryType=[[], [],[],[],[],[],[],catCountryType]
+  catNotCountryType=[[], [],[],[],[],[],[],catCountryType+[["global_event"]]]
   catPictures=["GFX_evt_throne_room","GFX_evt_organic_oppression","GFX_evt_fallen_empire_awakes","GFX_evt_wraith","GFX_evt_towel","GFX_evt_ai_planet","GFX_evt_khan_throne_room","GFX_evt_unknown_ships"]
   catColors="BHBBGRBB"
 
