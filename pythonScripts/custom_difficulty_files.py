@@ -103,8 +103,8 @@ def main():
   for bonus in possibleBoniNames:
     boniFactor[bonus]=1
   boniFactor["stability"]=0.2
-  boniFactor["upkeep"]=-1
-  boniFactor["ship_cost"]=-1
+  boniFactor["upkeep"]=-0.25
+  boniFactor["ship_cost"]=-0.25
   boniFactor["diplo_upkeep"]=-1
 
   possibleBoniPictures=[
