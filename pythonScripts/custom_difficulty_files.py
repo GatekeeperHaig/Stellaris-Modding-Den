@@ -11,7 +11,9 @@ import math
 import custom_difficulty_more_modifiers as cdmm
 
 
-ET = "event_target:custom_difficulty_var_storage"
+ETOld = "event_target:custom_difficulty_var_storage"
+ETNew = "event_target:global_event_country"
+ET = ETNew
 
 yes="yes"
 
@@ -51,7 +53,8 @@ name_removeEventTarget=eventNameSpace.format(id_removeModifiers+8)
 name_removeOLDModifiers="custom_difficulty_old.{}".format(id_removeModifiers+9)
 id_addModifiers=80  #reserved range up to 82
 id_addGroupModifiers=83  #reserved range up to 85
-id_defaultEvents=100 #reserved range up to 199
+id_defaultEvents=100 #reserved range up to 119
+id_updateEventCountryEvents=120 #reserved range up to 119
 id_ChangeEvents=1000 #reserved range up to 9999
 id_subChangeEvents=10
 
@@ -540,6 +543,25 @@ def main():
   #}
 
 
+  defaultEvents.addComment("variable transfer: old event country to new")
+  defaultDifficultyEvent=TagList("id", eventNameSpace.format(id_updateEventCountryEvents))
+  defaultEvents.add("country_event",defaultDifficultyEvent)
+  defaultDifficultyEvent.add("fire_only_once",yes)
+  defaultDifficultyEvent.add("hide_window",yes)
+  t=defaultDifficultyEvent.addReturn("trigger")
+  t.addReturn("NOT").add("has_global_flag", "custom_difficulty_variables_transfered")
+  immediate=defaultDifficultyEvent.addReturn("immediate")
+  immediate.add("set_global_flag", "custom_difficulty_variables_transfered")
+  et=immediate.addReturn(ETNew)
+  for cat in cats:
+    for val in possibleBoniNames:
+      et.variableOpNew("set","custom_difficulty_{}_{}_value".format(cat,val), ETOld)
+  et.variableOpNew("set","custom_difficulty_crisis_strength".format(cat,val), ETOld)
+  et.variableOpNew("set","custom_difficulty_random_handicap_perc".format(cat,val), ETOld,"=","",True)
+  et.variableOpNew("set","custom_difficulty_random_handicap".format(cat,val), ETOld,"=","",True)
+  et.variableOpNew("set","custom_difficulty_randomness_factor".format(cat,val), ETOld,"=","",True)
+      # et.add("set_variable", TagList().add("which", "custom_difficulty_{}_{}_value".format(cat,val)).add("value", str(value)))
+
 
   for difficultyIndex, difficulty in enumerate(difficulties):
     defaultDifficultyEvent=TagList("id", eventNameSpace.format(id_defaultEvents+difficultyIndex))
@@ -675,7 +697,11 @@ def main():
             limit.add("not", TagList("has_country_flag", f))
 
         if cat=="ai":
-          handicapChangedTest=ifTagList.createReturnIf(TagList("NOT",variableOpNew("check", "custom_difficulty_random_handicap_perc", ET)))
+          tmp=TagList(ET, TagList("is_variable_set", "custom_difficulty_random_handicap_perc"))
+          t2=tmp.addReturn("OR")
+          t2.addReturn("NOT").add("is_variable_set", "custom_difficulty_random_handicap_perc")
+          t2.add("NOT",variableOpNew("check", "custom_difficulty_random_handicap_perc", ET))
+          handicapChangedTest=ifTagList.createReturnIf(tmp)
           for bonus in possibleBoniNames:
             if not groupUpdate or bonus in representGroup:
               handicapChangedTest.add("set_country_flag", "custom_difficulty_{}_changed".format(bonus))
@@ -684,6 +710,9 @@ def main():
 
         et=TagList()
         ifTagList.add(ET,et)
+        if cat=="ai":
+          et2=ifTagList.createReturnIf(TagList("exists","overlord").add("overlord",TagList("is_ai","no")).add("has_global_flag", "custom_difficulty_deactivate_player_vassal_ai_boni"))
+          et2=et2.addReturn(ET)
         if len(catCountryType[catI])>1:
           limitOr=TagList()
           limit.add("or",limitOr)
@@ -708,26 +737,34 @@ def main():
           for entry in sorted(norSet):
             norTagList.add("is_country_type", entry)
         if "player"==cat or "ai" in cat:
-          orTagList=TagList()
+          # orTagList=TagList()
           if cat=="player":
-            orTagList.add("is_ai", "no")
-            orTagList.add("and", TagList().add("has_global_flag", "custom_difficulty_deactivate_player_vassal_ai_boni").add("exists","overlord").add("overlord",TagList().add("is_ai","no")))
+            limit.add("is_ai", "no")
+            # orTagList.add("and", TagList().add("has_global_flag", "custom_difficulty_deactivate_player_vassal_ai_boni").add("exists","overlord").add("overlord",TagList().add("is_ai","no")))
           else:
             limit.add("is_ai", yes)
-            orTagList.add("has_global_flag", "custom_difficulty_activate_player_vassal_ai_boni")
-            orTagList.add("not", TagList().add("exists","overlord"))
-            orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","yes")))
-          limit.add("or",orTagList)
+            # orTagList.add("has_global_flag", "custom_difficulty_activate_player_vassal_ai_boni")
+            # orTagList.add("not", TagList().add("exists","overlord"))
+            # orTagList.add("and", TagList().add("exists","overlord").add("overlord",TagList().add("is_ai","yes")))
+          # limit.add("or",orTagList)
         else:
           limit.add("is_ai", "yes")
         # afterIfTaglist=deepcopy(ifTagList)
         # after.add("if",afterIfTaglist)
         shortened=False
 
-        for bonus, bonusModifier in zip(possibleBoniNames,possibleBoniModifier):
+        for bonus, bonusModifier, val in zip(possibleBoniNames,possibleBoniModifier,defaultEmpireBonusMultList):
           if groupUpdate and not bonus in representGroup:
             continue
           et.add("set_variable", TagList().add("which", "custom_difficulty_{}_value".format(bonus)).add("value", "custom_difficulty_{}_{}_value".format(cat,bonus)))
+          if cat=="ai":
+            if val!=0:
+              t=et2.createReturnIf(variableOpNew("check", "custom_difficulty_{}_value".format(bonus), val*9//10, ">" if val>0 else "<"))
+              t.variableOpNew("change", "custom_difficulty_{}_value".format(bonus), -val)
+              # et2.add("set_variable", TagList().add("which", "custom_difficulty_{}_value".format(bonus)).add("value", "custom_difficulty_{}_{}_value".format(cat,bonus)))
+
+
+
           ifChanged=TagList("limit", TagList("not", 
             variableOpNew("check","custom_difficulty_{}_value".format(bonus), ET)))
           # ifChanged=TagList("limit", TagList("not", 
@@ -931,6 +968,9 @@ def main():
   onActions=TagList()
   onActions.add("on_yearly_pulse", TagList("events",TagList().add(name_rootYearlyEvent,""," #rootYearly").add(name_rootUpdateEvent,""," #rootUpdate")))
   onActions.add("on_game_start_country", TagList("events",TagList().add(name_gameStartFireOnlyOnce),"#set flag,set event target, start default events, start updates for all countries"))
+  # onActions.add("on_single_player_save_game_load", TagList("events",TagList().add(eventNameSpace.format(id_updateEventCountryEvents))))
+
+
   # onActions.add("on_single_player_save_game_load", TagList("events",TagList().add(name_dmm_new_init)))
   # onActions.add("dmm_mod_selected", TagList("events",TagList().add(name_dmm_new_start)))
   onActions.add("on_ruler_set", TagList("events",TagList().add(name_countryUpdateOneDayDelayEvent), "#new country update"))
@@ -1051,6 +1091,11 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
       mainMenu.add("picture", "GFX_evt_synth_sabotage")
     else:
       mainMenu.add("picture", "GFX_evt_custom_difficulty_pyra")
+    immediate=mainMenu.addReturn("immediate")
+    if not reducedMenu:
+      immediate.addReturn("country_event").add("id", eventNameSpace.format(id_updateEventCountryEvents)) #call transfer event. Only happens if player opens menu the day the new version is first loaded
+      immediate=immediate.createReturnIf(TagList("has_global_flag","custom_difficultyMM_active"))
+    immediate.addReturn("country_event").add("id", cdmm.name_updateEventCountryEvents_mm) #call transfer event. Only happens if player opens menu the day the new version is first loaded
     trigger=TagList()
     mainMenu.add("desc", TagList("trigger", trigger))
     trigger.add("fail_text", TagList().add("text", "custom_difficulty_choose_desc").add("custom_difficulty_allow_changes", "no"))
@@ -1189,6 +1234,7 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
   gameStartInitEvent.add("immediate",immediate)
   immediate.createEvent(name_randomDiffFireOnlyOnce)
   immediate.add("set_country_flag", "custom_difficulty_game_host")
+  immediate.add("set_global_flag", "custom_difficulty_variables_transfered")
   immediate.add("if", TagList("limit", TagList("NOR", t_anyOption).add("has_global_flag", "custom_difficulty_active"))
     .add("country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent")
     .add("country_event", TagList("id", name_removeEventTarget)," #removeEventTarget"))
@@ -1197,10 +1243,11 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
   # resetEvent.get("immediate").insert(0, "country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent").insert(0, "country_event", TagList("id", name_removeEventTarget)," #removeEventTarget")
   createEventTarget=immediate.createReturnIf(TagList("has_global_flag","MM_was_active_before_custom_difficulty"))
   createEventTarget.add("remove_global_flag","MM_was_active_before_custom_difficulty")
-  createEventTarget=immediate.addReturn("else")
-  createEventTarget.add("random_galaxy_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
+  # createEventTarget=immediate.addReturn("else")
+  # createEventTarget.add("random_galaxy_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
   # createEventTarget.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_var_storage"))
-  immediate.add(ET,TagList("get_galaxy_setup_value", TagList("which", "custom_difficulty_crisis_strength").add("setting", "crisis_strength_scale")))#.add("scale_by", "3"))
+
+  immediate.add(ET,TagList("get_galaxy_setup_value", TagList("which", "custom_difficulty_crisis_strength").add("setting", "crisis_strength_scale")).variableOp("set", "custom_difficulty_random_handicap_perc", 0).variableOp("set", "custom_difficulty_random_handicap", 0))#.add("scale_by", "3"))
   # gameStartInitEvent.add("option", TagList("name", "OK").add("trigger", TagList(ET,TagList("check_variable",TagList("which", "custom_difficulty_crisis_strength").add("value","0","",">")))))
   for strength in [0.25, 0.5, 1, 2,3,4,5,10,15,20,25]:
     gameStartInitEventWithDialog.add("option", TagList("name", "custom_difficulty_{!s}_crisis.name".format(strength))
@@ -1557,6 +1604,19 @@ def variableOpNew(opName, varName, val, sep="=",comment=""):
     val=f"{val}.{varName}"
   self.add(opName+"_variable", TagList("which", varName).add("value", val, comment,sep))
   return self
+def variableOpNew2(self, opName, varName, val, sep="=",comment="", skipCheck=False):
+  if self==None:
+    self=TagList()
+  t=self
+  if type(val)==str and val.startswith("event_target"):
+    if opName=="set" and not skipCheck:
+      # self.createReturnIf(TagList(val,variableOpNew("check", varName, 0, "="))).add(opName+"_variable", TagList("which", varName).add("value", "0"))
+      # t=self.addReturn("else")
+      # is_variable_set = clone_pops_missing
+      t=self.createReturnIf(TagList(val,TagList("is_variable_set", varName)))
+    val=f"{val}.{varName}"
+  t.add(opName+"_variable", TagList("which", varName).add("value", val, comment,sep))
+  return self
 def variableOp(self, opName, varName, val, sep="=",comment=""):
   if self==None:
     self=TagList()
@@ -1565,6 +1625,7 @@ def variableOp(self, opName, varName, val, sep="=",comment=""):
   self.add(opName+"_variable", TagList("which", varName).add("value", val, comment,sep))
   return self
 TagList.variableOp=variableOp
+TagList.variableOpNew=variableOpNew2
 
 def createEvent(self, id, name="country_event"):
   self.add(name, TagList("id", id))
@@ -1597,10 +1658,11 @@ def createModifierEvents(inDict, outDict, eventTaglist, id, addBool, eventNameSp
       item[1].add("remove_country_flag", eventNameSpace.format("")[:-1]+"_{}_modifier_active".format(item[0]))
     if addBool and item[0]=="ai":
       item[1].variableOp("set", "custom_difficulty_randomness_factor",1)
-      item[1].variableOp("set", "custom_difficulty_tmp","custom_difficulty_random_handicap")
-      item[1].variableOp("multiply", "custom_difficulty_tmp","custom_difficulty_random_handicap_perc")
-      item[1].variableOp("divide", "custom_difficulty_tmp",100*20) #100 for from perc, 20 as max handicap
-      item[1].variableOp("subtract", "custom_difficulty_randomness_factor","custom_difficulty_tmp")
+      t=item[1].createReturnIf(TagList("is_variable_set", "custom_difficulty_random_handicap").add("is_variable_set", "custom_difficulty_random_handicap_perc"))
+      t.variableOp("set", "custom_difficulty_tmp","custom_difficulty_random_handicap")
+      t.variableOp("multiply", "custom_difficulty_tmp","custom_difficulty_random_handicap_perc")
+      t.variableOp("divide", "custom_difficulty_tmp",100*20) #100 for from perc, 20 as max handicap
+      t.variableOp("subtract", "custom_difficulty_randomness_factor","custom_difficulty_tmp")
 
 def globalAddLocs(locClass):
    #global things: No translation needed (mod name and stuff taken from vanilla translations)
@@ -1733,12 +1795,12 @@ def globalAddLocs(locClass):
   #options loc
   locClass.addLoc("activate_custom_mode", "Activate Custom Mode")
   locClass.addLoc("activate_simple_mode", "Activate Simple Mode")
-  locClass.addLoc("activate_player_vassal_ai_boni", "Activate Player Vassal AI Bonus")
-  locClass.addLoc("deactivate_player_vassal_ai_boni", "Deactivate Player Vassal AI Bonus")
+  locClass.addLoc("activate_player_vassal_ai_boni", "Activate Player Vassal full AI Bonus")
+  locClass.addLoc("deactivate_player_vassal_ai_boni", "Deactivate Player Vassal full AI Bonus")
   locClass.addLoc("activate_custom_mode"+"Desc", "Specific choice of bonuses to be applied possible.")
   locClass.addLoc("activate_simple_mode"+"Desc", "Only bonus groups and default difficulties can be chosen. Slightly improved performance.")
   locClass.addLoc("activate_player_vassal_ai_boni"+"Desc", "Player vassals will get the same bonuses as other AI empires")
-  locClass.addLoc("deactivate_player_vassal_ai_boni"+"Desc", "Vanilla behavior of player vassals not getting AI bonuses. They will get player bonuses though if any such have been activated.")
+  locClass.addLoc("deactivate_player_vassal_ai_boni"+"Desc", "Vanilla behavior of player vassals getting AI bonus lowered by one difficulty level.")
   locClass.addLoc("activate_delay_mode", "Activate Delay Mode")
   locClass.addLoc("activate_delay_mode"+"Desc", "Update events will happen with a random delay of 1-181 days after the menu is closed or a year ends.")
   locClass.addLoc("deactivate_delay_mode", "Deactivate Delay Mode")

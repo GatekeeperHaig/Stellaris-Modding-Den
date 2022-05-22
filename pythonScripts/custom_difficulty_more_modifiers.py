@@ -11,7 +11,13 @@ import math
 import custom_difficulty_files as cdf
 import re
 
-ETMM = "event_target:custom_difficulty_MM_var_storage"
+ETMMOld = "event_target:custom_difficulty_MM_var_storage"
+ETMMNew = "event_target:global_event_country"
+ETMM=ETMMNew
+
+# ETOld = "event_target:custom_difficulty_var_storage"
+# ETNew = "event_target:global_event_country"
+# ET = ETNew
 
 
 eventNameSpace="custom_difficulty_mm.{!s}"
@@ -23,6 +29,7 @@ name_resetConfirmationEvent=eventNameSpace.format(3)
 name_removeConfirmationEvent=eventNameSpace.format(4)
 id_groupEvents=10 #reserved to 19
 id_updateEvents=20 #reserved to 21
+name_updateEventCountryEvents_mm=eventNameSpace.format(23) #reserved to 21
 name_removeModifiers=eventNameSpace.format(30)
 # name_removeEventTarget=eventNameSpace.format(31)
 id_modifierEventMenus=100 #reserved to 199
@@ -77,9 +84,11 @@ def main():
   immediate=TagList()
   gameStartInitEvent.add("immediate",immediate)
   # gameStartAfter=gameStartInitEvent.addReturn("after")
+  immediate.add_event("name_removeModifiers", globals())
   immediate.add_event("name_randomDiffFireOnlyOnce")
   immediate.add("set_country_flag", "custom_difficulty_game_host")
-  immediate.add("random_galaxy_planet", TagList("save_global_event_target_as", "custom_difficulty_MM_var_storage"))
+  immediate.add("set_global_flag", "custom_difficulty_variables_transfered_mm")
+  # immediate.add("random_galaxy_planet", TagList("save_global_event_target_as", "custom_difficulty_MM_var_storage"))
   # immediate.add("random_planet", TagList("save_global_event_target_as", "custom_difficulty_MM_var_storage"))
   gameStartAfter=TagList()
   gameStartInitEvent.add("after",TagList("hidden_effect", gameStartAfter))
@@ -89,8 +98,8 @@ def main():
   cdNotActive.add("set_global_flag", "custom_difficulty_active")
   cdNotActive.addComment("make sure the original init function still works:")
   cdNotActive.add("set_global_flag", "MM_was_active_before_custom_difficulty")
-  cdNotActive.addComment("main mod event target to save randomnessfactor:")
-  cdNotActive.add("random_galaxy_planet", TagList("save_global_event_target_as", cdf.ET.replace("event_target:","")))
+  # cdNotActive.addComment("main mod event target to save randomnessfactor:")
+  # cdNotActive.add("random_galaxy_planet", TagList("save_global_event_target_as", cdf.ET.replace("event_target:","")))
   # cdNotActive.add("random_planet", TagList("save_global_event_target_as", cdf.ET.replace("event_target:","")))
 
 
@@ -113,7 +122,7 @@ def main():
   isPlayable.createReturnIf(TagList("is_ai", "yes")).createEvent(eventNameSpace.format(id_updateEvents))
   isPlayable.addReturn("else").createEvent(eventNameSpace.format(id_updateEvents+1))
 
-  mainFileContent.addComment("removeAllModifiers")
+  removeStuffFileContent.addComment("removeAllModifiers")
   removeALLmodifiersEvent=removeStuffFileContent.addReturn("country_event")
   removeALLmodifiersEvent.add("id", name_removeModifiers)
   removeALLmodifiersEvent.add("is_triggered_only","yes")
@@ -121,6 +130,28 @@ def main():
   removeAllModifiersImmediate=removeALLmodifiersEvent.addReturn("immediate")
   removeAllModifiersEt=removeAllModifiersImmediate.addReturn(ETMM)
   removeAllModifiersImmediate=removeAllModifiersImmediate.addReturn("every_country")
+  removeAllModifiersEt.variableOp("set", "custom_difficulty_random_handicap_perc", 0)
+  removeAllModifiersEt.variableOp("set", "custom_difficulty_random_handicap", 0)
+
+  removeStuffFileContent.addComment("move modifiers to event country")
+  moveALLmodifiersEvent=removeStuffFileContent.addReturn("country_event")
+  moveALLmodifiersEvent.add("id", name_updateEventCountryEvents_mm)
+  moveALLmodifiersEvent.add("hide_window","yes")
+  moveALLmodifiersEvent.add("fire_only_once","yes")
+  t=moveALLmodifiersEvent.addReturn("trigger")
+  t.addReturn("NOT").add("has_global_flag", "custom_difficulty_variables_transfered_mm")
+  immediateMoveALLmodifiersEvent=moveALLmodifiersEvent.addReturn("immediate")
+  immediateMoveALLmodifiersEvent.add("set_global_flag", "custom_difficulty_variables_transfered_mm")
+  etMoveALLmodifiersEvent=immediateMoveALLmodifiersEvent.addReturn(ETMM)
+  etMoveALLmodifiersEvent.variableOpNew("set", "custom_difficulty_random_handicap_perc", ETMMOld,"=","",True)
+  etMoveALLmodifiersEvent.variableOpNew("set", "custom_difficulty_random_handicap", ETMMOld,"=","",True)
+
+  # for cat in cats:
+  #   for val in possibleBoniNames:
+  #     et.variableOpNew("set","custom_difficulty_{}_{}_value".format(cat,val), ETOld)
+  # et.variableOpNew("set","custom_difficulty_crisis_strength".format(cat,val), ETOld)
+  # et.variableOpNew("set","custom_difficulty_random_handicap_perc".format(cat,val), ETOld)
+  # et.variableOpNew("set","custom_difficulty_randomness_factor".format(cat,val), ETOld)
 
   curIdGroupEvent=id_groupEvents
   curIdModifierEvent=id_modifierEventMenus
@@ -128,6 +159,7 @@ def main():
     option=mainMenuEvent.addReturn("option")
     option.add("name", group.name)
     option.addReturn("hidden_effect").createEvent(eventNameSpace.format(curIdGroupEvent))
+    mainFileContent.addComment("removeAllModifiers")
     groupEvent=mainFileContent.addReturn("country_event")
     groupEvent.add("id", eventNameSpace.format(curIdGroupEvent))
     groupEvent.add("is_triggered_only", "yes")
@@ -160,6 +192,7 @@ def main():
       removeAllModifiersImmediate.variableOp("set", modifierName,0)
       for category in ["AI", "Player"]:
         removeAllModifiersEt.variableOp("set", modifierName+"_"+category, 0)
+        etMoveALLmodifiersEvent.variableOpNew("set", modifierName+"_"+category, ETMMOld,"=","",True)
         for comp in ["<",">"]:
           if (modifier.multiplier<0) == (comp=="<"):
             color="G" #checking smaller than zero and negative is good or checking larger and negativ is bad
