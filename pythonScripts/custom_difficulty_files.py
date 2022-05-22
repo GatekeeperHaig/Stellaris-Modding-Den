@@ -788,6 +788,7 @@ def main():
               removeModifierImmediates[cat].add("if",removeIFChanged)
               addModifierImmediates[cat].add("if",addIFChanged)
             addIFChanged.add("remove_country_flag","custom_difficulty_{}_changed".format(bonus) )
+            addIFChanged=addIFChanged.createReturnIf(TagList("is_variable_set", "custom_difficulty_{}_value".format(bonus)))
             addIFChanged.add("set_variable",TagList("which", "custom_difficulty_tmp").add("value","custom_difficulty_{}_value".format(bonus)))
             if cat == "ai":
               addIFChanged.variableOp("multiply", "custom_difficulty_tmp", "custom_difficulty_randomness_factor")

@@ -259,11 +259,12 @@ def main():
     if category=="AI":
       localUpdateImmediate.addComment("Update randomness")
       localUpdateImmediate.variableOp("set", "custom_difficulty_randomness_factor",1)
-      localUpdateImmediate.variableOp("set", "custom_difficulty_tmp","custom_difficulty_random_handicap")
-      localUpdateImmediate.variableOp("set", "custom_difficulty_random_handicap_perc",cdf.ET)
-      localUpdateImmediate.variableOp("multiply", "custom_difficulty_tmp","custom_difficulty_random_handicap_perc")
-      localUpdateImmediate.variableOp("divide", "custom_difficulty_tmp",100*20) #100 for from perc, 20 as max handicap
-      localUpdateImmediate.variableOp("subtract", "custom_difficulty_randomness_factor","custom_difficulty_tmp")
+      t=localUpdateImmediate.createReturnIf(TagList("is_variable_set", "custom_difficulty_random_handicap").add("is_variable_set", "custom_difficulty_random_handicap_perc"))
+      t.variableOp("set", "custom_difficulty_tmp","custom_difficulty_random_handicap")
+      t.variableOp("set", "custom_difficulty_random_handicap_perc",cdf.ET)
+      t.variableOp("multiply", "custom_difficulty_tmp","custom_difficulty_random_handicap_perc")
+      t.variableOp("divide", "custom_difficulty_tmp",100*20) #100 for from perc, 20 as max handicap
+      t.variableOp("subtract", "custom_difficulty_randomness_factor","custom_difficulty_tmp")
 
     for group in groupList:
       for modifier in group.modifiers:
