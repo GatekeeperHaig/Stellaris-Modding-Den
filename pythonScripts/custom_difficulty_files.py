@@ -1012,7 +1012,7 @@ def main():
   scriptedModifiers.add("difficulty_scaled_very_hard",TagList())
   scriptedModifiers.add("difficulty_scaled_hard",TagList())
   scriptedModifiers.add("difficulty_scaled_normal",TagList())
-  scriptedModifiers.add("playable_ai_empire",TagList())
+  # scriptedModifiers.add("playable_ai_empire",TagList())
   outputToFolderAndFile(scriptedModifiers, "common/static_modifiers","!_custom_difficulty_00_static_modifier.txt")
 
   createMenuFile(locClass, cats, catColors,difficulties,debugMode)
