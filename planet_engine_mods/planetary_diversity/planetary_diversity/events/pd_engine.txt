@@ -272,6 +272,8 @@ country_event = {
 		every_galaxy_planet = { limit = { is_planet_class = pc_crystal is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Floating
 		every_galaxy_planet = { limit = { is_planet_class = pc_floating is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
+		#Zro Stripmine
+		every_galaxy_planet = { limit = { is_planet_class = pc_pd_zro is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Graveyard
 		every_galaxy_planet = { limit = { is_planet_class = pc_graveyard is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Techno-Organic
@@ -511,6 +513,17 @@ country_event = {
 				20 = { change_pc = pc_badlands reroll_planet = yes }
 				20 = { change_pc = pc_hadesert reroll_planet = yes }
 				20 = { change_pc = pc_med reroll_planet = yes }		
+			}
+		}
+		#Zro Stripmine
+		every_galaxy_planet = { 				
+			limit = { is_planet_class = pc_pd_zrois_homeworld = no has_planet_flag = prescripted_ideal }
+			random_list = {		
+				20 = { change_pc = pc_savannah reroll_planet = yes	}	
+				20 = { change_pc = pc_steppe reroll_planet = yes }	
+				20 = { change_pc = pc_prairie eroll_planet = yes }
+				20 = { change_pc = pc_veld reroll_planet = yes }
+				20 = { change_pc = pc_semiarid reroll_planet = yes }		
 			}
 		}
 		#Radiotrophic Start
@@ -1149,6 +1162,10 @@ country_event = {
 			set_planet_flag = pdfloating
 		}
 		every_galaxy_planet = {
+			limit = { is_planet_class = pc_pd_zro }
+			set_planet_flag = pdzrostripmine
+		}
+		every_galaxy_planet = {
 			limit = { is_planet_class = pc_crystal }
 			set_planet_flag = pdcrystal
 		}
@@ -1718,6 +1735,27 @@ planet_event = {
 				limit = { is_colony = yes }
 				remove_building = building_eludium_mine
 			}
+		}
+		if = { 
+		limit = { NOT = { is_planet_class = pc_pd_zro }
+		remove_deposit = d_zro_stripmine_untouched_farmland
+		remove_deposit = d_zro_stripmine_untouched_farmland
+		remove_deposit = d_zro_stripmine_untouched_farmland
+		remove_deposit = d_zro_stripmine_untouched_generator
+		remove_deposit = d_zro_stripmine_untouched_generator
+		remove_deposit = d_zro_stripmine_untouched_generator
+		remove_deposit = d_zro_stripmine_mining_pit
+		remove_deposit = d_zro_stripmine_mining_pit
+		remove_deposit = d_zro_stripmine_mining_pit
+		remove_deposit = d_zro_stripmine_mining_pit
+		remove_deposit = d_zro_stripmine_mining_pit
+		remove_deposit = d_zro_stripmine_mining_pit
+		remove_deposit = d_zro_stripmine_mining_pit
+		remove_deposit = d_zro_stripmine_mining_pit
+		remove_deposit = d_zro_stripmine_mining_pit
+		remove_deposit = d_zro_stripmine_mining_pit
+		remove_modifier = pdzrostripmine
+		}
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_graveyard } }
@@ -2476,6 +2514,20 @@ country_event = {
 				remove_star_flag = crucible_notorigin
 				remove_star_flag = crucible_system
 				}
+			} 
+		}
+		if = { limit = { any_country = { has_origin = origin_pd_zro_world } }
+        every_galaxy_planet = {
+            if = {
+                limit = { solar_system = { has_star_flag = pd_stripmine_system } is_planet_class = pc_pd_zro }
+					change_pc = pc_broken
+					remove_planet_flag = pd_stripmine_planet
+					remove_modifier = pdzrostripmine
+					set_deposit = d_zro_deposit_1
+				}
+			}
+		every_system = {
+			remove_star_flag = pd_stripmine_system
 			} 
 		}
 	}

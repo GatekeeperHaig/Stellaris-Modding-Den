@@ -1655,3 +1655,498 @@ building_biosynth_lm_refinery = {
 		"tech_biosynth_lm_refinery"
 	}
 }
+
+#Zro Mine
+
+building_pdzro_harvester = {
+	base_buildtime = 360
+
+	is_capped_by_modifier = yes
+
+	category = resource
+	
+	potential = {
+		NOT = { has_modifier = resort_colony }
+	}
+
+	prerequisites = {
+		"tech_mine_pd_zro"
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_pdzro_harvester_add = 1
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			job_pdzro_drone_add = 1
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 400
+		}
+		upkeep = {
+			energy = 1
+		}
+	}	
+
+	ai_resource_production = {
+		trigger = { always = yes }
+		sr_zro = 1
+	}	 
+}
+
+building_pdzro_dealer_domestic = {
+	base_buildtime = 360
+	base_cap_amount = 1
+
+	category = resource
+	
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		NOT = { is_planet_class = pc_pd_zro }
+	}
+
+	prerequisites = {
+		"tech_pd_zro_dealer"
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_zro } }
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_pdzro_dealer_add = 4
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_zro } }
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			job_pdzro_dealer_drone_add = 4
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b1_minerals
+			sr_zro = 100
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	ai_resource_production = {
+		trigger = { always = yes }
+		sr_zro = 1
+	}	 
+}
+
+holding_pdzro_dealer = {
+	base_buildtime = 360
+	owner_type = subject_holding
+	icon = building_pdzro_dealer_domestic
+	base_cap_amount = 1
+
+	category = resource
+
+	planet_modifier = {
+		pop_happiness = 0.1
+		monthly_loyalty = 1.0
+	}
+
+	prerequisites = {
+		"tech_pd_zro_dealer"
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = planet.owner
+			planet.owner = { is_gestalt = no }
+			owner = { NOT = { has_deficit = sr_zro } }
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_overlord_pdzro_dealer_add = 2
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_zro } }
+			owner = { is_gestalt = yes }
+		}
+		modifier = {
+			job_overlord_pdzro_dealer_drone_add = 2
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b1_minerals
+			sr_zro = 100
+		}
+		upkeep = {
+			energy = 2
+		}
+	}
+
+	triggered_desc = {
+		text = job_overlord_pdzro_dealer_effect_desc
+	}	 
+}
+
+building_corporate_pdzro = {
+	base_buildtime = @b2_time
+	base_cap_amount = 1
+	icon = building_pdzro_dealer_domestic
+
+	owner_type = corporate
+
+	potential = {
+		has_branch_office = yes
+		branch_office_owner = { is_criminal_syndicate = no }
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = "requires_building_major_capital"
+			OR = {
+				has_building = building_major_capital
+				has_building = building_system_capital
+				has_building = building_imperial_capital
+			}
+		}
+	}
+
+	prerequisites = {
+		"tech_pd_zro_dealer"
+	}
+
+	show_tech_unlock_if = {
+		is_megacorp = yes
+		is_criminal_syndicate = no
+	}
+
+	#triggered_country_modifier = {
+	#	potential = {
+	#		exists = owner
+	#		owner = { NOT = { has_deficit = sr_zro } }
+	#	}
+	#	country_energy_produces_mult = 0.05
+	#}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_zro } }
+		}
+		modifier = {
+			job_merchant_add = 1
+			pop_happiness = 0.1
+			branch_office_value_mult = 0.2
+		}
+	}
+
+	resources = {
+		category = planet_branch_office_buildings
+		cost = {
+			minerals = @b3_minerals
+			sr_zro = 100
+		}
+		upkeep = {
+			energy = 3
+			sr_zro = 1
+		}
+	}
+
+	ai_weight = {
+		weight = 50
+		modifier = {
+			factor = 10
+			branch_office_owner = {
+				is_galactic_community_member = yes
+			}
+		}
+	}
+}
+
+building_crime_syndicate_pdzro = {
+	base_buildtime = @b2_time
+	base_cap_amount = 1
+
+	owner_type = corporate
+
+	potential = {
+		has_branch_office = yes
+		branch_office_owner = { is_criminal_syndicate = yes }
+	}
+
+	allow = {
+		custom_tooltip = {
+			fail_text = "requires_building_major_capital"
+			OR = {
+				has_building = building_major_capital
+				has_building = building_system_capital
+				has_building = building_imperial_capital
+			}
+		}
+	}
+
+	prerequisites = {
+		"tech_pd_zro_dealer"
+	}
+
+	show_tech_unlock_if = {
+		is_megacorp = yes
+		is_criminal_syndicate = yes
+	}
+
+	triggered_country_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_zro } }
+		}
+		spy_network_levels_add = 5
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_zro } }
+		}
+		modifier = {
+			job_merchant_add = 1
+			branch_office_value_mult = 0.25
+			planet_crime_add = 50
+		}
+	}
+
+	resources = {
+		category = planet_branch_office_buildings
+		cost = {
+			minerals = @b3_minerals
+			sr_zro = 100
+		}
+		upkeep = {
+			energy = 3
+			sr_zro = 1
+		}
+	}
+
+	ai_weight = {
+		weight = 50
+		modifier = {
+			factor = 10
+			branch_office_owner = {
+				is_galactic_community_member = yes
+			}
+		}
+	}
+}
+
+building_zro_institute = {
+	base_buildtime = @b3_time
+	base_cap_amount = 1
+
+	category = research
+
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		NOT = { has_modifier = slave_colony }
+		exists = owner
+		text = EMPIRE_UNIQUE_BUILDING
+		owner = {
+			NOT = {
+				has_country_flag = building_zro_institute
+			}
+		}
+	}
+
+	destroy_trigger = {
+		exists = owner
+		OR = {
+			has_modifier = resort_colony
+			has_modifier = slave_colony
+		}
+	}
+
+	#convert_to = {
+	#	building_supercomputer
+	#}
+
+	allow = {
+		has_major_upgraded_capital = yes
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b3_minerals
+			sr_zro = 200
+		}
+		upkeep = {
+			energy = @b3_upkeep
+			sr_zro = 2
+		}
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_zro } }
+			owner = { is_regular_empire = yes }
+		}
+		planet_researchers_produces_mult = 0.1
+		job_head_researcher_add = 1
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_zro } }
+			owner = { is_hive_empire = yes }
+		}
+		planet_researchers_produces_mult = 0.1
+		job_brain_drone_add = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { NOT = { has_deficit = sr_zro } }
+			owner = { is_machine_empire = yes }
+		}
+		planet_researchers_produces_mult = 0.1
+		job_calculator_add = 2
+	}
+
+	country_modifier = {
+		all_technology_research_speed = 0.05
+	}
+
+	prerequisites = {
+		"tech_zro_research_initiative"
+	}
+
+	show_tech_unlock_if = {
+		owner = { any_owned_planet = { is_planet_class = pc_pd_zro } }
+	}
+
+	ai_resource_production = {
+		trigger = { always = yes }
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+	ai_resource_production = {
+		trigger = {
+			planet_resource_compare = {
+				resource = physics_research
+				value >= 20
+			}
+		}
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+	ai_resource_production = {
+		trigger = {
+			planet_resource_compare = {
+				resource = physics_research
+				value >= 40
+			}
+		}
+		physics_research = 3
+		society_research = 3
+		engineering_research = 3
+	}
+
+	on_built = {
+		owner = { set_country_flag = building_zro_institute }
+	}
+
+	on_destroy = {
+		owner = {
+			if = {
+				limit = {
+					has_country_flag = building_zro_institute
+				}
+				remove_country_flag = building_zro_institute
+			}
+		}
+	}
+}
+
+building_pdzro_hub = {
+	icon = building_pdzro_hub
+	base_buildtime = @b3_time
+	base_cap_amount = 1
+
+	category = research
+
+	prerequisites = {
+		"tech_pd_robo_zro_processing"
+	}
+
+	potential = {
+		exists = owner
+		owner = { is_machine_empire = yes }
+	}
+
+	allow = {
+		owner = { is_machine_empire = yes }
+	}
+
+	destroy_trigger = {
+		exists = owner
+		owner = { is_robot_empire = no }
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+			owner = { NOT = { has_deficit = sr_zro } }
+		}
+		modifier = {
+			planet_jobs_produces_mult = 0.1
+			planet_pop_assembly_mult = 0.1
+		}
+	}
+
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = @b3_minerals
+			sr_zro = 100
+		}
+		upkeep = {
+			energy = @b3_upkeep
+			sr_zro = 1
+		}
+	}
+}
