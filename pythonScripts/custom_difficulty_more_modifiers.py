@@ -479,7 +479,7 @@ class Modifier:
     #   self.unit="1"
     #   self.multiplier/=percentDefault
     #   print(modifier)
-    if "_mult" in modifier:
+    if "_mult" in modifier or "_perc" in modifier:
       self.setUnit("%")
     self.name="$MOD_"+modifier.upper()+"$"
     self.name+="$mod_"+modifier.lower()+"$" #some are lower, some are upper. Game does not complain if something misses so I just add both...
