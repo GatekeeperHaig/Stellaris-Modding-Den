@@ -660,7 +660,6 @@ country_event = {
 	}
 }
 
-
 # Ammonia Suits 1 Project End
 country_event = {
 	id = pdexotic.12
@@ -733,7 +732,6 @@ country_event = {
 	}
 }
 
-
 # Ammonia Suits 2 Tech
 country_event = {
 	id = pdexotic.13
@@ -805,7 +803,6 @@ country_event = {
 		}
 	}
 }
-
 
 # Ammonia Suits 3 Tech
 country_event = {
@@ -1138,7 +1135,6 @@ country_event = {
 	}
 }
 
-#Toxic Worlds get Sulfur Terraforming Candidates
 #On gain AP
 country_event = {
 	id = "pdexotic.22"
@@ -1257,5 +1253,114 @@ country_event = {
 				add_modifier = { modifier = sulfur_terraforming_candidate days = -1 }
 			}
 		}
+	}
+}
+
+#Rogue World - Turn Planets Around Black Holes to Rogue Barrens
+country_event = {
+	id = "pdexotic.25"
+	hide_window = yes
+	
+	is_triggered_only = yes
+
+	immediate = {
+		every_galaxy_planet = {
+			limit = {
+				OR = {
+					is_planet_class = pc_barren
+					is_planet_class = pc_barren_cold
+					is_planet_class = pc_molten
+					is_planet_class = pc_frozen
+					is_planet_class = pc_toxic
+				}
+				solar_system = {
+					OR = {
+						is_star_class = sc_black_hole
+						is_star_class = sc_neutron_star
+						is_star_class = sc_pulsar
+					}
+				}
+				OR = {
+					planet = {
+						is_moon = no
+						not = { has_moon = yes }
+						planet_size <= 25
+						planet_size >= 10
+					}	
+					planet = {
+						is_moon = yes
+						planet_size <= 15
+						planet_size >= 10
+					}
+				}
+			}
+			change_pc = pc_rogue_barren
+			#add_modifier = { modifier = pdterra_rogue days = -1	}
+		}
+	}
+}
+
+#Rogue Empire gains systems 
+country_event = {
+	id = "pdexotic.26"
+	hide_window = yes
+	
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { 
+			has_origin = origin_pd_rogue_voidfarers
+		}	
+	}
+	immediate = {
+		from = { 
+			every_system_planet = {
+				limit = {
+					is_planet_class = pc_rogue_barren
+					NOT = { has_modifier = pdterra_rogue }
+				}
+				add_modifier = { modifier = pdterra_rogue days = -1 }
+			}
+		}
+	}
+}
+
+#Non Rogue gains Rogue systems
+country_event = {
+	id = "pdexotic.27"
+	hide_window = yes
+	
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { 
+			NOT = { 
+				has_origin = origin_pd_rogue_voidfarers 
+			} 
+		}
+	}
+	immediate = {
+		from = { 
+			every_system_planet = {
+				limit = {
+					has_modifier = pdterra_rogue
+				}
+				remove_modifier = pdterra_rogue
+			}
+		}
+	}
+}
+
+#Rogue Races Can Build Habitats
+country_event = {
+	id = "pdexotic.28"
+	hide_window = yes
+	
+	is_triggered_only = yes
+
+	trigger = {	has_origin = origin_pd_rogue_voidfarers }
+	
+	immediate = {
+		owner = { add_research_option = tech_habitat_1 }
 	}
 }

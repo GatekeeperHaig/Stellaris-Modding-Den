@@ -1016,43 +1016,38 @@ pd_origin_init_crucible = {
 			orbit_distance = 5
 		}
 	}
+
+	neighbor_system = {
+		trigger = { num_guaranteed_colonies >= 2 }
+		hyperlane_jumps = { min = 1 max = 3 }
+		initializer = "neighbor_t1"
+	}
+	neighbor_system = {
+		trigger = { num_guaranteed_colonies >= 1 }
+		hyperlane_jumps = { min = 1 max = 3 }
+		initializer = "neighbor_t1_first_colony"
+	}
 }
 
 #Zro Start
 pd_origin_init_pd_zro = {
 	class = "sc_b"
 	usage = origin
+	flags = { empire_home_system pd_stripmine_system pd_stripmine_home_system  }
+
+	init_effect = {
+		every_neighbor_system = {
+			set_star_flag = empire_cluster
+			every_neighbor_system = {
+				set_star_flag = empire_cluster
+			}
+		}
+		generate_home_system_resources = yes
+	}
+
 	max_instances = 1
 	scaled_spawn_chance = 12
 	spawn_chance = 100	
-	usage_odds = {
-		base = 100
-		modifier = {
-			factor = 0
-			is_fe_cluster = yes
-		}
-		modifier = {
-			factor = 0
-			has_star_flag = empire_cluster
-		}
-		modifier = {
-			factor = 0
-			is_bottleneck_system = yes
-		}
-	}	
-	
-	flags = { pd_stripmine_system }
-	init_effect = {
-		if = {
-			limit = {
-				is_inside_nebula = no
-			}
-			create_nebula = {
-				radius = 20
-			}
-			set_star_flag = pd_unique_nebula
-		}
-	}
 
     planet = {
         count = 1
@@ -1061,19 +1056,6 @@ pd_origin_init_pd_zro = {
         orbit_angle = 1
         size = { min = 25 max = 30 }
         has_ring = no
-		init_effect = {
-			create_ambient_object = {
-				type = "nebula_4"
-				location = this
-			}
-			last_created_ambient_object = {
-				set_location = {
-					target = prev
-					distance = 0
-					angle = random
-				}
-			}
-		}
     }
 	
 	planet = {
