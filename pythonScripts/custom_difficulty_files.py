@@ -4,7 +4,7 @@
 import sys, os, io
 from stellarisTxtRead import *
 from copy import deepcopy
-from googletrans import Translator
+# from googletrans import Translator
 import re
 from locList import LocList
 import math
