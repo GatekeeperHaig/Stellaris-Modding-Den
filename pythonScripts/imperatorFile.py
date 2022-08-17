@@ -5,39 +5,47 @@ import sys, os, io
 from stellarisTxtRead import *
 import custom_difficulty_files as cdf
 import math
+import yaml
+from yaml.loader import SafeLoader
+from locList import LocList
+
 
 def main():
   fileContent=TagList()
 
-  races=["noldor", "teleri", "edain", "dwarf","orc"]
-  raceGrowth={"noldor":-1,"teleri":-1,"edain":-0.8, "dwarf":-0.8,"orc":4}
-  raceCombat={"noldor":1,"teleri":1,"edain":0.8, "dwarf":0.8,"orc":0}
-  raceCommerce={"noldor":0.5,"teleri":.5,"edain":.5, "dwarf":1,"orc":0}
-  # raceGrowth={"noldor":-1,"teleri":-1,"edain":-0.8, "dwarf":-0.8,"orc":4}
+  locClass=LocList()
+
+  races=["Noldor", "Teleri", "Edain", "Dwarf","Orc"]
+  raceGrowth={"Noldor":-1.2,"Teleri":-1.2,"Edain":-0.8, "Dwarf":-1,"Orc":4}
+  raceCombat={"Noldor":1.2,"Teleri":1,"Edain":0.8, "Dwarf":0.8,"Orc":0}
+  raceCommerce={"Noldor":0.5,"Teleri":0.7,"Edain":.5, "Dwarf":1,"Orc":0}
+  raceDesc={"Noldor":"The Noldor where the second clan of elves to reach Valinor in the years of the trees and later where led back to Middle-earth by Fëanor. These elves have a long list of famous heroes and take pride in their combat ability. You have access to this modifier as your primary culture is Noldor.","Teleri":"The Teleri were the last clan of elves to reach Valinor in the years of the trees, though many remained in Middle-earth in the first place. They have always been the greatest seafarers of Middle-earth. As many of their breathren were slaughtered by Fëanor's host on his way back to Middle-earth, it took a long time for them to forgive the Noldor elves. You have access to this modifier as your primary culture is Teleri.","Edain":"The Edain were the group of mankind that reached Beleriand in the First Age. Many of them have fought Morgoth in the Battle of Beleriand and they and their ancestors have thus been rewarded with long life. You have access to this modifier as your primary culture is Edain, Mixed Edain or Banadûnaim.", "Dwarf":"The Masters of Stone were created by Aulë even before Ilúvatar created the elves, but slept underground until about a century after the elves awoke. Dwarves spend most of their time crafting, smithying and mining. You have access to this modifier as your primary culture is dwarven.","Orc":"Melkor created the orcs by twisting kidnapped elves in the Years of the Lamps. Without the guidance of Melkor or a fallen Maia, they are usually disorganized and pose little thread to any of the other races. Now that the Lord of the Rings is returning to his power though, the Age of the Orcs will come. You have access to this modifier as your primary culture is orcish."}
+  # raceGrowth={"Noldor":-1,"Teleri":-1,"Edain":-0.8, "Dwarf":-0.8,"Orc":4}
 
   for race in races:
     for i in range(1,11):
-      t=fileContent.addReturn(f"{i*10}_{race}")
-      if race!="orc":
-        t.add("land_morale_modifier", round(i*0.04*raceCombat[race],3))
+      name=f"{i*10}_{race}"
+      t=fileContent.addReturn(name)
+      if race!="Orc":
+        t.add("land_morale_modifier", round(i*0.06*raceCombat[race],3))
         t.add("land_morale_recovery", round(i*0.01*raceCombat[race],3))
-        t.add("discipline", round(i*0.04*raceCombat[race],3))
+        t.add("discipline", round(i*0.06*raceCombat[race],3))
         t.add("global_commerce_modifier", round(i*0.06*raceCommerce[race],3))
       t.add("global_population_growth", round(i*0.015*raceGrowth[race],3))
+      locClass.addEntry(name, f"{i*10}% {race}")
+      locClass.addEntry("desc_"+name, raceDesc[race])
+
+  for i in range(1,20):
+    name=f"foreign_support_{i*5}"
+    t=fileContent.addReturn(name)
+    t.add("levy_size_multiplier",0.05*i)
+    locClass.addEntry(name, f"{i*5}% Foreign Culture Support")
+    locClass.addEntry("desc_"+name, "Non-integrated culture do not direcly increase the number of possible levies (and thus legion size) and due to a bug in the vanilla game we cannot allow their integration outside of your culture group. Instead they will slightly increase the numbers of your integrated culture levies.")
+
 
   # print(f'fileContent = "{fileContent}"')
+  locClass.writeToMod(".","lotr")
   cdf.outputToFolderAndFile(fileContent , ".", "br_racial_modifiers.txt" ,2,".")
-
-  # relations = { #VANILLA (ignoring camels)
-    # "archers": { "archers":0, "chariots":0, "heavyCavalry":-10, "heavyInfantry":10, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":0 },
-    # "chariots": { "archers":20, "chariots":0 ,"heavyCavalry":-50, "heavyInfantry":-10, "horseArchers":10, "lightCavalry":0, "lightInfantry":35, "elephants":-50},
-    # "heavyCavalry": { "archers":50, "chariots":25, "heavyCavalry":0, "heavyInfantry":-10, "horseArchers":0, "lightCavalry":20, "lightInfantry":25, "elephants":-50},
-    # "heavyInfantry": { "archers":0, "chariots":25, "heavyCavalry":20, "heavyInfantry":0, "horseArchers":-25, "lightCavalry":-10, "lightInfantry":20, "elephants":0},
-    # "horseArchers": { "archers":25, "chariots":25, "heavyCavalry":-10, "heavyInfantry":25, "horseArchers":0 "lightCavalry":-10, "lightInfantry":25, "elephants":-20},
-    # "lightCavalry": { "archers":25, "chariots":25, "heavyCavalry":-20, "heavyInfantry":-50, "horseArchers":25 "lightCavalry":0, "lightInfantry":25, "elephants":-50},
-    # "lightInfantry": { "archers":-10, "chariots":-10, "heavyCavalry":-25, "heavyInfantry":-20, "horseArchers":-50 "lightCavalry":0, "lightInfantry":0, "elephants":-20},
-    # "elephants": { "archers":50, "chariots":50, "heavyCavalry":-10, "heavyInfantry":40, "horseArchers":-10 "lightCavalry":-10, "lightInfantry":30, "elephants":0},
-  # }
 
   relations = {
     "archers":        { "archers":0, "chariots":0, "heavyCavalry":-10, "heavyInfantry":10, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":0 },
@@ -57,11 +65,11 @@ def main():
     "horseArchers":   { "cost":16, "assault":False, "speed":4, "maneuver":5, "morale":-25, "strength":0, "attrition":50, "attritionLoss":5, "food":3, "consumption":0.25, "tradeGood":"steppe_horses"  },
     "lightCavalry":   { "cost":10, "assault":False, "speed":4, "maneuver":3, "morale":0, "strength":0, "attrition":50, "attritionLoss":5, "food":2.4, "consumption":0.25, "tradeGood":"horses"  },
     "lightInfantry":  { "cost":8, "assault":True, "speed":2.5, "maneuver":1, "morale":30, "strength":0, "attrition":-50, "attritionLoss":2.5, "food":2.4, "consumption":0.1  },
-    "elephants":      { "cost":35, "assault":False, "speed":2.5, "maneuver":0, "morale":-20, "strength":50, "attrition":200, "attritionLoss":10, "food":1, "consumption":0.3, "tradeGood":"elephants", "levy_tier":"advanced"  },
-    "supply_train":   { "cost":20, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":50, "consumption":0.05  },
-    "engineer_cohort":{ "cost":40, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":5, "consumption":0.05  },
+    "elephants":      { "cost":35, "assault":False, "speed":2.5, "maneuver":0, "morale":-20, "strength":50, "attrition":200, "attritionLoss":10, "food":1, "consumption":0.3, "tradeGood":"elephants", "levy_tier":"advanced", "ai_max_percentage":15  },
+    "supply_train":   { "cost":20, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":50, "consumption":0.05, "ai_max_percentage":15  },
+    "engineer_cohort":{ "cost":40, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":5, "consumption":0.05, "ai_max_percentage":15  },
     "rangers":        { "cost":10, "assault":True, "speed":2.5, "maneuver":2, "morale":0, "strength":0, "attrition":-20, "attritionLoss":5, "food":2.4, "consumption":0.1  },
-    "troll_infantry": { "cost":10, "assault":True, "speed":2.5, "maneuver":1, "morale":0, "strength":0, "attrition":150, "attritionLoss":5, "food":3, "consumption":0.3, "tradeGood":"iron", "levy_tier":"advanced"  },
+    "troll_infantry": { "cost":10, "assault":True, "speed":2.5, "maneuver":1, "morale":0, "strength":0, "attrition":150, "attritionLoss":5, "food":3, "consumption":0.3, "tradeGood":"iron", "levy_tier":"advanced", "ai_max_percentage":15  },
   }
 
   units = [
@@ -78,12 +86,12 @@ def main():
     Unit("dwarven_goat_riders", "heavyCavalry", 1.5, 2, 1.5, AP=True),
     Unit("warg_riders", "heavyCavalry", 1, 1, 1, { "archers":15, "chariots":30, "heavyCavalry":15, "heavyInfantry":-30, "horseArchers":15, "lightCavalry":30, "lightInfantry":0, "elephants":0 }),
     Unit("heavy_infantry", "heavyInfantry"),
-    Unit("dunedain_infantry", "heavyInfantry", 1.5, 2, 1.75),
-    Unit("dwarven_infantry", "heavyInfantry", 1.5, 2.5, 1.75, AP=True),
-    Unit("elvish_infantry", "heavyInfantry", 2, 2.25, 2),
+    Unit("dunedain_infantry", "heavyInfantry", 1.4, 2, 1.75),
+    Unit("dwarven_infantry", "heavyInfantry", 1.4, 2.5, 1.75, AP=True),
+    Unit("elvish_infantry", "heavyInfantry", 1.6, 2.25, 2),
     Unit("uruk_heavy_infantry", "heavyInfantry", 1.25, 1.5, 1.25),
-    Unit("troll_infantry", "heavyInfantry", 3, 4, 1, AP=True),
-    Unit("rangers", "heavyInfantry", 2, 2, 1.5, { "archers":0, "chariots":0, "heavyCavalry":0, "heavyInfantry":0, "horseArchers":0, "lightCavalry":0, "lightInfantry":30, "elephants":0 }),
+    Unit("troll_infantry", "heavyInfantry", 2, 4, 1, AP=True),
+    Unit("rangers", "heavyInfantry", 1.6, 2, 1.5, { "archers":0, "chariots":0, "heavyCavalry":0, "heavyInfantry":0, "horseArchers":0, "lightCavalry":0, "lightInfantry":30, "elephants":0 }),
     Unit("horse_archers", "horseArchers"),
     Unit("elvish_cavalry_archers", "horseArchers", 2.5, 1.5, 1),
     Unit("light_cavalry", "lightCavalry"),
@@ -97,12 +105,260 @@ def main():
     # Unit("mumakils", "elephants", 3, 3, 2), ???
   ]
 
+  os.makedirs("units",exist_ok=True)
   for unit in units:
-    unit.computeAllDamages(units,relations,properties)
-    print(f"  cost = {unit.computeCosts(properties)}")
-    if unit.category=="support":
-      print(f"  strength_damage_taken = {unit.computeStrengthDamageTaken(properties)}")
-    print(f"  morale_damage_taken = {unit.computeMoraleDamageTaken(properties)}")
+    d=unit.assemble(relations, properties, units)
+    cdf.outputToFolderAndFile(d , ".", f"units/army_{unit.name}.txt" ,2,".",encoding="utf-8-sig")
+
+    # unit.computeAllDamages(units,relations,properties)
+    # print(f"  cost = {unit.computeCosts(properties)}")
+    # if unit.category=="support":
+    # print(f"  morale_damage_taken = {unit.computeMoraleDamageTaken(properties)}")
+  # return
+
+  provinceNames={}
+  with open("provincenames_l_english.yml",encoding='utf-8-sig') as f:
+    for line in f.readlines():
+      # print(line)
+      split=line.split()
+      key=split[0]
+      # print(f'key = "{key}"')
+      key=key.replace("PROV", "").replace(":0", "")
+      # print(f'key = "{key}"')
+      rest=" ".join(split[1:]).replace('"', "")
+      # print(f'rest = "{rest}"')
+      provinceNames[key]=rest
+
+
+  provinceFile=TagList(0)
+  provinceFile.readFile("setup/provinces/00_default.txt",encoding='utf-8-sig')
+  countryFile=TagList(0)
+  countryFile.readFile("setup/main/00_default.txt",encoding='utf-8-sig')
+  climateFile=TagList(0)
+  climateFile.readFile("map_data/climate.txt",encoding='utf-8')
+  areaFile=TagList(0)
+  areaFile.readFile("map_data/areas.txt",encoding='utf-8')
+  regionFile=TagList(0)
+  regionFile.readFile("map_data/regions.txt",encoding='utf-8')
+
+  # print(f'climateFile.vals[0].names = "{climateFile.vals[0].names}"')
+
+  # print(f'climateFile.names = "{climateFile.names}"')
+  # print(f'climateFile.seperators = "{climateFile.seperators}"')
+  # print(f'climateFile.get("mild_winter") = "{climateFile.get("mild_winter")}"')
+  # print(f'climateFile.get("mild_winter").names = "{climateFile.get("mild_winter").names}"')
+
+
+
+  uninhabitable = set(map(str,list(range(4969,4988))+list(range(5453,5459))+list([52,2616,577,564,563,576,575,604,605,606,607,608,602,603,2696,2697,2698,2607,2604,2605,3402,3403,3404,476,475,478,479,2961,2960,2959,2954,2955,2984,2985,2986,540,539,538,537,536,535,547,546,545,544,543,542,2617,594,595,596,597,94,27,95,91,92,581,582,2046,2045,2044,87,85,89,88,83,82,80,2375,2376,7,3,17,23,48,1965,583,584,585,586,587,588,589,590,2997,2998,3000,3001,2988,2991,2989,2992,2994,3003,2990,2995,2996,2993,3002,579,578,2048,2049,2050,2051,2052,2053,593,3142,3143,3146,3144,3145,3147,3148,3149,3150,51,2378,2377,3638,3639,3678,3679,3680,3681,3682,3683,3684,3685,3686,3687,3688,3689,3690,3691,3692,3693,3694,3593,3709,3719,3611,3613,3612,3653,3654,3656,3660,3718,3626,3659,1127,3706,711,3607,3608,3609,3740,3741,3742,3743,3744,3745,3746,3747,3787,3788,3781,3779,3778,3777,3784,3793,3794,3792,3790,3789,3791,3775,3776,3771,3795,3797,508,461,2730,2731,2732,2733,2739,2737,2741,2735,2740,2742,2745,2744,2743,3860,3862,3863,3864,3865,3866,3874,3867,3881,3871,3869,3552,3553,3880,3879,3868,3872,3873,3870,3554,2738,2750,2749,2748,2747,2746,2751,3875,2729,2769,2728,3582,3581,3580,3643,3637,3904,3909,3910,3937,3938,3939,5215,5217,5218,5174,5176,5291,5292,5293,5300,5301,5302,5303,5304,5305,5306,5307,5308,5309,5310,5311,5312,5313,5314,5315,5317,5318,5319,5320,5321,5322,5323,5324,5326,5327,5328,5329,5330,5331,5332,5333,5334,5336,5337,5338,5339,5340,5341,5342,5343,5344,5345,5348,5386,5387,5388,5389,5390,5433,5434,5435,5399,5400,5401,5378,5379,5375,5274,5275,5276,5277,5278,5281,5279,5282,5283,5406,5429,5430,5297,5298,5299,5437,5023,5024,5443,5444,5445,5446,5447,5448,5449,5450,5451,5067,5463,5396,5395,5409,5280,5462,5466,5284,5286,5287,5294,5296,5452,5410,5411,5412,5216,5252,5285,5288,5060,5273])))
+
+  # print(f'uninhabitable = "{uninhabitable}"')
+
+
+  countries=countryFile.get("country").get("countries")
+  # ownedProvinces=set()
+  ownerCountry=dict()
+  for name,vals in zip(countries.names, countries.vals):
+    # print(f'vals = "{vals}"')
+    if vals=="":
+      continue
+    cores=vals.get("own_control_core")
+    # print(f'cores = "{cores.vals}"')
+    for core in cores.names:
+      # ownedProvinces.add(core)
+      ownerCountry[core]=name
+    # print(f'cores = "{cores}"')
+
+
+  provinceToArea=dict()
+  areaToRegion=dict()
+  provinceToRegion=dict()
+  regionToArea=dict()
+  areaToProvince=dict()
+
+  for name, val in areaFile.getNameVal():
+    if name:
+      for p in val.get("provinces").names:
+        provinceToArea[p]=name
+        if not name in areaToProvince:
+          areaToProvince[name]=[]
+        areaToProvince[name].append(p)
+  for name, val in regionFile.getNameVal():
+    if name:
+      for p in val.get("areas").names:
+        areaToRegion[p]=name
+        if not name in regionToArea:
+          regionToArea[name]=[]
+        regionToArea[name].append(p)
+  for province, area in provinceToArea.items():
+    if area in areaToRegion:
+      provinceToRegion[province]=areaToRegion[area]
+
+  provinceToTerrain=dict()
+  for name, val in provinceFile.getNameVal():
+    if name:
+      provinceToTerrain[name]=val.get("terrain")
+
+  newClimate=TagList(0)
+  forceClimate=dict()
+  forceClimate["lorien_area"]="perfect"
+  forceClimate["umbar_region"]="mild_winter"
+  forceClimate["harnendor_region"]="mild_winter"
+  forceClimate["harondor_region"]="mild_winter"
+  forceClimate["dacranamel_region"]="mild_winter"
+  forceClimate["dor_rhunen_region"]="mild_winter"
+  forceClimate["anorien_region"]="mild_winter"
+  forceClimate["rhuvenlhad_region"]="mild_winter"
+  forceClimate["belfalas_region"]="mild_winter"
+  forceClimate["anfalas_region"]="mild_winter"
+  forceClimate["calenardhon_region"]="mild_winter"
+  forceClimate["dunendor_region"]="mild_winter"
+  forceClimate["druwaith_region"]="mild_winter"
+  forceClimate["enedhwaith_region"]="mild_winter"
+  forceClimate["andrast_region"]="mild_winter"
+  # forceClimate["umbar_area"]="normal_winter"
+  # forceClimate["glinfalas_area"]="normal_winter"
+  # forceClimate["31"]="normal_winter"
+  # forceClimate["dacranamel_region"]="normal_winter"
+  for name, climate in forceClimate.items():
+    if climateFile.count(climate)>0:
+      currentCLimate=climateFile.get(climate)
+      if name.endswith("region"):
+        for a in regionToArea[name]:
+          for p in areaToProvince[a]:
+            currentCLimate.add(p)
+        pass
+      elif name.endswith("area"):
+        for p in areaToProvince[name]:
+          currentCLimate.add(p)
+      else:
+        currentCLimate.add(name)
+  nonPerfect=set()
+  climateFile.addReturn("perfect") #probably need to be removed as it might confuse the game
+  for climate, entries in climateFile.getNameVal():
+    if not climate:
+      continue
+    if climate=="perfect":
+      # perfect=[]
+      for key in provinceToArea:
+        if not key in nonPerfect:
+          # perfect.append(key)
+          entries.add(key)
+    currentNewClimate=newClimate.addReturn(climate,"= LIST")
+    provinceSet=set()
+    for provinceId in entries.names:
+      if provinceId:
+        provinceSet.add(int(provinceId))
+    provinceList=list(map(str,sorted(provinceSet,reverse=True)))
+    while provinceList:
+      province=provinceList[-1]
+      # print(f'province = "{province}"')
+      region=provinceToRegion[province]
+      # if region in forceClimate:
+      if region in forceClimate and forceClimate[region]!=climate:
+        provinceList.pop()
+        continue
+      currentNewClimate.addComment("## "+region+" ###")
+      regionCommentId=len(currentNewClimate.comments)-1
+      for area in regionToArea[region]:
+      # area=provinceToArea[province]
+        # currentNewClimate.add(province)
+        searchForList=areaToProvince[area]
+        newArea=True
+        found=[]
+        for searchFor in searchForList:
+          try:
+            i=provinceList.index(searchFor)
+            p=provinceList.pop(i)
+            # if area in forceClimate or p in forceClimate:
+            if area in forceClimate and forceClimate[area]!=climate or p in forceClimate and forceClimate[p]!=climate:
+              continue
+            found.append(p)
+            nonPerfect.add(p)
+            if newArea:
+              currentNewClimate.add(p)
+              newArea=False
+            else:
+              currentNewClimate.names[-1]+=" "+p
+          except ValueError:
+            pass
+        if not newArea:
+          currentNewClimate.comments[-1]="#"+area
+          if len(found)<len(searchForList):
+            if len(found)>len(searchForList)/2:
+              currentNewClimate.comments[-1]+=" (mostly: "
+            elif len(found)>1:
+              currentNewClimate.comments[-1]+=" (partly: "
+            else:
+              currentNewClimate.comments[-1]+=" (only: "
+            for p in found:
+              currentNewClimate.comments[-1]+=f"{provinceNames[p]}, "
+            currentNewClimate.comments[-1]=currentNewClimate.comments[-1][:-2]+")"
+            if len(found)>1:
+              currentNewClimate.comments[-1]+=" (misses: "
+              for p in searchForList:
+                if not p in found:
+                  currentNewClimate.comments[-1]+=f"{p}:{provinceNames[p]}, "
+              currentNewClimate.comments[-1]=currentNewClimate.comments[-1][:-2]+")"
+        else:
+          currentNewClimate.comments[regionCommentId]+=" not "+area
+
+
+
+    # print(f'provinceSet = "{provinceSet}"')
+
+  def removeComment(t):
+    if type(t)==TagList:
+      for i in range(len(t.comments)):
+        t.comments[i]=""
+  def empty(t):
+    return t[0]=='' and t[1]=='' and t[2]==''
+
+
+  provinceFile.applyOnAllLevel(removeComment)
+  provinceFile.deleteOnLowestLevel(empty)
+  for i in range(len(provinceFile.names)):
+    j=provinceFile.names[i]
+    if j in provinceNames:
+      provinceFile.comments[i]="#"+provinceNames[ j]
+    # if not j in ownedProvinces:
+    #   provinceFile.comments[i]+=" (unowned)"
+    if j in ownerCountry:
+      provinceFile.comments[i]+=f" ({ownerCountry[j]})"
+      if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
+        tribes=provinceFile.vals[i].get("tribesmen").get("amount")
+        if int(tribes)>4:
+          provinceFile.vals[i].get("tribesmen").set("amount",int(tribes)-1)
+          # print(f'tribes = "{tribes}"')
+        provinceFile.vals[i].addReturn("slaves").add("amount","1")
+      if j in uninhabitable:
+        print(f"{j} owned but uninhabitable")
+    else:
+      if j in uninhabitable:
+        provinceFile.comments[i]+=" (uninhabitable)"
+      else:
+        provinceFile.comments[i]+=" (unowned)"
+        if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
+          tribes=provinceFile.vals[i].get("tribesmen").get("amount")
+          if int(tribes)>6:
+            provinceFile.vals[i].get("tribesmen").set("amount",6)
+    if j in provinceToArea:
+      provinceFile.comments[i]+=f" ({provinceToArea[j]})"
+    if j in provinceToRegion:
+      provinceFile.comments[i]+=f" ({provinceToRegion[j]})"
+      # print(f'provinceNames[i] = "{provinceNames[ provinceFile.names[i]]}"')
+
+  # provinceFile.writeAll(open("provinceFile.txt","w",encoding='utf-8-sig'),cdf.args(2))
+  # countryFile.writeAll(open("countryFile.txt","w",encoding='utf-8-sig'),cdf.args(4))
+
+  cdf.outputToFolderAndFile(provinceFile , ".", "provinceFile.txt" ,2,".",encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(countryFile , ".", "countryFile.txt" ,4,".",encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(newClimate , ".", "climateFile.txt" ,4,".",encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(areaFile , ".", "areaFile.txt" ,4,".",encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(regionFile , ".", "regionFile.txt" ,4,".",encoding="utf-8-sig")
+
+
+
 
 
 
@@ -111,15 +367,15 @@ class Unit:
   def __init__(self, name, category, attackFactor=1, armorFactor=1, moraleFactor=1, customRelation=None, AP=False):
     self.name=name
     self.category=category
-    self.attackFactor=attackFactor
+    self.attackFactor=self.reducedFactor(4.0/3.0,attackFactor)
     self.armorFactor=armorFactor
-    self.armorFactor=self.reducedArmor(2) #values chosen probably too high
+    self.armorFactor=self.reducedFactor(2) #values chosen probably too high
     self.moraleFactor=moraleFactor
     self.customRelation=customRelation
     self.AP=AP
     self.foodFactor=0.1
-    self.attritionFactor=0.01 #weight, not loss, might need to round up a bit?
-  def reducedArmor(self, fac=2, armorFactor=None):
+    self.attritionFactor=0.1 #weight, not loss, might need to round up a bit?
+  def reducedFactor(self, fac=2, armorFactor=None):
     if armorFactor is None:
       armorFactor=self.armorFactor
     return 1+(armorFactor-1)/fac
@@ -141,16 +397,23 @@ class Unit:
 
     otherArmor=other.computeArmorFactor(properties) #support units are already excluded above
     if self.AP:
-      otherArmor=other.reducedArmor(2, otherArmor)
+      otherArmor=other.reducedFactor(2, otherArmor)
 
     return round(baseFactor*self.attackFactor/otherArmor,2)
-  def computeAllDamages(self,allUnits, relations, properties):
-    print(f"{self.name} = "+"{")
+  def computeAllDamages(self,allUnits, relations, properties, data=None):
+    # print(f"{self.name} = "+"{")
+    lastType=""
     for other in allUnits:
       dmg=self.computeDamageVS(other, relations, properties)
       if abs(dmg-1)<1e-2:
         continue
-      print(f"  {other.name} = {dmg} #{other.category}")
+      if data:
+        if lastType!=other.category:
+          data.addComment(other.category+":")
+          lastType=other.category
+        data.add(other.name, dmg)
+      else:
+        print(f"  {other.name} = {dmg} #{other.category}")
   def computeCosts(self, properties):
     properties=self.getProperties(properties)
     base=properties["cost"]
@@ -176,6 +439,38 @@ class Unit:
       return properties[self.name]
     else:
       return properties[self.category]
+
+  def assemble(self, relations, properties,allUnits):
+    props=self.getProperties(properties)
+    topTag=TagList(0)
+    data=topTag.addReturn(self.name)
+    data.add("army", "yes")
+    # if props["assault"]:
+    data.add("assault", "yes" if props["assault"] else "no")
+    data.add("levy_tier", "advanced" if "levy_tier" in props else "basic")
+    if "tradeGood" in props:
+      data.addReturn("allow").addReturn("trade_good_surplus").add("target", props["tradeGood"]).add("value",0,"", ">")
+    data.add("maneuver", props["maneuver"])
+    data.add("movement_speed", props["speed"])
+    data.add("build_time", props["cost"]) #no longer used?!
+    self.computeAllDamages(allUnits, relations, properties, data)
+    data.add("attrition_weight", round((100+props["attrition"])/100*self.attritionFactor,2))
+    data.add("attrition_loss", props["attritionLoss"]/100)
+    data.add("food_consumption", props["consumption"])
+    data.add("food_storage", props["food"])
+    if "ai_max_percentage" in props:
+      data.add("ai_max_percentage", props["ai_max_percentage"])
+    cost=data.addReturn("build_cost")
+    cost.add("gold", self.computeCosts(properties))
+    cost.add("manpower",1)
+    if props["strength"]<0:
+      data.add("strength_damage_taken", self.computeStrengthDamageTaken(properties))
+    data.add("morale_damage_taken", self.computeMoraleDamageTaken(properties))
+
+
+
+
+    return topTag
 
 
 

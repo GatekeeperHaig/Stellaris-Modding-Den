@@ -1550,14 +1550,14 @@ def createEdictFile(modFolder="../gratak_mods/custom_difficulty"):
   outputToFolderAndFile(edictFile, "common/edicts", "custom_difficulty_edict.txt",2, modFolder)
 
 
-def outputToFolderAndFile(tagList, folder, fileName, level=2, modFolder="../gratak_mods/custom_difficulty", warningText=True):
+def outputToFolderAndFile(tagList, folder, fileName, level=2, modFolder="../gratak_mods/custom_difficulty", warningText=True,encoding=None):
   tagList=deepcopy(tagList)
   if warningText:
     tagList.insert(0, "","","# This file was created by script!\n # Instead of editing it, you should change the python script.\n # Changes to the file will be overwritten the next time the script is run.")
   folder=modFolder+"/"+folder
   if not os.path.exists(folder):
     os.makedirs(folder)
-  with open(folder+"/"+fileName,'w') as file:
+  with open(folder+"/"+fileName,'w',encoding=encoding) as file:
     tagList.writeAll(file, args(level))
   return folder+"/"+fileName
 
