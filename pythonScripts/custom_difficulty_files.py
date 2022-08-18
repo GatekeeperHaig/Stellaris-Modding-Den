@@ -1626,6 +1626,12 @@ def variableOp(self, opName, varName, val, sep="=",comment=""):
   self.add(opName+"_variable", TagList("which", varName).add("value", val, comment,sep))
   return self
 TagList.variableOp=variableOp
+def variableOpImp(self, opName, varName, val, sep="=", valName="value"):
+  if self==None:
+    self=TagList()
+  self.add(opName+"_variable", TagList("name", varName).add(valName, val, "",sep))
+  return self
+TagList.variableOpImp=variableOpImp
 TagList.variableOpNew=variableOpNew2
 
 def createEvent(self, id, name="country_event"):
@@ -1633,12 +1639,12 @@ def createEvent(self, id, name="country_event"):
   return self
 TagList.createEvent=createEvent
 
-def createReturnIf(self, limit, addMethod="add"):
+def createReturnIf(self, limit, addMethod="add", condType="if"):
   if not isinstance(limit, TagList):
     print("Invalid use of createReturnIf")
     return 0
   ifLoc=TagList("limit", limit)
-  getattr(self,addMethod)("if", ifLoc)
+  getattr(self,addMethod)(condType, ifLoc)
   # self.add
   return ifLoc
 TagList.createReturnIf=createReturnIf

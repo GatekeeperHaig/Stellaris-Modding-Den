@@ -14,38 +14,64 @@ def main():
   fileContent=TagList()
 
   locClass=LocList()
+  locClass.limitLanguage(["en"])
 
   races=["Noldor", "Teleri", "Edain", "Dwarf","Orc"]
-  raceGrowth={"Noldor":-1.2,"Teleri":-1.2,"Edain":-0.8, "Dwarf":-1,"Orc":4}
+  raceGrowth={"Noldor":-1.2,"Teleri":-1.2,"Edain":-0.8, "Dwarf":-1,"Orc":1}
   raceCombat={"Noldor":1.2,"Teleri":1,"Edain":0.8, "Dwarf":0.8,"Orc":0}
   raceCommerce={"Noldor":0.5,"Teleri":0.7,"Edain":.5, "Dwarf":1,"Orc":0}
-  raceDesc={"Noldor":"The Noldor where the second clan of elves to reach Valinor in the years of the trees and later where led back to Middle-earth by Fëanor. These elves have a long list of famous heroes and take pride in their combat ability. You have access to this modifier as your primary culture is Noldor.","Teleri":"The Teleri were the last clan of elves to reach Valinor in the years of the trees, though many remained in Middle-earth in the first place. They have always been the greatest seafarers of Middle-earth. As many of their breathren were slaughtered by Fëanor's host on his way back to Middle-earth, it took a long time for them to forgive the Noldor elves. You have access to this modifier as your primary culture is Teleri.","Edain":"The Edain were the group of mankind that reached Beleriand in the First Age. Many of them have fought Morgoth in the Battle of Beleriand and they and their ancestors have thus been rewarded with long life. You have access to this modifier as your primary culture is Edain, Mixed Edain or Banadûnaim.", "Dwarf":"The Masters of Stone were created by Aulë even before Ilúvatar created the elves, but slept underground until about a century after the elves awoke. Dwarves spend most of their time crafting, smithying and mining. You have access to this modifier as your primary culture is dwarven.","Orc":"Melkor created the orcs by twisting kidnapped elves in the Years of the Lamps. Without the guidance of Melkor or a fallen Maia, they are usually disorganized and pose little thread to any of the other races. Now that the Lord of the Rings is returning to his power though, the Age of the Orcs will come. You have access to this modifier as your primary culture is orcish."}
+  raceDesc={"Noldor":"The Noldor where the second clan of elves to reach Valinor in the years of the trees and later where led back to Middle-earth by Fëanor. These elves have a long list of famous heroes and take pride in their combat ability. You have access to this modifier as your primary culture is Noldor.","Teleri":"The Teleri were the last clan of elves to reach Valinor in the years of the trees, though many remained in Middle-earth in the first place. They have always been the greatest seafarers of Middle-earth. As many of their breathren were slaughtered by Fëanor's host on his way back to Middle-earth, it took a long time for them to forgive the Noldor elves. You have access to this modifier as your primary culture is Teleri.","Edain":"The Edain were the group of mankind that reached Beleriand in the First Age. Many of them have fought Morgoth in the Battle of Beleriand and they and their ancestors have thus been rewarded with long life. You have access to this modifier as your primary culture is Edain. Lesser dunedain, corsairs and dol amrothian only count half.", "Dwarf":"The Masters of Stone were created by Aulë even before Ilúvatar created the elves, but slept underground until about a century after the elves awoke. Dwarves spend most of their time crafting, smithying and mining. You have access to this modifier as your primary culture is dwarven.","Orc":"Melkor created the orcs by twisting kidnapped elves in the Years of the Lamps. Without the guidance of Melkor or a fallen Maia, they are usually disorganized and pose little thread to any of the other races. Now that the Lord of the Rings is returning to his power though, the Age of the Orcs will come. You have access to this modifier as your primary culture is orcish."}
   # raceGrowth={"Noldor":-1,"Teleri":-1,"Edain":-0.8, "Dwarf":-0.8,"Orc":4}
+
+  lotr_pops=TagList("namespace", "lotr_pops")
+  foreignPopsEvent=lotr_pops.addReturn("lotr_pops.1")
+  foreignPopsEvent.add("type", "country_event").add("hidden","yes")
+  trigger=foreignPopsEvent.addReturn("trigger")
+  trigger.addReturn("NOT").add("has_law","age_of_the_orc")
+  immediate=foreignPopsEvent.addReturn("immediate")
+  option=foreignPopsEvent.addReturn("option")
+  option.add("name", "OK")
 
   for race in races:
     for i in range(1,11):
-      name=f"{i*10}_{race}"
+      name=f"{i*10}_{race}".lower()
       t=fileContent.addReturn(name)
       if race!="Orc":
         t.add("land_morale_modifier", round(i*0.06*raceCombat[race],3))
         t.add("land_morale_recovery", round(i*0.01*raceCombat[race],3))
         t.add("discipline", round(i*0.06*raceCombat[race],3))
         t.add("global_commerce_modifier", round(i*0.06*raceCommerce[race],3))
+      else:
+        t.add("global_pop_assimilation_speed_modifier", round(i/10,2))
       t.add("global_population_growth", round(i*0.015*raceGrowth[race],3))
       locClass.addEntry(name, f"{i*10}% {race}")
       locClass.addEntry("desc_"+name, raceDesc[race])
 
-  for i in range(1,20):
+  for i in reversed(range(1,20)):
     name=f"foreign_support_{i*5}"
     t=fileContent.addReturn(name)
-    t.add("levy_size_multiplier",0.05*i)
+    t.add("levy_size_multiplier",round(0.05*i,2))
     locClass.addEntry(name, f"{i*5}% Foreign Culture Support")
     locClass.addEntry("desc_"+name, "Non-integrated culture do not direcly increase the number of possible levies (and thus legion size) and due to a bug in the vanilla game we cannot allow their integration outside of your culture group. Instead they will slightly increase the numbers of your integrated culture levies.")
+    immediate.add("remove_country_modifier", name)
+    option.createReturnIf(TagList("local_var:foreign_pop_percentage", round(i*5/100,2),"",">="),condType="else_if" if i!=19 else "if").add("add_country_modifier", TagList("name",name))
 
-
+  immediate.variableOpImp("set_local", "total_pops", 0)
+  immediate.variableOpImp("set_local", "foreign_pops", 0)
+  everyPop=immediate.addReturn("every_owned_province").addReturn("every_pops_in_province")
+  everyPop.add("save_scope_as","pop")
+  everyPop.variableOpImp("change_local", "total_pops", 1, valName="add")
+  foreignPop=everyPop.createReturnIf(TagList("NOT", TagList("ROOT", TagList("any_integrated_culture", TagList("this.culture", "scope:pop.culture")))))
+  foreignPop.variableOpImp("change_local", "foreign_pops", 1, valName="add")
+  immediate.variableOpImp("set_local", "foreign_pop_percentage", "local_var:foreign_pops")
+  immediate.createReturnIf(TagList("local_var:total_pops", "0", "", ">")).variableOpImp("change_local", "foreign_pop_percentage", "local_var:total_pops", valName="divide")
+  immediate.addReturn("else").variableOpImp("set_local", "foreign_pop_percentage", 0 )
+  halfLevy=immediate.createReturnIf(TagList("OR", TagList("has_country_modifier","harassed_by_corsairs").add("has_country_modifier","influenced_by_sarman")))
+  halfLevy.variableOpImp("change_local", "foreign_pop_percentage",2, valName="divide")
   # print(f'fileContent = "{fileContent}"')
-  locClass.writeToMod(".","lotr")
-  cdf.outputToFolderAndFile(fileContent , ".", "br_racial_modifiers.txt" ,2,".")
+  locClass.writeToMod(".","lotr_country_modifiers_from_script","z")
+  cdf.outputToFolderAndFile(fileContent , ".", "common/modifiers/br_racial_modifiers.txt" ,2,".", encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(lotr_pops , ".", "events/lotr_pops.txt" ,1,".", encoding="utf-8-sig")
 
   relations = {
     "archers":        { "archers":0, "chariots":0, "heavyCavalry":-10, "heavyInfantry":10, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":0 },
@@ -108,7 +134,7 @@ def main():
   os.makedirs("units",exist_ok=True)
   for unit in units:
     d=unit.assemble(relations, properties, units)
-    cdf.outputToFolderAndFile(d , ".", f"units/army_{unit.name}.txt" ,2,".",encoding="utf-8-sig")
+    cdf.outputToFolderAndFile(d , ".", f"common/units/army_{unit.name}.txt" ,2,".",encoding="utf-8-sig")
 
     # unit.computeAllDamages(units,relations,properties)
     # print(f"  cost = {unit.computeCosts(properties)}")
@@ -117,7 +143,7 @@ def main():
   # return
 
   provinceNames={}
-  with open("provincenames_l_english.yml",encoding='utf-8-sig') as f:
+  with open("localization/english/provincenames_l_english.yml",encoding='utf-8-sig') as f:
     for line in f.readlines():
       # print(line)
       split=line.split()
@@ -140,6 +166,7 @@ def main():
   areaFile.readFile("map_data/areas.txt",encoding='utf-8')
   regionFile=TagList(0)
   regionFile.readFile("map_data/regions.txt",encoding='utf-8')
+  # cdf.outputToFolderAndFile(climateFile , ".", "climateFile.txt" ,4,".",encoding="utf-8-sig")
 
   # print(f'climateFile.vals[0].names = "{climateFile.vals[0].names}"')
 
@@ -150,7 +177,7 @@ def main():
 
 
 
-  uninhabitable = set(map(str,list(range(4969,4988))+list(range(5453,5459))+list([52,2616,577,564,563,576,575,604,605,606,607,608,602,603,2696,2697,2698,2607,2604,2605,3402,3403,3404,476,475,478,479,2961,2960,2959,2954,2955,2984,2985,2986,540,539,538,537,536,535,547,546,545,544,543,542,2617,594,595,596,597,94,27,95,91,92,581,582,2046,2045,2044,87,85,89,88,83,82,80,2375,2376,7,3,17,23,48,1965,583,584,585,586,587,588,589,590,2997,2998,3000,3001,2988,2991,2989,2992,2994,3003,2990,2995,2996,2993,3002,579,578,2048,2049,2050,2051,2052,2053,593,3142,3143,3146,3144,3145,3147,3148,3149,3150,51,2378,2377,3638,3639,3678,3679,3680,3681,3682,3683,3684,3685,3686,3687,3688,3689,3690,3691,3692,3693,3694,3593,3709,3719,3611,3613,3612,3653,3654,3656,3660,3718,3626,3659,1127,3706,711,3607,3608,3609,3740,3741,3742,3743,3744,3745,3746,3747,3787,3788,3781,3779,3778,3777,3784,3793,3794,3792,3790,3789,3791,3775,3776,3771,3795,3797,508,461,2730,2731,2732,2733,2739,2737,2741,2735,2740,2742,2745,2744,2743,3860,3862,3863,3864,3865,3866,3874,3867,3881,3871,3869,3552,3553,3880,3879,3868,3872,3873,3870,3554,2738,2750,2749,2748,2747,2746,2751,3875,2729,2769,2728,3582,3581,3580,3643,3637,3904,3909,3910,3937,3938,3939,5215,5217,5218,5174,5176,5291,5292,5293,5300,5301,5302,5303,5304,5305,5306,5307,5308,5309,5310,5311,5312,5313,5314,5315,5317,5318,5319,5320,5321,5322,5323,5324,5326,5327,5328,5329,5330,5331,5332,5333,5334,5336,5337,5338,5339,5340,5341,5342,5343,5344,5345,5348,5386,5387,5388,5389,5390,5433,5434,5435,5399,5400,5401,5378,5379,5375,5274,5275,5276,5277,5278,5281,5279,5282,5283,5406,5429,5430,5297,5298,5299,5437,5023,5024,5443,5444,5445,5446,5447,5448,5449,5450,5451,5067,5463,5396,5395,5409,5280,5462,5466,5284,5286,5287,5294,5296,5452,5410,5411,5412,5216,5252,5285,5288,5060,5273])))
+  uninhabitable = set(map(str,list(range(4969,4988))+list(range(5453,5459))+list([52,2616,577,564,563,576,575,604,605,606,607,608,602,603,2696,2697,2698,2607,2604,2605,3402,3403,3404,476,475,478,479,2961,2960,2959,2954,2955,2984,2985,2986,540,539,538,537,536,535,547,546,545,544,543,542,2617,594,595,596,597,94,27,95,91,92,581,582,2046,2045,2044,87,85,89,88,83,82,80,2375,2376,7,3,17,23,48,1965,583,584,585,586,587,588,589,590,2997,2998,3000,3001,2988,2991,2989,2992,2994,3003,2990,2995,2996,2993,3002,579,578,2048,2049,2050,2051,2052,2053,593,3142,3143,3146,3144,3145,3147,3148,3149,3150,51,2378,2377,3638,3639,3678,3679,3680,3681,3682,3683,3684,3685,3686,3687,3688,3689,3690,3691,3692,3693,3694,3593,3709,3719,3611,3613,3612,3653,3654,3656,3660,3718,3626,3659,3706,3607,3608,3609,3740,3741,3742,3743,3744,3745,3746,3747,3787,3781,3779,3778,3777,3784,3793,3794,3792,3790,3789,3791,3775,3776,3771,3795,3797,2730,2731,2732,2733,2739,2737,2741,2735,2740,2742,2745,2744,2743,3860,3862,3863,3864,3865,3866,3874,3867,3881,3871,3869,3552,3553,3880,3879,3868,3872,3873,3870,3554,2738,2750,2749,2748,2747,2746,2751,3875,2729,2769,2728,3582,3581,3580,3643,3637,3904,3909,3910,3937,3938,3939,5215,5217,5218,5174,5176,5291,5292,5293,5300,5301,5302,5303,5304,5305,5306,5307,5308,5309,5310,5311,5312,5313,5314,5315,5317,5318,5319,5320,5321,5322,5323,5324,5326,5327,5328,5329,5330,5331,5332,5333,5334,5336,5337,5338,5339,5340,5341,5342,5343,5344,5345,5348,5386,5387,5388,5389,5390,5433,5434,5435,5399,5400,5401,5378,5379,5375,5274,5275,5276,5277,5278,5281,5279,5282,5283,5406,5429,5430,5297,5298,5299,5437,5023,5024,5443,5444,5445,5446,5447,5448,5449,5450,5451,5067,5463,5396,5395,5409,5280,5462,5466,5284,5286,5287,5294,5296,5452,5410,5411,5412,5216,5252,5285,5288,5060,5273])))
 
   # print(f'uninhabitable = "{uninhabitable}"')
 
@@ -201,25 +228,109 @@ def main():
 
   newClimate=TagList(0)
   forceClimate=dict()
+  #remember to remove stuff after it is done
+  # forceClimate["umbar_region"]="mild_winter"
+  # forceClimate["harnendor_region"]="mild_winter"
+  # forceClimate["harondor_region"]="mild_winter"
+  # forceClimate["dacranamel_region"]="mild_winter"
+  # forceClimate["dor_rhunen_region"]="mild_winter"
+  # forceClimate["anorien_region"]="mild_winter"
+  # forceClimate["rhuvenlhad_region"]="mild_winter"
+  # forceClimate["belfalas_region"]="mild_winter"
+  # forceClimate["anfalas_region"]="mild_winter"
+  # forceClimate["calenardhon_region"]="mild_winter"
+  # forceClimate["dunendor_region"]="mild_winter"
+  # forceClimate["druwaith_region"]="mild_winter"
+  # forceClimate["enedhwaith_region"]="mild_winter"
+  # forceClimate["andrast_region"]="mild_winter"
+  # forceClimate["forlindon_region"]="mild_winter"
+  # forceClimate["dor_wathui_region"]="mild_winter"
+  # forceClimate["siragale_region"]="mild_winter"
+  # forceClimate["minhiriath_region"]="mild_winter"
+  # forceClimate["cardolan_region"]="mild_winter"
+  # forceClimate["tawar_norndor_region"]="mild_winter"
+  # forceClimate["mintyrnath_region"]="mild_winter"
+  # forceClimate["mithlond_region"]="mild_winter"
+  # forceClimate["harlindon_region"]="mild_winter"
+  # forceClimate["arthedain_region"]="mild_winter"
+  # forceClimate["rhudaur_region"]="normal_winter"
+  # forceClimate["dyr_erib_region"]="normal_winter"
+  # forceClimate["pend_hithaeglir_region"]="normal_winter"
+  # forceClimate["lorien_region"]="normal_winter"
+  # forceClimate["taur_romen_region"]="normal_winter"
+  # forceClimate["menelothriand_region"]="normal_winter"
+  # forceClimate["logathavuld_region"]="normal_winter"
+  # forceClimate["rhovanion_region"]="normal_winter"
+  # forceClimate["ered_mithrin_region"]="normal_winter"
+  # forceClimate["uvanwaith_region"]="normal_winter"
+  # forceClimate["anduin_region"]="normal_winter"
+  # forceClimate["dyr_erib_region"]="normal_winter"
+  # forceClimate["rhudaur_region"]="normal_winter"
+  # forceClimate["numeriador_region"]="normal_winter"
+  # forceClimate["kykurian_kyn_region"]="normal_winter"
+  # forceClimate["lygar_kraw_region"]="normal_winter"
+  # forceClimate["ubain_region"]="normal_winter"
+  # forceClimate["eryn_galen_region"]="normal_winter"
+  # forceClimate["angmar_region"]="severe_winter"
+  # forceClimate["dyr_region"]="severe_winter"
+  # forceClimate["lugnimbar_region"]="severe_winter"
+  # forceClimate["lu_tyr_su_region"]="severe_winter"
+  # forceClimate["felaya_region"]="arid"
+  # forceClimate["bellakar_region"]="arid"
+  # forceClimate["mardruak_region"]="arid"
+  # forceClimate["an_balkumagan_region"]="arid"
+  # forceClimate["bozisha_miraz_region"]="arid"
+  # forceClimate["sirayn_region"]="arid"
+  # forceClimate["cennacatt_region"]="arid"
+  # forceClimate["harshandatt_region"]="arid"
+  # forceClimate["nafarat_region"]="arid"
+  # forceClimate["khand_region"]="arid"
+  # forceClimate["nurn_region"]="arid"
+  # forceClimate["tulwang_region"]="arid"
+  # forceClimate["khailuza_region"]="arid"
+  # forceClimate["kykurian_kyn_region"]="arid"
+  # forceClimate["kargagis_ahar_region"]="arid"
+  # forceClimate["gathgykarkan_region"]="arid"
+  # forceClimate["anarike_region"]="arid"
+  # forceClimate["yopi_region"]="arid"
+  # forceClimate["nikkea_region"]="arid"
+  # forceClimate["shay_region"]="arid"
+  # forceClimate["lokhas_drus_region"]="arid"
+  # forceClimate["ibav_region"]="arid"
+  # forceClimate["wer_falin_region"]="arid"
+  # forceClimate["ralian_region"]="arid"
+  # forceClimate["burskadekar_region"]="arid"
+  # forceClimate["alduryaknar_region"]="arid"
+  for name, terrain in provinceToTerrain.items():
+    if terrain.strip('"') in ["caverns", "halls"] and name in provinceToArea:
+      forceClimate[name]="mild_winter"
   forceClimate["lorien_area"]="perfect"
-  forceClimate["umbar_region"]="mild_winter"
-  forceClimate["harnendor_region"]="mild_winter"
-  forceClimate["harondor_region"]="mild_winter"
-  forceClimate["dacranamel_region"]="mild_winter"
-  forceClimate["dor_rhunen_region"]="mild_winter"
-  forceClimate["anorien_region"]="mild_winter"
-  forceClimate["rhuvenlhad_region"]="mild_winter"
-  forceClimate["belfalas_region"]="mild_winter"
-  forceClimate["anfalas_region"]="mild_winter"
-  forceClimate["calenardhon_region"]="mild_winter"
-  forceClimate["dunendor_region"]="mild_winter"
-  forceClimate["druwaith_region"]="mild_winter"
-  forceClimate["enedhwaith_region"]="mild_winter"
-  forceClimate["andrast_region"]="mild_winter"
-  # forceClimate["umbar_area"]="normal_winter"
-  # forceClimate["glinfalas_area"]="normal_winter"
-  # forceClimate["31"]="normal_winter"
-  # forceClimate["dacranamel_region"]="normal_winter"
+  forceClimate["1936"]="perfect"
+  forceClimate["lothlann_area"]="normal_winter"
+  forceClimate["tyrn_formen_area"]="normal_winter"
+  forceClimate["rykholiz_area"]="normal_winter"
+  forceClimate["thult_area"]="normal_winter"
+  forceClimate["en_engladil_area"]="mild_winter"
+  forceClimate["pend_eregion_area"]="mild_winter"
+  forceClimate["sarch_nia_linquelie_area"]="severe_winter"
+  ###arthedain
+  forceClimate["1701"]="normal_winter"
+  forceClimate["1877"]="normal_winter"
+  forceClimate["1815"]="normal_winter"
+  forceClimate["1814"]="normal_winter"
+  forceClimate["1709"]="normal_winter"
+  forceClimate["1710"]="normal_winter"
+  forceClimate["1634"]="normal_winter"
+  forceClimate["1822"]="normal_winter"
+  forceClimate["2420"]="normal_winter"
+  forceClimate["2423"]="normal_winter"
+  forceClimate["2551"]="normal_winter"
+  forceClimate["3729"]="normal_winter"
+  forceClimate["3730"]="normal_winter"
+  forceClimate["3736"]="normal_winter"
+  forceClimate["2190"]="mild_winter"
+  forceClimate["1747"]="mild_winter"
+  forceClimate["1790"]="mild_winter"
   for name, climate in forceClimate.items():
     if climateFile.count(climate)>0:
       currentCLimate=climateFile.get(climate)
@@ -234,7 +345,7 @@ def main():
       else:
         currentCLimate.add(name)
   nonPerfect=set()
-  climateFile.addReturn("perfect") #probably need to be removed as it might confuse the game
+  # climateFile.addReturn("perfect") #probably need to be removed as it might confuse the game
   for climate, entries in climateFile.getNameVal():
     if not climate:
       continue
@@ -314,9 +425,27 @@ def main():
   def empty(t):
     return t[0]=='' and t[1]=='' and t[2]==''
 
-
+  strengthenSauron=False
   provinceFile.applyOnAllLevel(removeComment)
   provinceFile.deleteOnLowestLevel(empty)
+  # tooManyNonOwnedPops=[
+  #   balchoth = {}
+  #   rachoth = {}
+  #   nurnim = {}
+  #   variag = {}
+  #   nuriag = {}
+  #   khundolar = {}
+  #   jangovar = {}
+  #       yarlung = {}
+  #   tsang = {}
+  #       haradrim = {}
+  #   qarsag = {} 
+  #   siranian= {}
+  #       yopi = {}
+  #   shayna = {}
+  #       mumakanim = {}
+  #   tulwany = {}
+  # ]
   for i in range(len(provinceFile.names)):
     j=provinceFile.names[i]
     if j in provinceNames:
@@ -331,6 +460,11 @@ def main():
           provinceFile.vals[i].get("tribesmen").set("amount",int(tribes)-1)
           # print(f'tribes = "{tribes}"')
         provinceFile.vals[i].addReturn("slaves").add("amount","1")
+      # print(f'provinceFile.vals[i].get("culture") = "{provinceFile.vals[i].get("culture")}"')
+      if strengthenSauron:
+        if provinceFile.vals[i].count("tribesmen") and provinceFile.vals[i].get("culture").strip('"')=="orcish":
+          tribes=provinceFile.vals[i].get("tribesmen").get("amount")
+          provinceFile.vals[i].get("tribesmen").set("amount",int(tribes)+4)
       if j in uninhabitable:
         print(f"{j} owned but uninhabitable")
     else:
@@ -351,11 +485,13 @@ def main():
   # provinceFile.writeAll(open("provinceFile.txt","w",encoding='utf-8-sig'),cdf.args(2))
   # countryFile.writeAll(open("countryFile.txt","w",encoding='utf-8-sig'),cdf.args(4))
 
-  cdf.outputToFolderAndFile(provinceFile , ".", "provinceFile.txt" ,2,".",encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(countryFile , ".", "countryFile.txt" ,4,".",encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(newClimate , ".", "climateFile.txt" ,4,".",encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(areaFile , ".", "areaFile.txt" ,4,".",encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(regionFile , ".", "regionFile.txt" ,4,".",encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(provinceFile , ".", "setup/provinces/00_default.txt" ,2,".",False,encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(newClimate , ".", "map_data/climate.txt" ,4,".",encoding="utf-8")
+  # cdf.outputToFolderAndFile(provinceFile , ".", "provinceFile.txt" ,2,".",encoding="utf-8-sig")
+  # cdf.outputToFolderAndFile(countryFile , ".", "countryFile.txt" ,4,".",encoding="utf-8-sig")
+  # cdf.outputToFolderAndFile(newClimate , ".", "climateFile.txt" ,4,".",encoding="utf-8-sig")
+  # cdf.outputToFolderAndFile(areaFile , ".", "areaFile.txt" ,4,".",encoding="utf-8-sig")
+  # cdf.outputToFolderAndFile(regionFile , ".", "regionFile.txt" ,4,".",encoding="utf-8-sig")
 
 
 
