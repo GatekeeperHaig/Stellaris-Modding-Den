@@ -66,7 +66,7 @@ def main():
   immediate.variableOpImp("set_local", "foreign_pop_percentage", "local_var:foreign_pops")
   immediate.createReturnIf(TagList("local_var:total_pops", "0", "", ">")).variableOpImp("change_local", "foreign_pop_percentage", "local_var:total_pops", valName="divide")
   immediate.addReturn("else").variableOpImp("set_local", "foreign_pop_percentage", 0 )
-  halfLevy=immediate.createReturnIf(TagList("OR", TagList("has_country_modifier","harassed_by_corsairs").add("has_country_modifier","influenced_by_sarman")))
+  halfLevy=immediate.createReturnIf(TagList("OR", TagList("has_country_modifier","harassed_by_corsairs").add("has_country_modifier","influenced_by_saruman")))
   halfLevy.variableOpImp("change_local", "foreign_pop_percentage",2, valName="divide")
   # print(f'fileContent = "{fileContent}"')
   locClass.writeToMod(".","lotr_country_modifiers_from_script","z")
@@ -185,11 +185,13 @@ def main():
   countries=countryFile.get("country").get("countries")
   # ownedProvinces=set()
   ownerCountry=dict()
+  countryCulture=dict()
   for name,vals in zip(countries.names, countries.vals):
     # print(f'vals = "{vals}"')
     if vals=="":
       continue
     cores=vals.get("own_control_core")
+    countryCulture[name]=vals.get("primary_culture")
     # print(f'cores = "{cores.vals}"')
     for core in cores.names:
       # ownedProvinces.add(core)
@@ -426,30 +428,17 @@ def main():
     return t[0]=='' and t[1]=='' and t[2]==''
 
   strengthenSauron=False
+  strengthenCarnDum=False
   provinceFile.applyOnAllLevel(removeComment)
   provinceFile.deleteOnLowestLevel(empty)
-  # tooManyNonOwnedPops=[
-  #   balchoth = {}
-  #   rachoth = {}
-  #   nurnim = {}
-  #   variag = {}
-  #   nuriag = {}
-  #   khundolar = {}
-  #   jangovar = {}
-  #       yarlung = {}
-  #   tsang = {}
-  #       haradrim = {}
-  #   qarsag = {} 
-  #   siranian= {}
-  #       yopi = {}
-  #   shayna = {}
-  #       mumakanim = {}
-  #   tulwany = {}
-  # ]
+  tooManyNonOwnedPops=[ "balchoth", "rachoth", "nurnim", "variag", "nuriag", "khundolar", "jangovar", "yarlung", "tsang", "haradrim", "qarsag", "siranian", "yopi", "shayna", "mumakanim", "tulwany"]
+  tooFewNonOwnedPops=[ "stonefoot", "stiffbeard"]
+  pops=["slaves", "tribesmen", "freemen", "citizen", "nobles"]
   for i in range(len(provinceFile.names)):
     j=provinceFile.names[i]
     if j in provinceNames:
       provinceFile.comments[i]="#"+provinceNames[ j]
+      culture=provinceFile.vals[i].get("culture").strip('"')
     # if not j in ownedProvinces:
     #   provinceFile.comments[i]+=" (unowned)"
     if j in ownerCountry:
@@ -465,6 +454,16 @@ def main():
         if provinceFile.vals[i].count("tribesmen") and provinceFile.vals[i].get("culture").strip('"')=="orcish":
           tribes=provinceFile.vals[i].get("tribesmen").get("amount")
           provinceFile.vals[i].get("tribesmen").set("amount",int(tribes)+4)
+      if strengthenCarnDum:
+        # print(f'ownerCountry = "{ownerCountry}"')
+        if provinceFile.vals[i].count("tribesmen") and ownerCountry[j]=="XXQ":
+          tribes=provinceFile.vals[i].get("tribesmen").get("amount")
+          provinceFile.vals[i].get("tribesmen").set("amount",int(tribes)+4)
+      # if culture!=countryCulture[ownerCountry[j]]:
+      #   print(f"{j} owned by {countryCulture[ownerCountry[j]]} but has {culture} culture")
+      if culture=="beasts":
+        provinceFile.vals[i].set("culture", f'"{countryCulture[ownerCountry[j]]}"')
+        print(f"{j} owned but beast culture")
       if j in uninhabitable:
         print(f"{j} owned but uninhabitable")
     else:
@@ -472,10 +471,27 @@ def main():
         provinceFile.comments[i]+=" (uninhabitable)"
       else:
         provinceFile.comments[i]+=" (unowned)"
-        if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
-          tribes=provinceFile.vals[i].get("tribesmen").get("amount")
-          if int(tribes)>6:
-            provinceFile.vals[i].get("tribesmen").set("amount",6)
+        if culture=="beasts":
+          for pop in pops:
+            if provinceFile.vals[i].count(pop):
+              provinceFile.vals[i].remove(pop)
+        elif culture=="goblins" or culture=="silvan":
+          empty=True
+          for pop in pops:
+            if provinceFile.vals[i].count(pop):
+              empty=False
+          if empty:
+            provinceFile.vals[i].set("culture",'"beasts"')
+        # if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
+        #   tribes=provinceFile.vals[i].get("tribesmen").get("amount")
+        #   if int(tribes)>2:
+        #     if culture in tooManyNonOwnedPops:
+        #       provinceFile.vals[i].get("tribesmen").set("amount",2)
+        #   elif int(tribes)>6:
+        #     provinceFile.vals[i].get("tribesmen").set("amount",6)
+        # elif provinceFile.vals[i].count("tribesmen")==0 and provinceFile.vals[i].count("slaves")==0 and provinceFile.vals[i].count("freemen")==0:
+        #   if culture in tooFewNonOwnedPops:
+        #     provinceFile.vals[i].addReturn("tribesmen").add("amount",2)
     if j in provinceToArea:
       provinceFile.comments[i]+=f" ({provinceToArea[j]})"
     if j in provinceToRegion:
