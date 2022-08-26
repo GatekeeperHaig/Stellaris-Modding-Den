@@ -50,7 +50,7 @@ def main():
   for i in reversed(range(1,20)):
     name=f"foreign_support_{i*5}"
     t=fileContent.addReturn(name)
-    t.add("levy_size_multiplier",round(0.05*i,2))
+    t.add("levy_size_multiplier",round(0.025*i,2))
     locClass.addEntry(name, f"{i*5}% Foreign Culture Support")
     locClass.addEntry("desc_"+name, "Non-integrated culture do not direcly increase the number of possible levies (and thus legion size) and due to a bug in the vanilla game we cannot allow their integration outside of your culture group. Instead they will slightly increase the numbers of your integrated culture levies.")
     immediate.add("remove_country_modifier", name)
@@ -475,13 +475,15 @@ def main():
           for pop in pops:
             if provinceFile.vals[i].count(pop):
               provinceFile.vals[i].remove(pop)
-        elif culture=="goblins" or culture=="silvan":
+        elif culture and culture!="beasts" and culture !="spider":# or culture=="silvan":
           empty=True
           for pop in pops:
             if provinceFile.vals[i].count(pop):
               empty=False
           if empty:
             provinceFile.vals[i].set("culture",'"beasts"')
+      if provinceFile.vals[i].count("nobles"):
+        print(f"{j} unowned but nobles")
         # if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
         #   tribes=provinceFile.vals[i].get("tribesmen").get("amount")
         #   if int(tribes)>2:
