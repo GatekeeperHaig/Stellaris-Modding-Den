@@ -6,7 +6,8 @@ import argparse
 import re
 # import shlex
 
-splitSigns=["= hsv","= rgb",">=","<=","#"," ","\t","{","}","=",">","<",'"']
+splitSignsNoBrackets=["= hsv","= rgb","= LIST",">=","<=","=",">","<"]
+splitSigns=splitSignsNoBrackets+["{","}","#"," ","\t",'"']
 splitPattern="("
 for sign in splitSigns:
   splitPattern+=sign+"|"
@@ -42,6 +43,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     return self.names.count(name)
   def get(self,name): #allows changing of content if vals[i] is an object
     return self.vals[self.names.index(name)]  
+  def set(self,name,val): #allows changing of content if vals[i] is an object
+    self.vals[self.names.index(name)]=str(val)
   def getN_th(self,name,n): #allows changing of content if vals[i] is an object
     index=self.n_thIndex(name,n)
     return self.vals[index]
@@ -84,9 +87,9 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     while name in self.names:
       self.remove(name)
     return self.add(name,val, comment, seperator)
-  def addReturn(self,name):
+  def addReturn(self,name,seperator="="):
     val=TagList()
-    self.add(name,val)
+    self.add(name,val,"",seperator)
     return val
   def addComment(self, comment):
     self.add("","","#"+comment)
@@ -230,31 +233,42 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           self.writeEntry(file, i,args)
       except:
         self.printAll()
+        print(f'i = "{i}"')
         raise
   def _writeTabs(self, file):
     for b in range(self.bracketLevel):
       file.write("\t")
   def writeEntry(self, file,i,args=0):
     self._writeTabs(file)
+    hasName=True
     try:
-      file.write(self.names[i])
+      if self.names[i]:
+        file.write(self.names[i])
+      else:
+        hasName=False
     except TypeError:
       self.names[i].printAll()
       raise
+    commentDone=False
     if not isinstance(self.vals[i],TagList):
       if len(str(self.vals[i]))>0:
         file.write(" {!s} {!s}".format(self.seperators[i],self.vals[i]))
     else:
-      file.write(" {!s} ".format(self.seperators[i]))
+      if hasName:
+        file.write(" {!s} ".format(self.seperators[i]))
       if self.vals[i].oneLineWriteCheck(args):
         file.write(self.vals[i]._toLine())
         # self.vals[i].writeLine(file)
       else:
-        file.write("{\n")
+        commentDone=True
+        file.write("{")
+        if self.comments[i].strip()!="":
+          file.write(" "+self.comments[i])
+        file.write("\n")
         self.vals[i].writeAll(file,args)
         self._writeTabs(file)
         file.write("}")
-    if self.comments[i].strip()!="":
+    if not commentDone and self.comments[i].strip()!="":
       file.write(" "+self.comments[i])
     file.write("\n")
   def writeLine(self, file):
@@ -470,6 +484,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
       i+=1
         # self.getattr(applyString)
 
+
   #resolves triggers and effect (possibly other stuff). targetList would be the full list of triggers and effect. If a trigger/effect is not in the list, it is assumed to be vanilla. No missing trigger/effect checking (use cwtools for this!)
   def resolveStellarisLinks(self, targetList):
     i=0
@@ -512,7 +527,12 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           continue
         elif word=="{":
           if not expectingVal:
-            raise ParseError("ERROR: Unexpected '{'")
+            newTag=TagList(bracketLevel)
+            objectList[-1].add("",TagList())
+            objectList[-1].vals[-1]=newTag
+            # objectList.append(newTag)
+            # sys.exit(0)
+            # raise ParseError("ERROR: Unexpected '{'")
           bracketLevel+=1
           if useNamedTagList and bracketLevel==1:
             newTag=NamedTagList(objectList[-1].names[-1])
@@ -540,7 +560,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           else:
             objectList[-1].comments[-1]=" "+comment
           break #rest of line is comment. Was already added, not being parsed to avoid special characters to have an impact in the comment
-        elif word in [">=","<=",">","<","=","= hsv","= rgb"]:
+        elif word in splitSignsNoBrackets:
+        # elif word in [">=","<=",">","<","=","= hsv","= rgb"]:
           objectList[-1].seperators[-1]=word
           expectingVal=True
         elif not expectingQuote and word=='"':
@@ -576,13 +597,13 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     return self, bracketLevel, expectingVal
 
 
-  def readFile(self, fileName, args=0, varsToValue=0,useNamedTagList=False): #the varsToValue is mostly still in due to me being to lazy to remove it atm. Try to avoid using it as it will be removed at some point in the future.
+  def readFile(self, fileName, args=0, varsToValue=0,useNamedTagList=False, encoding=None): #the varsToValue is mostly still in due to me being to lazy to remove it atm. Try to avoid using it as it will be removed at some point in the future.
 
     bracketLevel=0
     objectList=[self] #objects currently open objectList[0] would be lowest bracket object (a building), etc
     expectingVal=False
     # expectingNameAddition=False
-    with open(fileName,'r') as inputFile:
+    with open(fileName,'r', encoding=encoding) as inputFile:
       if args==0 or not hasattr(args, "silent") or args.silent==False:
         print("Start reading "+fileName)
       for lineI,line in enumerate(inputFile):

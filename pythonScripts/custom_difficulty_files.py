@@ -4,7 +4,7 @@
 import sys, os, io
 from stellarisTxtRead import *
 from copy import deepcopy
-from googletrans import Translator
+# from googletrans import Translator
 import re
 from locList import LocList
 import math
@@ -1550,14 +1550,14 @@ def createEdictFile(modFolder="../gratak_mods/custom_difficulty"):
   outputToFolderAndFile(edictFile, "common/edicts", "custom_difficulty_edict.txt",2, modFolder)
 
 
-def outputToFolderAndFile(tagList, folder, fileName, level=2, modFolder="../gratak_mods/custom_difficulty", warningText=True):
+def outputToFolderAndFile(tagList, folder, fileName, level=2, modFolder="../gratak_mods/custom_difficulty", warningText=True,encoding=None):
   tagList=deepcopy(tagList)
   if warningText:
     tagList.insert(0, "","","# This file was created by script!\n # Instead of editing it, you should change the python script.\n # Changes to the file will be overwritten the next time the script is run.")
   folder=modFolder+"/"+folder
   if not os.path.exists(folder):
     os.makedirs(folder)
-  with open(folder+"/"+fileName,'w') as file:
+  with open(folder+"/"+fileName,'w',encoding=encoding) as file:
     tagList.writeAll(file, args(level))
   return folder+"/"+fileName
 
@@ -1626,6 +1626,12 @@ def variableOp(self, opName, varName, val, sep="=",comment=""):
   self.add(opName+"_variable", TagList("which", varName).add("value", val, comment,sep))
   return self
 TagList.variableOp=variableOp
+def variableOpImp(self, opName, varName, val, sep="=", valName="value"):
+  if self==None:
+    self=TagList()
+  self.add(opName+"_variable", TagList("name", varName).add(valName, val, "",sep))
+  return self
+TagList.variableOpImp=variableOpImp
 TagList.variableOpNew=variableOpNew2
 
 def createEvent(self, id, name="country_event"):
@@ -1633,12 +1639,12 @@ def createEvent(self, id, name="country_event"):
   return self
 TagList.createEvent=createEvent
 
-def createReturnIf(self, limit, addMethod="add"):
+def createReturnIf(self, limit, addMethod="add", condType="if"):
   if not isinstance(limit, TagList):
     print("Invalid use of createReturnIf")
     return 0
   ifLoc=TagList("limit", limit)
-  getattr(self,addMethod)("if", ifLoc)
+  getattr(self,addMethod)(condType, ifLoc)
   # self.add
   return ifLoc
 TagList.createReturnIf=createReturnIf

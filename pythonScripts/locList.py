@@ -18,6 +18,16 @@ class LocList:
     for languageCode in self.languageCodes:
       self.dicts[languageCode]=dict()
 
+  def limitLanguage(self, l):
+    langs=[]
+    codes=[]
+    for lang,code in zip(self.languages, self.languageCodes):
+      if lang in l or code in l:
+        langs.append(lang)
+        codes.append(code)
+    self.languages=langs
+    self.languageCodes=codes
+
   def addLoc(self, id, loc, language="en"):
     # if id=="basic":
     #   print(loc)
@@ -111,9 +121,9 @@ class LocList:
         if yml:
           file.write('"')
         file.write("\n")
-  def writeToMod(self,path,fileNameBase):
+  def writeToMod(self,path,fileNameBase,locali="s"):
     for language in self.languages:
-      outFolderLoc=path+"/localisation/"
+      outFolderLoc=f"{path}/locali{locali}ation/"
       outFolderLoc+=language
       if self.useReplaceFolder:
         outFolderLoc+="/replace"
