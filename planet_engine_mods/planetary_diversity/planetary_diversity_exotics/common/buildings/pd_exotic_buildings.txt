@@ -122,9 +122,9 @@ building_acidseeders_1 = {
 			is_planet_class = pc_acid	# No double bonuses if player uses other tools to turn it into a Gaia world.
 			is_planet_class = pc_city
 			is_pd_arcology = yes
-			is_planet_class = pc_hive
+			is_pd_hive_world = yes
 			is_pd_hive_arcology = yes
-			is_planet_class = pc_machine
+			is_pd_machine = yes
 			is_pd_robot_arcology = yes
 			is_planet_class = pc_relic
 		}
@@ -140,9 +140,9 @@ building_acidseeders_1 = {
 			is_planet_class = pc_acid	# No double bonuses if player uses other tools to turn it into a Gaia world.
 			is_planet_class = pc_city
 			is_pd_arcology = yes
-			is_planet_class = pc_hive
+			is_pd_hive_world = yes
 			is_pd_hive_arcology = yes
-			is_planet_class = pc_machine
+			is_pd_machine = yes
 			is_pd_robot_arcology = yes
 			is_planet_class = pc_relic
 			NOT = { exists = owner }
@@ -184,9 +184,9 @@ building_acidseeders_2 = {
 			is_planet_class = pc_acid	# No double bonuses if player uses other tools to turn it into a Gaia world.
 			is_planet_class = pc_city
 			is_pd_arcology = yes
-			is_planet_class = pc_hive
+			is_pd_hive_world = yes
 			is_pd_hive_arcology = yes
-			is_planet_class = pc_machine
+			is_pd_machine = yes
 			is_pd_robot_arcology = yes
 			is_planet_class = pc_relic
 			NOT = { exists = owner }
@@ -249,9 +249,9 @@ building_pd_tectonic_drills = {
 			is_planet_class = pc_ash	# No double bonuses if player uses other tools to turn it into a Gaia world.
 			is_planet_class = pc_city
 			is_pd_arcology = yes
-			is_planet_class = pc_hive
+			is_pd_hive_world = yes
 			is_pd_hive_arcology = yes
-			is_planet_class = pc_machine
+			is_pd_machine = yes
 			is_pd_robot_arcology = yes
 			is_planet_class = pc_relic
 			NOT = { exists = owner }
@@ -296,9 +296,9 @@ building_pd_tectonic_drills_2 = {
 			is_planet_class = pc_ash	# No double bonuses if player uses other tools to turn it into a Gaia world.
 			is_planet_class = pc_city
 			is_pd_arcology = yes
-			is_planet_class = pc_hive
+			is_pd_hive_world = yes
 			is_pd_hive_arcology = yes
-			is_planet_class = pc_machine
+			is_pd_machine = yes
 			is_pd_robot_arcology = yes
 			is_planet_class = pc_relic
 			NOT = { exists = owner }
@@ -558,6 +558,8 @@ building_rogue_lab = {
 		NOT = { has_building = building_rogue_grid }
 		NOT = { has_building_construction = building_rogue_grid }
 		NOT = { has_building_construction = building_rogue_lab }
+		NOT = { has_building = building_rogue_mine }
+		NOT = { has_building_construction = building_rogue_mine }
 	}
 
 	allow = {
@@ -565,7 +567,7 @@ building_rogue_lab = {
 	}
 
 	planet_modifier = {
-        planet_researchers_physics_research_produces_add = 2
+        planet_researchers_physics_research_produces_add = 3
         planet_researchers_engineering_research_produces_add = 1
 	}
 
@@ -612,7 +614,10 @@ building_rogue_lab = {
 	destroy_trigger = {
 		planet = {
 			NOT = { is_planet_class = pc_cryoflora }
-			has_building = building_rogue_grid
+			OR = {
+				has_building = building_rogue_grid
+				has_building = building_rogue_mine
+			}
 		}
 	} 
 
@@ -632,7 +637,7 @@ building_rogue_lab = {
 building_rogue_grid = {
 	base_buildtime = 600
 
-	category = research
+	category = resource
 	
 	potential = {
 		NOT = { has_modifier = resort_colony }
@@ -641,6 +646,8 @@ building_rogue_grid = {
 		NOT = { has_building = building_rogue_grid }
 		NOT = { has_building_construction = building_rogue_grid }
 		NOT = { has_building_construction = building_rogue_lab }
+		NOT = { has_building = building_rogue_mine }
+		NOT = { has_building_construction = building_rogue_mine }
 	}
 
 	allow = {
@@ -687,14 +694,92 @@ building_rogue_grid = {
 			minerals = 800
 		}
 		upkeep = {
-			energy = 8
+			energy = 2
 		}
 	}	
 
 	destroy_trigger = {
 		planet = {
 			NOT = { is_planet_class = pc_rogue }
-			has_building = building_rogue_lab
+			OR = {
+				has_building = building_rogue_lab
+				has_building = building_rogue_mine
+			}
+		}
+	} 
+}
+
+building_rogue_mine = {
+	base_buildtime = 600
+
+	category = resource
+	
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		is_planet_class = pc_rogue
+		NOT = { has_building = building_rogue_lab }
+		NOT = { has_building_construction = building_rogue_lab }
+		NOT = { has_building = building_rogue_grid }
+		NOT = { has_building_construction = building_rogue_grid }
+		NOT = { has_building = building_rogue_mine }
+		NOT = { has_building_construction = building_rogue_mine }
+	}
+
+	allow = {
+		has_upgraded_capital = yes
+	}
+
+	planet_modifier = {
+		planet_miners_minerals_produces_add = 2
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_regular_empire = yes }
+		}
+		modifier = {
+			job_miner_add = 2
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_hive_empire = yes }
+		}
+		modifier = {
+			job_mining_drone_add =  2
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+		modifier = {
+			job_mining_drone_add = 2
+		}
+	}
+	
+	resources = {
+		category = planet_buildings
+		cost = {
+			minerals = 800
+		}
+		upkeep = {
+			energy = 2
+		}
+	}	
+
+	destroy_trigger = {
+		planet = {
+			NOT = { is_planet_class = pc_rogue }
+			OR = {
+				has_building = building_rogue_lab
+				has_building = building_rogue_grid
+			}
 		}
 	} 
 }

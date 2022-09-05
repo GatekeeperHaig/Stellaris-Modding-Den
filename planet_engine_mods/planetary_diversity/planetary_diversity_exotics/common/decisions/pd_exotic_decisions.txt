@@ -77,9 +77,9 @@ decision_pd_tectonic_drilling = {
 			is_planet_class = pc_city
 			is_planet_class = pc_relic
 			is_pd_arcology = yes
-			is_planet_class = pc_hive
+			is_pd_hive_world = yes
 			is_pd_hive_arcology = yes
-			is_planet_class = pc_machine
+			is_pd_machine = yes
 			is_planet_class = pc_gas_giant
 			is_pd_robot_arcology = yes
 			has_deposit = d_pd_tectonic_fissure
@@ -133,9 +133,9 @@ decision_pd_tectonic_drilling_planetside = {
 				is_planet_class = pc_ash
 				is_planet_class = pc_city
 				is_pd_arcology = yes
-				is_planet_class = pc_hive
+				is_pd_hive_world = yes
 				is_pd_hive_arcology = yes
-				is_planet_class = pc_machine
+				is_pd_machine = yes
 				is_pd_robot_arcology = yes
 				is_planet_class = pc_relic
 				is_planet_class = pc_gas_giant
@@ -191,19 +191,20 @@ decision_pd_remove_tectonic_drilling = {
     }
 }
 
-# Add in 
+# Rogue World Habitats
 decision_pd_rogue_better_habs = {
 	owned_planets_only = yes
 
-	enactment_time = 360
+	enactment_time = 720
 		
 	#prerequisites = { "tech_terrestrial_sculpting" }
 
-	icon = decision_upgrade_habitat
+	icon = decision_pd_rogue_better_habs
 	resources = {
 		category = decisions
 		cost = {
-			energy =  1000
+			alloys = 1000
+			sr_dark_matter = 200
 		}
 	}
 
@@ -211,6 +212,13 @@ decision_pd_rogue_better_habs = {
 		is_planet_class = pc_habitat
 		owner = { has_origin = origin_pd_rogue_voidfarers }
 		NOT = { has_modifier = rogue_void_architecture }
+		star = {
+			OR = {
+				is_star_class = sc_black_hole
+				is_star_class = sc_neutron_star
+				is_star_class = sc_pulsar
+			}
+		}
 	}
 
 	effect = {
@@ -222,5 +230,147 @@ decision_pd_rogue_better_habs = {
 
     ai_weight = {
         weight = 10000
+    }
+}
+
+# Rogue World Habitats
+decision_pd_rogue_better_habs = {
+	owned_planets_only = yes
+
+	enactment_time = 720
+		
+	#prerequisites = { "tech_terrestrial_sculpting" }
+
+	icon = decision_pd_rogue_better_habs
+	resources = {
+		category = decisions
+		cost = {
+			alloys = 1000
+			sr_dark_matter = 200
+		}
+	}
+
+	potential = {
+		is_planet_class = pc_habitat
+		owner = { has_origin = origin_pd_rogue_voidfarers }
+		NOT = { has_modifier = rogue_void_architecture }
+		star = {
+			OR = {
+				is_star_class = sc_black_hole
+				is_star_class = sc_neutron_star
+				is_star_class = sc_pulsar
+			}
+		}
+	}
+
+	effect = {
+		add_modifier = {
+			modifier = rogue_void_architecture
+			days = -1
+		}
+	}     
+
+    ai_weight = {
+        weight = 10000
+    }
+}
+
+# Rogue Collapse Start
+decision_pd_rogue_collapse_star = {
+	#owned_planets_only = yes
+
+	#enactment_time = 720
+		
+	#prerequisites = { "tech_terrestrial_sculpting" } #TODO
+		
+	prerequisites = { "tech_rogue_star_collapsing" }
+
+	icon = decision_pd_rogue_better_habs
+	resources = {
+		category = decisions
+		cost = { 
+			trigger = { is_planet_class = pc_m_giant_star }
+			influence = 50
+			sr_dark_matter = 1000
+		}
+		cost = { 
+			trigger = { 
+				OR = {
+					is_planet_class = pc_a_star
+					is_planet_class = pc_b_star
+					is_planet_class = pc_f_star
+				}
+			}
+			influence = 50
+			sr_dark_matter = 2000
+		}
+		cost = { 
+			trigger = { 
+				OR = {
+					is_planet_class = pc_g_star
+					is_planet_class = pc_k_star
+				}
+			}
+			influence = 50
+			sr_dark_matter = 3000
+		}
+		cost = { 
+			trigger = { 
+				OR = {
+					is_planet_class = pc_m_star
+					is_planet_class = pc_t_star
+				}
+			}
+			influence = 50
+			sr_dark_matter = 4000
+		}
+		cost = { 
+			trigger = { 
+				OR = {
+					is_planet_class = pc_pulsar
+					is_planet_class = pc_neutron_star
+				}
+			}
+			influence = 50
+			sr_dark_matter = 5000
+		}
+	}
+
+	potential = {
+		from = { 
+			has_origin = origin_pd_rogue_voidfarers 
+		}
+		is_star = yes
+		NOT = { is_planet_class = pc_black_hole }
+		NOT = { has_planet_flag = pd_incoming_black_hole }
+	}
+
+	allow = {
+		from = { has_technology = tech_rogue_star_collapsing }
+		space_owner = { is_at_war = no }
+		#is_planet_class = pc_m_giant_star
+		OR = {
+			space_owner = { has_policy_flag = purge_allowed }
+			AND = {
+				solar_system = { NOT = { any_system_planet = { is_colony = yes } }
+				space_owner = { NOT = { has_policy_flag = purge_allowed } }
+				}
+			}
+		}	
+	}
+
+	effect = {
+		custom_tooltip = decision_pd_rogue_collapse_star_effects
+		hidden_effect = { 
+			add_modifier = {
+				modifier = pdroguestarcollapse
+			}
+			planet_event = { id = pdexotic.29 days = 90 } 
+			set_timed_planet_flag = { flag = pd_incoming_black_hole days = 90 }
+		}
+	}     
+
+    ai_weight = {
+        weight = 100
     }
 }

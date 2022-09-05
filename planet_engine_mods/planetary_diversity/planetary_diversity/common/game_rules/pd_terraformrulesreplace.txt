@@ -25,3 +25,60 @@ can_terraform_planet = {
 		root = { NOT = { has_origin = origin_pd_tree_of_life } }
 	}
 }
+
+#Root = planet
+#This = species
+species_can_live_on_planet = {
+	exists = root #somehow this appeared in the error log. No idea how!
+	NAND = {
+		root = { 
+			OR = {
+				is_planet_class = pc_machine 
+				is_planet_class = pc_machinetidallylocked 
+				is_planet_class = pc_machine_factory 
+				is_planet_class = pc_machine_necropolis
+				is_planet_class = pc_machine_factory
+				is_planet_class = pc_machine_fort
+				is_planet_class = pc_machine_capital 
+			}
+		}
+		NOR = {
+			has_trait = trait_machine_unit
+			has_trait = trait_mechanical
+			AND = {
+				has_trait = trait_cybernetic
+				exists = root.owner
+				root.owner = {
+					has_authority = auth_machine_intelligence
+					has_civic = civic_machine_assimilator # Assimilator empire
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			root = {
+				OR = {
+					is_planet_class = pc_hive 
+					is_planet_class = pc_hivetidallylocked
+					is_planet_class = pc_pdhive1
+					is_planet_class = pc_pdhive2
+					is_planet_class = pc_bioforge
+					is_planet_class = pc_biocapital
+					is_planet_class = pc_biofort
+				} 
+			} 
+		}
+		OR = {
+			has_trait = trait_hive_mind
+			AND = { #Necrophage Hive Mind can have Necrophytes
+				exists = root.owner
+				root.owner = {
+					is_hive_empire = yes
+					has_origin = origin_necrophage
+					prev = { species_can_be_necrophaged = yes }
+				}
+			}
+		}
+	}
+}

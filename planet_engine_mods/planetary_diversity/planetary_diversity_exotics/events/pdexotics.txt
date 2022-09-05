@@ -712,7 +712,7 @@ country_event = {
 						class = this
 						portrait = this
 						traits = this
-						can_be_modified = this
+						can_be_modified = yes
 						homeworld = this
 						namelist = this
 						gender = this
@@ -1272,30 +1272,21 @@ country_event = {
 					is_planet_class = pc_molten
 					is_planet_class = pc_frozen
 					is_planet_class = pc_toxic
+					is_planet_class = pc_broken
+					is_planet_class = pc_shattered
+					is_planet_class = pc_hothouse
 				}
-				solar_system = {
-					OR = {
-						is_star_class = sc_black_hole
-						is_star_class = sc_neutron_star
-						is_star_class = sc_pulsar
-					}
-				}
-				OR = {
-					planet = {
-						is_moon = no
-						not = { has_moon = yes }
-						planet_size <= 25
-						planet_size >= 10
-					}	
-					planet = {
-						is_moon = yes
-						planet_size <= 15
-						planet_size >= 10
-					}
-				}
+				solar_system = { is_star_class = sc_black_hole }
 			}
 			change_pc = pc_rogue_barren
-			#add_modifier = { modifier = pdterra_rogue days = -1	}
+			IF = {
+				limit = {
+					planet_size <= 25
+					planet_size >= 10
+
+				}
+				add_modifier = { modifier = pdterra_rogue days = -1	}
+			}
 		}
 	}
 }
@@ -1351,7 +1342,7 @@ country_event = {
 	}
 }
 
-#Rogue Races Can Build Habitats
+#Rogue Races Can Build Habitat and get Dark Matter Tech
 country_event = {
 	id = "pdexotic.28"
 	hide_window = yes
@@ -1361,6 +1352,186 @@ country_event = {
 	trigger = {	has_origin = origin_pd_rogue_voidfarers }
 	
 	immediate = {
-		owner = { add_research_option = tech_habitat_1 }
+		owner = { 
+			add_research_option = tech_habitat_1 
+			give_technology = { 
+				tech = tech_mine_dark_matter
+				message = no
+			}
+		}
+	}
+}
+
+#Rogue World Collapse Star Event
+planet_event = {
+	id = "pdexotic.29"
+	hide_window = yes
+	
+	is_triggered_only = yes
+
+	trigger = {	space_owner = { has_origin = origin_pd_rogue_voidfarers } }
+	
+	immediate = {
+		solar_system = { 
+			set_star_class = sc_black_hole
+			every_system_planet = {
+				limit = {
+					OR = {
+						colonizable_planet = yes
+						has_modifier = terraforming_candidate
+					}
+				}
+				#People Are Angry if you kill people for some reasons, nerds
+				if = {
+					limit = {
+						has_observation_outpost = yes
+					}
+					observation_outpost = {
+						dismantle = yes
+					}
+				}		
+				#you've basically shortcutted terraforming. Yep, that's a breach
+				if = { 
+					limit = {
+						exists = space_owner
+						space_owner = {
+							is_same_value = from.owner
+						}
+						OR = {
+							NOT = { exists = owner }
+							owner = { is_same_value = from.owner }
+						}
+						OR = {
+							is_active_resolution = "resolution_ecology_environmental_control_board"
+							is_active_resolution = "resolution_ecology_paradise_initiative"
+						}
+					}
+					from.owner = {
+						set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+					}
+				}
+				#People Are Angry if you kill primative people for some reasons, nerds
+				if = {
+					limit = {
+						exists = owner
+						owner = { is_country_type = primitive }
+					}
+					# modifier for allies + those upset by genocide
+					every_country = {
+						limit = {
+							NOR = { is_same_value = from.space_owner }
+							OR = {
+								has_communications = from.space_owner
+								has_communications = root.space_owner
+							}
+							is_country_type = default
+							NOR = {
+								is_xenophobe = yes
+								is_homicidal = yes
+								is_xenophile = yes
+							}
+						}
+						add_opinion_modifier = {
+							modifier = opinion_pd_roguebh_a_primitive_world
+							who = from.space_owner
+						}
+					}
+					every_country = {
+						limit = {
+							NOR = { is_same_value = from.space_owner }
+							OR = {
+								has_communications = from.space_owner
+								has_communications = root.space_owner
+							}
+							OR = {
+								has_ai_personality = awakened_fallen_empire_xenophile
+								AND = {
+									is_country_type = default
+									is_xenophile = yes
+								}
+							}
+						}
+						add_opinion_modifier = {
+							modifier = opinion_pd_roguebh_a_primitive_world_phile
+							who = from.space_owner
+						}
+					}
+				}
+				#Whoopsie, did a genocide
+				if = {
+					limit = { 
+						planet = { is_colony = yes }
+					}
+					every_country = {
+						limit = {
+							has_communications = from.space_owner
+							NOT = { is_country = from.space_owner }
+							NOT = { is_same_species = FROMFROM.space_owner }
+							NOT = { has_ai_personality_behaviour = purger }
+							OR = {
+								is_country_type = default
+								has_ai_personality = awakened_fallen_empire_xenophile
+							}
+							has_intel_level = {
+								who = from.space_owner
+								category = economy
+								level >= 1
+							}
+						}
+						while = { 
+							count = 50
+							add_opinion_modifier = { 
+								who = from.space_owner 
+								modifier = opinion_genocidal 
+							}
+						}
+					}
+				}
+				change_pc = pc_rogue_barren
+				reset_planet = yes
+				remove_modifier = terraforming_candidate
+				add_modifier = { modifier = pdterra_rogue days = -1	}
+			} 
+			every_system_planet = {
+				limit = {
+					NOT = {
+					OR = {
+							colonizable_planet = yes
+							has_modifier = terraforming_candidate
+							is_planet_class = pc_gas_giant
+							is_planet_class = pc_gas_giant 
+							is_planet_class = pc_hot_gas_giant 
+							is_planet_class = pc_cold_gas_giant 
+							is_planet_class = pc_cloudless_gas_giant
+							is_planet_class = pc_rogue_barren
+							is_star = yes
+							is_artificial = yes
+							is_asteroid = yes
+						}
+					}
+				}
+				change_pc = pc_rogue_barren
+				reset_planet = yes
+			} 
+			every_system_planet = {
+				limit = { 
+					OR = {
+						is_planet_class = pc_gas_giant 
+						is_planet_class = pc_hot_gas_giant 
+						is_planet_class = pc_cold_gas_giant 
+						is_planet_class = pc_cloudless_gas_giant
+					}
+				}
+				change_pc = pc_rogue_gas_giant
+				reset_planet = yes
+			} 
+			every_system_planet = {
+				limit = { is_star = yes	}
+				change_pc = pc_black_hole
+				clear_deposits = yes
+				clear_planet_modifiers = yes
+				remove_modifier = pdroguestarcollapse
+			} 
+		}
 	}
 }
