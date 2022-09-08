@@ -70,8 +70,8 @@ def main():
   halfLevy.variableOpImp("change_local", "foreign_pop_percentage",2, valName="divide")
   # print(f'fileContent = "{fileContent}"')
   locClass.writeToMod(".","lotr_country_modifiers_from_script","z")
-  cdf.outputToFolderAndFile(fileContent , ".", "common/modifiers/br_racial_modifiers.txt" ,2,".", encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(lotr_pops , ".", "events/lotr_pops.txt" ,1,".", encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(fileContent , "common/modifiers", "br_racial_modifiers.txt" ,2,".", encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(lotr_pops , "events/", "lotr_pops.txt" ,1,".", encoding="utf-8-sig")
 
   relations = {
     "archers":        { "archers":0, "chariots":0, "heavyCavalry":-10, "heavyInfantry":10, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":0 },
@@ -134,7 +134,7 @@ def main():
   os.makedirs("units",exist_ok=True)
   for unit in units:
     d=unit.assemble(relations, properties, units)
-    cdf.outputToFolderAndFile(d , ".", f"common/units/army_{unit.name}.txt" ,2,".",encoding="utf-8-sig")
+    cdf.outputToFolderAndFile(d , "common/units", f"army_{unit.name}.txt" ,2,".",encoding="utf-8-sig")
 
     # unit.computeAllDamages(units,relations,properties)
     # print(f"  cost = {unit.computeCosts(properties)}")
@@ -148,6 +148,8 @@ def main():
       # print(line)
       split=line.split()
       key=split[0]
+      if key=="l_english:":
+        continue
       # print(f'key = "{key}"')
       key=key.replace("PROV", "").replace(":0", "")
       # print(f'key = "{key}"')
@@ -155,11 +157,41 @@ def main():
       # print(f'rest = "{rest}"')
       provinceNames[key]=rest
 
+  moveGroupNamesToNormal=False
+  if moveGroupNamesToNormal:
+    removeList=[]
+    for p,name in provinceNames.items():
+      if "_group" in p:
+        for i,s in enumerate(p):
+          if not s.isnumeric():
+            break
+        else:
+          i+=1
+        removeList.append(p)
+        newKey=p[:i]
+        print(f"Replacing {provinceNames[newKey]} with {name}")
+        provinceNames[newKey]=name
+    for p in removeList:
+      del provinceNames[p]
+
+    os.makedirs("out/localization/english", exist_ok=True)
+    with open("out/localization/english/provincenames_l_english.yml","w",encoding='utf-8-sig') as f:
+      f.write("l_english:\n")
+      for p,i in provinceNames.items():
+        f.write(f' PROV{p}:0 "{i}"\n')
 
   provinceFile=TagList(0)
   provinceFile.readFile("setup/provinces/00_default.txt",encoding='utf-8-sig')
+  applyModificationOnProvinces=False
+  if applyModificationOnProvinces:
+    provinceFileLatest=TagList(0)
+    provinceFileLatest.readFile("00_default_new.txt",encoding='utf-8-sig')
+    provinceFileOld=TagList(0)
+    provinceFileOld.readFile("00_default_old.txt",encoding='utf-8-sig')
   countryFile=TagList(0)
-  countryFile.readFile("setup/main/00_default.txt",encoding='utf-8-sig')
+  countryFile.readFile("setup/main/00_default.txt")
+  treasureFile=TagList(0)
+  treasureFile.readFile("setup/main/lotr_treasures.txt")
   climateFile=TagList(0)
   climateFile.readFile("map_data/climate.txt",encoding='utf-8')
   areaFile=TagList(0)
@@ -303,6 +335,8 @@ def main():
   # forceClimate["ralian_region"]="arid"
   # forceClimate["burskadekar_region"]="arid"
   # forceClimate["alduryaknar_region"]="arid"
+
+
   for name, terrain in provinceToTerrain.items():
     if terrain.strip('"') in ["caverns", "halls"] and name in provinceToArea:
       forceClimate[name]="mild_winter"
@@ -429,6 +463,15 @@ def main():
 
   strengthenSauron=False
   strengthenCarnDum=False
+
+  if applyModificationOnProvinces:
+    for i in range(len(provinceFile.names)):
+      j=provinceFile.names[i]
+      if j in provinceNames:
+        if not provinceFileLatest.vals[i].compare(provinceFileOld.vals[i]):
+          provinceFile.vals[i]=provinceFileLatest[i]
+
+
   provinceFile.applyOnAllLevel(removeComment)
   provinceFile.deleteOnLowestLevel(empty)
   tooManyNonOwnedPops=[ "balchoth", "rachoth", "nurnim", "variag", "nuriag", "khundolar", "jangovar", "yarlung", "tsang", "haradrim", "qarsag", "siranian", "yopi", "shayna", "mumakanim", "tulwany"]
@@ -439,10 +482,32 @@ def main():
     if j in provinceNames:
       provinceFile.comments[i]="#"+provinceNames[ j]
       culture=provinceFile.vals[i].get("culture").strip('"')
-    # if not j in ownedProvinces:
-    #   provinceFile.comments[i]+=" (unowned)"
+
+
+    # if culture=="tsang":
+    #   provinceFile.vals[i].set("culture",'"kargarim"')
+    # if culture=="yarlung":
+    #   provinceFile.vals[i].set("culture",'"yarlung"')
+    # if culture=="zhangzhung":
+    #   provinceFile.vals[i].set("culture",'"lutyr"')
+    # if culture=="sumpa":
+    #   provinceFile.vals[i].set("culture",'"lenitani"')
     if j in ownerCountry:
       provinceFile.comments[i]+=f" ({ownerCountry[j]})"
+    #   if ownerCountry[j] in ["XCX", "SIR", "YOP", "XRX", "QAR","XTX", "XIX","XUX","XNX", "XSX"]:
+    #     has_tribesmen_or_freemen=provinceFile.vals[i].count("freemen")
+    #     if provinceFile.vals[i].count("tribesmen"):
+    #       provinceFile.vals[i].get("tribesmen").set("amount",1)
+    #       has_tribesmen_or_freemen=True
+    #     if provinceFile.vals[i].count("slaves"):
+    #       provinceFile.vals[i].get("slaves").set("amount",1 if has_tribesmen_or_freemen else 2)
+    #     if ownerCountry[j] in ["SIR", "YOP", "XRX", "XIX","XNX"]:
+    #       provinceFile.vals[i].set("civilization_value",15 if has_tribesmen_or_freemen else 10)
+    #   if ownerCountry[j]=="XQX":
+    #     provinceFile.vals[i].set("civilization_value",25)
+    #     provinceFile.vals[i].set("culture",'"shayna"')
+
+
       if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
         tribes=provinceFile.vals[i].get("tribesmen").get("amount")
         if int(tribes)>4:
@@ -471,6 +536,16 @@ def main():
         provinceFile.comments[i]+=" (uninhabitable)"
       else:
         provinceFile.comments[i]+=" (unowned)"
+
+
+        # if culture in ["yopi", "qarsag"]:
+        #   if provinceFile.vals[i].count("tribesmen"):
+        #     provinceFile.vals[i].get("tribesmen").set("amount",2)
+        #   if provinceFile.vals[i].count("slaves"):
+        #     provinceFile.vals[i].get("slaves").set("amount",1)
+        # if culture in ["yopi"]:
+        #   provinceFile.vals[i].set("civilization_value",15)
+
         if culture=="beasts":
           for pop in pops:
             if provinceFile.vals[i].count(pop):
@@ -503,8 +578,46 @@ def main():
   # provinceFile.writeAll(open("provinceFile.txt","w",encoding='utf-8-sig'),cdf.args(2))
   # countryFile.writeAll(open("countryFile.txt","w",encoding='utf-8-sig'),cdf.args(4))
 
-  cdf.outputToFolderAndFile(provinceFile , ".", "setup/provinces/00_default.txt" ,2,".",False,encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(newClimate , ".", "map_data/climate.txt" ,4,".",encoding="utf-8")
+  for v in countryFile.get("family").get("families").vals:
+    if type(v)==TagList:
+      v.forceMultiLineOutput = True
+
+  removeList=[]
+  # countries = countryFile.get("country").get("countries")
+  for provinceId, provinceContent in treasureFile.get("provinces").getNameVal():
+    # print(f'provinceId = "{provinceId}"')
+    localTreasures=provinceContent.get("treasure_slots").get("treasures")
+    num=len(localTreasures.names)
+    province=provinceFile.get(provinceId)
+    if province.count("holy_site")==0:
+      removeList.append(provinceId)
+      country=countries.get(ownerCountry[provinceId])
+      treasures=country.getOrCreate("treasures")
+      for t in localTreasures.names:
+        treasures.add(t)
+      print(f'cannot hold any = "{provinceNames[provinceId]}". Moved to {ownerCountry[provinceId]}')
+    elif num==2 and province.get("province_rank").strip('"') in ["settlement",""]:
+      country=countries.get(ownerCountry[provinceId])
+      treasures=country.getOrCreate("treasures")
+      for t in localTreasures.names[1:]:
+        treasures.add(t)
+      localTreasures.names=localTreasures.names[:1]
+      print(f'cannot hold two = "{provinceNames[provinceId]}". Moved to {ownerCountry[provinceId]}')
+    elif num==3 and province.get("province_rank").strip('"') in ["city", "settlement",""]:
+      country=countries.get(ownerCountry[provinceId])
+      treasures=country.getOrCreate("treasures")
+      for t in localTreasures.names[2:]:
+        treasures.add(t)
+      localTreasures.names=localTreasures.names[:2]
+      print(f'cannot hold three = "{provinceNames[provinceId]}". Moved to {ownerCountry[provinceId]}')
+  for p in removeList:
+    treasureFile.get("provinces").remove(p)
+    # print(f'province = "{province.names}"')
+
+  cdf.outputToFolderAndFile(provinceFile , "setup/provinces", "00_default.txt" ,2,"out",False,encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(countryFile , "setup/main", "00_default.txt" ,4,"out",False)
+  cdf.outputToFolderAndFile(treasureFile , "setup/main", "lotr_treasures.txt" ,2,"out",False)
+  cdf.outputToFolderAndFile(newClimate , "map_data", "climate.txt" ,4,"out",encoding="utf-8")
   # cdf.outputToFolderAndFile(provinceFile , ".", "provinceFile.txt" ,2,".",encoding="utf-8-sig")
   # cdf.outputToFolderAndFile(countryFile , ".", "countryFile.txt" ,4,".",encoding="utf-8-sig")
   # cdf.outputToFolderAndFile(newClimate , ".", "climateFile.txt" ,4,".",encoding="utf-8-sig")
