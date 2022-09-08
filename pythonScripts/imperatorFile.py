@@ -8,6 +8,7 @@ import math
 import yaml
 from yaml.loader import SafeLoader
 from locList import LocList
+from random import randint
 
 
 def main():
@@ -142,6 +143,8 @@ def main():
     # print(f"  morale_damage_taken = {unit.computeMoraleDamageTaken(properties)}")
   # return
 
+  output_folder="."
+
   provinceNames={}
   with open("localization/english/provincenames_l_english.yml",encoding='utf-8-sig') as f:
     for line in f.readlines():
@@ -214,6 +217,7 @@ def main():
   # print(f'uninhabitable = "{uninhabitable}"')
 
 
+  provinceToCapitalType=dict()
   countries=countryFile.get("country").get("countries")
   # ownedProvinces=set()
   ownerCountry=dict()
@@ -224,6 +228,7 @@ def main():
       continue
     cores=vals.get("own_control_core")
     countryCulture[name]=vals.get("primary_culture")
+    provinceToCapitalType[vals.get("capital")]="country_capital"
     # print(f'cores = "{cores.vals}"')
     for core in cores.names:
       # ownedProvinces.add(core)
@@ -239,6 +244,9 @@ def main():
 
   for name, val in areaFile.getNameVal():
     if name:
+      cap=val.get("provinces").names[0]
+      if not cap in provinceToCapitalType:
+        provinceToCapitalType[cap]="state_capital"
       for p in val.get("provinces").names:
         provinceToArea[p]=name
         if not name in areaToProvince:
@@ -463,6 +471,8 @@ def main():
 
   strengthenSauron=False
   strengthenCarnDum=False
+  weakenAvari=False
+  weakenSouthernGoblins=False
 
   if applyModificationOnProvinces:
     for i in range(len(provinceFile.names)):
@@ -506,7 +516,18 @@ def main():
     #   if ownerCountry[j]=="XQX":
     #     provinceFile.vals[i].set("civilization_value",25)
     #     provinceFile.vals[i].set("culture",'"shayna"')
-
+      if weakenSouthernGoblins:
+        if ownerCountry[j]=="XLX":
+          reduceTribesmen(j, provinceFile.vals[i], provinceToCapitalType, 4, 6)
+        # and provinceFile.vals[i].count("tribesmen"):
+        #   tribes=provinceFile.vals[i].get("tribesmen").get("amount")
+        #   provinceFile.vals[i].get("tribesmen").set("amount",max(1,int(tribes)-randint(4,5)))
+      if weakenAvari:
+        if culture=="nandor":
+          reduceTribesmen(j, provinceFile.vals[i], provinceToCapitalType, 3, 4)
+        # and provinceFile.vals[i].count("tribesmen"):
+        #   tribes=provinceFile.vals[i].get("tribesmen").get("amount")
+        #   provinceFile.vals[i].get("tribesmen").set("amount",max(1,int(tribes)-randint(3,4)))
 
       if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
         tribes=provinceFile.vals[i].get("tribesmen").get("amount")
@@ -614,10 +635,10 @@ def main():
     treasureFile.get("provinces").remove(p)
     # print(f'province = "{province.names}"')
 
-  cdf.outputToFolderAndFile(provinceFile , "setup/provinces", "00_default.txt" ,2,"out",False,encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(countryFile , "setup/main", "00_default.txt" ,4,"out",False)
-  cdf.outputToFolderAndFile(treasureFile , "setup/main", "lotr_treasures.txt" ,2,"out",False)
-  cdf.outputToFolderAndFile(newClimate , "map_data", "climate.txt" ,4,"out",encoding="utf-8")
+  cdf.outputToFolderAndFile(provinceFile , "setup/provinces", "00_default.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(countryFile , "setup/main", "00_default.txt" ,4,output_folder,False)
+  cdf.outputToFolderAndFile(treasureFile , "setup/main", "lotr_treasures.txt" ,2,output_folder,False)
+  cdf.outputToFolderAndFile(newClimate , "map_data", "climate.txt" ,4,output_folder,encoding="utf-8")
   # cdf.outputToFolderAndFile(provinceFile , ".", "provinceFile.txt" ,2,".",encoding="utf-8-sig")
   # cdf.outputToFolderAndFile(countryFile , ".", "countryFile.txt" ,4,".",encoding="utf-8-sig")
   # cdf.outputToFolderAndFile(newClimate , ".", "climateFile.txt" ,4,".",encoding="utf-8-sig")
@@ -625,8 +646,18 @@ def main():
   # cdf.outputToFolderAndFile(regionFile , ".", "regionFile.txt" ,4,".",encoding="utf-8-sig")
 
 
-
-
+def reduceTribesmen(id, province, provinceToCapitalType, minRed, maxRed=None, stateCapitalFactor=0.5, capitalFactor=0):
+  if maxRed is None:
+    maxRed = minR
+  if province.count("tribesmen"):
+    factor = 1
+    if id in provinceToCapitalType:
+      if provinceToCapitalType[id]=="country_capital":
+        factor=capitalFactor
+      elif provinceToCapitalType[id]=="state_capital":
+        factor = stateCapitalFactor
+    tribes=province.get("tribesmen").get("amount")
+    province.get("tribesmen").set("amount",max(1,int(int(tribes)-factor*randint(minRed,maxRed))))
 
 
 
