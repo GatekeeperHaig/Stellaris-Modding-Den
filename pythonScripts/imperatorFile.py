@@ -566,12 +566,11 @@ def main():
         #     provinceFile.vals[i].get("slaves").set("amount",1)
         # if culture in ["yopi"]:
         #   provinceFile.vals[i].set("civilization_value",15)
-
         if culture=="beasts":
           for pop in pops:
             if provinceFile.vals[i].count(pop):
               provinceFile.vals[i].remove(pop)
-        elif culture and culture!="beasts" and culture !="spider":# or culture=="silvan":
+        elif culture and culture!="beasts" and culture !="spider" and not provinceFile.vals[i].get("terrain")=='"impassable_terrain"':# or culture=="silvan":
           empty=True
           for pop in pops:
             if provinceFile.vals[i].count(pop):
