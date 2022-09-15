@@ -72,7 +72,7 @@ def main():
   # print(f'fileContent = "{fileContent}"')
   locClass.writeToMod(".","lotr_country_modifiers_from_script","z")
   cdf.outputToFolderAndFile(fileContent , "common/modifiers", "br_racial_modifiers.txt" ,2,".", encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(lotr_pops , "events/", "lotr_pops.txt" ,1,".", encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(lotr_pops , "events/", "LOTR_pops.txt" ,1,".", encoding="utf-8-sig")
 
   relations = {
     "archers":        { "archers":0, "chariots":0, "heavyCavalry":-10, "heavyInfantry":10, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":0 },
@@ -93,8 +93,8 @@ def main():
     "lightCavalry":   { "cost":10, "assault":False, "speed":4, "maneuver":3, "morale":0, "strength":0, "attrition":50, "attritionLoss":5, "food":2.4, "consumption":0.25, "tradeGood":"horses"  },
     "lightInfantry":  { "cost":8, "assault":True, "speed":2.5, "maneuver":1, "morale":30, "strength":0, "attrition":-50, "attritionLoss":2.5, "food":2.4, "consumption":0.1  },
     "elephants":      { "cost":35, "assault":False, "speed":2.5, "maneuver":0, "morale":-20, "strength":50, "attrition":200, "attritionLoss":10, "food":1, "consumption":0.3, "tradeGood":"elephants", "levy_tier":"advanced", "ai_max_percentage":15  },
-    "supply_train":   { "cost":20, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":50, "consumption":0.05, "ai_max_percentage":15  },
-    "engineer_cohort":{ "cost":40, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":5, "consumption":0.05, "ai_max_percentage":15  },
+    "supply_train":   { "cost":20, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":50, "consumption":0.05, "ai_max_percentage":15, "levy_tier":"none"  },
+    "engineer_cohort":{ "cost":40, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":5, "consumption":0.05, "ai_max_percentage":15, "levy_tier":"none"  },
     "rangers":        { "cost":10, "assault":True, "speed":2.5, "maneuver":2, "morale":0, "strength":0, "attrition":-20, "attritionLoss":5, "food":2.4, "consumption":0.1  },
     "troll_infantry": { "cost":10, "assault":True, "speed":2.5, "maneuver":1, "morale":0, "strength":0, "attrition":150, "attritionLoss":5, "food":3, "consumption":0.3, "tradeGood":"iron", "levy_tier":"advanced", "ai_max_percentage":15  },
   }
@@ -135,7 +135,10 @@ def main():
   os.makedirs("units",exist_ok=True)
   for unit in units:
     d=unit.assemble(relations, properties, units)
-    cdf.outputToFolderAndFile(d , "common/units", f"army_{unit.name}.txt" ,2,".",encoding="utf-8-sig")
+    fileName=unit.name
+    if unit.name=="warelephant":
+      fileName="warelephants"
+    cdf.outputToFolderAndFile(d , "common/units", f"army_{fileName}.txt" ,2,".",encoding="utf-8-sig")
 
     # unit.computeAllDamages(units,relations,properties)
     # print(f"  cost = {unit.computeCosts(properties)}")
@@ -743,8 +746,15 @@ class Unit:
     data=topTag.addReturn(self.name)
     data.add("army", "yes")
     # if props["assault"]:
+    if self.category == "support":
+      data.add("support", "yes")
+      data.add("merc_cohorts_required", 8)
+      if self.name == "engineer_cohort":
+        data.add("reduces_road_building_cost", "yes")
+        data.add("watercrossing_negation", "1.0")
+        data.add("siege_impact", "1.0")
     data.add("assault", "yes" if props["assault"] else "no")
-    data.add("levy_tier", "advanced" if "levy_tier" in props else "basic")
+    data.add("levy_tier", props["levy_tier"] if "levy_tier" in props else "basic")
     if "tradeGood" in props:
       data.addReturn("allow").addReturn("trade_good_surplus").add("target", props["tradeGood"]).add("value",0,"", ">")
     data.add("maneuver", props["maneuver"])
