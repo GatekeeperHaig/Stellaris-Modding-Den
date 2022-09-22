@@ -3,5 +3,5 @@ tags={
 }
 name="Planetary Diversity - Gaia Worlds"
 picture="thumbnail.png"
-supported_version="3.4.*"
+supported_version="3.5.*"
 remote_file_id="2284514368"

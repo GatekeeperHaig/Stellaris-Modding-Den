@@ -7,5 +7,5 @@ name="Planetary Diversity - Shroud Worlds"
 dependencies={
 	"Planetary Diversity"
 }
-supported_version="3.4.*"
+supported_version="3.5.*"
 remote_file_id="1960179456"

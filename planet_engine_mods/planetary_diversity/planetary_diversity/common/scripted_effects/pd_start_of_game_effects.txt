@@ -5,6 +5,17 @@
 generate_pd_start_deposits_and_blockers = {
 	clear_deposits = yes
 	
+	if = {
+		limit = { has_planet_flag = toxic_knights_homeworld }
+		remove_building = building_commercial_zone
+	
+		add_deposit = d_toxic_god_blight_upon_the_land
+		add_deposit = d_toxic_god_deitys_swarms
+		add_deposit = d_toxic_god_pools_most_venemous
+		add_deposit = d_toxic_god_pestilential_wasteland
+		add_deposit = d_toxic_god_envenomed_seas
+	}
+
 	# blockers
 	if = {
 		limit = {
@@ -2187,7 +2198,6 @@ generate_pd_start_deposits_and_blockers = {
 				add_deposit = d_marvelous_oasis
 			}
 		}
-		add_deposit = d_salt_caves
 		if = { limit = { not = { has_modifier = pdsalt } } add_modifier = { modifier = pdsalt days = -1 } }
 	}
 
@@ -2229,7 +2239,6 @@ generate_pd_start_deposits_and_blockers = {
 				add_deposit = d_marvelous_oasis
 			}
 		}
-		add_deposit = d_aquifer_cave
 		if = { limit = { not = { has_modifier = pdaquifer } } add_modifier = { modifier = pdaquifer days = -1 } }
 	}
 
@@ -2479,7 +2488,6 @@ generate_pd_start_deposits_and_blockers = {
 				add_deposit = d_teeming_reef
 			}
 		}
-		add_deposit = d_great_reef
 		if = { limit = { not = { has_modifier = pdreef } } add_modifier = { modifier = pdreef days = -1 } }
 	}
 	
@@ -2521,6 +2529,58 @@ generate_pd_start_deposits_and_blockers = {
 		}	
 		add_deposit = d_aquatic_trench
 		if = { limit = { not = { has_modifier = aquatic } } add_modifier = { modifier = aquatic days = -1 } }
+	}
+	
+	if = {
+		limit = { is_planet_class = pc_pd_hycean }
+		
+		# 3 + 3 energy		
+		add_deposit = d_strong_currents			
+		add_deposit = d_underwater_jets
+		add_deposit = d_underwater_vent	
+		add_deposit = d_strong_currents			
+		add_deposit = d_underwater_jets
+		add_deposit = d_underwater_vent	
+		if = {
+			limit = { owner = { is_machine_empire = yes } }
+			add_deposit = d_underwater_jets		
+			add_deposit = d_underwater_jets		
+		}
+		if = {
+			limit = { owner = { has_valid_civic = civic_machine_servitor } }
+			add_deposit = d_strong_currents
+			add_deposit = d_strong_currents
+		}		
+		
+		# 3 + 3 mining
+		add_deposit = d_coral_deposit			
+		add_deposit = d_submerged_caves
+		add_deposit = d_submerged_ore_veins
+		add_deposit = d_coral_deposit			
+		add_deposit = d_submerged_caves
+		add_deposit = d_submerged_ore_veins
+		
+		# 4 + 3 farming
+		add_deposit = d_sea_grass
+		add_deposit = d_kelp_forests
+		add_deposit = d_sea_grass
+		add_deposit = d_kelp_forests
+		if = {
+			limit = { owner = { is_machine_empire = no } }
+			add_deposit = d_kelp_forests
+			add_deposit = d_kelp_forests
+
+			if = {
+				limit = { owner = { is_lithoid_empire = yes } }
+				add_deposit = d_submerged_ore_veins
+				add_deposit = d_submerged_ore_veins
+			}
+			else = {
+				add_deposit = d_teeming_reef
+				add_deposit = d_teeming_reef
+			}
+		}	
+		if = { limit = { not = { has_modifier = pd_hycean } } add_modifier = { modifier = pd_hycean days = -1 } }
 	}
 
 	if = {
@@ -3259,11 +3319,17 @@ pdhabitat_sol_system_setup = {
 			limit = { 
 				OR = { has_planet_flag = pd_habitat_start_earth has_planet_flag = pd_habitat_start }
 			}
-			remove_building =  building_research_lab_1
-			#add_building = building_foundry_1
+			#remove_building =  building_research_lab_1
 			add_modifier = { modifier = pd_moon_start_homeworld days = 7200 }
 			add_district = district_industrial
-			add_district = district_farming
+			#add_district = district_farming
+			remove_district = district_mining
+			while = {
+				count = 1
+				create_pop = {
+					species = owner_main_species
+				}
+			}
 		}
 		random_system_planet = {
 			limit = { has_planet_flag = pd_habitat_start_luna }
@@ -3276,8 +3342,8 @@ pdhabitat_sol_system_setup = {
 			}
 			set_planet_flag = pd_commercial_hab
 			set_planet_flag = pd_hab_d1
-			set_planet_flag = has_megastructure
 			add_district = district_pdhab_commercial
+			add_modifier = { modifier = pdhablevel1 days = -1 }
 			add_modifier = { modifier = pd_moon_start_moon days = 7200 }
 			IF = {
 				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
@@ -3295,6 +3361,7 @@ pdhabitat_sol_system_setup = {
 				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
 				add_modifier = { modifier = pdsulfuratmosphere days = -1	}
 			}
+			set_colony_type = col_dome_trade
 		}
 		random_system_planet = {
 			limit = { has_planet_flag = pd_habitat_start_mars }
@@ -3305,11 +3372,10 @@ pdhabitat_sol_system_setup = {
 					species = owner_main_species
 				}
 			}
-			set_planet_flag = pd_science_hab
-			set_planet_flag = pd_mining_hab
-			set_planet_flag = pd_hab_d1
-			set_planet_flag = pd_hab_d2
-			add_district = district_pdhab_science
+			reroll_deposits = yes
+			clear_blockers = yes
+			remove_deposit = d_prospectorium_strip_mine
+			add_modifier = { modifier = pdhablevel1 days = -1 }
 			add_modifier = { modifier = pd_moon_start_colony days = 7200 }
 			if = {
 				limit = { has_planet_flag = pdmars }
@@ -3318,6 +3384,7 @@ pdhabitat_sol_system_setup = {
 					picture = pc_pd_mars_hab
 				}
 			}
+			add_district = district_pdhab_mining
 			IF = {
 				limit = { owner = { has_trait = trait_pc_ammonia_preference } }
 				add_modifier = { modifier = pdammoniaatmosphere days = -1	}
@@ -3334,6 +3401,7 @@ pdhabitat_sol_system_setup = {
 				limit = { owner = { has_trait = trait_pc_sulfur_preference } }
 				add_modifier = { modifier = pdsulfuratmosphere days = -1	}
 			}
+			set_colony_type = col_dome_mining
 		}
 	}
 }

@@ -729,6 +729,7 @@ country_event = {
 
 	option = {
 		name = "pdexotic.12.a"
+		add_research_option = tech_pd_ammonia_suits_2
 	}
 }
 
@@ -747,6 +748,7 @@ country_event = {
 	}
 
 	immediate = {
+		add_research_option = tech_pd_ammonia_suits_3
 		every_owned_pop = {
 			limit = {
 				is_same_species = root
@@ -1260,6 +1262,7 @@ country_event = {
 country_event = {
 	id = "pdexotic.25"
 	hide_window = yes
+	fire_only_once = yes
 	
 	is_triggered_only = yes
 
@@ -1534,4 +1537,155 @@ planet_event = {
 			} 
 		}
 	}
+}
+
+#Hycean Habitat Set Up
+planet_event = {
+	id = pdexotic.30
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { has_planet_flag = pd_hycean_homeworld }
+			pd_hycean_habitat_setup = yes
+		}
+	}
+}
+
+#Gas Dwarf Spawning
+country_event = {
+	id = pdexotic.31
+	hide_window = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		every_galaxy_planet = { 
+			limit = { 
+				is_planet_class = pc_gas_giant
+				not = { has_modifier = terraforming_candidate }	
+				solar_system = { NOT = { has_star_flag = empire_home_system } }
+			}	
+			random_list = {
+				10 = { 
+					change_pc = pc_dwarf_gas_giant
+					this = { clear_deposits = yes }
+					change_planet_size = 10
+				}
+				90 = { }	
+			}
+		}
+	}
+}
+
+#Hycean Empire gains Gas Dwarf 
+country_event = {
+	id = "pdexotic.32"
+	hide_window = yes
+	
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { 
+			has_origin = origin_pd_hycean_aquatic
+		}	
+	}
+	immediate = {
+		from = { 
+			every_system_planet = {
+				limit = {
+					is_planet_class = pc_dwarf_gas_giant
+					NOT = { has_modifier = hycean_terraforming_candidate}
+				}
+				add_modifier = { modifier = hycean_terraforming_candidate days = -1 }
+			}
+		}
+	}
+}
+
+#Non Hycean gains Hycean Gas Dwarf 
+country_event = {
+	id = "pdexotic.33"
+	hide_window = yes
+	
+	is_triggered_only = yes
+
+	trigger = {
+		owner = { 
+			NOT = { 
+				has_origin = origin_pd_hycean_aquatic 
+			} 
+		}
+	}
+	immediate = {
+		from = { 
+			every_system_planet = {
+				limit = {
+					has_modifier = hycean_terraforming_candidate
+				}
+				remove_modifier = hycean_terraforming_candidate
+			}
+		}
+	}
+}
+
+#Hycean Megastructures
+country_event = {
+    id = pdexotic.34
+    hide_window = yes
+    is_triggered_only = yes
+    trigger = {
+        owner = { has_trait = trait_pc_pd_hycean_preference }
+    }
+    immediate = {
+        every_planet_within_border = {
+			IF = {
+				limit = { 
+					OR = {
+					is_planet_class = pc_habitat 
+					is_planet_class = pc_pd_barren_hab
+					is_planet_class = pc_pd_barren_cold_hab
+					is_planet_class = pc_pd_frozen_hab
+					is_planet_class = pc_pd_molten_hab
+					is_planet_class = pc_pd_hothouse_hab
+					is_planet_class = pc_pd_toxic_hab
+					is_planet_class = pc_pd_gas_giant_hab
+					is_planet_class = pc_pd_asteroid_hab
+					}
+					NOT = { has_modifier = hyceanfloodedhabitat }
+					is_colony = no
+				}	
+				add_modifier = { modifier = hyceanfloodedhabitat days = -1 }
+				set_planet_entity = { picture = pc_hyceanhabitat }
+				IF = {
+					limit = {
+						is_planet_class = pc_habitat
+					}
+					set_planet_entity = { entity = "habitat_phase_01_entity" graphical_culture = from }
+				}
+			}
+			IF = {
+				limit = { 
+					is_planet_class = "pc_ringworld_habitable" 
+					NOT = { has_modifier = hyceanfloodedworld }
+					is_colony = no
+				}	
+				add_modifier = { modifier = hyceanfloodedworld days = -1 }
+				set_planet_entity = { picture = pc_pd_hycean entity = hycean_01_ringworld_habitable_entity_01_entity  }
+            }
+			IF = {
+				limit = { 
+					is_planet_class = pc_ringworld_seam
+				}	
+				set_planet_entity = { entity = aquatic_01_ringworld_seam_entity_01_entity }
+            }
+			IF = {
+				limit = { 
+					is_planet_class = pc_ringworld_tech
+				}	
+				set_planet_entity = { entity = aquatic_01_ringworld_tech_entity_01_entity }
+            }
+        }
+    }
 }

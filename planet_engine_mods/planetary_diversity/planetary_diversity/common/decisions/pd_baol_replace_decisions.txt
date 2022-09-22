@@ -17,6 +17,8 @@ decision_baol_life_seed = {
 			is_planet_class = pc_city
 			is_planet_class = pc_relic
 			is_planet_class = pc_milarc_relic
+			is_planet_class = pc_pd_wasteland
+			is_planet_class = pc_pd_tidally_wasteland
 		}
 		is_pd_shroud_world = no
 		is_pd_hive_world = no
@@ -24,8 +26,12 @@ decision_baol_life_seed = {
 		is_pd_unique = no
 		is_pd_arcology = no
 		is_pd_machine = no
+		is_pd_exotic = no
 		exists = owner
 		owner = { has_country_flag = relic_last_baol_activated }
+		owner = {
+			has_country_flag = not_activated_baol
+		}
 	}
 	
 	allow = { }
@@ -47,13 +53,27 @@ decision_baol_life_seed = {
 			}
 			if = {
 				limit = { 
-					NOT = { is_planet_class = pc_tidallygaia }
+					OR = {
+						NOT = { is_planet_class = pc_tidallylocked }
+						NOT = { is_planet_class = pc_wettidallylocked }
+						NOT = { is_planet_class = pc_eyeball }
+					}
 				}
 				change_pc = pc_gaia
 			}
 			if = {
 				limit = { NOT = { exists = event_target:nu_baol_species } }
-				create_nu_baol_effect = yes
+				if = {
+					limit = {
+						owner = {
+							is_hive_empire = yes
+						}
+					}
+					create_hive_nu_baol_effect = yes
+				}
+				else = {
+					create_nu_baol_effect = yes
+				}
 			}
 			while = {
 				count = 4
