@@ -25,6 +25,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     self.vals=[]
     self.comments=[]
     self.seperators=[] #"=" by default
+    self.forceMultiLineOutput=False
     if val!=0:
       self.bracketLevel=0
       self.add(levelOrName,val,comment,sep)
@@ -280,6 +281,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         file.write(name+" ")
     file.write("}")
   def oneLineWriteCheck(self,args=0):
+    if self.forceMultiLineOutput:
+      return False
     if args==0 or args.one_line_level<0.5:
       return False
     for comment in self.comments:

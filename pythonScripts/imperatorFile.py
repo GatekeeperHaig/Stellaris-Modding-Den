@@ -8,6 +8,7 @@ import math
 import yaml
 from yaml.loader import SafeLoader
 from locList import LocList
+from random import randint
 
 
 def main():
@@ -70,8 +71,8 @@ def main():
   halfLevy.variableOpImp("change_local", "foreign_pop_percentage",2, valName="divide")
   # print(f'fileContent = "{fileContent}"')
   locClass.writeToMod(".","lotr_country_modifiers_from_script","z")
-  cdf.outputToFolderAndFile(fileContent , ".", "common/modifiers/br_racial_modifiers.txt" ,2,".", encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(lotr_pops , ".", "events/lotr_pops.txt" ,1,".", encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(fileContent , "common/modifiers", "br_racial_modifiers.txt" ,2,".", encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(lotr_pops , "events/", "LOTR_pops.txt" ,1,".", encoding="utf-8-sig")
 
   relations = {
     "archers":        { "archers":0, "chariots":0, "heavyCavalry":-10, "heavyInfantry":10, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":0 },
@@ -92,8 +93,8 @@ def main():
     "lightCavalry":   { "cost":10, "assault":False, "speed":4, "maneuver":3, "morale":0, "strength":0, "attrition":50, "attritionLoss":5, "food":2.4, "consumption":0.25, "tradeGood":"horses"  },
     "lightInfantry":  { "cost":8, "assault":True, "speed":2.5, "maneuver":1, "morale":30, "strength":0, "attrition":-50, "attritionLoss":2.5, "food":2.4, "consumption":0.1  },
     "elephants":      { "cost":35, "assault":False, "speed":2.5, "maneuver":0, "morale":-20, "strength":50, "attrition":200, "attritionLoss":10, "food":1, "consumption":0.3, "tradeGood":"elephants", "levy_tier":"advanced", "ai_max_percentage":15  },
-    "supply_train":   { "cost":20, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":50, "consumption":0.05, "ai_max_percentage":15  },
-    "engineer_cohort":{ "cost":40, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":5, "consumption":0.05, "ai_max_percentage":15  },
+    "supply_train":   { "cost":20, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":50, "consumption":0.05, "ai_max_percentage":15, "levy_tier":"none"  },
+    "engineer_cohort":{ "cost":40, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":5, "consumption":0.05, "ai_max_percentage":15, "levy_tier":"none"  },
     "rangers":        { "cost":10, "assault":True, "speed":2.5, "maneuver":2, "morale":0, "strength":0, "attrition":-20, "attritionLoss":5, "food":2.4, "consumption":0.1  },
     "troll_infantry": { "cost":10, "assault":True, "speed":2.5, "maneuver":1, "morale":0, "strength":0, "attrition":150, "attritionLoss":5, "food":3, "consumption":0.3, "tradeGood":"iron", "levy_tier":"advanced", "ai_max_percentage":15  },
   }
@@ -134,7 +135,10 @@ def main():
   os.makedirs("units",exist_ok=True)
   for unit in units:
     d=unit.assemble(relations, properties, units)
-    cdf.outputToFolderAndFile(d , ".", f"common/units/army_{unit.name}.txt" ,2,".",encoding="utf-8-sig")
+    fileName=unit.name
+    if unit.name=="warelephant":
+      fileName="warelephants"
+    cdf.outputToFolderAndFile(d , "common/units", f"army_{fileName}.txt" ,2,".",encoding="utf-8-sig")
 
     # unit.computeAllDamages(units,relations,properties)
     # print(f"  cost = {unit.computeCosts(properties)}")
@@ -142,12 +146,16 @@ def main():
     # print(f"  morale_damage_taken = {unit.computeMoraleDamageTaken(properties)}")
   # return
 
+  output_folder="."
+
   provinceNames={}
   with open("localization/english/provincenames_l_english.yml",encoding='utf-8-sig') as f:
     for line in f.readlines():
       # print(line)
       split=line.split()
       key=split[0]
+      if key=="l_english:":
+        continue
       # print(f'key = "{key}"')
       key=key.replace("PROV", "").replace(":0", "")
       # print(f'key = "{key}"')
@@ -155,11 +163,41 @@ def main():
       # print(f'rest = "{rest}"')
       provinceNames[key]=rest
 
+  moveGroupNamesToNormal=False
+  if moveGroupNamesToNormal:
+    removeList=[]
+    for p,name in provinceNames.items():
+      if "_group" in p:
+        for i,s in enumerate(p):
+          if not s.isnumeric():
+            break
+        else:
+          i+=1
+        removeList.append(p)
+        newKey=p[:i]
+        print(f"Replacing {provinceNames[newKey]} with {name}")
+        provinceNames[newKey]=name
+    for p in removeList:
+      del provinceNames[p]
+
+    os.makedirs("out/localization/english", exist_ok=True)
+    with open("out/localization/english/provincenames_l_english.yml","w",encoding='utf-8-sig') as f:
+      f.write("l_english:\n")
+      for p,i in provinceNames.items():
+        f.write(f' PROV{p}:0 "{i}"\n')
 
   provinceFile=TagList(0)
   provinceFile.readFile("setup/provinces/00_default.txt",encoding='utf-8-sig')
+  applyModificationOnProvinces=False
+  if applyModificationOnProvinces:
+    provinceFileLatest=TagList(0)
+    provinceFileLatest.readFile("00_default_new.txt",encoding='utf-8-sig')
+    provinceFileOld=TagList(0)
+    provinceFileOld.readFile("00_default_old.txt",encoding='utf-8-sig')
   countryFile=TagList(0)
-  countryFile.readFile("setup/main/00_default.txt",encoding='utf-8-sig')
+  countryFile.readFile("setup/main/00_default.txt")
+  treasureFile=TagList(0)
+  treasureFile.readFile("setup/main/lotr_treasures.txt")
   climateFile=TagList(0)
   climateFile.readFile("map_data/climate.txt",encoding='utf-8')
   areaFile=TagList(0)
@@ -182,6 +220,7 @@ def main():
   # print(f'uninhabitable = "{uninhabitable}"')
 
 
+  provinceToCapitalType=dict()
   countries=countryFile.get("country").get("countries")
   # ownedProvinces=set()
   ownerCountry=dict()
@@ -192,6 +231,7 @@ def main():
       continue
     cores=vals.get("own_control_core")
     countryCulture[name]=vals.get("primary_culture")
+    provinceToCapitalType[vals.get("capital")]="country_capital"
     # print(f'cores = "{cores.vals}"')
     for core in cores.names:
       # ownedProvinces.add(core)
@@ -207,6 +247,9 @@ def main():
 
   for name, val in areaFile.getNameVal():
     if name:
+      cap=val.get("provinces").names[0]
+      if not cap in provinceToCapitalType:
+        provinceToCapitalType[cap]="state_capital"
       for p in val.get("provinces").names:
         provinceToArea[p]=name
         if not name in areaToProvince:
@@ -303,6 +346,8 @@ def main():
   # forceClimate["ralian_region"]="arid"
   # forceClimate["burskadekar_region"]="arid"
   # forceClimate["alduryaknar_region"]="arid"
+
+
   for name, terrain in provinceToTerrain.items():
     if terrain.strip('"') in ["caverns", "halls"] and name in provinceToArea:
       forceClimate[name]="mild_winter"
@@ -429,6 +474,17 @@ def main():
 
   strengthenSauron=False
   strengthenCarnDum=False
+  weakenAvari=False
+  weakenSouthernGoblins=False
+
+  if applyModificationOnProvinces:
+    for i in range(len(provinceFile.names)):
+      j=provinceFile.names[i]
+      if j in provinceNames:
+        if not provinceFileLatest.vals[i].compare(provinceFileOld.vals[i]):
+          provinceFile.vals[i]=provinceFileLatest[i]
+
+
   provinceFile.applyOnAllLevel(removeComment)
   provinceFile.deleteOnLowestLevel(empty)
   tooManyNonOwnedPops=[ "balchoth", "rachoth", "nurnim", "variag", "nuriag", "khundolar", "jangovar", "yarlung", "tsang", "haradrim", "qarsag", "siranian", "yopi", "shayna", "mumakanim", "tulwany"]
@@ -439,10 +495,43 @@ def main():
     if j in provinceNames:
       provinceFile.comments[i]="#"+provinceNames[ j]
       culture=provinceFile.vals[i].get("culture").strip('"')
-    # if not j in ownedProvinces:
-    #   provinceFile.comments[i]+=" (unowned)"
+
+
+    # if culture=="tsang":
+    #   provinceFile.vals[i].set("culture",'"kargarim"')
+    # if culture=="yarlung":
+    #   provinceFile.vals[i].set("culture",'"yarlung"')
+    # if culture=="zhangzhung":
+    #   provinceFile.vals[i].set("culture",'"lutyr"')
+    # if culture=="sumpa":
+    #   provinceFile.vals[i].set("culture",'"lenitani"')
     if j in ownerCountry:
       provinceFile.comments[i]+=f" ({ownerCountry[j]})"
+    #   if ownerCountry[j] in ["XCX", "SIR", "YOP", "XRX", "QAR","XTX", "XIX","XUX","XNX", "XSX"]:
+    #     has_tribesmen_or_freemen=provinceFile.vals[i].count("freemen")
+    #     if provinceFile.vals[i].count("tribesmen"):
+    #       provinceFile.vals[i].get("tribesmen").set("amount",1)
+    #       has_tribesmen_or_freemen=True
+    #     if provinceFile.vals[i].count("slaves"):
+    #       provinceFile.vals[i].get("slaves").set("amount",1 if has_tribesmen_or_freemen else 2)
+    #     if ownerCountry[j] in ["SIR", "YOP", "XRX", "XIX","XNX"]:
+    #       provinceFile.vals[i].set("civilization_value",15 if has_tribesmen_or_freemen else 10)
+    #   if ownerCountry[j]=="XQX":
+    #     provinceFile.vals[i].set("civilization_value",25)
+    #     provinceFile.vals[i].set("culture",'"shayna"')
+      if weakenSouthernGoblins:
+        if ownerCountry[j]=="XLX":
+          reduceTribesmen(j, provinceFile.vals[i], provinceToCapitalType, 4, 6)
+        # and provinceFile.vals[i].count("tribesmen"):
+        #   tribes=provinceFile.vals[i].get("tribesmen").get("amount")
+        #   provinceFile.vals[i].get("tribesmen").set("amount",max(1,int(tribes)-randint(4,5)))
+      if weakenAvari:
+        if culture=="nandor":
+          reduceTribesmen(j, provinceFile.vals[i], provinceToCapitalType, 3, 4)
+        # and provinceFile.vals[i].count("tribesmen"):
+        #   tribes=provinceFile.vals[i].get("tribesmen").get("amount")
+        #   provinceFile.vals[i].get("tribesmen").set("amount",max(1,int(tribes)-randint(3,4)))
+
       if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
         tribes=provinceFile.vals[i].get("tribesmen").get("amount")
         if int(tribes)>4:
@@ -471,11 +560,20 @@ def main():
         provinceFile.comments[i]+=" (uninhabitable)"
       else:
         provinceFile.comments[i]+=" (unowned)"
+
+
+        # if culture in ["yopi", "qarsag"]:
+        #   if provinceFile.vals[i].count("tribesmen"):
+        #     provinceFile.vals[i].get("tribesmen").set("amount",2)
+        #   if provinceFile.vals[i].count("slaves"):
+        #     provinceFile.vals[i].get("slaves").set("amount",1)
+        # if culture in ["yopi"]:
+        #   provinceFile.vals[i].set("civilization_value",15)
         if culture=="beasts":
           for pop in pops:
             if provinceFile.vals[i].count(pop):
               provinceFile.vals[i].remove(pop)
-        elif culture and culture!="beasts" and culture !="spider":# or culture=="silvan":
+        elif culture and culture!="beasts" and culture !="spider" and not provinceFile.vals[i].get("terrain")=='"impassable_terrain"':# or culture=="silvan":
           empty=True
           for pop in pops:
             if provinceFile.vals[i].count(pop):
@@ -503,8 +601,46 @@ def main():
   # provinceFile.writeAll(open("provinceFile.txt","w",encoding='utf-8-sig'),cdf.args(2))
   # countryFile.writeAll(open("countryFile.txt","w",encoding='utf-8-sig'),cdf.args(4))
 
-  cdf.outputToFolderAndFile(provinceFile , ".", "setup/provinces/00_default.txt" ,2,".",False,encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(newClimate , ".", "map_data/climate.txt" ,4,".",encoding="utf-8")
+  for v in countryFile.get("family").get("families").vals:
+    if type(v)==TagList:
+      v.forceMultiLineOutput = True
+
+  removeList=[]
+  # countries = countryFile.get("country").get("countries")
+  for provinceId, provinceContent in treasureFile.get("provinces").getNameVal():
+    # print(f'provinceId = "{provinceId}"')
+    localTreasures=provinceContent.get("treasure_slots").get("treasures")
+    num=len(localTreasures.names)
+    province=provinceFile.get(provinceId)
+    if province.count("holy_site")==0:
+      removeList.append(provinceId)
+      country=countries.get(ownerCountry[provinceId])
+      treasures=country.getOrCreate("treasures")
+      for t in localTreasures.names:
+        treasures.add(t)
+      print(f'cannot hold any = "{provinceNames[provinceId]}". Moved to {ownerCountry[provinceId]}')
+    elif num==2 and province.get("province_rank").strip('"') in ["settlement",""]:
+      country=countries.get(ownerCountry[provinceId])
+      treasures=country.getOrCreate("treasures")
+      for t in localTreasures.names[1:]:
+        treasures.add(t)
+      localTreasures.names=localTreasures.names[:1]
+      print(f'cannot hold two = "{provinceNames[provinceId]}". Moved to {ownerCountry[provinceId]}')
+    elif num==3 and province.get("province_rank").strip('"') in ["city", "settlement",""]:
+      country=countries.get(ownerCountry[provinceId])
+      treasures=country.getOrCreate("treasures")
+      for t in localTreasures.names[2:]:
+        treasures.add(t)
+      localTreasures.names=localTreasures.names[:2]
+      print(f'cannot hold three = "{provinceNames[provinceId]}". Moved to {ownerCountry[provinceId]}')
+  for p in removeList:
+    treasureFile.get("provinces").remove(p)
+    # print(f'province = "{province.names}"')
+
+  cdf.outputToFolderAndFile(provinceFile , "setup/provinces", "00_default.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(countryFile , "setup/main", "00_default.txt" ,4,output_folder,False)
+  cdf.outputToFolderAndFile(treasureFile , "setup/main", "lotr_treasures.txt" ,2,output_folder,False)
+  cdf.outputToFolderAndFile(newClimate , "map_data", "climate.txt" ,4,output_folder,encoding="utf-8")
   # cdf.outputToFolderAndFile(provinceFile , ".", "provinceFile.txt" ,2,".",encoding="utf-8-sig")
   # cdf.outputToFolderAndFile(countryFile , ".", "countryFile.txt" ,4,".",encoding="utf-8-sig")
   # cdf.outputToFolderAndFile(newClimate , ".", "climateFile.txt" ,4,".",encoding="utf-8-sig")
@@ -512,8 +648,18 @@ def main():
   # cdf.outputToFolderAndFile(regionFile , ".", "regionFile.txt" ,4,".",encoding="utf-8-sig")
 
 
-
-
+def reduceTribesmen(id, province, provinceToCapitalType, minRed, maxRed=None, stateCapitalFactor=0.5, capitalFactor=0):
+  if maxRed is None:
+    maxRed = minR
+  if province.count("tribesmen"):
+    factor = 1
+    if id in provinceToCapitalType:
+      if provinceToCapitalType[id]=="country_capital":
+        factor=capitalFactor
+      elif provinceToCapitalType[id]=="state_capital":
+        factor = stateCapitalFactor
+    tribes=province.get("tribesmen").get("amount")
+    province.get("tribesmen").set("amount",max(1,int(int(tribes)-factor*randint(minRed,maxRed))))
 
 
 
@@ -600,8 +746,15 @@ class Unit:
     data=topTag.addReturn(self.name)
     data.add("army", "yes")
     # if props["assault"]:
+    if self.category == "support":
+      data.add("support", "yes")
+      data.add("merc_cohorts_required", 8)
+      if self.name == "engineer_cohort":
+        data.add("reduces_road_building_cost", "yes")
+        data.add("watercrossing_negation", "1.0")
+        data.add("siege_impact", "1.0")
     data.add("assault", "yes" if props["assault"] else "no")
-    data.add("levy_tier", "advanced" if "levy_tier" in props else "basic")
+    data.add("levy_tier", props["levy_tier"] if "levy_tier" in props else "basic")
     if "tradeGood" in props:
       data.addReturn("allow").addReturn("trade_good_surplus").add("target", props["tradeGood"]).add("value",0,"", ">")
     data.add("maneuver", props["maneuver"])
