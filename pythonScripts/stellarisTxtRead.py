@@ -26,6 +26,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     self.comments=[]
     self.seperators=[] #"=" by default
     self.forceMultiLineOutput=False
+    self.forceNoSpace=False
     if val!=0:
       self.bracketLevel=0
       self.add(levelOrName,val,comment,sep)
@@ -162,6 +163,16 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     #   if len(string)>0:
     #     self.vals[i].addString(string)
     return self.vals[i]
+  def sort(self, sortType=str, skip=0):
+    if sortType!=str:
+      self.names[skip:]=[sortType(n) for n in self.names[skip:]]
+    d={n:(v,c,s) for n,v,c,s in self.getAll()}
+    self.names[skip:]=sorted(self.names[skip:])
+    # print(f'self.names = "{self.names}"')
+    self.vals=[d[n][0] for n in self.names]
+    self.comments=[d[n][1] for n in self.names]
+    self.seperators=[d[n][2] for n in self.names]
+    self.names[skip:]=[str(n) for n in self.names[skip:]]
   def giveCorrectLevel(self,parent):
     self.bracketLevel=parent.bracketLevel+1
     for val in self.vals:
@@ -253,7 +264,10 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     commentDone=False
     if not isinstance(self.vals[i],TagList):
       if len(str(self.vals[i]))>0:
-        file.write(" {!s} {!s}".format(self.seperators[i],self.vals[i]))
+        if self.forceNoSpace:
+          file.write("{!s}{!s}".format(self.seperators[i],self.vals[i]))
+        else:
+          file.write(" {!s} {!s}".format(self.seperators[i],self.vals[i]))
     else:
       if hasName:
         file.write(" {!s} ".format(self.seperators[i]))
