@@ -11,6 +11,8 @@ from locList import LocList
 from random import randint
 from PIL import Image
 from copy import copy
+import pickle
+import random
 
 
 
@@ -246,27 +248,34 @@ def main():
   provinceLocators.readFile("gfx/map/map_object_data/vfx_locators.txt",encoding='utf-8-sig')
   cityLocators=TagList(0)
   cityLocators.readFile("gfx/map/map_object_data/city_locators.txt",encoding='utf-8-sig')
-  fortLocators=TagList(0)
-  fortLocators.readFile("gfx/map/map_object_data/fort_locators.txt",encoding='utf-8-sig')
-  combatLocators=TagList(0)
-  combatLocators.readFile("gfx/map/map_object_data/combat_locators.txt",encoding='utf-8-sig')
+
+  # with open("gfx/map/map_object_data/oak_tree_generator_3.txt",'r', encoding='utf-8-sig') as inputFile:
+  #   oakFile=[line for line in inputFile]
+  #   oakFile=oakFile[:9] #just use the header, rest is added by script
+  # with open("gfx/map/map_object_data/pine_tree_generator_2.txt",'r', encoding='utf-8-sig') as inputFile:
+  #   pineFile=[line for line in inputFile]
+  #   pineFile=pineFile[:9] #just use the header, rest is added by script
+  # fortLocators=TagList(0)
+  # fortLocators.readFile("gfx/map/map_object_data/fort_locators.txt",encoding='utf-8-sig')
+  # combatLocators=TagList(0)
+  # combatLocators.readFile("gfx/map/map_object_data/combat_locators.txt",encoding='utf-8-sig')
 
   locs=provinceLocators.get("game_object_locator").get("instances")
   provinceToLocation=[None for _ in locs.vals]
   provinceToCityLocation=[None for _ in locs.vals]
-  provinceToFortLocation=[None for _ in locs.vals]
-  provinceToCombatLocation=[None for _ in locs.vals]
+  # provinceToFortLocation=[None for _ in locs.vals]
+  # provinceToCombatLocation=[None for _ in locs.vals]
   for loc in locs.vals:
     provinceToLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
   locs=cityLocators.get("game_object_locator").get("instances")
   for loc in locs.vals:
     provinceToCityLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
-  locs=fortLocators.get("game_object_locator").get("instances")
-  for loc in locs.vals:
-    provinceToFortLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
-  locs=combatLocators.get("game_object_locator").get("instances")
-  for loc in locs.vals:
-    provinceToCombatLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
+  # locs=fortLocators.get("game_object_locator").get("instances")
+  # for loc in locs.vals:
+  #   provinceToFortLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
+  # locs=combatLocators.get("game_object_locator").get("instances")
+  # for loc in locs.vals:
+  #   provinceToCombatLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
 
   # cdf.outputToFolderAndFile(climateFile , ".", "climateFile.txt" ,4,".",encoding="utf-8-sig")
 
@@ -335,14 +344,118 @@ def main():
     if name:
       provinceToTerrain[name]=val.get("terrain")
 
-
   heightMap=ImageRead("map_data/heightmap.png")
+  with open("map_data/definition.csv",'r') as file:
+    provinceDefinitions=[line.strip().split(";") for line in file if len(line.split(";"))>1 and not line.startswith("#")]
+  provinceToColor=[None for _ in provinceDefinitions]
+  colorToProvince=dict()
+  provinceToPixels=[ [] for _ in provinceDefinitions]
+
+  def colorToString(l):
+    s=""
+    for e in l:
+      s+=f"{e:03}"
+    return s
+  for line in provinceDefinitions:
+    provinceToColor[int(line[0])]=list(map(int,line[1:4]))
+    colorToProvince[colorToString(map(int,line[1:4]))]=int(line[0])
+  # print(f'colorToProvince = "{colorToProvince}"')
+  del provinceDefinitions
+
+  updateProvincePixels=False
+  if updateProvincePixels or not os.path.exists("assign.bin"):
+    provinceImage=ImageRead("map_data/provinces.png")
+    xM=provinceImage.im.size[0]
+    yM=provinceImage.im.size[1]
+    riverImage=ImageRead("map_data/rivers.png")
+    for i in range(provinceImage.im.size[0]):
+      for j in range(provinceImage.im.size[1]):
+        # print(f'riverImage.c(i,j) = "{riverImage.c(i,j)}"')
+        valid=True
+        for x in range(-1,2):
+          for y in range(-1,2):
+            ii=i+x
+            jj=j+y
+            if ii>=0 and ii<xM and jj>=0 and jj<yM and riverImage.c(ii,jj)<250:
+              valid=False
+        if valid:
+        # if riverImage.c(i,j)>250:
+          provinceToPixels[colorToProvince[colorToString(provinceImage.c(i,j))]]+=(i,j)
+
+
+    with open("assign.bin",'wb') as file:
+      pickle.dump(provinceToPixels, file)
+  else:
+    with open("assign.bin",'rb') as file:
+      provinceToPixels = pickle.load(file)
+
+  # print(f'provinceToPixels[2898] = "{provinceToPixels[2898]}"')
+
+  oakLayer="oak_tree_layer"
+  oakA="tree_oak_2_mesh"
+  oakB="tree_oak_2_variation_1_mesh"
+  oakC="tree_oak_2_variation_2_mesh"
+  oakTrees=[]
+  oakTreeSplit=[[] for _ in range(3)]
+
+  treeLayer="tree_layer"
+  pine="tree_pine_01_mesh"
+  pineTrees=[]
+  "tree_olive_01_mesh"
+  "tree_palm_mesh"
+  "tree_india_01_mesh"
+  "tree_cypress_01_mesh"
+
+  def makeTree(c, rotation=[0,random.random(),0,random.random()], size=random.uniform(0.9,1)):
+    coord=[c[0]+random.uniform(-0.45,0.45),0,c[1]+random.uniform(-0.45,0.45)]
+    return " ".join(map('{:.6f}'.format,coord+rotation+[size for _ in range(3)]))
+
+
+  def generateTrees(provinceId, number):
+    t=provinceToPixels[provinceId]
+    t2=[None for _ in range(len(t)//2)]
+    for i in range(len(t)//2):
+      t2[i]=(t[2*i],t[2*i+1])
+    r=random.choices(t2, k=number)
+    for c in r:
+      h = heightMap.p(*c)
+      if h<7.5 or h>18:
+        continue
+      # coord=[c[0]+random.uniform(-0.45,0.45),0,c[1]+random.uniform(-0.45,0.45)]
+      # rotation=[0,random.random(),0,random.random()]
+      # size=random.uniform(0.9,1)
+      if h<random.randint(15,16):
+        oakTrees.append(makeTree(c))
+        # oakFile.append(" ".join(map('{:.6f}'.format,coord+rotation+[size for _ in range(3)]))+"\n")
+      else:
+        pineTrees.append(makeTree(c))
+        # pineFile.append(" ".join(map('{:.6f}'.format,coord+rotation+[size for _ in range(3)]))+"\n")
+  for area in ["jayir_ahar_area","murgarm_area","lokhas_area"]:
+    for province in areaToProvince[area]:
+      generateTrees(int(province), random.randint(100,300))
+  generateTrees(2898, 500)
+  
+  for oak in oakTrees:
+    oakTreeSplit[random.randint(0, 2)].append(oak)
+
+
+  # return
+
+
+  # print(f'provinceToPixels = "{provinceToPixels}"')
+  # som.work()
+
+  # print(f'provinceToPixels = "{provinceToPixels}"')
+
+  # print(f'provinceImage.h(provinceToLocation[1]) = "{provinceImage.col(provinceToLocation[1])}"')
+  # print(f'colorToProvince[colorToString(provinceImage.col(provinceToLocation[1]))] = "{colorToProvince[colorToString(provinceImage.col(provinceToLocation[1]))]}"')
+
 
   # print(f'heightMap.h(provinceToLocation[1]) = "{heightMap.h(provinceToLocation[1])}"')
 
   # print(f'heightMap.h(provinceToLocation[5025]) = "{heightMap.h(provinceToLocation[5025])}"')
   # print(f'heightMap.h(provinceToLocation[4126]) = "{heightMap.h(provinceToLocation[4126])}"')
-  heightMap.h(provinceToLocation[1])
+  # heightMap.h(provinceToLocation[1])
 
   newClimate=TagList(0)
   forceTerrainGeneral=dict()
@@ -885,6 +998,37 @@ def main():
   cdf.outputToFolderAndFile(treasureFile , "setup/main", "lotr_treasures.txt" ,2,output_folder,False)
   cdf.outputToFolderAndFile(newClimate , "map_data", "climate.txt" ,4,output_folder,encoding="utf-8")
   cdf.outputToFolderAndFile(terrainFile , "common/province_terrain", "00_province_terrain.txt" ,2,output_folder,False,encoding="utf-8-sig")
+
+  def saveTrees(file, name, layer, mesh, treeList):
+    br="{"
+    br2="}"
+    nl="\n"
+    file.write(f"""object={br}
+  name="{name}"
+  clamp_to_water_level=no
+  render_under_water=no
+  generated_content=yes
+  layer="{layer}"
+  pdxmesh="{mesh}"
+  count={len(treeList)}
+  transform="{nl.join(treeList)}
+"{br2}
+""")
+  with open("gfx/map/map_object_data/script_trees.txt", "w", encoding='utf-8-sig') as file:
+    saveTrees(file, "oak_tree_by_script_A", oakLayer, oakA, oakTreeSplit[0])
+    saveTrees(file, "oak_tree_by_script_B", oakLayer, oakB, oakTreeSplit[1])
+    saveTrees(file, "oak_tree_by_script_C", oakLayer, oakC, oakTreeSplit[2])
+    saveTrees(file, "pine_tree_by_script", treeLayer, pine, pineTrees)
+  # with open("gfx/map/map_object_data/oak_tree_generator_3.txt",'w', encoding='utf-8-sig') as file:
+  #   oakFile[7]=f"\tcount={len(oakFile)-8}\n"
+  #   for line in oakFile:
+  #     file.write(line)
+  #   file.write('"}\n')
+  # with open("gfx/map/map_object_data/pine_tree_generator_2.txt",'w', encoding='utf-8-sig') as file:
+  #   pineFile[7]=f"\tcount={len(pineFile)-8}\n"
+  #   for line in pineFile:
+  #     file.write(line)
+  #   file.write('"}\n')
   # cdf.outputToFolderAndFile(provinceFile , ".", "provinceFile.txt" ,2,".",encoding="utf-8-sig")
   # cdf.outputToFolderAndFile(countryFile , ".", "countryFile.txt" ,4,".",encoding="utf-8-sig")
   # cdf.outputToFolderAndFile(newClimate , ".", "climateFile.txt" ,4,".",encoding="utf-8-sig")
@@ -1030,9 +1174,13 @@ class ImageRead:
     self.yM = self.im.size[1]
     self.pix = self.im.load()
   def p(self, x,y):
-    return self.pix[x, self.yM-y]/1000
+    return self.pix[x, self.yM-1-y]/1000
+  def c(self, x,y):
+    return self.pix[x, self.yM-1-y]
   def h(self, l):
     return self.p(l[0],l[2])
+  def col(self, l):
+    return self.c(l[0],l[2])
       # print(f"({x},{y}):{pix[x,im.size[1]-y]}")
 
 
