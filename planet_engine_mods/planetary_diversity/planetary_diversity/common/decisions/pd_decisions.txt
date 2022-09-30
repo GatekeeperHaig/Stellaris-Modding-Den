@@ -122,6 +122,7 @@ decision_removeocean = {
 		NOT = { is_planet_class = pc_milarc }
 		is_pd_machine = no
 		is_artificial = no
+		is_pd_habitat = no
 		has_planet_flag = pdaquapicture
 	}
 
@@ -173,6 +174,7 @@ decision_removeocean = {
 			IF = { limit = { is_planet_class = pc_aquifer } set_planet_entity = { picture = pc_aquifer } }
 			IF = { limit = { is_planet_class = pc_coral } set_planet_entity = { picture = pc_coral } }
 			IF = { limit = { is_planet_class = pc_storm } set_planet_entity = { picture = pc_storm } }
+			IF = { limit = { is_planet_class = pc_pd_iceberg } set_planet_entity = { picture = pc_pd_iceberg } }
 			IF = { limit = { is_planet_class = pc_cryoflora } set_planet_entity = { picture = pc_cryoflora } }
 			IF = { limit = { is_planet_class = pc_lichen } set_planet_entity = { picture = pc_lichen } }
 			IF = { limit = { is_planet_class = pc_eyeball } set_planet_entity = { picture = pc_eyeball } }
@@ -237,6 +239,7 @@ decision_oceancapital = {
 		NOT = { is_dry = yes }
 		is_pd_machine = no
 		is_artificial = no
+		is_pd_habitat = no
 
 	}
 
@@ -280,6 +283,7 @@ decision_oceancapital = {
 			IF = { limit = { is_planet_class = pc_frozen_desert } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_cold_gaia } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_storm } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_pd_iceberg } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_eyeball } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture }
 			#Tropical
 			IF = { limit = { is_planet_class = pc_desertislands } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture }
@@ -354,6 +358,7 @@ decision_pd_transplant_tree = {
 				NOT = { has_planet_flag = pd_tol2 }
 				NOT = { has_planet_flag = pd_tol3 }
 				NOT = { is_artificial = yes }
+				NOT = { is_pd_habitat = yes }
 				NOT = { is_planet_class = pc_ecocity }
 				NOT = { is_planet_class = pc_corpoarc }
 				NOT = { is_planet_class = pc_palacearc }
@@ -385,6 +390,7 @@ decision_pd_transplant_tree = {
 		ELSE_IF = {
 			limit = { 
 				is_artificial = yes
+				is_pd_habitat = yes
 				NOT = { is_planet_class = pc_ringworld_habitable }
 			 }
 		add_deposit = d_pd_tree_of_life_habitat
@@ -437,6 +443,7 @@ decision_armbombownplanet = {
 		owner = { has_origin = origin_post_apocalyptic } 
 	 	NOT = { is_planet_class = pc_nuked } 
 		is_artificial = no
+		is_pd_habitat = no
 		is_pd_unique = no
 	}
 
@@ -470,6 +477,7 @@ decision_tolbarren_no_colony = {
 	
 	potential = {
 		is_artificial = no
+		is_pd_habitat = no
 		has_owner = no
 		FROM = { owner = { has_origin = origin_pd_tree_of_life has_technology = tech_climate_restoration } }
 		OR = {
@@ -707,6 +715,7 @@ decision_wasteland_world = {
 			is_planet_class = pc_necropolis
 			is_planet_class = pc_necrohive
 			is_planet_class = pc_pd_wasteland
+			is_planet_class = pc_pd_tidally_wasteland
 			has_modifier = resort_colony
 			has_modifier = penal_colony
 			has_modifier = slave_colony
@@ -718,15 +727,14 @@ decision_wasteland_world = {
 		is_pd_arcology = no
 		is_pd_unique = no
 		is_artificial = no
-		is_pd_tidally_locked = no
+		is_pd_habitat = no
+		#is_pd_tidally_locked = no
+		is_pd_exotic = no
 		exists = owner
 		owner = { has_ascension_perk = ap_pd_wasteland_worlds }
 	}
 
 	allow = {
-		if = {
-			limit = { owner = { is_ai = no } }
-		}
 		num_uncleared_blockers < 1
 	}
 	
@@ -745,6 +753,15 @@ decision_wasteland_world = {
 					is_pd_tidally_locked = yes
 				}
 				change_pc = pc_pd_tidally_wasteland
+				add_modifier = { modifier = tidal_locked days = -1 }
+			}
+			while = {
+				limit = { num_districts = { type = district_farming value > 0 } }
+				remove_district = district_farming
+			}
+			while = {
+				limit = { num_districts = { type = district_farming_uncapped value > 0 } }
+				remove_district = district_farming_uncapped
 			}
 		}
 	}

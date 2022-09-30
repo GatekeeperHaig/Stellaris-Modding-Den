@@ -11,8 +11,8 @@ pd_hothouse_hab_0 = {
 	resources = {
 		category = megastructures
 		cost = {
-			alloys = 750
-			influence = 75
+			alloys = 1000
+			influence = 100
 		}
 	}
 	construction_blocks_and_blocked_by = none
@@ -66,11 +66,11 @@ pd_hothouse_hab_0 = {
 				fail_text = "requires_not_minor_planetary_body"
 				NOT = {	is_asteroid = yes }
 			}
-            custom_tooltip = {
-                fail_text = "requires_different_size"
-                planet_size <= 25
-                planet_size >= 2
-            }
+           # custom_tooltip = {
+           #     fail_text = "requires_different_size"
+           #     planet_size <= 25
+           #    planet_size >= 2
+           # }
 			custom_tooltip = {
 				fail_text = "is_hothouse"
 				OR = {
@@ -93,11 +93,7 @@ pd_hothouse_hab_0 = {
 		modifier = {
 			factor = 0
 			any_system_planet = {
-				OR = {
-					is_planet_class = pc_habitat
-					is_pd_habitat = yes
-				}
-				is_colony = no
+				is_pd_habitat = yes
 			}
 		}
 
@@ -110,18 +106,8 @@ pd_hothouse_hab_0 = {
 		}
 		modifier = {
 			factor = 2
-			any_neighbor_system = {
-				exists = owner
-				is_same_value = owner.capital_scope.solar_system
-			}
-		}
-
-		modifier = {
-			factor = 0.1
-			any_neighbor_system = {
-				exists = owner
-				owner = { NOT = { is_same_value = from } }
-			}
+			exists = sector
+			sector = { has_sector_type = core_sector }
 		}
 	}
 	
@@ -149,6 +135,22 @@ pd_hothouse_hab_0 = {
 					is_planet_class = pc_hothouse
 				}
 				change_pc = pc_pd_hothouse_hab
+			}
+			if = {
+				limit = {
+					planet_size > 25
+				}
+				add_modifier = {
+					modifier = high_gravity days = -1
+				}
+			}
+			if = {
+				limit = {
+					planet_size < 10
+				}
+				add_modifier = {
+					modifier = low_gravity days = -1
+				}
 			}
 			if = {
 				limit = {
