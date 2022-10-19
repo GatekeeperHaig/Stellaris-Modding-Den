@@ -290,6 +290,8 @@ country_event = {
 		every_galaxy_planet = { limit = { is_planet_class = pc_crystal is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Floating
 		every_galaxy_planet = { limit = { is_planet_class = pc_floating is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
+		#Scrapyard
+		every_galaxy_planet = { limit = { is_planet_class = pc_pd_scrapyard is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Zro Stripmine
 		every_galaxy_planet = { limit = { is_planet_class = pc_pd_zro is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Graveyard
@@ -362,7 +364,9 @@ country_event = {
 	#Remove Vanilla Tidally Locked Modifier
 	immediate = {
 		every_galaxy_planet = { 
-			limit = { is_moon = no }
+			limit = { 
+				is_moon = no 
+			}
 			remove_modifier = tidal_locked
 		}
 		every_galaxy_planet = { 
@@ -811,13 +815,11 @@ country_event = {
 		every_galaxy_planet = { 				
 			limit = { is_planet_class = pc_ash is_homeworld = no has_planet_flag = prescripted_ideal }
 			if = { limit = { not = { has_modifier = ash } } add_modifier = { modifier = ash days = -1 } }
-			add_deposit = d_lava_lakes	
 		}
 		#Methane Start
 		every_galaxy_planet = { 				
 			limit = { is_planet_class = pc_methane is_homeworld = no has_planet_flag = prescripted_ideal }
 			if = { limit = { not = { has_modifier = methane } } add_modifier = { modifier = methane days = -1 } }
-			add_deposit = d_frozen_gas_mountain	
 		}
 		#Methane Start
 		every_galaxy_planet = { 				
@@ -1272,6 +1274,10 @@ country_event = {
 			set_planet_flag = pdfloating
 		}
 		every_galaxy_planet = {
+			limit = { is_planet_class = pc_pd_scrapyard }
+			set_planet_flag = pdscrapyard
+		}
+		every_galaxy_planet = {
 			limit = { is_planet_class = pc_pd_zro }
 			set_planet_flag = pdzrostripmine
 		}
@@ -1655,12 +1661,7 @@ planet_event = {
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_superhabitable } }
-		remove_deposit = d_ancient_motes
 		remove_modifier = superhabitable
-			if = {
-				limit = { is_colony = yes }
-				remove_building = building_volatiles_mine
-			}
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_biolumen } }
@@ -1760,14 +1761,6 @@ planet_event = {
 		remove_modifier = ash
 		}
 		if = { 
-		limit = { NOT = { OR = { is_planet_class = pc_ash is_planet_class = pc_primal } } }
-		remove_deposit = d_lava_lakes
-			if = {
-				limit = { is_colony = yes }
-				remove_building = building_lava_mine
-			}
-		}
-		if = { 
 		limit = { NOT = { OR = { is_planet_class = pc_aquatic is_planet_class = pc_tidallyaquatic } } }
 		remove_deposit = d_aquatic_trench
 		remove_modifier = aquatic
@@ -1806,7 +1799,6 @@ planet_event = {
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_methane } }
-		remove_deposit = d_frozen_gas_mountain
 		remove_modifier = methane
 			if = {
 				limit = { is_colony = yes }
@@ -2073,8 +2065,7 @@ planet_event = {
 		add_modifier = { modifier = "geothermal" days = -1 }
 		}
 		if = { 
-		limit = { is_planet_class = pc_superhabitable not = { has_deposit = d_ancient_motes } }
-		add_deposit = d_ancient_motes
+		limit = { is_planet_class = pc_superhabitable }
 		add_modifier = { modifier = "superhabitable" days = -1 }
 		}
 		if = { 
@@ -2151,8 +2142,7 @@ planet_event = {
 		add_modifier = { modifier = "pdmegaflora" days = -1 }
 		}
 		if = { 
-		limit = { is_planet_class = pc_ash not = { has_deposit = d_lava_lakes } }
-		add_deposit = d_lava_lakes
+		limit = { is_planet_class = pc_ash }
 		add_modifier = { modifier = "ash" days = -1 }
 		}
 		if = { 
@@ -2177,8 +2167,7 @@ planet_event = {
 		add_modifier = { modifier = "pdacid" days = -1 }
 		}
 		if = { 
-		limit = { is_planet_class = pc_methane not = { has_deposit = d_frozen_gas_mountain } }
-		add_deposit = d_frozen_gas_mountain
+		limit = { is_planet_class = pc_methane  }
 		add_modifier = { modifier = "methane" days = -1 }
 		}
 		if = { 
@@ -2483,7 +2472,7 @@ planet_event = {
 						owner = { has_origin = origin_shattered_ring } 	#setup in initializer 
 					}
 				}
-				generate_pd_start_deposits_and_blockers = yes
+				#generate_pd_start_deposits_and_blockers = yes
 				
 			}
 			if = {
@@ -3259,6 +3248,7 @@ planet_event = {
 				NOT = { is_planet_class = pc_milarc_relic }
 				NOT = { is_planet_class = pc_city }
 				NOT = { is_planet_class = pc_floating }
+				NOT = { is_planet_class = pc_pd_scrapyard }
 				NOT = { is_planet_class = pc_crucible }
 				NOT = { is_planet_class = pc_shroud_crucible }
 				NOT = { is_planet_class = pc_clean_crucible }
@@ -3298,6 +3288,7 @@ planet_event = {
 				is_planet_class = pc_palacearc
 				is_planet_class = pc_capitalarc
 				is_planet_class = pc_floating
+				is_planet_class = pc_pd_scrapyard
 				is_planet_class = pc_crucible
 				is_planet_class = pc_shroud_crucible
 				is_planet_class = pc_clean_crucible
@@ -3372,7 +3363,6 @@ planet_event = {
 			if = {
 				limit = { is_planet_class = pc_megaflorahivetl }
 				change_pc = pc_wettidallylocked
-				remove_modifier = tidal_locked
 			}
 			add_deposit = d_pd_tree_of_life_dead
 			add_modifier = {
@@ -3433,7 +3423,6 @@ planet_event = {
 			limit = { is_planet_class = pc_megaflorahivetl }
 			change_pc = pc_wettidallylocked
 			add_deposit = d_pd_tree_of_life_dead
-			remove_modifier = tidal_locked
 		}
 	}
 
@@ -3511,6 +3500,7 @@ planet_event = {
 		NOT = { is_planet_class = pc_milarc_relic }
 		NOT = { is_planet_class = pc_city }
 		NOT = { is_planet_class = pc_floating }
+		NOT = { is_planet_class = pc_pd_scrapyard }
 		NOT = { is_planet_class = pc_crystal }
 		NOT = { is_planet_class = pc_technoorganic }
 		NOT = { is_planet_class = pc_graveyard }
@@ -3560,6 +3550,7 @@ planet_event = {
 		NOT = { is_planet_class = pc_milarc_relic }
 		NOT = { is_planet_class = pc_city }
 		NOT = { is_planet_class = pc_floating }
+		NOT = { is_planet_class = pc_pd_scrapyard }
 		NOT = { is_planet_class = pc_crystal }
 		NOT = { is_planet_class = pc_technoorganic }
 		NOT = { is_planet_class = pc_graveyard }
@@ -3589,8 +3580,7 @@ planet_event = {
 					is_planet_class = pc_tidallylocked
 				}
 			}
-			change_pc = pc_megaflorahivetl
-			add_modifier = { modifier = tidal_locked days = -1 }
+			change_pc = pc_megafloratl
 		}
 		pd_remove_special_deposits_modifiers = yes
 		remove_planet_flag = pd_tol1
@@ -5110,7 +5100,6 @@ country_event = {
 							is_planet_class = pc_ash
 						}
 						reroll_deposits = yes
-						add_deposit = d_lava_lakes
 					}
 					if = {
 						limit = {
@@ -6039,7 +6028,6 @@ country_event = {
 							is_planet_class = pc_ash
 						}
 						reroll_deposits = yes
-						add_deposit = d_lava_lakes
 					}
 					if = {
 						limit = {
@@ -6783,9 +6771,6 @@ country_event = {
 				has_planet_flag = fallen_empire_world
 			}	
 			IF = { limit = { is_planet_class = pc_superhabitable } 
-				IF = { limit = { not = { has_deposit = d_ancient_motes } }
-				add_deposit = d_ancient_motes
-				}
 				IF = { limit = { not = { has_modifier = superhabitable } }
 				add_modifier = { modifier = "superhabitable" days = -1 }
 				}
@@ -7956,10 +7941,6 @@ planet_event = {
 				}
 			}
 			change_pc = pc_necrotidallylocked
-			add_modifier = {
-				modifier = tidal_locked
-				days = -1
-			}
 		}
 
 		# Remove Gaia Seed building.

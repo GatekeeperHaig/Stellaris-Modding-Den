@@ -35,6 +35,7 @@ decision_engineered_environment_gaia = {
 		is_pd_machine = no
 		is_pd_shroud_world = no
 		is_pd_habitat = no
+		is_pd_planetary_megaproject = no
 		NOT = { is_planet_class = pc_gaia }
 		NOT = { is_planet_class = pc_relic }
 		NOT = { is_planet_class = pc_milarc_relic }
@@ -123,6 +124,7 @@ decision_removeocean = {
 		is_pd_machine = no
 		is_artificial = no
 		is_pd_habitat = no
+		is_pd_planetary_megaproject = no
 		has_planet_flag = pdaquapicture
 	}
 
@@ -233,6 +235,7 @@ decision_oceancapital = {
 		NOT = { is_planet_class = pc_shroudcorpoarc }
 		NOT = { is_planet_class = pc_milarc }
 		NOT = { is_planet_class = pc_crucible }
+		NOT = { is_planet_class = pc_pd_scrapyard }
 		NOT = { is_planet_class = pc_shroud_crucible }
 		NOT = { is_planet_class = pc_clean_crucible }
 		NOT = { is_planet_class = pc_archive }
@@ -240,6 +243,7 @@ decision_oceancapital = {
 		is_pd_machine = no
 		is_artificial = no
 		is_pd_habitat = no
+		is_pd_planetary_megaproject = no
 
 	}
 
@@ -359,6 +363,7 @@ decision_pd_transplant_tree = {
 				NOT = { has_planet_flag = pd_tol3 }
 				NOT = { is_artificial = yes }
 				NOT = { is_pd_habitat = yes }
+				NOT = { is_pd_planetary_megaproject = yes }
 				NOT = { is_planet_class = pc_ecocity }
 				NOT = { is_planet_class = pc_corpoarc }
 				NOT = { is_planet_class = pc_palacearc }
@@ -391,6 +396,7 @@ decision_pd_transplant_tree = {
 			limit = { 
 				is_artificial = yes
 				is_pd_habitat = yes
+				is_pd_planetary_megaproject = yes
 				NOT = { is_planet_class = pc_ringworld_habitable }
 			 }
 		add_deposit = d_pd_tree_of_life_habitat
@@ -444,6 +450,7 @@ decision_armbombownplanet = {
 	 	NOT = { is_planet_class = pc_nuked } 
 		is_artificial = no
 		is_pd_habitat = no
+		is_pd_planetary_megaproject = no
 		is_pd_unique = no
 	}
 
@@ -478,6 +485,7 @@ decision_tolbarren_no_colony = {
 	potential = {
 		is_artificial = no
 		is_pd_habitat = no
+		is_pd_planetary_megaproject = no
 		has_owner = no
 		FROM = { owner = { has_origin = origin_pd_tree_of_life has_technology = tech_climate_restoration } }
 		OR = {
@@ -727,7 +735,7 @@ decision_wasteland_world = {
 		is_pd_arcology = no
 		is_pd_unique = no
 		is_artificial = no
-		is_pd_habitat = no
+		is_pd_planetary_megaproject = no
 		#is_pd_tidally_locked = no
 		is_pd_exotic = no
 		exists = owner
@@ -742,6 +750,9 @@ decision_wasteland_world = {
 		# Make city-planet
 		custom_tooltip = decision_wasteland_project_effects
 		hidden_effect = {	
+			remove_deposit = d_pd_orbital_mirrors
+			remove_deposit = d_pd_seismic_resonators
+			remove_deposit = d_pd_bionanite_soil
 			IF = {
 				limit = {
 					is_pd_tidally_locked = no
@@ -753,7 +764,6 @@ decision_wasteland_world = {
 					is_pd_tidally_locked = yes
 				}
 				change_pc = pc_pd_tidally_wasteland
-				add_modifier = { modifier = tidal_locked days = -1 }
 			}
 			while = {
 				limit = { num_districts = { type = district_farming value > 0 } }
@@ -762,6 +772,17 @@ decision_wasteland_world = {
 			while = {
 				limit = { num_districts = { type = district_farming_uncapped value > 0 } }
 				remove_district = district_farming_uncapped
+				}
+			create_message = {
+				type = TOXICWASTE_MESSAGE_TYPE
+				localization = MESSAGE_TOXICWASTE
+				days = 30
+				target = this
+				variable = {
+					type = name
+					localization = PLANET
+					scope = this
+				}
 			}
 		}
 	}
