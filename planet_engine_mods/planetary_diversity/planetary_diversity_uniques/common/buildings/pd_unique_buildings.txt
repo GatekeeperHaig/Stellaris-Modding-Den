@@ -1111,7 +1111,7 @@ building_acean_patch = {
 	}
 }
 
-# Habitat Central Complex
+# Archive Central Complex
 building_archive_major_capital = {
 	capital = yes
 	can_build = no
@@ -1343,7 +1343,6 @@ building_archive_major_capital = {
 }
 
 #Techno-Organic
-
 building_subsurface_assembly = {
 	base_buildtime = 360
 
@@ -2315,6 +2314,67 @@ building_pd_scrap_coordination = {
 		}
 	}
 }
+#Holding
+holding_pd_scrap_pile = {
+	base_buildtime = @b2_time
+	owner_type = subject_holding
+	icon = holding_pd_scrap_pile
+	base_cap_amount = 1
+
+	resources = {
+		category = planet_holdings
+		produces = {
+			engineering_research = 8
+			physics_research = 2
+			society_research = 2
+		}
+	}
+
+	potential = {
+		owner.overlord = { any_owned_planet = { is_planet_class = pc_pd_scrapyard } }
+		NOT = { is_planet_class = pc_pd_scrapyard }
+	}
+
+	planet_modifier = {
+		monthly_loyalty = -0.5
+		habitability_ceil_add = -0.1
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = planet.owner
+			planet.owner = { is_gestalt = no }
+		}
+		job_pd_scrap_miner_add = 3
+	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = planet.owner
+			planet.owner = { is_gestalt = yes }
+		}
+		job_pd_scrap_miner_drone_add = 3
+	}
+
+	on_built = {
+		planet = {
+			owner.overlord.capital_scope = {
+				append_scrap_pile_build = yes
+				refresh_scrap_pile_build_modifier = yes
+			}
+		}
+	}
+
+	on_destroy = {
+		owner.overlord.capital_scope = {
+			remove_scrap_pile_build = yes
+			refresh_scrap_pile_build_modifier = yes
+		}
+	}
+	triggered_desc = {
+		text = holding_scrap_pile_effect
+	}
+}
+
 
 #Archive Buildings
 building_archive_link_node = {
