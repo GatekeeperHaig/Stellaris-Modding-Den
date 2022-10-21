@@ -51,7 +51,7 @@ def main():
   locClass.limitLanguage(["en"])
 
   races=["Noldor", "Teleri", "Edain", "Dwarf","Orc"]
-  raceGrowth={"Noldor":-1.8,"Teleri":-1.8,"Edain":-0.8, "Dwarf":-1.4,"Orc":1}
+  raceGrowth={"Noldor":-1.4,"Teleri":-1.4,"Edain":-0.6666, "Dwarf":-1,"Orc":1}
   raceCombat={"Noldor":1.2,"Teleri":1,"Edain":0.8, "Dwarf":0.8,"Orc":0}
   raceCommerce={"Noldor":0.5,"Teleri":0.7,"Edain":.5, "Dwarf":1,"Orc":0}
   raceDesc={"Noldor":"The Noldor where the second clan of elves to reach Valinor in the years of the trees and later where led back to Middle-earth by Fëanor. These elves have a long list of famous heroes and take pride in their combat ability. You have access to this modifier as your primary culture is Noldor.","Teleri":"The Teleri were the last clan of elves to reach Valinor in the years of the trees, though many remained in Middle-earth in the first place. They have always been the greatest seafarers of Middle-earth. As many of their breathren were slaughtered by Fëanor's host on his way back to Middle-earth, it took a long time for them to forgive the Noldor elves. You have access to this modifier as your primary culture is Teleri.","Edain":"The Edain were the group of mankind that reached Beleriand in the First Age. Many of them have fought Morgoth in the Battle of Beleriand and they and their ancestors have thus been rewarded with long life. You have access to this modifier as your primary culture is Edain. Lesser dunedain, corsairs and dol amrothian only count half.", "Dwarf":"The Masters of Stone were created by Aulë even before Ilúvatar created the elves, but slept underground until about a century after the elves awoke. Dwarves spend most of their time crafting, smithying and mining. You have access to this modifier as your primary culture is dwarven.","Orc":"Melkor created the orcs by twisting kidnapped elves in the Years of the Lamps. Without the guidance of Melkor or a fallen Maia, they are usually disorganized and pose little thread to any of the other races. Now that the Lord of the Rings is returning to his power though, the Age of the Orcs will come. You have access to this modifier as your primary culture is orcish."}
@@ -81,10 +81,13 @@ def main():
         t.add("movement_speed_if_no_road", round(i/50,2))
       elif race == "Dwarf":
         t.add("army_movement_speed", round(i/200,2))
-
-      t.add("global_population_growth", round(i*0.015*raceGrowth[race],3))
+      if raceGrowth[race] > 0:
+        t.add("global_population_growth", round(i*0.015*raceGrowth[race],3))
+      else:
+        t.add("global_population_growth", round(i**0.5*10**0.5*0.015*raceGrowth[race],3))
       locClass.addEntry(name, f"{i*10}% {race}")
       locClass.addEntry("desc_"+name, raceDesc[race])
+
 
   for i in reversed(range(1,20)):
     name=f"foreign_support_{i*5}"
@@ -113,22 +116,24 @@ def main():
   cdf.outputToFolderAndFile(lotr_pops , "events/", "LOTR_pops.txt" ,1,".", encoding="utf-8-sig")
 
   relations = {
-    "archers":        { "archers":0, "chariots":0, "heavyCavalry":-10, "heavyInfantry":10, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":0 },
-    "chariots":       { "archers":20, "chariots":0 ,"heavyCavalry":-50, "heavyInfantry":-10, "horseArchers":10, "lightCavalry":0, "lightInfantry":35, "elephants":-50},
-    "heavyCavalry":   { "archers":50, "chariots":25, "heavyCavalry":0, "heavyInfantry":-10, "horseArchers":0, "lightCavalry":20, "lightInfantry":25, "elephants":-50},
-    "heavyInfantry":  { "archers":0, "chariots":25, "heavyCavalry":20, "heavyInfantry":0, "horseArchers":-25, "lightCavalry":-10, "lightInfantry":20, "elephants":0},
-    "horseArchers":   { "archers":25, "chariots":25, "heavyCavalry":-10, "heavyInfantry":25, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":-20},
-    "lightCavalry":   { "archers":25, "chariots":25, "heavyCavalry":-20, "heavyInfantry":-50, "horseArchers":25, "lightCavalry":0, "lightInfantry":25, "elephants":-50},
-    "lightInfantry":  { "archers":-10, "chariots":-10, "heavyCavalry":-25, "heavyInfantry":-20, "horseArchers":-50, "lightCavalry":0, "lightInfantry":0, "elephants":-20},
-    "elephants":      { "archers":50, "chariots":50, "heavyCavalry":-10, "heavyInfantry":40, "horseArchers":-10, "lightCavalry":-10, "lightInfantry":30, "elephants":0},
+    "archers":        { "archers":0, "camels":-10, "chariots":0, "heavyCavalry":-10, "heavyInfantry":10, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":0 },
+    "camels":         { "archers":10, "camels":0, "chariots":10, "heavyCavalry":-20, "heavyInfantry":-10, "horseArchers":10, "lightCavalry":0, "lightInfantry":10, "elephants":-50 },
+    "chariots":       { "archers":20, "camels":-10, "chariots":0 ,"heavyCavalry":-50, "heavyInfantry":-10, "horseArchers":10, "lightCavalry":0, "lightInfantry":35, "elephants":-50},
+    "heavyCavalry":   { "archers":50, "camels":10, "chariots":25, "heavyCavalry":0, "heavyInfantry":-10, "horseArchers":0, "lightCavalry":20, "lightInfantry":25, "elephants":-50},
+    "heavyInfantry":  { "archers":0, "camels":-10, "chariots":25, "heavyCavalry":20, "heavyInfantry":0, "horseArchers":-25, "lightCavalry":-10, "lightInfantry":20, "elephants":0},
+    "horseArchers":   { "archers":25, "camels":-10, "chariots":25, "heavyCavalry":-10, "heavyInfantry":25, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":-20},
+    "lightCavalry":   { "archers":25, "camels":0, "chariots":25, "heavyCavalry":-20, "heavyInfantry":-50, "horseArchers":25, "lightCavalry":0, "lightInfantry":25, "elephants":-50},
+    "lightInfantry":  { "archers":-10, "camels":0, "chariots":-10, "heavyCavalry":-25, "heavyInfantry":-20, "horseArchers":-50, "lightCavalry":0, "lightInfantry":0, "elephants":-20},
+    "elephants":      { "archers":50, "camels":-10, "chariots":50, "heavyCavalry":-10, "heavyInfantry":40, "horseArchers":-10, "lightCavalry":-10, "lightInfantry":30, "elephants":0},
   }
   properties = {
     "archers":        { "cost":8, "assault":True, "speed":2.5, "maneuver":2, "morale":-30, "strength":0, "attrition":-10, "attritionLoss":5, "food":2.4, "consumption":0.1, "ai_max_percentage":15  },
+    "camels":         { "cost":15, "assault":False, "speed":3.5, "maneuver":4, "morale":0, "strength":0, "attrition":0, "attritionLoss":2.5, "food":3.6, "consumption":0.2, "tradeGood":"camel","flank":"yes"},
     "chariots":       { "cost":8, "assault":False, "speed":2.5, "maneuver":1, "morale":0, "strength":0, "attrition":0, "attritionLoss":5, "food":2.4, "consumption":0.2  },
     "heavyCavalry":   { "cost":18, "assault":False, "speed":3.5, "maneuver":2, "morale":0, "strength":0, "attrition":100, "attritionLoss":5, "food":2.4, "consumption":0.25, "tradeGood":"horses", "levy_tier":"advanced" },
     "heavyInfantry":  { "cost":16, "assault":True, "speed":2.5, "maneuver":1, "morale":10, "strength":0, "attrition":50, "attritionLoss":5, "food":2.4, "consumption":0.2, "tradeGood":"iron", "levy_tier":"advanced" },
-    "horseArchers":   { "cost":16, "assault":False, "speed":4, "maneuver":5, "morale":-25, "strength":0, "attrition":50, "attritionLoss":5, "food":3, "consumption":0.25, "tradeGood":"steppe_horses"  },
-    "lightCavalry":   { "cost":10, "assault":False, "speed":4, "maneuver":3, "morale":0, "strength":0, "attrition":50, "attritionLoss":5, "food":2.4, "consumption":0.25, "tradeGood":"horses"  },
+    "horseArchers":   { "cost":16, "assault":False, "speed":4, "maneuver":5, "morale":-25, "strength":0, "attrition":50, "attritionLoss":5, "food":3, "consumption":0.25, "tradeGood":"steppe_horses","flank":"yes"  },
+    "lightCavalry":   { "cost":10, "assault":False, "speed":4, "maneuver":3, "morale":0, "strength":0, "attrition":50, "attritionLoss":5, "food":2.4, "consumption":0.25, "tradeGood":"horses","flank":"yes"  },
     "lightInfantry":  { "cost":8, "assault":True, "speed":2.5, "maneuver":1, "morale":30, "strength":0, "attrition":-50, "attritionLoss":2.5, "food":2.4, "consumption":0.1  },
     "elephants":      { "cost":35, "assault":False, "speed":2.5, "maneuver":0, "morale":-20, "strength":50, "attrition":200, "attritionLoss":10, "food":1, "consumption":0.3, "tradeGood":"elephants", "levy_tier":"advanced", "ai_max_percentage":15  },
     "supply_train":   { "cost":20, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":50, "consumption":0.05, "ai_max_percentage":15, "levy_tier":"none"  },
@@ -145,6 +150,7 @@ def main():
     Unit("dwarven_archers", "archers", 1.5, 1.5, 1.3, AP=True),
     Unit("elvish_archers", "archers", 3, 1.25, 1.3),
     Unit("uruk_crossbows", "archers", 1.5, 1, 1),
+    Unit("camels", "camels"),
     Unit("chariots", "chariots"),
     Unit("heavy_cavalry", "heavyCavalry"),
     Unit("dol_amroth_knights", "heavyCavalry", 1.5, 2, 1.5),
@@ -288,7 +294,7 @@ def main():
 
 
 
-  uninhabitable = set(map(str,list(range(4969,4988))+list(range(5453,5459))+list([52,2616,577,564,563,576,575,604,605,606,607,608,602,603,2696,2697,2698,2607,2604,2605,3402,3403,3404,476,475,478,479,2961,2960,2959,2954,2955,2984,2985,2986,540,539,538,537,536,535,547,546,545,544,543,542,2617,594,595,596,597,94,27,95,91,92,581,582,2046,2045,2044,87,85,89,88,83,82,80,2375,2376,7,3,17,23,48,1965,583,584,585,586,587,588,589,590,2997,2998,3000,3001,2988,2991,2989,2992,2994,3003,2990,2995,2996,2993,3002,579,578,2048,2049,2050,2051,2052,2053,593,3142,3143,3146,3144,3145,3147,3148,3149,3150,51,2378,2377,3638,3639,3678,3679,3680,3681,3682,3683,3684,3685,3686,3687,3688,3689,3690,3691,3692,3693,3694,3593,3709,3719,3611,3613,3612,3653,3654,3656,3660,3718,3626,3659,3706,3607,3608,3609,3740,3741,3742,3743,3744,3745,3746,3747,3787,3781,3779,3778,3777,3784,3793,3794,3792,3790,3789,3791,3775,3776,3771,3795,3797,2730,2731,2732,2733,2739,2737,2741,2735,2740,2742,2745,2744,2743,3860,3862,3863,3864,3865,3866,3874,3867,3881,3871,3869,3552,3553,3880,3879,3868,3872,3873,3870,3554,2738,2750,2749,2748,2747,2746,2751,3875,2729,2769,2728,3582,3581,3580,3643,3637,3904,3909,3910,3937,3938,3939,5215,5217,5218,5174,5176,5291,5292,5293,5300,5301,5302,5303,5304,5305,5306,5307,5308,5309,5310,5311,5312,5313,5314,5315,5317,5318,5319,5320,5321,5322,5323,5324,5326,5327,5328,5329,5330,5331,5332,5333,5334,5336,5337,5338,5339,5340,5341,5342,5343,5344,5345,5348,5386,5387,5388,5389,5390,5433,5434,5435,5399,5400,5401,5378,5379,5375,5274,5275,5276,5277,5278,5281,5279,5282,5283,5406,5429,5430,5297,5298,5299,5437,5023,5024,5443,5444,5445,5446,5447,5448,5449,5450,5451,5067,5463,5396,5395,5409,5280,5462,5466,5284,5286,5287,5294,5296,5452,5410,5411,5412,5216,5252,5285,5288,5060,5273])))
+  uninhabitable = set(map(str,list(range(4969,4988))+list(range(5453,5459))+list([52,2616,577,564,563,576,575,604,605,606,607,608,602,603,2696,2697,2698,2607,2604,2605,3402,3403,3404,476,475,478,479,2961,2960,2959,2954,2955,2984,2985,2986,540,539,538,537,536,535,547,546,545,544,543,542,2617,594,595,596,597,94,27,95,91,92,581,582,2046,2045,2044,87,85,89,88,83,82,80,2375,2376,7,3,17,23,48,1965,583,584,585,586,587,588,589,590,2997,2998,3000,3001,2988,2991,2989,2992,2994,3003,2990,2995,2996,2993,3002,579,578,2048,2049,2050,2051,2052,2053,593,3142,3143,3146,3144,3145,3147,3148,3149,3150,51,2378,2377,3638,3639,3678,3679,3680,3681,3682,3683,3684,3685,3686,3687,3688,3689,3690,3691,3692,3693,3694,3593,3709,3719,3611,3613,3612,3653,3654,3656,3660,3718,3626,3659,3706,3607,3608,3609,3740,3741,3742,3743,3744,3745,3746,3747,3787,3781,3779,3778,3777,3784,3793,3794,3792,3790,3789,3791,3775,3776,3771,3795,3797,2730,2731,2732,2733,2739,2737,2741,2735,2740,2742,2745,2744,2743,3860,3862,3863,3864,3865,3866,3874,3867,3881,3871,3869,3552,3553,3880,3879,3868,3872,3873,3870,3554,2738,2750,2749,2748,2747,2746,2751,3875,2729,2769,2728,3582,3581,3580,3643,3637,3904,3909,3910,3937,3938,3939,5215,5217,5218,5174,5176,5291,5292,5293,5306,5307,5308,5309,5310,5311,5312,5313,5314,5315,5317,5318,5319,5320,5321,5322,5323,5324,5326,5327,5328,5329,5330,5331,5332,5333,5334,5336,5337,5338,5339,5340,5341,5342,5343,5344,5345,5348,5386,5387,5388,5389,5390,5433,5434,5435,5399,5400,5401,5378,5379,5375,5274,5275,5276,5277,5278,5281,5279,5282,5283,5406,5429,5430,5297,5298,5299,5437,5023,5024,5443,5444,5445,5446,5447,5448,5449,5450,5451,5067,5463,5396,5395,5409,5280,5462,5466,5284,5286,5287,5294,5296,5452,5410,5411,5412,5216,5252,5285,5288,5060,5273])))
 
   # print(f'uninhabitable = "{uninhabitable}"')
 
@@ -298,6 +304,7 @@ def main():
   # ownedProvinces=set()
   ownerCountry=dict()
   countryCulture=dict()
+  countryProvinces=dict()
   for name,vals in zip(countries.names, countries.vals):
     # print(f'vals = "{vals}"')
     if vals=="":
@@ -306,6 +313,7 @@ def main():
     countryCulture[name]=vals.get("primary_culture")
     provinceToCapitalType[vals.get("capital")]="country_capital"
     # print(f'cores = "{cores.vals}"')
+    countryProvinces[name]=cores.names
     for core in cores.names:
       # ownedProvinces.add(core)
       ownerCountry[core]=name
@@ -316,6 +324,8 @@ def main():
   areaToRegion=dict()
   provinceToRegion=dict()
   regionToArea=dict()
+  regionToProvince=dict()
+  regionToNum=dict()
   areaToProvince=dict()
 
   for name, val in areaFile.getNameVal():
@@ -329,15 +339,24 @@ def main():
           areaToProvince[name]=[]
         areaToProvince[name].append(p)
   for name, val in regionFile.getNameVal():
+    regionToProvince[name]=[]
     if name:
       for p in val.get("areas").names:
         areaToRegion[p]=name
         if not name in regionToArea:
           regionToArea[name]=[]
+          regionToNum[name]=0
+        for pp in areaToProvince[p]:
+          regionToProvince[name].append(pp)
         regionToArea[name].append(p)
+        regionToNum[name]+=len(areaToProvince[p])
   for province, area in provinceToArea.items():
     if area in areaToRegion:
       provinceToRegion[province]=areaToRegion[area]
+
+  # print(f'regionToNum = "{sorted(regionToNum.items(), key=lambda x:x[1])}"')
+  for item in sorted(regionToNum.items(), key=lambda x:x[1]):
+    print(item)
 
   provinceToTerrain=dict()
   for name, val in provinceFile.getNameVal():
@@ -391,52 +410,54 @@ def main():
 
   # print(f'provinceToPixels[2898] = "{provinceToPixels[2898]}"')
 
-  oakLayer="oak_tree_layer"
-  oakA="tree_oak_2_mesh"
-  oakB="tree_oak_2_variation_1_mesh"
-  oakC="tree_oak_2_variation_2_mesh"
-  oakTrees=[]
-  oakTreeSplit=[[] for _ in range(3)]
+  makeTrees=False
+  if makeTrees:
+    oakLayer="oak_tree_layer"
+    oakA="tree_oak_2_mesh"
+    oakB="tree_oak_2_variation_1_mesh"
+    oakC="tree_oak_2_variation_2_mesh"
+    oakTrees=[]
+    oakTreeSplit=[[] for _ in range(3)]
 
-  treeLayer="tree_layer"
-  pine="tree_pine_01_mesh"
-  pineTrees=[]
-  "tree_olive_01_mesh"
-  "tree_palm_mesh"
-  "tree_india_01_mesh"
-  "tree_cypress_01_mesh"
+    treeLayer="tree_layer"
+    pine="tree_pine_01_mesh"
+    pineTrees=[]
+    "tree_olive_01_mesh"
+    "tree_palm_mesh"
+    "tree_india_01_mesh"
+    "tree_cypress_01_mesh"
 
-  def makeTree(c, rotation=[0,random.random(),0,random.random()], size=random.uniform(0.9,1)):
-    coord=[c[0]+random.uniform(-0.45,0.45),0,c[1]+random.uniform(-0.45,0.45)]
-    return " ".join(map('{:.6f}'.format,coord+rotation+[size for _ in range(3)]))
+    def makeTree(c, rotation=[0,random.random(),0,random.random()], size=random.uniform(0.9,1)):
+      coord=[c[0]+random.uniform(-0.45,0.45),0,c[1]+random.uniform(-0.45,0.45)]
+      return " ".join(map('{:.6f}'.format,coord+rotation+[size for _ in range(3)]))
 
 
-  def generateTrees(provinceId, number):
-    t=provinceToPixels[provinceId]
-    t2=[None for _ in range(len(t)//2)]
-    for i in range(len(t)//2):
-      t2[i]=(t[2*i],t[2*i+1])
-    r=random.choices(t2, k=number)
-    for c in r:
-      h = heightMap.p(*c)
-      if h<7.5 or h>18:
-        continue
-      # coord=[c[0]+random.uniform(-0.45,0.45),0,c[1]+random.uniform(-0.45,0.45)]
-      # rotation=[0,random.random(),0,random.random()]
-      # size=random.uniform(0.9,1)
-      if h<random.randint(15,16):
-        oakTrees.append(makeTree(c))
-        # oakFile.append(" ".join(map('{:.6f}'.format,coord+rotation+[size for _ in range(3)]))+"\n")
-      else:
-        pineTrees.append(makeTree(c))
-        # pineFile.append(" ".join(map('{:.6f}'.format,coord+rotation+[size for _ in range(3)]))+"\n")
-  for area in ["jayir_ahar_area","murgarm_area","lokhas_area"]:
-    for province in areaToProvince[area]:
-      generateTrees(int(province), random.randint(100,300))
-  generateTrees(2898, 500)
-  
-  for oak in oakTrees:
-    oakTreeSplit[random.randint(0, 2)].append(oak)
+    def generateTrees(provinceId, number):
+      t=provinceToPixels[provinceId]
+      t2=[None for _ in range(len(t)//2)]
+      for i in range(len(t)//2):
+        t2[i]=(t[2*i],t[2*i+1])
+      r=random.choices(t2, k=number)
+      for c in r:
+        h = heightMap.p(*c)
+        if h<7.5 or h>18:
+          continue
+        # coord=[c[0]+random.uniform(-0.45,0.45),0,c[1]+random.uniform(-0.45,0.45)]
+        # rotation=[0,random.random(),0,random.random()]
+        # size=random.uniform(0.9,1)
+        if h<random.randint(15,16):
+          oakTrees.append(makeTree(c))
+          # oakFile.append(" ".join(map('{:.6f}'.format,coord+rotation+[size for _ in range(3)]))+"\n")
+        else:
+          pineTrees.append(makeTree(c))
+          # pineFile.append(" ".join(map('{:.6f}'.format,coord+rotation+[size for _ in range(3)]))+"\n")
+    for area in ["jayir_ahar_area","murgarm_area","lokhas_area"]:
+      for province in areaToProvince[area]:
+        generateTrees(int(province), random.randint(100,300))
+    generateTrees(2898, 500)
+    
+    for oak in oakTrees:
+      oakTreeSplit[random.randint(0, 2)].append(oak)
 
 
   # return
@@ -484,7 +505,10 @@ def main():
   forceTerrainGeneral["3258"]="arctic"
   forceTerrainGeneral["5429"]="arctic"
   forceTerrainGeneral["5430"]="arctic"
+  forceTerrainGeneral["1097"]="arctic"
+  forceTerrainGeneral["5306"]="arctic"
   forceTerrainGeneral["durganla_area"]="arctic"
+  forceTerrainGeneral["lothren_baul_area"]="arctic"
 
   forceTerrain=dict()
   for name, terrain in forceTerrainGeneral.items():
@@ -559,19 +583,25 @@ def main():
   # forceClimate["nafarat_region"]="arid"
   # forceClimate["khand_region"]="arid"
   # forceClimate["nurn_region"]="arid"
-  # forceClimate["tulwang_region"]="arid"
+  forceClimate["tulwang_region"]="mild_winter"
   # forceClimate["khailuza_region"]="arid"
   # forceClimate["kykurian_kyn_region"]="arid"
   # forceClimate["kargagis_ahar_region"]="arid"
   # forceClimate["gathgykarkan_region"]="arid"
-  # forceClimate["anarike_region"]="arid"
-  # forceClimate["yopi_region"]="arid"
-  # forceClimate["nikkea_region"]="arid"
-  # forceClimate["shay_region"]="arid"
-  # forceClimate["lokhas_drus_region"]="arid"
+  forceClimate["anarike_region"]="mild_winter"
+  forceClimate["yopi_region"]="mild_winter"
+  forceClimate["nikkea_region"]="mild_winter"
+  forceClimate["shay_region"]="mild_winter"
+  forceClimate["lokhas_drus_region"]="mild_winter"
   # forceClimate["ibav_region"]="arid"
-  # forceClimate["wer_falin_region"]="arid"
-  # forceClimate["ralian_region"]="arid"
+  forceClimate["wer_falin_region"]="mild_winter"
+  forceClimate["ralian_region"]="mild_winter"
+  forceClimate["lenitan_region"]="mild_winter"
+  forceClimate["kalz_raishoul_area"]="mild_winter"
+  forceClimate["lokhurush_area"]="mild_winter"
+  forceClimate["nithilfalas_area"]="mild_winter"
+  forceClimate["bellazen_area"]="mild_winter"
+  forceClimate["2093"]="mild_winter"
   # forceClimate["burskadekar_region"]="arid"
   # forceClimate["alduryaknar_region"]="arid"
 
@@ -744,6 +774,8 @@ def main():
       terrainFile.set(j, terrain)
     except:
       terrainFile.add(j, terrain)
+  a=[]
+  b=[]
 
   provinceFile.applyOnAllLevel(removeComment)
   provinceFile.deleteOnLowestLevel(empty)
@@ -751,9 +783,17 @@ def main():
   haladrin = [ "dunlending", "calending", "druwaithing", "daoine", "andrasting", "eredrim", "ethirfolk", "ishmalogim"]
   haradrim = [ "haradrim", "qarsag", "siranian" ]
   tooFewNonOwnedPops=[ "stonefoot", "stiffbeard"]
+  elven = ["sindar","silvan","galadhrim","nandor","gondolin","lindon","eregion","imladris","feanorian"]
+  dwarven = ["longbeard","firebeard","ironfist","stiffbeard","blacklock","broadbeam","stonefoot"]
   pops=["slaves", "tribesmen", "freemen", "citizen", "nobles"]
+  ownedNoSlavesList=[]
   for i in range(len(provinceFile.names)):
     j=provinceFile.names[i]
+    # if int(j) in [269,270,275,279,280,284,285,286,292,2719,111,112,113,114,115,116,117,118,120,239,722,2040,122,123,124,125,126,128,240,241,263,264,229,271,272,273,274,276,277,278,282,3912,119,121,261,262,265,266,267,268,323,320,321,322,361,314,765,981,255,257,258,259,260,330,331,334,338,795,333,335,337,340,342,792,797,1277,690,691,129,130,166,326,327,332,360,359,729,249,250,251,252,253,254,440]:
+    #   if provinceFile.vals[i].get("culture").strip('"')=="jangovar":
+    #     a.append(j)
+    #   else:
+    #     b.append(j)
     if j in forceTerrain:
       setTerrain(i, forceTerrain[j])
     if j in provinceNames:
@@ -849,6 +889,8 @@ def main():
       # else:
         # print(f'provinceNames[ j] = "{j} {provinceNames[ j]}:{heightMap.h(loc)}({loc})"')
 
+
+
     if j in ownerCountry:
       provinceFile.comments[i]+=f" ({ownerCountry[j]})"
       if weakenSouthernGoblins:
@@ -863,6 +905,9 @@ def main():
         # and provinceFile.vals[i].count("tribesmen"):
         #   tribes=provinceFile.vals[i].get("tribesmen").get("amount")
         #   provinceFile.vals[i].get("tribesmen").set("amount",max(1,int(tribes)-randint(3,4)))
+
+      if not provinceFile.vals[i].count("slaves"):
+        ownedNoSlavesList.append(j)
 
       if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
         tribes=provinceFile.vals[i].get("tribesmen").get("amount")
@@ -883,6 +928,12 @@ def main():
       addCiv=0
       if provinceFile.vals[i].get("province_rank").strip('"') == "city":
         addCiv=5
+      elif provinceFile.vals[i].get("province_rank").strip('"') == "city_metropolis":
+        addCiv=10
+      if culture in elven+dwarven and addCiv==0: #elven and dwarven settlement
+        provinceFile.vals[i].set("civilization_value", 40)
+      elif addCiv == 0 and int(provinceFile.vals[i].get("civilization_value"))>35:
+        provinceFile.vals[i].set("civilization_value", 35)
       if culture in haladrin:
         if j!="1546": #Isengard
           provinceFile.vals[i].set("civilization_value", 10+addCiv)
@@ -955,6 +1006,14 @@ def main():
   # provinceFile.writeAll(open("provinceFile.txt","w",encoding='utf-8-sig'),cdf.args(2))
   # countryFile.writeAll(open("countryFile.txt","w",encoding='utf-8-sig'),cdf.args(4))
 
+  for no_s in ownedNoSlavesList:
+    region=provinceToRegion[no_s]
+    for core in countryProvinces[ownerCountry[no_s]]:
+      if core in regionToProvince[region] and not core in ownedNoSlavesList:
+        break
+    else:
+      print(f"{no_s} no slave in region {region} for {ownerCountry[no_s]}")
+
   for v in countryFile.get("family").get("families").vals:
     if type(v)==TagList:
       v.forceMultiLineOutput = True
@@ -993,32 +1052,38 @@ def main():
     treasureFile.get("provinces").remove(p)
     # print(f'province = "{province.names}"')
 
+
+  print(" ".join(a))
+  print("\n")
+  print(" ".join(b))
+  
   cdf.outputToFolderAndFile(provinceFile , "setup/provinces", "00_default.txt" ,2,output_folder,False,encoding="utf-8-sig")
   cdf.outputToFolderAndFile(countryFile , "setup/main", "00_default.txt" ,4,output_folder,False)
   cdf.outputToFolderAndFile(treasureFile , "setup/main", "lotr_treasures.txt" ,2,output_folder,False)
   cdf.outputToFolderAndFile(newClimate , "map_data", "climate.txt" ,4,output_folder,encoding="utf-8")
   cdf.outputToFolderAndFile(terrainFile , "common/province_terrain", "00_province_terrain.txt" ,2,output_folder,False,encoding="utf-8-sig")
 
-  def saveTrees(file, name, layer, mesh, treeList):
-    br="{"
-    br2="}"
-    nl="\n"
-    file.write(f"""object={br}
-  name="{name}"
-  clamp_to_water_level=no
-  render_under_water=no
-  generated_content=yes
-  layer="{layer}"
-  pdxmesh="{mesh}"
-  count={len(treeList)}
-  transform="{nl.join(treeList)}
-"{br2}
-""")
-  with open("gfx/map/map_object_data/script_trees.txt", "w", encoding='utf-8-sig') as file:
-    saveTrees(file, "oak_tree_by_script_A", oakLayer, oakA, oakTreeSplit[0])
-    saveTrees(file, "oak_tree_by_script_B", oakLayer, oakB, oakTreeSplit[1])
-    saveTrees(file, "oak_tree_by_script_C", oakLayer, oakC, oakTreeSplit[2])
-    saveTrees(file, "pine_tree_by_script", treeLayer, pine, pineTrees)
+  if makeTrees:
+    def saveTrees(file, name, layer, mesh, treeList):
+      br="{"
+      br2="}"
+      nl="\n"
+      file.write(f"""object={br}
+    name="{name}"
+    clamp_to_water_level=no
+    render_under_water=no
+    generated_content=yes
+    layer="{layer}"
+    pdxmesh="{mesh}"
+    count={len(treeList)}
+    transform="{nl.join(treeList)}
+  "{br2}
+  """)
+    with open("gfx/map/map_object_data/script_trees.txt", "w", encoding='utf-8-sig') as file:
+      saveTrees(file, "oak_tree_by_script_A", oakLayer, oakA, oakTreeSplit[0])
+      saveTrees(file, "oak_tree_by_script_B", oakLayer, oakB, oakTreeSplit[1])
+      saveTrees(file, "oak_tree_by_script_C", oakLayer, oakC, oakTreeSplit[2])
+      saveTrees(file, "pine_tree_by_script", treeLayer, pine, pineTrees)
   # with open("gfx/map/map_object_data/oak_tree_generator_3.txt",'w', encoding='utf-8-sig') as file:
   #   oakFile[7]=f"\tcount={len(oakFile)-8}\n"
   #   for line in oakFile:
@@ -1145,6 +1210,8 @@ class Unit:
     data.add("levy_tier", props["levy_tier"] if "levy_tier" in props else "basic")
     if "tradeGood" in props:
       data.addReturn("allow").addReturn("trade_good_surplus").add("target", props["tradeGood"]).add("value",0,"", ">")
+    if "flank" in props:
+      data.add("is_flank", props["flank"])
     data.add("maneuver", props["maneuver"])
     data.add("movement_speed", props["speed"])
     data.add("build_time", props["cost"]) #no longer used?!
