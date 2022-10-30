@@ -702,24 +702,139 @@ building_methane_guild = {
 }
 
 #Sulfur
-building_sulfur_lab = {
-	base_buildtime = 360
+	#building_sulfur_lab = {
+	#	base_buildtime = 360
+	#
+	#	category = amenity
+	#	
+	#	potential = {
+	#		#NOT = { has_modifier = resort_colony }
+	#		NOT = { is_planet_class = pc_sulfur }
+	#		NOT = {	owner = { is_robot_empire = yes } }
+	#		owner = { has_origin = origin_pd_sulfur_springs }
+	#	}
+	#
+	#	allow = {
+	#		has_upgraded_capital = yes
+	#	}
+	#	
+	#	prerequisites = {
+	#		"tech_pd_sulfur_springs"
+	#	}
+	#
+	#	triggered_planet_modifier = {
+	#		potential = {
+	#			exists = owner
+	#			owner = { is_regular_empire = yes }
+	#		}
+	#		modifier = {
+	#			job_sulfur_ent_add = 4
+	#		}
+	#	}
+	#
+	#	triggered_planet_modifier = {
+	#		potential = {
+	#			exists = owner
+	#			owner = { is_hive_empire = yes }
+	#		}
+	#		modifier = {
+	#			job_sulfur_ent_drone_add = 4
+	#		}
+	#	}
+	#	
+	#	resources = {
+	#		category = planet_buildings
+	#		cost = {
+	#			minerals = 400
+	#		}
+	#		upkeep = {
+	#			energy = 1
+	#		}
+	#	}
+	#
+	#	ai_resource_production = {
+	#		trigger = { always = yes }
+	#		society_research = 30
+	#		minerals = 20
+	#	}	 
+	#
+	#	destroy_trigger = {
+	#		NOT = {
+	#			owner = { has_origin = origin_pd_sulfur_springs }
+	#		}
+	#	}  
+	#
+	#    ai_weight = {
+	#        weight = 10000
+	#    }
+	#}
 
-	category = amenity
+pd_building_sulfer_springs = {
+	base_buildtime = 600
 	
+	category = resource
+
 	potential = {
-		#NOT = { has_modifier = resort_colony }
-		NOT = { is_planet_class = pc_sulfur }
-		NOT = {	owner = { is_robot_empire = yes } }
-		owner = { has_origin = origin_pd_sulfur_springs }
+		NOT = { has_modifier = resort_colony }
+		is_planet_class =  pc_sulfur
+		NOT = { has_building = pd_building_sulfer_lab }
+		NOT = { has_building = pd_building_sulfer_springs }
+		NOT = { has_building = pd_building_sulfer_resort }
+		NOT = { has_building_construction = pd_building_sulfer_springs }
+		NOT = { has_building_construction = pd_building_sulfer_lab }
+		NOT = { has_building_construction = pd_building_resorts }	
+	}
+
+	inline_script = "buildings/pd_rare_energy_building"
+
+	destroy_trigger = {
+		planet = {
+			NOT = { is_planet_class = pc_sulfur }
+		}
+	}
+}
+
+pd_building_sulfer_lab = {
+	base_buildtime = 600
+	
+	category = research
+
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		is_planet_class =  pc_sulfur
+		NOT = { has_building = pd_building_sulfer_lab }
+		NOT = { has_building = pd_building_sulfer_springs }
+		NOT = { has_building = pd_building_sulfer_resort }
+		NOT = { has_building_construction = pd_building_sulfer_springs }
+		NOT = { has_building_construction = pd_building_sulfer_lab }
+		NOT = { has_building_construction = pd_building_resorts }	
 	}
 
 	allow = {
 		has_upgraded_capital = yes
 	}
-	
-	prerequisites = {
-		"tech_pd_sulfur_springs"
+
+	planet_modifier = {
+        planet_researchers_society_research_produces_add = 0.25
+		planet_researchers_engineering_research_produces_add = 0.25
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_basic_science_lab_2 }
+		}
+        planet_researchers_society_research_produces_add = 0.25
+		planet_researchers_engineering_research_produces_add = 0.25
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { has_technology = tech_basic_science_lab_3 }
+		}
+        planet_researchers_society_research_produces_add = 0.5
+		planet_researchers_engineering_research_produces_add = 0.5
 	}
 
 	triggered_planet_modifier = {
@@ -728,45 +843,82 @@ building_sulfur_lab = {
 			owner = { is_regular_empire = yes }
 		}
 		modifier = {
-			job_sulfur_ent_add = 4
+			job_head_researcher_add = 1
 		}
 	}
-
+	
 	triggered_planet_modifier = {
 		potential = {
 			exists = owner
 			owner = { is_hive_empire = yes }
 		}
 		modifier = {
-			job_sulfur_ent_drone_add = 4
+			job_brain_drone_add = 1
+		}
+	}
+	
+	triggered_planet_modifier = {
+		potential = {
+			exists = owner
+			owner = { is_machine_empire = yes }
+		}
+		modifier = {
+			job_calculator_add = 1
 		}
 	}
 	
 	resources = {
 		category = planet_buildings
 		cost = {
-			minerals = 400
+			minerals = 800
 		}
 		upkeep = {
-			energy = 1
+			energy = 8
 		}
 	}
-
+	
 	ai_resource_production = {
-		trigger = { always = yes }
-		society_research = 30
-		minerals = 20
-	}	 
+		trigger = {
+			planet_resource_compare = {
+				resource = engineering_research
+				value >= 30
+			}
+		}
+		physics_research = 5
+		society_research = 5
+		engineering_research = 5
+	} 
 
 	destroy_trigger = {
-		NOT = {
-			owner = { has_origin = origin_pd_sulfur_springs }
+		planet = {
+			NOT = { is_planet_class = pc_sulfur }
 		}
-	}  
+	}
+}
 
-    ai_weight = {
-        weight = 10000
-    }
+pd_building_sulfer_resort = {
+	base_buildtime = 600
+	
+	category = resource
+
+	potential = {
+		NOT = { has_modifier = resort_colony }
+		is_planet_class =  pc_sulfur
+		NOT = { has_building = pd_building_sulfer_lab }
+		NOT = { has_building = pd_building_sulfer_springs }
+		NOT = { has_building = pd_building_sulfer_resort }
+		NOT = { has_building_construction = pd_building_sulfer_springs }
+		NOT = { has_building_construction = pd_building_sulfer_lab }
+		NOT = { has_building_construction = pd_building_resorts }	
+	}
+
+	inline_script = "buildings/pd_rare_resort_building"
+
+	destroy_trigger = {
+		planet = {
+			NOT = { is_planet_class = pc_sulfur }
+		}
+	}
 }
 
 #Ammonia
@@ -940,6 +1092,7 @@ building_rogue_lab = {
 		engineering_research = 5
 	}  
 }
+
 building_rogue_grid = {
 	base_buildtime = 600
 
