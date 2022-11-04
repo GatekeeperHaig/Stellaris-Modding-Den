@@ -107,7 +107,8 @@ country_event = {
 				20 = { change_pc = pc_prairie reroll_planet = yes }		
 				20 = { change_pc = pc_veld reroll_planet = yes }	
 				20 = { change_pc = pc_semiarid reroll_planet = yes }	
-				20 = { change_pc = pc_supercon reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = supercon } }						
+				20 = { change_pc = pc_supercon reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = supercon } }
+				20 = { change_pc = pc_pd_sinkhole reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = pdsinkhole } }						
 			}
 		}
 
@@ -286,6 +287,8 @@ country_event = {
 		every_galaxy_planet = { limit = { is_planet_class = pc_tidallylocked is_homeworld = yes is_moon = no } generate_pd_start_deposits_and_blockers = yes }
 		#Supercontinent
 		every_galaxy_planet = { limit = { is_planet_class = pc_supercon is_homeworld = yes is_moon = no } generate_pd_start_deposits_and_blockers = yes }
+		#Sinkhole
+		every_galaxy_planet = { limit = { is_planet_class = pc_pd_sinkhole is_homeworld = yes is_moon = no } generate_pd_start_deposits_and_blockers = yes }
 		#Crystal
 		every_galaxy_planet = { limit = { is_planet_class = pc_crystal is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Floating
@@ -412,6 +415,17 @@ country_event = {
 		#Supercon Player Start
 		every_galaxy_planet = {
 			limit = { is_planet_class = pc_supercon  is_homeworld = no has_planet_flag = prescripted_ideal }
+			random_list = {
+				20 = { change_pc = pc_savannah reroll_planet = yes }	
+				20 = { change_pc = pc_veld reroll_planet = yes }		
+				20 = { change_pc = pc_steppe reroll_planet = yes }		
+				20 = { change_pc = pc_prairie reroll_planet = yes }
+				20 = { change_pc = pc_semiarid reroll_planet = yes }
+			}
+		}
+		#Sinkhole Player Start
+		every_galaxy_planet = {
+			limit = { is_planet_class = pc_pd_sinkhole  is_homeworld = no has_planet_flag = prescripted_ideal }
 			random_list = {
 				20 = { change_pc = pc_savannah reroll_planet = yes }	
 				20 = { change_pc = pc_veld reroll_planet = yes }		
@@ -1230,6 +1244,10 @@ country_event = {
 			set_planet_flag = pdsupercon
 		}
 		every_galaxy_planet = {
+			limit = { is_planet_class = pc_pd_sinkhole }
+			set_planet_flag = pc_pd_sinkhole
+		}
+		every_galaxy_planet = {
 			limit = { is_planet_class = pc_karst }
 			set_planet_flag = pdkarst
 		}
@@ -1680,6 +1698,10 @@ planet_event = {
 		remove_modifier = supercon
 		}
 		if = { 
+			limit = { NOT = { is_planet_class = pc_pd_sinkhole } }
+			remove_modifier = pdsinkhole
+		}
+		if = { 
 		limit = { NOT = { is_planet_class = pc_karst } }
 		remove_modifier = karst
 		}
@@ -2077,8 +2099,12 @@ planet_event = {
 		add_modifier = { modifier = "tidal_locked2" days = -1 }
 		}
 		if = { 
-		limit = { is_planet_class = pc_supercon }
-		add_modifier = { modifier = "supercon" days = -1 }
+			limit = { is_planet_class = pc_supercon }
+			add_modifier = { modifier = "supercon" days = -1 }
+		}
+		if = { 
+			limit = { is_planet_class = pc_pd_sinkhole }
+			add_modifier = { modifier = "pdsinkhole" days = -1 }
 		}
 		if = { 
 		limit = { is_planet_class = pc_karst }
@@ -2308,6 +2334,7 @@ planet_event = {
 			is_planet_class = pc_tidallylocked
 			is_planet_class = pc_wettidallylocked
 			is_planet_class = pc_supercon
+			is_planet_class = pc_pd_sinkhole
 			is_planet_class = pc_biolumen
 			is_planet_class = pc_karst
 			is_planet_class = pc_reef
@@ -2342,6 +2369,7 @@ planet_event = {
 			IF = { limit = { is_planet_class = pc_tidallylocked } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture  }
 			IF = { limit = { is_planet_class = pc_wettidallylocked } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture  }
 			IF = { limit = { is_planet_class = pc_supercon } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_pd_sinkhole } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_karst } set_planet_entity = { picture = pc_aquatickarst_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_reef } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			#Cold
@@ -2862,6 +2890,7 @@ planet_event = {
 		if = { limit = { is_planet_class = pc_tidallylocked } set_planet_flag = pdhive_tidallylocked }
 		if = { limit = { is_planet_class = pc_wettidallylocked } set_planet_flag = pdhive_wettidallylocked }
 		if = { limit = { is_planet_class = pc_supercon } set_planet_flag = pdhive_supercon }
+		if = { limit = { is_planet_class = pc_pd_sinkhole } set_planet_flag = pdhive_sinkhole }
 		if = { limit = { is_planet_class = pc_biolumen } set_planet_flag = pdhive_biolumen }
 		if = { limit = { is_planet_class = pc_karst } set_planet_flag = pdhive_karst }
 		if = { limit = { is_planet_class = pc_reef } set_planet_flag = pdhive_reef }
@@ -3164,6 +3193,7 @@ planet_event = {
 		if = { limit = { has_planet_flag = pdhive_tidallylocked } change_pc = pc_tidallylocked remove_planet_flag = pdhive_tidallylocked }
 		if = { limit = { has_planet_flag = pdhive_wettidallylocked } change_pc = pc_wettidallylocked remove_planet_flag = pdhive_wettidallylocked }
 		if = { limit = { has_planet_flag = pdhive_supercon } change_pc = pc_supercon remove_planet_flag = pdhive_supercon }
+		if = { limit = { has_planet_flag = pdhive_sinkhole } change_pc = pc_pd_sinkhole remove_planet_flag = pdhive_sinkhole }
 		if = { limit = { has_planet_flag = pdhive_biolumen } change_pc = pc_biolumen remove_planet_flag = pdhive_biolumen }
 		if = { limit = { has_planet_flag = pdhive_karst } change_pc = pc_karst remove_planet_flag = pdhive_karst }
 		if = { limit = { has_planet_flag = pdhive_reef } change_pc = pc_reef remove_planet_flag = pdhive_reef }
@@ -4341,6 +4371,20 @@ country_event = {
 			if = {
 				limit = {
 					has_planet_flag = lost_colony_planet
+					is_planet_class = pc_pd_sinkhole
+				}
+				random_list = {
+					20 = { change_pc = pc_savannah }
+					20 = { change_pc = pc_prairie }
+					20 = { change_pc = pc_veld }
+					20 = { change_pc = pc_steppe }
+					20 = { change_pc = pc_semiarid }
+				}
+				generate_pd_start_deposits_and_blockers = yes
+			}
+			if = {
+				limit = {
+					has_planet_flag = lost_colony_planet
 					is_planet_class = pc_coral
 				}
 				random_list = {
@@ -4931,6 +4975,20 @@ country_event = {
 					if = {
 						limit = {
 							is_planet_class = pc_supercon
+						}
+						random_list = {
+							20 = { change_pc = pc_savannah }
+							20 = { change_pc = pc_prairie }
+							20 = { change_pc = pc_veld }
+							20 = { change_pc = pc_steppe }
+							20 = { change_pc = pc_semiarid }
+						}
+						reroll_deposits = yes
+						remove_modifier = tidal_locked2
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_pd_sinkhole
 						}
 						random_list = {
 							20 = { change_pc = pc_savannah }
@@ -5872,6 +5930,19 @@ country_event = {
 					}
 					if = {
 						limit = {
+							is_planet_class = pc_pd_sinkhole
+						}
+						random_list = {
+							20 = { change_pc = pc_savannah }		
+							20 = { change_pc = pc_steppe }
+							20 = { change_pc = pc_prairie }	
+							20 = { change_pc = pc_veld }
+							20 = { change_pc = pc_semiarid }
+						}
+						reroll_deposits = yes
+					}
+					if = {
+						limit = {
 							is_planet_class = pc_coral
 						}
 						random_list = {
@@ -6798,6 +6869,11 @@ country_event = {
 			IF = { limit = { is_planet_class = pc_supercon } 
 				IF = { limit = { not = { has_modifier = supercon } }
 				add_modifier = { modifier = "supercon" days = -1 }
+				}
+			}		
+			IF = { limit = { is_planet_class = pc_pd_sinkhole } 
+				IF = { limit = { not = { has_modifier = pdsinkhole } }
+				add_modifier = { modifier = "pdsinkhole" days = -1 }
 				}
 			}	
 			IF = { limit = { is_planet_class = pc_karst } 
