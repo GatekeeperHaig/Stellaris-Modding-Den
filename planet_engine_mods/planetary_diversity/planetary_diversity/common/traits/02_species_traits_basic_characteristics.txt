@@ -97,7 +97,10 @@ trait_syncretic_proles = {
 		always = no
 	}
 	species_possible_remove = {
-		always = no
+		can_remove_presapient_genetic_traits = yes
+	}
+	species_possible_merge_remove = {
+		always = yes
 	}
 	species_possible_merge_add = {
 		always = no
@@ -149,7 +152,7 @@ trait_lithoid = {
 	custom_tooltip = TRAIT_LITHOID_EFFECT
 	modifier = {
 		pop_growth_speed = -0.25
-		pop_assembly_speed = -0.25
+		planet_pop_assembly_organic_mult = -0.25
 		pop_environment_tolerance = 0.5
 		army_health = 0.5
 		leader_age = 50
@@ -157,7 +160,7 @@ trait_lithoid = {
 }
 
 trait_aquatic = {
-	cost = 1
+	cost = 2
 	host_has_dlc = "Aquatics Species Pack"
 
 	sorting_priority = 20
@@ -168,7 +171,7 @@ trait_aquatic = {
 		HUM = 2
 		MAM = 2
 		LITHOID = 0.5
-	 }
+	}
 
 	allowed_planet_classes = {
 		pc_ocean
@@ -189,7 +192,7 @@ trait_aquatic = {
 				limit = { NOT = { from = { has_ascension_perk = ap_hydrocentric } } }
 				custom_tooltip = {
 					fail_text = trait_aquatic_remove_evolutionary_mastery
-					from = { has_ascension_perk = ap_evolutionary_mastery }
+					from = { has_tradition = tr_genetics_resequencing }
 				}
 			}
 			else = {
@@ -203,7 +206,7 @@ trait_aquatic = {
 	species_potential_add = {
 		exists = from
 		from = {
-			has_ascension_perk = ap_evolutionary_mastery
+			has_tradition = tr_genetics_resequencing
 		}
 	}
 	initial = yes
@@ -340,12 +343,41 @@ trait_aquatic = {
 	}
 
 	icon = "gfx/interface/icons/traits/trait_aquatic.dds"
+
+	assembly_score = {
+		modifier = {
+			add = 1
+			from = {
+				OR = {
+					is_planet_class = pc_ocean
+					is_planet_class = pc_aquatic
+					is_planet_class = pc_reef
+					is_planet_class = pc_desertislands
+					is_planet_class = pc_subarctic
+					is_planet_class = pc_storm
+					is_planet_class = pc_pd_iceberg
+					has_modifier = flooded_habitat
+				}
+			}
+		}
+
+		modifier = {
+			subtract = 1
+			from = {
+				NOR = {
+					has_climate = wet
+					has_modifier = flooded_habitat
+				}
+				is_ideal = no
+			}
+		}
+	}
 }
 
 trait_necrophage = {
 	cost = 0
 	potential_crossbreeding_chance = 0
-	opposites = { "trait_plantoid_budding" }
+	opposites = { "trait_plantoid_budding" "trait_lithoid_budding" "trait_advanced_budding" "trait_tiyanki" }
 	sorting_priority = 20
 
 	initial = no
@@ -372,7 +404,7 @@ trait_necrophage = {
 	modifier = {
 		leader_age = 80
 		pop_growth_speed = -0.75
-		pop_assembly_speed = -0.5
+		planet_pop_assembly_organic_mult = -0.5
 		planet_pops_organics_food_upkeep_mult = -0.5
 		planet_pops_organics_minerals_upkeep_mult = -0.5
 		planet_pops_organics_energy_upkeep_mult = -0.5
@@ -387,7 +419,7 @@ trait_necrophage = {
 trait_clone_soldier_infertile = {
 	cost = 0
 	potential_crossbreeding_chance = 0
-	opposites = { "trait_slow_breeders" "trait_rapid_breeders" "trait_plantoid_budding" }
+	opposites = { "trait_slow_breeders" "trait_rapid_breeders" "trait_plantoid_budding" "trait_lithoid_budding" "trait_advanced_budding" "trait_vat_grown" "trait_tiyanki" }
 	sorting_priority = 20
 
 	initial = no
@@ -430,7 +462,7 @@ trait_clone_soldier_infertile = {
 trait_clone_soldier_infertile_full_potential = {
 	cost = 0
 	potential_crossbreeding_chance = 0
-	opposites = { "trait_slow_breeders" "trait_rapid_breeders" "trait_plantoid_budding" }
+	opposites = { "trait_slow_breeders" "trait_rapid_breeders" "trait_plantoid_budding" "trait_lithoid_budding" "trait_advanced_budding" "trait_vat_grown" "trait_tiyanki" }
 	sorting_priority = 20
 
 	initial = no
@@ -478,6 +510,7 @@ trait_clone_soldier_infertile_full_potential = {
 
 trait_clone_soldier_fertile = {
 	cost = 0
+	opposites = { "trait_vat_grown" }
 	sorting_priority = 20
 
 	initial = no
@@ -510,12 +543,15 @@ trait_clone_soldier_fertile = {
 		# Leader modifiers
 		army_damage_mult = 0.2
 	}
+	slave_cost = {
+		energy = 1000
+	}
 }
 
 trait_cave_dweller = {
 	cost = 0
 	potential_crossbreeding_chance = 0
-	opposites = { "trait_plantoid_phototrophic" "trait_aquatic" }
+	opposites = { "trait_plantoid_phototrophic" "trait_aquatic" "trait_advanced_phototrophic" }
 	sorting_priority = 20
 
 	initial = no
@@ -532,7 +568,7 @@ trait_cave_dweller = {
 	species_possible_merge_add = {
 		always = no
 	}
-	
+
 	allowed_archetypes = { BIOLOGICAL LITHOID }
 	ai_weight = {
 		weight = 0
@@ -561,5 +597,15 @@ trait_cave_dweller = {
 	
 	slave_cost = {
 		energy = 500
+	}
+	assembly_score = {
+		modifier = {
+			add = 1.5
+			from = { has_mining_designation = yes }
+		}
+		modifier = {
+			add = 0.5
+			from = { has_rural_designation = yes }
+		}
 	}
 }
