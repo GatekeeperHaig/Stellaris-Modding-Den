@@ -50,7 +50,8 @@ country_event = {
 				20 = { change_pc = pc_wetswamp reroll_planet = yes }
 				20 = { change_pc = pc_fog reroll_planet = yes }
 				20 = { change_pc = pc_karst reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = karst } }
-				20 = { change_pc = pc_reef reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = pdreef } }					
+				20 = { change_pc = pc_reef reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = pdreef } }	
+				20 = { change_pc = pc_pd_archipelago reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = pdarchipelago } }					
 			}
 		}
 		every_galaxy_planet = {
@@ -307,6 +308,8 @@ country_event = {
 		every_galaxy_planet = { limit = { is_planet_class = pc_karst is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Reef
 		every_galaxy_planet = { limit = { is_planet_class = pc_reef is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
+		#Archipelago
+		every_galaxy_planet = { limit = { is_planet_class = pc_pd_archipelago is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Archive
 		every_galaxy_planet = { limit = { is_planet_class = pc_archive is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Machine
@@ -646,6 +649,17 @@ country_event = {
 		#Reef Start
 		every_galaxy_planet = { 				
 			limit = { is_planet_class = pc_reef is_homeworld = no has_planet_flag = prescripted_ideal }
+			random_list = {
+				20 = { change_pc = pc_ocean }
+				20 = { change_pc = pc_cascadian }
+				20 = { change_pc = pc_wetswamp }
+				20 = { change_pc = pc_fog }
+				20 = { change_pc = pc_subarctic }		
+			}
+		}
+		#Archipelago Start
+		every_galaxy_planet = { 				
+			limit = { is_planet_class = pc_pd_archipelago is_homeworld = no has_planet_flag = prescripted_ideal }
 			random_list = {
 				20 = { change_pc = pc_ocean }
 				20 = { change_pc = pc_cascadian }
@@ -1256,6 +1270,10 @@ country_event = {
 			set_planet_flag = pdreef
 		}
 		every_galaxy_planet = {
+			limit = { is_planet_class = pc_pd_archipelago }
+			set_planet_flag = pdarchipelago
+		}
+		every_galaxy_planet = {
 			limit = { is_planet_class = pc_superhabitable }
 			set_planet_flag = pdsuperhabitable
 		}
@@ -1708,10 +1726,10 @@ planet_event = {
 		if = { 
 		limit = { NOT = { is_planet_class = pc_reef } }
 		remove_modifier = pdreef
-			if = {
-				limit = { is_colony = yes }
-				remove_building = building_reef_lab
-			}
+		}
+		if = { 
+		limit = { NOT = { is_planet_class = pc_pd_archipelago } }
+		remove_modifier = pdarchipelago
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_salt } }
@@ -2033,10 +2051,6 @@ planet_event = {
 		remove_modifier = pdterra_supercon
 		}
 		if = { 
-		limit = { NOT = { is_planet_class = pc_ocean } }
-		remove_modifier = pdterra_reef
-		}
-		if = { 
 			limit = { 
 				NOR = { 
 					is_planet_class = pc_pdshroud 
@@ -2111,8 +2125,12 @@ planet_event = {
 		add_modifier = { modifier = "karst" days = -1 }
 		}
 		if = { 
-		limit = { is_planet_class = pc_reef }
-		add_modifier = { modifier = "pdreef" days = -1 }
+			limit = { is_planet_class = pc_reef }
+				add_modifier = { modifier = "pdreef" days = -1 }
+		}
+		if = { 
+			limit = { is_planet_class = pc_pd_archipelago }
+				add_modifier = { modifier = "pdarchipelago" days = -1 }
 		}
 		if = { 
 		limit = { is_planet_class = pc_primal  }
@@ -2281,71 +2299,19 @@ planet_event = {
 			}
 		}
 		OR = {
-			is_planet_class = pc_continental
-			is_planet_class = pc_ocean
-			is_planet_class = pc_tropical
-			is_planet_class = pc_cascadian
-			is_planet_class = pc_forest
-			is_planet_class = pc_lake
-			is_planet_class = pc_tepid
-			is_planet_class = pc_desertislands
-			is_planet_class = pc_retinal
-			is_planet_class = pc_subarctic
-			is_planet_class = pc_mangrove
-			is_planet_class = pc_wetswamp
-			is_planet_class = pc_fog
-			is_planet_class = pc_hajungle
-			is_planet_class = pc_cenote
+			is_wet = yes
+			is_dry = yes
+			is_cold = yes
 			is_planet_class = pc_gaia
 			is_planet_class = pc_hot_gaia
 			is_planet_class = pc_cold_gaia
-			is_planet_class = pc_prairie
-			is_planet_class = pc_steppe
-			is_planet_class = pc_veld
-			is_planet_class = pc_semiarid
-			is_planet_class = pc_swamp
-			is_planet_class = pc_mud
-			is_planet_class = pc_basalt
-			is_planet_class = pc_glacial
-			is_planet_class = pc_boreal
-			is_planet_class = pc_arctic
-			is_planet_class = pc_alpine
-			is_planet_class = pc_highland
-			is_planet_class = pc_duneforest
-			is_planet_class = pc_mushroom
-			is_planet_class = pc_med
-			is_planet_class = pc_savannah
 			is_planet_class = pc_ringworld_habitable
 			is_planet_class = pc_city
 			is_planet_class = pc_mesa
-			is_planet_class = pc_badlands
-			is_planet_class = pc_outback
-			is_planet_class = pc_coastal
-			is_planet_class = pc_hadesert
-			is_planet_class = pc_desert
-			is_planet_class = pc_arid
-			is_planet_class = pc_sandsea
-			is_planet_class = pc_antarctic
-			is_planet_class = pc_aeolian
-			is_planet_class = pc_snow
-			is_planet_class = pc_tundra
-			is_planet_class = pc_geothermal
-			is_planet_class = pc_superhabitable
-			is_planet_class = pc_tidallylocked
-			is_planet_class = pc_wettidallylocked
-			is_planet_class = pc_supercon
-			is_planet_class = pc_pd_sinkhole
-			is_planet_class = pc_biolumen
-			is_planet_class = pc_karst
-			is_planet_class = pc_reef
-			is_planet_class = pc_primal
 			is_planet_class = pc_pdshroud
 			is_planet_class = pc_tidallyshroud
 			is_planet_class = pc_aquatic
 			is_planet_class = pc_tidallyaquatic
-			is_planet_class = pc_storm
-			is_planet_class = pc_pd_iceberg
-			is_planet_class = pc_eyeball
 		}
 	}
 
@@ -2372,6 +2338,7 @@ planet_event = {
 			IF = { limit = { is_planet_class = pc_pd_sinkhole } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_karst } set_planet_entity = { picture = pc_aquatickarst_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_reef } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_pd_aripelago } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			#Cold
 			IF = { limit = { is_planet_class = pc_subarctic } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
 			IF = { limit = { is_planet_class = pc_swamp } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
@@ -2894,6 +2861,7 @@ planet_event = {
 		if = { limit = { is_planet_class = pc_biolumen } set_planet_flag = pdhive_biolumen }
 		if = { limit = { is_planet_class = pc_karst } set_planet_flag = pdhive_karst }
 		if = { limit = { is_planet_class = pc_reef } set_planet_flag = pdhive_reef }
+		if = { limit = { is_planet_class = pc_pd_archipelago } set_planet_flag = pdhive_archipelago }
 		if = { limit = { is_planet_class = pc_primal } set_planet_flag = pdhive_primal }
 		if = { limit = { is_planet_class = pc_aquatic } set_planet_flag = pdhive_aquatic }
 		if = { limit = { is_planet_class = pc_salt } set_planet_flag = pdhive_salt }
@@ -3197,6 +3165,7 @@ planet_event = {
 		if = { limit = { has_planet_flag = pdhive_biolumen } change_pc = pc_biolumen remove_planet_flag = pdhive_biolumen }
 		if = { limit = { has_planet_flag = pdhive_karst } change_pc = pc_karst remove_planet_flag = pdhive_karst }
 		if = { limit = { has_planet_flag = pdhive_reef } change_pc = pc_reef remove_planet_flag = pdhive_reef }
+		if = { limit = { has_planet_flag = pdhive_archipelago } change_pc = pc_pd_archpelago remove_planet_flag = pdhive_archipelago }
 		if = { limit = { has_planet_flag = pdhive_primal } change_pc = pc_primal remove_planet_flag = pdhive_primal }
 		if = { limit = { has_planet_flag = pdhive_aquatic } change_pc = pc_aquatic remove_planet_flag = pdhive_aquatic }
 		if = { limit = { has_planet_flag = pdhive_salt } change_pc = pc_salt remove_planet_flag = pdhive_salt }
@@ -4294,6 +4263,20 @@ country_event = {
 			if = {
 				limit = {
 					has_planet_flag = lost_colony_planet
+					is_planet_class = pc_pd_archipelago
+				}
+				random_list = {
+					20 = { change_pc = pc_ocean }
+					20 = { change_pc = pc_cascadian }
+					20 = { change_pc = pc_wetswamp }
+					20 = { change_pc = pc_fog }
+					20 = { change_pc = pc_subarctic }
+				}
+				generate_pd_start_deposits_and_blockers = yes
+			}
+			if = {
+				limit = {
+					has_planet_flag = lost_colony_planet
 					is_planet_class = pc_megaflora
 				}
 				random_list = {
@@ -4909,6 +4892,20 @@ country_event = {
 						}
 						reroll_deposits = yes
 						remove_modifier = pdreef
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_pd_archipelago
+						}
+						random_list = {
+							20 = { change_pc = pc_ocean }
+							20 = { change_pc = pc_cascadian }
+							20 = { change_pc = pc_wetswamp }
+							20 = { change_pc = pc_fog }
+							20 = { change_pc = pc_subarctic }
+						}
+						reroll_deposits = yes
+						remove_modifier = pdarchipelago
 					}
 					if = {
 						limit = {
@@ -5851,6 +5848,20 @@ country_event = {
 						}
 						reroll_deposits = yes
 						remove_modifier = pdreef
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_pd_archipelago
+						}
+						random_list = {
+							20 = { change_pc = pc_ocean }
+							20 = { change_pc = pc_cascadian }
+							20 = { change_pc = pc_wetswamp }
+							20 = { change_pc = pc_fog }
+							20 = { change_pc = pc_subarctic }
+						}
+						reroll_deposits = yes
+						remove_modifier = pdarchipelago
 					}
 					if = {
 						limit = {
@@ -6884,6 +6895,11 @@ country_event = {
 			IF = { limit = { is_planet_class = pc_reef } 
 				IF = { limit = { not = { has_modifier = pdreef } }
 				add_modifier = { modifier = "pdreef" days = -1 }
+				}
+			}	
+			IF = { limit = { is_planet_class = pc_pd_archipelago } 
+				IF = { limit = { not = { has_modifier = pdarchipelago } }
+				add_modifier = { modifier = "pdarchipelago" days = -1 }
 				}
 			}	
 			IF = { limit = { is_planet_class = pc_primal } 
