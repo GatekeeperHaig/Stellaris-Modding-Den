@@ -193,6 +193,7 @@ def main():
   output_folder="."
 
   provinceNames={}
+  provinceNamesInv={}
   with open("localization/english/provincenames_l_english.yml",encoding='utf-8-sig') as f:
     for line in f.readlines():
       # print(line)
@@ -206,6 +207,9 @@ def main():
       rest=" ".join(split[1:]).replace('"', "")
       # print(f'rest = "{rest}"')
       provinceNames[key]=rest
+      if not rest in provinceNamesInv:
+        provinceNamesInv[rest]=[]
+      provinceNamesInv[rest].append(key)
 
   moveGroupNamesToNormal=False
   if moveGroupNamesToNormal:
@@ -224,11 +228,7 @@ def main():
     for p in removeList:
       del provinceNames[p]
 
-    os.makedirs("out/localization/english", exist_ok=True)
-    with open("out/localization/english/provincenames_l_english.yml","w",encoding='utf-8-sig') as f:
-      f.write("l_english:\n")
-      for p,i in provinceNames.items():
-        f.write(f' PROV{p}:0 "{i}"\n')
+
 
   provinceFile=TagList(0)
   provinceFile.readFile("setup/provinces/00_default.txt",encoding='utf-8-sig')
@@ -294,9 +294,55 @@ def main():
 
 
 
-  uninhabitable = set(map(str,list(range(4969,4988+1))+list(range(5453,5459+1))+list([552,2616,3765,577,564,563,576,575,604,605,606,607,608,602,603,2696,2697,2698,2607,2604,2605,3402,3403,3404,476,475,478,479,2961,2960,2959,2954,2955,2984,2985,2986,540,539,538,537,536,535,547,546,545,544,543,542,2617,594,595,596,597,94,27,95,91,92,581,582,2046,2045,2044,87,85,89,88,83,82,80,2375,2376,7,3,17,23,48,1965,583,584,585,586,587,588,589,590,2997,2998,3000,3001,2988,2991,2989,2992,2994,3003,2990,2995,2996,2993,3002,579,578,2048,2049,2050,2051,2052,2053,593,3142,3143,3146,3144,3145,3147,3148,3149,3150,51,2378,2377,3638,3639,3678,3679,3680,3681,3682,3683,3684,3685,3686,3687,3688,3689,3690,3691,3692,3693,3694,3593,3709,3719,3611,3613,3612,3653,3654,3656,3660,3718,3626,3659,3706,3607,3608,3609,3740,3741,3742,3743,3744,3745,3746,3747,3787,3781,3779,3778,3777,3784,3793,3794,3792,3790,3789,3791,3775,3776,3771,3795,3797,2730,2731,2732,2733,2739,2737,2741,2735,2740,2742,2745,2744,2743,3860,3862,3863,3864,3865,3866,3874,3867,3881,3871,3869,3552,3553,3880,3879,3868,3872,3873,3870,3554,2738,2750,2749,2748,2747,2746,2751,3875,2729,2769,2728,3582,3581,3580,3643,3637,3904,3909,3910,3937,3938,3939,5215,5217,5218,5174,5176,5291,5292,5293,5306,5307,5308,5309,5310,5311,5312,5313,5314,5315,5317,5318,5319,5320,5321,5322,5323,5324,5326,5327,5328,5329,5330,5331,5332,5333,5334,5336,5337,5338,5339,5340,5341,5342,5343,5344,5345,5348,5386,5387,5388,5389,5390,5433,5434,5435,5399,5400,5401,5378,5379,5375,5274,5275,5276,5277,5278,5281,5279,5282,5283,5406,5429,5430,5297,5298,5299,5437,5024,5025,5443,5444,5445,5446,5447,5448,5449,5450,5451,5067,5463,5396,5395,5409,5280,5462,5466,5284,5286,5287,5294,5296,5452,5410,5411,5412,5216,5252,5285,5288,5060,5273])))
+  uninhabitable = set(map(str,list(range(4969,4988+1))+list(range(5453,5459+1))+list([52,2616,3765,577,564,563,576,575,604,605,606,607,608,602,603,2696,2697,2698,2607,2604,2605,3402,3403,3404,476,475,478,479,2961,2960,2959,2954,2955,2984,2985,2986,540,539,538,537,536,535,547,546,545,544,543,542,2617,594,595,596,597,94,27,95,91,92,581,582,2046,2045,2044,87,85,89,88,83,82,80,2375,2376,7,3,17,23,48,1965,583,584,585,586,587,588,589,590,2997,2998,3000,3001,2988,2991,2989,2992,2994,3003,2990,2995,2996,2993,3002,579,578,2048,2049,2050,2051,2052,2053,593,3142,3143,3146,3144,3145,3147,3148,3149,3150,51,2378,2377,3638,3639,3678,3679,3680,3681,3682,3683,3684,3685,3686,3687,3688,3689,3690,3691,3692,3693,3694,3593,3709,3719,3611,3613,3612,3653,3654,3656,3660,3718,3626,3659,3706,3607,3608,3609,3740,3741,3742,3743,3744,3745,3746,3747,3787,3781,3779,3778,3777,3784,3793,3794,3792,3790,3789,3791,3775,3776,3771,3795,3797,2730,2731,2732,2733,2739,2737,2741,2735,2740,2742,2745,2744,2743,3860,3862,3863,3864,3865,3866,3874,3867,3881,3871,3869,3552,3553,3880,3879,3868,3872,3873,3870,3554,2738,2750,2749,2748,2747,2746,2751,3875,2729,2769,2728,3582,3581,3580,3643,3637,3904,3909,3910,3937,3938,3939,5215,5217,5218,5174,5176,5291,5306,5307,5308,5309,5310,5311,5312,5313,5314,5315,5317,5318,5319,5320,5321,5322,5323,5324,5326,5327,5328,5329,5330,5331,5332,5333,5334,5336,5337,5338,5339,5340,5341,5342,5343,5344,5345,5348,5386,5387,5388,5389,5390,5433,5434,5435,5399,5400,5401,5378,5379,5375,5274,5275,5276,5277,5278,5281,5279,5282,5283,5406,5429,5430,5297,5298,5299,5437,5024,5025,5443,5444,5445,5446,5447,5448,5449,5450,5451,5067,5463,5396,5395,5409,5280,5462,5466,5284,5286,5287,5296,5452,5410,5411,5412,5216,5252,5285,5288,5060,5273])))
 
   # print(f'uninhabitable = "{uninhabitable}"')
+
+  addNumbersToDuplicateNames=False
+  if addNumbersToDuplicateNames:
+    sea_of_rhun=list(range(3500,3505+1))
+    Haragaer=list(range(4744,4894+1))
+    EdgeSee=list(range(5478,5499+1))
+    Belegaer=list(range(5500,5687+1))
+    river_provinces = list(range(4895,4988+1))
+    allSeas=sea_of_rhun+Haragaer+EdgeSee+Belegaer+river_provinces
+    numbers=["","Mîn","Tâd","Neledh","Canad","Leben","Eneg","Odog","Tolodh","Neder","Pae","Minib","Ýneg","Neleb","Canab","Lebem","Eneph","Odoph","Toloph","Nederph"]
+    cardinals=["","","Taphaen","Nelphaen","Cambaen","Lephaen","Enephaen","Odophaen","Tolophaen","Nederphaen"]
+    for name in provinceNamesInv:
+      if len(provinceNamesInv[name])>=2:
+        hab=[]
+        other=[]
+        for j in provinceNamesInv[name]:
+          i=int(j)-1
+          terrain=provinceFile.vals[i].get("terrain").strip('"')
+          is_impassable=(terrain=='impassable_terrain')
+          if not is_impassable and not terrain=='coastal_terrain' and not j in uninhabitable and not int(j) in allSeas:
+            hab.append(j)
+          else:
+            other.append(j)
+        cur=1
+        for h in hab:
+          provinceNames[h]+=" "+numbers[cur]
+          cur+=1
+        for h in other:
+          if cur<20:
+            provinceNames[h]+=" "+numbers[cur]
+          else:
+            a=cur//10
+            b=cur%10
+            provinceNames[h]+=f" {cardinals[a]}"
+            if b:
+              provinceNames[h]+=f" a {numbers[b]}"
+          cur+=1
+
+            # print(f'name = "{name}"{len(provinceNamesInv[name])}')
+
+    # os.makedirs("out/localization/english", exist_ok=True)
+    with open("localization/english/provincenames_l_english.yml","w",encoding='utf-8-sig') as f:
+      f.write("l_english:\n")
+      for p,i in provinceNames.items():
+        f.write(f' PROV{p}:0 "{i}"\n')
+    return
 
 
   provinceToCapitalType=dict()
@@ -613,6 +659,7 @@ def main():
       else:
         currentCLimate.add(name)
   nonPerfect=set()
+  provinceToClimate=dict()
   # climateFile.addReturn("perfect") #probably need to be removed as it might confuse the game
   for climate, entries in climateFile.getNameVal():
     if not climate:
@@ -658,6 +705,7 @@ def main():
               continue
             found.append(p)
             nonPerfect.add(p)
+            provinceToClimate[p]=climate
             if newArea:
               currentNewClimate.add(p)
               newArea=False
@@ -750,6 +798,43 @@ def main():
   dwarven = ["longbeard","firebeard","ironfist","stiffbeard","blacklock","broadbeam","stonefoot"]
   pops=["slaves", "tribesmen", "freemen", "citizen", "nobles"]
   ownedNoSlavesList=[]
+
+  addTradeGoods=False #don't enable for regions where this was already applied!
+  if addTradeGoods:
+
+    numWildGames=dict()
+    areasNeedTradeGoods=[]
+    for area in areaFile.names:
+      numWildGames[area]=0
+    for i in range(len(provinceFile.names)):
+      j=provinceFile.names[i]
+      try:
+        if provinceFile.vals[i].get("trade_goods").strip('"')=="wild_game":
+          numWildGames[provinceToArea[j]]+=1
+      except ValueError:
+        pass
+    for i in range(len(provinceFile.names)):
+      j=provinceFile.names[i]
+      if j in provinceToCapitalType and provinceToCapitalType[j]=="country_capital" and numWildGames[provinceToArea[j]]>2:
+        # print(f'provinceToArea[j] = "{provinceToArea[j]}"')
+        areasNeedTradeGoods.append(provinceToArea[j])
+    print(f'areasNeedTradeGoods = "{areasNeedTradeGoods}"')
+    return
+
+
+    # provinceNeedTradeGoods=["ibav_region","ralian_region","lenitan_region","wer_falin_region","burskadekar_region","ubain_region","kargagis_ahar_region","lygar_kraw_region","lugnimbar_region","orgothrath_region","alduryaknar_region","gathgykarkan_region"]
+    dessertTadeGoods={"iron":5,"camels":20,"stone":20,"base_metals":10, "elephants":10, "dates":10,"incense":10}
+    hillTradeGoods={"iron":10, "precious_metals":5,"cattle":10,"stone":20,"base_metals":20,"gems":3,"marble":5}
+    woodTradeGoods={"wild_game":10, "fur":10,"wood":20,"leather":10, "woad":10}
+    coastalTradeGoods={"fish":40,"spices":5,"glass":5,"papyrus":5, "earthware":5,"hemp":10, "whale":5, "cloth":5,"dye":5, "incense":5, "silk":5, "wine":10, "dates":5, "olive":5}
+    planeTradeGoods={"horses":10, "steppe_horses":10, "grain":15, "salt":10, "cattle":8, "vegetables":10, "wild_game":10, "woad":10, "dates":5, "olive":5, "honey":5}
+    with open("coastal.txt") as file:
+      coastalProvinces=[entry for line in file for entry in line.split()]
+      # print(f'coastalProvinces = "{coastalProvinces}"')
+      # return
+
+  # test=random.choices(list(hillTradeGoods.keys()), list(hillTradeGoods.values()), k=1000)
+
   for i in range(len(provinceFile.names)):
     j=provinceFile.names[i]
     # if int(j) in [269,270,275,279,280,284,285,286,292,2719,111,112,113,114,115,116,117,118,120,239,722,2040,122,123,124,125,126,128,240,241,263,264,229,271,272,273,274,276,277,278,282,3912,119,121,261,262,265,266,267,268,323,320,321,322,361,314,765,981,255,257,258,259,260,330,331,334,338,795,333,335,337,340,342,792,797,1277,690,691,129,130,166,326,327,332,360,359,729,249,250,251,252,253,254,440]:
@@ -759,11 +844,13 @@ def main():
     #     b.append(j)
     if j in forceTerrain:
       setTerrain(i, forceTerrain[j])
-    if j in provinceNames:
-      provinceFile.comments[i]="#"+provinceNames[ j]
     culture=provinceFile.vals[i].get("culture").strip('"')
     terrain=provinceFile.vals[i].get("terrain").strip('"')
     is_impassable=(terrain=='impassable_terrain')
+    if j in provinceNames:
+      provinceFile.comments[i]="#"+provinceNames[ j]
+      if len(provinceNamesInv[provinceNames[ j]])>1 and not is_impassable and not terrain=='coastal_terrain' and not j in uninhabitable:
+        print(f'provinceNames[ j] = "{provinceNames[ j]}"')
 
     if terrain in ["plains","hills","mountain"] and not j in forceTerrain:
       # if terrainFile.count(j) and terrainFile.get(j)!="plains":
@@ -853,6 +940,43 @@ def main():
         # print(f'provinceNames[ j] = "{j} {provinceNames[ j]}:{heightMap.h(loc)}({loc})"')
 
 
+    if addTradeGoods:
+      # print(f'areasNeedTradeGoods = "{areasNeedTradeGoods}"')
+      if j in provinceToArea and provinceToArea[j] in areasNeedTradeGoods and provinceFile.vals[i].get("trade_goods").strip('"')=="wild_game":
+      # if j in provinceToRegion and provinceToRegion[j] in provinceNeedTradeGoods and provinceFile.vals[i].get("trade_goods").strip('"')=="wild_game":
+        if terrain in ["desserts"]:
+          provinceFile.vals[i].set("trade_goods",f'"{random.choices(list(dessertTadeGoods.keys()), list(dessertTadeGoods.values()))[0]}"')
+        if terrain in ["hills","mountain"]:
+          provinceFile.vals[i].set("trade_goods",f'"{random.choices(list(hillTradeGoods.keys()), list(hillTradeGoods.values()))[0]}"')
+        elif terrain in ["forest","deep_forest"] or provinceToClimate[j] in "severe_winter":
+          provinceFile.vals[i].set("trade_goods",f'"{random.choices(list(woodTradeGoods.keys()), list(woodTradeGoods.values()))[0]}"')
+        elif j in coastalProvinces:
+          while True:
+            t=random.choices(list(coastalTradeGoods.keys()), list(coastalTradeGoods.values()))[0]
+            #restrictions:
+            if t in ["incense","dates","dye","spices","olive"] and not provinceToClimate[j]=="arid":
+              continue
+            if t in ["wine"] and provinceToClimate[j]=="normal_winter":
+              continue
+            if t in ["whale"] and provinceToClimate[j]=="arid":
+              continue
+            break
+          provinceFile.vals[i].set("trade_goods",f'"{t}"')
+        else:
+          while True:
+            t=random.choices(list(planeTradeGoods.keys()), list(planeTradeGoods.values()))[0]
+            #restrictions:
+            if t in ["dates","olive"] and not provinceToClimate[j]=="arid":
+              continue
+            if t in ["honey"] and provinceToClimate[j]=="arid":
+              continue
+            if t in ["horses","grain"] and terrain=="steppe":
+              continue
+            if t in ["steppe_horses"] and terrain!="steppe":
+              continue
+            break
+          provinceFile.vals[i].set("trade_goods",f'"{t}"')
+
 
     if j in ownerCountry:
       provinceFile.comments[i]+=f" ({ownerCountry[j]})"
@@ -925,10 +1049,17 @@ def main():
               pass
       if j in uninhabitable:
         provinceFile.comments[i]+=" (uninhabitable)"
+        try:
+          provinceFile.vals[i].set("trade_goods", '""')
+        except ValueError:
+          pass
         if testCold(j):
           harsh.names[harshUninhab]+=f" {j}"
       else:
-        provinceFile.comments[i]+=" (unowned)"
+        if is_impassable:
+          provinceFile.comments[i]+=" (impassable)"
+        else:
+          provinceFile.comments[i]+=" (unowned)"
         if is_impassable and testCold(j):
           harsh.names[harshUnpass]+=f" {j}"
         # if not is_impassable:
