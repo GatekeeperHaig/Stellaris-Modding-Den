@@ -29,7 +29,8 @@ country_event = {
                 20 = { change_pc = pc_forest reroll_planet = yes }        
                 20 = { change_pc = pc_lake reroll_planet = yes }    
                 20 = { change_pc = pc_tepid reroll_planet = yes }    
-                20 = { change_pc = pc_megaflora reroll_planet = yes clear_planet_modifiers = yes add_modifier = {	modifier = pdmegaflora } }                        
+                20 = { change_pc = pc_megaflora reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = pdmegaflora } }  
+                20 = { change_pc = pc_pd_petrified reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = pdpetrified } }                       
             }
         }
 		every_galaxy_planet = { 				
@@ -348,6 +349,8 @@ country_event = {
 		every_galaxy_planet = { limit = { is_planet_class = pc_glacio is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Lanthanide
 		every_galaxy_planet = { limit = { is_planet_class = pc_lanthanide is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
+		#Petrified
+		every_galaxy_planet = { limit = { is_planet_class = pc_pd_petrified is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Megaflora
 		every_galaxy_planet = { limit = { is_planet_class = pc_megaflora is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#MegafloraHive
@@ -360,7 +363,6 @@ country_event = {
 		every_galaxy_planet = { limit = { is_planet_class = pc_cold_gaia NOT = { has_deposit = d_pdgaia } } add_deposit = d_pdgaia }
 	}
 }
-
 
 country_event = {
 	id = pdengine.04
@@ -787,6 +789,17 @@ country_event = {
 				20 = { change_pc = pc_snow reroll_planet = yes }
 				20 = { change_pc = pc_boreal reroll_planet = yes }	
 				20 = { change_pc = pc_duneforest reroll_planet = yes }	
+			}
+		}
+		#Petrified Start
+		every_galaxy_planet = { 				
+			limit = { is_planet_class = pc_pd_petrified is_homeworld = no has_planet_flag = prescripted_ideal }
+			random_list = {
+				20 = { change_pc = pc_continental reroll_planet = yes }	
+				20 = { change_pc = pc_retinal reroll_planet = yes }		
+				20 = { change_pc = pc_forest reroll_planet = yes }		
+				20 = { change_pc = pc_lake reroll_planet = yes }	
+				20 = { change_pc = pc_tepid reroll_planet = yes }		
 			}
 		}
 		#Megaflora Start
@@ -1793,6 +1806,10 @@ planet_event = {
 		remove_modifier = pdmegaflora
 		}
 		if = { 
+			limit = { NOT = { is_planet_class = pc_pd_petrified } }
+			remove_modifier = pdpetrified
+		}
+		if = { 
 		limit = { NOT = { is_planet_class = pc_primal } }
 		remove_modifier = primal
 		}
@@ -1884,13 +1901,13 @@ planet_event = {
 			}
 		}
 		if = { 
-		limit = { NOT = { is_planet_class = pc_crystal } }
-		remove_deposit = d_crystal_guild
-		remove_modifier = crystal
-			if = {
-				limit = { is_colony = yes }
-				remove_building = building_crystal_carver
-			}
+			limit = { NOT = { is_planet_class = pc_crystal } }
+			remove_deposit = d_crystal_guild
+			remove_modifier = crystal
+				if = {
+					limit = { is_colony = yes }
+					remove_building = building_crystal_carver
+				}
 		}
 		if = { 
 		limit = { NOT = { is_planet_class = pc_technoorganic } }
@@ -1985,70 +2002,6 @@ planet_event = {
 				} 
 			}
 		remove_modifier = pdhabvolcanicminerals
-		}
-		if = { 
-		limit = { NOR = { is_planet_class = pc_glacial } }
-		remove_modifier = pdterra_storm
-		}
-		if = { 
-		limit = { NOT = { is_planet_class = pc_alpine } }
-		remove_modifier = pdterra_glacio
-		}
-		if = { 
-		limit = { NOR = { is_planet_class = pc_barren_cold is_planet_class = pc_pd_barren_cold_hab } }
-		remove_modifier = pdterra_lanthanide
-		}
-		if = { 
-		limit = { NOR = { is_planet_class = pc_barren_cold is_planet_class = pc_pd_barren_cold_hab } }
-		remove_modifier = pdterra_karst
-		}
-		if = { 
-		limit = { NOT= { is_planet_class = pc_rogue_barren } }
-		remove_modifier = pdterra_rogue
-		}
-		if = { 
-		limit = { NOT = { is_planet_class = pc_tundra } }
-		remove_modifier = pdterra_lichen
-		}
-		if = { 
-		limit = { NOT = { is_planet_class = pc_forest } }
-		remove_modifier = pdterra_megaflora
-		}
-		if = { 
-		limit = { NOT = { is_planet_class = pc_tropical } }
-		remove_modifier = pdterra_biolumen
-		}
-		if = { 
-		limit = { NOT = { is_planet_class = pc_tropical } }
-		remove_modifier = pdterra_biolumen
-		}
-		if = { 
-		limit = { NOR = { is_planet_class = pc_frozen is_planet_class = pc_pd_frozen_hab } }
-		remove_modifier = pdterra_geothermal
-		}
-		if = { 
-		limit = { NOR = { is_planet_class = pc_barren is_planet_class = pc_pd_barren_hab } }
-		remove_modifier = pdterra_superhabitable
-		}
-		if = { 
-		limit = { NOR = { is_planet_class = pc_barren is_planet_class = pc_pd_barren_hab } }
-		remove_modifier = pdterra_salt
-		}
-		if = { 
-		limit = { NOT = { is_planet_class = pc_sandsea } }
-		remove_modifier = pdterra_aquifer
-		}
-		if = { 
-		limit = { NOT = { is_planet_class = pc_arid } }
-		remove_modifier = pdterra_coral
-		}
-		if = { 
-		limit = { NOR = { is_planet_class = pc_molten is_planet_class = pc_pd_molten_hab } }
-		remove_modifier = pdterra_primal
-		}
-		if = { 
-		limit = { NOT = { is_planet_class = pc_savannah } }
-		remove_modifier = pdterra_supercon
 		}
 		if = { 
 			limit = { 
@@ -2180,6 +2133,10 @@ planet_event = {
 		if = { 
 		limit = { is_planet_class = pc_lanthanide }
 		add_modifier = { modifier = pdlanthanide days = -1 }
+		}
+		if = { 
+			limit = { is_planet_class = pc_pd_petrified
+			add_modifier = { modifier = pdpetrified days = -1 }
 		}
 		if = { 
 		limit = { OR = { is_planet_class = pc_megaflora is_planet_class = pc_megaflorahive is_planet_class = pc_megafloratol is_planet_class = pc_megaflorahivetl } }
@@ -2874,6 +2831,7 @@ planet_event = {
 		if = { limit = { is_planet_class = pc_eyeball } set_planet_flag = pdhive_eyeball }
 		if = { limit = { is_planet_class = pc_glacio } set_planet_flag = pdhive_glacio }
 		if = { limit = { is_planet_class = pc_lanthanide } set_planet_flag = pdhive_lanthanide }
+		if = { limit = { is_planet_class = pc_pd_petrified set_planet_flag = pdhive_petrified }
 		IF = { limit = { is_planet_class = pc_megaflora } set_planet_flag = pdhive_megaflora }
 		IF = { limit = { is_planet_class = pc_megaflorahive } set_planet_flag = pdhive_megaflorahive }
 		IF = { limit = { is_planet_class = pc_megaflorahivetl } set_planet_flag = pdhive_megaflorahivetl }
@@ -4291,6 +4249,20 @@ country_event = {
 			if = {
 				limit = {
 					has_planet_flag = lost_colony_planet
+					is_planet_class = pc_pd_petrified
+				}
+				random_list = {
+					20 = { change_pc = pc_continental	reroll_planet = yes	}		
+					20 = { change_pc = pc_forest reroll_planet = yes }		
+					20 = { change_pc = pc_retinal reroll_planet = yes }		
+					20 = { change_pc = pc_lake reroll_planet = yes }	
+					20 = { change_pc = pc_tepid reroll_planet = yes }
+				}
+				generate_pd_start_deposits_and_blockers = yes
+			}
+			if = {
+				limit = {
+					has_planet_flag = lost_colony_planet
 					is_planet_class = pc_aquatic
 				}
 				generate_pd_start_deposits_and_blockers = yes
@@ -4920,6 +4892,20 @@ country_event = {
 						}
 						reroll_deposits = yes
 						remove_modifier = pdmegaflora
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_pd_petrified
+						}
+						random_list = {
+							20 = { change_pc = pc_continental }
+							20 = { change_pc = pc_lake }
+							20 = { change_pc = pc_retinal }
+							20 = { change_pc = pc_forest }
+							20 = { change_pc = pc_tepid }
+						}
+						reroll_deposits = yes
+						remove_modifier = pdpetrified
 					}
 					if = {
 						limit = {
@@ -5862,6 +5848,20 @@ country_event = {
 						}
 						reroll_deposits = yes
 						remove_modifier = pdarchipelago
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_pd_petrified
+						}
+						random_list = {
+							20 = { change_pc = pc_continental }
+							20 = { change_pc = pc_lake }
+							20 = { change_pc = pc_retinal }
+							20 = { change_pc = pc_forest }
+							20 = { change_pc = pc_tepid }
+						}
+						reroll_deposits = yes
+						remove_modifier = pdpetrified
 					}
 					if = {
 						limit = {
@@ -6968,6 +6968,11 @@ country_event = {
 			IF = { limit = { is_planet_class = pc_megaflora } 
 				IF = { limit = { not = { has_modifier = pdmegaflora } }
 				add_modifier = { modifier = "pdmegaflora" days = -1 }
+				}
+			}	
+			IF = { limit = { is_planet_class = pc_pd_petrified
+				IF = { limit = { not = { has_modifier = pdpetrified} }
+				add_modifier = { modifier = "pdpetrified" days = -1 }
 				}
 			}	
 			IF = { limit = { OR = { is_planet_class = pc_aquatic is_planet_class = pc_tidallyaquatic } }
