@@ -409,7 +409,7 @@ def main():
     if name:
       provinceToTerrain[name]=val.get("terrain")
 
-  heightMap=ImageRead("map_data/heightmap.png")
+  heightMap=ImageRead("../wotrbeta/map_data/heightmap.png")
 
 
   provinceToPixels,_,_,_ = getProvinceToPixels()
@@ -1370,11 +1370,11 @@ def getProvinceToPixels(updateProvincePixels=False):
       colorToProvince[colorToString(map(int,line[1:4]))]=int(line[0])
     # print(f'colorToProvince = "{colorToProvince}"')
     del provinceDefinitions
-    provinceImage=ImageRead("map_data/provinces.png")
+    provinceImage=ImageRead("../wotrbeta/map_data/provinces.png")
     xM=provinceImage.im.size[0]
     yM=provinceImage.im.size[1]
     pixelToProvince=[ -1 for _ in range(xM*yM)]
-    riverImage=ImageRead("map_data/rivers.png")
+    riverImage=ImageRead("../wotrbeta/map_data/rivers.png")
     for i in range(xM):
       for j in range(yM):
         provinceId=colorToProvince[colorToString(provinceImage.c(i,j))]
