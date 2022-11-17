@@ -2,7 +2,6 @@
 # Decisions
 ##########################################################################
 
-
 # Eco-Arcology Project
 decision_ecoarcology_project = {
 	owned_planets_only = yes
@@ -1267,9 +1266,15 @@ decision_capital_spot = {
 			is_planet_class = pc_machine
 			is_planet_class = pc_machine_factory
 			is_planet_class = pc_machine_fort
+			is_planet_class = pc_pd_techno_arc
 		}
 		exists = owner
-		owner = { has_technology = tech_housing_2 }
+		owner = { 
+			OR = {
+				has_technology = tech_housing_2 
+				has_technology = tech_housing_agrarian_idyll
+			}
+		}
 		NOT = { 
 			OR = {
 				has_deposit = d_pd_capital_arc
@@ -1356,6 +1361,8 @@ decision_capital_arc = {
 			is_planet_class = pc_ecocity
 			is_planet_class = pc_milarc
 			is_planet_class = pc_ringworld_habitable
+			is_planet_class = pc_pd_techno_arc
+			is_planet_class = pc_habitat
 		}
 		exists = owner
 		owner = { 
@@ -1364,7 +1371,10 @@ decision_capital_arc = {
 				has_authority = auth_democratic 
 				has_authority = auth_oligarchic
 			}
-			has_technology = tech_housing_2
+			OR = {
+				has_technology = tech_housing_2 
+				has_technology = tech_housing_agrarian_idyll
+			}
 		}
 		NOT = { has_deposit = d_pd_capital_arc }
 		is_capital = yes
@@ -1381,6 +1391,15 @@ decision_capital_arc = {
 		hidden_effect = {	
 			remove_deposit = d_pd_capital_spot
 			add_deposit = d_pd_capital_arc
+			#Techno Arc
+			IF = {
+				limit = { 
+					is_planet_class = pc_pd_techno_arc
+				}
+				set_planet_entity = {
+					picture = pc_pd_techno_arc_capital
+				}
+			}
 			#Regular City World
 			IF = {
 				limit = { 
@@ -1767,6 +1786,7 @@ decision_palace_arc = {
 			is_planet_class = pc_milarc
 			is_planet_class = pc_ringworld_habitable
 			is_planet_class = pc_habitat
+			is_planet_class = pc_pd_techno_arc
 		}
 		exists = owner
 		owner = { 
@@ -1775,7 +1795,10 @@ decision_palace_arc = {
 				has_authority = auth_dictatorial
 				has_authority = auth_imperial
 			}
-			has_technology = tech_housing_2
+			OR = {
+				has_technology = tech_housing_2 
+				has_technology = tech_housing_agrarian_idyll
+			}
 		}
 		NOT = { has_deposit = d_pd_palace_arc }
 		is_capital = yes
@@ -1792,6 +1815,15 @@ decision_palace_arc = {
 		hidden_effect = {	
 			remove_deposit = d_pd_capital_spot
 			add_deposit = d_pd_palace_arc
+			#Techno Arc
+			IF = {
+				limit = { 
+					is_planet_class = pc_pd_techno_arc
+				}
+				set_planet_entity = {
+					picture = pc_pd_techno_arc_palace
+				}
+			}
 			#Regular City World
 			IF = {
 				limit = { 
@@ -2178,12 +2210,17 @@ decision_boardroom_arc = {
 			is_planet_class = pc_milarc
 			is_planet_class = pc_corpoarc
 			is_planet_class = pc_ringworld_habitable
+			is_planet_class = pc_habitat
+			is_planet_class = pc_pd_techno_arc
 		}
 		exists = owner
 		owner = { 
 			is_regular_empire = yes
 			is_megacorp = yes
-			has_technology = tech_housing_2
+			OR = {
+				has_technology = tech_housing_2 
+				has_technology = tech_housing_agrarian_idyll
+			}
 		}
 		NOT = { has_deposit = d_pd_boardroom_arc }
 		is_capital = yes
@@ -2200,6 +2237,15 @@ decision_boardroom_arc = {
 		hidden_effect = {	
 			remove_deposit = d_pd_capital_spot
 			add_deposit = d_pd_boardroom_arc
+			#Techno Arc
+			IF = {
+				limit = { 
+					is_planet_class = pc_pd_techno_arc
+				}
+				set_planet_entity = {
+					picture = pc_pd_techno_arc_corpocap
+				}
+			}
 			#Regular City World
 			IF = {
 				limit = { 
@@ -3344,5 +3390,107 @@ decision_machine_fort_project = {
 	}
 }
 
+# Techno-Arcology Project
+decision_technoarcology_project = {
+	owned_planets_only = yes
+	icon = decision_ecoarcology_project
+
+	enactment_time = 3600
+	resources = {
+		category = decisions
+		cost = {
+			influence = 200
+			minerals = 20000
+		}
+	}
+	
+	potential = {
+		is_planet_class = pc_technoorganic
+		owner = {
+			OR = {
+				AND = {
+					has_origin = origin_techno_world
+					has_technology = tech_housing_agrarian_idyll
+				}
+				has_ascension_perk = ap_arcology_project
+			}
+		}
+	}
+	
+	allow = {
+		custom_tooltip = {
+			fail_text = decision_techno_arcology_project_requirements
+			free_district_slots < 1
+			num_districts = { type = district_farming value < 11 }
+			num_districts = { type = district_mining value < 1 }
+			num_districts = { type = district_generator value < 1 }
+			num_districts = { type = district_farming_uncapped value < 11 }
+			num_districts = { type = district_mining_uncapped value < 1 }
+			num_districts = { type = district_generator_uncapped value < 1 }
+		}
+		num_uncleared_blockers < 1
+	}
+	
+	effect = {
+		# Make city-planet
+		custom_tooltip = decision_techno_arcology_project_effects
+		hidden_effect = {		
+			clear_deposits = yes
+			change_pc = pc_pd_techno_arc
+			if = {
+				limit = {
+					OR = {
+						is_active_resolution = "resolution_ecology_environmental_control_board"
+						is_active_resolution = "resolution_ecology_paradise_initiative"
+					}
+				}
+				owner = {
+					set_timed_country_flag = { flag = resolution_breached_terraformed days = 3600 }
+				}
+			}
+			planet_event = { id = pdengine.09 }
+			remove_modifier = engineered_environment
+			remove_modifier = engineered_environment_gaia
+			add_deposit = d_pd_techno_arc_farm
+			add_deposit = d_subsurface_assembly
+			IF = {
+				limit = {
+					has_planet_flag = pddead04
+				}
+				add_deposit = d_dead04
+			}
+			IF = {
+				limit = {
+					has_planet_flag = pdunit04
+				}
+				add_deposit = d_unit04
+			}
+			IF = {
+				limit = {
+					owner = {
+						has_origin = origin_techno_world
+					}
+				}
+				add_deposit = d_home04
+			}
+			relic_world_conversion_effect = {
+				DISTRICT = district_arcology_housing
+				VARIABLE = num_housing_districts
+			}
+			relic_world_conversion_effect = {
+				DISTRICT = district_techno_industrial
+				VARIABLE = num_industrial_districts
+			}
+		}
+	}
+	
+	ai_weight = {
+		weight = 10
+		modifier = { 
+			factor = 0	
+			owner = { any_owned_planet = { is_planet_class = pc_technoorganic } }
+		}
+	}
+}
 
 

@@ -1342,178 +1342,7 @@ building_archive_major_capital = {
 }
 
 #Techno-Organic
-#building_subsurface_assembly = {
-#	base_buildtime = 360
-#
-#	is_capped_by_modifier = yes
-#
-#	category = resource
-#	
-#	potential = {
-#		NOT = { has_modifier = resort_colony }
-#	}
-#
-#	allow = {
-#		has_upgraded_capital = yes
-#	}
-# 
-#	#Regular Empire (With Robots)
-#	triggered_planet_modifier = {
-#		potential = {
-#			exists = owner
-#			owner = { is_regular_empire = yes }
-#			planet = { has_building = building_robot_assembly_plant }
-#		}
-#		modifier = {
-#			job_techno_eng_add = 4
-#		    #planet_pop_assembly_add = 2
-#		}
-#	}
-# 
-#	#Regular Empire (Without Robots)
-#	triggered_planet_modifier = {
-#		potential = {
-#			exists = owner
-#			owner = { is_regular_empire = yes }
-#			planet = { NOT = { has_building = building_robot_assembly_plant } }
-#		}
-#		modifier = {
-#			job_techno_eng_add = 4
-#		}
-#	}
-#
-#	#Hives (Without Robots)
-#	
-#	triggered_planet_modifier = {
-#		potential = {
-#			exists = owner
-#			owner = { is_hive_empire = yes }
-#		}
-#		modifier = {
-#			job_techno_drone_add = 4
-#		}
-#	}
-#	
-#	#Machine Empires
-#	
-#	triggered_planet_modifier = {
-#		potential = {
-#			exists = owner
-#			owner = { is_machine_empire = yes }
-#		}
-#		modifier = {
-#			job_techno_drone_add = 4
-#		    #planet_pop_assembly_add = 2
-#		}
-#	}
-#
-#	prerequisites = {
-#		"tech_subsurface_assembly"
-#	}
-#	
-#	resources = {
-#		category = planet_buildings
-#		cost = {
-#			minerals = 400
-#		}
-#		upkeep = {
-#			energy = 1
-#		}
-#	}	
-#}
-#building_techno_canal = {
-#	base_buildtime = @b3_time
-#	base_cap_amount = 1
-#
-#	category = resource
-#
-#	potential = {
-#		NOT = { has_modifier = resort_colony }
-#		NOT = { has_modifier = slave_colony }
-#		NOT = { is_planet_class = pc_technoorganic }
-#		is_pd_arcology = no
-#		is_pd_robot_arcology = no
-#		is_pd_hive_arcology = no  
-#	}
-#
-#	allow = {
-#		has_upgraded_capital = yes
-#	}
-#
-#	destroy_trigger = {
-#		exists = owner
-#		OR = {
-#			owner = { is_machine_empire = yes NOT = { has_civic = civic_machine_servitor } }
-#			has_modifier = slave_colony
-#			has_modifier = resort_colony
-#		}
-#	}
-#
-#	triggered_planet_modifier = {
-#		potential = {
-#			exists = owner
-#			owner = { NOT = { has_deficit = sr_living_metal } }
-#			owner = { is_regular_empire = yes }
-#		}
-#		planet_jobs_food_produces_mult = 0.2
-#		planet_jobs_engineering_research_produces_mult = 0.2
-#		job_farmer_add = 4
-#	}
-#
-#	triggered_planet_modifier = {
-#		potential = {
-#			exists = owner
-#			owner = { NOT = { has_deficit = sr_living_metal } }
-#			owner = { is_gestalt = yes }
-#		}
-#		planet_jobs_food_produces_mult = 0.2
-#		planet_jobs_engineering_research_produces_mult = 0.2
-#		job_agri_drone_add = 4
-#	}
-#
-#	resources = {
-#		category = planet_buildings
-#		cost = {
-#			minerals = @b3_minerals
-#			sr_living_metal = 100
-#		}
-#		upkeep = {
-#			energy = @b3_upkeep
-#			sr_living_metal = 1
-#		}
-#	}
-#
-#	prerequisites = {
-#		"tech_techno_canal"
-#	}
-#
-#	ai_resource_production = {
-#		food = 3
-#		trigger = {
-#			always = yes
-#		}
-#	}
-#	ai_resource_production = {
-#		food = 3
-#		trigger = {
-#			planet_resource_compare = {
-#				resource = food
-#				value >= 20
-#				type = produces
-#			}
-#		}
-#	}
-#	ai_resource_production = {
-#		food = 3
-#		trigger = {
-#			planet_resource_compare = {
-#				resource = food
-#				value >= 40
-#				type = produces
-#			}
-#		}
-#	}
-#}
+#Planet Unique
 building_techno_synth_workshop = {
 	base_buildtime = @b3_time
 	base_cap_amount = 1
@@ -1608,8 +1437,7 @@ building_techno_synth_workshop = {
 		"tech_techno_synth_workshop"
 	}
 }
-
-#Origin Only
+#Origin Living Metal Refine
 building_biosynth_lm_refinery = {
 	base_buildtime = @b3_time
 
@@ -1662,6 +1490,100 @@ building_biosynth_lm_refinery = {
 
 	prerequisites = {
 		"tech_biosynth_lm_refinery"
+	}
+}
+#Holding
+holding_pd_techno_canal = {
+	base_buildtime = @b2_time
+	owner_type = subject_holding
+	icon = building_techno_synth_workshop
+	base_cap_amount = 1
+
+	resources = {
+		category = planet_holdings
+		produces = {
+			engineering_research = 6
+			food = 6
+		}
+	}
+
+	potential = {
+		owner.overlord = { 	has_technology = tech_techno_canal }
+		NOT = { planet.owner = { country_uses_food = no } }
+		is_pd_hive_world = no
+		is_artificial = no
+		is_pd_unique = no
+		is_pd_arcology = no
+		is_pd_machine = no
+		is_pd_habitat = no
+		is_pd_planetary_megaproject = no
+	}
+	destroy_trigger = {
+		is_pd_hive_world = yes
+		is_artificial = yes
+		is_pd_unique = yes
+		is_pd_arcology = yes
+		is_pd_machine = yes
+		is_pd_habitat = yes
+		is_pd_planetary_megaproject = yes
+	}	
+
+	planet_modifier = {
+		monthly_loyalty = 0.5
+	}
+
+	triggered_planet_modifier = {
+		potential = {
+			exists = planet.owner
+			planet.owner = { is_gestalt = no }
+		}
+		job_farmer_add = 3
+	}
+	triggered_planet_modifier = {
+		potential = {
+			exists = planet.owner
+			planet.owner = { is_gestalt = yes }
+		}
+		job_agri_drone_add = 3
+	}
+
+	on_built = {
+		planet = {
+			add_blocker = { type = d_technocanal }
+			if = {
+				limit = {
+					planet.owner = { country_uses_food = yes }
+				}
+				while = {
+					limit = { num_districts = { type = district_farming value > 0 } }
+					remove_district = district_farming
+					add_district_and_planet_size_if_needed_effect = {
+					district = district_farming_uncapped
+					}
+				}
+			}
+		}
+	}
+
+	on_destroy = {
+		planet = {
+			add_blocker = { type = d_technocanal }
+			if = {
+				limit = {
+					planet.owner = { country_uses_food = yes }
+				}
+				while = {
+					limit = { num_districts = { type = district_farming_uncapped value > 0 } }
+					remove_district = district_farming_uncapped
+					add_district_and_planet_size_if_needed_effect = {
+					district = district_farming
+					}
+				}
+			}
+		}
+	}
+	triggered_desc = {
+		text = holding_techno_canal_effect
 	}
 }
 
