@@ -1,5 +1,6 @@
 namespace = pdexotic
 
+#General Events
 event = {
 	id = pdexotic.00
 	hide_window = yes
@@ -7,7 +8,7 @@ event = {
 	fire_only_once = yes
 	immediate = { set_global_flag = planetarydiversityexotics }
 }
-
+#Give their habitats
 country_event = {
     id = pdexotic.01
     hide_window = yes
@@ -61,7 +62,6 @@ country_event = {
         }
     }
 }
-
 country_event = {
     id = pdexotic.02
     hide_window = yes
@@ -115,7 +115,6 @@ country_event = {
         }
     }
 }
-
 country_event = {
     id = pdexotic.03
     hide_window = yes
@@ -169,7 +168,6 @@ country_event = {
         }
     }
 }
-
 country_event = {
     id = pdexotic.04
     hide_window = yes
@@ -223,7 +221,6 @@ country_event = {
         }
     }
 }
-
 planet_event = {
 	id = pdexotic.07
 	title = pdexotic.07.name
@@ -584,6 +581,7 @@ planet_event = {
 	}
 }
 
+###Ash
 # Ash Seed building chain completed.
 planet_event = {
 	id = pdexotic.10
@@ -625,7 +623,26 @@ planet_event = {
 		}
 	}
 }
+#Ash Origin Gains Tech
+country_event = {
+	id = "pdexotic.15"
+	hide_window = yes
+	
+	is_triggered_only = yes
 
+	trigger = {
+		has_origin = origin_pd_ash_tectonic_drillers
+	}
+
+	immediate = {
+		owner = { 
+			add_research_option = tech_ash_tectonic_drillers
+			add_research_option = tech_mine_rare_crystals
+		}
+	}
+}
+
+###Ammonia
 # Ammonia Suits 1 Project Start
 country_event = {
 	id = pdexotic.11
@@ -658,7 +675,6 @@ country_event = {
 		}
 	}
 }
-
 # Ammonia Suits 1 Project End
 country_event = {
 	id = pdexotic.12
@@ -731,7 +747,6 @@ country_event = {
 		add_research_option = tech_pd_ammonia_suits_2
 	}
 }
-
 # Ammonia Suits 2 Tech
 country_event = {
 	id = pdexotic.13
@@ -804,7 +819,6 @@ country_event = {
 		}
 	}
 }
-
 # Ammonia Suits 3 Tech
 country_event = {
 	id = pdexotic.14
@@ -874,26 +888,9 @@ country_event = {
 	}
 }
 
-country_event = {
-	id = "pdexotic.15"
-	hide_window = yes
-	
-	is_triggered_only = yes
-
-	trigger = {
-		has_origin = origin_pd_ash_tectonic_drillers
-	}
-
-	immediate = {
-		owner = { 
-			add_research_option = tech_ash_tectonic_drillers
-			add_research_option = tech_mine_rare_crystals
-		}
-	}
-}
-
-#Frozen Worlds get Methane Terraforming Candidates
+#Methane
 #On gain AP
+#Game Start, Gain Terraforming Candidates
 country_event = {
 	id = "pdexotic.16"
 	hide_window = yes
@@ -901,46 +898,32 @@ country_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		space_owner = { 
-			has_origin = origin_pd_methane_cryogenics 
-			has_ascension_perk = ap_pd_methane_cryogenics
-		}	
+		owner = { has_origin = origin_pd_methane_cryogenics }
 	}
 
 	immediate = {
-		every_planet_within_border = {
-			limit = {
-				solar_system = {
-					NOR = {
-						is_star_class = sc_black_hole
-						is_star_class = sc_neutron_star
-						is_star_class = sc_pulsar
+		capital_scope = { save_event_target_as = methanecapital }
+		while = {
+			count = 5
+			every_galaxy_planet = {
+				limit = {
+					distance = {
+						source = event_target:methanecapital
+						use_bypasses = no
+						min_jumps = 0
+						max_jumps = 3
 					}
-				}
-				OR = {
 					is_planet_class = pc_frozen
-					is_planet_class = pc_pd_frozen_hab
+					planet_size > 9
+					planet_size < 31
+					#has_owner = no
 				}
-				OR = {
-					planet = {
-						is_moon = no
-						planet_size <= 25
-						planet_size >= 12
-					}	
-					planet = {
-						is_moon = yes
-						planet_size <= 15
-						planet_size >= 10
-					}
-				}
-				NOT = { has_modifier = methane_terraforming_candidate }
+				add_modifier = { modifier = methane_terraforming_candidate_for_others days = -1 }
 			}
-			add_modifier = { modifier = methane_terraforming_candidate days = -1 }
 		}
 	}
 }
-
-#Non Methane gains methane systems
+#Non Methane gains Sulfur systems
 country_event = {
 	id = "pdexotic.17"
 	hide_window = yes
@@ -961,182 +944,38 @@ country_event = {
 					has_modifier = methane_terraforming_candidate
 				}
 				remove_modifier = methane_terraforming_candidate
+				add_modifier = { modifier = methane_terraforming_candidate_for_others days = -1 }
 			}
 		}
 	}
 }
-
 #Methane Empire gains systems
 country_event = {
 	id = "pdexotic.18"
 	hide_window = yes
 	
 	is_triggered_only = yes
-
 	trigger = {
 		owner = { 
-			has_origin = origin_pd_methane_cryogenics 
-			has_ascension_perk = ap_pd_methane_cryogenics
+			has_origin = origin_pd_methane_cryogenics
 		}	
 	}
 	immediate = {
 		from = { 
 			every_system_planet = {
 				limit = {
-					solar_system = {
-						NOR = {
-							is_star_class = sc_black_hole
-							is_star_class = sc_neutron_star
-							is_star_class = sc_pulsar
-						}
-					}
-					OR = {
-						is_planet_class = pc_frozen
-						is_planet_class = pc_pd_frozen_hab
-					}
-					OR = {
-						planet = {
-							is_moon = no
-							planet_size <= 25
-							planet_size >= 12
-						}	
-						planet = {
-							is_moon = yes
-							planet_size <= 15
-							planet_size >= 10
-						}
-					}
-					NOT = { has_modifier = methane_terraforming_candidate }
+					is_planet_class = pc_frozen
+					has_modifier = methane_terraforming_candidate_for_others
 				}
+				remove_modifier = methane_terraforming_candidate_for_others
 				add_modifier = { modifier = methane_terraforming_candidate days = -1 }
 			}
 		}
 	}
 }
 
-#Toxic Worlds get Ammonia Terraforming Candidates
-#On gain AP
-country_event = {
-	id = "pdexotic.19"
-	hide_window = yes
-	
-	is_triggered_only = yes
-
-	trigger = {
-		space_owner = { 
-			has_origin = origin_pd_ammonia_breathers 
-			has_ascension_perk = ap_pd_ammonia_terraforming
-		}	
-	}
-
-	immediate = {
-		every_planet_within_border = {
-			limit = {
-				solar_system = {
-					NOR = {
-						is_star_class = sc_black_hole
-						is_star_class = sc_neutron_star
-						is_star_class = sc_pulsar
-					}
-				}
-				OR = {
-					is_planet_class = pc_toxic
-					is_planet_class = pc_pd_toxic_hab
-				}
-				OR = {
-					planet = {
-						is_moon = no
-						planet_size <= 25
-						planet_size >= 12
-					}	
-					planet = {
-						is_moon = yes
-						planet_size <= 15
-						planet_size >= 10
-					}
-				}
-				NOT = { has_modifier = ammonia_terraforming_candidate }
-			}
-			add_modifier = { modifier = ammonia_terraforming_candidate days = -1 }
-		}
-	}
-}
-
-#Non Ammonia gains Ammonia systems
-country_event = {
-	id = "pdexotic.20"
-	hide_window = yes
-	
-	is_triggered_only = yes
-
-	trigger = {
-		owner = { 
-			NOT = { 
-				has_origin = origin_pd_ammonia_breathers 
-			} 
-		}
-	}
-	immediate = {
-		from = { 
-			every_system_planet = {
-				limit = {
-					has_modifier = ammonia_terraforming_candidate
-				}
-				remove_modifier = ammonia_terraforming_candidate
-			}
-		}
-	}
-}
-
-#Ammonia Empire gains systems
-country_event = {
-	id = "pdexotic.21"
-	hide_window = yes
-	
-	is_triggered_only = yes
-
-	trigger = {
-		owner = { 
-			has_origin = origin_pd_ammonia_breathers 
-			has_ascension_perk = ap_pd_ammonia_terraforming
-		}	
-	}
-	immediate = {
-		from = { 
-			every_system_planet = {
-				limit = {
-					solar_system = {
-						NOR = {
-							is_star_class = sc_black_hole
-							is_star_class = sc_neutron_star
-							is_star_class = sc_pulsar
-						}
-					}
-					OR = {
-						is_planet_class = pc_frozen
-						is_planet_class = pc_pd_frozen_hab
-					}
-					OR = {
-						planet = {
-							is_moon = no
-							planet_size <= 25
-							planet_size >= 12
-						}	
-						planet = {
-							is_moon = yes
-							planet_size <= 15
-							planet_size >= 10
-						}
-					}
-					NOT = { has_modifier = ammonia_terraforming_candidate }
-				}
-				add_modifier = { modifier = ammonia_terraforming_candidate days = -1 }
-			}
-		}
-	}
-}
-
-#On gain AP
+###Sulfur
+#Game Start, Gain Terraforming Candidates
 country_event = {
 	id = "pdexotic.22"
 	hide_window = yes
@@ -1144,46 +983,32 @@ country_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		space_owner = { 
-			has_origin = origin_pd_sulfur_springs
-			has_ascension_perk = ap_pd_sulfur_terraforming
-		}	
+		owner = { has_origin = origin_pd_sulfur_springs }
 	}
 
 	immediate = {
-		every_planet_within_border = {
-			limit = {
-				solar_system = {
-					NOR = {
-						is_star_class = sc_black_hole
-						is_star_class = sc_neutron_star
-						is_star_class = sc_pulsar
+		capital_scope = { save_event_target_as = sulfurcapital }
+		while = {
+			count = 5
+			every_galaxy_planet = {
+				limit = {
+					distance = {
+						source = event_target:sulfurcapital
+						use_bypasses = no
+						min_jumps = 0
+						max_jumps = 3
 					}
-				}
-				OR = {
 					is_planet_class = pc_toxic
-					is_planet_class = pc_pd_toxic_hab
+					planet_size > 9
+					planet_size < 31
+					#has_owner = no
 				}
-				OR = {
-					planet = {
-						is_moon = no
-						planet_size <= 25
-						planet_size >= 12
-					}	
-					planet = {
-						is_moon = yes
-						planet_size <= 15
-						planet_size >= 10
-					}
-				}
-				NOT = { has_modifier = sulfur_terraforming_candidate }
+				add_modifier = { modifier = sulfur_terraforming_candidate_for_others days = -1 }
 			}
-			add_modifier = { modifier = sulfur_terraforming_candidate days = -1 }
 		}
 	}
 }
-
-#Non Ammonia gains Ammonia systems
+#Non Sulfur gains Sulfur systems
 country_event = {
 	id = "pdexotic.23"
 	hide_window = yes
@@ -1204,59 +1029,37 @@ country_event = {
 					has_modifier = sulfur_terraforming_candidate
 				}
 				remove_modifier = sulfur_terraforming_candidate
+				add_modifier = { modifier = sulfur_terraforming_candidate_for_others days = -1 }
 			}
 		}
 	}
 }
-
-#Ammonia Empire gains systems
+#Sulfur Empire gains systems
 country_event = {
 	id = "pdexotic.24"
 	hide_window = yes
 	
 	is_triggered_only = yes
-
 	trigger = {
 		owner = { 
-			has_origin = origin_pd_sulfur_springs 
-			has_ascension_perk = ap_pd_sulfur_terraforming
+			has_origin = origin_pd_sulfur_springs
 		}	
 	}
 	immediate = {
 		from = { 
 			every_system_planet = {
 				limit = {
-					solar_system = {
-						NOR = {
-							is_star_class = sc_black_hole
-							is_star_class = sc_neutron_star
-							is_star_class = sc_pulsar
-						}
-					}
-					OR = {
-						is_planet_class = pc_frozen
-						is_planet_class = pc_pd_frozen_hab
-					}
-					OR = {
-						planet = {
-							is_moon = no
-							planet_size <= 25
-							planet_size >= 12
-						}	
-						planet = {
-							is_moon = yes
-							planet_size <= 15
-							planet_size >= 10
-						}
-					}
-					NOT = { has_modifier = sulfur_terraforming_candidate }
+					is_planet_class = pc_toxic
+					has_modifier = sulfur_terraforming_candidate_for_others
 				}
+				remove_modifier = sulfur_terraforming_candidate_for_others
 				add_modifier = { modifier = sulfur_terraforming_candidate days = -1 }
 			}
 		}
 	}
 }
 
+###Rogue
 #Rogue World - Turn Planets Around Black Holes to Rogue Barrens
 country_event = {
 	id = "pdexotic.25"
@@ -1292,7 +1095,6 @@ country_event = {
 		}
 	}
 }
-
 #Rogue Empire gains systems 
 country_event = {
 	id = "pdexotic.26"
@@ -1317,7 +1119,6 @@ country_event = {
 		}
 	}
 }
-
 #Non Rogue gains Rogue systems
 country_event = {
 	id = "pdexotic.27"
@@ -1343,7 +1144,6 @@ country_event = {
 		}
 	}
 }
-
 #Rogue Races Can Build Habitat and get Dark Matter Tech
 country_event = {
 	id = "pdexotic.28"
@@ -1363,7 +1163,6 @@ country_event = {
 		}
 	}
 }
-
 #Rogue World Collapse Star Event
 planet_event = {
 	id = "pdexotic.29"
@@ -1552,6 +1351,7 @@ planet_event = {
 	}
 }
 
+###Hycean
 #Hycean Habitat Set Up
 planet_event = {
 	id = pdexotic.30
@@ -1565,7 +1365,6 @@ planet_event = {
 		}
 	}
 }
-
 #Gas Dwarf Spawning
 country_event = {
 	id = pdexotic.31
@@ -1591,7 +1390,6 @@ country_event = {
 		}
 	}
 }
-
 #Hycean Empire gains Gas Dwarf 
 country_event = {
 	id = "pdexotic.32"
@@ -1616,7 +1414,6 @@ country_event = {
 		}
 	}
 }
-
 #Non Hycean gains Hycean Gas Dwarf 
 country_event = {
 	id = "pdexotic.33"
@@ -1642,7 +1439,6 @@ country_event = {
 		}
 	}
 }
-
 #Hycean Megastructures
 country_event = {
     id = pdexotic.34
