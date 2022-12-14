@@ -85,6 +85,10 @@ country_event = {
 				20 = { change_pc = pc_aquifer reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = pdaquifer } }
 			}
 		}
+		every_galaxy_planet = {                 
+            limit = { is_planet_class = pc_arid system_star = { OR = { is_star_class = sc_k is_star_class = sc_trinary_3 is_star_class = sc_binary_7 } } is_homeworld = no is_moon = no NOR = { has_planet_flag = prescripted_ideal has_planet_flag = pd_ignore has_planet_flag = planet_earth solar_system = { has_star_flag = empire_cluster } solar_system = { has_star_flag = empire_home_system } solar_system = { has_star_flag = sol_system } solar_system = { has_star_flag = sol } } } #TODO 80/20, no 0/100
+            change_pc = pc_pd_dry_superhab reroll_planet = yes clear_planet_modifiers = yes
+        }
 		every_galaxy_planet = { 				
 			limit = { is_planet_class = pc_arid is_homeworld = no  nor = { has_planet_flag = prescripted_ideal has_planet_flag = pd_ignore solar_system = { has_star_flag = empire_cluster } } }
 			random_list = {
@@ -145,6 +149,10 @@ country_event = {
 				20 = { change_pc = pc_lanthanide reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = pdlanthanide } }				
 			}
 		}
+		every_galaxy_planet = {                 
+            limit = { is_planet_class = pc_tundra system_star = { OR = { is_star_class = sc_k is_star_class = sc_trinary_3 is_star_class = sc_binary_7 } } is_homeworld = no is_moon = no NOR = { has_planet_flag = prescripted_ideal has_planet_flag = pd_ignore has_planet_flag = planet_earth solar_system = { has_star_flag = empire_cluster } solar_system = { has_star_flag = empire_home_system } solar_system = { has_star_flag = sol_system } solar_system = { has_star_flag = sol } } } #TODO 80/20, no 0/100
+            change_pc = pc_pd_cold_superhab reroll_planet = yes clear_planet_modifiers = yes
+        }
 		every_galaxy_planet = { 				
 			limit = { is_planet_class = pc_tundra is_homeworld = no  nor = { has_planet_flag = prescripted_ideal has_planet_flag = pd_ignore solar_system = { has_star_flag = empire_cluster } } }
 			random_list = {
@@ -281,6 +289,10 @@ country_event = {
 		every_galaxy_planet = { limit = { is_planet_class = pc_biolumen is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Superhabitable
 		every_galaxy_planet = { limit = { is_planet_class = pc_superhabitable is_homeworld = yes } change_planet_size = +9 generate_pd_start_deposits_and_blockers = yes }
+		#Dry Superhabitable
+		every_galaxy_planet = { limit = { is_planet_class = pc_pd_dry_superhab is_homeworld = yes } change_planet_size = +9 generate_pd_start_deposits_and_blockers = yes }
+		#Cold Superhabitable
+		every_galaxy_planet = { limit = { is_planet_class = pc_pd_cold_superhab is_homeworld = yes } change_planet_size = +9 generate_pd_start_deposits_and_blockers = yes }
 		#Geothermal
 		every_galaxy_planet = { limit = { is_planet_class = pc_geothermal is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Wet Tidally Locked
@@ -680,6 +692,17 @@ country_event = {
 				20 = { change_pc = pc_med reroll_planet = yes }					
 			}
 		}
+		#Primal Start
+		every_galaxy_planet = { 				
+			limit = { is_planet_class = pc_pd_dry_superhab is_homeworld = no has_planet_flag = prescripted_ideal }
+			random_list = {
+				20 = { change_pc = pc_arid reroll_planet = yes	}	
+				20 = { change_pc = pc_mesa reroll_planet = yes }	
+				20 = { change_pc = pc_badlands reroll_planet = yes }
+				20 = { change_pc = pc_hadesert reroll_planet = yes }
+				20 = { change_pc = pc_med reroll_planet = yes }					
+			}
+		}
 		#Salt Start
 		every_galaxy_planet = { 				
 			limit = { is_planet_class = pc_salt is_homeworld = no has_planet_flag = prescripted_ideal }
@@ -738,6 +761,17 @@ country_event = {
 		#Cryoflora Start
 		every_galaxy_planet = { 				
 			limit = { is_planet_class = pc_cryoflora is_homeworld = no has_planet_flag = prescripted_ideal }
+			random_list = {
+				20 = { change_pc = pc_tundra reroll_planet = yes }
+				20 = { change_pc = pc_mud reroll_planet = yes }		
+				20 = { change_pc = pc_basalt reroll_planet = yes }	
+				20 = { change_pc = pc_mushroom reroll_planet = yes }
+				20 = { change_pc = pc_swamp reroll_planet = yes }		
+			}
+		}
+		#Dry Superhab Start
+		every_galaxy_planet = { 				
+			limit = { is_planet_class = pc_pd_cold_superhab is_homeworld = no has_planet_flag = prescripted_ideal }
 			random_list = {
 				20 = { change_pc = pc_tundra reroll_planet = yes }
 				20 = { change_pc = pc_mud reroll_planet = yes }		
@@ -1289,6 +1323,14 @@ country_event = {
 			set_planet_flag = pdsuperhabitable
 		}
 		every_galaxy_planet = {
+			limit = { is_planet_class = pc_pd_dry_superhab }
+			set_planet_flag = pddrysuperhabitable
+		}
+		every_galaxy_planet = {
+			limit = { is_planet_class = pc_pd_cold_superhab }
+			set_planet_flag = pdcoldsuperhabitable
+		}
+		every_galaxy_planet = {
 				limit = { is_planet_class = pc_geothermal }
 			set_planet_flag = pdgeothermal
 		}
@@ -1711,6 +1753,14 @@ planet_event = {
 		remove_modifier = superhabitable
 		}
 		if = { 
+			limit = { NOT = { is_planet_class = pc_pd_dry_superhab } }
+			remove_modifier = pd_dry_superhab
+		}
+		if = { 
+			limit = { NOT = { is_planet_class = pc_pd_cold_superhab } }
+			remove_modifier = pd_cold_superhab
+		}
+		if = { 
 		limit = { NOT = { is_planet_class = pc_biolumen } }
 		remove_modifier = biolumen
 		}
@@ -2055,6 +2105,14 @@ planet_event = {
 		add_modifier = { modifier = "superhabitable" days = -1 }
 		}
 		if = { 
+			limit = { is_planet_class = pc_pd_dry_superhab }
+			add_modifier = { modifier = "pd_dry_superhab" days = -1 }
+		}
+		if = { 
+			limit = { is_planet_class = pc_pd_cold_superhab }
+			add_modifier = { modifier = "pd_cold_superhab" days = -1 }
+		}
+		if = { 
 		limit = { is_planet_class = pc_biolumen }
 		add_modifier = { modifier = "biolumen" days = -1 }
 		}
@@ -2299,6 +2357,7 @@ planet_event = {
 			IF = { limit = { is_planet_class = pc_karst } set_planet_entity = { picture = pc_aquatickarst_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_reef } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_pd_archipelago } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_superhabitable } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			#Cold
 			IF = { limit = { is_planet_class = pc_subarctic } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
 			IF = { limit = { is_planet_class = pc_swamp } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
@@ -2322,6 +2381,7 @@ planet_event = {
 			IF = { limit = { is_planet_class = pc_storm } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
 			IF = { limit = { is_planet_class = pc_pd_iceberg } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
 			IF = { limit = { is_planet_class = pc_eyeball } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
+			IF = { limit = { is_planet_class = pc_pd_cold_superhab } set_planet_entity = { picture = pc_aquaticcold_uw } set_planet_flag = pdaquapicture set_planet_flag = coldaquatic }
 			#Tropical
 			IF = { limit = { is_planet_class = pc_desertislands } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
 			IF = { limit = { is_planet_class = pc_tropical } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
@@ -2342,7 +2402,7 @@ planet_event = {
 			IF = { limit = { is_planet_class = pc_arid } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
 			IF = { limit = { is_planet_class = pc_sandsea } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
 			IF = { limit = { is_planet_class = pc_geothermal } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
-			IF = { limit = { is_planet_class = pc_superhabitable } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
+			IF = { limit = { is_planet_class = pc_pd_dry_superhab } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
 			IF = { limit = { is_planet_class = pc_biolumen } set_planet_entity = { picture = pc_aquaticbio_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
 			IF = { limit = { is_planet_class = pc_primal } set_planet_entity = { picture = pc_aquatichot_uw } set_planet_flag = pdaquapicture set_planet_flag = hotaquatic }
 			#Shroud
@@ -2840,6 +2900,8 @@ planet_event = {
 		#Rare
 		if = { limit = { is_planet_class = pc_geothermal } set_planet_flag = pdhive_geothermal }
 		if = { limit = { is_planet_class = pc_superhabitable } set_planet_flag = pdhive_superhabitable }
+		if = { limit = { is_planet_class = pc_pd_dry_superhab } set_planet_flag = pdhive_drysuperhabitable }
+		if = { limit = { is_planet_class = pc_pd_cold_superhab } set_planet_flag = pdhive_coldsuperhabitable }
 		if = { limit = { is_planet_class = pc_tidallylocked } set_planet_flag = pdhive_tidallylocked }
 		if = { limit = { is_planet_class = pc_wettidallylocked } set_planet_flag = pdhive_wettidallylocked }
 		if = { limit = { is_planet_class = pc_supercon } set_planet_flag = pdhive_supercon }
@@ -3146,6 +3208,8 @@ planet_event = {
 		#Rare
 		if = { limit = { has_planet_flag = pdhive_geothermal } change_pc = pc_geothermal remove_planet_flag = pdhive_geothermal }
 		if = { limit = { has_planet_flag = pdhive_superhabitable } change_pc = pc_superhabitable remove_planet_flag = pdhive_superhabitable }
+		if = { limit = { has_planet_flag = pdhive_drysuperhabitable } change_pc = pc_pd_dry_superhab remove_planet_flag = pdhive_drysuperhabitable }
+		if = { limit = { has_planet_flag = pdhive_coldsuperhabitable } change_pc = pc_pd_cold_superhab remove_planet_flag = pdhive_coldsuperhabitable }
 		if = { limit = { has_planet_flag = pdhive_tidallylocked } change_pc = pc_tidallylocked remove_planet_flag = pdhive_tidallylocked }
 		if = { limit = { has_planet_flag = pdhive_wettidallylocked } change_pc = pc_wettidallylocked remove_planet_flag = pdhive_wettidallylocked }
 		if = { limit = { has_planet_flag = pdhive_supercon } change_pc = pc_supercon remove_planet_flag = pdhive_supercon }
@@ -4383,6 +4447,20 @@ country_event = {
 			if = {
 				limit = {
 					has_planet_flag = lost_colony_planet
+					is_planet_class = pc_pd_dry_superhab
+				}
+				random_list = {
+					20 = { change_pc = pc_arid }
+					20 = { change_pc = pc_mesa }
+					20 = { change_pc = pc_badlands }
+					20 = { change_pc = pc_hadesert }
+					20 = { change_pc = pc_med }
+				}
+				generate_pd_start_deposits_and_blockers = yes
+			}
+			if = {
+				limit = {
+					has_planet_flag = lost_colony_planet
 					is_planet_class = pc_storm
 				}
 				random_list = {
@@ -4412,6 +4490,20 @@ country_event = {
 				limit = {
 					has_planet_flag = lost_colony_planet
 					is_planet_class = pc_cryoflora
+				}
+				random_list = {
+					20 = { change_pc = pc_tundra }
+					20 = { change_pc = pc_mud }
+					20 = { change_pc = pc_basalt }
+					20 = { change_pc = pc_mushroom }
+					20 = { change_pc = pc_swamp }
+				}
+				generate_pd_start_deposits_and_blockers = yes
+			}
+			if = {
+				limit = {
+					has_planet_flag = lost_colony_planet
+					is_planet_class = pc_pd_cold_superhab
 				}
 				random_list = {
 					20 = { change_pc = pc_tundra }
@@ -4958,6 +5050,20 @@ country_event = {
 					}
 					if = {
 						limit = {
+							is_planet_class = pc_pd_dry_superhab
+						}
+						random_list = {
+							20 = { change_pc = pc_arid }
+							20 = { change_pc = pc_mesa }
+							20 = { change_pc = pc_badlands }
+							20 = { change_pc = pc_hadesert }
+							20 = { change_pc = pc_med }
+						}
+						reroll_deposits = yes
+						remove_modifier = primal
+					}
+					if = {
+						limit = {
 							is_planet_class = pc_tidallylocked
 						}
 						random_list = {
@@ -5010,7 +5116,7 @@ country_event = {
 							20 = { change_pc = pc_semiarid }
 						}
 						reroll_deposits = yes
-						remove_modifier = tidal_locked2
+						remove_modifier = pdsinkhole
 					}
 					if = {
 						limit = {
@@ -5067,6 +5173,20 @@ country_event = {
 						}
 						reroll_deposits = yes
 						remove_modifier = pdcryoflora
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_pd_cold_superhab
+						}
+						random_list = {
+							20 = { change_pc = pc_tundra }
+							20 = { change_pc = pc_mud }
+							20 = { change_pc = pc_basalt }
+							20 = { change_pc = pc_mushroom }
+							20 = { change_pc = pc_swamp }
+						}
+						reroll_deposits = yes
+						remove_modifier = pd_cold_superhab
 					}
 					if = {
 						limit = {
@@ -5997,6 +6117,20 @@ country_event = {
 					}
 					if = {
 						limit = {
+							is_planet_class = pc_pd_dry_superhab
+						}
+						random_list = {
+							20 = { change_pc = pc_arid }
+							20 = { change_pc = pc_mesa }
+							20 = { change_pc = pc_badlands }
+							20 = { change_pc = pc_hadesert }
+							20 = { change_pc = pc_med }	
+						}
+						reroll_deposits = yes
+						remove_modifier = pd_dry_superhab
+					}
+					if = {
+						limit = {
 							is_planet_class = pc_storm
 						}
 						random_list = {
@@ -6036,6 +6170,20 @@ country_event = {
 						}
 						reroll_deposits = yes
 						remove_modifier = pdcryoflora
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_pd_cold_superhab
+						}
+						random_list = {
+							20 = { change_pc = pc_tundra }
+							20 = { change_pc = pc_mud }
+							20 = { change_pc = pc_basalt }
+							20 = { change_pc = pc_mushroom }
+							20 = { change_pc = pc_swamp }
+						}
+						reroll_deposits = yes
+						remove_modifier = pd_cold_superhab
 					}
 					if = {
 						limit = {
@@ -6885,6 +7033,16 @@ country_event = {
 				IF = { limit = { not = { has_modifier = superhabitable } }
 				add_modifier = { modifier = "superhabitable" days = -1 }
 				}
+			}
+			IF = { limit = { is_planet_class = pc_pd_dry_superhab } 
+				IF = { limit = { not = { has_modifier = pd_dry_superhab } }
+				add_modifier = { modifier = "pd_dry_superhab" days = -1 }
+				}
+			}	
+			IF = { limit = { is_planet_class = pc_pd_cold_superhab } 
+				IF = { limit = { not = { has_modifier = pd_cold_superhab } }
+				add_modifier = { modifier = "pd_cold_superhab" days = -1 }
+				}
 			}	
 			IF = { limit = { is_planet_class = pc_geothermal } 
 				IF = { limit = { not = { has_modifier = geothermal } }
@@ -7342,7 +7500,27 @@ country_event = {
 	immediate = {
 		every_galaxy_planet = {
 			if = { 
-				limit = { is_planet_class = pc_superhabitable is_homeworld = yes system_star = {  OR = { is_star_class = sc_b is_star_class = sc_a is_star_class = sc_f is_star_class = sc_g is_star_class = sc_m is_star_class = sc_m_giant is_star_class = sc_t is_star_class = sc_neutron_star is_star_class = sc_pulsar } } }
+				limit = { 
+					OR = {
+						is_planet_class = pc_superhabitable 
+						is_planet_class = pc_pd_dry_superhab 
+						is_planet_class = pc_pd_cold_superhab 
+					}
+					is_homeworld = yes 
+					system_star = {  
+						OR = { 
+							is_star_class = sc_b 
+							is_star_class = sc_a 
+							is_star_class = sc_f 
+							is_star_class = sc_g 
+							is_star_class = sc_m 
+							is_star_class = sc_m_giant 
+							is_star_class = sc_t 
+							is_star_class = sc_neutron_star 
+							is_star_class = sc_pulsar 
+						} 
+					} 
+				}
 				solar_system = {
 					set_star_class = sc_k
 					every_system_planet = { limit = { is_planet_class = pc_k_star planet_size = 20 } change_planet_size = 10 }
@@ -7360,7 +7538,15 @@ country_event = {
 		}
 		every_galaxy_planet = {
 			if = {
-				limit = { is_planet_class = pc_superhabitable is_homeworld = yes system_star = { is_star_class = sc_binary_1 } }
+				limit = { 
+					OR = {
+						is_planet_class = pc_superhabitable 
+						is_planet_class = pc_pd_dry_superhab 
+						is_planet_class = pc_pd_cold_superhab 
+					}
+					is_homeworld = yes 
+					system_star = { is_star_class = sc_binary_1 } 
+				}
 				solar_system = {
 					every_system_planet = { limit = { is_planet_class = pc_pulsar } change_pc = pc_f_star }
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 15 } change_planet_size = 10 }
@@ -7383,7 +7569,14 @@ country_event = {
 		}
 		every_galaxy_planet = {
 			if = {
-				limit = { is_planet_class = pc_superhabitable is_homeworld = yes system_star = { is_star_class = sc_binary_2 } }
+				limit = { 
+					OR = {
+						is_planet_class = pc_superhabitable 
+						is_planet_class = pc_pd_dry_superhab 
+						is_planet_class = pc_pd_cold_superhab 
+					}
+					is_homeworld = yes system_star = { is_star_class = sc_binary_2 } 
+				}
 				solar_system = {
 					every_system_planet = { limit = { is_planet_class = pc_neutron_star } change_pc = pc_f_star }
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 15 } change_planet_size = 10 }
@@ -7406,7 +7599,7 @@ country_event = {
 		}
 		every_galaxy_planet = {
 			if = {
-				limit = { is_planet_class = pc_superhabitable is_homeworld = yes system_star = { is_star_class = sc_binary_3 } }
+				limit = { OR = { is_planet_class = pc_superhabitable is_planet_class = pc_pd_dry_superhab is_planet_class = pc_pd_cold_superhab } is_homeworld = yes system_star = { is_star_class = sc_binary_3 } }
 				solar_system = {
 					every_system_planet = { limit = { is_planet_class = pc_b_star } change_pc = pc_f_star }
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 15 } change_planet_size = 10 }
@@ -7429,7 +7622,7 @@ country_event = {
 		}
 		every_galaxy_planet = { # This one already has a secondary F star so only the central star needs to change
 			if = {
-				limit = { is_planet_class = pc_superhabitable is_homeworld = yes system_star = { is_star_class = sc_binary_4 } }
+				limit = { OR = { is_planet_class = pc_superhabitable is_planet_class = pc_pd_dry_superhab is_planet_class = pc_pd_cold_superhab } is_homeworld = yes system_star = { is_star_class = sc_binary_4 } }
 				solar_system = {
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 15 } change_planet_size = 10 }
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 16 } change_planet_size = 9 }
@@ -7451,7 +7644,7 @@ country_event = {
 		}
 		every_galaxy_planet = { # This one is a B B binary so I change all of them to F stars and then set the star class to sc_binary_7 as it changes the central star to a K star
 			if = {
-				limit = { is_planet_class = pc_superhabitable is_homeworld = yes system_star = { is_star_class = sc_binary_5 } }
+				limit = { OR = { is_planet_class = pc_superhabitable is_planet_class = pc_pd_dry_superhab is_planet_class = pc_pd_cold_superhab } is_homeworld = yes system_star = { is_star_class = sc_binary_5 } }
 				solar_system = {
 					every_system_planet = { limit = { is_planet_class = pc_b_star } change_pc = pc_f_star }
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 15 } change_planet_size = 10 }
@@ -7474,7 +7667,7 @@ country_event = {
 		}
 		every_galaxy_planet = {
 			if = {
-				limit = { is_planet_class = pc_superhabitable is_homeworld = yes system_star = { is_star_class = sc_binary_6 } }
+				limit = { OR = { is_planet_class = pc_superhabitable is_planet_class = pc_pd_dry_superhab is_planet_class = pc_pd_cold_superhab } is_homeworld = yes system_star = { is_star_class = sc_binary_6 } }
 				solar_system = {
 					every_system_planet = { limit = { is_planet_class = pc_g_star } change_pc = pc_f_star }
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 15 } change_planet_size = 10 }
@@ -7497,7 +7690,7 @@ country_event = {
 		}
 		every_galaxy_planet = { # This one already has a secondary F star so only the central star needs to change
 			if = {
-				limit = { is_planet_class = pc_superhabitable is_homeworld = yes system_star = { is_star_class = sc_binary_8 } }
+				limit = { OR = { is_planet_class = pc_superhabitable is_planet_class = pc_pd_dry_superhab is_planet_class = pc_pd_cold_superhab } is_homeworld = yes system_star = { is_star_class = sc_binary_8 } }
 				solar_system = {
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 15 } change_planet_size = 10 }
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 16 } change_planet_size = 9 }
@@ -7519,7 +7712,7 @@ country_event = {
 		}
 		every_galaxy_planet = { # This one already has a secondary F star so only the central star needs to change
 			if = {
-				limit = { is_planet_class = pc_superhabitable is_homeworld = yes system_star = { is_star_class = sc_binary_9 } }
+				limit = { OR = { is_planet_class = pc_superhabitable is_planet_class = pc_pd_dry_superhab is_planet_class = pc_pd_cold_superhab } is_homeworld = yes system_star = { is_star_class = sc_binary_9 } }
 				solar_system = {
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 15 } change_planet_size = 10 }
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 16 } change_planet_size = 9 }
@@ -7541,7 +7734,7 @@ country_event = {
 		}
 		every_galaxy_planet = {
 			if = {
-				limit = { is_planet_class = pc_superhabitable is_homeworld = yes system_star = { is_star_class = sc_binary_10 } }
+				limit = { OR = { is_planet_class = pc_superhabitable is_planet_class = pc_pd_dry_superhab is_planet_class = pc_pd_cold_superhab } is_homeworld = yes system_star = { is_star_class = sc_binary_10 } }
 				solar_system = {
 					every_system_planet = { limit = { is_planet_class = pc_t_star } change_pc = pc_f_star }
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 15 } change_planet_size = 10 }
@@ -7564,7 +7757,7 @@ country_event = {
 		}
 		every_galaxy_planet = {
 			if = {
-				limit = { is_planet_class = pc_superhabitable is_homeworld = yes system_star = { is_star_class = sc_trinary_1 } }
+				limit = { OR = { is_planet_class = pc_superhabitable is_planet_class = pc_pd_dry_superhab is_planet_class = pc_pd_cold_superhab } is_homeworld = yes system_star = { is_star_class = sc_trinary_1 } }
 				solar_system = {
 					every_system_planet = { limit = { is_planet_class = pc_m_star } change_pc = pc_f_star }
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 20 } change_planet_size = 5 }
@@ -7603,7 +7796,7 @@ country_event = {
 		}
 		every_galaxy_planet = { # Even if it already has an F Star I decided to change into a G star and the A star into an F in order to keep the secondary and tertiary planets similar to the sc_trinary_3 list order the code must execute in the exact order as below otherwise it may bork it
 			if = {
-				limit = { is_planet_class = pc_superhabitable is_homeworld = yes system_star = { is_star_class = sc_trinary_2 } }
+				limit = { OR = { is_planet_class = pc_superhabitable is_planet_class = pc_pd_dry_superhab is_planet_class = pc_pd_cold_superhab } is_homeworld = yes system_star = { is_star_class = sc_trinary_2 } }
 				solar_system = {
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 20 } change_planet_size = 5 }
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 21 } change_planet_size = 4 }
@@ -7641,7 +7834,7 @@ country_event = {
 		}
 		every_galaxy_planet = {
 			if = {
-				limit = { is_planet_class = pc_superhabitable is_homeworld = yes system_star = { is_star_class = sc_trinary_4 } }
+				limit = { OR = { is_planet_class = pc_superhabitable is_planet_class = pc_pd_dry_superhab is_planet_class = pc_pd_cold_superhab } is_homeworld = yes system_star = { is_star_class = sc_trinary_4 } }
 				solar_system = {
 					every_system_planet = { limit = { is_planet_class = pc_k_star } change_pc = pc_f_star }
 					every_system_planet = { limit = { is_planet_class = pc_f_star planet_size = 20 } change_planet_size = 5 }
