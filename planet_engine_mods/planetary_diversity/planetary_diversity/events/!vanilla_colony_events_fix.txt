@@ -1304,3 +1304,362 @@ planet_event = {
 		}
 	}
 }
+
+planet_event = { #Dimensional portal
+	id = colony.3005
+	title = "colony.3005.name"
+	desc = "colony.3005.desc"
+	picture = GFX_evt_wormhole
+	location = ROOT
+	situation = from #only does something if from is actually a situation
+	trackable = yes
+
+	trigger = {
+		has_owner = yes
+		original_owner = yes
+		is_homeworld = no
+		owner = {
+			is_ai = no
+			NOR = {
+				has_country_flag = dportal_country }
+				has_origin = origin_floating_world
+				has_origin = origin_crystal_world
+				has_origin = origin_crucible_world
+				has_origin = origin_pd_zro_world
+				has_origin = origin_pd_hive
+				has_origin = origin_archive_world
+				has_origin = origin_graveyard_world
+				has_origin = origin_graveyard_world
+				has_origin = origin_techno_world
+			}
+		}
+		is_capital = no
+		has_ground_combat = no
+		is_occupied_flag = no
+		num_pops > 0
+		NOR = {
+			is_planet_class = pc_habitat
+			is_planet_class = pc_ringworld_habitable
+			has_planet_flag = colony_event
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_planet_flag = dportal_event
+		set_planet_flag = colony_event
+		owner = { set_country_flag = dportal_country }
+
+	}
+
+	option = {
+		name = INTRIGUING
+		enable_special_project = {
+			name = "DPORTAL_PROJECT"
+			location = this
+			owner = root
+		}
+		if = {
+			limit = {
+				owner = {
+					is_gestalt = yes
+				}
+			}
+			add_deposit = d_portal_research_zone_gestalt
+		}
+		else = {
+			add_deposit = d_portal_research_zone
+		}
+	}
+}
+
+#Sucessfuly bring planet into your reality
+country_event = {
+	id = colony.9850
+	title = "colony.9850.name"
+	desc = {
+		trigger = { is_machine_empire = yes }
+		text = "colony.9850.desc.robot"
+	}
+	desc = {
+		trigger = { is_hive_empire = yes }
+		text = "colony.9850.desc.hive"
+	}
+	desc = {
+		trigger = { is_regular_empire = yes }
+		text = "colony.9850.desc"
+	}
+	is_triggered_only = yes
+	picture = GFX_evt_atmospheric_entry
+	show_sound = event_activating_unknown_technology
+
+	immediate = {
+		if = {
+			limit = {
+				has_origin = origin_ocean_paradise
+			}
+			home_planet = {
+				solar_system = {
+					spawn_planet = {
+						class = pc_ocean
+						location = root.home_planet
+						orbit_distance_offset = 2
+						orbit_angle_offset = 180
+						size = 30
+						init_effect = {
+							set_name = {
+								key = NAME_B_Planet
+								variable_string = "[Root.GetHomeWorldName]"
+							}
+							save_event_target_as = b_planet
+							set_owner = root
+							set_controller = root
+							prevent_anomaly = yes
+							clear_blockers = yes
+							set_planet_entity = {
+								entity = "ocean_paradise_planet_01_entity"
+							}
+							generate_start_deposits_and_blockers = yes
+							remove_all_buildings = yes
+							set_planet_flag = colony_event
+							if = {
+								limit = {
+									root = { is_gestalt = yes }
+								}
+								add_modifier = {
+									modifier = ocean_paradise_hive
+								}
+							}
+							else = {
+								add_modifier = {
+									modifier = ocean_paradise
+								}
+							}
+						}
+					}
+					every_ambient_object = {
+						limit = { has_ambient_object_flag = b_world_portal }
+						destroy_ambient_object = this
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_origin = origin_aquatic_paradise
+			}
+			home_planet = {
+				solar_system = {
+					spawn_planet = {
+						class = pc_aquatic
+						location = root.home_planet
+						orbit_distance_offset = 2
+						orbit_angle_offset = 180
+						size = 30
+						init_effect = {
+							set_name = {
+								key = NAME_B_Planet
+								variable_string = "[Root.GetHomeWorldName]"
+							}
+							save_event_target_as = b_planet
+							set_owner = root
+							set_controller = root
+							prevent_anomaly = yes
+							clear_blockers = yes
+							set_planet_entity = {
+								entity = "ocean_paradise_planet_01_entity"
+							}
+							generate_start_deposits_and_blockers = yes
+							remove_all_buildings = yes
+							set_planet_flag = colony_event
+							if = {
+								limit = {
+									root = { is_gestalt = yes }
+								}
+								add_modifier = {
+									modifier = ocean_paradise_hive
+								}
+							}
+							else = {
+								add_modifier = {
+									modifier = ocean_paradise
+								}
+							}
+						}
+					}
+					every_ambient_object = {
+						limit = { has_ambient_object_flag = b_world_portal }
+						destroy_ambient_object = this
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_origin = origin_life_seeded
+			}
+			home_planet = {
+				solar_system = {
+					spawn_planet = {
+						class = pc_gaia
+						location = root.home_planet
+						orbit_distance_offset = 2
+						orbit_angle_offset = 180
+						size = 30
+						init_effect = {
+							set_name = {
+								key = NAME_B_Planet
+								variable_string = "[Root.GetHomeWorldName]"
+							}
+							save_event_target_as = b_planet
+							set_owner = root
+							set_controller = root
+							prevent_anomaly = yes
+							clear_blockers = yes
+							generate_start_deposits_and_blockers = yes
+							remove_all_buildings = yes
+							set_planet_flag = colony_event
+						}
+					}
+					every_ambient_object = {
+						limit = { has_ambient_object_flag = b_world_portal }
+						destroy_ambient_object = this
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_origin = origin_post_apocalyptic
+			}
+			home_planet = {
+				solar_system = {
+					spawn_planet = {
+						class = pc_nuked
+						location = root.home_planet
+						orbit_distance_offset = 2
+						orbit_angle_offset = 180
+						size = 20
+						init_effect = {
+							set_name = {
+								key = NAME_B_Planet
+								variable_string = "[Root.GetHomeWorldName]"
+							}
+							save_event_target_as = b_planet
+							set_owner = root
+							set_controller = root
+							prevent_anomaly = yes
+							clear_blockers = yes
+							generate_start_deposits_and_blockers = yes
+							remove_all_buildings = yes
+							set_planet_flag = colony_event
+						}
+					}
+					every_ambient_object = {
+						limit = { has_ambient_object_flag = b_world_portal }
+						destroy_ambient_object = this
+					}
+				}
+			}
+		}
+		else = {
+			home_planet = {
+				solar_system = {
+					spawn_planet = {
+						class = pc_ocean
+						location = root.home_planet
+						orbit_distance_offset = 2
+						orbit_angle_offset = 180
+						size = 18
+						init_effect = {
+							set_name = {
+								key = NAME_B_Planet
+								variable_string = "[Root.GetHomeWorldName]"
+							}
+							save_event_target_as = b_planet
+							set_owner = root
+							set_controller = root
+							prevent_anomaly = yes
+							clear_deposits = yes
+							remove_all_buildings = yes
+							if = {
+								limit = {
+									root.home_planet = {
+										has_planet_flag = planet_earth
+									}
+								}
+								generate_earth_deposits_and_blockers = yes
+								if = {
+									limit = {
+										root.home_planet = {
+											is_planet_class = pc_continental
+										}
+									}
+									set_planet_entity = {
+										entity = "continental_planet_earth_entity"
+									}
+								}
+							}
+							else = {
+								generate_start_deposits_and_blockers = yes
+							}
+							generate_start_buildings_and_districts = yes
+							set_planet_flag = colony_event
+							if = {
+								limit = {
+									root = {
+										is_machine_empire = no
+									}
+								}
+								change_pc = root.owner_species
+							}
+							else = {
+								change_pc = pc_nuked
+							}
+						}
+					}
+					every_ambient_object = {
+						limit = { has_ambient_object_flag = b_world_portal }
+						destroy_ambient_object = this
+					}
+				}
+			}
+		}
+		event_target:b_planet = {
+			while = {
+				count = 18
+				create_pop = {
+					species = root.species	
+				}
+				last_created_pop = { set_pop_flag = b_worlder }
+			}
+			every_owned_pop = {
+				limit = {
+					has_pop_flag = b_worlder
+				}
+				if = { 
+					limit = { is_robot_pop = yes }
+					modify_species = {
+						species = this
+						add_trait = trait_robot_notofthisworld
+					}
+				}
+				else = {
+					modify_species = {
+						species = this 
+						add_trait = trait_notofthisworld
+					}
+				}
+			}
+			add_modifier = {
+				modifier = b_world_saved
+				days = 3600
+			}
+		}
+	}
+	option = {
+		name = colony.9850.a
+		remove_modifier = "harvesting_negative_mass"
+	}
+}
