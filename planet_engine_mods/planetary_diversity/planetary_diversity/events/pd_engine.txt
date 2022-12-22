@@ -1889,8 +1889,18 @@ planet_event = {
 			}
 		}
 		if = { 
-		limit = { NOT = { OR = { is_planet_class = pc_megaflora is_planet_class = pc_megaflorahive is_planet_class = pc_megafloratol is_planet_class = pc_megaflorahivetl } } }
-		remove_modifier = pdmegaflora
+			limit = { 
+				NOT = { 
+					OR = { 
+						is_planet_class = pc_megaflora 
+						is_planet_class = pc_megaflorahive 
+						is_planet_class = pc_megafloratol 
+						is_planet_class = pc_megaflorahivetl 
+						is_planet_class = pc_megaflorahive_superhab
+					} 
+				} 
+			}
+			remove_modifier = pdmegaflora
 		}
 		if = { 
 			limit = { NOT = { is_planet_class = pc_pd_petrified } }
@@ -2233,8 +2243,16 @@ planet_event = {
 			add_modifier = { modifier = pdpetrified days = -1 }
 		}
 		if = { 
-		limit = { OR = { is_planet_class = pc_megaflora is_planet_class = pc_megaflorahive is_planet_class = pc_megafloratol is_planet_class = pc_megaflorahivetl } }
-		add_modifier = { modifier = "pdmegaflora" days = -1 }
+			limit = { 
+				OR = { 
+					is_planet_class = pc_megaflora 
+					is_planet_class = pc_megaflorahive 
+					is_planet_class = pc_megafloratol 
+					is_planet_class = pc_megaflorahivetl 
+					is_planet_class = pc_megaflorahive_superhab
+				} 
+			}
+			add_modifier = { modifier = "pdmegaflora" days = -1 }
 		}
 		if = { 
 		limit = { is_planet_class = pc_ash }
@@ -2965,6 +2983,7 @@ planet_event = {
 		IF = { limit = { is_planet_class = pc_megaflora } set_planet_flag = pdhive_megaflora }
 		IF = { limit = { is_planet_class = pc_megaflorahive } set_planet_flag = pdhive_megaflorahive }
 		IF = { limit = { is_planet_class = pc_megaflorahivetl } set_planet_flag = pdhive_megaflorahivetl }
+		IF = { limit = { is_planet_class = pc_megaflorahive_superhab } set_planet_flag = pdhive_megaflorahivesuperhab }
 		#Exotic
 		if = { limit = { is_planet_class = pc_ammonia } set_planet_flag = pdhive_ammonia }
 		if = { limit = { is_planet_class = pc_sulfur } set_planet_flag = pdhive_sulfur }
@@ -3454,6 +3473,10 @@ planet_event = {
 				limit = { is_planet_class = pc_megaflorahivetl }
 				change_pc = pc_wettidallylocked
 			}
+			if = {
+				limit = { is_planet_class = pc_megaflorahive_superhab }
+				change_pc = pc_superhabitable
+			}
 			add_deposit = d_pd_tree_of_life_dead
 			add_modifier = {
 				modifier = no_pd_lifetree
@@ -3512,6 +3535,11 @@ planet_event = {
 		if = {
 			limit = { is_planet_class = pc_megaflorahivetl }
 			change_pc = pc_wettidallylocked
+			add_deposit = d_pd_tree_of_life_dead
+		}
+		if = {
+			limit = { is_planet_class = pc_megaflorahive_superhab }
+			change_pc = pc_superhabitable
 			add_deposit = d_pd_tree_of_life_dead
 		}
 	}
@@ -3652,25 +3680,22 @@ planet_event = {
 	immediate = {
 		IF = {
 			limit = {
-				NOT = {
-					OR = {
-						is_planet_class = pc_wettidallylocked
-						is_planet_class = pc_eyeball
-						is_planet_class = pc_tidallylocked
-					}
-				}
+				is_pd_superhab = no
+				is_pd_tidally_locked = no
 			}
 			change_pc = pc_megaflorahive
 		}
 		IF = {
 			limit = {
-				OR = {
-					is_planet_class = pc_wettidallylocked
-					is_planet_class = pc_eyeball
-					is_planet_class = pc_tidallylocked
-				}
+				is_pd_tidally_locked = yes
 			}
-			change_pc = pc_megafloratol
+			change_pc = pc_megaflorahivetl
+		}
+		IF = {
+			limit = {
+				is_pd_superhab = yes
+			}
+			change_pc = pc_megaflorahive_superhab
 		}
 		pd_remove_special_deposits_modifiers = yes
 		remove_planet_flag = pd_tol1
@@ -3721,6 +3746,7 @@ planet_event = {
 		NOT = { is_planet_class = pc_milarc_relic }
 		NOT = { is_planet_class = pc_city }
 		NOT = { is_planet_class = pc_megaflorahivetl }
+		NOT = { is_planet_class = pc_megaflorahive_superhab }
 	}
 
 	immediate = {
