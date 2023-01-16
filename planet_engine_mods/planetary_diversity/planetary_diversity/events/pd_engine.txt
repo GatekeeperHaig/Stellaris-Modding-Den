@@ -83,6 +83,7 @@ country_event = {
 				20 = { change_pc = pc_coastal reroll_planet = yes }			
 				20 = { change_pc = pc_salt reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = pdsalt } }
 				20 = { change_pc = pc_aquifer reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = pdaquifer } }
+				20 = { change_pc = pc_pd_dry_cave reroll_planet = yes clear_planet_modifiers = yes add_modifier = { modifier = pd_dry_cave } }
 			}
 		}
 		every_galaxy_planet = {                 
@@ -320,8 +321,10 @@ country_event = {
 		every_galaxy_planet = { limit = { is_planet_class = pc_irradiated is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Karst
 		every_galaxy_planet = { limit = { is_planet_class = pc_karst is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
-		#Karst
+		#Cold Karst
 		every_galaxy_planet = { limit = { is_planet_class = pc_pd_cold_cave is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
+		#Dry Karst
+		every_galaxy_planet = { limit = { is_planet_class = pc_pd_dry_cave is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Reef
 		every_galaxy_planet = { limit = { is_planet_class = pc_reef is_homeworld = yes } generate_pd_start_deposits_and_blockers = yes }
 		#Archipelago
@@ -665,6 +668,17 @@ country_event = {
 		#Cold Cave Start
 		every_galaxy_planet = { 				
 			limit = { is_planet_class = pc_pd_cold_cave is_homeworld = no has_planet_flag = prescripted_ideal }
+			random_list = {
+				20 = { change_pc = pc_alpine reroll_planet = yes }
+				20 = { change_pc = pc_highland reroll_planet = yes }	
+				20 = { change_pc = pc_snow reroll_planet = yes }
+				20 = { change_pc = pc_boreal reroll_planet = yes }	
+				20 = { change_pc = pc_duneforest reroll_planet = yes }	
+			}
+		}
+		#Dry Cave Start
+		every_galaxy_planet = { 				
+			limit = { is_planet_class = pc_pd_dry_cave is_homeworld = no has_planet_flag = prescripted_ideal }
 			random_list = {
 				20 = { change_pc = pc_alpine reroll_planet = yes }
 				20 = { change_pc = pc_highland reroll_planet = yes }	
@@ -1329,6 +1343,10 @@ country_event = {
 			set_planet_flag = pdcoldcave
 		}
 		every_galaxy_planet = {
+			limit = { is_planet_class = pc_pd_dry_cave }
+			set_planet_flag = pdcoldcave
+		}
+		every_galaxy_planet = {
 			limit = { is_planet_class = pc_reef }
 			set_planet_flag = pdreef
 		}
@@ -1846,6 +1864,10 @@ planet_event = {
 			remove_modifier = pdcoldcave
 		}
 		if = { 
+			limit = { NOT = { is_planet_class = pc_pd_dry_cave } }
+			remove_modifier = pddrycave
+		}
+		if = { 
 		limit = { NOT = { is_planet_class = pc_reef } }
 		remove_modifier = pdreef
 		}
@@ -2208,6 +2230,10 @@ planet_event = {
 			add_modifier = { modifier = "pd_cold_cave" days = -1 }
 		}
 		if = { 
+			limit = { is_planet_class = pc_pd_dry_cave }
+			add_modifier = { modifier = "pd_dry_cave" days = -1 }
+		}
+		if = { 
 			limit = { is_planet_class = pc_reef }
 				add_modifier = { modifier = "pdreef" days = -1 }
 		}
@@ -2439,6 +2465,7 @@ planet_event = {
 			IF = { limit = { is_planet_class = pc_pd_sinkhole } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_karst } set_planet_entity = { picture = pc_aquatickarst_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_pd_cold_cave } set_planet_entity = { picture = pc_aquatickarst_uw } set_planet_flag = pdaquapicture }
+			IF = { limit = { is_planet_class = pc_pd_dry_cave } set_planet_entity = { picture = pc_aquatickarst_uw } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_reef } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_pd_archipelago } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
 			IF = { limit = { is_planet_class = pc_superhabitable } set_planet_entity = { picture = pc_aquatic } set_planet_flag = pdaquapicture }
@@ -2995,6 +3022,7 @@ planet_event = {
 		if = { limit = { is_planet_class = pc_biolumen } set_planet_flag = pdhive_biolumen }
 		if = { limit = { is_planet_class = pc_karst } set_planet_flag = pdhive_karst }
 		if = { limit = { is_planet_class = pc_pd_cold_cave } set_planet_flag = pdhive_pd_cold_cave }
+		if = { limit = { is_planet_class = pc_pd_dry_cave } set_planet_flag = pdhive_pd_dry_cave }
 		if = { limit = { is_planet_class = pc_reef } set_planet_flag = pdhive_reef }
 		if = { limit = { is_planet_class = pc_pd_archipelago } set_planet_flag = pdhive_archipelago }
 		if = { limit = { is_planet_class = pc_primal } set_planet_flag = pdhive_primal }
@@ -3305,6 +3333,7 @@ planet_event = {
 		if = { limit = { has_planet_flag = pdhive_biolumen } change_pc = pc_biolumen remove_planet_flag = pdhive_biolumen }
 		if = { limit = { has_planet_flag = pdhive_karst } change_pc = pc_karst remove_planet_flag = pdhive_karst }
 		if = { limit = { has_planet_flag = pdhive_pd_cold_cave } change_pc = pc_pd_cold_cave remove_planet_flag = pdhive_pd_cold_cave }
+		if = { limit = { has_planet_flag = pdhive_pd_dry_cave } change_pc = pc_pd_dry_cave remove_planet_flag = pdhive_pd_dry_cave }
 		if = { limit = { has_planet_flag = pdhive_reef } change_pc = pc_reef remove_planet_flag = pdhive_reef }
 		if = { limit = { has_planet_flag = pdhive_archipelago } change_pc = pc_pd_archipelago remove_planet_flag = pdhive_archipelago }
 		if = { limit = { has_planet_flag = pdhive_primal } change_pc = pc_primal remove_planet_flag = pdhive_primal }
@@ -4418,6 +4447,20 @@ country_event = {
 			if = {
 				limit = {
 					has_planet_flag = lost_colony_planet
+					is_planet_class = pc_pd_dry_cave
+				}
+				random_list = {
+					20 = { change_pc = pc_desert }
+					20 = { change_pc = pc_sandsea }
+					20 = { change_pc = pc_outback }
+					20 = { change_pc = pc_coastal }
+					20 = { change_pc = pc_oasis }
+				}
+				generate_pd_start_deposits_and_blockers = yes
+			}
+			if = {
+				limit = {
+					has_planet_flag = lost_colony_planet
 					is_planet_class = pc_reef
 				}
 				random_list = {
@@ -5092,6 +5135,20 @@ country_event = {
 					}
 					if = {
 						limit = {
+							is_planet_class = pc_pd_dry_cave
+						}
+						random_list = {
+							20 = { change_pc = pc_desert }
+							20 = { change_pc = pc_sandsea }
+							20 = { change_pc = pc_outback }
+							20 = { change_pc = pc_coastal }
+							20 = { change_pc = pc_oasis }
+						}
+						reroll_deposits = yes
+						remove_modifier = pd_cold_cave
+					}
+					if = {
+						limit = {
 							is_planet_class = pc_pd_cold_cave
 						}
 						random_list = {
@@ -5102,7 +5159,21 @@ country_event = {
 							20 = { change_pc = pc_duneforest }
 						}
 						reroll_deposits = yes
-						remove_modifier = pdcoldcave
+						remove_modifier = pd_cold_cave
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_pd_dry_cave
+						}
+						random_list = {
+							20 = { change_pc = pc_desert }
+							20 = { change_pc = pc_sandsea }
+							20 = { change_pc = pc_outback }
+							20 = { change_pc = pc_coastal }
+							20 = { change_pc = pc_oasis }
+						}
+						reroll_deposits = yes
+						remove_modifier = pd_dry_cave
 					}
 					if = {
 						limit = {
@@ -6114,7 +6185,21 @@ country_event = {
 							20 = { change_pc = pc_duneforest }
 						}
 						reroll_deposits = yes
-						remove_modifier = pdcoldcave
+						remove_modifier = pd_cold_cave
+					}
+					if = {
+						limit = {
+							is_planet_class = pc_pd_dry_cave
+						}
+						random_list = {
+							20 = { change_pc = pc_desert }
+							20 = { change_pc = pc_sandsea }
+							20 = { change_pc = pc_outback }
+							20 = { change_pc = pc_coastal }
+							20 = { change_pc = pc_oasis }
+						}
+						reroll_deposits = yes
+						remove_modifier = pd_dry_cave
 					}
 					if = {
 						limit = {
@@ -7226,8 +7311,13 @@ country_event = {
 				}
 			}	
 			IF = { limit = { is_planet_class = pc_pd_cold_cave } 
-				IF = { limit = { not = { has_modifier = pdcoldcave } }
-				add_modifier = { modifier = "pdcoldcave" days = -1 }
+				IF = { limit = { not = { has_modifier = pd_cold_cave } }
+				add_modifier = { modifier = "pd_cold_cave" days = -1 }
+				}
+			}	
+			IF = { limit = { is_planet_class = pc_pd_dry_cave } 
+				IF = { limit = { not = { has_modifier = pc_pd_dry_cave } }
+				add_modifier = { modifier = "pd_dry_cave" days = -1 }
 				}
 			}	
 			IF = { limit = { is_planet_class = pc_reef } 
