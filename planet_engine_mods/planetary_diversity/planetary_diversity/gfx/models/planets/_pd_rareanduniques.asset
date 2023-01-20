@@ -2623,25 +2623,18 @@ entity = {
 	}
 	attach = { planet = "city_planet_surface_ships_entity" }
 }
-
+#Eco Clouds
 entity = {
-	name = "ecocity_planet_01_entity"
-	pdxmesh = "planet_clouded_mesh"
-
-	#planet surface texture override	
-	meshsettings = {
-		name = "planet_geosphereShape"
-		texture_diffuse = "ecocity_01_diffuse.dds"
-		texture_normal = "ecocity_01_normal.dds"
-		texture_specular = "ecocity_01_specular.dds"
-		shader = "PdxMeshPlanetEmissive"
-	}	
+	name = "pd_ecocity_planet_cloud_mesh"
+	pdxmesh = "planet_cloud_mesh"
+	scale = 1
 	##cloud texture override
 	meshsettings = {
 		name = "clouds_geosphereShape"
 		texture_diffuse = "clouds_smog_white_01_diffuse.dds"
 		texture_normal = "nonormal.dds"
 		texture_specular = "nospec.dds"
+		shader = "AlphaBlend_00"
 	}
 	##cloud shadow texture override
 	meshsettings = {
@@ -2649,15 +2642,68 @@ entity = {
 		texture_diffuse = "clouds_smog_shadow_01_diffuse.dds"
 		texture_normal = "nonormal.dds"
 		texture_specular = "nospec.dds"
+		shader = "AlphaBlend_00"
 	}
+	default_state = "idle"
+	state = { name = "idle" animation = "idle" time_offset = { 0 100 }
+		animation_speed = 0.6 
+	}
+}
+entity = {
+    name = "ecocity_planet_01_entity"
+    locator = { name = "planetloc" position = { 0 0 0 } rotation = { 0 0 0 } }
+    default_state = "idle"
+    playback_rate = 1.0 # Animation speed 0
+    state = { name = "idle" time_offset = { 0 100 } }
+    attach = { "planetloc" = "pd_ecocity_planet_mesh"}
+	game_data = {
+		shader_type = ship
+		emissive_recolor_crunch = 5.0
+	}
+    attach = { 
+		"planetloc" = "pd_ecocity_planet_cloud_mesh"
+	}
+    scale = 1.0
+}
+entity = {
+	name = "pd_ecocity_planet_mesh"
+	pdxmesh = "planet_non_clouded_mesh"
+
+	#planet surface texture override	
+	meshsettings = {
+		name = "planet_geosphereShape"
+		texture_diffuse = "ecocity_01_diffuse.dds"
+		texture_normal = "ecocity_01_normal.dds"
+		texture_specular = "ecocity_01_specular.dds"
+		shader = "PdxMeshTerra"
+		#shader = "PdxMeshPlanetEmissive"
+	}	
+	##cloud texture override
+	#meshsettings = {
+	#name = "clouds_geosphereShape"
+	#	texture_diffuse = "planet_transparent_diffuse.dds"
+	#	texture_normal = "nonormal.dds"
+	#	texture_specular = "nospec.dds"
+	#	shader = "AlphaBlend_00"
+	#}
+	##cloud shadow texture override
+	#meshsettings = {
+	#name = "clouds_shadow_geosphereShape"
+	#	texture_diffuse = "planet_transparent_diffuse.dds"
+	#	texture_normal = "nonormal.dds"
+	#	texture_specular = "nospec.dds"
+	#	shader = "AlphaBlend_00"
+	#}
 	##pole texture override
 	meshsettings = {
 		name = "polesShape"
 		texture_diffuse = "poles_tropical_1_diffuse.dds"
 		texture_normal = "nonormal.dds"
 		texture_specular = "nospec.dds"
+		shader = "AlphaBlend_00"
 	}
 	default_state = "idle"
+	playback_rate = -0.5 # Rotation is reversed
 	state = { name = "idle" animation = "idle" time_offset = { 0 100 } 
 		start_event = { trigger_once = yes sound = { soundeffect = "amb_city_planet" } }
 		start_event = { trigger_once = yes sound = { soundeffect = "amb_city_planet_flyby" } }
