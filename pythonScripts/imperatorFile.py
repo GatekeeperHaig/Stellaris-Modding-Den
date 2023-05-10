@@ -57,14 +57,14 @@ def main():
   raceDesc={"Noldor":"The Noldor where the second clan of elves to reach Valinor in the years of the trees and later where led back to Middle-earth by Fëanor. These elves have a long list of famous heroes and take pride in their combat ability. You have access to this modifier as your primary culture is Noldor.","Teleri":"The Teleri were the last clan of elves to reach Valinor in the years of the trees, though many remained in Middle-earth in the first place. They have always been the greatest seafarers of Middle-earth. As many of their breathren were slaughtered by Fëanor's host on his way back to Middle-earth, it took a long time for them to forgive the Noldor elves. You have access to this modifier as your primary culture is Teleri.","Edain":"The Edain were the group of mankind that reached Beleriand in the First Age. Many of them have fought Morgoth in the Battle of Beleriand and they and their ancestors have thus been rewarded with long life. You have access to this modifier as your primary culture is Edain. Lesser dunedain, corsairs and dol amrothian only count half.", "Dwarf":"The Masters of Stone were created by Aulë even before Ilúvatar created the elves, but slept underground until about a century after the elves awoke. Dwarves spend most of their time crafting, smithying and mining. You have access to this modifier as your primary culture is dwarven.","Orc":"Melkor created the orcs by twisting kidnapped elves in the Years of the Lamps. Without the guidance of Melkor or a fallen Maia, they are usually disorganized and pose little thread to any of the other races. Now that the Lord of the Rings is returning to his power though, the Age of the Orcs will come. You have access to this modifier as your primary culture is orcish."}
   # raceGrowth={"Noldor":-1,"Teleri":-1,"Edain":-0.8, "Dwarf":-0.8,"Orc":4}
 
-  lotr_pops=TagList("namespace", "lotr_pops")
-  foreignPopsEvent=lotr_pops.addReturn("lotr_pops.1")
-  foreignPopsEvent.add("type", "country_event").add("hidden","yes")
-  trigger=foreignPopsEvent.addReturn("trigger")
-  trigger.addReturn("NOT").add("has_law","age_of_the_orc")
-  immediate=foreignPopsEvent.addReturn("immediate")
-  option=foreignPopsEvent.addReturn("option")
-  option.add("name", "OK")
+  # lotr_pops=TagList("namespace", "lotr_pops")
+  # foreignPopsEvent=lotr_pops.addReturn("lotr_pops.1")
+  # foreignPopsEvent.add("type", "country_event").add("hidden","yes")
+  # trigger=foreignPopsEvent.addReturn("trigger")
+  # trigger.addReturn("NOT").add("has_law","age_of_the_orc")
+  # immediate=foreignPopsEvent.addReturn("immediate")
+  # option=foreignPopsEvent.addReturn("option")
+  # option.add("name", "OK")
 
   for race in races:
     for i in range(1,11):
@@ -89,31 +89,31 @@ def main():
       locClass.addEntry("desc_"+name, raceDesc[race])
 
 
-  for i in reversed(range(1,20)):
-    name=f"foreign_support_{i*5}"
-    t=fileContent.addReturn(name)
-    t.add("levy_size_multiplier",round(0.025*i,2))
-    locClass.addEntry(name, f"{i*5}% Foreign Culture Support")
-    locClass.addEntry("desc_"+name, "Non-integrated culture do not direcly increase the number of possible levies (and thus legion size) and due to a bug in the vanilla game we cannot allow their integration outside of your culture group. Instead they will slightly increase the numbers of your integrated culture levies.")
-    immediate.add("remove_country_modifier", name)
-    option.createReturnIf(TagList("local_var:foreign_pop_percentage", round(i*5/100,2),"",">="),condType="else_if" if i!=19 else "if").add("add_country_modifier", TagList("name",name))
+  # for i in reversed(range(1,20)):
+  #   name=f"foreign_support_{i*5}"
+  #   t=fileContent.addReturn(name)
+  #   t.add("levy_size_multiplier",round(0.025*i,2))
+  #   locClass.addEntry(name, f"{i*5}% Foreign Culture Support")
+  #   locClass.addEntry("desc_"+name, "Non-integrated culture do not direcly increase the number of possible levies (and thus legion size) and due to a bug in the vanilla game we cannot allow their integration outside of your culture group. Instead they will slightly increase the numbers of your integrated culture levies.")
+  #   immediate.add("remove_country_modifier", name)
+  #   option.createReturnIf(TagList("local_var:foreign_pop_percentage", round(i*5/100,2),"",">="),condType="else_if" if i!=19 else "if").add("add_country_modifier", TagList("name",name))
 
-  immediate.variableOpImp("set_local", "total_pops", 0)
-  immediate.variableOpImp("set_local", "foreign_pops", 0)
-  everyPop=immediate.addReturn("every_owned_province").addReturn("every_pops_in_province")
-  everyPop.add("save_scope_as","pop")
-  everyPop.variableOpImp("change_local", "total_pops", 1, valName="add")
-  foreignPop=everyPop.createReturnIf(TagList("NOT", TagList("ROOT", TagList("any_integrated_culture", TagList("this.culture", "scope:pop.culture")))))
-  foreignPop.variableOpImp("change_local", "foreign_pops", 1, valName="add")
-  immediate.variableOpImp("set_local", "foreign_pop_percentage", "local_var:foreign_pops")
-  immediate.createReturnIf(TagList("local_var:total_pops", "0", "", ">")).variableOpImp("change_local", "foreign_pop_percentage", "local_var:total_pops", valName="divide")
-  immediate.addReturn("else").variableOpImp("set_local", "foreign_pop_percentage", 0 )
-  halfLevy=immediate.createReturnIf(TagList("OR", TagList("has_country_modifier","harassed_by_corsairs").add("has_country_modifier","influenced_by_saruman")))
-  halfLevy.variableOpImp("change_local", "foreign_pop_percentage",2, valName="divide")
+  # immediate.variableOpImp("set_local", "total_pops", 0)
+  # immediate.variableOpImp("set_local", "foreign_pops", 0)
+  # everyPop=immediate.addReturn("every_owned_province").addReturn("every_pops_in_province")
+  # everyPop.add("save_scope_as","pop")
+  # everyPop.variableOpImp("change_local", "total_pops", 1, valName="add")
+  # foreignPop=everyPop.createReturnIf(TagList("NOT", TagList("ROOT", TagList("any_integrated_culture", TagList("this.culture", "scope:pop.culture")))))
+  # foreignPop.variableOpImp("change_local", "foreign_pops", 1, valName="add")
+  # immediate.variableOpImp("set_local", "foreign_pop_percentage", "local_var:foreign_pops")
+  # immediate.createReturnIf(TagList("local_var:total_pops", "0", "", ">")).variableOpImp("change_local", "foreign_pop_percentage", "local_var:total_pops", valName="divide")
+  # immediate.addReturn("else").variableOpImp("set_local", "foreign_pop_percentage", 0 )
+  # halfLevy=immediate.createReturnIf(TagList("OR", TagList("has_country_modifier","harassed_by_corsairs").add("has_country_modifier","influenced_by_saruman")))
+  # halfLevy.variableOpImp("change_local", "foreign_pop_percentage",2, valName="divide")
   # print(f'fileContent = "{fileContent}"')
   locClass.writeToMod(".","lotr_country_modifiers_from_script","z")
   cdf.outputToFolderAndFile(fileContent , "common/modifiers", "br_racial_modifiers.txt" ,2,".", encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(lotr_pops , "events/", "LOTR_pops.txt" ,1,".", encoding="utf-8-sig")
+  # cdf.outputToFolderAndFile(lotr_pops , "events/", "LOTR_pops.txt" ,1,".", encoding="utf-8-sig")
 
   relations = {
     "archers":        { "archers":0, "camels":-10, "chariots":0, "heavyCavalry":-10, "heavyInfantry":10, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":0 },
@@ -1136,7 +1136,7 @@ def main():
       treasures=country.getOrCreate("treasures")
       for t in localTreasures.names:
         treasures.add(t)
-      print(f'cannot hold any = "{provinceNames[provinceId]}". Moved to {ownerCountry[provinceId]}')
+      print(f'cannot hold any treasures: "{provinceNames[provinceId]}". Moved to {ownerCountry[provinceId]}')
     elif num==2 and province.get("province_rank").strip('"') in ["settlement",""]:
       country=countries.get(ownerCountry[provinceId])
       treasures=country.getOrCreate("treasures")

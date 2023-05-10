@@ -1555,7 +1555,7 @@ def createTriggerFile(modFolder="../gratak_mods/custom_difficulty"):
 
 def createEdictFile(modFolder="../gratak_mods/custom_difficulty"):
 
-  edict=TagList().add("length","0")
+  edict=TagList().add("length","-1")
   edict.add("resources", TagList("category", "edicts").add("cost",TagList()))
   edict.add("effect", TagList("hidden_effect",TagList("country_event",TagList("id",name_mainMenuEvent))))
   edict.add("potential", TagList("is_ai","no").add("not",TagList("has_global_flag", "custom_difficulty_deactivate_edict")).add("NOT",TagList("has_global_flag","dmm_installed")))
