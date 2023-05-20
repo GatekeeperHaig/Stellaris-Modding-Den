@@ -86,7 +86,7 @@ def main():
       else:
         t.add("global_population_growth", round(i**0.5*10**0.5*0.015*raceGrowth[race],3))
       locClass.addEntry(name, f"{i*10}% {race}")
-      locClass.addEntry("desc_"+name, raceDesc[race])
+      locClass.addEntry("desc_"+name, "Only for the primary culture group this modifier can be gained. Integrated cultures are counted doubly.\n\n"+raceDesc[race])
 
 
   # for i in reversed(range(1,20)):
@@ -517,6 +517,8 @@ def main():
   forceTerrainGeneral["5027"]="hills"
   for i in [5074,5073,5072,5068,5019,5018,3964,3963,3960,3958,3957,3956,3955,3954,3953,3952,3950,3949]:
     forceTerrainGeneral[str(i)]="forest"
+  for i in [2997, 2998, 3000, 3001, 3765, 2988, 2991, 2989, 2992, 2994, 3003, 2993, 2996, 2995, 2990, 3002]:
+    forceTerrainGeneral[str(i)]="mountain"
   forceTerrainGeneral["durganla_area"]="arctic"
   forceTerrainGeneral["lothren_baul_area"]="arctic"
 
@@ -791,7 +793,7 @@ def main():
 
   provinceFile.applyOnAllLevel(removeComment)
   provinceFile.deleteOnLowestLevel(empty)
-  tooManyNonOwnedPops=[ "balchoth", "rachoth", "nurnim", "variag", "nuriag", "khundolar", "jangovar", "yarlung", "tsang", "haradrim", "qarsag", "siranian", "yopi", "shayna", "mumakanim", "tulwany"]
+  tooManyNonOwnedPops=[ "balchoth", "rachoth", "nurnim", "variag", "nuriag", "khundolar", "jangovar", "yarlung", "tsang", "haradrim", "qarsag", "siranian", "yopi", "shayna", "mumakanim", "tulwany", "andrasting"]
   haladrin = [ "dunlending", "calending", "druwaithing", "daoine", "andrasting", "eredrim", "ethirfolk", "ishmalogim"]
   haradrim = [ "haradrim", "qarsag", "siranian" ]
   tooFewNonOwnedPops=[ "stonefoot", "stiffbeard"]
@@ -1090,13 +1092,13 @@ def main():
             provinceFile.vals[i].set("culture",'"beasts"')
       if provinceFile.vals[i].count("nobles"):
         print(f"{j} unowned but nobles")
-        # if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
-        #   tribes=provinceFile.vals[i].get("tribesmen").get("amount")
-        #   if int(tribes)>2:
-        #     if culture in tooManyNonOwnedPops:
-        #       provinceFile.vals[i].get("tribesmen").set("amount",2)
-        #   elif int(tribes)>6:
-        #     provinceFile.vals[i].get("tribesmen").set("amount",6)
+      if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
+        tribes=provinceFile.vals[i].get("tribesmen").get("amount")
+        if int(tribes)>2:
+          if culture in tooManyNonOwnedPops:
+            provinceFile.vals[i].get("tribesmen").set("amount",2)
+        elif int(tribes)>6:
+          provinceFile.vals[i].get("tribesmen").set("amount",6)
         # elif provinceFile.vals[i].count("tribesmen")==0 and provinceFile.vals[i].count("slaves")==0 and provinceFile.vals[i].count("freemen")==0:
         #   if culture in tooFewNonOwnedPops:
         #     provinceFile.vals[i].addReturn("tribesmen").add("amount",2)

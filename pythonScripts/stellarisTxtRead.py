@@ -264,7 +264,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     commentDone=False
     if not isinstance(self.vals[i],TagList):
       if len(str(self.vals[i]))>0:
-        if self.forceNoSpace:
+        if hasattr(self, "forceNoSpace") and self.forceNoSpace:
           file.write("{!s}{!s}".format(self.seperators[i],self.vals[i]))
         else:
           file.write(" {!s} {!s}".format(self.seperators[i],self.vals[i]))
@@ -295,7 +295,7 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         file.write(name+" ")
     file.write("}")
   def oneLineWriteCheck(self,args=0):
-    if self.forceMultiLineOutput:
+    if hasattr(self, "forceMultiLineOutput") and self.forceMultiLineOutput:
       return False
     if args==0 or args.one_line_level<0.5:
       return False
