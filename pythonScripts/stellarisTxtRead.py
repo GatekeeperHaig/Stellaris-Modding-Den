@@ -17,6 +17,8 @@ def addCommonArgs(parser):
   parser.add_argument("--one_line_level", type= float, default=2.0, help="How much the script tries to create one-liners on output: 0 - never, only keeping some existing one-liners. 1 - whenever only one text subtag exists. 2 (default) - maximum two 'subtags' (that means three in a line). 3 - maximum three subtags. 4 - whenever only text subtags exist")
   parser.add_argument('--test_run', action="store_true", help="No Output.")
 
+class QuotationError(Exception):
+  pass
 
 
 class TagList: #Basically everything is stored recursively in objects of this class. Each file is one such object. Each tag within is one such object. The variables defined in a file are one such object. Only out-of-building comments are ignored and simply copied file to file.
@@ -531,7 +533,10 @@ class TagList: #Basically everything is stored recursively in objects of this cl
 
 
 
+
   def readString(self, line, expectingVal=False,objectList=0,args=0, bracketLevel=0, useNamedTagList=False, lineI=0):
+    if line.count('"')%2==1:
+      raise QuotationError
     if objectList==0:
       objectList=[self]
     lineSplit=re.split(splitPattern,line)
@@ -615,8 +620,6 @@ class TagList: #Basically everything is stored recursively in objects of this cl
         raise
     if expectingQuote:
       print("Error: Line ended while waiting for quotation mark!")
-      class QuotationError(Exception):
-        pass
       raise QuotationError
     return self, bracketLevel, expectingVal
 
@@ -630,14 +633,24 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     with open(fileName,'r', encoding=encoding) as inputFile:
       if args==0 or not hasattr(args, "silent") or args.silent==False:
         print("Start reading "+fileName)
+      combinedLine=""
       for lineI,line in enumerate(inputFile):
         try:
-          _,bracketLevel, expectingVal=self.readString(line, expectingVal,objectList,args, bracketLevel, useNamedTagList, lineI)
+          if combinedLine=="":
+            combinedLine=line
+          else:
+            combinedLine+=" "+line
+          _,bracketLevel, expectingVal=self.readString(combinedLine, expectingVal,objectList,args, bracketLevel, useNamedTagList, lineI)
+          combinedLine=""
+        except QuotationError:
+          pass
         except:
           print("In file: "+fileName)
           print("Line number {!s}".format(lineI+1))
           print("Line content: "+line)
           raise
+    if combinedLine!="":
+      print("Error: Line ended while waiting for quotation mark!")
 
     if isinstance(varsToValue,TagList):
       for name,val in self.getNameVal():
