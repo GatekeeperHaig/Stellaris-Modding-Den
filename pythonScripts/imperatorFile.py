@@ -255,8 +255,10 @@ def main():
   provinceLocators.readFile("gfx/map/map_object_data/vfx_locators.txt",encoding='utf-8-sig')
   cityLocators=TagList(0)
   cityLocators.readFile("gfx/map/map_object_data/city_locators.txt",encoding='utf-8-sig')
-  lakeLocators=TagList(0)
-  lakeLocators.readFile("gfx/map/map_object_data/lakes_locators_c",encoding='utf-8-sig')
+  redoLakes=False
+  if redoLakes:
+    lakeLocators=TagList(0)
+    lakeLocators.readFile("gfx/map/map_object_data/lakes_locators_c",encoding='utf-8-sig')
 
   # with open("gfx/map/map_object_data/oak_tree_generator_3.txt",'r', encoding='utf-8-sig') as inputFile:
   #   oakFile=[line for line in inputFile]
@@ -280,13 +282,14 @@ def main():
   for loc in locs.vals:
     provinceToCityLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
 
-  lakes=[]
-  newLakes=[]
-  for line in lakeLocators.get("object").get("transform").split("\n"):
-    line = line.strip('"').strip(" ")
-    coords=line.split(" ")
-    if line:
-      lakes.append((float(coords[0]),float(coords[2])))
+  if redoLakes:
+    lakes=[]
+    newLakes=[]
+    for line in lakeLocators.get("object").get("transform").split("\n"):
+      line = line.strip('"').strip(" ")
+      coords=line.split(" ")
+      if line:
+        lakes.append((float(coords[0]),float(coords[2])))
   # locs=fortLocators.get("game_object_locator").get("instances")
   # for loc in locs.vals:
   #   provinceToFortLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
@@ -424,10 +427,19 @@ def main():
     if name:
       provinceToTerrain[name]=val.get("terrain")
 
-  heightMap=ImageRead("../wotrbeta/map_data/heightmap_.png")
-  # for i in range(1000):
-  #   for j in range(1000):
-  #     heightMap.setP(i, j, 30)
+  if redoLakes:
+    heightMap=ImageRead("../wotrbeta/map_data/heightmap_.png")
+  else:
+    heightMap=ImageRead("../wotrbeta/map_data/heightmap.png")
+  redoCoastLine=False
+  if redoCoastLine:
+    coastlineMap=ImageRead("../wotrbeta/map_data/heightmap_.png")
+    riverImage=ImageRead("../wotrbeta/map_data/rivers.png")
+    # riverRGB=riverImage.im.convert('RGB')
+    # riverImage.pix=riverRGB.load()
+    for i in range(8192):
+      for j in range(4096):
+        coastlineMap.setP(i, j, 255)
 
 
   # provinceToPixels,_,_,_ = getProvinceToPixels()
@@ -812,8 +824,8 @@ def main():
       terrainFile.set(j, terrain)
     except:
       terrainFile.add(j, terrain)
-  a=[]
-  b=[]
+  # a=[]
+  # b=[]
 
   provinceFile.applyOnAllLevel(removeComment)
   provinceFile.deleteOnLowestLevel(empty)
@@ -1014,6 +1026,17 @@ def main():
             break
           provinceFile.vals[i].set("trade_goods",f'"{t}"')
 
+    if redoCoastLine:
+      if not jj in allSeas:
+        for (xx,yy) in provinceToPixels[jj]:
+          # if riverImage.c(xx,yy)<5 or riverImage.c(xx,yy)>254:
+            coastlineMap.setP(xx, yy, 0)
+            # if riverImage.c(xx,yy)>10:
+            #   for xxx in range(-1,2):
+            #     for yyy in range(-1,2):
+            #       coastlineMap.setP(xx+xxx, yy+yyy, 0)
+          # else:
+          #   print(f'riverImage.c(xx,yy) = "{riverImage.c(xx,yy)}"')
 
     if j in ownerCountry:
       provinceFile.comments[i]+=f" ({ownerCountry[j]})"
@@ -1117,36 +1140,43 @@ def main():
           provinceFile.comments[i]+=" (river)"
         elif int(j) in lake_provinces:
           provinceFile.comments[i]+=" (lake)"
+          setTerrain(jj-1, "ocean")
+          provinceFile.vals[i].set("culture", '""')
+          provinceFile.vals[i].set("province_rank", '""')
+          provinceFile.vals[i].set("religion", '""')
+          provinceFile.vals[i].set("trade_goods", '""')
 
-          pixels=np.array(provinceToPixels[jj])
-          low=np.min(pixels, axis=0)
-          high=np.max(pixels, axis=0)
-          heights=np.array([heightMap.p(xLake, yLake) for (xLake,yLake) in provinceToPixels[jj]])
-          lowLake=np.min(heights)
-          highLake=np.max(heights)
-          heightsEnv=np.array([heightMap.p(xEnv, yEnv) for xEnv in range(low[0]-1,high[0]+2) for yEnv in range(low[1]-1,high[1]+2)])
-          lowEnv=np.min(heightsEnv)
-          highEnv=np.max(heightsEnv)
-          center=0.5*(low+high)
-          # print(f'(pixels[None,:]-center)**2 = "{(pixels[None,:]-center)**2}"')
-          # test=np.argmin(np.sum((pixels[None,:]-center)**2,axis=-1), axis=0)
-          centerInLake=np.argmin(np.linalg.norm(pixels-center,axis=1)+heights)
-          center=pixels[centerInLake]
-          size=high-low
-          lakeDone=False
-          for lake in lakes:
-            if lake[0]>low[0] and lake[0]<high[0] and lake[1]>low[1] and lake[1]<high[1]:
-              lakeDone=True
-              break
-          if not lakeDone and not lowLake<8:
-            centerHeight=heightMap.p(*center.tolist())
-            # h=(0.75*highLake+0.25*lowLake)-centerHeight
-            h=(highLake-centerHeight)*0.75
-            debth=highLake-lowEnv+0.2
-            for (xLake,yLake) in provinceToPixels[jj]:
-              heightMap.setP(xLake, yLake, heightMap.p(xLake, yLake)-debth)
-            print(f'debth = "{debth}"')
-            newLakes.append((center, size, h))
+
+          if redoLakes:
+            pixels=np.array(provinceToPixels[jj])
+            low=np.min(pixels, axis=0)
+            high=np.max(pixels, axis=0)
+            heights=np.array([heightMap.p(xLake, yLake) for (xLake,yLake) in provinceToPixels[jj]])
+            lowLake=np.min(heights)
+            highLake=np.max(heights)
+            heightsEnv=np.array([heightMap.p(xEnv, yEnv) for xEnv in range(low[0]-1,high[0]+2) for yEnv in range(low[1]-1,high[1]+2)])
+            lowEnv=np.min(heightsEnv)
+            highEnv=np.max(heightsEnv)
+            center=0.5*(low+high)
+            # print(f'(pixels[None,:]-center)**2 = "{(pixels[None,:]-center)**2}"')
+            # test=np.argmin(np.sum((pixels[None,:]-center)**2,axis=-1), axis=0)
+            centerInLake=np.argmin(np.linalg.norm(pixels-center,axis=1)+heights)
+            center=pixels[centerInLake]
+            size=high-low
+            lakeDone=False
+            for lake in lakes:
+              if lake[0]>low[0] and lake[0]<high[0] and lake[1]>low[1] and lake[1]<high[1]:
+                lakeDone=True
+                break
+            if not lakeDone and not lowLake<8:
+              centerHeight=heightMap.p(*center.tolist())
+              # h=(0.75*highLake+0.25*lowLake)-centerHeight
+              h=(highLake-centerHeight)*0.75
+              debth=highLake-lowEnv+0.2
+              for (xLake,yLake) in provinceToPixels[jj]:
+                heightMap.setP(xLake, yLake, heightMap.p(xLake, yLake)-debth)
+              # print(f'debth = "{debth}"')
+              newLakes.append((center, size, h))
 
 
           # # print(f'test = "{test}"')
@@ -1306,46 +1336,74 @@ def main():
     # print(f'province = "{province.names}"')
 
 
-  heightMap.im.save("../wotrbeta/map_data/heightmap.png",compress_level=1)
-  print(" ".join(a))
-  print("\n")
-  print(" ".join(b))
+  # riverImage=ImageRead("../wotrbeta/map_data/rivers.png")
+  if redoCoastLine:
+    for i in range(8192):
+      for j in range(4096):
+        c=riverImage.c(i, j)
 
-  # lakeLocators.get("object").set("count", len(newLakes))
-  # lakeLocators.get("object").set("clamp_to_water_level", "true")
-  # lakeLocators.get("object").set("render_under_water", "true")
-  # t=""
-  lakeLocators.get("object").set("count", len(lakes)+len(newLakes))
-  t=lakeLocators.get("object").get("transform")
-  t=t.strip('"')
-  t=t.strip(' ')
-  t=t.strip('\n')
-  for lake in newLakes:
-    size=lake[1]
-    center=lake[0]
-    height=lake[2]
-    if size[1]>size[0]:
-      rot = 1
-      size[0]*=2
-    else:
-      rot = 0
-      size[1]*=2
-    s=max(size)*1.2
-    t+="\n"+f"{center[0]} {height} {center[1]} 0 {rot} 0 1 {s/2} {s/2} {s/2}"
-  # for lake in newLakes:
-  #   # newLakes.push_back((xAv,yAv,xMax-xMin,yMax-yMin))
-  #   if lake[3]>lake[2]:
-  #     rot = 1
-  #     lake[2]*=2
-  #   else:
-  #     rot = 0
-  #     lake[3]*=2
-  #   s=max(lake[2:])*1.05
-  #   t+="\n"+f"{lake[0]} 0.5 {lake[1]} 0 {rot} 0 1 {s/2} {s/2} {s/2}"
-  t=f'"{t}"'
-  lakeLocators.get("object").set("transform",t)
+        # coastlineMap.setP(i, j, c)
+        # print(f'c = "{c}"')
+        if c<254:
+          if c==1 or c==2:
+            count=0
+            for xxx in range(-1,2):
+              for yyy in range(-1,2):
+                cc=riverImage.c(i+xxx, j+xxx)
+                if cc<254 and cc>4:
+                  count+=1
+            # print(f'count = "{count}"')
+            if count>1:
+              # print(f'count = "{count}"')
+              coastlineMap.setP(i, j, 255)
+          elif c>7:
+            for xxx in range(-1,2):
+              for yyy in range(-1,2):
+                coastlineMap.setP(i+xxx, j+yyy, 255)
+          elif c>4:
+            coastlineMap.setP(i, j, 255)
 
-  cdf.outputToFolderAndFile(lakeLocators , "gfx/map/map_object_data", "lakes_locators.txt" ,2,output_folder,False,encoding="utf-8-sig")
+    coastlineMap.im.save("../wotrbeta/map_data/coastlineMap.png",compress_level=1)
+
+    
+  # print(" ".join(a))
+  # print("\n")
+  # print(" ".join(b))
+
+  
+  if redoLakes:
+    heightMap.im.save("../wotrbeta/map_data/heightmap.png",compress_level=1)
+    lakeLocators.get("object").set("count", len(lakes)+len(newLakes))
+    t=lakeLocators.get("object").get("transform")
+    t=t.strip('"')
+    t=t.strip(' ')
+    t=t.strip('\n')
+    for lake in newLakes:
+      size=lake[1]
+      center=lake[0]
+      height=lake[2]
+      if size[1]>size[0]:
+        rot = 1
+        size[0]*=2
+      else:
+        rot = 0
+        size[1]*=2
+      s=max(size)*1.2
+      t+="\n"+f"{center[0]} {height} {center[1]} 0 {rot} 0 1 {s/2} {s/2} {s/2}"
+    # for lake in newLakes:
+    #   # newLakes.push_back((xAv,yAv,xMax-xMin,yMax-yMin))
+    #   if lake[3]>lake[2]:
+    #     rot = 1
+    #     lake[2]*=2
+    #   else:
+    #     rot = 0
+    #     lake[3]*=2
+    #   s=max(lake[2:])*1.05
+    #   t+="\n"+f"{lake[0]} 0.5 {lake[1]} 0 {rot} 0 1 {s/2} {s/2} {s/2}"
+    t=f'"{t}"'
+    lakeLocators.get("object").set("transform",t)
+
+    cdf.outputToFolderAndFile(lakeLocators , "gfx/map/map_object_data", "lakes_locators.txt" ,2,output_folder,False,encoding="utf-8-sig")
 
   cdf.outputToFolderAndFile(provinceFile , "setup/provinces", "00_default.txt" ,2,output_folder,False,encoding="utf-8-sig")
   cdf.outputToFolderAndFile(countryFile , "setup/main", "00_default.txt" ,4,output_folder,False)
@@ -1533,7 +1591,10 @@ class ImageRead:
   def p(self, x,y):
     return self.pix[x, self.yM-1-y]/1000
   def setP(self,x,y,value):
-    self.pix[x, self.yM-1-y]=int(value*1000)
+    # try:
+      self.pix[x, self.yM-1-y]=int(value*1000)
+    # except:
+      # pass
   def c(self, x,y):
     return self.pix[x, self.yM-1-y]
   def h(self, l):
