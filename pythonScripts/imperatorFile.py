@@ -173,9 +173,19 @@ def main():
     Unit("orc_infantry", "lightInfantry", 1, 1, 0.5),
     Unit("uruk_infantry", "lightInfantry", 1.25, 1.25, 0.7),
     Unit("warelephant", "elephants"),
+    Unit("mumakil", "elephants",1.75,4,2),
 
     # Unit("mumakils", "elephants", 3, 3, 2), ???
   ]
+
+  for unit in units:
+    if unit.name=="mumakil":
+      unit.properties=copy(properties["elephants"])
+      unit.properties["tradeGood"]="mumakil"
+      unit.properties["speed"]=3.5
+      unit.properties["maneuver"]=2
+      unit.properties["morale"]=20
+      unit.properties["food"]=5
 
   os.makedirs("units",exist_ok=True)
   for unit in units:
@@ -306,20 +316,54 @@ def main():
   # print(f'climateFile.get("mild_winter") = "{climateFile.get("mild_winter")}"')
   # print(f'climateFile.get("mild_winter").names = "{climateFile.get("mild_winter").names}"')
 
+  with open("map_data/default.map",encoding='utf-8-sig') as file:
+    content=[line for line in file]
+  sea_zones=list()
+  wasteland=list()
+  impassable_terrain=list()
+  uninhabitable=list()
+  lakes=list()
+  river_provinces=list()
+  allAttributes=dict()
+  allAttributes["sea_zones"]=sea_zones
+  allAttributes["wasteland"]=wasteland
+  allAttributes["impassable_terrain"]=impassable_terrain
+  allAttributes["uninhabitable"]=uninhabitable
+  allAttributes["lakes"]=lakes
+  allAttributes["river_provinces"]=river_provinces
+  for line in content:
+    for key in allAttributes.keys():
+      if line.startswith(key):
+        l=line.strip(key)
+        l=l.strip(" ")
+        l=l.strip("=")
+        l=l.strip(" ")
+        if l.startswith("RANGE"):
+          l=l.strip("RANGE")
+          l=l.strip(" ")
+          l=l.strip("{")
+          l=l.strip(" ")
+          ids = l.split()
+          allAttributes[key]+=list(range(int(ids[0]),int(ids[1])+1))
+        elif l.startswith("LIST"):
+          l=l.strip("LIST")
+          l=l.strip(" ")
+          l=l.strip("{")
+          l=l.strip(" ")
+          for i in l.split():
+            try:
+              allAttributes[key].append(int(i))
+            except ValueError:
+              pass
 
+  uninhabitable= set(map(str,uninhabitable))
+  allSeaAndLakeProvinces=set(sea_zones+lakes)
+  allWaterProvinces=set(sea_zones+lakes+river_provinces)
+  lake_provinces=set(lakes)
+  river_provinces=set(river_provinces)
+  impassable_terrain_list=set(impassable_terrain)
+  
 
-  uninhabitable = set(map(str,list([52,2616,3765,577,564,563,576,575,604,605,606,607,608,602,603,2696,2697,2698,2607,2604,2605,3402,3403,3404,476,475,478,479,2961,2960,2959,2954,2955,2984,2985,2986,540,539,538,537,536,535,547,546,545,544,543,542,2617,594,595,596,597,94,27,95,91,92,581,582,2046,2045,2044,87,85,89,88,83,82,80,2375,2376,7,3,17,23,48,1965,583,584,585,586,587,588,589,590,2997,2998,3000,3001,2988,2991,2989,2992,2994,3003,2990,2995,2996,2993,3002,579,578,2048,2049,2050,2051,2052,2053,593,3142,3143,3146,3144,3145,3147,3148,3149,3150,51,2378,2377,3638,3639,3678,3679,3680,3681,3682,3683,3684,3685,3686,3687,3688,3689,3690,3691,3692,3693,3694,3593,3709,3719,3611,3613,3612,3653,3654,3656,3660,3718,3626,3659,3706,3607,3608,3609,3740,3741,3742,3743,3744,3745,3746,3747,3787,3781,3779,3778,3777,3784,3793,3794,3792,3790,3789,3791,3775,3776,3771,3795,3797,2730,2731,2732,2733,2739,2737,2741,2735,2740,2742,2745,2744,2743,3860,3862,3863,3864,3865,3866,3874,3867,3881,3871,3869,3552,3553,3880,3879,3868,3872,3873,3870,3554,2738,2750,2749,2748,2747,2746,2751,3875,2729,2769,2728,3582,3581,3580,3643,3637,3904,3909,3910,3937,3938,3939,5215,5217,5218,5174,5176,5291,5306,5307,5308,5309,5310,5311,5312,5313,5314,5315,5317,5318,5319,5320,5321,5322,5323,5324,5326,5327,5328,5329,5330,5331,5332,5333,5334,5336,5337,5338,5339,5340,5341,5342,5343,5344,5345,5348,5386,5387,5388,5389,5390,5433,5434,5435,5399,5400,5401,5378,5379,5375,5274,5275,5276,5277,5278,5281,5279,5282,5283,5406,5429,5430,5297,5298,5299,5437,5024,5025,5443,5444,5445,5446,5447,5448,5449,5450,5451,5067,5463,5396,5395,5409,5280,5462,5466,5284,5286,5287,5296,5452,5410,5411,5412,5216,5252,5285,5288,5060,5273, 5455, 5457, 5458])))
-
-  # print(f'uninhabitable = "{uninhabitable}"')
-
-  sea_of_rhun=list(range(3500,3505+1))
-  Haragaer=list(range(4744,4894+1))
-  EdgeSee=list(range(5478,5499+1))
-  Belegaer=list(range(5500,5687+1))
-  river_provinces = list(range(4895,4988+1))+ [5453, 5454, 5456, 5459]
-  lake_provinces = list(range(3435,3499+1)) + list(range(3520,3549+1))
-  allSeas=sea_of_rhun+Haragaer+EdgeSee+Belegaer+river_provinces+lake_provinces
-  impassable_terrain_list = list(range(4000,4743+1))+[ 5455, 5458,5460 ,5461 ,5465 ,5467 ]
   addNumbersToDuplicateNames=False
   if addNumbersToDuplicateNames:
     numbers=["","Mîn","Tâd","Neledh","Canad","Leben","Eneg","Odog","Tolodh","Neder","Pae","Minib","Ýneg","Neleb","Canab","Lebem","Eneph","Odoph","Toloph","Nederph"]
@@ -332,7 +376,7 @@ def main():
           i=int(j)-1
           terrain=provinceFile.vals[i].get("terrain").strip('"')
           is_impassable=(terrain=='impassable_terrain')
-          if not is_impassable and not terrain=='coastal_terrain' and not j in uninhabitable and not int(j) in allSeas:
+          if not is_impassable and not terrain=='coastal_terrain' and not j in uninhabitable and not int(j) in allWaterProvinces:
             hab.append(j)
           else:
             other.append(j)
@@ -433,8 +477,8 @@ def main():
     heightMap=ImageRead("../wotrbeta/map_data/heightmap.png")
   redoCoastLine=False
   if redoCoastLine:
-    coastlineMap=ImageRead("../wotrbeta/map_data/heightmap_.png")
     riverImage=ImageRead("../wotrbeta/map_data/rivers.png")
+    coastlineMap=ImageRead("../wotrbeta/map_data/heightmap_.png")
     # riverRGB=riverImage.im.convert('RGB')
     # riverImage.pix=riverRGB.load()
     for i in range(8192):
@@ -896,7 +940,7 @@ def main():
     if loc is None:
       loc=provinceToLocation[jj]
     h=heightMap.h(loc)
-    # if int(j) in allSeas and not int(j) in river_provinces:
+    # if int(j) in allWaterProvinces and not int(j) in river_provinces:
     #   if h>7.5:
     #     print(f'j = "{j}" sea without water:{h}')
     #     # if h<9.4:
@@ -1027,10 +1071,15 @@ def main():
           provinceFile.vals[i].set("trade_goods",f'"{t}"')
 
     if redoCoastLine:
-      if not jj in allSeas:
+      if not jj in allWaterProvinces or jj in [5694,5696,5697]: #anduin islands
         for (xx,yy) in provinceToPixels[jj]:
-          # if riverImage.c(xx,yy)<5 or riverImage.c(xx,yy)>254:
-            coastlineMap.setP(xx, yy, 0)
+          coastlineMap.setP(xx, yy, 0)
+          if riverImage.c(xx, yy)==254:
+            riverImage.setC(xx, yy,255)
+      if jj in allSeaAndLakeProvinces:
+        for (xx,yy) in provinceToPixels[jj]:
+          if riverImage.c(xx, yy)==255:
+            riverImage.setC(xx, yy,254)
             # if riverImage.c(xx,yy)>10:
             #   for xxx in range(-1,2):
             #     for yyy in range(-1,2):
@@ -1231,7 +1280,7 @@ def main():
 
 
 
-        elif int(j) in allSeas:
+        elif int(j) in allWaterProvinces:
           provinceFile.comments[i]+=" (sea)"
         elif int(j) in impassable_terrain_list:
           print(f'j = "{j} impassable without being impassable_terrain"')
@@ -1350,20 +1399,25 @@ def main():
             for xxx in range(-1,2):
               for yyy in range(-1,2):
                 cc=riverImage.c(i+xxx, j+xxx)
-                if cc<254 and cc>4:
+                if cc<254 and cc>5:
                   count+=1
             # print(f'count = "{count}"')
             if count>1:
               # print(f'count = "{count}"')
               coastlineMap.setP(i, j, 255)
-          elif c>7:
+          # elif c>11:
+          #   for xxx in range(-1,2):
+          #     for yyy in range(-1,2):
+          #       coastlineMap.setP(i+xxx, j+yyy, 255)
+          elif c>8:
             for xxx in range(-1,2):
               for yyy in range(-1,2):
-                coastlineMap.setP(i+xxx, j+yyy, 255)
-          elif c>4:
+                coastlineMap.setP(i+xxx, j+yyy, min(255, coastlineMap.p(i+xxx, j+yyy)+4*(c-8)))
+          if c>5:
             coastlineMap.setP(i, j, 255)
 
     coastlineMap.im.save("../wotrbeta/map_data/coastlineMap.png",compress_level=1)
+    riverImage.im.save("../wotrbeta/map_data/rivers.png",compress_level=1)
 
     
   # print(" ".join(a))
@@ -1597,6 +1651,8 @@ class ImageRead:
       # pass
   def c(self, x,y):
     return self.pix[x, self.yM-1-y]
+  def setC(self, x,y, index):
+    self.pix[x, self.yM-1-y]=index
   def h(self, l):
     return self.p(l[0],l[2])
   def col(self, l):
