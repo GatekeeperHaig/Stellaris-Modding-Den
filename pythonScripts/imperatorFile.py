@@ -14,6 +14,7 @@ from PIL import Image
 from copy import copy
 import pickle
 import random
+from statistics import variance,pvariance,median,mean
 
 
 
@@ -359,6 +360,7 @@ def main():
   uninhabitable= set(map(str,uninhabitable))
   allSeaAndLakeProvinces=set(sea_zones+lakes)
   allWaterProvinces=set(sea_zones+lakes+river_provinces)
+  allSweetWaterProvinces=set(lakes+river_provinces)
   lake_provinces=set(lakes)
   river_provinces=set(river_provinces)
   impassable_terrain_list=set(impassable_terrain)
@@ -476,8 +478,10 @@ def main():
   else:
     heightMap=ImageRead("../wotrbeta/map_data/heightmap.png")
   redoCoastLine=False
-  if redoCoastLine:
+  redoTerrain=False
+  if redoCoastLine or redoTerrain:
     riverImage=ImageRead("../wotrbeta/map_data/rivers.png")
+  if redoCoastLine:
     coastlineMap=ImageRead("../wotrbeta/map_data/heightmap_.png")
     # riverRGB=riverImage.im.convert('RGB')
     # riverImage.pix=riverRGB.load()
@@ -488,7 +492,9 @@ def main():
 
   # provinceToPixels,_,_,_ = getProvinceToPixels()
   # print(f'provinceToPixels[1] = "{provinceToPixels[1]}"')
-  provinceToPixels= getProvinceToCoordList(False, False)
+  provinceToPixels,pixelToProvince,xM,yM= getProvinceToCoordList(False, False)
+
+
   # for i,j in provinceToPixels[3499]:
   #   print(f'heightMap.p(i, j) = "{heightMap.p(i, j)}"')
   # sys.exit(1)
@@ -595,6 +601,26 @@ def main():
   forceTerrainGeneral["1561"]="mountain"
   forceTerrainGeneral["2845"]="hills"
   forceTerrainGeneral["5027"]="hills"
+  forceTerrainGeneral["5342"]="desert"
+  forceTerrainGeneral["5341"]="desert"
+  forceTerrainGeneral["5340"]="desert"
+  forceTerrainGeneral["3143"]="desert"
+  forceTerrainGeneral["5296"]="desert"
+  forceTerrainGeneral["5337"]="desert"
+  forceTerrainGeneral["5320"]="desert"
+  forceTerrainGeneral["5321"]="desert"
+  forceTerrainGeneral["5326"]="desert"
+  forceTerrainGeneral["5329"]="desert"
+  forceTerrainGeneral["5327"]="desert"
+  forceTerrainGeneral["5328"]="desert"
+  forceTerrainGeneral["5448"]="desert"
+  forceTerrainGeneral["5446"]="desert"
+  forceTerrainGeneral["5445"]="desert"
+  forceTerrainGeneral["5298"]="desert"
+  forceTerrainGeneral["5297"]="desert"
+  forceTerrainGeneral["5332"]="steppe"
+  forceTerrainGeneral["5333"]="steppe"
+  forceTerrainGeneral["5334"]="steppe"
   for i in [5074,5073,5072,5068,5019,5018,3964,3963,3960,3958,3957,3956,3955,3954,3953,3952,3950,3949]:
     forceTerrainGeneral[str(i)]="forest"
   for i in [2997, 2998, 3000, 3001, 3765, 2988, 2991, 2989, 2992, 2994, 3003, 2993, 2996, 2995, 2990, 3002]:
@@ -680,6 +706,14 @@ def main():
   # forceClimate["kykurian_kyn_region"]="arid"
   # forceClimate["kargagis_ahar_region"]="arid"
   # forceClimate["gathgykarkan_region"]="arid"
+  forceClimate["morad_area"]="arid"
+  forceClimate["gathod_area"]="arid"
+  forceClimate["surubeki_morad_area"]="arid"
+  forceClimate["sagathavuld_area"]="arid"
+  forceClimate["aramuth_ayal_area"]="arid"
+  forceClimate["boli_area"]="arid"
+  forceClimate["kykurian_kyn_region"]="arid"
+  forceClimate["dalpygis_region"]="arid"
   forceClimate["anarike_region"]="mild_winter"
   forceClimate["yopi_region"]="mild_winter"
   forceClimate["nikkea_region"]="mild_winter"
@@ -705,8 +739,6 @@ def main():
   forceClimate["1936"]="perfect"
   forceClimate["lothlann_area"]="normal_winter"
   forceClimate["tyrn_formen_area"]="normal_winter"
-  forceClimate["rykholiz_area"]="normal_winter"
-  forceClimate["thult_area"]="normal_winter"
   forceClimate["en_engladil_area"]="mild_winter"
   forceClimate["pend_eregion_area"]="mild_winter"
   forceClimate["sarch_nia_linquelie_area"]="severe_winter"
@@ -761,7 +793,6 @@ def main():
     provinceList=list(map(str,sorted(provinceSet,reverse=True)))
     while provinceList:
       province=provinceList[-1]
-      # print(f'province = "{province}"')
       try:
         region=provinceToRegion[province]
       except:
@@ -906,7 +937,7 @@ def main():
 
 
     # provinceNeedTradeGoods=["ibav_region","ralian_region","lenitan_region","wer_falin_region","burskadekar_region","ubain_region","kargagis_ahar_region","lygar_kraw_region","lugnimbar_region","orgothrath_region","alduryaknar_region","gathgykarkan_region"]
-    dessertTadeGoods={"iron":5,"camels":20,"stone":20,"base_metals":10, "elephants":10, "dates":10,"incense":10}
+    desertTadeGoods={"iron":5,"camels":20,"stone":20,"base_metals":10, "elephants":10, "dates":10,"incense":10}
     hillTradeGoods={"iron":10, "precious_metals":5,"cattle":10,"stone":20,"base_metals":20,"gems":3,"marble":5}
     woodTradeGoods={"wild_game":10, "fur":10,"wood":20,"leather":10, "woad":10}
     coastalTradeGoods={"fish":40,"spices":5,"glass":5,"papyrus":5, "earthware":5,"hemp":10, "whale":5, "cloth":5,"dye":5, "incense":5, "silk":5, "wine":10, "dates":5, "olive":5}
@@ -949,96 +980,142 @@ def main():
     #   if h<7:
     #     print(f'j = "{j}" province under water:{h}')
 
-    if terrain in ["plains","hills","mountain"] and not j in forceTerrain:
-      # if terrainFile.count(j) and terrainFile.get(j)!="plains":
-        # print(f'terrainFile.get(j) = "{terrainFile.get(j)}"')
+    if redoTerrain and terrain in ["plains","hills","mountain","steppe"] and not j in forceTerrain:
+
+      slopes=[]
+      beachlevel1=7
+      beachlevel2=9
+      provinceToPixelsSet=set([f"{c[0]} {c[1]}" for c in provinceToPixels[jj]])
+      dry=False
+      if j in provinceToClimate and provinceToClimate[j]=="arid":
+        dry=True
+      for coords in provinceToPixels[jj]:
+        hC=heightMap.h2(coords)
+        slope=0
+        if hC>beachlevel1:
+          for xx in range(-1,2):
+            for yy in range(-1,2):
+              coords2=[coords[0]+xx,coords[1]+yy]
+              if f"{coords2[0]} {coords2[1]}" in provinceToPixelsSet:
+                h=heightMap.h2(coords2)
+                if h>beachlevel1:
+                  slope=max(slope, abs(h-hC))
+              if dry:
+                r=riverImage.c(*coords2)
+                if r>4 and r <254:
+                  dry=False
+              if dry:
+                if pixelToProvince[coords2[0]*yM+coords2[1]] in allSweetWaterProvinces:
+                  dry=False
+          slopes.append(slope)
+
+
+      heights=list(sorted([heightMap.h2(coords) for coords in provinceToPixels[jj]]))
+      # if jj==51:
+      #   print(f'heights = "{heights}"')
+      #   print(f'provinceToPixels[jj] = "{provinceToPixels[jj]}"')
+      n=len(heights)
+      for n1 in range(0,n):
+        if heights[n1]>beachlevel1:
+          break
+      for n2 in range(0,n):
+        if heights[n2]>beachlevel2:
+          break
+      # n1=n//10
+      nMiddle=n//2
+      # n3=(n+1)*9//10
+      hMax=heights[-1]
+      hMin=heights[n1]
+
+
+
+      if n2!=n-1:
+        # m1=median(heights[n1:])
+        m2=median(heights[n2:])
+        m=heights[nMiddle]
+        vari=variance(heights)
+        variA=pvariance(heights[:nMiddle],m)
+        variB=pvariance(heights[nMiddle:],m2)
+        # variC=variance(heights[n1:n3])
         # print(f'j = "{j}"')
-      hCenter=heightMap.h(loc)
-      hMax=hCenter
-      hMin=hCenter
-      hMaxClose=hCenter
-      hMinClose=hCenter
+        # print(f'hMax-hMin = "{hMax-hMin}"')
+        # print(f'vari = "{vari}"')
+        # print(f'variA = "{variA}"')
+        # print(f'variB = "{variB}"')
+        # print(f'variC = "{variC}"')
+        # print(f'hMax = "{hMax}"')
 
-      for dir in [0,2]:
-        for s in range(-10,11):
-          locB=copy(loc)
-          locB[dir]+=s
-          h=heightMap.h(locB)
-          hMax=max(h, hMax)
-          hMin=min(h, hMin)
-          if abs(s)<6:
-            hMaxClose=max(h, hMax)
-            hMinClose=min(h, hMin)
-      for dirA,dirB in [(0,2),(2,0)]:
-        for s in range(-10,11):
-          locB=copy(loc)
-          locB[dirA]+=s/math.sqrt(2)
-          locB[dirB]-=s/math.sqrt(2)
-          h=heightMap.h(locB)
-          hMax=max(h, hMax)
-          hMin=min(h, hMin)
-          if abs(s)<6:
-            hMaxClose=max(h, hMax)
-            hMinClose=min(h, hMin)
+        maxSlope=max(slopes)
+        meanSlop=mean(slopes)
+        medianSlope=median(slopes)
+        # print(f'maxSlope = "{maxSlope}"')
+        # print(f'meanSlop = "{meanSlop}"')
+        # print(f'medianSlope = "{medianSlope}"')
 
-      if hMax>20 and hCenter>10 and hMax-hMin>7 and hMaxClose-hMinClose>5:
-        setTerrain(i, "mountain")
-        # provinceFile.vals[i].set("terrain",'"mountain"')
-        # try:
-        #   terrainFile.set(j, "mountain")
-        # except:
-        #   terrainFile.add(j, "mountain")
-        # print(f'mountain[ j] = "{provinceNames[ j]}"')
-      elif hMax>15 and hCenter>8 and hMax-hMin>3.5 and hMaxClose-hMinClose>2.5:
-        setTerrain(i, "hills")
-        # provinceFile.vals[i].set("terrain",'"hills"')
-        # try:
-        #   terrainFile.set(j, "hills")
-        # except:
-        #   terrainFile.add(j, "hills")
+        if hMax>25 and (vari>7.5 and variA>6 or maxSlope>3 and medianSlope>1):
+          setTerrain(i, "mountain")
+        elif hMax>16 and (variB>9 and variA>6 or maxSlope>4 and medianSlope>1):
+          setTerrain(i, "mountain")
+        elif not dry and hMax-hMin>6 and ( variB>7 or maxSlope>2 and meanSlop>0.65):
+          setTerrain(i, "hills")
+        elif not dry and hMax>17 and hMax-hMin>7 and ( variB>6 or maxSlope>2 and meanSlop>0.45):
+          setTerrain(i, "hills")
+        elif hMax-hMin>8 and ( variB>8 or maxSlope>2.5 and meanSlop>0.8):
+          setTerrain(i, "hills")
+        else:
+          if dry:
+            setTerrain(i, "steppe")
+          else:
+            setTerrain(i, "plains")
       else:
-        setTerrain(i, "plains")
-        # provinceFile.vals[i].set("terrain",'"plains"')
-        # try:
-        #   terrainFile.set(j, "plains")
-        # except:
-        #   terrainFile.add(j, "plains")
-      # locB=provinceToFortLocation[jj]
-      # if locB is None:
-      # locB=provinceToCombatLocation[jj]
+        if dry:
+          setTerrain(i, "steppe")
+        else:
+          setTerrain(i, "plains")
 
-      # mo=20
-      # hi=15
-      # try:
-      #   h2=heightMap.h(locB)
-      # except:
-      #   print(f'j = "{j}"')
-      #   h2=h1
 
-      # if (h1>mo or h2>mo) and abs(h1-h2)>3:
-      #   provinceFile.vals[i].set("terrain",'"mountain"')
-      #   try:
-      #     terrainFile.set(j, "mountain")
-      #   except:
-      #     terrainFile.add(j, "mountain")
-      #   # print(f'mountain[ j] = "{provinceNames[ j]}"')
-      # elif (h1>hi or h2>hi) and abs(h1-h2)>2:
-      #   provinceFile.vals[i].set("terrain",'"hills"')
-      #   try:
-      #     terrainFile.set(j, "hills")
-      #   except:
-      #     terrainFile.add(j, "hills")
-        # print(f'hill[ j] = "{provinceNames[ j]}"')
+      # hCenter=heightMap.h(loc)
+      # hMax=hCenter
+      # hMin=hCenter
+      # hMaxClose=hCenter
+      # hMinClose=hCenter
+
+      # for dir in [0,2]:
+      #   for s in range(-10,11):
+      #     locB=copy(loc)
+      #     locB[dir]+=s
+      #     h=heightMap.h(locB)
+      #     hMax=max(h, hMax)
+      #     hMin=min(h, hMin)
+      #     if abs(s)<6:
+      #       hMaxClose=max(h, hMax)
+      #       hMinClose=min(h, hMin)
+      # for dirA,dirB in [(0,2),(2,0)]:
+      #   for s in range(-10,11):
+      #     locB=copy(loc)
+      #     locB[dirA]+=s/math.sqrt(2)
+      #     locB[dirB]-=s/math.sqrt(2)
+      #     h=heightMap.h(locB)
+      #     hMax=max(h, hMax)
+      #     hMin=min(h, hMin)
+      #     if abs(s)<6:
+      #       hMaxClose=max(h, hMax)
+      #       hMinClose=min(h, hMin)
+
+      # if hMax>20 and hCenter>10 and hMax-hMin>7 and hMaxClose-hMinClose>5:
+      #   setTerrain(i, "mountain")
+      # elif hMax>15 and hCenter>8 and hMax-hMin>3.5 and hMaxClose-hMinClose>2.5:
+      #   setTerrain(i, "hills")
       # else:
-        # print(f'provinceNames[ j] = "{j} {provinceNames[ j]}:{heightMap.h(loc)}({loc})"')
+      #   setTerrain(i, "plains")
 
 
     if addTradeGoods:
       # print(f'areasNeedTradeGoods = "{areasNeedTradeGoods}"')
       if j in provinceToArea and provinceToArea[j] in areasNeedTradeGoods and provinceFile.vals[i].get("trade_goods").strip('"')=="wild_game":
       # if j in provinceToRegion and provinceToRegion[j] in provinceNeedTradeGoods and provinceFile.vals[i].get("trade_goods").strip('"')=="wild_game":
-        if terrain in ["desserts"]:
-          provinceFile.vals[i].set("trade_goods",f'"{random.choices(list(dessertTadeGoods.keys()), list(dessertTadeGoods.values()))[0]}"')
+        if terrain in ["deserts"]:
+          provinceFile.vals[i].set("trade_goods",f'"{random.choices(list(desertTadeGoods.keys()), list(desertTadeGoods.values()))[0]}"')
         if terrain in ["hills","mountain"]:
           provinceFile.vals[i].set("trade_goods",f'"{random.choices(list(hillTradeGoods.keys()), list(hillTradeGoods.values()))[0]}"')
         elif terrain in ["forest","deep_forest"] or provinceToClimate[j] in "severe_winter":
@@ -1655,6 +1732,8 @@ class ImageRead:
     self.pix[x, self.yM-1-y]=index
   def h(self, l):
     return self.p(l[0],l[2])
+  def h2(self, l):
+    return self.p(l[0],l[1])
   def col(self, l):
     return self.c(l[0],l[2])
       # print(f"({x},{y}):{pix[x,im.size[1]-y]}")
@@ -1718,7 +1797,7 @@ def getProvinceToPixels(updateProvincePixels=False, excludeRivers=True):
   return provinceToPixels, pixelToProvince, xM, yM
 
 def getProvinceToCoordList(updateProvincePixels=False, excludeRivers=True):
-  provinceToPixels,_,_,_ = getProvinceToPixels(updateProvincePixels,excludeRivers)
+  provinceToPixels,pixelToProvince,xM,yM = getProvinceToPixels(updateProvincePixels,excludeRivers)
   provinceToPixelList=[None for _ in provinceToPixels]
   for j,t in enumerate(provinceToPixels):
 
@@ -1726,7 +1805,7 @@ def getProvinceToCoordList(updateProvincePixels=False, excludeRivers=True):
     for i in range(len(t)//2):
       t2[i]=(t[2*i],t[2*i+1])
     provinceToPixelList[j]=t2
-  return provinceToPixelList
+  return provinceToPixelList,pixelToProvince,xM,yM
 
   # im = im.convert("HSV")
 
