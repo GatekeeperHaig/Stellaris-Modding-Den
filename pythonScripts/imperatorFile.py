@@ -138,7 +138,7 @@ def main():
     "lightCavalry":   { "cost":10, "assault":False, "speed":4, "maneuver":3, "morale":0, "strength":0, "attrition":50, "attritionLoss":5, "food":2.4, "consumption":0.25, "tradeGood":"horses","flank":"yes"  },
     "lightInfantry":  { "cost":8, "assault":True, "speed":2.5, "maneuver":1, "morale":30, "strength":0, "attrition":-50, "attritionLoss":2.5, "food":2.4, "consumption":0.1  },
     "elephants":      { "cost":35, "assault":False, "speed":2.5, "maneuver":0, "morale":-20, "strength":50, "attrition":200, "attritionLoss":10, "food":1, "consumption":0.3, "tradeGood":"elephants", "levy_tier":"advanced", "ai_max_percentage":15  },
-    "supply_train":   { "cost":20, "assault":False, "speed":3.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":50, "consumption":0.05, "ai_max_percentage":15, "levy_tier":"none"  },
+    "supply_train":   { "cost":14, "assault":False, "speed":3.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":30, "consumption":0.03, "ai_max_percentage":20, "levy_tier":"none"  },
     "engineer_cohort":{ "cost":40, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":5, "consumption":0.05, "ai_max_percentage":15, "levy_tier":"none"  },
     "rangers":        { "cost":10, "assault":True, "speed":2.5, "maneuver":2, "morale":0, "strength":0, "attrition":-20, "attritionLoss":5, "food":2.4, "consumption":0.1  },
     "troll_infantry": { "cost":10, "assault":True, "speed":2.5, "maneuver":1, "morale":0, "strength":0, "attrition":150, "attritionLoss":5, "food":3, "consumption":0.3, "tradeGood":"iron", "levy_tier":"advanced", "ai_max_percentage":15  },
@@ -188,7 +188,7 @@ def main():
       unit.properties["morale"]=20
       unit.properties["food"]=5
 
-  os.makedirs("units",exist_ok=True)
+  # os.makedirs("units",exist_ok=True)
   for unit in units:
     d=unit.assemble(relations, properties, units)
     fileName=unit.name
@@ -569,6 +569,7 @@ def main():
 
   newClimate=TagList(0)
   forceTerrainGeneral=dict()
+  forceClimate=dict()
   forceTerrainGeneral["pend_hithaeglir_region"]="forest"
   forceTerrainGeneral["chail_caerdh_area"]="forest"
   forceTerrainGeneral["gwaelad_area"]="forest"
@@ -599,6 +600,8 @@ def main():
   forceTerrainGeneral["5024"]="mountain"
   forceTerrainGeneral["5025"]="mountain"
   forceTerrainGeneral["1561"]="mountain"
+  forceTerrainGeneral["2536"]="mountain"
+  forceTerrainGeneral["2553"]="hills"
   forceTerrainGeneral["2845"]="hills"
   forceTerrainGeneral["5027"]="hills"
   forceTerrainGeneral["5342"]="desert"
@@ -621,6 +624,27 @@ def main():
   forceTerrainGeneral["5332"]="steppe"
   forceTerrainGeneral["5333"]="steppe"
   forceTerrainGeneral["5334"]="steppe"
+  forceTerrainGeneral["isfahan_area"]="desert"
+  forceTerrainGeneral["gai_area"]="jungle"
+  forceTerrainGeneral["kalz_raishoul_area"]="jungle"
+  forceTerrainGeneral["bru_isra_area"]="jungle"
+  forceTerrainGeneral["isra_area"]="jungle"
+  forceTerrainGeneral["sara_bask_area"]="jungle"
+  forceTerrainGeneral["vol_kug_area"]="forest"
+  forceTerrainGeneral["137"]="plains"
+  forceTerrainGeneral["135"]="plains"
+  forceTerrainGeneral["160"]="plains"
+  forceTerrainGeneral["243"]="forest"
+  forceTerrainGeneral["245"]="forest"
+  forceTerrainGeneral["247"]="forest"
+  forceTerrainGeneral["244"]="forest"
+  forceTerrainGeneral["240"]="plains"
+  forceTerrainGeneral["263"]="hills"
+  forceClimate["bru_isra_area"]="mild_winter"
+  forceClimate["isra_area"]="mild_winter"
+  forceClimate["sara_bask_area"]="mild_winter"
+  # forceTerrainGeneral["bozisha_miraz_region"]="steppe"
+  # forceTerrainGeneral["bellakar_region"]="steppe"
   for i in [5074,5073,5072,5068,5019,5018,3964,3963,3960,3958,3957,3956,3955,3954,3953,3952,3950,3949]:
     forceTerrainGeneral[str(i)]="forest"
   for i in [2997, 2998, 3000, 3001, 3765, 2988, 2991, 2989, 2992, 2994, 3003, 2993, 2996, 2995, 2990, 3002]:
@@ -642,7 +666,7 @@ def main():
     if name.isdigit():
       forceTerrain[name]=terrain
 
-  forceClimate=dict()
+
   #remember to remove stuff after it is done
   # forceClimate["umbar_region"]="mild_winter"
   # forceClimate["harnendor_region"]="mild_winter"
@@ -694,7 +718,7 @@ def main():
   # forceClimate["bellakar_region"]="arid"
   # forceClimate["mardruak_region"]="arid"
   # forceClimate["an_balkumagan_region"]="arid"
-  # forceClimate["bozisha_miraz_region"]="arid"
+  # forceClimate["bozisha_miraz_region"]="mild_winter"
   # forceClimate["sirayn_region"]="arid"
   # forceClimate["cennacatt_region"]="arid"
   # forceClimate["harshandatt_region"]="arid"
@@ -712,6 +736,9 @@ def main():
   forceClimate["sagathavuld_area"]="arid"
   forceClimate["aramuth_ayal_area"]="arid"
   forceClimate["boli_area"]="arid"
+  forceClimate["isfahan_area"]="arid"
+  forceClimate["suza_ray_area"]="arid"
+  forceClimate["suza_sumar_area"]="arid"
   forceClimate["kykurian_kyn_region"]="arid"
   forceClimate["dalpygis_region"]="arid"
   forceClimate["anarike_region"]="mild_winter"
@@ -883,6 +910,7 @@ def main():
   strengthenSauron=False
   strengthenCarnDum=False
   weakenAvari=False
+  weakenMordor=False
   weakenSouthernGoblins=False
 
   if applyModificationOnProvinces:
@@ -963,8 +991,8 @@ def main():
     is_impassable=(terrain=='impassable_terrain')
     if j in provinceNames:
       provinceFile.comments[i]="#"+provinceNames[ j]
-      if len(provinceNamesInv[provinceNames[ j]])>1 and not is_impassable and not terrain=='coastal_terrain' and not j in uninhabitable:
-        print(f'provinceNames[ j] = "{provinceNames[ j]}"')
+    #   if len(provinceNamesInv[provinceNames[ j]])>1 and not is_impassable and not terrain=='coastal_terrain' and not j in uninhabitable:
+    #     print(f'provinceNames[ j] = "{provinceNames[ j]}"')
 
     jj=int(j)
     loc=provinceToCityLocation[jj]
@@ -985,7 +1013,7 @@ def main():
       slopes=[]
       beachlevel1=7
       beachlevel2=9
-      provinceToPixelsSet=set([f"{c[0]} {c[1]}" for c in provinceToPixels[jj]])
+      # provinceToPixelsSet=set([f"{c[0]} {c[1]}" for c in provinceToPixels[jj]])
       dry=False
       if j in provinceToClimate and provinceToClimate[j]=="arid":
         dry=True
@@ -996,7 +1024,8 @@ def main():
           for xx in range(-1,2):
             for yy in range(-1,2):
               coords2=[coords[0]+xx,coords[1]+yy]
-              if f"{coords2[0]} {coords2[1]}" in provinceToPixelsSet:
+              if pixelToProvince[coords2[0]*yM+coords2[1]]==jj:
+              # if f"{coords2[0]} {coords2[1]}" in provinceToPixelsSet:
                 h=heightMap.h2(coords2)
                 if h>beachlevel1:
                   slope=max(slope, abs(h-hC))
@@ -1175,6 +1204,15 @@ def main():
       if weakenAvari:
         if culture=="nandor":
           reduceTribesmen(j, provinceFile.vals[i], provinceToCapitalType, 3, 4)
+      if weakenMordor:
+        if ownerCountry[j]=="MOR":
+          reduceTribesmen(j, provinceFile.vals[i], provinceToCapitalType, 0, 3, 0, 0)
+          # try:
+          #   slaves=int(provinceFile.vals[i].get("slaves").get("amount"))
+          #   if slaves>1:
+          #     provinceFile.vals[i].get("slaves").set("amount",slaves-1)
+          # except ValueError:
+          #   pass
         # and provinceFile.vals[i].count("tribesmen"):
         #   tribes=provinceFile.vals[i].get("tribesmen").get("amount")
         #   provinceFile.vals[i].get("tribesmen").set("amount",max(1,int(tribes)-randint(3,4)))
@@ -1185,11 +1223,11 @@ def main():
 
       if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
         tribes=provinceFile.vals[i].get("tribesmen").get("amount")
-        if int(tribes)>4:
+        if int(tribes)>=4:
           provinceFile.vals[i].get("tribesmen").set("amount",int(tribes)-1)
-          # print(f'tribes = "{tribes}"')
-        if int(tribes)>1:
           provinceFile.vals[i].addReturn("slaves").add("amount","1")
+          # print(f'tribes = "{tribes}"')
+        # if int(tribes)>1:
 
 
 
@@ -1258,15 +1296,20 @@ def main():
         if testCold(j):
           harsh.names[harshUninhab]+=f" {j}"
       else:
-        if is_impassable:
+        if is_impassable and not provinceNames[j].startswith("River"):
           provinceFile.comments[i]+=" (impassable)"
           if not int(j) in impassable_terrain_list:
             print(f'j = "{j} impassable_terrain without being impassable"')
+        elif jj in impassable_terrain_list:
+          # provinceNames[j]
+          setTerrain(i, "riverine_terrain")
+          provinceFile.comments[i]+=" (impassable river)"
         elif int(j) in river_provinces:
           provinceFile.comments[i]+=" (river)"
+          setTerrain(i, "riverine_terrain")
         elif int(j) in lake_provinces:
           provinceFile.comments[i]+=" (lake)"
-          setTerrain(jj-1, "ocean")
+          setTerrain(i, "ocean")
           provinceFile.vals[i].set("culture", '""')
           provinceFile.vals[i].set("province_rank", '""')
           provinceFile.vals[i].set("religion", '""')
@@ -1486,10 +1529,13 @@ def main():
           #   for xxx in range(-1,2):
           #     for yyy in range(-1,2):
           #       coastlineMap.setP(i+xxx, j+yyy, 255)
-          elif c>8:
-            for xxx in range(-1,2):
-              for yyy in range(-1,2):
-                coastlineMap.setP(i+xxx, j+yyy, min(255, coastlineMap.p(i+xxx, j+yyy)+4*(c-8)))
+          elif c>9:
+            for xxx,yyy in [(-1,-1),(1,-1),(-1,1),(1,1)]:
+              coastlineMap.setP(i+xxx, j+yyy, 255)
+          # elif c>8:
+          #   for xxx in range(-1,2):
+          #     for yyy in range(-1,2):
+          #       coastlineMap.setP(i+xxx, j+yyy, min(255, coastlineMap.p(i+xxx, j+yyy)+4*(c-8)))
           if c>5:
             coastlineMap.setP(i, j, 255)
 
@@ -1695,14 +1741,14 @@ class Unit:
     data.add("movement_speed", props["speed"])
     data.add("build_time", props["cost"]) #no longer used?!
     self.computeAllDamages(allUnits, relations, properties, data)
-    data.add("attrition_weight", round((100+props["attrition"])/100*self.attritionFactor,2))
+    data.add("attrition_weight", round(3*(100+props["attrition"])/100*self.attritionFactor,2))
     data.add("attrition_loss", props["attritionLoss"]/100)
     data.add("food_consumption", props["consumption"])
     data.add("food_storage", props["food"])
     if "ai_max_percentage" in props:
       data.add("ai_max_percentage", props["ai_max_percentage"])
     cost=data.addReturn("build_cost")
-    cost.add("gold", self.computeCosts(properties))
+    cost.add("gold", 2*self.computeCosts(properties))
     cost.add("manpower",1)
     if props["strength"]<0:
       data.add("strength_damage_taken", self.computeStrengthDamageTaken(properties))
