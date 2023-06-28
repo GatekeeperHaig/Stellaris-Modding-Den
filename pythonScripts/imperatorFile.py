@@ -17,142 +17,191 @@ import random
 from statistics import variance,pvariance,median,mean
 
 
+class LoadedFileContents:
+  def __init__(self): #will really just load them, no changes yet
+    self.provinces=TagList(0)
+    self.provinces.readFile("setup/provinces/00_default.txt",encoding='utf-8-sig')
+    self.applyModificationOnProvinces=False
+    if self.applyModificationOnProvinces:
+      self.provincesLatest=TagList(0)
+      self.provincesLatest.readFile("00_default_new.txt",encoding='utf-8-sig')
+      self.provincesOld=TagList(0)
+      self.provincesOld.readFile("00_default_old.txt",encoding='utf-8-sig')
+    self.terrains=TagList(0)
+    self.terrains.readFile("common/province_terrain/00_province_terrain.txt",encoding='utf-8-sig')
+    self.countries=TagList(0)
+    self.countries.readFile("setup/main/00_default.txt")
+    self.treasures=TagList(0)
+    self.treasures.readFile("setup/main/lotr_treasures.txt")
+    self.climate=TagList(0)
+    self.climate.readFile("map_data/climate.txt",encoding='utf-8')
+    self.areas=TagList(0)
+    self.areas.readFile("map_data/areas.txt",encoding='utf-8')
+    self.regions=TagList(0)
+    self.regions.readFile("map_data/regions.txt",encoding='utf-8')
+    self.provinceLocators=TagList(0)
+    self.provinceLocators.readFile("gfx/map/map_object_data/vfx_locators.txt",encoding='utf-8-sig')
+    self.redoLakes=False
+    if self.redoLakes:
+      self.lakeLocators=TagList(0)
+      self.lakeLocators.readFile("gfx/map/map_object_data/lakes_locators_c",encoding='utf-8-sig')
+
+class ProcessedFileData:
+  def __init__(self, loadedFileContents):
+    self.provinceNames={}
+    self.provinceNamesInv={}
+    self.provinceToLocation=[]
+    self.sea_zones=list()
+    self.wasteland=list()
+    self.impassable_terrain=list()
+    self.uninhabitable=list()
+    self.lakes=list()
+    self.river_provinces=list()
+
+    self.provinceToCapitalType=dict()
+    self.ownerCountry=dict()
+    self.countryCulture=dict()
+    self.countryProvinces=dict()
+    self.provinceToArea=dict()
+    self.areaToRegion=dict()
+    self.provinceToRegion=dict()
+    self.regionToArea=dict()
+    self.regionToProvince=dict()
+    self.regionToNum=dict()
+    self.areaToProvince=dict()
+    self.provinceToTerrain=dict()
 
 
+
+    with open("localization/english/provincenames_l_english.yml",encoding='utf-8-sig') as f:
+      for line in f.readlines():
+        # print(line)
+        split=line.split()
+        key=split[0]
+        if key=="l_english:":
+          continue
+        # print(f'key = "{key}"')
+        key=key.replace("PROV", "").replace(":0", "")
+        # print(f'key = "{key}"')
+        rest=" ".join(split[1:]).replace('"', "")
+        # print(f'rest = "{rest}"')
+        self.provinceNames[key]=rest
+        if not rest in self.provinceNamesInv:
+          self.provinceNamesInv[rest]=[]
+        self.provinceNamesInv[rest].append(key)
+
+    locs=loadedFileContents.provinceLocators.get("game_object_locator").get("instances")
+    self.provinceToLocation=[None for _ in locs.vals]
+    for loc in locs.vals:
+      self.provinceToLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
+
+    if loadedFileContents.redoLakes:
+      self.lakes=[]
+      self.newLakes=[]
+      for line in loadedFileContents.lakeLocators.get("object").get("transform").split("\n"):
+        line = line.strip('"').strip(" ")
+        coords=line.split(" ")
+        if line:
+          self.lakes.append((float(coords[0]),float(coords[2])))
+
+    with open("map_data/default.map",encoding='utf-8-sig') as file:
+      content=[line for line in file]
+    allAttributes=dict()
+    allAttributes["sea_zones"]=self.sea_zones
+    allAttributes["wasteland"]=self.wasteland
+    allAttributes["impassable_terrain"]=self.impassable_terrain
+    allAttributes["uninhabitable"]=self.uninhabitable
+    allAttributes["lakes"]=self.lakes
+    allAttributes["river_provinces"]=self.river_provinces
+    for line in content:
+      for key in allAttributes.keys():
+        if line.startswith(key):
+          l=line.strip(key)
+          l=l.strip(" ")
+          l=l.strip("=")
+          l=l.strip(" ")
+          if l.startswith("RANGE"):
+            l=l.strip("RANGE")
+            l=l.strip(" ")
+            l=l.strip("{")
+            l=l.strip(" ")
+            ids = l.split()
+            allAttributes[key]+=list(range(int(ids[0]),int(ids[1])+1))
+          elif l.startswith("LIST"):
+            l=l.strip("LIST")
+            l=l.strip(" ")
+            l=l.strip("{")
+            l=l.strip(" ")
+            for i in l.split():
+              try:
+                allAttributes[key].append(int(i))
+              except ValueError:
+                pass
+
+    self.uninhabitable= set(map(str,self.uninhabitable))
+    self.allSeaAndLakeProvinces=set(self.sea_zones+self.lakes)
+    self.allWaterProvinces=set(self.sea_zones+self.lakes+self.river_provinces)
+    self.allSweetWaterProvinces=set(self.lakes+self.river_provinces)
+    self.lake_provinces=set(self.lakes)
+    self.river_provinces=set(self.river_provinces)
+    self.impassable_terrain_list=set(self.impassable_terrain)
+
+    countries=loadedFileContents.countries.get("country").get("countries")
+    for name,vals in zip(countries.names, countries.vals):
+      # print(f'vals = "{vals}"')
+      if vals=="":
+        continue
+      cores=vals.get("own_control_core")
+      self.countryCulture[name]=vals.get("primary_culture")
+      self.provinceToCapitalType[vals.get("capital")]="country_capital"
+      # print(f'cores = "{cores.vals}"')
+      self.countryProvinces[name]=cores.names
+      for core in cores.names:
+        # ownedProvinces.add(core)
+        self.ownerCountry[core]=name
+      # print(f'cores = "{cores}"')
+
+
+
+    for name, val in loadedFileContents.areas.getNameVal():
+      if name:
+        cap=val.get("provinces").names[0]
+        if not cap in self.provinceToCapitalType:
+          self.provinceToCapitalType[cap]="state_capital"
+        for p in val.get("provinces").names:
+          self.provinceToArea[p]=name
+          if not name in self.areaToProvince:
+            self.areaToProvince[name]=[]
+          self.areaToProvince[name].append(p)
+    for name, val in loadedFileContents.regions.getNameVal():
+      self.regionToProvince[name]=[]
+      if name:
+        for p in val.get("areas").names:
+          self.areaToRegion[p]=name
+          if not name in self.regionToArea:
+            self.regionToArea[name]=[]
+            self.regionToNum[name]=0
+          for pp in self.areaToProvince[p]:
+            self.regionToProvince[name].append(pp)
+          self.regionToArea[name].append(p)
+          self.regionToNum[name]+=len(self.areaToProvince[p])
+    for province, area in self.provinceToArea.items():
+      if area in self.areaToRegion:
+        self.provinceToRegion[province]=self.areaToRegion[area]
+
+    for name, val in loadedFileContents.provinces.getNameVal():
+      if name:
+        self.provinceToTerrain[name]=val.get("terrain")
 
 def main():
-
-
-  # im = Image.open("heightmap.png") # Can be many different formats.
-
-
-  # # im = im.convert("HSV")
-  # pix = im.load()
-  # def p(x,y):
-  #   print(f"({x},{y}):{pix[x,im.size[1]-y]}")
-  # print(im.size)  # Get the width and hight of the image for iterating over
-  # # print(f'im.getpixel((3807,2920)) = "{im.getpixel((3807,2920))}"')
-  # # print(f'im.getpixel((1000,1000)) = "{im.getpixel((1000,1000))}"')
-  # # print(f'pix[3000,1800] = "{pix[3000,1800]}"')
-  # # print(f'pix[2458,3432] = "{pix[2458,3432]}"')
-  # p(1000, 1000)
-  # p(3807, 2920)
-  # p(3000, 1800)
-  # p(2458, 3432)
-  # # pix[2458,3432]
-  # # print(pix[3807,2920])  # Get the RGBA Value of the a pixel of an image
-  # # pix[x,y] = value  # Set the RGBA Value of the image (tuple)
-  # # im.save('alive_parrot.png')  # Save the modified pixels as .png
-
-  # return
-
-
-  fileContent=TagList()
-
-  locClass=LocList()
-  locClass.limitLanguage(["en"])
-
-  races=["Noldor", "Teleri", "Edain", "Dwarf","Orc"]
-  raceGrowth={"Noldor":-1.4,"Teleri":-1.4,"Edain":-0.6666, "Dwarf":-1,"Orc":1}
-  raceCombat={"Noldor":1.2,"Teleri":1,"Edain":0.8, "Dwarf":0.8,"Orc":0}
-  raceCommerce={"Noldor":0.5,"Teleri":0.7,"Edain":.5, "Dwarf":1,"Orc":0}
-  raceDesc={"Noldor":"The Noldor where the second clan of elves to reach Valinor in the years of the trees and later where led back to Middle-earth by Fëanor. These elves have a long list of famous heroes and take pride in their combat ability. You have access to this modifier as your primary culture is Noldor.","Teleri":"The Teleri were the last clan of elves to reach Valinor in the years of the trees, though many remained in Middle-earth in the first place. They have always been the greatest seafarers of Middle-earth. As many of their breathren were slaughtered by Fëanor's host on his way back to Middle-earth, it took a long time for them to forgive the Noldor elves. You have access to this modifier as your primary culture is Teleri.","Edain":"The Edain were the group of mankind that reached Beleriand in the First Age. Many of them have fought Morgoth in the Battle of Beleriand and they and their ancestors have thus been rewarded with long life. You have access to this modifier as your primary culture is Edain. Lesser dunedain, corsairs and dol amrothian only count half.", "Dwarf":"The Masters of Stone were created by Aulë even before Ilúvatar created the elves, but slept underground until about a century after the elves awoke. Dwarves spend most of their time crafting, smithying and mining. You have access to this modifier as your primary culture is dwarven.","Orc":"Melkor created the orcs by twisting kidnapped elves in the Years of the Lamps. Without the guidance of Melkor or a fallen Maia, they are usually disorganized and pose little thread to any of the other races. Now that the Lord of the Rings is returning to his power though, the Age of the Orcs will come. You have access to this modifier as your primary culture is orcish."}
-  # raceGrowth={"Noldor":-1,"Teleri":-1,"Edain":-0.8, "Dwarf":-0.8,"Orc":4}
-
-  # lotr_pops=TagList("namespace", "lotr_pops")
-  # foreignPopsEvent=lotr_pops.addReturn("lotr_pops.1")
-  # foreignPopsEvent.add("type", "country_event").add("hidden","yes")
-  # trigger=foreignPopsEvent.addReturn("trigger")
-  # trigger.addReturn("NOT").add("has_law","age_of_the_orc")
-  # immediate=foreignPopsEvent.addReturn("immediate")
-  # option=foreignPopsEvent.addReturn("option")
-  # option.add("name", "OK")
-
-  for race in races:
-    for i in range(1,11):
-      name=f"{i*10}_{race}".lower()
-      t=fileContent.addReturn(name)
-      if race!="Orc":
-        t.add("land_morale_modifier", round(i*0.06*raceCombat[race],3))
-        t.add("land_morale_recovery", round(i*0.01*raceCombat[race],3))
-        t.add("discipline", round(i*0.06*raceCombat[race],3))
-        t.add("global_commerce_modifier", round(i*0.06*raceCommerce[race],3))
-      else:
-        t.add("global_pop_assimilation_speed_modifier", round(i/10,2))
-      if race in ["Noldor","Teleri"]:
-        t.add("movement_speed_if_no_road", round(i/50,2))
-      elif race == "Dwarf":
-        t.add("army_movement_speed", round(i/200,2))
-      if raceGrowth[race] > 0:
-        t.add("global_population_growth", round(i*0.015*raceGrowth[race],3))
-      else:
-        t.add("global_population_growth", round(i**0.5*10**0.5*0.015*raceGrowth[race],3))
-      locClass.addEntry(name, f"{i*10}% {race}")
-      locClass.addEntry("desc_"+name, "Only for the primary culture group this modifier can be gained. Integrated cultures are counted doubly.\n\n"+raceDesc[race])
-
-
-  # for i in reversed(range(1,20)):
-  #   name=f"foreign_support_{i*5}"
-  #   t=fileContent.addReturn(name)
-  #   t.add("levy_size_multiplier",round(0.025*i,2))
-  #   locClass.addEntry(name, f"{i*5}% Foreign Culture Support")
-  #   locClass.addEntry("desc_"+name, "Non-integrated culture do not direcly increase the number of possible levies (and thus legion size) and due to a bug in the vanilla game we cannot allow their integration outside of your culture group. Instead they will slightly increase the numbers of your integrated culture levies.")
-  #   immediate.add("remove_country_modifier", name)
-  #   option.createReturnIf(TagList("local_var:foreign_pop_percentage", round(i*5/100,2),"",">="),condType="else_if" if i!=19 else "if").add("add_country_modifier", TagList("name",name))
-
-  # immediate.variableOpImp("set_local", "total_pops", 0)
-  # immediate.variableOpImp("set_local", "foreign_pops", 0)
-  # everyPop=immediate.addReturn("every_owned_province").addReturn("every_pops_in_province")
-  # everyPop.add("save_scope_as","pop")
-  # everyPop.variableOpImp("change_local", "total_pops", 1, valName="add")
-  # foreignPop=everyPop.createReturnIf(TagList("NOT", TagList("ROOT", TagList("any_integrated_culture", TagList("this.culture", "scope:pop.culture")))))
-  # foreignPop.variableOpImp("change_local", "foreign_pops", 1, valName="add")
-  # immediate.variableOpImp("set_local", "foreign_pop_percentage", "local_var:foreign_pops")
-  # immediate.createReturnIf(TagList("local_var:total_pops", "0", "", ">")).variableOpImp("change_local", "foreign_pop_percentage", "local_var:total_pops", valName="divide")
-  # immediate.addReturn("else").variableOpImp("set_local", "foreign_pop_percentage", 0 )
-  # halfLevy=immediate.createReturnIf(TagList("OR", TagList("has_country_modifier","harassed_by_corsairs").add("has_country_modifier","influenced_by_saruman")))
-  # halfLevy.variableOpImp("change_local", "foreign_pop_percentage",2, valName="divide")
-  # print(f'fileContent = "{fileContent}"')
-  locClass.writeToMod(".","lotr_country_modifiers_from_script","z")
-  cdf.outputToFolderAndFile(fileContent , "common/modifiers", "br_racial_modifiers.txt" ,2,".", encoding="utf-8-sig")
-  # cdf.outputToFolderAndFile(lotr_pops , "events/", "LOTR_pops.txt" ,1,".", encoding="utf-8-sig")
-
-
-
-  unitSetup = UnitSetup()
-  for unit in unitSetup.units:
-    d=unit.assemble(unitSetup)
-    fileName=unit.name
-    if unit.name=="warelephant":
-      fileName="warelephants"
-    cdf.outputToFolderAndFile(d , "common/units", f"army_{fileName}.txt" ,2,".",encoding="utf-8-sig")
-
-
   output_folder="."
-
-  provinceNames={}
-  provinceNamesInv={}
-  with open("localization/english/provincenames_l_english.yml",encoding='utf-8-sig') as f:
-    for line in f.readlines():
-      # print(line)
-      split=line.split()
-      key=split[0]
-      if key=="l_english:":
-        continue
-      # print(f'key = "{key}"')
-      key=key.replace("PROV", "").replace(":0", "")
-      # print(f'key = "{key}"')
-      rest=" ".join(split[1:]).replace('"', "")
-      # print(f'rest = "{rest}"')
-      provinceNames[key]=rest
-      if not rest in provinceNamesInv:
-        provinceNamesInv[rest]=[]
-      provinceNamesInv[rest].append(key)
+  loadedFileContents = LoadedFileContents()
+  processedFileData = ProcessedFileData(loadedFileContents)
 
   moveGroupNamesToNormal=False
   if moveGroupNamesToNormal:
     removeList=[]
-    for p,name in provinceNames.items():
+    for p,name in processedFileData.provinceNames.items():
       if "_group" in p:
         for i,s in enumerate(p):
           if not s.isnumeric():
@@ -161,245 +210,58 @@ def main():
           i+=1
         removeList.append(p)
         newKey=p[:i]
-        print(f"Replacing {provinceNames[newKey]} with {name}")
-        provinceNames[newKey]=name
+        print(f"Replacing {processedFileData.provinceNames[newKey]} with {name}")
+        processedFileData.provinceNames[newKey]=name
     for p in removeList:
-      del provinceNames[p]
-
-
-
-  provinceFile=TagList(0)
-  provinceFile.readFile("setup/provinces/00_default.txt",encoding='utf-8-sig')
-  applyModificationOnProvinces=False
-  if applyModificationOnProvinces:
-    provinceFileLatest=TagList(0)
-    provinceFileLatest.readFile("00_default_new.txt",encoding='utf-8-sig')
-    provinceFileOld=TagList(0)
-    provinceFileOld.readFile("00_default_old.txt",encoding='utf-8-sig')
-  terrainFile=TagList(0)
-  terrainFile.readFile("common/province_terrain/00_province_terrain.txt",encoding='utf-8-sig')
-  countryFile=TagList(0)
-  countryFile.readFile("setup/main/00_default.txt")
-  treasureFile=TagList(0)
-  treasureFile.readFile("setup/main/lotr_treasures.txt")
-  climateFile=TagList(0)
-  climateFile.readFile("map_data/climate.txt",encoding='utf-8')
-  areaFile=TagList(0)
-  areaFile.readFile("map_data/areas.txt",encoding='utf-8')
-  regionFile=TagList(0)
-  regionFile.readFile("map_data/regions.txt",encoding='utf-8')
-  provinceLocators=TagList(0)
-  provinceLocators.readFile("gfx/map/map_object_data/vfx_locators.txt",encoding='utf-8-sig')
-  # cityLocators=TagList(0)
-  # cityLocators.readFile("gfx/map/map_object_data/city_locators.txt",encoding='utf-8-sig')
-  redoLakes=False
-  if redoLakes:
-    lakeLocators=TagList(0)
-    lakeLocators.readFile("gfx/map/map_object_data/lakes_locators_c",encoding='utf-8-sig')
-
-  # with open("gfx/map/map_object_data/oak_tree_generator_3.txt",'r', encoding='utf-8-sig') as inputFile:
-  #   oakFile=[line for line in inputFile]
-  #   oakFile=oakFile[:9] #just use the header, rest is added by script
-  # with open("gfx/map/map_object_data/pine_tree_generator_2.txt",'r', encoding='utf-8-sig') as inputFile:
-  #   pineFile=[line for line in inputFile]
-  #   pineFile=pineFile[:9] #just use the header, rest is added by script
-  # fortLocators=TagList(0)
-  # fortLocators.readFile("gfx/map/map_object_data/fort_locators.txt",encoding='utf-8-sig')
-  # combatLocators=TagList(0)
-  # combatLocators.readFile("gfx/map/map_object_data/combat_locators.txt",encoding='utf-8-sig')
-
-  locs=provinceLocators.get("game_object_locator").get("instances")
-  provinceToLocation=[None for _ in locs.vals]
-  # provinceToCityLocation=[None for _ in locs.vals]
-  # provinceToFortLocation=[None for _ in locs.vals]
-  # provinceToCombatLocation=[None for _ in locs.vals]
-  for loc in locs.vals:
-    provinceToLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
-  # locs=cityLocators.get("game_object_locator").get("instances")
-  # for loc in locs.vals:
-  #   provinceToCityLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
-
-  if redoLakes:
-    lakes=[]
-    newLakes=[]
-    for line in lakeLocators.get("object").get("transform").split("\n"):
-      line = line.strip('"').strip(" ")
-      coords=line.split(" ")
-      if line:
-        lakes.append((float(coords[0]),float(coords[2])))
-  # locs=fortLocators.get("game_object_locator").get("instances")
-  # for loc in locs.vals:
-  #   provinceToFortLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
-  # locs=combatLocators.get("game_object_locator").get("instances")
-  # for loc in locs.vals:
-  #   provinceToCombatLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
-
-  # cdf.outputToFolderAndFile(climateFile , ".", "climateFile.txt" ,4,".",encoding="utf-8-sig")
-
-  # print(f'climateFile.vals[0].names = "{climateFile.vals[0].names}"')
-
-  # print(f'climateFile.names = "{climateFile.names}"')
-  # print(f'climateFile.seperators = "{climateFile.seperators}"')
-  # print(f'climateFile.get("mild_winter") = "{climateFile.get("mild_winter")}"')
-  # print(f'climateFile.get("mild_winter").names = "{climateFile.get("mild_winter").names}"')
-
-  with open("map_data/default.map",encoding='utf-8-sig') as file:
-    content=[line for line in file]
-  sea_zones=list()
-  wasteland=list()
-  impassable_terrain=list()
-  uninhabitable=list()
-  lakes=list()
-  river_provinces=list()
-  allAttributes=dict()
-  allAttributes["sea_zones"]=sea_zones
-  allAttributes["wasteland"]=wasteland
-  allAttributes["impassable_terrain"]=impassable_terrain
-  allAttributes["uninhabitable"]=uninhabitable
-  allAttributes["lakes"]=lakes
-  allAttributes["river_provinces"]=river_provinces
-  for line in content:
-    for key in allAttributes.keys():
-      if line.startswith(key):
-        l=line.strip(key)
-        l=l.strip(" ")
-        l=l.strip("=")
-        l=l.strip(" ")
-        if l.startswith("RANGE"):
-          l=l.strip("RANGE")
-          l=l.strip(" ")
-          l=l.strip("{")
-          l=l.strip(" ")
-          ids = l.split()
-          allAttributes[key]+=list(range(int(ids[0]),int(ids[1])+1))
-        elif l.startswith("LIST"):
-          l=l.strip("LIST")
-          l=l.strip(" ")
-          l=l.strip("{")
-          l=l.strip(" ")
-          for i in l.split():
-            try:
-              allAttributes[key].append(int(i))
-            except ValueError:
-              pass
-
-  uninhabitable= set(map(str,uninhabitable))
-  allSeaAndLakeProvinces=set(sea_zones+lakes)
-  allWaterProvinces=set(sea_zones+lakes+river_provinces)
-  allSweetWaterProvinces=set(lakes+river_provinces)
-  lake_provinces=set(lakes)
-  river_provinces=set(river_provinces)
-  impassable_terrain_list=set(impassable_terrain)
-  
+      del processedFileData.provinceNames[p]
 
   addNumbersToDuplicateNames=False
   if addNumbersToDuplicateNames:
     numbers=["","Mîn","Tâd","Neledh","Canad","Leben","Eneg","Odog","Tolodh","Neder","Pae","Minib","Ýneg","Neleb","Canab","Lebem","Eneph","Odoph","Toloph","Nederph"]
     cardinals=["","","Taphaen","Nelphaen","Cambaen","Lephaen","Enephaen","Odophaen","Tolophaen","Nederphaen"]
-    for name in provinceNamesInv:
-      if len(provinceNamesInv[name])>=2:
+    for name in processedFileData.provinceNamesInv:
+      if len(processedFileData.provinceNamesInv[name])>=2:
         hab=[]
         other=[]
-        for j in provinceNamesInv[name]:
+        for j in processedFileData.provinceNamesInv[name]:
           i=int(j)-1
-          terrain=provinceFile.vals[i].get("terrain").strip('"')
+          terrain=loadedFileContents.provinces.vals[i].get("terrain").strip('"')
           is_impassable=(terrain=='impassable_terrain')
-          if not is_impassable and not terrain=='coastal_terrain' and not j in uninhabitable and not int(j) in allWaterProvinces:
+          if not is_impassable and not terrain=='coastal_terrain' and not j in processedFileData.uninhabitable and not int(j) in processedFileData.allWaterProvinces:
             hab.append(j)
           else:
             other.append(j)
         cur=1
         for h in hab:
-          provinceNames[h]+=" "+numbers[cur]
+          processedFileData.provinceNames[h]+=" "+numbers[cur]
           cur+=1
         for h in other:
           if cur<20:
-            provinceNames[h]+=" "+numbers[cur]
+            processedFileData.provinceNames[h]+=" "+numbers[cur]
           else:
             a=cur//10
             b=cur%10
-            provinceNames[h]+=f" {cardinals[a]}"
+            processedFileData.provinceNames[h]+=f" {cardinals[a]}"
             if b:
-              provinceNames[h]+=f" a {numbers[b]}"
+              processedFileData.provinceNames[h]+=f" a {numbers[b]}"
           cur+=1
 
-            # print(f'name = "{name}"{len(provinceNamesInv[name])}')
+            # print(f'name = "{name}"{len(processedFileData.provinceNamesInv[name])}')
 
     # os.makedirs("out/localization/english", exist_ok=True)
     with open("localization/english/provincenames_l_english.yml","w",encoding='utf-8-sig') as f:
       f.write("l_english:\n")
-      for p,i in provinceNames.items():
+      for p,i in processedFileData.provinceNames.items():
         f.write(f' PROV{p}:0 "{i}"\n')
     return
 
-
-  provinceToCapitalType=dict()
-  countries=countryFile.get("country").get("countries")
-  # ownedProvinces=set()
-  ownerCountry=dict()
-  countryCulture=dict()
-  countryProvinces=dict()
-  for name,vals in zip(countries.names, countries.vals):
-    # print(f'vals = "{vals}"')
-    if vals=="":
-      continue
-    cores=vals.get("own_control_core")
-    countryCulture[name]=vals.get("primary_culture")
-    provinceToCapitalType[vals.get("capital")]="country_capital"
-    # print(f'cores = "{cores.vals}"')
-    countryProvinces[name]=cores.names
-    for core in cores.names:
-      # ownedProvinces.add(core)
-      ownerCountry[core]=name
-    # print(f'cores = "{cores}"')
-
-
-  provinceToArea=dict()
-  areaToRegion=dict()
-  provinceToRegion=dict()
-  regionToArea=dict()
-  regionToProvince=dict()
-  regionToNum=dict()
-  areaToProvince=dict()
-
-  for name, val in areaFile.getNameVal():
-    if name:
-      cap=val.get("provinces").names[0]
-      if not cap in provinceToCapitalType:
-        provinceToCapitalType[cap]="state_capital"
-      for p in val.get("provinces").names:
-        provinceToArea[p]=name
-        if not name in areaToProvince:
-          areaToProvince[name]=[]
-        areaToProvince[name].append(p)
-  for name, val in regionFile.getNameVal():
-    regionToProvince[name]=[]
-    if name:
-      for p in val.get("areas").names:
-        areaToRegion[p]=name
-        if not name in regionToArea:
-          regionToArea[name]=[]
-          regionToNum[name]=0
-        for pp in areaToProvince[p]:
-          regionToProvince[name].append(pp)
-        regionToArea[name].append(p)
-        regionToNum[name]+=len(areaToProvince[p])
-  for province, area in provinceToArea.items():
-    if area in areaToRegion:
-      provinceToRegion[province]=areaToRegion[area]
-
-  # print(f'regionToNum = "{sorted(regionToNum.items(), key=lambda x:x[1])}"')
   spamProvincesPerRegion=False
   if spamProvincesPerRegion:
-    for item in sorted(regionToNum.items(), key=lambda x:x[1]):
+    for item in sorted(processedFileData.regionToNum.items(), key=lambda x:x[1]):
       print(item)
 
-  provinceToTerrain=dict()
-  for name, val in provinceFile.getNameVal():
-    if name:
-      provinceToTerrain[name]=val.get("terrain")
 
-  if redoLakes:
+  if loadedFileContents.redoLakes:
     heightMap=ImageRead("../wotrbeta/map_data/heightmap_.png")
   else:
     heightMap=ImageRead("../wotrbeta/map_data/heightmap.png")
@@ -415,15 +277,8 @@ def main():
       for j in range(4096):
         coastlineMap.setP(i, j, 255)
 
-
-  # provinceToPixels,_,_,_ = getProvinceToPixels()
-  # print(f'provinceToPixels[1] = "{provinceToPixels[1]}"')
   provinceToPixels,pixelToProvince,xM,yM= getProvinceToCoordList(False, False)
 
-
-  # for i,j in provinceToPixels[3499]:
-  #   print(f'heightMap.p(i, j) = "{heightMap.p(i, j)}"')
-  # sys.exit(1)
 
   makeTrees=False
   if makeTrees:
@@ -467,31 +322,12 @@ def main():
           pineTrees.append(makeTree(c))
           # pineFile.append(" ".join(map('{:.6f}'.format,coord+rotation+[size for _ in range(3)]))+"\n")
     for area in ["jayir_ahar_area","murgarm_area","lokhas_area"]:
-      for province in areaToProvince[area]:
+      for province in processedFileData.areaToProvince[area]:
         generateTrees(int(province), random.randint(100,300))
     generateTrees(2898, 500)
     
     for oak in oakTrees:
       oakTreeSplit[random.randint(0, 2)].append(oak)
-
-
-  # return
-
-
-  # print(f'provinceToPixels = "{provinceToPixels}"')
-  # som.work()
-
-  # print(f'provinceToPixels = "{provinceToPixels}"')
-
-  # print(f'provinceImage.h(provinceToLocation[1]) = "{provinceImage.col(provinceToLocation[1])}"')
-  # print(f'colorToProvince[colorToString(provinceImage.col(provinceToLocation[1]))] = "{colorToProvince[colorToString(provinceImage.col(provinceToLocation[1]))]}"')
-
-
-  # print(f'heightMap.h(provinceToLocation[1]) = "{heightMap.h(provinceToLocation[1])}"')
-
-  # print(f'heightMap.h(provinceToLocation[5025]) = "{heightMap.h(provinceToLocation[5025])}"')
-  # print(f'heightMap.h(provinceToLocation[4126]) = "{heightMap.h(provinceToLocation[4126])}"')
-  # heightMap.h(provinceToLocation[1])
 
   newClimate=TagList(0)
   forceTerrainGeneral=dict()
@@ -581,12 +417,12 @@ def main():
   forceTerrain=dict()
   for name, terrain in forceTerrainGeneral.items():
     if name.endswith("region"):
-      for a in regionToArea[name]:
-        for p in areaToProvince[a]:
+      for a in processedFileData.regionToArea[name]:
+        for p in processedFileData.areaToProvince[a]:
           forceTerrain[p]=terrain
   for name, terrain in forceTerrainGeneral.items():
     if name.endswith("area"):
-      for p in areaToProvince[name]:
+      for p in processedFileData.areaToProvince[name]:
         forceTerrain[p]=terrain
   for name, terrain in forceTerrainGeneral.items():
     if name.isdigit():
@@ -651,90 +487,90 @@ def main():
   # forceClimate["nafarat_region"]="arid"
   # forceClimate["khand_region"]="arid"
   # forceClimate["nurn_region"]="arid"
-  forceClimate["tulwang_region"]="mild_winter"
+  # forceClimate["tulwang_region"]="mild_winter"
   # forceClimate["khailuza_region"]="arid"
   # forceClimate["kykurian_kyn_region"]="arid"
   # forceClimate["kargagis_ahar_region"]="arid"
   # forceClimate["gathgykarkan_region"]="arid"
-  forceClimate["morad_area"]="arid"
-  forceClimate["gathod_area"]="arid"
-  forceClimate["surubeki_morad_area"]="arid"
-  forceClimate["sagathavuld_area"]="arid"
-  forceClimate["aramuth_ayal_area"]="arid"
-  forceClimate["boli_area"]="arid"
-  forceClimate["isfahan_area"]="arid"
-  forceClimate["suza_ray_area"]="arid"
-  forceClimate["suza_sumar_area"]="arid"
-  forceClimate["kykurian_kyn_region"]="arid"
-  forceClimate["dalpygis_region"]="arid"
-  forceClimate["anarike_region"]="mild_winter"
-  forceClimate["yopi_region"]="mild_winter"
-  forceClimate["nikkea_region"]="mild_winter"
-  forceClimate["shay_region"]="mild_winter"
-  forceClimate["lokhas_drus_region"]="mild_winter"
+  # forceClimate["morad_area"]="arid"
+  # forceClimate["gathod_area"]="arid"
+  # forceClimate["surubeki_morad_area"]="arid"
+  # forceClimate["sagathavuld_area"]="arid"
+  # forceClimate["aramuth_ayal_area"]="arid"
+  # forceClimate["boli_area"]="arid"
+  # forceClimate["isfahan_area"]="arid"
+  # forceClimate["suza_ray_area"]="arid"
+  # forceClimate["suza_sumar_area"]="arid"
+  # forceClimate["kykurian_kyn_region"]="arid"
+  # forceClimate["dalpygis_region"]="arid"
+  # forceClimate["anarike_region"]="mild_winter"
+  # forceClimate["yopi_region"]="mild_winter"
+  # forceClimate["nikkea_region"]="mild_winter"
+  # forceClimate["shay_region"]="mild_winter"
+  # forceClimate["lokhas_drus_region"]="mild_winter"
   # forceClimate["ibav_region"]="arid"
-  forceClimate["wer_falin_region"]="mild_winter"
-  forceClimate["ralian_region"]="mild_winter"
-  forceClimate["lenitan_region"]="mild_winter"
-  forceClimate["kalz_raishoul_area"]="mild_winter"
-  forceClimate["lokhurush_area"]="mild_winter"
-  forceClimate["nithilfalas_area"]="mild_winter"
-  forceClimate["bellazen_area"]="mild_winter"
-  forceClimate["2093"]="mild_winter"
+  # forceClimate["wer_falin_region"]="mild_winter"
+  # forceClimate["ralian_region"]="mild_winter"
+  # forceClimate["lenitan_region"]="mild_winter"
+  # forceClimate["kalz_raishoul_area"]="mild_winter"
+  # forceClimate["lokhurush_area"]="mild_winter"
+  # forceClimate["nithilfalas_area"]="mild_winter"
+  # forceClimate["bellazen_area"]="mild_winter"
+  # forceClimate["2093"]="mild_winter"
   # forceClimate["burskadekar_region"]="arid"
   # forceClimate["alduryaknar_region"]="arid"
-
-
-  for name, terrain in provinceToTerrain.items():
-    if terrain.strip('"') in ["caverns", "halls"] and name in provinceToArea:
+  # forceClimate["lorien_area"]="perfect"
+  # forceClimate["1936"]="perfect"
+  # forceClimate["lothlann_area"]="normal_winter"
+  # forceClimate["tyrn_formen_area"]="normal_winter"
+  # forceClimate["en_engladil_area"]="mild_winter"
+  # forceClimate["pend_eregion_area"]="mild_winter"
+  # forceClimate["sarch_nia_linquelie_area"]="severe_winter"
+  # ###arthedain
+  # forceClimate["1701"]="normal_winter"
+  # forceClimate["1877"]="normal_winter"
+  # forceClimate["1815"]="normal_winter"
+  # forceClimate["1814"]="normal_winter"
+  # forceClimate["1709"]="normal_winter"
+  # forceClimate["1710"]="normal_winter"
+  # forceClimate["1634"]="normal_winter"
+  # forceClimate["1822"]="normal_winter"
+  # forceClimate["2420"]="normal_winter"
+  # forceClimate["2423"]="normal_winter"
+  # forceClimate["2551"]="normal_winter"
+  # forceClimate["3729"]="normal_winter"
+  # forceClimate["3730"]="normal_winter"
+  # forceClimate["3736"]="normal_winter"
+  # forceClimate["2190"]="mild_winter"
+  # forceClimate["1747"]="mild_winter"
+  # forceClimate["1790"]="mild_winter"
+  for name, terrain in processedFileData.provinceToTerrain.items():
+    if terrain.strip('"') in ["caverns", "halls"] and name in processedFileData.provinceToArea:
       forceClimate[name]="mild_winter"
-  forceClimate["lorien_area"]="perfect"
-  forceClimate["1936"]="perfect"
-  forceClimate["lothlann_area"]="normal_winter"
-  forceClimate["tyrn_formen_area"]="normal_winter"
-  forceClimate["en_engladil_area"]="mild_winter"
-  forceClimate["pend_eregion_area"]="mild_winter"
-  forceClimate["sarch_nia_linquelie_area"]="severe_winter"
-  ###arthedain
-  forceClimate["1701"]="normal_winter"
-  forceClimate["1877"]="normal_winter"
-  forceClimate["1815"]="normal_winter"
-  forceClimate["1814"]="normal_winter"
-  forceClimate["1709"]="normal_winter"
-  forceClimate["1710"]="normal_winter"
-  forceClimate["1634"]="normal_winter"
-  forceClimate["1822"]="normal_winter"
-  forceClimate["2420"]="normal_winter"
-  forceClimate["2423"]="normal_winter"
-  forceClimate["2551"]="normal_winter"
-  forceClimate["3729"]="normal_winter"
-  forceClimate["3730"]="normal_winter"
-  forceClimate["3736"]="normal_winter"
-  forceClimate["2190"]="mild_winter"
-  forceClimate["1747"]="mild_winter"
-  forceClimate["1790"]="mild_winter"
+
+
   for name, climate in forceClimate.items():
-    if climateFile.count(climate)>0:
-      currentCLimate=climateFile.get(climate)
+    if loadedFileContents.climate.count(climate)>0:
+      currentCLimate=loadedFileContents.climate.get(climate)
       if name.endswith("region"):
-        for a in regionToArea[name]:
-          for p in areaToProvince[a]:
+        for a in processedFileData.regionToArea[name]:
+          for p in processedFileData.areaToProvince[a]:
             currentCLimate.add(p)
         pass
       elif name.endswith("area"):
-        for p in areaToProvince[name]:
+        for p in processedFileData.areaToProvince[name]:
           currentCLimate.add(p)
       else:
         currentCLimate.add(name)
   nonPerfect=set()
   provinceToClimate=dict()
-  # climateFile.addReturn("perfect") #probably need to be removed as it might confuse the game
-  for climate, entries in climateFile.getNameVal():
+  # loadedFileContents.climate.addReturn("perfect") #probably need to be removed as it might confuse the game
+  for climate, entries in loadedFileContents.climate.getNameVal():
     if not climate:
       continue
     if climate=="perfect":
       # perfect=[]
-      for key in provinceToArea:
+      for key in processedFileData.provinceToArea:
         if not key in nonPerfect:
           # perfect.append(key)
           entries.add(key)
@@ -747,7 +583,7 @@ def main():
     while provinceList:
       province=provinceList[-1]
       try:
-        region=provinceToRegion[province]
+        region=processedFileData.provinceToRegion[province]
       except:
         provinceList.pop()
         continue
@@ -757,10 +593,10 @@ def main():
         continue
       currentNewClimate.addComment("## "+region+" ###")
       regionCommentId=len(currentNewClimate.comments)-1
-      for area in regionToArea[region]:
-      # area=provinceToArea[province]
+      for area in processedFileData.regionToArea[region]:
+      # area=processedFileData.provinceToArea[province]
         # currentNewClimate.add(province)
-        searchForList=areaToProvince[area]
+        searchForList=processedFileData.areaToProvince[area]
         newArea=True
         found=[]
         for searchFor in searchForList:
@@ -790,13 +626,13 @@ def main():
             else:
               currentNewClimate.comments[-1]+=" (only: "
             for p in found:
-              currentNewClimate.comments[-1]+=f"{provinceNames[p]}, "
+              currentNewClimate.comments[-1]+=f"{processedFileData.provinceNames[p]}, "
             currentNewClimate.comments[-1]=currentNewClimate.comments[-1][:-2]+")"
             if len(found)>1:
               currentNewClimate.comments[-1]+=" (misses: "
               for p in searchForList:
                 if not p in found:
-                  currentNewClimate.comments[-1]+=f"{p}:{provinceNames[p]}, "
+                  currentNewClimate.comments[-1]+=f"{p}:{processedFileData.provinceNames[p]}, "
               currentNewClimate.comments[-1]=currentNewClimate.comments[-1][:-2]+")"
         else:
           currentNewClimate.comments[regionCommentId]+=" not "+area
@@ -817,12 +653,12 @@ def main():
     j=int(j)
     if j in range(4066,4073): #mordor interior
       return False
-    if provinceToLocation[j][2]>3000:
+    if processedFileData.provinceToLocation[j][2]>3000:
       return True
-    elif provinceToLocation[j][2]>1800:
-      if heightMap.h(provinceToLocation[j])>15:
+    elif processedFileData.provinceToLocation[j][2]>1800:
+      if heightMap.h(processedFileData.provinceToLocation[j])>15:
         return True
-    elif heightMap.h(provinceToLocation[j])>20:
+    elif heightMap.h(processedFileData.provinceToLocation[j])>20:
       return True
     return False
 
@@ -839,25 +675,25 @@ def main():
   weakenMordor=False
   weakenSouthernGoblins=False
 
-  if applyModificationOnProvinces:
-    for i in range(len(provinceFile.names)):
-      j=provinceFile.names[i]
-      if j in provinceNames:
-        if not provinceFileLatest.vals[i].compare(provinceFileOld.vals[i]):
-          provinceFile.vals[i]=provinceFileLatest[i]
+  if loadedFileContents.applyModificationOnProvinces:
+    for i in range(len(loadedFileContents.provinces.names)):
+      j=loadedFileContents.provinces.names[i]
+      if j in processedFileData.provinceNames:
+        if not loadedFileContents.provincesLatest.vals[i].compare(loadedFileContents.provincesOld.vals[i]):
+          loadedFileContents.provinces.vals[i]=loadedFileContents.provincesLatest[i]
 
   def setTerrain(i, terrain):
-    j=provinceFile.names[i]
-    provinceFile.vals[i].set("terrain",f'"{terrain}"')
+    j=loadedFileContents.provinces.names[i]
+    loadedFileContents.provinces.vals[i].set("terrain",f'"{terrain}"')
     try:
-      terrainFile.set(j, terrain)
+      loadedFileContents.terrains.set(j, terrain)
     except:
-      terrainFile.add(j, terrain)
+      loadedFileContents.terrains.add(j, terrain)
   # a=[]
   # b=[]
 
-  provinceFile.applyOnAllLevel(removeComment)
-  provinceFile.deleteOnLowestLevel(empty)
+  loadedFileContents.provinces.applyOnAllLevel(removeComment)
+  loadedFileContents.provinces.deleteOnLowestLevel(empty)
   tooManyNonOwnedPops=[ "balchoth", "rachoth", "nurnim", "variag", "nuriag", "khundolar", "jangovar", "yarlung", "tsang", "haradrim", "qarsag", "siranian", "yopi", "shayna", "mumakanim", "tulwany", "andrasting"]
   haladrin = [ "dunlending", "calending", "druwaithing", "daoine", "andrasting", "eredrim", "ethirfolk", "ishmalogim"]
   haradrim = [ "haradrim", "qarsag", "siranian" ]
@@ -872,20 +708,20 @@ def main():
 
     numWildGames=dict()
     areasNeedTradeGoods=[]
-    for area in areaFile.names:
+    for area in loadedFileContents.areas.names:
       numWildGames[area]=0
-    for i in range(len(provinceFile.names)):
-      j=provinceFile.names[i]
+    for i in range(len(loadedFileContents.provinces.names)):
+      j=loadedFileContents.provinces.names[i]
       try:
-        if provinceFile.vals[i].get("trade_goods").strip('"')=="wild_game":
-          numWildGames[provinceToArea[j]]+=1
+        if loadedFileContents.provinces.vals[i].get("trade_goods").strip('"')=="wild_game":
+          numWildGames[processedFileData.provinceToArea[j]]+=1
       except ValueError:
         pass
-    for i in range(len(provinceFile.names)):
-      j=provinceFile.names[i]
-      if j in provinceToCapitalType and provinceToCapitalType[j]=="country_capital" and numWildGames[provinceToArea[j]]>2:
-        # print(f'provinceToArea[j] = "{provinceToArea[j]}"')
-        areasNeedTradeGoods.append(provinceToArea[j])
+    for i in range(len(loadedFileContents.provinces.names)):
+      j=loadedFileContents.provinces.names[i]
+      if j in processedFileData.provinceToCapitalType and processedFileData.provinceToCapitalType[j]=="country_capital" and numWildGames[processedFileData.provinceToArea[j]]>2:
+        # print(f'processedFileData.provinceToArea[j] = "{processedFileData.provinceToArea[j]}"')
+        areasNeedTradeGoods.append(processedFileData.provinceToArea[j])
     print(f'areasNeedTradeGoods = "{areasNeedTradeGoods}"')
     return
 
@@ -903,22 +739,22 @@ def main():
 
   # test=random.choices(list(hillTradeGoods.keys()), list(hillTradeGoods.values()), k=1000)
   totalProv=0
-  for i in range(len(provinceFile.names)):
-    j=provinceFile.names[i]
+  for i in range(len(loadedFileContents.provinces.names)):
+    j=loadedFileContents.provinces.names[i]
     # if int(j) in [269,270,275,279,280,284,285,286,292,2719,111,112,113,114,115,116,117,118,120,239,722,2040,122,123,124,125,126,128,240,241,263,264,229,271,272,273,274,276,277,278,282,3912,119,121,261,262,265,266,267,268,323,320,321,322,361,314,765,981,255,257,258,259,260,330,331,334,338,795,333,335,337,340,342,792,797,1277,690,691,129,130,166,326,327,332,360,359,729,249,250,251,252,253,254,440]:
-    #   if provinceFile.vals[i].get("culture").strip('"')=="jangovar":
+    #   if loadedFileContents.provinces.vals[i].get("culture").strip('"')=="jangovar":
     #     a.append(j)
     #   else:
     #     b.append(j)
     if j in forceTerrain:
       setTerrain(i, forceTerrain[j])
-    culture=provinceFile.vals[i].get("culture").strip('"')
-    terrain=provinceFile.vals[i].get("terrain").strip('"')
+    culture=loadedFileContents.provinces.vals[i].get("culture").strip('"')
+    terrain=loadedFileContents.provinces.vals[i].get("terrain").strip('"')
     is_impassable=(terrain=='impassable_terrain')
-    if j in provinceNames:
-      provinceFile.comments[i]="#"+provinceNames[ j]
-    #   if len(provinceNamesInv[provinceNames[ j]])>1 and not is_impassable and not terrain=='coastal_terrain' and not j in uninhabitable:
-    #     print(f'provinceNames[ j] = "{provinceNames[ j]}"')
+    if j in processedFileData.provinceNames:
+      loadedFileContents.provinces.comments[i]="#"+processedFileData.provinceNames[ j]
+    #   if len(processedFileData.provinceNamesInv[processedFileData.provinceNames[ j]])>1 and not is_impassable and not terrain=='coastal_terrain' and not j in processedFileData.uninhabitable:
+    #     print(f'processedFileData.provinceNames[ j] = "{processedFileData.provinceNames[ j]}"')
 
     jj=int(j)
     if redoTerrain and terrain in ["plains","hills","mountain","steppe"] and not j in forceTerrain:
@@ -947,7 +783,7 @@ def main():
                 if r>4 and r <254:
                   dry=False
               if dry:
-                if pixelToProvince[coords2[0]*yM+coords2[1]] in allSweetWaterProvinces:
+                if pixelToProvince[coords2[0]*yM+coords2[1]] in processedFileData.allSweetWaterProvinces:
                   dry=False
           slopes.append(slope)
 
@@ -1054,14 +890,14 @@ def main():
 
     if addTradeGoods:
       # print(f'areasNeedTradeGoods = "{areasNeedTradeGoods}"')
-      if j in provinceToArea and provinceToArea[j] in areasNeedTradeGoods and provinceFile.vals[i].get("trade_goods").strip('"')=="wild_game":
-      # if j in provinceToRegion and provinceToRegion[j] in provinceNeedTradeGoods and provinceFile.vals[i].get("trade_goods").strip('"')=="wild_game":
+      if j in processedFileData.provinceToArea and processedFileData.provinceToArea[j] in areasNeedTradeGoods and loadedFileContents.provinces.vals[i].get("trade_goods").strip('"')=="wild_game":
+      # if j in processedFileData.provinceToRegion and processedFileData.provinceToRegion[j] in provinceNeedTradeGoods and loadedFileContents.provinces.vals[i].get("trade_goods").strip('"')=="wild_game":
         if terrain in ["deserts"]:
-          provinceFile.vals[i].set("trade_goods",f'"{random.choices(list(desertTadeGoods.keys()), list(desertTadeGoods.values()))[0]}"')
+          loadedFileContents.provinces.vals[i].set("trade_goods",f'"{random.choices(list(desertTadeGoods.keys()), list(desertTadeGoods.values()))[0]}"')
         if terrain in ["hills","mountain"]:
-          provinceFile.vals[i].set("trade_goods",f'"{random.choices(list(hillTradeGoods.keys()), list(hillTradeGoods.values()))[0]}"')
+          loadedFileContents.provinces.vals[i].set("trade_goods",f'"{random.choices(list(hillTradeGoods.keys()), list(hillTradeGoods.values()))[0]}"')
         elif terrain in ["forest","deep_forest"] or provinceToClimate[j] in "severe_winter":
-          provinceFile.vals[i].set("trade_goods",f'"{random.choices(list(woodTradeGoods.keys()), list(woodTradeGoods.values()))[0]}"')
+          loadedFileContents.provinces.vals[i].set("trade_goods",f'"{random.choices(list(woodTradeGoods.keys()), list(woodTradeGoods.values()))[0]}"')
         elif j in coastalProvinces:
           while True:
             t=random.choices(list(coastalTradeGoods.keys()), list(coastalTradeGoods.values()))[0]
@@ -1073,7 +909,7 @@ def main():
             if t in ["whale"] and provinceToClimate[j]=="arid":
               continue
             break
-          provinceFile.vals[i].set("trade_goods",f'"{t}"')
+          loadedFileContents.provinces.vals[i].set("trade_goods",f'"{t}"')
         else:
           while True:
             t=random.choices(list(planeTradeGoods.keys()), list(planeTradeGoods.values()))[0]
@@ -1087,15 +923,15 @@ def main():
             if t in ["steppe_horses"] and terrain!="steppe":
               continue
             break
-          provinceFile.vals[i].set("trade_goods",f'"{t}"')
+          loadedFileContents.provinces.vals[i].set("trade_goods",f'"{t}"')
 
     if redoCoastLine:
-      if not jj in allWaterProvinces or jj in [5694,5696,5697]: #anduin islands
+      if not jj in processedFileData.allWaterProvinces or jj in [5694,5696,5697]: #anduin islands
         for (xx,yy) in provinceToPixels[jj]:
           coastlineMap.setP(xx, yy, 0)
           if riverImage.c(xx, yy)==254:
             riverImage.setC(xx, yy,255)
-      if jj in allSeaAndLakeProvinces:
+      if jj in processedFileData.allSeaAndLakeProvinces:
         for (xx,yy) in provinceToPixels[jj]:
           if riverImage.c(xx, yy)==255:
             riverImage.setC(xx, yy,254)
@@ -1106,130 +942,130 @@ def main():
           # else:
           #   print(f'riverImage.c(xx,yy) = "{riverImage.c(xx,yy)}"')
 
-    if j in ownerCountry:
-      provinceFile.comments[i]+=f" ({ownerCountry[j]})"
+    if j in processedFileData.ownerCountry:
+      loadedFileContents.provinces.comments[i]+=f" ({processedFileData.ownerCountry[j]})"
       if weakenSouthernGoblins:
-        if ownerCountry[j]=="XLX":
-          reduceTribesmen(j, provinceFile.vals[i], provinceToCapitalType, 4, 6)
-        # and provinceFile.vals[i].count("tribesmen"):
-        #   tribes=provinceFile.vals[i].get("tribesmen").get("amount")
-        #   provinceFile.vals[i].get("tribesmen").set("amount",max(1,int(tribes)-randint(4,5)))
+        if processedFileData.ownerCountry[j]=="XLX":
+          reduceTribesmen(j, loadedFileContents.provinces.vals[i], processedFileData.provinceToCapitalType, 4, 6)
+        # and loadedFileContents.provinces.vals[i].count("tribesmen"):
+        #   tribes=loadedFileContents.provinces.vals[i].get("tribesmen").get("amount")
+        #   loadedFileContents.provinces.vals[i].get("tribesmen").set("amount",max(1,int(tribes)-randint(4,5)))
       if weakenAvari:
         if culture=="nandor":
-          reduceTribesmen(j, provinceFile.vals[i], provinceToCapitalType, 3, 4)
+          reduceTribesmen(j, loadedFileContents.provinces.vals[i], processedFileData.provinceToCapitalType, 3, 4)
       if weakenMordor:
-        if ownerCountry[j]=="MOR":
-          reduceTribesmen(j, provinceFile.vals[i], provinceToCapitalType, 0, 3, 0, 0)
+        if processedFileData.ownerCountry[j]=="MOR":
+          reduceTribesmen(j, loadedFileContents.provinces.vals[i], processedFileData.provinceToCapitalType, 0, 3, 0, 0)
           # try:
-          #   slaves=int(provinceFile.vals[i].get("slaves").get("amount"))
+          #   slaves=int(loadedFileContents.provinces.vals[i].get("slaves").get("amount"))
           #   if slaves>1:
-          #     provinceFile.vals[i].get("slaves").set("amount",slaves-1)
+          #     loadedFileContents.provinces.vals[i].get("slaves").set("amount",slaves-1)
           # except ValueError:
           #   pass
-        # and provinceFile.vals[i].count("tribesmen"):
-        #   tribes=provinceFile.vals[i].get("tribesmen").get("amount")
-        #   provinceFile.vals[i].get("tribesmen").set("amount",max(1,int(tribes)-randint(3,4)))
+        # and loadedFileContents.provinces.vals[i].count("tribesmen"):
+        #   tribes=loadedFileContents.provinces.vals[i].get("tribesmen").get("amount")
+        #   loadedFileContents.provinces.vals[i].get("tribesmen").set("amount",max(1,int(tribes)-randint(3,4)))
 
       ##MAKING SURE EVERYBODY HAS SLAVES.
-      if not provinceFile.vals[i].count("slaves"):
+      if not loadedFileContents.provinces.vals[i].count("slaves"):
         ownedNoSlavesList.append(j)
 
-      if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
-        tribes=provinceFile.vals[i].get("tribesmen").get("amount")
+      if loadedFileContents.provinces.vals[i].count("tribesmen") and not loadedFileContents.provinces.vals[i].count("slaves"):
+        tribes=loadedFileContents.provinces.vals[i].get("tribesmen").get("amount")
         if int(tribes)>=4:
-          provinceFile.vals[i].get("tribesmen").set("amount",int(tribes)-1)
-          provinceFile.vals[i].addReturn("slaves").add("amount","1")
+          loadedFileContents.provinces.vals[i].get("tribesmen").set("amount",int(tribes)-1)
+          loadedFileContents.provinces.vals[i].addReturn("slaves").add("amount","1")
           # print(f'tribes = "{tribes}"')
         # if int(tribes)>1:
 
 
 
-      # print(f'provinceFile.vals[i].get("culture") = "{provinceFile.vals[i].get("culture")}"')
+      # print(f'loadedFileContents.provinces.vals[i].get("culture") = "{loadedFileContents.provinces.vals[i].get("culture")}"')
       if strengthenSauron:
-        if provinceFile.vals[i].count("tribesmen") and provinceFile.vals[i].get("culture").strip('"')=="orcish":
-          tribes=provinceFile.vals[i].get("tribesmen").get("amount")
-          provinceFile.vals[i].get("tribesmen").set("amount",int(tribes)+4)
+        if loadedFileContents.provinces.vals[i].count("tribesmen") and loadedFileContents.provinces.vals[i].get("culture").strip('"')=="orcish":
+          tribes=loadedFileContents.provinces.vals[i].get("tribesmen").get("amount")
+          loadedFileContents.provinces.vals[i].get("tribesmen").set("amount",int(tribes)+4)
       if strengthenCarnDum:
-        # print(f'ownerCountry = "{ownerCountry}"')
-        if provinceFile.vals[i].count("tribesmen") and ownerCountry[j]=="XXQ":
-          tribes=provinceFile.vals[i].get("tribesmen").get("amount")
-          provinceFile.vals[i].get("tribesmen").set("amount",int(tribes)+4)
+        # print(f'processedFileData.ownerCountry = "{processedFileData.ownerCountry}"')
+        if loadedFileContents.provinces.vals[i].count("tribesmen") and processedFileData.ownerCountry[j]=="XXQ":
+          tribes=loadedFileContents.provinces.vals[i].get("tribesmen").get("amount")
+          loadedFileContents.provinces.vals[i].get("tribesmen").set("amount",int(tribes)+4)
       addCiv=0
-      if provinceFile.vals[i].get("province_rank").strip('"') == "city":
+      if loadedFileContents.provinces.vals[i].get("province_rank").strip('"') == "city":
         addCiv=5
-      elif provinceFile.vals[i].get("province_rank").strip('"') == "city_metropolis":
+      elif loadedFileContents.provinces.vals[i].get("province_rank").strip('"') == "city_metropolis":
         addCiv=10
       if culture in elven+dwarven and addCiv==0: #elven and dwarven settlement
-        provinceFile.vals[i].set("civilization_value", 40)
-      elif addCiv == 0 and int(provinceFile.vals[i].get("civilization_value"))>35:
-        provinceFile.vals[i].set("civilization_value", 35)
+        loadedFileContents.provinces.vals[i].set("civilization_value", 40)
+      elif addCiv == 0 and int(loadedFileContents.provinces.vals[i].get("civilization_value"))>35:
+        loadedFileContents.provinces.vals[i].set("civilization_value", 35)
       if culture in haladrin:
         if j!="1546": #Isengard
-          provinceFile.vals[i].set("civilization_value", 10+addCiv)
+          loadedFileContents.provinces.vals[i].set("civilization_value", 10+addCiv)
       elif culture in haradrim:
-        provinceFile.vals[i].set("civilization_value", 20+addCiv)
+        loadedFileContents.provinces.vals[i].set("civilization_value", 20+addCiv)
       elif culture == "harondorian":
-        if ownerCountry[j]=="XXJ" or ownerCountry[j]=="XXK": #not tribal
-          provinceFile.vals[i].set("civilization_value", 25+addCiv)
+        if processedFileData.ownerCountry[j]=="XXJ" or processedFileData.ownerCountry[j]=="XXK": #not tribal
+          loadedFileContents.provinces.vals[i].set("civilization_value", 25+addCiv)
         else:
-          provinceFile.vals[i].set("civilization_value", 15+addCiv)
-      # if culture!=countryCulture[ownerCountry[j]]:
-      #   print(f"{j} owned by {countryCulture[ownerCountry[j]]} but has {culture} culture")
+          loadedFileContents.provinces.vals[i].set("civilization_value", 15+addCiv)
+      # if culture!=processedFileData.countryCulture[processedFileData.ownerCountry[j]]:
+      #   print(f"{j} owned by {processedFileData.countryCulture[processedFileData.ownerCountry[j]]} but has {culture} culture")
       if culture=="beasts":
-        provinceFile.vals[i].set("culture", f'"{countryCulture[ownerCountry[j]]}"')
+        loadedFileContents.provinces.vals[i].set("culture", f'"{processedFileData.countryCulture[processedFileData.ownerCountry[j]]}"')
         print(f"{j} owned but beast culture")
-      if j in uninhabitable:
+      if j in processedFileData.uninhabitable:
         print(f"{j} owned but uninhabitable")
       else:
         totalProv+=1
     else:
       justUnowned=False
       for area in ["thurl_ralian_fen_area","klyan_area","arg_simorig_area"]:
-        if j in areaToProvince[area]:
-          provinceFile.vals[i].set("culture",'"beasts"')
+        if j in processedFileData.areaToProvince[area]:
+          loadedFileContents.provinces.vals[i].set("culture",'"beasts"')
           for p in pops:
             try:
-              provinceFile.vals[i].remove(p)
+              loadedFileContents.provinces.vals[i].remove(p)
             except ValueError:
               pass
-      if j in uninhabitable:
-        provinceFile.comments[i]+=" (uninhabitable)"
-        provinceFile.vals[i].tryRemove("slaves")
-        provinceFile.vals[i].tryRemove("tribesmen")
-        provinceFile.vals[i].tryRemove("freemen")
-        provinceFile.vals[i].tryRemove("citizen")
-        provinceFile.vals[i].tryRemove("nobles")
-        provinceFile.vals[i].set("culture", '"beasts"')
+      if j in processedFileData.uninhabitable:
+        loadedFileContents.provinces.comments[i]+=" (uninhabitable)"
+        loadedFileContents.provinces.vals[i].tryRemove("slaves")
+        loadedFileContents.provinces.vals[i].tryRemove("tribesmen")
+        loadedFileContents.provinces.vals[i].tryRemove("freemen")
+        loadedFileContents.provinces.vals[i].tryRemove("citizen")
+        loadedFileContents.provinces.vals[i].tryRemove("nobles")
+        loadedFileContents.provinces.vals[i].set("culture", '"beasts"')
         if terrain=='coastal_terrain' or terrain =='ocean':
           print(f'j = "{j} passable river or ocean"')
         try:
-          provinceFile.vals[i].set("trade_goods", '""')
+          loadedFileContents.provinces.vals[i].set("trade_goods", '""')
         except ValueError:
           pass
         if testCold(j):
           harsh.names[harshUninhab]+=f" {j}"
       else:
-        if is_impassable and not provinceNames[j].startswith("River"):
-          provinceFile.comments[i]+=" (impassable)"
-          if not int(j) in impassable_terrain_list:
+        if is_impassable and not processedFileData.provinceNames[j].startswith("River"):
+          loadedFileContents.provinces.comments[i]+=" (impassable)"
+          if not int(j) in processedFileData.impassable_terrain_list:
             print(f'j = "{j} impassable_terrain without being impassable"')
-        elif jj in impassable_terrain_list:
-          # provinceNames[j]
+        elif jj in processedFileData.impassable_terrain_list:
+          # processedFileData.provinceNames[j]
           setTerrain(i, "riverine_terrain")
-          provinceFile.comments[i]+=" (impassable river)"
-        elif int(j) in river_provinces:
-          provinceFile.comments[i]+=" (river)"
+          loadedFileContents.provinces.comments[i]+=" (impassable river)"
+        elif int(j) in processedFileData.river_provinces:
+          loadedFileContents.provinces.comments[i]+=" (river)"
           setTerrain(i, "riverine_terrain")
-        elif int(j) in lake_provinces:
-          provinceFile.comments[i]+=" (lake)"
+        elif int(j) in processedFileData.lake_provinces:
+          loadedFileContents.provinces.comments[i]+=" (lake)"
           setTerrain(i, "ocean")
-          provinceFile.vals[i].set("culture", '""')
-          provinceFile.vals[i].set("province_rank", '""')
-          provinceFile.vals[i].set("religion", '""')
-          provinceFile.vals[i].set("trade_goods", '""')
+          loadedFileContents.provinces.vals[i].set("culture", '""')
+          loadedFileContents.provinces.vals[i].set("province_rank", '""')
+          loadedFileContents.provinces.vals[i].set("religion", '""')
+          loadedFileContents.provinces.vals[i].set("trade_goods", '""')
 
 
-          if redoLakes:
+          if loadedFileContents.redoLakes:
             pixels=np.array(provinceToPixels[jj])
             low=np.min(pixels, axis=0)
             high=np.max(pixels, axis=0)
@@ -1246,7 +1082,7 @@ def main():
             center=pixels[centerInLake]
             size=high-low
             lakeDone=False
-            for lake in lakes:
+            for lake in processedFileData.lakes:
               if lake[0]>low[0] and lake[0]<high[0] and lake[1]>low[1] and lake[1]<high[1]:
                 lakeDone=True
                 break
@@ -1295,7 +1131,7 @@ def main():
           #     pMinEnv=min(pMinEnv,heightMap.p(xEnv, yEnv))
           #     pMaxEnv=max(pMinEnv,heightMap.p(xEnv, yEnv))
 
-          # for lake in lakes:
+          # for lake in processedFileData.lakes:
           #   if lake[0]>xMin and lake[0]<xMax and lake[1]>yMin and lake[1]<yMax:
           #     lakeDone=True
           #     break
@@ -1313,108 +1149,108 @@ def main():
 
 
 
-        elif int(j) in allWaterProvinces:
-          provinceFile.comments[i]+=" (sea)"
-        elif int(j) in impassable_terrain_list:
+        elif int(j) in processedFileData.allWaterProvinces:
+          loadedFileContents.provinces.comments[i]+=" (sea)"
+        elif int(j) in processedFileData.impassable_terrain_list:
           print(f'j = "{j} impassable without being impassable_terrain"')
         else:
-          provinceFile.comments[i]+=" (unowned)"
+          loadedFileContents.provinces.comments[i]+=" (unowned)"
           totalProv+=1
           justUnowned=True
         if is_impassable and testCold(j):
           harsh.names[harshUnpass]+=f" {j}"
         # if not is_impassable:
-      if not justUnowned and j in provinceToArea:
+      if not justUnowned and j in processedFileData.provinceToArea:
         print(f'j = "{j} should not be in area"')
       if not culture in ["silvan","stonefoot","ironfist"]:
-        provinceFile.vals[i].set("civilization_value", 0)
+        loadedFileContents.provinces.vals[i].set("civilization_value", 0)
       else:
-        provinceFile.vals[i].set("civilization_value", 20)
+        loadedFileContents.provinces.vals[i].set("civilization_value", 20)
 
 
         # if culture in ["yopi", "qarsag"]:
-        #   if provinceFile.vals[i].count("tribesmen"):
-        #     provinceFile.vals[i].get("tribesmen").set("amount",2)
-        #   if provinceFile.vals[i].count("slaves"):
-        #     provinceFile.vals[i].get("slaves").set("amount",1)
+        #   if loadedFileContents.provinces.vals[i].count("tribesmen"):
+        #     loadedFileContents.provinces.vals[i].get("tribesmen").set("amount",2)
+        #   if loadedFileContents.provinces.vals[i].count("slaves"):
+        #     loadedFileContents.provinces.vals[i].get("slaves").set("amount",1)
         # if culture in ["yopi"]:
-        #   provinceFile.vals[i].set("civilization_value",15)
+        #   loadedFileContents.provinces.vals[i].set("civilization_value",15)
         if culture=="beasts":
           for pop in pops:
-            if provinceFile.vals[i].count(pop):
-              provinceFile.vals[i].remove(pop)
+            if loadedFileContents.provinces.vals[i].count(pop):
+              loadedFileContents.provinces.vals[i].remove(pop)
         elif culture and culture!="beasts" and culture !="spider" and not is_impassable:# or culture=="silvan":
           empty=True
           for pop in pops:
-            if provinceFile.vals[i].count(pop):
+            if loadedFileContents.provinces.vals[i].count(pop):
               empty=False
           if empty:
-            provinceFile.vals[i].set("culture",'"beasts"')
-      if provinceFile.vals[i].count("nobles"):
+            loadedFileContents.provinces.vals[i].set("culture",'"beasts"')
+      if loadedFileContents.provinces.vals[i].count("nobles"):
         print(f"{j} unowned but nobles")
-      if provinceFile.vals[i].count("tribesmen") and not provinceFile.vals[i].count("slaves"):
-        tribes=provinceFile.vals[i].get("tribesmen").get("amount")
+      if loadedFileContents.provinces.vals[i].count("tribesmen") and not loadedFileContents.provinces.vals[i].count("slaves"):
+        tribes=loadedFileContents.provinces.vals[i].get("tribesmen").get("amount")
         if int(tribes)>2:
           if culture in tooManyNonOwnedPops:
-            provinceFile.vals[i].get("tribesmen").set("amount",2)
+            loadedFileContents.provinces.vals[i].get("tribesmen").set("amount",2)
         elif int(tribes)>6:
-          provinceFile.vals[i].get("tribesmen").set("amount",6)
-        # elif provinceFile.vals[i].count("tribesmen")==0 and provinceFile.vals[i].count("slaves")==0 and provinceFile.vals[i].count("freemen")==0:
+          loadedFileContents.provinces.vals[i].get("tribesmen").set("amount",6)
+        # elif loadedFileContents.provinces.vals[i].count("tribesmen")==0 and loadedFileContents.provinces.vals[i].count("slaves")==0 and loadedFileContents.provinces.vals[i].count("freemen")==0:
         #   if culture in tooFewNonOwnedPops:
-        #     provinceFile.vals[i].addReturn("tribesmen").add("amount",2)
-    if j in provinceToArea:
-      provinceFile.comments[i]+=f" ({provinceToArea[j]})"
-    if j in provinceToRegion:
-      provinceFile.comments[i]+=f" ({provinceToRegion[j]})"
-      # print(f'provinceNames[i] = "{provinceNames[ provinceFile.names[i]]}"')
+        #     loadedFileContents.provinces.vals[i].addReturn("tribesmen").add("amount",2)
+    if j in processedFileData.provinceToArea:
+      loadedFileContents.provinces.comments[i]+=f" ({processedFileData.provinceToArea[j]})"
+    if j in processedFileData.provinceToRegion:
+      loadedFileContents.provinces.comments[i]+=f" ({processedFileData.provinceToRegion[j]})"
+      # print(f'processedFileData.provinceNames[i] = "{processedFileData.provinceNames[ loadedFileContents.provinces.names[i]]}"')
 
-  # provinceFile.writeAll(open("provinceFile.txt","w",encoding='utf-8-sig'),cdf.args(2))
-  # countryFile.writeAll(open("countryFile.txt","w",encoding='utf-8-sig'),cdf.args(4))
+  # loadedFileContents.provinces.writeAll(open("loadedFileContents.provinces.txt","w",encoding='utf-8-sig'),cdf.args(2))
+  # loadedFileContents.countries.writeAll(open("loadedFileContents.countries.txt","w",encoding='utf-8-sig'),cdf.args(4))
   print(f'totalProv = "{totalProv}"')
   for no_s in ownedNoSlavesList:
-    region=provinceToRegion[no_s]
-    for core in countryProvinces[ownerCountry[no_s]]:
-      if core in regionToProvince[region] and not core in ownedNoSlavesList:
+    region=processedFileData.provinceToRegion[no_s]
+    for core in processedFileData.countryProvinces[processedFileData.ownerCountry[no_s]]:
+      if core in processedFileData.regionToProvince[region] and not core in ownedNoSlavesList:
         break
     else:
-      print(f"{no_s} no slave in region {region} for {ownerCountry[no_s]}")
+      print(f"{no_s} no slave in region {region} for {processedFileData.ownerCountry[no_s]}")
 
-  for v in countryFile.get("family").get("families").vals:
+  for v in loadedFileContents.countries.get("family").get("families").vals:
     if type(v)==TagList:
       v.forceMultiLineOutput = True
-  terrainFile.forceNoSpace = True
-  terrainFile.sort(int,2)
+  loadedFileContents.terrains.forceNoSpace = True
+  loadedFileContents.terrains.sort(int,2)
 
   removeList=[]
-  # countries = countryFile.get("country").get("countries")
-  for provinceId, provinceContent in treasureFile.get("provinces").getNameVal():
+  # countries = loadedFileContents.countries.get("country").get("countries")
+  for provinceId, provinceContent in loadedFileContents.treasures.get("provinces").getNameVal():
     # print(f'provinceId = "{provinceId}"')
     localTreasures=provinceContent.get("treasure_slots").get("treasures")
     num=len(localTreasures.names)
-    province=provinceFile.get(provinceId)
+    province=loadedFileContents.provinces.get(provinceId)
     if province.count("holy_site")==0:
       removeList.append(provinceId)
-      country=countries.get(ownerCountry[provinceId])
+      country=countries.get(processedFileData.ownerCountry[provinceId])
       treasures=country.getOrCreate("treasures")
       for t in localTreasures.names:
         treasures.add(t)
-      print(f'cannot hold any treasures: "{provinceNames[provinceId]}". Moved to {ownerCountry[provinceId]}')
+      print(f'cannot hold any treasures: "{processedFileData.provinceNames[provinceId]}". Moved to {processedFileData.ownerCountry[provinceId]}')
     elif num==2 and province.get("province_rank").strip('"') in ["settlement",""]:
-      country=countries.get(ownerCountry[provinceId])
+      country=countries.get(processedFileData.ownerCountry[provinceId])
       treasures=country.getOrCreate("treasures")
       for t in localTreasures.names[1:]:
         treasures.add(t)
       localTreasures.names=localTreasures.names[:1]
-      print(f'cannot hold two = "{provinceNames[provinceId]}". Moved to {ownerCountry[provinceId]}')
+      print(f'cannot hold two = "{processedFileData.provinceNames[provinceId]}". Moved to {processedFileData.ownerCountry[provinceId]}')
     elif num==3 and province.get("province_rank").strip('"') in ["city", "settlement",""]:
-      country=countries.get(ownerCountry[provinceId])
+      country=countries.get(processedFileData.ownerCountry[provinceId])
       treasures=country.getOrCreate("treasures")
       for t in localTreasures.names[2:]:
         treasures.add(t)
       localTreasures.names=localTreasures.names[:2]
-      print(f'cannot hold three = "{provinceNames[provinceId]}". Moved to {ownerCountry[provinceId]}')
+      print(f'cannot hold three = "{processedFileData.provinceNames[provinceId]}". Moved to {processedFileData.ownerCountry[provinceId]}')
   for p in removeList:
-    treasureFile.get("provinces").remove(p)
+    loadedFileContents.treasures.get("provinces").remove(p)
     # print(f'province = "{province.names}"')
 
 
@@ -1461,10 +1297,10 @@ def main():
   # print(" ".join(b))
 
   
-  if redoLakes:
+  if loadedFileContents.redoLakes:
     heightMap.im.save("../wotrbeta/map_data/heightmap.png",compress_level=1)
-    lakeLocators.get("object").set("count", len(lakes)+len(newLakes))
-    t=lakeLocators.get("object").get("transform")
+    loadedFileContents.lakeLocators.get("object").set("count", len(processedFileData.lakes)+len(newLakes))
+    t=loadedFileContents.lakeLocators.get("object").get("transform")
     t=t.strip('"')
     t=t.strip(' ')
     t=t.strip('\n')
@@ -1491,15 +1327,15 @@ def main():
     #   s=max(lake[2:])*1.05
     #   t+="\n"+f"{lake[0]} 0.5 {lake[1]} 0 {rot} 0 1 {s/2} {s/2} {s/2}"
     t=f'"{t}"'
-    lakeLocators.get("object").set("transform",t)
+    loadedFileContents.lakeLocators.get("object").set("transform",t)
 
-    cdf.outputToFolderAndFile(lakeLocators , "gfx/map/map_object_data", "lakes_locators.txt" ,2,output_folder,False,encoding="utf-8-sig")
+    cdf.outputToFolderAndFile(loadedFileContents.lakeLocators , "gfx/map/map_object_data", "lakes_locators.txt" ,2,output_folder,False,encoding="utf-8-sig")
 
-  cdf.outputToFolderAndFile(provinceFile , "setup/provinces", "00_default.txt" ,2,output_folder,False,encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(countryFile , "setup/main", "00_default.txt" ,4,output_folder,False)
-  cdf.outputToFolderAndFile(treasureFile , "setup/main", "lotr_treasures.txt" ,2,output_folder,False)
+  cdf.outputToFolderAndFile(loadedFileContents.provinces , "setup/provinces", "00_default.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(loadedFileContents.countries , "setup/main", "00_default.txt" ,4,output_folder,False)
+  cdf.outputToFolderAndFile(loadedFileContents.treasures , "setup/main", "lotr_treasures.txt" ,2,output_folder,False)
   cdf.outputToFolderAndFile(newClimate , "map_data", "climate.txt" ,4,output_folder,encoding="utf-8")
-  cdf.outputToFolderAndFile(terrainFile , "common/province_terrain", "00_province_terrain.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(loadedFileContents.terrains , "common/province_terrain", "00_province_terrain.txt" ,2,output_folder,False,encoding="utf-8-sig")
 
   if makeTrees:
     def saveTrees(file, name, layer, mesh, treeList):
@@ -1532,11 +1368,11 @@ def main():
   #   for line in pineFile:
   #     file.write(line)
   #   file.write('"}\n')
-  # cdf.outputToFolderAndFile(provinceFile , ".", "provinceFile.txt" ,2,".",encoding="utf-8-sig")
-  # cdf.outputToFolderAndFile(countryFile , ".", "countryFile.txt" ,4,".",encoding="utf-8-sig")
-  # cdf.outputToFolderAndFile(newClimate , ".", "climateFile.txt" ,4,".",encoding="utf-8-sig")
-  # cdf.outputToFolderAndFile(areaFile , ".", "areaFile.txt" ,4,".",encoding="utf-8-sig")
-  # cdf.outputToFolderAndFile(regionFile , ".", "regionFile.txt" ,4,".",encoding="utf-8-sig")
+  # cdf.outputToFolderAndFile(loadedFileContents.provinces , ".", "loadedFileContents.provinces.txt" ,2,".",encoding="utf-8-sig")
+  # cdf.outputToFolderAndFile(loadedFileContents.countries , ".", "loadedFileContents.countries.txt" ,4,".",encoding="utf-8-sig")
+  # cdf.outputToFolderAndFile(newClimate , ".", "loadedFileContents.climate.txt" ,4,".",encoding="utf-8-sig")
+  # cdf.outputToFolderAndFile(loadedFileContents.areas , ".", "loadedFileContents.areas.txt" ,4,".",encoding="utf-8-sig")
+  # cdf.outputToFolderAndFile(loadedFileContents.regions , ".", "loadedFileContents.regions.txt" ,4,".",encoding="utf-8-sig")
 
 
 def reduceTribesmen(id, province, provinceToCapitalType, minRed, maxRed=None, stateCapitalFactor=0.5, capitalFactor=0):
@@ -1544,10 +1380,10 @@ def reduceTribesmen(id, province, provinceToCapitalType, minRed, maxRed=None, st
     maxRed = minR
   if province.count("tribesmen"):
     factor = 1
-    if id in provinceToCapitalType:
-      if provinceToCapitalType[id]=="country_capital":
+    if id in processedFileData.provinceToCapitalType:
+      if processedFileData.provinceToCapitalType[id]=="country_capital":
         factor=capitalFactor
-      elif provinceToCapitalType[id]=="state_capital":
+      elif processedFileData.provinceToCapitalType[id]=="state_capital":
         factor = stateCapitalFactor
     tribes=province.get("tribesmen").get("amount")
     province.get("tribesmen").set("amount",max(1,int(int(tribes)-factor*randint(minRed,maxRed))))
@@ -1745,6 +1581,55 @@ class UnitSetup:
         unit.properties["morale"]=20
         unit.properties["food"]=5
     # return relations, properties, units
+
+def pureScriptCreatedFiles():
+  fileContent=TagList()
+
+  locClass=LocList()
+  locClass.limitLanguage(["en"])
+
+  races=["Noldor", "Teleri", "Edain", "Dwarf","Orc"]
+  raceGrowth={"Noldor":-1.4,"Teleri":-1.4,"Edain":-0.6666, "Dwarf":-1,"Orc":1}
+  raceCombat={"Noldor":1.2,"Teleri":1,"Edain":0.8, "Dwarf":0.8,"Orc":0}
+  raceCommerce={"Noldor":0.5,"Teleri":0.7,"Edain":.5, "Dwarf":1,"Orc":0}
+  raceDesc={"Noldor":"The Noldor where the second clan of elves to reach Valinor in the years of the trees and later where led back to Middle-earth by Fëanor. These elves have a long list of famous heroes and take pride in their combat ability. You have access to this modifier as your primary culture is Noldor.","Teleri":"The Teleri were the last clan of elves to reach Valinor in the years of the trees, though many remained in Middle-earth in the first place. They have always been the greatest seafarers of Middle-earth. As many of their breathren were slaughtered by Fëanor's host on his way back to Middle-earth, it took a long time for them to forgive the Noldor elves. You have access to this modifier as your primary culture is Teleri.","Edain":"The Edain were the group of mankind that reached Beleriand in the First Age. Many of them have fought Morgoth in the Battle of Beleriand and they and their ancestors have thus been rewarded with long life. You have access to this modifier as your primary culture is Edain. Lesser dunedain, corsairs and dol amrothian only count half.", "Dwarf":"The Masters of Stone were created by Aulë even before Ilúvatar created the elves, but slept underground until about a century after the elves awoke. Dwarves spend most of their time crafting, smithying and mining. You have access to this modifier as your primary culture is dwarven.","Orc":"Melkor created the orcs by twisting kidnapped elves in the Years of the Lamps. Without the guidance of Melkor or a fallen Maia, they are usually disorganized and pose little thread to any of the other races. Now that the Lord of the Rings is returning to his power though, the Age of the Orcs will come. You have access to this modifier as your primary culture is orcish."}
+
+  for race in races:
+    for i in range(1,11):
+      name=f"{i*10}_{race}".lower()
+      t=fileContent.addReturn(name)
+      if race!="Orc":
+        t.add("land_morale_modifier", round(i*0.06*raceCombat[race],3))
+        t.add("land_morale_recovery", round(i*0.01*raceCombat[race],3))
+        t.add("discipline", round(i*0.06*raceCombat[race],3))
+        t.add("global_commerce_modifier", round(i*0.06*raceCommerce[race],3))
+      else:
+        t.add("global_pop_assimilation_speed_modifier", round(i/10,2))
+      if race in ["Noldor","Teleri"]:
+        t.add("movement_speed_if_no_road", round(i/50,2))
+      elif race == "Dwarf":
+        t.add("army_movement_speed", round(i/200,2))
+      if raceGrowth[race] > 0:
+        t.add("global_population_growth", round(i*0.015*raceGrowth[race],3))
+      else:
+        t.add("global_population_growth", round(i**0.5*10**0.5*0.015*raceGrowth[race],3))
+      locClass.addEntry(name, f"{i*10}% {race}")
+      locClass.addEntry("desc_"+name, "Only for the primary culture group this modifier can be gained. Integrated cultures are counted doubly.\n\n"+raceDesc[race])
+
+  locClass.writeToMod(".","lotr_country_modifiers_from_script","z")
+  cdf.outputToFolderAndFile(fileContent , "common/modifiers", "br_racial_modifiers.txt" ,2,".", encoding="utf-8-sig")
+
+
+
+  unitSetup = UnitSetup()
+  for unit in unitSetup.units:
+    d=unit.assemble(unitSetup)
+    fileName=unit.name
+    if unit.name=="warelephant":
+      fileName="warelephants"
+    cdf.outputToFolderAndFile(d , "common/units", f"army_{fileName}.txt" ,2,".",encoding="utf-8-sig")
+
+  pureScriptCreatedFiles()
 
 
 class ImageRead:
