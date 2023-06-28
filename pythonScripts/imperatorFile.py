@@ -117,90 +117,16 @@ def main():
   cdf.outputToFolderAndFile(fileContent , "common/modifiers", "br_racial_modifiers.txt" ,2,".", encoding="utf-8-sig")
   # cdf.outputToFolderAndFile(lotr_pops , "events/", "LOTR_pops.txt" ,1,".", encoding="utf-8-sig")
 
-  relations = {
-    "archers":        { "archers":0, "camels":-10, "chariots":0, "heavyCavalry":-10, "heavyInfantry":10, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":0 },
-    "camels":         { "archers":10, "camels":0, "chariots":10, "heavyCavalry":-20, "heavyInfantry":-10, "horseArchers":10, "lightCavalry":0, "lightInfantry":10, "elephants":-50 },
-    "chariots":       { "archers":20, "camels":-10, "chariots":0 ,"heavyCavalry":-50, "heavyInfantry":-10, "horseArchers":10, "lightCavalry":0, "lightInfantry":35, "elephants":-50},
-    "heavyCavalry":   { "archers":50, "camels":10, "chariots":25, "heavyCavalry":0, "heavyInfantry":-10, "horseArchers":0, "lightCavalry":20, "lightInfantry":25, "elephants":-50},
-    "heavyInfantry":  { "archers":0, "camels":-10, "chariots":25, "heavyCavalry":20, "heavyInfantry":0, "horseArchers":-25, "lightCavalry":-10, "lightInfantry":20, "elephants":0},
-    "horseArchers":   { "archers":25, "camels":-10, "chariots":25, "heavyCavalry":-10, "heavyInfantry":25, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":-20},
-    "lightCavalry":   { "archers":25, "camels":0, "chariots":25, "heavyCavalry":-20, "heavyInfantry":-50, "horseArchers":25, "lightCavalry":0, "lightInfantry":25, "elephants":-50},
-    "lightInfantry":  { "archers":-10, "camels":0, "chariots":-10, "heavyCavalry":-25, "heavyInfantry":-20, "horseArchers":-50, "lightCavalry":0, "lightInfantry":0, "elephants":-20},
-    "elephants":      { "archers":50, "camels":-10, "chariots":50, "heavyCavalry":-10, "heavyInfantry":40, "horseArchers":-10, "lightCavalry":-10, "lightInfantry":30, "elephants":0},
-  }
-  properties = {
-    "archers":        { "cost":8, "assault":True, "speed":2.5, "maneuver":2, "morale":-30, "strength":0, "attrition":-10, "attritionLoss":5, "food":2.4, "consumption":0.1, "ai_max_percentage":15  },
-    "camels":         { "cost":15, "assault":False, "speed":3.5, "maneuver":4, "morale":0, "strength":0, "attrition":0, "attritionLoss":2.5, "food":3.6, "consumption":0.2, "tradeGood":"camel","flank":"yes"},
-    "chariots":       { "cost":8, "assault":False, "speed":2.5, "maneuver":1, "morale":0, "strength":0, "attrition":0, "attritionLoss":5, "food":2.4, "consumption":0.2  },
-    "heavyCavalry":   { "cost":18, "assault":False, "speed":3.5, "maneuver":2, "morale":0, "strength":0, "attrition":100, "attritionLoss":5, "food":2.4, "consumption":0.25, "tradeGood":"horses", "levy_tier":"advanced" },
-    "heavyInfantry":  { "cost":16, "assault":True, "speed":2.5, "maneuver":1, "morale":10, "strength":0, "attrition":50, "attritionLoss":5, "food":2.4, "consumption":0.2, "tradeGood":"iron", "levy_tier":"advanced" },
-    "horseArchers":   { "cost":16, "assault":False, "speed":4, "maneuver":5, "morale":-25, "strength":0, "attrition":50, "attritionLoss":5, "food":3, "consumption":0.25, "tradeGood":"steppe_horses","flank":"yes"  },
-    "lightCavalry":   { "cost":10, "assault":False, "speed":4, "maneuver":3, "morale":0, "strength":0, "attrition":50, "attritionLoss":5, "food":2.4, "consumption":0.25, "tradeGood":"horses","flank":"yes"  },
-    "lightInfantry":  { "cost":8, "assault":True, "speed":2.5, "maneuver":1, "morale":30, "strength":0, "attrition":-50, "attritionLoss":2.5, "food":2.4, "consumption":0.1  },
-    "elephants":      { "cost":35, "assault":False, "speed":2.5, "maneuver":0, "morale":-20, "strength":50, "attrition":200, "attritionLoss":10, "food":1, "consumption":0.3, "tradeGood":"elephants", "levy_tier":"advanced", "ai_max_percentage":15  },
-    "supply_train":   { "cost":14, "assault":False, "speed":3.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":30, "consumption":0.03, "ai_max_percentage":20, "levy_tier":"none"  },
-    "engineer_cohort":{ "cost":40, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":5, "consumption":0.05, "ai_max_percentage":15, "levy_tier":"none"  },
-    "rangers":        { "cost":10, "assault":True, "speed":2.5, "maneuver":2, "morale":0, "strength":0, "attrition":-20, "attritionLoss":5, "food":2.4, "consumption":0.1  },
-    "troll_infantry": { "cost":10, "assault":True, "speed":2.5, "maneuver":1, "morale":0, "strength":0, "attrition":150, "attritionLoss":5, "food":3, "consumption":0.3, "tradeGood":"iron", "levy_tier":"advanced", "ai_max_percentage":15  },
-  }
 
-  units = [
-    Unit("supply_train", "support"),
-    Unit("engineer_cohort", "support"),
-    Unit("archers", "archers"),
-    Unit("dunedain_archers", "archers", 2.5, 1, 1.3),
-    Unit("dwarven_archers", "archers", 1.5, 1.5, 1.3, AP=True),
-    Unit("elvish_archers", "archers", 3, 1.25, 1.3),
-    Unit("uruk_crossbows", "archers", 1.5, 1, 1),
-    Unit("camels", "camels"),
-    Unit("chariots", "chariots"),
-    Unit("heavy_cavalry", "heavyCavalry"),
-    Unit("dol_amroth_knights", "heavyCavalry", 1.5, 2, 1.5),
-    Unit("dwarven_goat_riders", "heavyCavalry", 1.5, 2, 1.5, AP=True),
-    Unit("warg_riders", "heavyCavalry", 1, 1, 1, { "archers":15, "chariots":30, "heavyCavalry":15, "heavyInfantry":-30, "horseArchers":15, "lightCavalry":30, "lightInfantry":0, "elephants":0 }),
-    Unit("heavy_infantry", "heavyInfantry"),
-    Unit("dunedain_infantry", "heavyInfantry", 1.4, 2, 1.75),
-    Unit("dwarven_infantry", "heavyInfantry", 1.4, 2.5, 1.75, AP=True),
-    Unit("elvish_infantry", "heavyInfantry", 1.6, 2.25, 2),
-    Unit("uruk_heavy_infantry", "heavyInfantry", 1.25, 1.5, 1.25),
-    Unit("troll_infantry", "heavyInfantry", 2, 4, 1, AP=True),
-    Unit("rangers", "heavyInfantry", 1.6, 2, 1.5, { "archers":0, "chariots":0, "heavyCavalry":0, "heavyInfantry":0, "horseArchers":0, "lightCavalry":0, "lightInfantry":30, "elephants":0 }),
-    Unit("horse_archers", "horseArchers"),
-    Unit("elvish_cavalry_archers", "horseArchers", 2.5, 1.5, 1),
-    Unit("light_cavalry", "lightCavalry"),
-    Unit("dunedain_cavalry", "lightCavalry", 2.5, 1, 1.5),
-    Unit("light_infantry", "lightInfantry"),
-    Unit("halfling_infantry", "lightInfantry", 0.75, 1, 1),
-    Unit("orc_infantry", "lightInfantry", 1, 1, 0.5),
-    Unit("uruk_infantry", "lightInfantry", 1.25, 1.25, 0.7),
-    Unit("warelephant", "elephants"),
-    Unit("mumakil", "elephants",1.75,4,2),
 
-    # Unit("mumakils", "elephants", 3, 3, 2), ???
-  ]
-
-  for unit in units:
-    if unit.name=="mumakil":
-      unit.properties=copy(properties["elephants"])
-      unit.properties["tradeGood"]="mumakil"
-      unit.properties["speed"]=3.5
-      unit.properties["maneuver"]=2
-      unit.properties["morale"]=20
-      unit.properties["food"]=5
-
-  # os.makedirs("units",exist_ok=True)
-  for unit in units:
-    d=unit.assemble(relations, properties, units)
+  unitSetup = UnitSetup()
+  for unit in unitSetup.units:
+    d=unit.assemble(unitSetup)
     fileName=unit.name
     if unit.name=="warelephant":
       fileName="warelephants"
     cdf.outputToFolderAndFile(d , "common/units", f"army_{fileName}.txt" ,2,".",encoding="utf-8-sig")
 
-    # unit.computeAllDamages(units,relations,properties)
-    # print(f"  cost = {unit.computeCosts(properties)}")
-    # if unit.category=="support":
-    # print(f"  morale_damage_taken = {unit.computeMoraleDamageTaken(properties)}")
-  # return
 
   output_folder="."
 
@@ -264,8 +190,8 @@ def main():
   regionFile.readFile("map_data/regions.txt",encoding='utf-8')
   provinceLocators=TagList(0)
   provinceLocators.readFile("gfx/map/map_object_data/vfx_locators.txt",encoding='utf-8-sig')
-  cityLocators=TagList(0)
-  cityLocators.readFile("gfx/map/map_object_data/city_locators.txt",encoding='utf-8-sig')
+  # cityLocators=TagList(0)
+  # cityLocators.readFile("gfx/map/map_object_data/city_locators.txt",encoding='utf-8-sig')
   redoLakes=False
   if redoLakes:
     lakeLocators=TagList(0)
@@ -284,14 +210,14 @@ def main():
 
   locs=provinceLocators.get("game_object_locator").get("instances")
   provinceToLocation=[None for _ in locs.vals]
-  provinceToCityLocation=[None for _ in locs.vals]
+  # provinceToCityLocation=[None for _ in locs.vals]
   # provinceToFortLocation=[None for _ in locs.vals]
   # provinceToCombatLocation=[None for _ in locs.vals]
   for loc in locs.vals:
     provinceToLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
-  locs=cityLocators.get("game_object_locator").get("instances")
-  for loc in locs.vals:
-    provinceToCityLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
+  # locs=cityLocators.get("game_object_locator").get("instances")
+  # for loc in locs.vals:
+  #   provinceToCityLocation[int(loc.get("id"))]=[int(float(a)) for a in loc.get("position").names]
 
   if redoLakes:
     lakes=[]
@@ -995,19 +921,6 @@ def main():
     #     print(f'provinceNames[ j] = "{provinceNames[ j]}"')
 
     jj=int(j)
-    loc=provinceToCityLocation[jj]
-    if loc is None:
-      loc=provinceToLocation[jj]
-    h=heightMap.h(loc)
-    # if int(j) in allWaterProvinces and not int(j) in river_provinces:
-    #   if h>7.5:
-    #     print(f'j = "{j}" sea without water:{h}')
-    #     # if h<9.4:
-    #       # print(f'j = "{j}" TIGHT sea without water:{h}')
-    # else:
-    #   if h<7:
-    #     print(f'j = "{j}" province under water:{h}')
-
     if redoTerrain and terrain in ["plains","hills","mountain","steppe"] and not j in forceTerrain:
 
       slopes=[]
@@ -1657,14 +1570,14 @@ class Unit:
     if armorFactor is None:
       armorFactor=self.armorFactor
     return 1+(armorFactor-1)/fac
-  def computeDamageVS(self, other, relations, properties):
+  def computeDamageVS(self, other, unitSetup): #, relations, properties):
     if other.category=="support":
       return 1
     relation=None
     if not self.customRelation is None:
       relation=self.customRelation
-    elif self.category in relations:
-      relation=relations[self.category]
+    elif self.category in unitSetup.relations:
+      relation=unitSetup.relations[self.category]
     base = 0
     if not relation is None:
       if other.category in relation:
@@ -1673,16 +1586,16 @@ class Unit:
       base=-90
     baseFactor=1+base/100
 
-    otherArmor=other.computeArmorFactor(properties) #support units are already excluded above
+    otherArmor=other.computeArmorFactor(unitSetup.properties) #support units are already excluded above
     if self.AP:
       otherArmor=other.reducedFactor(2, otherArmor)
 
     return round(baseFactor*self.attackFactor/otherArmor,2)
-  def computeAllDamages(self,allUnits, relations, properties, data=None):
+  def computeAllDamages(self, unitSetup,data=None):
     # print(f"{self.name} = "+"{")
     lastType=""
-    for other in allUnits:
-      dmg=self.computeDamageVS(other, relations, properties)
+    for other in unitSetup.units:
+      dmg=self.computeDamageVS(other, unitSetup)
       if abs(dmg-1)<1e-2:
         continue
       if data:
@@ -1718,8 +1631,8 @@ class Unit:
     else:
       return properties[self.category]
 
-  def assemble(self, relations, properties,allUnits):
-    props=self.getProperties(properties)
+  def assemble(self, unitSetup):
+    props=self.getProperties(unitSetup.properties)
     topTag=TagList(0)
     data=topTag.addReturn(self.name)
     data.add("army", "yes")
@@ -1740,7 +1653,7 @@ class Unit:
     data.add("maneuver", props["maneuver"])
     data.add("movement_speed", props["speed"])
     data.add("build_time", props["cost"]) #no longer used?!
-    self.computeAllDamages(allUnits, relations, properties, data)
+    self.computeAllDamages(unitSetup, data)
     data.add("attrition_weight", round(3*(100+props["attrition"])/100*self.attritionFactor,2))
     data.add("attrition_loss", props["attritionLoss"]/100)
     data.add("food_consumption", props["consumption"])
@@ -1748,16 +1661,90 @@ class Unit:
     if "ai_max_percentage" in props:
       data.add("ai_max_percentage", props["ai_max_percentage"])
     cost=data.addReturn("build_cost")
-    cost.add("gold", 2*self.computeCosts(properties))
+    cost.add("gold", 2*self.computeCosts(unitSetup.properties))
     cost.add("manpower",1)
     if props["strength"]<0:
-      data.add("strength_damage_taken", self.computeStrengthDamageTaken(properties))
-    data.add("morale_damage_taken", self.computeMoraleDamageTaken(properties))
+      data.add("strength_damage_taken", self.computeStrengthDamageTaken(unitSetup.properties))
+    data.add("morale_damage_taken", self.computeMoraleDamageTaken(unitSetup.properties))
 
 
 
 
     return topTag
+
+class UnitSetup:
+  def __init__(self):
+    self.relations = {
+      "archers":        { "archers":0, "camels":-10, "chariots":0, "heavyCavalry":-10, "heavyInfantry":10, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":0 },
+      "camels":         { "archers":10, "camels":0, "chariots":10, "heavyCavalry":-20, "heavyInfantry":-10, "horseArchers":10, "lightCavalry":0, "lightInfantry":10, "elephants":-50 },
+      "chariots":       { "archers":20, "camels":-10, "chariots":0 ,"heavyCavalry":-50, "heavyInfantry":-10, "horseArchers":10, "lightCavalry":0, "lightInfantry":35, "elephants":-50},
+      "heavyCavalry":   { "archers":50, "camels":10, "chariots":25, "heavyCavalry":0, "heavyInfantry":-10, "horseArchers":0, "lightCavalry":20, "lightInfantry":25, "elephants":-50},
+      "heavyInfantry":  { "archers":0, "camels":-10, "chariots":25, "heavyCavalry":20, "heavyInfantry":0, "horseArchers":-25, "lightCavalry":-10, "lightInfantry":20, "elephants":0},
+      "horseArchers":   { "archers":25, "camels":-10, "chariots":25, "heavyCavalry":-10, "heavyInfantry":25, "horseArchers":0, "lightCavalry":-10, "lightInfantry":25, "elephants":-20},
+      "lightCavalry":   { "archers":25, "camels":0, "chariots":25, "heavyCavalry":-20, "heavyInfantry":-50, "horseArchers":25, "lightCavalry":0, "lightInfantry":25, "elephants":-50},
+      "lightInfantry":  { "archers":-10, "camels":0, "chariots":-10, "heavyCavalry":-25, "heavyInfantry":-20, "horseArchers":-50, "lightCavalry":0, "lightInfantry":0, "elephants":-20},
+      "elephants":      { "archers":50, "camels":-10, "chariots":50, "heavyCavalry":-10, "heavyInfantry":40, "horseArchers":-10, "lightCavalry":-10, "lightInfantry":30, "elephants":0},
+    }
+    self.properties = {
+      "archers":        { "cost":8, "assault":True, "speed":2.5, "maneuver":2, "morale":-30, "strength":0, "attrition":-10, "attritionLoss":5, "food":2.4, "consumption":0.1, "ai_max_percentage":15  },
+      "camels":         { "cost":15, "assault":False, "speed":3.5, "maneuver":4, "morale":0, "strength":0, "attrition":0, "attritionLoss":2.5, "food":3.6, "consumption":0.2, "tradeGood":"camel","flank":"yes"},
+      "chariots":       { "cost":8, "assault":False, "speed":2.5, "maneuver":1, "morale":0, "strength":0, "attrition":0, "attritionLoss":5, "food":2.4, "consumption":0.2  },
+      "heavyCavalry":   { "cost":18, "assault":False, "speed":3.5, "maneuver":2, "morale":0, "strength":0, "attrition":100, "attritionLoss":5, "food":2.4, "consumption":0.25, "tradeGood":"horses", "levy_tier":"advanced" },
+      "heavyInfantry":  { "cost":16, "assault":True, "speed":2.5, "maneuver":1, "morale":10, "strength":0, "attrition":50, "attritionLoss":5, "food":2.4, "consumption":0.2, "tradeGood":"iron", "levy_tier":"advanced" },
+      "horseArchers":   { "cost":16, "assault":False, "speed":4, "maneuver":5, "morale":-25, "strength":0, "attrition":50, "attritionLoss":5, "food":3, "consumption":0.25, "tradeGood":"steppe_horses","flank":"yes"  },
+      "lightCavalry":   { "cost":10, "assault":False, "speed":4, "maneuver":3, "morale":0, "strength":0, "attrition":50, "attritionLoss":5, "food":2.4, "consumption":0.25, "tradeGood":"horses","flank":"yes"  },
+      "lightInfantry":  { "cost":8, "assault":True, "speed":2.5, "maneuver":1, "morale":30, "strength":0, "attrition":-50, "attritionLoss":2.5, "food":2.4, "consumption":0.1  },
+      "elephants":      { "cost":35, "assault":False, "speed":2.5, "maneuver":0, "morale":-20, "strength":50, "attrition":200, "attritionLoss":10, "food":1, "consumption":0.3, "tradeGood":"elephants", "levy_tier":"advanced", "ai_max_percentage":15  },
+      "supply_train":   { "cost":14, "assault":False, "speed":3.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":30, "consumption":0.03, "ai_max_percentage":20, "levy_tier":"none"  },
+      "engineer_cohort":{ "cost":40, "assault":False, "speed":2.5, "maneuver":1, "morale":-100, "strength":-100, "attrition":0, "attritionLoss":10, "food":5, "consumption":0.05, "ai_max_percentage":15, "levy_tier":"none"  },
+      "rangers":        { "cost":10, "assault":True, "speed":2.5, "maneuver":2, "morale":0, "strength":0, "attrition":-20, "attritionLoss":5, "food":2.4, "consumption":0.1  },
+      "troll_infantry": { "cost":10, "assault":True, "speed":2.5, "maneuver":1, "morale":0, "strength":0, "attrition":150, "attritionLoss":5, "food":3, "consumption":0.3, "tradeGood":"iron", "levy_tier":"advanced", "ai_max_percentage":15  },
+    }
+
+    self.units = [
+      Unit("supply_train", "support"),
+      Unit("engineer_cohort", "support"),
+      Unit("archers", "archers"),
+      Unit("dunedain_archers", "archers", 2.5, 1, 1.3),
+      Unit("dwarven_archers", "archers", 1.5, 1.5, 1.3, AP=True),
+      Unit("elvish_archers", "archers", 3, 1.25, 1.3),
+      Unit("uruk_crossbows", "archers", 1.5, 1, 1),
+      Unit("camels", "camels"),
+      Unit("chariots", "chariots"),
+      Unit("heavy_cavalry", "heavyCavalry"),
+      Unit("dol_amroth_knights", "heavyCavalry", 1.5, 2, 1.5),
+      Unit("dwarven_goat_riders", "heavyCavalry", 1.5, 2, 1.5, AP=True),
+      Unit("warg_riders", "heavyCavalry", 1, 1, 1, { "archers":15, "chariots":30, "heavyCavalry":15, "heavyInfantry":-30, "horseArchers":15, "lightCavalry":30, "lightInfantry":0, "elephants":0 }),
+      Unit("heavy_infantry", "heavyInfantry"),
+      Unit("dunedain_infantry", "heavyInfantry", 1.4, 2, 1.75),
+      Unit("dwarven_infantry", "heavyInfantry", 1.4, 2.5, 1.75, AP=True),
+      Unit("elvish_infantry", "heavyInfantry", 1.6, 2.25, 2),
+      Unit("uruk_heavy_infantry", "heavyInfantry", 1.25, 1.5, 1.25),
+      Unit("troll_infantry", "heavyInfantry", 2, 4, 1, AP=True),
+      Unit("rangers", "heavyInfantry", 1.6, 2, 1.5, { "archers":0, "chariots":0, "heavyCavalry":0, "heavyInfantry":0, "horseArchers":0, "lightCavalry":0, "lightInfantry":30, "elephants":0 }),
+      Unit("horse_archers", "horseArchers"),
+      Unit("elvish_cavalry_archers", "horseArchers", 2.5, 1.5, 1),
+      Unit("light_cavalry", "lightCavalry"),
+      Unit("dunedain_cavalry", "lightCavalry", 2.5, 1, 1.5),
+      Unit("light_infantry", "lightInfantry"),
+      Unit("halfling_infantry", "lightInfantry", 0.75, 1, 1),
+      Unit("orc_infantry", "lightInfantry", 1, 1, 0.5),
+      Unit("uruk_infantry", "lightInfantry", 1.25, 1.25, 0.7),
+      Unit("warelephant", "elephants"),
+      Unit("mumakil", "elephants",1.75,4,2),
+
+      # Unit("mumakils", "elephants", 3, 3, 2), ???
+    ]
+
+    for unit in self.units:
+      if unit.name=="mumakil":
+        unit.properties=copy(self.properties["elephants"])
+        unit.properties["tradeGood"]="mumakil"
+        unit.properties["speed"]=3.5
+        unit.properties["maneuver"]=2
+        unit.properties["morale"]=20
+        unit.properties["food"]=5
+    # return relations, properties, units
 
 
 class ImageRead:
