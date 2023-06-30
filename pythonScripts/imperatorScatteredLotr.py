@@ -423,10 +423,10 @@ def main():
   cdf.outputToFolderAndFile(loadedFileContents.yearlyProvOnAction , "common/on_action/", "00_yearly_province.txt" ,3,output_folder,False,encoding="utf-8-sig")
 
   ##### removing decisions ####
-  cdf.outputToFolderAndFile(TagList() , "decisions", "BR_mechanics.txt" ,2,output_folder,False,encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(TagList() , "decisions", "00_gondor_decisions.txt" ,2,output_folder,False,encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(TagList() , "decisions", "BR_rangers_of_the_north.txt" ,2,output_folder,False,encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(TagList() , "decisions", "00_gondor_decisions.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(TagList().addComment("cleared") , "decisions", "BR_mechanics.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(TagList().addComment("cleared") , "decisions", "00_gondor_decisions.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(TagList().addComment("cleared") , "decisions", "BR_rangers_of_the_north.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(TagList().addComment("cleared") , "decisions", "00_gondor_decisions.txt" ,2,output_folder,False,encoding="utf-8-sig")
   for d in ["lotr_rohan_break_gondor_decision","lotr_restore_rohan_decision","lotr_restore_gondor_decision","lotr_force_ranger_subjects_decision","lotr_satrapy_break_gondor_decision","lotr_attack_melkor_vassals","lotr_protect_the_free_people", "lotr_orc_conquest_decision"]:
     loadedFileContents.lotr_other_decisions.get("country_decisions").remove(d)
   for d in ["release_dorw_decision","release_dale_decision","release_gondor_decision","release_dol_amorth_decision","release_rohan_decision"]:
@@ -440,25 +440,28 @@ def main():
         if n in ["charisma", "finesse", "zeal","martial","health","country"]:
           val.remove(n)
   for name,val in loadedFileContents.BR_racial.getNameVal(True):
-    for n,_ in val.getNameVal(True):
-      if n in ["charisma", "finesse", "zeal","martial","country","monthly_character_popularity","unit","character_loyalty"]:
-        val.remove(n)
+    if name!="restored_sauron":
+      for n,_ in val.getNameVal(True):
+        if n in ["charisma", "finesse", "zeal","martial","country","monthly_character_popularity","unit","character_loyalty"]:
+          val.remove(n)
   for name,val in loadedFileContents.BR_bloodlines.getNameVal(True):
     for n,_ in val.getNameVal(True):
       if n in ["charisma", "finesse", "zeal","martial","country","monthly_character_popularity","unit","character_loyalty"]:
         val.remove(n)
-  cdf.outputToFolderAndFile(loadedFileContents.BR_rings , "common/traits/", "BR_rings.txt" ,3,output_folder,False,encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(loadedFileContents.BR_racial , "common/traits/", "BR_racial.txt" ,3,output_folder,False,encoding="utf-8-sig")
-  cdf.outputToFolderAndFile(loadedFileContents.BR_bloodlines , "common/traits/", "BR_bloodlines.txt" ,3,output_folder,False,encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(loadedFileContents.BR_rings , "common/traits/", "BR_rings.txt" ,0,output_folder,False,encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(loadedFileContents.BR_racial , "common/traits/", "BR_racial.txt" ,0,output_folder,False,encoding="utf-8-sig")
+  cdf.outputToFolderAndFile(loadedFileContents.BR_bloodlines , "common/traits/", "BR_bloodlines.txt" ,0,output_folder,False,encoding="utf-8-sig")
 
   ##### removing modifiers ######
   for name,val in loadedFileContents.lotr_from_events_province.getNameVal(True):
     if name in ["minas_anor_modifier","minas_anor_corrupted_modifier","supplied_from_the_rear","minas_ithil_modifier","black_gate_modifier","orthanc_modifier","helms_deep_modifier","argonath_modifier","umbar_harbour_modifier","seaward_modifier","island_fortress_modifier","osgiliath_modifier","caras_galadhon_modifier","lothlorien_from_moria_modifier","mithlond_harbour_modifier","imladris_modifier","elostirion_modifier","arestirion_modifier","ivrostirion_modifier","amon_lind_modifier","dale_modifier","esgaroth_modifier","erebor_modifier","iron_hills_modifier","moria_west_gate_modifier","fanuidhol_modifier","durins_tower_modifier","moria_east_gate_modifier","barad_dur_modifier","barad_dur_foundations_modifier","dol_guldur_modifier","carn_dum_modifier",]:
       val.clear()
+      val.add("local_defensive",0.01) #make sure they still have an icon
     elif name in ["elven_forests_modifier","woodmen_forests_modifier","dwarven_hills_modifier","dwarven_mountain_modifier","dwarven_halls_modifier","goblin_hills_mountain_caves_modifier","uruk_orc_vulcanic_modifier","elven_steppes_modifier","elven_dessert_modifier","other_steppes_modifier","other_dessert_modifier","hobbit_holes_modifier","stuffed_hobbit_holes_modifier"]: #NOT "forodwaith_arctic_modifier",
       for n,v in val.getNameVal(True):
-        if name == "local_population_growth" or name == "local_population_capacity_modifier":
+        if n == "local_population_growth" or n == "local_population_capacity_modifier":
           val.remove(n)
+  cdf.outputToFolderAndFile(loadedFileContents.lotr_from_events_province , "common/modifiers/", "lotr_from_events_province.txt" ,0,output_folder,False,encoding="utf-8-sig")
 
   ##### remove OP character stats #####
   for fileName in os.listdir("setup/characters/"):
@@ -466,6 +469,8 @@ def main():
       continue
     charFile=TagList(0)
     charFile.readFile("setup/characters/"+fileName,encoding='utf-8-sig')
+    if len(charFile.names)==0:
+      charFile.addComment("empty")
     for _,countryVal in charFile.getNameVal(True):
       for charId,char in countryVal.getNameVal(True):
         if type(char)==TagList:
@@ -474,10 +479,101 @@ def main():
               char.remove(attribute)
     cdf.outputToFolderAndFile(charFile , "setup/characters", fileName ,2,output_folder,False,encoding="utf-8-sig")
 
+
+
+
   cdf.outputToFolderAndFile(loadedFileContents.provinces , "setup/provinces", "00_default.txt" ,2,output_folder,False,encoding="utf-8-sig")
   cdf.outputToFolderAndFile(loadedFileContents.countries , "setup/main", "00_default.txt" ,4,output_folder,False)
   cdf.outputToFolderAndFile(loadedFileContents.countryProps , "setup/countries", "countries.txt" ,2,output_folder,False,encoding="utf-8-sig")
   # cdf.outputToFolderAndFile(loadedFileContents.treasures , "setup/main", "lotr_treasures.txt" ,2,output_folder,False)
+
+### undoing disabling assimilation #####
+  buildings=TagList(0)
+  buildings.readFile("common/buildings/lotr_buildings.txt",encoding='utf-8-sig')
+  for b in ["theathre_building"]:
+    buildings.get(b).replaceName("local_pop_conversion_speed","local_pop_assimilation_speed")
+    buildings.get(b).get("modification_display").replace("1","local_pop_assimilation_speed")
+  for b in ["commerce_building","local_forum_building"]:
+    buildings.get(b).replaceName("local_pop_conversion_speed_modifier","local_pop_assimilation_speed_modifier")
+    buildings.get(b).get("modification_display").replace("1","local_pop_assimilation_speed_modifier")
+  cdf.outputToFolderAndFile(buildings , "common/buildings/", "lotr_buildings.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  policies=TagList(0)
+  policies.readFile("common/governor_policies/00_default.txt",encoding='utf-8-sig')
+  tmp=policies.get("cultural_assimilation").get("ai_will_do")
+  for i,(name,val) in enumerate(tmp.getNameVal()):
+    if type(val)==TagList and val.getAnywhere("has_culture_group"):
+      tmp.removeIndex(i)
+  cdf.outputToFolderAndFile(policies , "common/governor_policies/", "00_default.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  gw=TagList(0)
+  gw.readFile("common/great_work_effects/00_default.txt",encoding='utf-8-sig')
+  tmp=gw.get("gw_effect_culture_expansion").get("great_work_tier_effect_modifiers")
+  for i in range(1,5):
+    tmp2=tmp.get(f"gw_effect_culture_expansion_tier_{i}").get("country_modifier")
+    tmp2.set("global_pop_conversion_speed_modifier",round(0.1*i,2))
+    tmp2.add("global_pop_assimilation_speed_modifier",round(0.1*i,2))
+  cdf.outputToFolderAndFile(gw , "common/great_work_effects/", "00_default.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  inv=TagList(0)
+  inv.readFile("common/inventions/00_civic_inventions.txt",encoding='utf-8-sig')
+  inv.get("civic_2").get("assimilate_pop_cost_modifier_inv_1").get("modifier").addUnique("global_pop_assimilation_speed_modifier",0.1)
+  cdf.outputToFolderAndFile(inv , "common/inventions/", "00_civic_inventions.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  laws=TagList(0)
+  laws.readFile("common/laws/00_monarchy.txt",encoding='utf-8-sig')
+  tmp=laws.get("monarchy_religious_laws")
+  p=laws.addReturn("placeholder")
+  p.addReturn("potential").add("always","no")
+  p.add("age_of_the_orc",tmp.get("age_of_the_orc"))
+  tmp.get("potential").clear()
+  tmp.get("potential").add("is_monarchy","yes")
+  tmp.get("religious_tolerance_monarchy").clear()
+  tmp.get("religious_integration_efforts").get("allow").clear()
+  tmp.get("religious_integration_efforts").get("allow").add("invention","omen_power_inv_4")
+  tmp.remove("age_of_the_orc")
+  tmp2=tmp.addReturn("monarchy_religious_mandate_military")
+  tmp2.addReturn("allow").add("invention","omen_power_inv_4")
+  tmp2.addReturn("modifier").add("global_pop_assimilation_speed","0.25").add("global_pop_assimilation_speed_modifier",0.3)
+  cdf.outputToFolderAndFile(laws , "common/laws/", "00_monarchy.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  laws=TagList(0)
+  laws.readFile("common/laws/00_tribal.txt",encoding='utf-8-sig')
+  laws.get("tribal_decentralized_laws").get("tribal_decentralized_laws_2").get("modifier").replaceName("global_pop_conversion_speed_modifier","global_pop_assimilation_speed_modifier")
+  laws.get("tribal_super_centralized_laws").get("potential").remove("NOT")
+  cdf.outputToFolderAndFile(laws , "common/laws/", "00_tribal.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  hardcoded=TagList(0)
+  hardcoded.readFile("common/modifiers/00_hardcoded.txt",encoding='utf-8-sig')
+  hardcoded.get("roads_in_province").addUnique("local_pop_assimilation_speed_modifier",0.025)
+  cdf.outputToFolderAndFile(hardcoded , "common/modifiers/", "00_hardcoded.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  for pop in ["tribesmen","slaves","nobles","freemen","citizen"]:
+    tmp=TagList(0)
+    tmp.readFile(f"common/pop_types/{pop}.txt",encoding='utf-8-sig')
+    if pop in ["nobles","tribesmen"]:
+      tmp.get(pop).set("assimilate",0.6)
+    else:
+      tmp.get(pop).set("assimilate",0.4)
+    cdf.outputToFolderAndFile(tmp , "common/pop_types/", f"{pop}.txt" ,2,output_folder,False,encoding="utf-8-sig")
+
+  ###undoing enslavement changes ###
+  govs = TagList(0)
+  govs.readFile("common/governments/00_default.txt",encoding='utf-8-sig')
+  for _,gov in govs.getNameVal(True):
+    gov.get("base").remove("enslavement_efficiency")
+  cdf.outputToFolderAndFile(govs , "common/governments/", "00_default.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  heritages = TagList(0)
+  heritages.readFile("common/heritage/00_country_specific.txt",encoding='utf-8-sig')
+  heritages.get("sauron_heritage").get("modifier").remove("enslavement_efficiency")
+  cdf.outputToFolderAndFile(heritages , "common/heritage/", "00_country_specific.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  heritages = TagList(0)
+  heritages.readFile("common/heritage/01_groups.txt",encoding='utf-8-sig')
+  heritages.get("orcish_heritage").get("modifier").remove("enslavement_efficiency")
+  cdf.outputToFolderAndFile(heritages , "common/heritage/", "01_groups.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  trads = TagList(0)
+  trads.readFile("common/military_traditions/00_barbarian.txt",encoding='utf-8-sig')
+  trads.get("barbarian_philosophy").get("barbarian_infantry_path_5").get("modifier").set("enslavement_efficiency",0.2)
+  trads.get("barbarian_philosophy").get("barbarian_infantry_path_5").get("allow").clear()
+  cdf.outputToFolderAndFile(trads , "common/military_traditions/", "00_barbarian.txt" ,2,output_folder,False,encoding="utf-8-sig")
+  trads = TagList(0)
+  trads.readFile("common/military_traditions/00_easterling.txt",encoding='utf-8-sig')
+  trads.get("easterling_philosophy").get("easterling_infantry_path_4").get("modifier").set("enslavement_efficiency",0.2)
+  trads.get("easterling_philosophy").get("easterling_infantry_path_4").get("allow").clear()
+  cdf.outputToFolderAndFile(trads , "common/military_traditions/", "00_easterling.txt" ,2,output_folder,False,encoding="utf-8-sig")
 
 def computePopNum(province):
   num=0

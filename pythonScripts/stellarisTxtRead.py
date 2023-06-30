@@ -164,6 +164,10 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     except ValueError:
       self.add(name,val,comment,seperator)
     return self
+  def replaceName(self, name,newName):
+    i=self.names.index(name)
+    self.names[i]=newName
+    return self
   def splitToListIfString(self,name,n=0): #deprecated
     try:
       if n==0:
