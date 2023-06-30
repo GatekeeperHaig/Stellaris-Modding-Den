@@ -48,7 +48,10 @@ class TagList: #Basically everything is stored recursively in objects of this cl
   def get(self,name): #allows changing of content if vals[i] is an object
     return self.vals[self.names.index(name)]  
   def set(self,name,val): #allows changing of content if vals[i] is an object
-    self.vals[self.names.index(name)]=str(val)
+    if type(val)==TagList:
+      self.vals[self.names.index(name)]=val
+    else:
+      self.vals[self.names.index(name)]=str(val)
   def getN_th(self,name,n): #allows changing of content if vals[i] is an object
     index=self.n_thIndex(name,n)
     return self.vals[index]
@@ -78,8 +81,8 @@ class TagList: #Basically everything is stored recursively in objects of this cl
           return possibleReturn
   def getAnywhereRequired(self,name):
     return self.getAnywhere(name, ["or", "not", "nor", "nand"])
-  def getNameVal(self):
-    return [[self.names[i],self.vals[i]] for i in range(len(self.names))]
+  def getNameVal(self,onlyNonEmpty=False):
+    return [[self.names[i],self.vals[i]] for i in range(len(self.names)) if not onlyNonEmpty or self.names[i]]
   def getAll(self):
     return zip(self.names, self.vals, self.comments, self.seperators)
   def getAllI(self,i):
@@ -125,6 +128,14 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     try:
       i=self.names.index(name)
       self.removeIndex(i)
+    except ValueError:
+      pass
+    return self
+  def removeAny(self, name): #remove via name
+    try:
+      while True:
+        i=self.names.index(name)
+        self.removeIndex(i)
     except ValueError:
       pass
     return self

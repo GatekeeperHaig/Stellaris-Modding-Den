@@ -50,6 +50,7 @@ class ProcessedFileData:
   def __init__(self, loadedFileContents):
     self.provinceNames={}
     self.provinceNamesInv={}
+    self.areaNames={}
     self.provinceToLocation=[]
     self.sea_zones=list()
     self.wasteland=list()
@@ -89,6 +90,24 @@ class ProcessedFileData:
         if not rest in self.provinceNamesInv:
           self.provinceNamesInv[rest]=[]
         self.provinceNamesInv[rest].append(key)
+
+    with open("localization/english/regionnames_l_english.yml",encoding='utf-8-sig') as f:
+      for line in f.readlines():
+        # print(line)
+        if not line.strip():
+          continue
+        # print(f'line = "{line}"')
+        line=line.split("#")[0]
+        split=line.split()
+        key=split[0]
+        if key=="l_english:":
+          continue
+        # print(f'key = "{key}"')
+        key=key.replace(":0", "")
+        # print(f'key = "{key}"')
+        rest=" ".join(split[1:]).replace('"', "")
+        # print(f'rest = "{rest}"')
+        self.areaNames[key]=rest
 
     locs=loadedFileContents.provinceLocators.get("game_object_locator").get("instances")
     self.provinceToLocation=[None for _ in locs.vals]
@@ -146,11 +165,8 @@ class ProcessedFileData:
     self.river_provinces=set(self.river_provinces)
     self.impassable_terrain_list=set(self.impassable_terrain)
 
-    countries=loadedFileContents.countries.get("country").get("countries")
-    for name,vals in zip(countries.names, countries.vals):
-      # print(f'vals = "{vals}"')
-      if vals=="":
-        continue
+    self.countries=loadedFileContents.countries.get("country").get("countries")
+    for name,vals in self.countries.getNameVal(True):
       cores=vals.get("own_control_core")
       self.countryCulture[name]=vals.get("primary_culture")
       self.provinceToCapitalType[vals.get("capital")]="country_capital"
@@ -197,6 +213,8 @@ def main():
   output_folder="."
   loadedFileContents = LoadedFileContents()
   processedFileData = ProcessedFileData(loadedFileContents)
+  
+  pureScriptCreatedFiles()
 
   moveGroupNamesToNormal=False
   if moveGroupNamesToNormal:
@@ -1629,7 +1647,6 @@ def pureScriptCreatedFiles():
       fileName="warelephants"
     cdf.outputToFolderAndFile(d , "common/units", f"army_{fileName}.txt" ,2,".",encoding="utf-8-sig")
 
-  pureScriptCreatedFiles()
 
 
 class ImageRead:
