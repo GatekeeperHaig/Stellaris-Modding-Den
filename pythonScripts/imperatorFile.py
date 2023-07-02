@@ -166,16 +166,7 @@ class ProcessedFileData:
     self.impassable_terrain_list=set(self.impassable_terrain)
 
     self.countries=loadedFileContents.countries.get("country").get("countries")
-    for name,vals in self.countries.getNameVal(True):
-      cores=vals.get("own_control_core")
-      self.countryCulture[name]=vals.get("primary_culture")
-      self.provinceToCapitalType[vals.get("capital")]="country_capital"
-      # print(f'cores = "{cores.vals}"')
-      self.countryProvinces[name]=cores.names
-      for core in cores.names:
-        # ownedProvinces.add(core)
-        self.ownerCountry[core]=name
-      # print(f'cores = "{cores}"')
+    self.countryListsUpdate()
 
 
 
@@ -208,13 +199,26 @@ class ProcessedFileData:
     for name, val in loadedFileContents.provinces.getNameVal():
       if name:
         self.provinceToTerrain[name]=val.get("terrain")
+  def countryListsUpdate(self):
+    for name,vals in self.countries.getNameVal(True):
+      cores=vals.get("own_control_core")
+      self.countryCulture[name]=vals.get("primary_culture")
+      self.provinceToCapitalType[vals.get("capital")]="country_capital"
+      # print(f'cores = "{cores.vals}"')
+      self.countryProvinces[name]=cores.names
+      for core in cores.names:
+        # ownedProvinces.add(core)
+        self.ownerCountry[core]=name
+      # print(f'cores = "{cores}"')
 
 def main():
   output_folder="."
+  gamePath=os.path.expanduser("~")+"/.steam/debian-installation/steamapps/common/ImperatorRome/game/"
   loadedFileContents = LoadedFileContents()
   processedFileData = ProcessedFileData(loadedFileContents)
   
   pureScriptCreatedFiles()
+  emptyVanillaFiles(gamePath,output_folder)
 
   moveGroupNamesToNormal=False
   if moveGroupNamesToNormal:
@@ -1647,7 +1651,10 @@ def pureScriptCreatedFiles():
       fileName="warelephants"
     cdf.outputToFolderAndFile(d , "common/units", f"army_{fileName}.txt" ,2,".",encoding="utf-8-sig")
 
-
+def emptyVanillaFiles(gamePath,output_folder):
+  for fileName in os.listdir(gamePath+"/common/province_names/"):
+    # print(f'fileName = "{fileName}"')
+    cdf.outputToFolderAndFile(TagList().add("MOR",TagList()) , "common/province_names/", fileName ,2,output_folder,False,encoding="utf-8-sig")
 
 class ImageRead:
   def __init__(self, fileName):

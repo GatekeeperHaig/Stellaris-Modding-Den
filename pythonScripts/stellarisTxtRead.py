@@ -98,6 +98,10 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     val=TagList()
     self.add(name,val,"",seperator)
     return val
+  def addReturnFront(self,name,seperator="="):
+    val=TagList()
+    self.addFront(name,val,"",seperator)
+    return val
   def addComment(self, comment):
     self.add("","","#"+comment)
     return self
@@ -124,6 +128,16 @@ class TagList: #Basically everything is stored recursively in objects of this cl
     i=self.names.index(name)
     self.removeIndex(i)
     return self
+  def removeNameVal(self, name, val): #remove via name AND value
+    n=0
+    while n<len(self.vals):
+      i=self.n_thIndex(name, n)
+      if self.vals[i]==val: 
+        self.removeIndex(i)
+        return self
+      n+=1
+    else:
+      print("REMOVE FAILED")
   def tryRemove(self, name): #remove via name
     try:
       i=self.names.index(name)
