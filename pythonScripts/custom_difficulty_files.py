@@ -1031,6 +1031,11 @@ def main():
 
   createTriggerFile()
 
+  threePointNineEventBugfix = TagList("namespace", "custom_difficulty_mm")
+  for i in [1,2,3,4,23]:
+    threePointNineEventBugfix.addReturn("country_event").add("id",f"custom_difficulty_mm.{i}").add("is_triggered_only","yes").add("title","test").add("desc","test").add("picture","GFX_evt_synth_sabotage").addReturn("option").add("name","OK")
+  outputToFolderAndFile(threePointNineEventBugfix, "events", "z_custom_difficulty_mm_tmp_needed_comp.txt")
+
   locClass.writeToMod("../gratak_mods/custom_difficulty","custom_difficulty")
   locClassReplace.addLoc("modName", "Dynamic Difficulty", "all")
   locClassReplace.addLoc("menuDesc", "Triggers an event to let you customize the difficulty of your current game")
@@ -1200,7 +1205,8 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
 
   newCountryUpdateEvent=TagList("id",name_countryUpdateOneDayDelayEvent)
   mainFileContent.addComment("newCountryUpdateEvent")
-  mainFileContent.add("country_event", newCountryUpdateEvent)
+  if not reducedMenu:
+    mainFileContent.add("country_event", newCountryUpdateEvent)
   newCountryUpdateEvent.add("is_triggered_only", yes)
   newCountryUpdateEvent.add("hide_window", yes)
   immediate=TagList()
@@ -1249,9 +1255,10 @@ def createMenuFile(locClass, cats, catColors, difficulties, debugMode=False, mod
   immediate.createEvent(name_randomDiffFireOnlyOnce)
   immediate.add("set_country_flag", "custom_difficulty_game_host")
   immediate.add("set_global_flag", "custom_difficulty_variables_transfered")
-  immediate.add("if", TagList("limit", TagList("NOR", t_anyOption).add("has_global_flag", "custom_difficulty_active"))
-    .add("country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent")
-    .add("country_event", TagList("id", name_removeEventTarget)," #removeEventTarget"))
+  if not reducedMenu:
+    immediate.add("if", TagList("limit", TagList("NOR", t_anyOption).add("has_global_flag", "custom_difficulty_active"))
+      .add("country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent")
+      .add("country_event", TagList("id", name_removeEventTarget)," #removeEventTarget"))
   # .add("every_country",TagList("country_event", TagList("id", name_removeOLDModifiers)," #removeOldModifiers")))
 
   # resetEvent.get("immediate").insert(0, "country_event", TagList("id", name_resetFlagsEvent)," #resetFlagsEvent").insert(0, "country_event", TagList("id", name_removeEventTarget)," #removeEventTarget")
